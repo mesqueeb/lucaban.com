@@ -9,7 +9,7 @@
 		<div class="panel-body">
 			@include('common.errors')
 
-			@if ($things[0]->body)
+			@if ($things[0]->body != '')
 			<ul>
 				@foreach ($things as $t)
 					<li>{{ $t->body }}</li>
