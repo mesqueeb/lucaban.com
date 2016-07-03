@@ -9,13 +9,13 @@
 		<div class="panel-body">
 			@include('common.errors')
 
-			@if ($things[0]->body != '')
+			{{-- @if ($things[0]->body) --}}
 			<ul>
 				@foreach ($things as $t)
 					<li>{{ $t->body }}</li>
 				@endforeach
 			</ul>
-			@endif
+			{{-- @endif --}}
 
 			<form action="/things/add" method="post">
 				<div class="form-group">
