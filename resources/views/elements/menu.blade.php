@@ -22,6 +22,7 @@
                 <ul class="nav navbar-nav">
                     <li><a href="{{ url('/home') }}">Home</a></li>
                     <li><a href="{{ url('/things') }}">Things</a></li>
+                    <li><a href="{{ url('/playground') }}">Playground</a></li>
 
                 </ul>
 
