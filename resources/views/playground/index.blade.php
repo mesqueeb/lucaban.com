@@ -2,56 +2,18 @@
 <head>
 	<meta charset="UTF-8">
 	<title>Playground</title>
-
+	<link rel="stylesheet" href="/css/app.css">
 	
 </head>
 <body>
 
-<div id="app">
-	<div v-for='plan in plans'>
-		<plan :plan='plan'></plan>
-	</div>
 
-	@{{ $data | json }}
+@include('playground.vue-alerts')
+@include('playground.vue-plans')
 
-</div>
 
-<template id="plan-temp">
-	<span >@{{ plan.name }}</span>
-	<span>@{{ plan.price }}/month</span>
-	<button @click='setActivePlan'>upgrade</button>
-</template>
+<script src="js/main-min.js"></script>
+<script src="js/playground-min.js"></script>
 
-<script src="http://cdn.jsdelivr.net/vue/1.0.26/vue.js"></script>
-<script>
-	var data = {
-		plans: [
-			{ name: 'Enterprise', price:100},
-			{ name: 'Pro', price:50},
-			{ name: 'Personal', price:10},
-			{ name: 'Free', price:0},
-		],
-	}
-	new Vue({
-		el: '#app',
-		data: data,
-		components: {
-			plan: {
-				template: '#plan-temp',
-				props:['plan'],
-				data:function () {
-					return {
-						active:false,
-					};
-				},
-				methods: {
-					setActivePlan: function	(){
-						this.active = this.plan;
-					}
-				},
-			}
-		}
-	});
-</script>
 </body>
 </html>

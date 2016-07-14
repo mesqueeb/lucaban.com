@@ -18,6 +18,16 @@ class ThingsController extends Controller
         	'things' => $things,
         ]);
 	}
+    public function getAllThings()
+    {
+        $things = DB::table('things')->get();
+        return $things;
+    }
+    public function markThingDone(App\Thing $thing)
+    {
+        $thing->delete();
+    }
+
     public function add(){
 		$request = request()->all();
     	$validator = \Validator::make($request, [

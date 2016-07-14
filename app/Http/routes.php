@@ -1,15 +1,16 @@
 <?php
-
+Route::auth();
+////////////////////////////////////////////////
 Route::get('/', function () {
     return view('welcome');
 });
-
-Route::auth();
-
 Route::get('/home', 'HomeController@index');
-
-Route::get('/things','ThingsController@index');
-Route::post('/things/add','ThingsController@add');
+////////////////////////////////////////////////
+Route::get('/things',function(){
+	return view('things.index');
+});
+Route::resource('/api/things','ThingsPanelController');
+////////////////////////////////////////////////
 Route::get('/playground',function(){
 	return view('playground.index');
 });
