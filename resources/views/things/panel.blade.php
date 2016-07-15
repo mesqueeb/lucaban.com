@@ -3,10 +3,12 @@
 		<div v-for="thing in list"
 			class="thing-card"
 			:class="{completed: thing.done, editing: thing == editedThing}"
+			@dblclick="startEdit(thing)"
 		>
 			<input class="toggle"
 				type="checkbox"
 				v-model="thing.done"
+				@click="completeThing(thing)"
 			>
 			<div @dblclick="startEdit(thing)">
 				<div>
@@ -81,6 +83,10 @@ Vue.component('things',{
 		},
 	},
 	methods: {
+		completeThing(thing){
+			var id = thing.id;
+			this.$http.patch('/api/things/' + id, {'done':!thing.done});
+		},
 		startEdit(thing){
 			console.log(thing.body);
 			this.beforeEditCache = thing.body;
