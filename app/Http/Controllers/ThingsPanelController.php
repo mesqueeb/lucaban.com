@@ -1,10 +1,13 @@
 <?php
 
 namespace App\Http\Controllers;
+
+use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Http\Requests;
 use App\Thing;
 use DB;
+use Illuminate\Http\Response;
 
 
 class ThingsPanelController extends Controller
@@ -76,7 +79,7 @@ class ThingsPanelController extends Controller
         Thing::findOrFail($id)->update([
             'body'=>$request->body,
         ]);
-        return Response::json($request->all());
+        // return appResponse::json($request->all());
     }
 
     /**
