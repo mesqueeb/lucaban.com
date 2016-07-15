@@ -9,9 +9,13 @@ input#task-body{
     border: none;
     border-bottom: dashed 1px #ededed;
 }
-.view-mode{
+.thing-card input{
 	display:none;
+    width: 96%;
 }
-.edit-mode{
-	display:block;
+.editing input{
+	display: block;
+    position: absolute;
+    margin-top: -25;
 }
+

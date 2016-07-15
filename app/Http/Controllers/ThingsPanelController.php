@@ -6,6 +6,7 @@ use App\Http\Requests;
 use App\Thing;
 use DB;
 
+
 class ThingsPanelController extends Controller
 {
     /**
@@ -72,7 +73,9 @@ class ThingsPanelController extends Controller
      */
     public function update(Request $request, $id)
     {
-        Thing::findOrFail($id)->update($request->all());
+        Thing::findOrFail($id)->update([
+            'body'=>$request->body,
+        ]);
         return Response::json($request->all());
     }
 

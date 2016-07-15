@@ -1,33 +1,42 @@
 <template id="things-panel-template">
 	<div class="things-panel">
-		<div v-for="thing in list" @click="startEdit(thing)">
-			<div class="thing-card"
-				
+		<div v-for="thing in list"
+			class="thing-card"
+			:class="{completed: thing.completed, editing: thing == editedThing}"
+		>
+			<input class="toggle"
+				type="checkbox"
+				v-model="thing.completed"
 			>
+			<div @dblclick="startEdit(thing)">
 				@{{ thing.body }}
 			</div>
-			<input type="text"
-				v-model="thing.body"
-				v-bind:class="[thing.editMode ? 'edit-mode' : 'view-mode']"
+			<form action="update"
+				@submit.prevent="doneEdit(thing)"
 			>
+				<input type="hidden" name="_method" value="PATCH">
+				<input type="text"
+					v-model="thing.body"
+					v-thing-focus="thing == editedThing"
+					@blur="doneEdit(thing)"
+					@keyup.esc="cancelEdit(thing)"
+				>
+			</form>
 		</div>
 
-		<form action="/things/add"
-			method="POST"
+		<form action=""
 			@submit.prevent="addNew"
 		>
-			<div class="">
-				<input type="text"
-					name="body"
-					id="task-body"
-					class=""
-					v-model="newThing.body"
-					placeholder="I can't forget to..."
-					autocomplete="off"
-				>
-			</div>
+			<input type="text"
+				name="body"
+				id="task-body"
+				class=""
+				v-model="newThing.body"
+				placeholder="I can't forget to..."
+				autocomplete="off"
+				autofocus 
+			>
 		</form>
-
 	</div>
 </template>
 
@@ -49,7 +58,7 @@ Vue.component('things',{
 				body: '',
 			},
 			editedThing: null,
-			visibility: 'all',		
+			visibility: 'all',
 		};
 	},
 	
@@ -70,36 +79,40 @@ Vue.component('things',{
 		},
 	},
 	methods: {
-			// doneEdit: function (todo) {
-			// 	if (!this.editedTodo) {
-			// 		return;
-			// 	}
-			// 	this.editedTodo = null;
-			// 	todo.title = todo.title.trim();
-			// 	if (!todo.title) {
-			// 		this.removeTodo(todo);
-			// 	}
-			// },
-
 		startEdit(thing){
-			console.log('click registered');
-			// this.beforeEditCache = thing.body;
-			// this.editedThing = thing;
-			thing.editMode = true;
+			console.log(thing.body);
+			this.beforeEditCache = thing.body;
+			this.editedThing = thing;
 		},
-		// cancelEdit: function (thing) {
-		// 	this.editedThing = null;
-		// 	thing.title = this.beforeEditCache;
-		// },
-		// deleteThing(thing){
-		// 	this.list.$remove(thing);
-		// },
+		doneEdit(thing) {
+			if (!this.editedThing) {
+				return;
+			}
+			this.editedThing = null;
+			thing.body = thing.body.trim();
+			if (!thing.body) {
+				this.deleteThing(thing);
+			}
+			var id = thing.id;
+			this.$http.patch('/api/things/' + id, {data: 'testbody'}, { method: 'PATCH'}).then((response) => {
+		        // get status
+		        response.status;
+		        console.log(response);
+			}, (response) => {
+				// error callback
+				console.log(response);
+			});
+		},
+		cancelEdit(thing) {
+			this.editedThing = null;
+			thing.body = this.beforeEditCache;
+		},
+		deleteThing(thing){
+			this.list.$remove(thing);
+		},
 		fetchAll(){
 			this.$http.get('/api/things').then(function(data) {
   				this.list = data.json();
-  				this.list.forEach(function (obj) {
-  					obj.editMode = false;
-				});
 			});
 		},
 		addNew(){
@@ -108,9 +121,17 @@ Vue.component('things',{
 			this.$http.post('/api/things',thing); // send
 			this.fetchAll();
 		},
-		edit(){
-
-		},
+	},
+	directives: {
+		'thing-focus': function (value) {
+			if (!value) {
+				return;
+			}
+			var el = this.el;
+			Vue.nextTick(function () {
+				el.focus();
+			});
+		}
 	},
 });
 
