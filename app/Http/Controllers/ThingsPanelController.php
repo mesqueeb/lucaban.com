@@ -79,7 +79,7 @@ class ThingsPanelController extends Controller
         Thing::findOrFail($id)->update([
             'body'=>$request->body,
         ]);
-        return Response::json($request->all());
+        return response()->json($request->all());
     }
 
     /**
