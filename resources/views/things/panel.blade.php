@@ -11,11 +11,11 @@
 				@click="completeThing(thing)"
 			>
 			<div @dblclick="startEdit(thing)">
-				<div>
+				<div class="bodybox" v-show="thing != editedThing">
 					@{{ thing.body }}
 				</div>
 				<form action="update"
-					class="updatebox" 
+					class="updatebox"
 					@submit.prevent="doneEdit(thing)"
 				>
 					<input type="text"
@@ -34,7 +34,6 @@
 			<input type="text"
 				name="body"
 				id="task-body"
-				class=""
 				v-model="newThing.body"
 				placeholder="I can't forget to..."
 				autocomplete="off"
