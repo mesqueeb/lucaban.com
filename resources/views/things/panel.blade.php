@@ -94,7 +94,7 @@ Vue.component('things',{
 				this.deleteThing(thing);
 			}
 			var id = thing.id;
-			this.$http.patch('/api/things/' + id, {data: 'testbody'}, { method: 'PATCH'}).then((response) => {
+			this.$http.patch('/api/things/' + id, thing, { method: 'PATCH'}).then((response) => {
 		        // get status
 		        response.status;
 		        console.log(response);
