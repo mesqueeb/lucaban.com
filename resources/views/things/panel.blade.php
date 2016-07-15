@@ -125,6 +125,7 @@ Vue.component('things',{
 		},
 		addNew(){
 			var thing = this.newThing; // get input
+			if (!thing.body){ return; }
 			this.newThing = {body:''}; // clear input
 			this.$http.post('/api/things',thing); // send
 			this.fetchAll();
