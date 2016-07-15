@@ -76,9 +76,7 @@ class ThingsPanelController extends Controller
      */
     public function update(Request $request, $id)
     {
-        Thing::findOrFail($id)->update([
-            'body'=>$request->body,
-        ]);
+        Thing::findOrFail($id)->update(request()->all());
         return response()->json($request->all());
     }
 

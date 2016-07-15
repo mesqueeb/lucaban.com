@@ -2,26 +2,28 @@
 	<div class="things-panel">
 		<div v-for="thing in list"
 			class="thing-card"
-			:class="{completed: thing.completed, editing: thing == editedThing}"
+			:class="{completed: thing.done, editing: thing == editedThing}"
 		>
 			<input class="toggle"
 				type="checkbox"
-				v-model="thing.completed"
+				v-model="thing.done"
 			>
 			<div @dblclick="startEdit(thing)">
-				@{{ thing.body }}
-			</div>
-			<form action="update"
-				@submit.prevent="doneEdit(thing)"
-			>
-				<input type="hidden" name="_method" value="PATCH">
-				<input type="text"
-					v-model="thing.body"
-					v-thing-focus="thing == editedThing"
-					@blur="doneEdit(thing)"
-					@keyup.esc="cancelEdit(thing)"
+				<div>
+					@{{ thing.body }}
+				</div>
+				<form action="update"
+					class="updatebox" 
+					@submit.prevent="doneEdit(thing)"
 				>
-			</form>
+					<input type="text"
+						v-model="thing.body"
+						v-thing-focus="thing == editedThing"
+						@blur="doneEdit(thing)"
+						@keyup.esc="cancelEdit(thing)"
+					>
+				</form>
+			</div>
 		</div>
 
 		<form action=""
