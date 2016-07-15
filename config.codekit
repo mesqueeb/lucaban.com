@@ -3057,21 +3057,21 @@
 		"shouldRunBless": 0,
 		"useLibsass": false
 		},
-	"\/resources\/assets\/sass\/components\/things-panel.sass": {
+	"\/resources\/assets\/sass\/components\/things-panel.scss": {
 		"createSourceMap": 0,
 		"debugStyle": 0,
 		"decimalPrecision": 10,
-		"fileType": 2,
+		"fileType": 4,
 		"ignore": 1,
 		"ignoreWasSetByUser": 0,
-		"inputAbbreviatedPath": "\/resources\/assets\/sass\/components\/things-panel.sass",
+		"inputAbbreviatedPath": "\/resources\/assets\/sass\/components\/things-panel.scss",
 		"outputAbbreviatedPath": "\/public\/css\/things-panel.css",
 		"outputPathIsOutsideProject": 0,
 		"outputPathIsSetByUser": 0,
 		"outputStyle": 0,
 		"shouldRunAutoprefixer": 1,
 		"shouldRunBless": 0,
-		"useLibsass": false
+		"useLibsass": 0
 		},
 	"\/resources\/lang\/en\/auth.php": {
 		"fileType": 8192,

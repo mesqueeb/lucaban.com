@@ -1,36 +1,30 @@
-
-
 <template id="things-panel-template">
 	<div class="things-panel">
-		<div class="thing-card"
-			v-for="thing in list"
-		>
-			@{{ thing.body }}
+		<div v-for="thing in list" @click="startEdit(thing)">
+			<div class="thing-card"
+				
+			>
+				@{{ thing.body }}
+			</div>
+			<input type="text"
+				v-model="thing.body"
+				v-bind:class="[thing.editMode ? 'edit-mode' : 'view-mode']"
+			>
 		</div>
 
-
-		<div class="alert alert-danger"
-			{{-- v-show="!validation.body" --}}
-			v-if="!isValid"
-		>Please type something.
-		</div>
 		<form action="/things/add"
 			method="POST"
 			@submit.prevent="addNew"
 		>
-			<div class="form-group">
-				{{-- {{ csrf_field() }} --}}
-				<label for="">Add</label>
+			<div class="">
 				<input type="text"
 					name="body"
 					id="task-body"
-					class="form-control"
+					class=""
 					v-model="newThing.body"
+					placeholder="I can't forget to..."
+					autocomplete="off"
 				>
-				<button :disabled="!isValid"
-					class="btn btn-primary"
-					type="submit"
-				>Add</button>
 			</div>
 		</form>
 
@@ -53,9 +47,9 @@ Vue.component('things',{
 			list: [],
 			newThing: {
 				body: '',
-				// _token: $('meta[name=_token]').attr('content'),
 			},
-
+			editedThing: null,
+			visibility: 'all',		
 		};
 	},
 	
@@ -75,13 +69,37 @@ Vue.component('things',{
 			});
 		},
 	},
-	methods:{
-		deleteThing(thing){
-			this.list.$remove(thing);
+	methods: {
+			// doneEdit: function (todo) {
+			// 	if (!this.editedTodo) {
+			// 		return;
+			// 	}
+			// 	this.editedTodo = null;
+			// 	todo.title = todo.title.trim();
+			// 	if (!todo.title) {
+			// 		this.removeTodo(todo);
+			// 	}
+			// },
+
+		startEdit(thing){
+			console.log('click registered');
+			// this.beforeEditCache = thing.body;
+			// this.editedThing = thing;
+			thing.editMode = true;
 		},
+		// cancelEdit: function (thing) {
+		// 	this.editedThing = null;
+		// 	thing.title = this.beforeEditCache;
+		// },
+		// deleteThing(thing){
+		// 	this.list.$remove(thing);
+		// },
 		fetchAll(){
 			this.$http.get('/api/things').then(function(data) {
   				this.list = data.json();
+  				this.list.forEach(function (obj) {
+  					obj.editMode = false;
+				});
 			});
 		},
 		addNew(){
@@ -89,6 +107,9 @@ Vue.component('things',{
 			this.newThing = {body:''}; // clear input
 			this.$http.post('/api/things',thing); // send
 			this.fetchAll();
+		},
+		edit(){
+
 		},
 	},
 });

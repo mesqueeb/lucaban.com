@@ -1,4 +1,16 @@
 // @import "node_modules/bootstrap-sass/assets/stylesheets/bootstrap";
 
 @import 'components/alert.sass';
-@import 'components/things-panel.sass';
+@import 'components/things-panel.scss';
+
+
+body{
+	font-family: 'Calibri', 'Lato';
+	line-height: 1.4em;
+	background: #f5f5f5;
+	color: #4d4d4d;
+	-webkit-font-smoothing: antialiased;
+    -moz-font-smoothing: antialiased;
+	font-smoothing: antialiased;
+	font-weight: 300;
+}
