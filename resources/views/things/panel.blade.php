@@ -2,7 +2,7 @@
 	<div class="things-panel">
 		<div v-for="thing in list"
 			class="thing-card"
-			:class="{completed: thing.done, editing: thing == editedThing}"
+			:class="{done: thing.done, editing: thing == editedThing}"
 			@dblclick="startEdit(thing)"
 		>
 			<input class="toggle"
@@ -24,6 +24,14 @@
 						@blur="doneEdit(thing)"
 						@keyup.esc="cancelEdit(thing)"
 					>
+					{{-- <textarea name=""
+						id=""
+						v-thing-focus="thing == editedThing"
+						@blur="doneEdit(thing)"
+						@keyup.esc="cancelEdit(thing)"
+					>
+						@{{ thing.body }}
+					</textarea> --}}
 				</form>
 			</div>
 		</div>

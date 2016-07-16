@@ -60,6 +60,10 @@ input#task-body {
   height: 2em;
   margin: -1em 0 0 -1em; }
 
+.done .bodybox {
+  color: #d9d9d9;
+  text-decoration: line-through; }
+
 body {
   font-family: 'Calibri', 'Lato';
   line-height: 1.4em;
