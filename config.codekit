@@ -236,6 +236,17 @@
 		"outputPathIsOutsideProject": 0,
 		"outputPathIsSetByUser": 0
 		},
+	"\/bower.json": {
+		"fileType": 524288,
+		"ignore": 1,
+		"ignoreWasSetByUser": 0,
+		"inputAbbreviatedPath": "\/bower.json",
+		"orderOutput": 0,
+		"outputAbbreviatedPath": "\/bower-min.json",
+		"outputPathIsOutsideProject": 0,
+		"outputPathIsSetByUser": 0,
+		"outputStyle": 1
+		},
 	"\/bower_components\/jquery\/bower.json": {
 		"fileType": 524288,
 		"ignore": 1,
@@ -3280,29 +3291,11 @@
 		"outputPathIsOutsideProject": 0,
 		"outputPathIsSetByUser": 0
 		},
-	"\/storage\/framework\/views\/09a3aa01814a7bcc4a3218c0ecc6a9dec39cd64e.php": {
-		"fileType": 8192,
-		"ignore": 0,
-		"ignoreWasSetByUser": 0,
-		"inputAbbreviatedPath": "\/storage\/framework\/views\/09a3aa01814a7bcc4a3218c0ecc6a9dec39cd64e.php",
-		"outputAbbreviatedPath": "No Output Path",
-		"outputPathIsOutsideProject": 0,
-		"outputPathIsSetByUser": 0
-		},
 	"\/storage\/framework\/views\/2bcea282ec49a761c8856b46db561a5deb65da0b.php": {
 		"fileType": 8192,
 		"ignore": 0,
 		"ignoreWasSetByUser": 0,
 		"inputAbbreviatedPath": "\/storage\/framework\/views\/2bcea282ec49a761c8856b46db561a5deb65da0b.php",
-		"outputAbbreviatedPath": "No Output Path",
-		"outputPathIsOutsideProject": 0,
-		"outputPathIsSetByUser": 0
-		},
-	"\/storage\/framework\/views\/30b914f69ce2a8a259908ec68cf796cb3521a383.php": {
-		"fileType": 8192,
-		"ignore": 0,
-		"ignoreWasSetByUser": 0,
-		"inputAbbreviatedPath": "\/storage\/framework\/views\/30b914f69ce2a8a259908ec68cf796cb3521a383.php",
 		"outputAbbreviatedPath": "No Output Path",
 		"outputPathIsOutsideProject": 0,
 		"outputPathIsSetByUser": 0
@@ -3316,38 +3309,11 @@
 		"outputPathIsOutsideProject": 0,
 		"outputPathIsSetByUser": 0
 		},
-	"\/storage\/framework\/views\/7c0f1bd3205ef18d9069efdc8a6954fe144e1553.php": {
-		"fileType": 8192,
-		"ignore": 0,
-		"ignoreWasSetByUser": 0,
-		"inputAbbreviatedPath": "\/storage\/framework\/views\/7c0f1bd3205ef18d9069efdc8a6954fe144e1553.php",
-		"outputAbbreviatedPath": "No Output Path",
-		"outputPathIsOutsideProject": 0,
-		"outputPathIsSetByUser": 0
-		},
 	"\/storage\/framework\/views\/7cae4e1f0a7213617de4cf3d551d4dbd06f401de.php": {
 		"fileType": 8192,
 		"ignore": 0,
 		"ignoreWasSetByUser": 0,
 		"inputAbbreviatedPath": "\/storage\/framework\/views\/7cae4e1f0a7213617de4cf3d551d4dbd06f401de.php",
-		"outputAbbreviatedPath": "No Output Path",
-		"outputPathIsOutsideProject": 0,
-		"outputPathIsSetByUser": 0
-		},
-	"\/storage\/framework\/views\/a417a35ec426c4f3746fe86decc7755ffc66fc35.php": {
-		"fileType": 8192,
-		"ignore": 0,
-		"ignoreWasSetByUser": 0,
-		"inputAbbreviatedPath": "\/storage\/framework\/views\/a417a35ec426c4f3746fe86decc7755ffc66fc35.php",
-		"outputAbbreviatedPath": "No Output Path",
-		"outputPathIsOutsideProject": 0,
-		"outputPathIsSetByUser": 0
-		},
-	"\/storage\/framework\/views\/b5b1f1a1c96ed595a281b29814c6cfc809ab48de.php": {
-		"fileType": 8192,
-		"ignore": 0,
-		"ignoreWasSetByUser": 0,
-		"inputAbbreviatedPath": "\/storage\/framework\/views\/b5b1f1a1c96ed595a281b29814c6cfc809ab48de.php",
 		"outputAbbreviatedPath": "No Output Path",
 		"outputPathIsOutsideProject": 0,
 		"outputPathIsSetByUser": 0
@@ -43534,7 +43500,7 @@
 	},
 "hooks": [
 	],
-"lastSavedByUser": "LUCA BAN",
+"lastSavedByUser": "Luca Ban",
 "manualImportLinks": {
 	"\/resources\/assets\/js\/main.js": [
 		{
