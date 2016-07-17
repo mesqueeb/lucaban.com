@@ -13,14 +13,12 @@
 		<div class="panel-body">
 			@include('common.errors')
 			
-			<things></things>
+			<panel></panel>
 
 		</div>
 	</div>
 
-<script src="js/main-min.js"></script>
-<script src="https://cdn.jsdelivr.net/vue.resource/0.9.3/vue-resource.min.js"></script>
-
-@include('things.panel')
+<script src="js/vendor.js"></script>
+<script src="js/main.js"></script>
 </body>
 </html>

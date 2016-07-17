@@ -1,11 +1,18 @@
+.panel{
+    margin: 0.5em;
+}
+
 .thing-card {
-    margin: 0.3em 0 0;
-    padding: 0.5em;
-    border-bottom: 1px solid #ededed;
+    margin: 0 0 0 0;
     display: flex;
     align-items: center;
 }
-input#task-body{
+.thing-card>div{
+    border-bottom: 1px solid #ededed;
+    width: 100%;
+}
+
+input#add-thing{
     padding: 0.5em;
     width: 100%;
     border-bottom: dashed 1px #ededed;
@@ -42,8 +49,15 @@ input#task-body{
     height: 2em;
     margin: -1em 0 0 -1em;
 }
+.bodybox{
+    padding: 0.5em;
+    display: inline-block;
+}
 .done .bodybox{
     color: #d9d9d9;
     text-decoration: line-through;
+}
+.selected .bodybox{
+    background: rgba(245,215,110,0.45);
 }
 
