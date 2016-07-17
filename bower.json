@@ -1,0 +1,22 @@
+{
+  "name": "lucaban",
+  "description": "",
+  "main": "",
+  "authors": [
+    "Luca Ban - MacMini <mesqueeb@gmail.com>"
+  ],
+  "license": "MIT",
+  "homepage": "https://github.com/mesqueeb/lucaban",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "vue": "^1.0.26",
+    "vue-resource": "^0.9.3",
+    "jquery": "^3.1.0"
+  }
+}
