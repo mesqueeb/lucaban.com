@@ -25,7 +25,7 @@
 					@submit.prevent="doneEdit(thing)"
 				>
 					<textarea name="thing_body"
-						rows='1'
+						rows="{{ thing.rows }}"
 						v-model="thing.body"
 						v-autosize="thing.body"
 						v-thing-focus="thing == editedThing"
@@ -58,6 +58,7 @@ export default {
 	template:'#things-panel-template',
 	created(){
 		this.fetchAll();
+
 	},
 	data: function(){
 		return {
@@ -158,8 +159,14 @@ export default {
 		},
 		fetchAll(){
 			this.$http.get('/api/things').then(function(data) {
-  				this.list = data.json();
+  				var data = data.json();
+  				$.each(data, function(k, v) {
+  					var nl = v['body'].split(/\r\n|\r|\n/).length;
+  					v['rows'] = nl;
+				});
+				this.list = data;
 			});
+
 		},
 		addNew(){
 			var thing = this.newThing; // get input
