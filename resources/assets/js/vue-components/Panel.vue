@@ -19,26 +19,19 @@
 			>
 				<span class="bodybox"
 					v-show="thing != editedThing"
-				>
-					{{ thing.body }}
-				</span>
+				>{{ thing.body }}</span>
 				<form action="update"
 					class="updatebox"
 					@submit.prevent="doneEdit(thing)"
 				>
-					<input type="text"
+					<textarea name="thing_body"
+						rows='1'
 						v-model="thing.body"
+						v-autosize="thing.body"
 						v-thing-focus="thing == editedThing"
 						@blur="doneEdit(thing)"
 						@keyup.esc="cancelEdit(thing)"
-					>
-					<!-- <textarea name=""
-						v-thing-focus="thing == editedThing"
-						@blur="doneEdit(thing)"
-						@keyup.esc="cancelEdit(thing)"
-					>
-						{{ thing.body }}
-					</textarea> -->
+					>{{ thing.body }}</textarea>
 				</form>
 			</div>
 		</div>
@@ -63,12 +56,9 @@
 
 export default {
 	template:'#things-panel-template',
-	http: {
-		root: '/root',
-		headers: {
-			'X-CSRF-TOKEN': document.querySelector('#token').getAttribute('value'),
-		},
-    },
+	created(){
+		this.fetchAll();
+	},
 	data: function(){
 		return {
 			list: [],
@@ -79,10 +69,6 @@ export default {
 			selectedThing: null,
 			visibility: 'all',
 		};
-	},
-	
-	created(){
-		this.fetchAll();
 	},
 	computed: {
 		validation(){
@@ -121,10 +107,21 @@ export default {
 				}).indexOf(this.selectedThing.id);
 			this.selectedThing = this.list[el_i-1];
 		},
-
+		indent(){
+			var thing = this.selectedThing;
+			if (!thing){ return; }
+			var el_i = this.list.map(function(obj){
+					return obj.id;
+				}).indexOf(thing.id);
+			if (el_i == 0){ return; }
+			var prevThingId = this.list[el_i-1].id;
+			this.$http.patch('/api/things/' + thing.id, {'parent_id':prevThingId});
+			fetchAll();
+		},
 		markDone(thing){
 			var thing = (thing) ? thing : this.selectedThing;
 			console.log(thing);
+			console.log('thing.done = '+thing.done);
 			this.$http.patch('/api/things/' + thing.id, {'done':!thing.done});
 			thing.done = !thing.done;
 		},
@@ -190,5 +187,11 @@ export default {
 			});
 		}
 	},
+	http: {
+		root: '/root',
+		headers: {
+			'X-CSRF-TOKEN': document.querySelector('#token').getAttribute('value'),
+		},
+    },
 }
 </script>

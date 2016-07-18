@@ -44,14 +44,14 @@ input#add-thing {
   width: 100%;
   border-bottom: dashed 1px #ededed; }
 
-.updatebox input {
+.updatebox input,
+.updatebox textarea {
   display: none;
   width: 96%; }
 
-.editing .updatebox input {
-  display: block;
-  position: absolute;
-  margin-top: -11; }
+.editing .updatebox input,
+.editing .updatebox textarea {
+  display: block; }
 
 .toggle {
   text-align: center;
@@ -78,7 +78,11 @@ input#add-thing {
 
 .bodybox {
   padding: 0.5em;
-  display: inline-block; }
+  display: inline-block;
+  white-space: pre-line; }
+
+.editing .bodybox {
+  display: none; }
 
 .done .bodybox {
   color: #d9d9d9;

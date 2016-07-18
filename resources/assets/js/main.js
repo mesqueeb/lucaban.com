@@ -1,4 +1,6 @@
 import Panel from './vue-components/panel.vue';
+var VueAutosize = require('vue-autosize')
+Vue.use(VueAutosize)
 
 new Vue({
 	el:'body',
@@ -19,8 +21,9 @@ new Vue({
 				e.preventDefault();
 				vm.$broadcast('markDone');
 				break;
-			case 'xexx':
-				vm.$broadcast('unindent');
+			case 9:
+				e.preventDefault();
+				vm.$broadcast('indent');
 				break;
 			case 'xexx':
 				vm.$broadcast('unindent');

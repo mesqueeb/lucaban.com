@@ -1,20 +1,295 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+/*!
+	Autosize 3.0.16
+	license: MIT
+	http://www.jacklmoore.com/autosize
+*/
+(function (global, factory) {
+	if (typeof define === 'function' && define.amd) {
+		define(['exports', 'module'], factory);
+	} else if (typeof exports !== 'undefined' && typeof module !== 'undefined') {
+		factory(exports, module);
+	} else {
+		var mod = {
+			exports: {}
+		};
+		factory(mod.exports, mod);
+		global.autosize = mod.exports;
+	}
+})(this, function (exports, module) {
+	'use strict';
+
+	var set = typeof Set === 'function' ? new Set() : (function () {
+		var list = [];
+
+		return {
+			has: function has(key) {
+				return Boolean(list.indexOf(key) > -1);
+			},
+			add: function add(key) {
+				list.push(key);
+			},
+			'delete': function _delete(key) {
+				list.splice(list.indexOf(key), 1);
+			} };
+	})();
+
+	var createEvent = function createEvent(name) {
+		return new Event(name);
+	};
+	try {
+		new Event('test');
+	} catch (e) {
+		// IE does not support `new Event()`
+		createEvent = function (name) {
+			var evt = document.createEvent('Event');
+			evt.initEvent(name, true, false);
+			return evt;
+		};
+	}
+
+	function assign(ta) {
+		var _ref = arguments[1] === undefined ? {} : arguments[1];
+
+		var _ref$setOverflowX = _ref.setOverflowX;
+		var setOverflowX = _ref$setOverflowX === undefined ? true : _ref$setOverflowX;
+		var _ref$setOverflowY = _ref.setOverflowY;
+		var setOverflowY = _ref$setOverflowY === undefined ? true : _ref$setOverflowY;
+
+		if (!ta || !ta.nodeName || ta.nodeName !== 'TEXTAREA' || set.has(ta)) return;
+
+		var heightOffset = null;
+		var overflowY = null;
+		var clientWidth = ta.clientWidth;
+
+		function init() {
+			var style = window.getComputedStyle(ta, null);
+
+			overflowY = style.overflowY;
+
+			if (style.resize === 'vertical') {
+				ta.style.resize = 'none';
+			} else if (style.resize === 'both') {
+				ta.style.resize = 'horizontal';
+			}
+
+			if (style.boxSizing === 'content-box') {
+				heightOffset = -(parseFloat(style.paddingTop) + parseFloat(style.paddingBottom));
+			} else {
+				heightOffset = parseFloat(style.borderTopWidth) + parseFloat(style.borderBottomWidth);
+			}
+			// Fix when a textarea is not on document body and heightOffset is Not a Number
+			if (isNaN(heightOffset)) {
+				heightOffset = 0;
+			}
+
+			update();
+		}
+
+		function changeOverflow(value) {
+			{
+				// Chrome/Safari-specific fix:
+				// When the textarea y-overflow is hidden, Chrome/Safari do not reflow the text to account for the space
+				// made available by removing the scrollbar. The following forces the necessary text reflow.
+				var width = ta.style.width;
+				ta.style.width = '0px';
+				// Force reflow:
+				/* jshint ignore:start */
+				ta.offsetWidth;
+				/* jshint ignore:end */
+				ta.style.width = width;
+			}
+
+			overflowY = value;
+
+			if (setOverflowY) {
+				ta.style.overflowY = value;
+			}
+
+			resize();
+		}
+
+		function getParentOverflows(el) {
+			var arr = [];
+
+			while (el && el.parentNode && el.parentNode instanceof Element) {
+				if (el.parentNode.scrollTop) {
+					arr.push({
+						node: el.parentNode,
+						scrollTop: el.parentNode.scrollTop });
+				}
+				el = el.parentNode;
+			}
+
+			return arr;
+		}
+
+		function resize() {
+			var originalHeight = ta.style.height;
+			var overflows = getParentOverflows(ta);
+			var docTop = document.documentElement && document.documentElement.scrollTop; // Needed for Mobile IE (ticket #240)
+
+			ta.style.height = 'auto';
+
+			var endHeight = ta.scrollHeight + heightOffset;
+
+			if (ta.scrollHeight === 0) {
+				// If the scrollHeight is 0, then the element probably has display:none or is detached from the DOM.
+				ta.style.height = originalHeight;
+				return;
+			}
+
+			ta.style.height = endHeight + 'px';
+
+			// used to check if an update is actually necessary on window.resize
+			clientWidth = ta.clientWidth;
+
+			// prevents scroll-position jumping
+			overflows.forEach(function (el) {
+				el.node.scrollTop = el.scrollTop;
+			});
+
+			if (docTop) {
+				document.documentElement.scrollTop = docTop;
+			}
+		}
+
+		function update() {
+			var startHeight = ta.style.height;
+
+			resize();
+
+			var style = window.getComputedStyle(ta, null);
+
+			if (style.height !== ta.style.height) {
+				if (overflowY !== 'visible') {
+					changeOverflow('visible');
+				}
+			} else {
+				if (overflowY !== 'hidden') {
+					changeOverflow('hidden');
+				}
+			}
+
+			if (startHeight !== ta.style.height) {
+				var evt = createEvent('autosize:resized');
+				ta.dispatchEvent(evt);
+			}
+		}
+
+		var pageResize = function pageResize() {
+			if (ta.clientWidth !== clientWidth) {
+				update();
+			}
+		};
+
+		var destroy = (function (style) {
+			window.removeEventListener('resize', pageResize, false);
+			ta.removeEventListener('input', update, false);
+			ta.removeEventListener('keyup', update, false);
+			ta.removeEventListener('autosize:destroy', destroy, false);
+			ta.removeEventListener('autosize:update', update, false);
+			set['delete'](ta);
+
+			Object.keys(style).forEach(function (key) {
+				ta.style[key] = style[key];
+			});
+		}).bind(ta, {
+			height: ta.style.height,
+			resize: ta.style.resize,
+			overflowY: ta.style.overflowY,
+			overflowX: ta.style.overflowX,
+			wordWrap: ta.style.wordWrap });
+
+		ta.addEventListener('autosize:destroy', destroy, false);
+
+		// IE9 does not fire onpropertychange or oninput for deletions,
+		// so binding to onkeyup to catch most of those events.
+		// There is no way that I know of to detect something like 'cut' in IE9.
+		if ('onpropertychange' in ta && 'oninput' in ta) {
+			ta.addEventListener('keyup', update, false);
+		}
+
+		window.addEventListener('resize', pageResize, false);
+		ta.addEventListener('input', update, false);
+		ta.addEventListener('autosize:update', update, false);
+		set.add(ta);
+
+		if (setOverflowX) {
+			ta.style.overflowX = 'hidden';
+			ta.style.wordWrap = 'break-word';
+		}
+
+		init();
+	}
+
+	function destroy(ta) {
+		if (!(ta && ta.nodeName && ta.nodeName === 'TEXTAREA')) return;
+		var evt = createEvent('autosize:destroy');
+		ta.dispatchEvent(evt);
+	}
+
+	function update(ta) {
+		if (!(ta && ta.nodeName && ta.nodeName === 'TEXTAREA')) return;
+		var evt = createEvent('autosize:update');
+		ta.dispatchEvent(evt);
+	}
+
+	var autosize = null;
+
+	// Do nothing in Node.js environment and IE8 (or lower)
+	if (typeof window === 'undefined' || typeof window.getComputedStyle !== 'function') {
+		autosize = function (el) {
+			return el;
+		};
+		autosize.destroy = function (el) {
+			return el;
+		};
+		autosize.update = function (el) {
+			return el;
+		};
+	} else {
+		autosize = function (el, options) {
+			if (el) {
+				Array.prototype.forEach.call(el.length ? el : [el], function (x) {
+					return assign(x, options);
+				});
+			}
+			return el;
+		};
+		autosize.destroy = function (el) {
+			if (el) {
+				Array.prototype.forEach.call(el.length ? el : [el], destroy);
+			}
+			return el;
+		};
+		autosize.update = function (el) {
+			if (el) {
+				Array.prototype.forEach.call(el.length ? el : [el], update);
+			}
+			return el;
+		};
+	}
+
+	module.exports = autosize;
+});
+},{}],2:[function(require,module,exports){
 module.exports = { "default": require("core-js/library/fn/object/keys"), __esModule: true };
-},{"core-js/library/fn/object/keys":2}],2:[function(require,module,exports){
+},{"core-js/library/fn/object/keys":3}],3:[function(require,module,exports){
 require('../../modules/es6.object.keys');
 module.exports = require('../../modules/_core').Object.keys;
-},{"../../modules/_core":7,"../../modules/es6.object.keys":35}],3:[function(require,module,exports){
+},{"../../modules/_core":8,"../../modules/es6.object.keys":36}],4:[function(require,module,exports){
 module.exports = function(it){
   if(typeof it != 'function')throw TypeError(it + ' is not a function!');
   return it;
 };
-},{}],4:[function(require,module,exports){
+},{}],5:[function(require,module,exports){
 var isObject = require('./_is-object');
 module.exports = function(it){
   if(!isObject(it))throw TypeError(it + ' is not an object!');
   return it;
 };
-},{"./_is-object":20}],5:[function(require,module,exports){
+},{"./_is-object":21}],6:[function(require,module,exports){
 // false -> Array#indexOf
 // true  -> Array#includes
 var toIObject = require('./_to-iobject')
@@ -36,16 +311,16 @@ module.exports = function(IS_INCLUDES){
     } return !IS_INCLUDES && -1;
   };
 };
-},{"./_to-index":28,"./_to-iobject":30,"./_to-length":31}],6:[function(require,module,exports){
+},{"./_to-index":29,"./_to-iobject":31,"./_to-length":32}],7:[function(require,module,exports){
 var toString = {}.toString;
 
 module.exports = function(it){
   return toString.call(it).slice(8, -1);
 };
-},{}],7:[function(require,module,exports){
+},{}],8:[function(require,module,exports){
 var core = module.exports = {version: '2.4.0'};
 if(typeof __e == 'number')__e = core; // eslint-disable-line no-undef
-},{}],8:[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 // optional / simple context binding
 var aFunction = require('./_a-function');
 module.exports = function(fn, that, length){
@@ -66,18 +341,18 @@ module.exports = function(fn, that, length){
     return fn.apply(that, arguments);
   };
 };
-},{"./_a-function":3}],9:[function(require,module,exports){
+},{"./_a-function":4}],10:[function(require,module,exports){
 // 7.2.1 RequireObjectCoercible(argument)
 module.exports = function(it){
   if(it == undefined)throw TypeError("Can't call method on  " + it);
   return it;
 };
-},{}],10:[function(require,module,exports){
+},{}],11:[function(require,module,exports){
 // Thank's IE8 for his funny defineProperty
 module.exports = !require('./_fails')(function(){
   return Object.defineProperty({}, 'a', {get: function(){ return 7; }}).a != 7;
 });
-},{"./_fails":14}],11:[function(require,module,exports){
+},{"./_fails":15}],12:[function(require,module,exports){
 var isObject = require('./_is-object')
   , document = require('./_global').document
   // in old IE typeof document.createElement is 'object'
@@ -85,12 +360,12 @@ var isObject = require('./_is-object')
 module.exports = function(it){
   return is ? document.createElement(it) : {};
 };
-},{"./_global":15,"./_is-object":20}],12:[function(require,module,exports){
+},{"./_global":16,"./_is-object":21}],13:[function(require,module,exports){
 // IE 8- don't enum bug keys
 module.exports = (
   'constructor,hasOwnProperty,isPrototypeOf,propertyIsEnumerable,toLocaleString,toString,valueOf'
 ).split(',');
-},{}],13:[function(require,module,exports){
+},{}],14:[function(require,module,exports){
 var global    = require('./_global')
   , core      = require('./_core')
   , ctx       = require('./_ctx')
@@ -152,7 +427,7 @@ $export.W = 32;  // wrap
 $export.U = 64;  // safe
 $export.R = 128; // real proto method for `library` 
 module.exports = $export;
-},{"./_core":7,"./_ctx":8,"./_global":15,"./_hide":17}],14:[function(require,module,exports){
+},{"./_core":8,"./_ctx":9,"./_global":16,"./_hide":18}],15:[function(require,module,exports){
 module.exports = function(exec){
   try {
     return !!exec();
@@ -160,17 +435,17 @@ module.exports = function(exec){
     return true;
   }
 };
-},{}],15:[function(require,module,exports){
+},{}],16:[function(require,module,exports){
 // https://github.com/zloirock/core-js/issues/86#issuecomment-115759028
 var global = module.exports = typeof window != 'undefined' && window.Math == Math
   ? window : typeof self != 'undefined' && self.Math == Math ? self : Function('return this')();
 if(typeof __g == 'number')__g = global; // eslint-disable-line no-undef
-},{}],16:[function(require,module,exports){
+},{}],17:[function(require,module,exports){
 var hasOwnProperty = {}.hasOwnProperty;
 module.exports = function(it, key){
   return hasOwnProperty.call(it, key);
 };
-},{}],17:[function(require,module,exports){
+},{}],18:[function(require,module,exports){
 var dP         = require('./_object-dp')
   , createDesc = require('./_property-desc');
 module.exports = require('./_descriptors') ? function(object, key, value){
@@ -179,21 +454,21 @@ module.exports = require('./_descriptors') ? function(object, key, value){
   object[key] = value;
   return object;
 };
-},{"./_descriptors":10,"./_object-dp":21,"./_property-desc":25}],18:[function(require,module,exports){
+},{"./_descriptors":11,"./_object-dp":22,"./_property-desc":26}],19:[function(require,module,exports){
 module.exports = !require('./_descriptors') && !require('./_fails')(function(){
   return Object.defineProperty(require('./_dom-create')('div'), 'a', {get: function(){ return 7; }}).a != 7;
 });
-},{"./_descriptors":10,"./_dom-create":11,"./_fails":14}],19:[function(require,module,exports){
+},{"./_descriptors":11,"./_dom-create":12,"./_fails":15}],20:[function(require,module,exports){
 // fallback for non-array-like ES3 and non-enumerable old V8 strings
 var cof = require('./_cof');
 module.exports = Object('z').propertyIsEnumerable(0) ? Object : function(it){
   return cof(it) == 'String' ? it.split('') : Object(it);
 };
-},{"./_cof":6}],20:[function(require,module,exports){
+},{"./_cof":7}],21:[function(require,module,exports){
 module.exports = function(it){
   return typeof it === 'object' ? it !== null : typeof it === 'function';
 };
-},{}],21:[function(require,module,exports){
+},{}],22:[function(require,module,exports){
 var anObject       = require('./_an-object')
   , IE8_DOM_DEFINE = require('./_ie8-dom-define')
   , toPrimitive    = require('./_to-primitive')
@@ -210,7 +485,7 @@ exports.f = require('./_descriptors') ? Object.defineProperty : function defineP
   if('value' in Attributes)O[P] = Attributes.value;
   return O;
 };
-},{"./_an-object":4,"./_descriptors":10,"./_ie8-dom-define":18,"./_to-primitive":33}],22:[function(require,module,exports){
+},{"./_an-object":5,"./_descriptors":11,"./_ie8-dom-define":19,"./_to-primitive":34}],23:[function(require,module,exports){
 var has          = require('./_has')
   , toIObject    = require('./_to-iobject')
   , arrayIndexOf = require('./_array-includes')(false)
@@ -228,7 +503,7 @@ module.exports = function(object, names){
   }
   return result;
 };
-},{"./_array-includes":5,"./_has":16,"./_shared-key":26,"./_to-iobject":30}],23:[function(require,module,exports){
+},{"./_array-includes":6,"./_has":17,"./_shared-key":27,"./_to-iobject":31}],24:[function(require,module,exports){
 // 19.1.2.14 / 15.2.3.14 Object.keys(O)
 var $keys       = require('./_object-keys-internal')
   , enumBugKeys = require('./_enum-bug-keys');
@@ -236,7 +511,7 @@ var $keys       = require('./_object-keys-internal')
 module.exports = Object.keys || function keys(O){
   return $keys(O, enumBugKeys);
 };
-},{"./_enum-bug-keys":12,"./_object-keys-internal":22}],24:[function(require,module,exports){
+},{"./_enum-bug-keys":13,"./_object-keys-internal":23}],25:[function(require,module,exports){
 // most Object methods by ES6 should accept primitives
 var $export = require('./_export')
   , core    = require('./_core')
@@ -247,7 +522,7 @@ module.exports = function(KEY, exec){
   exp[KEY] = exec(fn);
   $export($export.S + $export.F * fails(function(){ fn(1); }), 'Object', exp);
 };
-},{"./_core":7,"./_export":13,"./_fails":14}],25:[function(require,module,exports){
+},{"./_core":8,"./_export":14,"./_fails":15}],26:[function(require,module,exports){
 module.exports = function(bitmap, value){
   return {
     enumerable  : !(bitmap & 1),
@@ -256,20 +531,20 @@ module.exports = function(bitmap, value){
     value       : value
   };
 };
-},{}],26:[function(require,module,exports){
+},{}],27:[function(require,module,exports){
 var shared = require('./_shared')('keys')
   , uid    = require('./_uid');
 module.exports = function(key){
   return shared[key] || (shared[key] = uid(key));
 };
-},{"./_shared":27,"./_uid":34}],27:[function(require,module,exports){
+},{"./_shared":28,"./_uid":35}],28:[function(require,module,exports){
 var global = require('./_global')
   , SHARED = '__core-js_shared__'
   , store  = global[SHARED] || (global[SHARED] = {});
 module.exports = function(key){
   return store[key] || (store[key] = {});
 };
-},{"./_global":15}],28:[function(require,module,exports){
+},{"./_global":16}],29:[function(require,module,exports){
 var toInteger = require('./_to-integer')
   , max       = Math.max
   , min       = Math.min;
@@ -277,34 +552,34 @@ module.exports = function(index, length){
   index = toInteger(index);
   return index < 0 ? max(index + length, 0) : min(index, length);
 };
-},{"./_to-integer":29}],29:[function(require,module,exports){
+},{"./_to-integer":30}],30:[function(require,module,exports){
 // 7.1.4 ToInteger
 var ceil  = Math.ceil
   , floor = Math.floor;
 module.exports = function(it){
   return isNaN(it = +it) ? 0 : (it > 0 ? floor : ceil)(it);
 };
-},{}],30:[function(require,module,exports){
+},{}],31:[function(require,module,exports){
 // to indexed object, toObject with fallback for non-array-like ES3 strings
 var IObject = require('./_iobject')
   , defined = require('./_defined');
 module.exports = function(it){
   return IObject(defined(it));
 };
-},{"./_defined":9,"./_iobject":19}],31:[function(require,module,exports){
+},{"./_defined":10,"./_iobject":20}],32:[function(require,module,exports){
 // 7.1.15 ToLength
 var toInteger = require('./_to-integer')
   , min       = Math.min;
 module.exports = function(it){
   return it > 0 ? min(toInteger(it), 0x1fffffffffffff) : 0; // pow(2, 53) - 1 == 9007199254740991
 };
-},{"./_to-integer":29}],32:[function(require,module,exports){
+},{"./_to-integer":30}],33:[function(require,module,exports){
 // 7.1.13 ToObject(argument)
 var defined = require('./_defined');
 module.exports = function(it){
   return Object(defined(it));
 };
-},{"./_defined":9}],33:[function(require,module,exports){
+},{"./_defined":10}],34:[function(require,module,exports){
 // 7.1.1 ToPrimitive(input [, PreferredType])
 var isObject = require('./_is-object');
 // instead of the ES6 spec version, we didn't implement @@toPrimitive case
@@ -317,13 +592,13 @@ module.exports = function(it, S){
   if(!S && typeof (fn = it.toString) == 'function' && !isObject(val = fn.call(it)))return val;
   throw TypeError("Can't convert object to primitive value");
 };
-},{"./_is-object":20}],34:[function(require,module,exports){
+},{"./_is-object":21}],35:[function(require,module,exports){
 var id = 0
   , px = Math.random();
 module.exports = function(key){
   return 'Symbol('.concat(key === undefined ? '' : key, ')_', (++id + px).toString(36));
 };
-},{}],35:[function(require,module,exports){
+},{}],36:[function(require,module,exports){
 // 19.1.2.14 Object.keys(O)
 var toObject = require('./_to-object')
   , $keys    = require('./_object-keys');
@@ -333,7 +608,7 @@ require('./_object-sap')('keys', function(){
     return $keys(toObject(it));
   };
 });
-},{"./_object-keys":23,"./_object-sap":24,"./_to-object":32}],36:[function(require,module,exports){
+},{"./_object-keys":24,"./_object-sap":25,"./_to-object":33}],37:[function(require,module,exports){
 // shim for using process in browser
 
 var process = module.exports = {};
@@ -454,7 +729,26 @@ process.chdir = function (dir) {
 };
 process.umask = function() { return 0; };
 
-},{}],37:[function(require,module,exports){
+},{}],38:[function(require,module,exports){
+var autosize = require('autosize')
+
+exports.install = function(Vue) {
+  Vue.directive('autosize', {
+    bind: function() {
+      autosize(this.el)
+    },
+
+    update: function(value) {
+      this.el.value = value
+      autosize.update(this.el)
+    },
+
+    unbind: function() {
+      autosize.destroy(this.el)
+    }
+  })
+}
+},{"autosize":1}],39:[function(require,module,exports){
 var Vue // late bind
 var map = Object.create(null)
 var shimmed = false
@@ -755,7 +1049,7 @@ function format (id) {
   return match ? match[0] : id
 }
 
-},{}],38:[function(require,module,exports){
+},{}],40:[function(require,module,exports){
 (function (process,global){
 /*!
  * Vue.js v1.0.26
@@ -10832,7 +11126,7 @@ setTimeout(function () {
 
 module.exports = Vue;
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"_process":36}],39:[function(require,module,exports){
+},{"_process":37}],41:[function(require,module,exports){
 'use strict';
 
 var _panel = require('./vue-components/panel.vue');
@@ -10840,6 +11134,9 @@ var _panel = require('./vue-components/panel.vue');
 var _panel2 = _interopRequireDefault(_panel);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var VueAutosize = require('vue-autosize');
+Vue.use(VueAutosize);
 
 new Vue({
 	el: 'body',
@@ -10860,8 +11157,9 @@ new Vue({
 					e.preventDefault();
 					vm.$broadcast('markDone');
 					break;
-				case 'xexx':
-					vm.$broadcast('unindent');
+				case 9:
+					e.preventDefault();
+					vm.$broadcast('indent');
 					break;
 				case 'xexx':
 					vm.$broadcast('unindent');
@@ -10880,7 +11178,7 @@ new Vue({
 	}
 });
 
-},{"./vue-components/panel.vue":40}],40:[function(require,module,exports){
+},{"./vue-components/panel.vue":42,"vue-autosize":38}],42:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -10895,12 +11193,10 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 exports.default = {
 	template: '#things-panel-template',
-	http: {
-		root: '/root',
-		headers: {
-			'X-CSRF-TOKEN': document.querySelector('#token').getAttribute('value')
-		}
+	created: function created() {
+		this.fetchAll();
 	},
+
 	data: function data() {
 		return {
 			list: [],
@@ -10912,11 +11208,6 @@ exports.default = {
 			visibility: 'all'
 		};
 	},
-
-	created: function created() {
-		this.fetchAll();
-	},
-
 	computed: {
 		validation: function validation() {
 			return {
@@ -10954,9 +11245,25 @@ exports.default = {
 			}).indexOf(this.selectedThing.id);
 			this.selectedThing = this.list[el_i - 1];
 		},
+		indent: function indent() {
+			var thing = this.selectedThing;
+			if (!thing) {
+				return;
+			}
+			var el_i = this.list.map(function (obj) {
+				return obj.id;
+			}).indexOf(thing.id);
+			if (el_i == 0) {
+				return;
+			}
+			var prevThingId = this.list[el_i - 1].id;
+			this.$http.patch('/api/things/' + thing.id, { 'parent_id': prevThingId });
+			fetchAll();
+		},
 		markDone: function markDone(thing) {
 			var thing = thing ? thing : this.selectedThing;
 			console.log(thing);
+			console.log('thing.done = ' + thing.done);
 			this.$http.patch('/api/things/' + thing.id, { 'done': !thing.done });
 			thing.done = !thing.done;
 		},
@@ -11033,10 +11340,16 @@ exports.default = {
 				el.focus();
 			});
 		}
+	},
+	http: {
+		root: '/root',
+		headers: {
+			'X-CSRF-TOKEN': document.querySelector('#token').getAttribute('value')
+		}
 	}
 };
 if (module.exports.__esModule) module.exports = module.exports.default
-;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\n<div class=\"things-panel\">\n\t<div v-for=\"thing in list\" class=\"thing-card\" :class=\"{\n\t\t\tdone: thing.done,\n\t\t\tediting: thing == editedThing,\n\t\t\tselected: thing == selectedThing,\n\t\t\t}\">\n\t\t<input class=\"toggle\" type=\"checkbox\" v-model=\"thing.done\" @click=\"markDone(thing)\">\n\t\t<div @dblclick=\"startEdit(thing)\" @click=\"select(thing)\">\n\t\t\t<span class=\"bodybox\" v-show=\"thing != editedThing\">\n\t\t\t\t{{ thing.body }}\n\t\t\t</span>\n\t\t\t<form action=\"update\" class=\"updatebox\" @submit.prevent=\"doneEdit(thing)\">\n\t\t\t\t<input type=\"text\" v-model=\"thing.body\" v-thing-focus=\"thing == editedThing\" @blur=\"doneEdit(thing)\" @keyup.esc=\"cancelEdit(thing)\">\n\t\t\t\t<!-- <textarea name=\"\"\n\t\t\t\t\tv-thing-focus=\"thing == editedThing\"\n\t\t\t\t\t@blur=\"doneEdit(thing)\"\n\t\t\t\t\t@keyup.esc=\"cancelEdit(thing)\"\n\t\t\t\t>\n\t\t\t\t\t{{ thing.body }}\n\t\t\t\t</textarea> -->\n\t\t\t</form>\n\t\t</div>\n\t</div>\n\n\t<form action=\"\" @submit.prevent=\"addNew\">\n\t\t<input type=\"text\" name=\"body\" id=\"add-thing\" v-model=\"newThing.body\" placeholder=\"I can't forget to...\" autocomplete=\"off\" autofocus=\"\">\n\t</form>\n</div>\n"
+;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\n<div class=\"things-panel\">\n\t<div v-for=\"thing in list\" class=\"thing-card\" :class=\"{\n\t\t\tdone: thing.done,\n\t\t\tediting: thing == editedThing,\n\t\t\tselected: thing == selectedThing,\n\t\t\t}\">\n\t\t<input class=\"toggle\" type=\"checkbox\" v-model=\"thing.done\" @click=\"markDone(thing)\">\n\t\t<div @dblclick=\"startEdit(thing)\" @click=\"select(thing)\">\n\t\t\t<span class=\"bodybox\" v-show=\"thing != editedThing\">{{ thing.body }}</span>\n\t\t\t<form action=\"update\" class=\"updatebox\" @submit.prevent=\"doneEdit(thing)\">\n\t\t\t\t<textarea name=\"thing_body\" rows=\"1\" v-model=\"thing.body\" v-autosize=\"thing.body\" v-thing-focus=\"thing == editedThing\" @blur=\"doneEdit(thing)\" @keyup.esc=\"cancelEdit(thing)\">{{ thing.body }}</textarea>\n\t\t\t</form>\n\t\t</div>\n\t</div>\n\n\t<form action=\"\" @submit.prevent=\"addNew\">\n\t\t<input type=\"text\" name=\"body\" id=\"add-thing\" v-model=\"newThing.body\" placeholder=\"I can't forget to...\" autocomplete=\"off\" autofocus=\"\">\n\t</form>\n</div>\n"
 if (module.hot) {(function () {  module.hot.accept()
   var hotAPI = require("vue-hot-reload-api")
   hotAPI.install(require("vue"), true)
@@ -11047,6 +11360,6 @@ if (module.hot) {(function () {  module.hot.accept()
     hotAPI.update("_v-f86b8dc2", module.exports, (typeof module.exports === "function" ? module.exports.options : module.exports).template)
   }
 })()}
-},{"babel-runtime/core-js/object/keys":1,"vue":38,"vue-hot-reload-api":37}]},{},[39]);
+},{"babel-runtime/core-js/object/keys":2,"vue":40,"vue-hot-reload-api":39}]},{},[41]);
 
 //# sourceMappingURL=main.js.map
