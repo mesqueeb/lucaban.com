@@ -1,3 +1,18 @@
+
+<div>
+	<task>Go shopping</task>
+	<children>
+		<div>
+			<task>Mall</task>
+			<children>...</children>
+		</div>
+		<div>
+			<task>Supermarket</task>
+			<children>...</children>
+		</div>
+	</children>
+</div>
+
 <template id="things-panel-template">
 	<div class="things-panel">
 		<div v-for="thing in list"
@@ -6,6 +21,7 @@
 				done: thing.done,
 				editing: thing == editedThing,
 				selected: thing == selectedThing,
+				child: thing.parent_id > 0,
 				}"
 		>
 			<input class="toggle"
@@ -83,6 +99,7 @@ export default {
 				return validation[key]
 			});
 		},
+
 	},
 	methods: {
 		select(thing){
@@ -117,21 +134,30 @@ export default {
 			if (el_i == 0){ return; }
 			var prevThingId = this.list[el_i-1].id;
 			this.$http.patch('/api/things/' + thing.id, {'parent_id':prevThingId});
-			fetchAll();
+			this.fetchThis(thing);
 		},
 		markDone(thing){
-			var thing = (thing) ? thing : this.selectedThing;
-			console.log(thing);
-			console.log('thing.done = '+thing.done);
-			this.$http.patch('/api/things/' + thing.id, {'done':!thing.done});
-			thing.done = !thing.done;
+			// if (thing){
+			// 	console.log('click comp');
+			// 	var thing = thing;
+			// 	var doneVal = thing.done;
+			// } else {
+			// 	console.log('space comp');
+			// 	var thing = this.selectedThing;
+			// 	var doneVal = !thing.done;
+			// }
+			// console.log(thing);
+			console.log('thing.done '+thing.done);
+			console.log('doneVal '+doneVal);
+			this.$http.patch('/api/things/' + thing.id, {'done':doneVal}).then(this.fetchThis(this));
 		},
 		startEdit(thing){
-			console.log(thing.body);
+			var thing = (thing) ? thing : this.selectedThing;
 			this.beforeEditCache = thing.body;
 			this.editedThing = thing;
 		},
 		doneEdit(thing) {
+			var thing = (thing) ? thing : this.selectedThing;
 			if (!this.editedThing) {
 				return;
 			}
@@ -165,8 +191,14 @@ export default {
   					v['rows'] = nl;
 				});
 				this.list = data;
+				//console.log(JSON.stringify(data));
 			});
-
+		},
+		fetchThis(thing){
+			this.$http.get('/api/things/'+thing.id).then(function(data) {
+  				thing = data.json();
+  				console.log(thing);
+  			});
 		},
 		addNew(){
 			var thing = this.newThing; // get input
@@ -182,6 +214,8 @@ export default {
     	markDone() { this.markDone(); },
     	indent() { this.indent(); },
     	unindent() { this.unindent(); },
+    	startEdit() { this.startEdit(); },
+    	doneEdit() { this.doneEdit(); },
 	},
 	directives: {
 		'thing-focus': function (value) {

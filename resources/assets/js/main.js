@@ -8,6 +8,19 @@ new Vue({
 	ready: function() {
       var vm = this;
       window.addEventListener('keydown', function(e) {
+        if ( $('input:focus').length > 0 ||  $('textarea:focus').length > 0 ) {
+        	// INPUT AREAS IN FOCUS
+		switch(e.keyCode) { 
+			case 13:
+				if (e.shiftKey){
+					break;
+				}
+				e.preventDefault();
+				vm.$broadcast('doneEdit');
+				break;
+		} // end switch
+		} else { 
+			// INPUT AREAS NOT IN FOCUS
         switch(e.keyCode) { 
 			case 40:
 				e.preventDefault();
@@ -25,8 +38,9 @@ new Vue({
 				e.preventDefault();
 				vm.$broadcast('indent');
 				break;
-			case 'xexx':
-				vm.$broadcast('unindent');
+			case 13:
+				e.preventDefault();
+				vm.$broadcast('startEdit');
 				break;
 			case 'xexx':
 				vm.$broadcast('unindent');
@@ -37,7 +51,8 @@ new Vue({
 			case 'xexx':
 				vm.$broadcast('unindent');
 				break;
-        }
+        } // end switch
+    	} // END INPUT AREAS NOT IN FOCUS
       });
     }	
 });

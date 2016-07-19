@@ -11144,36 +11144,51 @@ new Vue({
 	ready: function ready() {
 		var vm = this;
 		window.addEventListener('keydown', function (e) {
-			switch (e.keyCode) {
-				case 40:
-					e.preventDefault();
-					vm.$broadcast('selectNext');
-					break;
-				case 38:
-					e.preventDefault();
-					vm.$broadcast('selectPrevious');
-					break;
-				case 32:
-					e.preventDefault();
-					vm.$broadcast('markDone');
-					break;
-				case 9:
-					e.preventDefault();
-					vm.$broadcast('indent');
-					break;
-				case 'xexx':
-					vm.$broadcast('unindent');
-					break;
-				case 'xexx':
-					vm.$broadcast('unindent');
-					break;
-				case 'xexx':
-					vm.$broadcast('unindent');
-					break;
-				case 'xexx':
-					vm.$broadcast('unindent');
-					break;
-			}
+			if ($('input:focus').length > 0 || $('textarea:focus').length > 0) {
+				// INPUT AREAS IN FOCUS
+				switch (e.keyCode) {
+					case 13:
+						if (e.shiftKey) {
+							break;
+						}
+						e.preventDefault();
+						vm.$broadcast('doneEdit');
+						break;
+				} // end switch
+			} else {
+				// INPUT AREAS NOT IN FOCUS
+				switch (e.keyCode) {
+					case 40:
+						e.preventDefault();
+						vm.$broadcast('selectNext');
+						break;
+					case 38:
+						e.preventDefault();
+						vm.$broadcast('selectPrevious');
+						break;
+					case 32:
+						e.preventDefault();
+						vm.$broadcast('markDone');
+						break;
+					case 9:
+						e.preventDefault();
+						vm.$broadcast('indent');
+						break;
+					case 13:
+						e.preventDefault();
+						vm.$broadcast('startEdit');
+						break;
+					case 'xexx':
+						vm.$broadcast('unindent');
+						break;
+					case 'xexx':
+						vm.$broadcast('unindent');
+						break;
+					case 'xexx':
+						vm.$broadcast('unindent');
+						break;
+				} // end switch
+			} // END INPUT AREAS NOT IN FOCUS
 		});
 	}
 });
@@ -11258,21 +11273,30 @@ exports.default = {
 			}
 			var prevThingId = this.list[el_i - 1].id;
 			this.$http.patch('/api/things/' + thing.id, { 'parent_id': prevThingId });
-			fetchAll();
+			this.fetchThis(thing);
 		},
 		markDone: function markDone(thing) {
-			var thing = thing ? thing : this.selectedThing;
-			console.log(thing);
-			console.log('thing.done = ' + thing.done);
-			this.$http.patch('/api/things/' + thing.id, { 'done': !thing.done });
-			thing.done = !thing.done;
+			// if (thing){
+			// 	console.log('click comp');
+			// 	var thing = thing;
+			// 	var doneVal = thing.done;
+			// } else {
+			// 	console.log('space comp');
+			// 	var thing = this.selectedThing;
+			// 	var doneVal = !thing.done;
+			// }
+			// console.log(thing);
+			console.log('thing.done ' + thing.done);
+			console.log('doneVal ' + doneVal);
+			this.$http.patch('/api/things/' + thing.id, { 'done': doneVal }).then(this.fetchThis(this));
 		},
 		startEdit: function startEdit(thing) {
-			console.log(thing.body);
+			var thing = thing ? thing : this.selectedThing;
 			this.beforeEditCache = thing.body;
 			this.editedThing = thing;
 		},
 		doneEdit: function doneEdit(thing) {
+			var thing = thing ? thing : this.selectedThing;
 			if (!this.editedThing) {
 				return;
 			}
@@ -11306,6 +11330,13 @@ exports.default = {
 					v['rows'] = nl;
 				});
 				this.list = data;
+				//console.log(JSON.stringify(data));
+			});
+		},
+		fetchThis: function fetchThis(thing) {
+			this.$http.get('/api/things/' + thing.id).then(function (data) {
+				thing = data.json();
+				console.log(thing);
 			});
 		},
 		addNew: function addNew() {
@@ -11333,6 +11364,12 @@ exports.default = {
 		},
 		unindent: function unindent() {
 			this.unindent();
+		},
+		startEdit: function startEdit() {
+			this.startEdit();
+		},
+		doneEdit: function doneEdit() {
+			this.doneEdit();
 		}
 	},
 	directives: {
@@ -11354,7 +11391,7 @@ exports.default = {
 	}
 };
 if (module.exports.__esModule) module.exports = module.exports.default
-;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\n<div class=\"things-panel\">\n\t<div v-for=\"thing in list\" class=\"thing-card\" :class=\"{\n\t\t\tdone: thing.done,\n\t\t\tediting: thing == editedThing,\n\t\t\tselected: thing == selectedThing,\n\t\t\t}\">\n\t\t<input class=\"toggle\" type=\"checkbox\" v-model=\"thing.done\" @click=\"markDone(thing)\">\n\t\t<div @dblclick=\"startEdit(thing)\" @click=\"select(thing)\">\n\t\t\t<span class=\"bodybox\" v-show=\"thing != editedThing\">{{ thing.body }}</span>\n\t\t\t<form action=\"update\" class=\"updatebox\" @submit.prevent=\"doneEdit(thing)\">\n\t\t\t\t<textarea name=\"thing_body\" rows=\"{{ thing.rows }}\" v-model=\"thing.body\" v-autosize=\"thing.body\" v-thing-focus=\"thing == editedThing\" @blur=\"doneEdit(thing)\" @keyup.esc=\"cancelEdit(thing)\">{{ thing.body }}</textarea>\n\t\t\t</form>\n\t\t</div>\n\t</div>\n\n\t<form action=\"\" @submit.prevent=\"addNew\">\n\t\t<input type=\"text\" name=\"body\" id=\"add-thing\" v-model=\"newThing.body\" placeholder=\"I can't forget to...\" autocomplete=\"off\" autofocus=\"\">\n\t</form>\n</div>\n"
+;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\n<div class=\"things-panel\">\n\t<div v-for=\"thing in list\" class=\"thing-card\" :class=\"{\n\t\t\tdone: thing.done,\n\t\t\tediting: thing == editedThing,\n\t\t\tselected: thing == selectedThing,\n\t\t\tchild: thing.parent_id > 0,\n\t\t\t}\">\n\t\t<input class=\"toggle\" type=\"checkbox\" v-model=\"thing.done\" @click=\"markDone(thing)\">\n\t\t<div @dblclick=\"startEdit(thing)\" @click=\"select(thing)\">\n\t\t\t<span class=\"bodybox\" v-show=\"thing != editedThing\">{{ thing.body }}</span>\n\t\t\t<form action=\"update\" class=\"updatebox\" @submit.prevent=\"doneEdit(thing)\">\n\t\t\t\t<textarea name=\"thing_body\" rows=\"{{ thing.rows }}\" v-model=\"thing.body\" v-autosize=\"thing.body\" v-thing-focus=\"thing == editedThing\" @blur=\"doneEdit(thing)\" @keyup.esc=\"cancelEdit(thing)\">{{ thing.body }}</textarea>\n\t\t\t</form>\n\t\t</div>\n\t</div>\n\n\t<form action=\"\" @submit.prevent=\"addNew\">\n\t\t<input type=\"text\" name=\"body\" id=\"add-thing\" v-model=\"newThing.body\" placeholder=\"I can't forget to...\" autocomplete=\"off\" autofocus=\"\">\n\t</form>\n</div>\n"
 if (module.hot) {(function () {  module.hot.accept()
   var hotAPI = require("vue-hot-reload-api")
   hotAPI.install(require("vue"), true)

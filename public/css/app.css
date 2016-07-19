@@ -39,6 +39,9 @@ input {
   border-bottom: 1px solid #ededed;
   width: 100%; }
 
+.child {
+  margin-left: 1.5em; }
+
 input#add-thing {
   padding: 0.5em;
   width: 100%;
@@ -47,7 +50,10 @@ input#add-thing {
 .updatebox input,
 .updatebox textarea {
   display: none;
-  width: 96%; }
+  width: 97%;
+  outline: 0px !important;
+  border-color: rgba(245, 215, 110, 0.5);
+  resize: none; }
 
 .editing .updatebox input,
 .editing .updatebox textarea {
@@ -89,6 +95,6 @@ input#add-thing {
   text-decoration: line-through; }
 
 .selected .bodybox {
-  background: rgba(245, 215, 110, 0.45); }
+  background: rgba(245, 215, 110, 0.5); }
 
 /*# sourceMappingURL=app.css.map */
