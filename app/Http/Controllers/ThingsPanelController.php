@@ -19,7 +19,14 @@ class ThingsPanelController extends Controller
      */
     public function index()
     {
-        return DB::table('things')->get();
+        $parents = DB::table('things')->where('parent_id',0)->get();
+
+        foreach($parents as $k => $v){
+            $childrenz = DB::table('things')->where('parent_id',$v->id)->get();
+            $v->children = $childrenz;
+        }
+        return $parents;
+
         // ==
         return Thing::get();
     }

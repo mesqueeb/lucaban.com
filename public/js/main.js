@@ -274,22 +274,30 @@
 	module.exports = autosize;
 });
 },{}],2:[function(require,module,exports){
+module.exports = { "default": require("core-js/library/fn/json/stringify"), __esModule: true };
+},{"core-js/library/fn/json/stringify":4}],3:[function(require,module,exports){
 module.exports = { "default": require("core-js/library/fn/object/keys"), __esModule: true };
-},{"core-js/library/fn/object/keys":3}],3:[function(require,module,exports){
+},{"core-js/library/fn/object/keys":5}],4:[function(require,module,exports){
+var core  = require('../../modules/_core')
+  , $JSON = core.JSON || (core.JSON = {stringify: JSON.stringify});
+module.exports = function stringify(it){ // eslint-disable-line no-unused-vars
+  return $JSON.stringify.apply($JSON, arguments);
+};
+},{"../../modules/_core":10}],5:[function(require,module,exports){
 require('../../modules/es6.object.keys');
 module.exports = require('../../modules/_core').Object.keys;
-},{"../../modules/_core":8,"../../modules/es6.object.keys":36}],4:[function(require,module,exports){
+},{"../../modules/_core":10,"../../modules/es6.object.keys":38}],6:[function(require,module,exports){
 module.exports = function(it){
   if(typeof it != 'function')throw TypeError(it + ' is not a function!');
   return it;
 };
-},{}],5:[function(require,module,exports){
+},{}],7:[function(require,module,exports){
 var isObject = require('./_is-object');
 module.exports = function(it){
   if(!isObject(it))throw TypeError(it + ' is not an object!');
   return it;
 };
-},{"./_is-object":21}],6:[function(require,module,exports){
+},{"./_is-object":23}],8:[function(require,module,exports){
 // false -> Array#indexOf
 // true  -> Array#includes
 var toIObject = require('./_to-iobject')
@@ -311,16 +319,16 @@ module.exports = function(IS_INCLUDES){
     } return !IS_INCLUDES && -1;
   };
 };
-},{"./_to-index":29,"./_to-iobject":31,"./_to-length":32}],7:[function(require,module,exports){
+},{"./_to-index":31,"./_to-iobject":33,"./_to-length":34}],9:[function(require,module,exports){
 var toString = {}.toString;
 
 module.exports = function(it){
   return toString.call(it).slice(8, -1);
 };
-},{}],8:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 var core = module.exports = {version: '2.4.0'};
 if(typeof __e == 'number')__e = core; // eslint-disable-line no-undef
-},{}],9:[function(require,module,exports){
+},{}],11:[function(require,module,exports){
 // optional / simple context binding
 var aFunction = require('./_a-function');
 module.exports = function(fn, that, length){
@@ -341,18 +349,18 @@ module.exports = function(fn, that, length){
     return fn.apply(that, arguments);
   };
 };
-},{"./_a-function":4}],10:[function(require,module,exports){
+},{"./_a-function":6}],12:[function(require,module,exports){
 // 7.2.1 RequireObjectCoercible(argument)
 module.exports = function(it){
   if(it == undefined)throw TypeError("Can't call method on  " + it);
   return it;
 };
-},{}],11:[function(require,module,exports){
+},{}],13:[function(require,module,exports){
 // Thank's IE8 for his funny defineProperty
 module.exports = !require('./_fails')(function(){
   return Object.defineProperty({}, 'a', {get: function(){ return 7; }}).a != 7;
 });
-},{"./_fails":15}],12:[function(require,module,exports){
+},{"./_fails":17}],14:[function(require,module,exports){
 var isObject = require('./_is-object')
   , document = require('./_global').document
   // in old IE typeof document.createElement is 'object'
@@ -360,12 +368,12 @@ var isObject = require('./_is-object')
 module.exports = function(it){
   return is ? document.createElement(it) : {};
 };
-},{"./_global":16,"./_is-object":21}],13:[function(require,module,exports){
+},{"./_global":18,"./_is-object":23}],15:[function(require,module,exports){
 // IE 8- don't enum bug keys
 module.exports = (
   'constructor,hasOwnProperty,isPrototypeOf,propertyIsEnumerable,toLocaleString,toString,valueOf'
 ).split(',');
-},{}],14:[function(require,module,exports){
+},{}],16:[function(require,module,exports){
 var global    = require('./_global')
   , core      = require('./_core')
   , ctx       = require('./_ctx')
@@ -427,7 +435,7 @@ $export.W = 32;  // wrap
 $export.U = 64;  // safe
 $export.R = 128; // real proto method for `library` 
 module.exports = $export;
-},{"./_core":8,"./_ctx":9,"./_global":16,"./_hide":18}],15:[function(require,module,exports){
+},{"./_core":10,"./_ctx":11,"./_global":18,"./_hide":20}],17:[function(require,module,exports){
 module.exports = function(exec){
   try {
     return !!exec();
@@ -435,17 +443,17 @@ module.exports = function(exec){
     return true;
   }
 };
-},{}],16:[function(require,module,exports){
+},{}],18:[function(require,module,exports){
 // https://github.com/zloirock/core-js/issues/86#issuecomment-115759028
 var global = module.exports = typeof window != 'undefined' && window.Math == Math
   ? window : typeof self != 'undefined' && self.Math == Math ? self : Function('return this')();
 if(typeof __g == 'number')__g = global; // eslint-disable-line no-undef
-},{}],17:[function(require,module,exports){
+},{}],19:[function(require,module,exports){
 var hasOwnProperty = {}.hasOwnProperty;
 module.exports = function(it, key){
   return hasOwnProperty.call(it, key);
 };
-},{}],18:[function(require,module,exports){
+},{}],20:[function(require,module,exports){
 var dP         = require('./_object-dp')
   , createDesc = require('./_property-desc');
 module.exports = require('./_descriptors') ? function(object, key, value){
@@ -454,21 +462,21 @@ module.exports = require('./_descriptors') ? function(object, key, value){
   object[key] = value;
   return object;
 };
-},{"./_descriptors":11,"./_object-dp":22,"./_property-desc":26}],19:[function(require,module,exports){
+},{"./_descriptors":13,"./_object-dp":24,"./_property-desc":28}],21:[function(require,module,exports){
 module.exports = !require('./_descriptors') && !require('./_fails')(function(){
   return Object.defineProperty(require('./_dom-create')('div'), 'a', {get: function(){ return 7; }}).a != 7;
 });
-},{"./_descriptors":11,"./_dom-create":12,"./_fails":15}],20:[function(require,module,exports){
+},{"./_descriptors":13,"./_dom-create":14,"./_fails":17}],22:[function(require,module,exports){
 // fallback for non-array-like ES3 and non-enumerable old V8 strings
 var cof = require('./_cof');
 module.exports = Object('z').propertyIsEnumerable(0) ? Object : function(it){
   return cof(it) == 'String' ? it.split('') : Object(it);
 };
-},{"./_cof":7}],21:[function(require,module,exports){
+},{"./_cof":9}],23:[function(require,module,exports){
 module.exports = function(it){
   return typeof it === 'object' ? it !== null : typeof it === 'function';
 };
-},{}],22:[function(require,module,exports){
+},{}],24:[function(require,module,exports){
 var anObject       = require('./_an-object')
   , IE8_DOM_DEFINE = require('./_ie8-dom-define')
   , toPrimitive    = require('./_to-primitive')
@@ -485,7 +493,7 @@ exports.f = require('./_descriptors') ? Object.defineProperty : function defineP
   if('value' in Attributes)O[P] = Attributes.value;
   return O;
 };
-},{"./_an-object":5,"./_descriptors":11,"./_ie8-dom-define":19,"./_to-primitive":34}],23:[function(require,module,exports){
+},{"./_an-object":7,"./_descriptors":13,"./_ie8-dom-define":21,"./_to-primitive":36}],25:[function(require,module,exports){
 var has          = require('./_has')
   , toIObject    = require('./_to-iobject')
   , arrayIndexOf = require('./_array-includes')(false)
@@ -503,7 +511,7 @@ module.exports = function(object, names){
   }
   return result;
 };
-},{"./_array-includes":6,"./_has":17,"./_shared-key":27,"./_to-iobject":31}],24:[function(require,module,exports){
+},{"./_array-includes":8,"./_has":19,"./_shared-key":29,"./_to-iobject":33}],26:[function(require,module,exports){
 // 19.1.2.14 / 15.2.3.14 Object.keys(O)
 var $keys       = require('./_object-keys-internal')
   , enumBugKeys = require('./_enum-bug-keys');
@@ -511,7 +519,7 @@ var $keys       = require('./_object-keys-internal')
 module.exports = Object.keys || function keys(O){
   return $keys(O, enumBugKeys);
 };
-},{"./_enum-bug-keys":13,"./_object-keys-internal":23}],25:[function(require,module,exports){
+},{"./_enum-bug-keys":15,"./_object-keys-internal":25}],27:[function(require,module,exports){
 // most Object methods by ES6 should accept primitives
 var $export = require('./_export')
   , core    = require('./_core')
@@ -522,7 +530,7 @@ module.exports = function(KEY, exec){
   exp[KEY] = exec(fn);
   $export($export.S + $export.F * fails(function(){ fn(1); }), 'Object', exp);
 };
-},{"./_core":8,"./_export":14,"./_fails":15}],26:[function(require,module,exports){
+},{"./_core":10,"./_export":16,"./_fails":17}],28:[function(require,module,exports){
 module.exports = function(bitmap, value){
   return {
     enumerable  : !(bitmap & 1),
@@ -531,20 +539,20 @@ module.exports = function(bitmap, value){
     value       : value
   };
 };
-},{}],27:[function(require,module,exports){
+},{}],29:[function(require,module,exports){
 var shared = require('./_shared')('keys')
   , uid    = require('./_uid');
 module.exports = function(key){
   return shared[key] || (shared[key] = uid(key));
 };
-},{"./_shared":28,"./_uid":35}],28:[function(require,module,exports){
+},{"./_shared":30,"./_uid":37}],30:[function(require,module,exports){
 var global = require('./_global')
   , SHARED = '__core-js_shared__'
   , store  = global[SHARED] || (global[SHARED] = {});
 module.exports = function(key){
   return store[key] || (store[key] = {});
 };
-},{"./_global":16}],29:[function(require,module,exports){
+},{"./_global":18}],31:[function(require,module,exports){
 var toInteger = require('./_to-integer')
   , max       = Math.max
   , min       = Math.min;
@@ -552,34 +560,34 @@ module.exports = function(index, length){
   index = toInteger(index);
   return index < 0 ? max(index + length, 0) : min(index, length);
 };
-},{"./_to-integer":30}],30:[function(require,module,exports){
+},{"./_to-integer":32}],32:[function(require,module,exports){
 // 7.1.4 ToInteger
 var ceil  = Math.ceil
   , floor = Math.floor;
 module.exports = function(it){
   return isNaN(it = +it) ? 0 : (it > 0 ? floor : ceil)(it);
 };
-},{}],31:[function(require,module,exports){
+},{}],33:[function(require,module,exports){
 // to indexed object, toObject with fallback for non-array-like ES3 strings
 var IObject = require('./_iobject')
   , defined = require('./_defined');
 module.exports = function(it){
   return IObject(defined(it));
 };
-},{"./_defined":10,"./_iobject":20}],32:[function(require,module,exports){
+},{"./_defined":12,"./_iobject":22}],34:[function(require,module,exports){
 // 7.1.15 ToLength
 var toInteger = require('./_to-integer')
   , min       = Math.min;
 module.exports = function(it){
   return it > 0 ? min(toInteger(it), 0x1fffffffffffff) : 0; // pow(2, 53) - 1 == 9007199254740991
 };
-},{"./_to-integer":30}],33:[function(require,module,exports){
+},{"./_to-integer":32}],35:[function(require,module,exports){
 // 7.1.13 ToObject(argument)
 var defined = require('./_defined');
 module.exports = function(it){
   return Object(defined(it));
 };
-},{"./_defined":10}],34:[function(require,module,exports){
+},{"./_defined":12}],36:[function(require,module,exports){
 // 7.1.1 ToPrimitive(input [, PreferredType])
 var isObject = require('./_is-object');
 // instead of the ES6 spec version, we didn't implement @@toPrimitive case
@@ -592,13 +600,13 @@ module.exports = function(it, S){
   if(!S && typeof (fn = it.toString) == 'function' && !isObject(val = fn.call(it)))return val;
   throw TypeError("Can't convert object to primitive value");
 };
-},{"./_is-object":21}],35:[function(require,module,exports){
+},{"./_is-object":23}],37:[function(require,module,exports){
 var id = 0
   , px = Math.random();
 module.exports = function(key){
   return 'Symbol('.concat(key === undefined ? '' : key, ')_', (++id + px).toString(36));
 };
-},{}],36:[function(require,module,exports){
+},{}],38:[function(require,module,exports){
 // 19.1.2.14 Object.keys(O)
 var toObject = require('./_to-object')
   , $keys    = require('./_object-keys');
@@ -608,7 +616,7 @@ require('./_object-sap')('keys', function(){
     return $keys(toObject(it));
   };
 });
-},{"./_object-keys":24,"./_object-sap":25,"./_to-object":33}],37:[function(require,module,exports){
+},{"./_object-keys":26,"./_object-sap":27,"./_to-object":35}],39:[function(require,module,exports){
 // shim for using process in browser
 
 var process = module.exports = {};
@@ -729,7 +737,7 @@ process.chdir = function (dir) {
 };
 process.umask = function() { return 0; };
 
-},{}],38:[function(require,module,exports){
+},{}],40:[function(require,module,exports){
 var autosize = require('autosize')
 
 exports.install = function(Vue) {
@@ -748,7 +756,7 @@ exports.install = function(Vue) {
     }
   })
 }
-},{"autosize":1}],39:[function(require,module,exports){
+},{"autosize":1}],41:[function(require,module,exports){
 var Vue // late bind
 var map = Object.create(null)
 var shimmed = false
@@ -1049,7 +1057,7 @@ function format (id) {
   return match ? match[0] : id
 }
 
-},{}],40:[function(require,module,exports){
+},{}],42:[function(require,module,exports){
 (function (process,global){
 /*!
  * Vue.js v1.0.26
@@ -11126,7 +11134,7 @@ setTimeout(function () {
 
 module.exports = Vue;
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"_process":37}],41:[function(require,module,exports){
+},{"_process":39}],43:[function(require,module,exports){
 'use strict';
 
 var _panel = require('./vue-components/panel.vue');
@@ -11193,12 +11201,16 @@ new Vue({
 	}
 });
 
-},{"./vue-components/panel.vue":42,"vue-autosize":38}],42:[function(require,module,exports){
+},{"./vue-components/panel.vue":44,"vue-autosize":40}],44:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
 	value: true
 });
+
+var _stringify = require('babel-runtime/core-js/json/stringify');
+
+var _stringify2 = _interopRequireDefault(_stringify);
 
 var _keys = require('babel-runtime/core-js/object/keys');
 
@@ -11214,13 +11226,14 @@ exports.default = {
 
 	data: function data() {
 		return {
-			list: [],
 			newThing: {
 				body: ''
 			},
 			editedThing: null,
 			selectedThing: null,
-			visibility: 'all'
+			selectedThingIndex: null,
+			visibility: 'all',
+			list: []
 		};
 	},
 	computed: {
@@ -11237,28 +11250,33 @@ exports.default = {
 		}
 	},
 	methods: {
+		getIndexOfId: function getIndexOfId(x) {
+			return this.list.map(function (obj) {
+				return obj.id;
+			}).indexOf(x);
+		},
 		select: function select(thing) {
 			this.selectedThing = thing;
+			var el_ind = this.getIndexOfId(thing);
+			this.selectedThingIndex = el_ind;
 		},
 		selectNext: function selectNext() {
 			if (!this.selectedThing) {
 				this.selectedThing = this.list[0];
 				return;
 			}
-			var el_i = this.list.map(function (obj) {
-				return obj.id;
-			}).indexOf(this.selectedThing.id);
+			var el_i = this.getIndexOfId(this.selectedThing.id);
 			this.selectedThing = this.list[el_i + 1];
+			this.selectedThingIndex++;
 		},
 		selectPrevious: function selectPrevious() {
 			if (!this.selectedThing) {
 				this.selectedThing = this.list[0];
 				return;
 			}
-			var el_i = this.list.map(function (obj) {
-				return obj.id;
-			}).indexOf(this.selectedThing.id);
+			var el_i = this.getIndexOfId(this.selectedThing.id);
 			this.selectedThing = this.list[el_i - 1];
+			this.selectedThingIndex--;
 		},
 		indent: function indent() {
 			var thing = this.selectedThing;
@@ -11276,6 +11294,8 @@ exports.default = {
 			this.fetchThis(thing);
 		},
 		markDone: function markDone(thing) {
+
+			this.fetchAll();
 			// if (thing){
 			// 	console.log('click comp');
 			// 	var thing = thing;
@@ -11286,9 +11306,9 @@ exports.default = {
 			// 	var doneVal = !thing.done;
 			// }
 			// console.log(thing);
-			console.log('thing.done ' + thing.done);
-			console.log('doneVal ' + doneVal);
-			this.$http.patch('/api/things/' + thing.id, { 'done': doneVal }).then(this.fetchThis(this));
+			// console.log('thing.done '+thing.done);
+			// console.log('doneVal '+doneVal);
+			// this.$http.patch('/api/things/' + thing.id, {'done':doneVal}).then(this.fetchThis(this));
 		},
 		startEdit: function startEdit(thing) {
 			var thing = thing ? thing : this.selectedThing;
@@ -11325,18 +11345,70 @@ exports.default = {
 		fetchAll: function fetchAll() {
 			this.$http.get('/api/things').then(function (data) {
 				var data = data.json();
+
+				var abcd = (0, _stringify2.default)(data);
+				console.log(abcd);
+
 				$.each(data, function (k, v) {
 					var nl = v['body'].split(/\r\n|\r|\n/).length;
 					v['rows'] = nl;
 				});
 				this.list = data;
+
+				function getParents(obj) {
+					if ('id' in obj && typeof obj.id === 'number' && !isNaN(obj.id)) {
+						return true;
+					} else {
+						invalidEntries++;
+						return false;
+					}
+				}
+
+				// find all parent objects, keep only those.
+				var parents = data.map(function (obj) {
+					var nl = obj['body'].split(/\r\n|\r|\n/).length;
+					obj['rows'] = nl;
+					if (obj.parent_id == 0) {
+						var children = data.filter(function (c_obj) {
+							if (obj.id == c_obj.parent_id) {
+								console.log('obj.parent_id .. ' + obj.parent_id);
+								return true;
+							} else {
+								return false;
+							}
+						});
+						obj['children'] = children;
+						return obj;
+					}
+				});
+				// for each parent object find the children and keep those.
+				// var parentsWithChildren = parents.map(function(obj){ 
+				// 	if (obj){
+				// 	var p_id = obj.id;
+				// 	var children = {};
+				// 	var children = data.map(function(c_obj){ 
+				// 		if(c_obj.parent_id == p_id){
+				// 			return c_obj;
+				// 		}
+				// 	});
+				// 	obj['children'] = children;
+				// 	}
+				// });
+				var abc = (0, _stringify2.default)(parents);
+				console.log(abc);
+
+				// var kvArray = [{key:1, value:10}, {key:2, value:20}, {key:3, value: 30}];
+				// reformattedArray is now [{1:10}, {2:20}, {3:30}], 
+				// kvArray is still [{key:1, value:10}, {key:2, value:20}, {key:3, value: 30}]
+
 				//console.log(JSON.stringify(data));
 			});
 		},
 		fetchThis: function fetchThis(thing) {
 			this.$http.get('/api/things/' + thing.id).then(function (data) {
 				thing = data.json();
-				console.log(thing);
+				this.list[selectedThingIndex] = data.json();
+				// console.log(this.list.thing);
 			});
 		},
 		addNew: function addNew() {
@@ -11402,6 +11474,6 @@ if (module.hot) {(function () {  module.hot.accept()
     hotAPI.update("_v-f86b8dc2", module.exports, (typeof module.exports === "function" ? module.exports.options : module.exports).template)
   }
 })()}
-},{"babel-runtime/core-js/object/keys":2,"vue":40,"vue-hot-reload-api":39}]},{},[41]);
+},{"babel-runtime/core-js/json/stringify":2,"babel-runtime/core-js/object/keys":3,"vue":42,"vue-hot-reload-api":41}]},{},[43]);
 
 //# sourceMappingURL=main.js.map
