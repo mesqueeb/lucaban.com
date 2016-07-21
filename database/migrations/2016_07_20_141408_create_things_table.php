@@ -26,12 +26,19 @@ class CreateThingsTable extends Migration {
       // $table->string('name', 255);
       $table->string('body');
       $table->text('memo');
-      $table->decimal('completion');
-      $table->morphs('taggable');
+      $table->time('planned_time');
+      $table->time('total_used_time');
+      $table->decimal('completion_rate', 5, 4);
+      $table->dateTime('due_date');
+      $table->dateTime('done_date');
       $table->boolean('done');
-      $table->timestamp('done_date');
+      $table->text('completion_memo');
       $table->softDeletes();
+      $table->morphs('taggable');
       $table->integer('created_by')->unsigned()->index();
+
+      // To assign things see table: link_things_users
+
       $table->timestamps();
 
     });
