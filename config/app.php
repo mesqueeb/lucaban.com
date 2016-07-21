@@ -158,7 +158,6 @@ return [
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
         Baum\Providers\BaumServiceProvider::class,
-        // 'Baum\Providers\BaumServiceProvider',
 
     ],
 
@@ -175,7 +174,6 @@ return [
 
     'aliases' => [
 
-        // 'baum' => Baum\Console\InstallCommand::class,
         'App' => Illuminate\Support\Facades\App::class,
         'Artisan' => Illuminate\Support\Facades\Artisan::class,
         'Auth' => Illuminate\Support\Facades\Auth::class,
