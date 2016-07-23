@@ -16,7 +16,7 @@ new Vue({
 					break;
 				}
 				e.preventDefault();
-				vm.$broadcast('enterOnInputFocus');
+				vm.$broadcast('enterOnFocussedInput');
 				break;
 		} // end switch
 		} else { 

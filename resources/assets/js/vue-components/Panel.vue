@@ -213,7 +213,13 @@ export default {
     	tab() { this.indent(); },
     	unindent() { this.unindent(); },
     	enter() { this.startEdit(); },
-    	enterOnInputFocus() { this.doneEdit(); },
+    	enterOnFocussedInput() {
+			if ( $('#add-thing:focus').length > 0 ) {
+				this.addNew();
+			} else {
+				this.doneEdit();
+			}
+    	},
 	},
 	directives: {
 		'thing-focus': function (value) {

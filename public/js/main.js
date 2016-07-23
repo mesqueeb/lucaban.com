@@ -11160,7 +11160,7 @@ new Vue({
 							break;
 						}
 						e.preventDefault();
-						vm.$broadcast('enterOnInputFocus');
+						vm.$broadcast('enterOnFocussedInput');
 						break;
 				} // end switch
 			} else {
@@ -11384,8 +11384,12 @@ exports.default = {
 		enter: function enter() {
 			this.startEdit();
 		},
-		enterOnInputFocus: function enterOnInputFocus() {
-			this.doneEdit();
+		enterOnFocussedInput: function enterOnFocussedInput() {
+			if ($('#add-thing:focus').length > 0) {
+				this.addNew();
+			} else {
+				this.doneEdit();
+			}
 		}
 	},
 	directives: {
