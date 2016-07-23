@@ -34,6 +34,7 @@ class CreateThingsTable extends Migration {
       $table->boolean('done');
       $table->text('completion_memo');
       $table->softDeletes();
+      $table->morphs('taggable');
       $table->integer('created_by')->unsigned()->index();
 
       // To assign things see table: link_things_users

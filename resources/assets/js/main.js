@@ -11,34 +11,34 @@ new Vue({
         if ( $('input:focus').length > 0 ||  $('textarea:focus').length > 0 ) {
         	// INPUT AREAS IN FOCUS
 		switch(e.keyCode) { 
-			case 13: //ENTER
+			case 13:
 				if (e.shiftKey){
 					break;
 				}
 				e.preventDefault();
-				vm.$broadcast('enterOnFocussedInput');
+				vm.$broadcast('enterOnInputFocus');
 				break;
 		} // end switch
 		} else { 
 			// INPUT AREAS NOT IN FOCUS
         switch(e.keyCode) { 
-			case 40: //Down arrow
+			case 40: // arrowDown
 				e.preventDefault();
-				vm.$broadcast('downArrow');
+				vm.$broadcast('arrowDown');
 				break;
-			case 38: //Up arrow
+			case 38: // arrowUp
 				e.preventDefault();
-				vm.$broadcast('upArrow');
+				vm.$broadcast('arrowUp');
 				break;
-			case 32: //space
+			case 32: // spaceBar
 				e.preventDefault();
 				vm.$broadcast('spaceBar');
 				break;
-			case 9: //TAB
+			case 9: // tab
 				e.preventDefault();
 				vm.$broadcast('tab');
 				break;
-			case 13: //ENTER
+			case 13: // enter
 				e.preventDefault();
 				vm.$broadcast('enter');
 				break;

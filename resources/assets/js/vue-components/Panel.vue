@@ -1,4 +1,4 @@
-<!-- 
+
 <div>
 	<task>Go shopping</task>
 	<children>
@@ -11,7 +11,7 @@
 			<children>...</children>
 		</div>
 	</children>
-</div> -->
+</div>
 
 <template id="things-panel-template">
 	<div class="things-panel">
@@ -20,12 +20,13 @@
 			:class="{
 				done: thing.done,
 				selected: thing.id == selectedId,
+				editing: thing == editedThing,
 				}"
 		>
 			<input class="toggle"
 				type="checkbox"
 				v-model="thing.done"
-				@click="markDone(thing)"
+				@change="markDone(thing)"
 			>
 			<div
 				@dblclick="startEdit(thing)"
@@ -53,16 +54,14 @@
 		<form action=""
 			@submit.prevent="addNew"
 		>
-			<textarea type="text"
+			<input type="text"
 				name="body"
 				id="add-thing"
 				v-model="newThing.body"
-				v-autosize="newThing.body"
-				rows="1" 
 				placeholder="I can't forget to..."
 				autocomplete="off"
 				autofocus 
-			>{{ newThing.body }}</textarea>
+			>
 		</form>
 	</div>
 </template>
@@ -114,10 +113,12 @@ export default {
 			this.selectedIndex = this.getIndexOfId(thing.id);
 		},
 		selectNext(){
-			if (!this.selectedIndex){
+			if (this.selectedIndex == null){
 				this.selectedIndex = 0;
+			} else if (this.selectedIndex == this.list.length-1) {
+				return;
 			} else {
-				this.selectedIndex++;
+				this.selectedIndex = this.selectedIndex+1;
 			}
 			this.selectedId = this.list[this.selectedIndex].id;
 		},
@@ -125,7 +126,7 @@ export default {
 			if (!this.selectedIndex){
 				this.selectedIndex = 0;
 			} else {
-				this.selectedIndex--;
+				this.selectedIndex = this.selectedIndex-1;
 			}
 			this.selectedId = this.list[this.selectedIndex].id;
 		},
@@ -141,25 +142,19 @@ export default {
 			this.fetchThis(thing);
 		},
 		markDone(thing){
-			var thing = (thing) ? thing : this.selectedThing;
-			console.log('thing...');
-			console.log(thing);
-			console.log('thing.done = '+thing.done);
-			console.log('!thing.done = '+!thing.done);
-			this.$http.patch('/api/things/' + thing.id, {'done':!thing.done}).then(
-				this.fetchThis(thing)
-				//thing.done = !thing.done
-			);
-			var msg = (thing.done) ? 'done → undo' : 'not done → done!' ;
-			console.log(msg);
+			if(!thing){
+				var thing = this.list[this.selectedIndex]
+				thing.done = !thing.done;
+			}
+			this.$http.patch('/api/things/' + thing.id, {'done':thing.done});
 		},
 		startEdit(thing){
-			var thing = (thing) ? thing : this.selectedThing;
+			var thing = (thing) ? thing : this.list[this.selectedIndex];
 			this.beforeEditCache = thing.body;
 			this.editedThing = thing;
 		},
 		doneEdit(thing) {
-			var thing = (thing) ? thing : this.selectedThing;
+			var thing = (thing) ? thing : this.list[this.selectedIndex];
 			if (!this.editedThing) {
 				return;
 			}
@@ -169,17 +164,12 @@ export default {
 				this.deleteThing(thing);
 			}
 			var id = thing.id;
-			this.$http.patch('/api/things/' + id, thing, { method: 'PATCH'}).then((response) => {
-		        // get status
-		        response.status;
-		        console.log(response);
-			}, (response) => {
-				// error callback
-				console.log(response);
-			});
+			this.$http.patch('/api/things/' + id, thing, { method: 'PATCH'});
+			$(':focus').blur();
 		},
 		cancelEdit(thing) {
 			this.editedThing = null;
+			console.log(this.beforeEditCache);
 			thing.body = this.beforeEditCache;
 		},
 		deleteThing(thing){
@@ -192,14 +182,13 @@ export default {
   					var nl = v['body'].split(/\r\n|\r|\n/).length;
   					v['rows'] = nl;
 				});
+				this.list = data;
 				var abcd = JSON.stringify(data);
 				console.log(abcd);
-				this.list = data;
 				console.log('fetchedAll');
 			});
 		},
 		fetchThis(thing){
-			var thing = (thing) ? thing : this.selectedThing;
 			this.$http.get('/api/things/'+thing.id).then(function(data) {
 				var data = data.json();
 				var nl = data['body'].split(/\r\n|\r|\n/).length;
@@ -215,23 +204,16 @@ export default {
 			this.newThing = {body:''}; // clear input
 			this.$http.post('/api/things',thing); // send
 			this.fetchAll();
-			console.log('addNew♡');
 		},
 	},
 	events: {
-    	downArrow() { this.selectNext(); },
-    	upArrow() { this.selectPrevious(); },
+    	arrowDown() { this.selectNext(); },
+    	arrowUp() { this.selectPrevious(); },
     	spaceBar() { this.markDone(); },
     	tab() { this.indent(); },
-    	// unindent() { this.unindent(); },
+    	unindent() { this.unindent(); },
     	enter() { this.startEdit(); },
-    	enterOnFocussedInput() {
-			if ( $('#add-thing:focus').length > 0 ) {
-				this.addNew();
-			} else {
-				this.doneEdit();
-			}
-    	},
+    	enterOnInputFocus() { this.doneEdit(); },
 	},
 	directives: {
 		'thing-focus': function (value) {

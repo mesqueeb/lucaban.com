@@ -11156,39 +11156,38 @@ new Vue({
 				// INPUT AREAS IN FOCUS
 				switch (e.keyCode) {
 					case 13:
-						//ENTER
 						if (e.shiftKey) {
 							break;
 						}
 						e.preventDefault();
-						vm.$broadcast('enterOnFocussedInput');
+						vm.$broadcast('enterOnInputFocus');
 						break;
 				} // end switch
 			} else {
 				// INPUT AREAS NOT IN FOCUS
 				switch (e.keyCode) {
 					case 40:
-						//Down arrow
+						// arrowDown
 						e.preventDefault();
-						vm.$broadcast('downArrow');
+						vm.$broadcast('arrowDown');
 						break;
 					case 38:
-						//Up arrow
+						// arrowUp
 						e.preventDefault();
-						vm.$broadcast('upArrow');
+						vm.$broadcast('arrowUp');
 						break;
 					case 32:
-						//space
+						// spaceBar
 						e.preventDefault();
 						vm.$broadcast('spaceBar');
 						break;
 					case 9:
-						//TAB
+						// tab
 						e.preventDefault();
 						vm.$broadcast('tab');
 						break;
 					case 13:
-						//ENTER
+						// enter
 						e.preventDefault();
 						vm.$broadcast('enter');
 						break;
@@ -11267,10 +11266,12 @@ exports.default = {
 			this.selectedIndex = this.getIndexOfId(thing.id);
 		},
 		selectNext: function selectNext() {
-			if (!this.selectedIndex) {
+			if (this.selectedIndex == null) {
 				this.selectedIndex = 0;
+			} else if (this.selectedIndex == this.list.length - 1) {
+				return;
 			} else {
-				this.selectedIndex++;
+				this.selectedIndex = this.selectedIndex + 1;
 			}
 			this.selectedId = this.list[this.selectedIndex].id;
 		},
@@ -11278,7 +11279,7 @@ exports.default = {
 			if (!this.selectedIndex) {
 				this.selectedIndex = 0;
 			} else {
-				this.selectedIndex--;
+				this.selectedIndex = this.selectedIndex - 1;
 			}
 			this.selectedId = this.list[this.selectedIndex].id;
 		},
@@ -11298,24 +11299,19 @@ exports.default = {
 			this.fetchThis(thing);
 		},
 		markDone: function markDone(thing) {
-			var thing = thing ? thing : this.selectedThing;
-			console.log('thing...');
-			console.log(thing);
-			console.log('thing.done = ' + thing.done);
-			console.log('!thing.done = ' + !thing.done);
-			this.$http.patch('/api/things/' + thing.id, { 'done': !thing.done }).then(this.fetchThis(thing)
-			//thing.done = !thing.done
-			);
-			var msg = thing.done ? 'done → undo' : 'not done → done!';
-			console.log(msg);
+			if (!thing) {
+				var thing = this.list[this.selectedIndex];
+				thing.done = !thing.done;
+			}
+			this.$http.patch('/api/things/' + thing.id, { 'done': thing.done });
 		},
 		startEdit: function startEdit(thing) {
-			var thing = thing ? thing : this.selectedThing;
+			var thing = thing ? thing : this.list[this.selectedIndex];
 			this.beforeEditCache = thing.body;
 			this.editedThing = thing;
 		},
 		doneEdit: function doneEdit(thing) {
-			var thing = thing ? thing : this.selectedThing;
+			var thing = thing ? thing : this.list[this.selectedIndex];
 			if (!this.editedThing) {
 				return;
 			}
@@ -11325,17 +11321,12 @@ exports.default = {
 				this.deleteThing(thing);
 			}
 			var id = thing.id;
-			this.$http.patch('/api/things/' + id, thing, { method: 'PATCH' }).then(function (response) {
-				// get status
-				response.status;
-				console.log(response);
-			}, function (response) {
-				// error callback
-				console.log(response);
-			});
+			this.$http.patch('/api/things/' + id, thing, { method: 'PATCH' });
+			$(':focus').blur();
 		},
 		cancelEdit: function cancelEdit(thing) {
 			this.editedThing = null;
+			console.log(this.beforeEditCache);
 			thing.body = this.beforeEditCache;
 		},
 		deleteThing: function deleteThing(thing) {
@@ -11348,14 +11339,13 @@ exports.default = {
 					var nl = v['body'].split(/\r\n|\r|\n/).length;
 					v['rows'] = nl;
 				});
+				this.list = data;
 				var abcd = (0, _stringify2.default)(data);
 				console.log(abcd);
-				this.list = data;
 				console.log('fetchedAll');
 			});
 		},
 		fetchThis: function fetchThis(thing) {
-			var thing = thing ? thing : this.selectedThing;
 			this.$http.get('/api/things/' + thing.id).then(function (data) {
 				var data = data.json();
 				var nl = data['body'].split(/\r\n|\r|\n/).length;
@@ -11373,14 +11363,13 @@ exports.default = {
 			this.newThing = { body: '' }; // clear input
 			this.$http.post('/api/things', thing); // send
 			this.fetchAll();
-			console.log('addNew♡');
 		}
 	},
 	events: {
-		downArrow: function downArrow() {
+		arrowDown: function arrowDown() {
 			this.selectNext();
 		},
-		upArrow: function upArrow() {
+		arrowUp: function arrowUp() {
 			this.selectPrevious();
 		},
 		spaceBar: function spaceBar() {
@@ -11389,17 +11378,14 @@ exports.default = {
 		tab: function tab() {
 			this.indent();
 		},
-
-		// unindent() { this.unindent(); },
+		unindent: function unindent() {
+			this.unindent();
+		},
 		enter: function enter() {
 			this.startEdit();
 		},
-		enterOnFocussedInput: function enterOnFocussedInput() {
-			if ($('#add-thing:focus').length > 0) {
-				this.addNew();
-			} else {
-				this.doneEdit();
-			}
+		enterOnInputFocus: function enterOnInputFocus() {
+			this.doneEdit();
 		}
 	},
 	directives: {
@@ -11421,7 +11407,7 @@ exports.default = {
 	}
 };
 if (module.exports.__esModule) module.exports = module.exports.default
-;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\n<div class=\"things-panel\">\n\t<div v-for=\"thing in list\" class=\"thing-card\" :class=\"{\n\t\t\tdone: thing.done,\n\t\t\tselected: thing.id == selectedId,\n\t\t\t}\">\n\t\t<input class=\"toggle\" type=\"checkbox\" v-model=\"thing.done\" @click=\"markDone(thing)\">\n\t\t<div @dblclick=\"startEdit(thing)\" @click=\"select(thing)\">\n\t\t\t<span class=\"bodybox\" v-show=\"thing != editedThing\">{{ thing.body }}</span>\n\t\t\t<form action=\"update\" class=\"updatebox\" @submit.prevent=\"doneEdit(thing)\">\n\t\t\t\t<textarea name=\"thing_body\" rows=\"{{ thing.rows }}\" v-model=\"thing.body\" v-autosize=\"thing.body\" v-thing-focus=\"thing == editedThing\" @blur=\"doneEdit(thing)\" @keyup.esc=\"cancelEdit(thing)\">{{ thing.body }}</textarea>\n\t\t\t</form>\n\t\t</div>\n\t</div>\n\n\t<form action=\"\" @submit.prevent=\"addNew\">\n\t\t<textarea type=\"text\" name=\"body\" id=\"add-thing\" v-model=\"newThing.body\" v-autosize=\"newThing.body\" rows=\"1\" placeholder=\"I can't forget to...\" autocomplete=\"off\" autofocus=\"\">{{ newThing.body }}</textarea>\n\t</form>\n</div>\n"
+;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\n<div class=\"things-panel\">\n\t<div v-for=\"thing in list\" class=\"thing-card\" :class=\"{\n\t\t\tdone: thing.done,\n\t\t\tselected: thing.id == selectedId,\n\t\t\tediting: thing == editedThing,\n\t\t\t}\">\n\t\t<input class=\"toggle\" type=\"checkbox\" v-model=\"thing.done\" @change=\"markDone(thing)\">\n\t\t<div @dblclick=\"startEdit(thing)\" @click=\"select(thing)\">\n\t\t\t<span class=\"bodybox\" v-show=\"thing != editedThing\">{{ thing.body }}</span>\n\t\t\t<form action=\"update\" class=\"updatebox\" @submit.prevent=\"doneEdit(thing)\">\n\t\t\t\t<textarea name=\"thing_body\" rows=\"{{ thing.rows }}\" v-model=\"thing.body\" v-autosize=\"thing.body\" v-thing-focus=\"thing == editedThing\" @blur=\"doneEdit(thing)\" @keyup.esc=\"cancelEdit(thing)\">{{ thing.body }}</textarea>\n\t\t\t</form>\n\t\t</div>\n\t</div>\n\n\t<form action=\"\" @submit.prevent=\"addNew\">\n\t\t<input type=\"text\" name=\"body\" id=\"add-thing\" v-model=\"newThing.body\" placeholder=\"I can't forget to...\" autocomplete=\"off\" autofocus=\"\">\n\t</form>\n</div>\n"
 if (module.hot) {(function () {  module.hot.accept()
   var hotAPI = require("vue-hot-reload-api")
   hotAPI.install(require("vue"), true)
