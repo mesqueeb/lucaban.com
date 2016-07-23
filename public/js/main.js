@@ -11236,8 +11236,9 @@ exports.default = {
 				body: ''
 			},
 			editedThing: null,
-			selectedThing: null,
-			selectedThingIndex: null,
+			// selectedThing: null,
+			selectedIndex: null,
+			selectedId: null,
 			visibility: 'all',
 			list: []
 		};
@@ -11262,28 +11263,24 @@ exports.default = {
 			}).indexOf(x);
 		},
 		select: function select(thing) {
-			this.selectedThing = thing;
-			thing.selected = true;
-			var el_ind = this.getIndexOfId(thing.id);
-			this.selectedThingIndex = el_ind;
+			this.selectedId = thing.id;
+			this.selectedIndex = this.getIndexOfId(thing.id);
 		},
 		selectNext: function selectNext() {
-			if (!this.selectedThing) {
-				this.selectedThing = this.list[0];
-				return;
+			if (!this.selectedIndex) {
+				this.selectedIndex = 0;
+			} else {
+				this.selectedIndex++;
 			}
-			var el_i = this.getIndexOfId(this.selectedThing.id);
-			this.selectedThing = this.list[el_i + 1];
-			this.selectedThingIndex++;
+			this.selectedId = this.list[this.selectedIndex].id;
 		},
 		selectPrevious: function selectPrevious() {
-			if (!this.selectedThing) {
-				this.selectedThing = this.list[0];
-				return;
+			if (!this.selectedIndex) {
+				this.selectedIndex = 0;
+			} else {
+				this.selectedIndex--;
 			}
-			var el_i = this.getIndexOfId(this.selectedThing.id);
-			this.selectedThing = this.list[el_i - 1];
-			this.selectedThingIndex--;
+			this.selectedId = this.list[this.selectedIndex].id;
 		},
 		indent: function indent() {
 			var thing = this.selectedThing;
@@ -11347,56 +11344,14 @@ exports.default = {
 		fetchAll: function fetchAll() {
 			this.$http.get('/api/things').then(function (data) {
 				var data = data.json();
-				var abcd = (0, _stringify2.default)(data);
-				console.log(abcd);
 				$.each(data, function (k, v) {
 					var nl = v['body'].split(/\r\n|\r|\n/).length;
 					v['rows'] = nl;
 				});
+				var abcd = (0, _stringify2.default)(data);
+				console.log(abcd);
 				this.list = data;
-				console.log('fetchAll');
-
-				// function getParents(obj) {
-				// 	if ('id' in obj && typeof(obj.id) === 'number' && !isNaN(obj.id)) {
-				//     return true;
-				//   } else {
-				//     invalidEntries++;
-				//     return false;
-				//   }
-				// }
-
-				// // find all parent objects, keep only those.
-				// var parents = data.map(function(obj){ 
-				// 	var nl = obj['body'].split(/\r\n|\r|\n/).length;
-				// 	obj['rows'] = nl;
-				// 	if(obj.parent_id == 0){
-				// 		var children = data.filter(function(c_obj){
-				// 			if(obj.id == c_obj.parent_id){
-				// 				console.log('obj.parent_id .. '+obj.parent_id);
-				// 				return true;
-				// 			} else { return false; }
-				// 		});
-				// 		obj['children'] = children;
-				// 		return obj;
-				// 	}
-				// });
-				// for each parent object find the children and keep those.
-				// var parentsWithChildren = parents.map(function(obj){ 
-				// 	if (obj){
-				// 	var p_id = obj.id;
-				// 	var children = {};
-				// 	var children = data.map(function(c_obj){ 
-				// 		if(c_obj.parent_id == p_id){
-				// 			return c_obj;
-				// 		}
-				// 	});
-				// 	obj['children'] = children;
-				// 	}
-				// });
-				// var abc = JSON.stringify(parents);
-				// console.log(abc);
-
-				//console.log(JSON.stringify(data));
+				console.log('fetchedAll');
 			});
 		},
 		fetchThis: function fetchThis(thing) {
@@ -11405,7 +11360,7 @@ exports.default = {
 				var data = data.json();
 				var nl = data['body'].split(/\r\n|\r|\n/).length;
 				data['rows'] = nl;
-				var el_ind = this.selectedThingIndex ? this.selectedThingIndex : this.getIndexOfId(thing.id);
+				var el_ind = this.selectedIndex ? this.selectedIndex : this.getIndexOfId(thing.id);
 				console.log('fetched index = ' + el_ind);
 				this.list[el_ind] = data;
 			});
@@ -11466,7 +11421,7 @@ exports.default = {
 	}
 };
 if (module.exports.__esModule) module.exports = module.exports.default
-;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\n<div class=\"things-panel\">\n\t<div v-for=\"thing in list\" class=\"thing-card\" :class=\"{\n\t\t\tdone: thing.done,\n\t\t\tediting: thing == editedThing,\n\t\t\tselected: thing == selectedThing,\n\t\t\tchild: thing.parent_id > 0,\n\t\t\t}\">\n\t\t<input class=\"toggle\" type=\"checkbox\" v-model=\"thing.done\" @click=\"markDone(thing)\">\n\t\t<div @dblclick=\"startEdit(thing)\" @click=\"select(thing)\">\n\t\t\t<span class=\"bodybox\" v-show=\"thing != editedThing\">{{ thing.body }}</span>\n\t\t\t<form action=\"update\" class=\"updatebox\" @submit.prevent=\"doneEdit(thing)\">\n\t\t\t\t<textarea name=\"thing_body\" rows=\"{{ thing.rows }}\" v-model=\"thing.body\" v-autosize=\"thing.body\" v-thing-focus=\"thing == editedThing\" @blur=\"doneEdit(thing)\" @keyup.esc=\"cancelEdit(thing)\">{{ thing.body }}</textarea>\n\t\t\t</form>\n\t\t</div>\n\t</div>\n\n\t<form action=\"\" @submit.prevent=\"addNew\">\n\t\t<textarea type=\"text\" name=\"body\" id=\"add-thing\" v-model=\"newThing.body\" v-autosize=\"newThing.body\" rows=\"1\" placeholder=\"I can't forget to...\" autocomplete=\"off\" autofocus=\"\">{{ newThing.body }}</textarea>\n\t</form>\n</div>\n"
+;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\n<div class=\"things-panel\">\n\t<div v-for=\"thing in list\" class=\"thing-card\" :class=\"{\n\t\t\tdone: thing.done,\n\t\t\tselected: thing.id == selectedId,\n\t\t\t}\">\n\t\t<input class=\"toggle\" type=\"checkbox\" v-model=\"thing.done\" @click=\"markDone(thing)\">\n\t\t<div @dblclick=\"startEdit(thing)\" @click=\"select(thing)\">\n\t\t\t<span class=\"bodybox\" v-show=\"thing != editedThing\">{{ thing.body }}</span>\n\t\t\t<form action=\"update\" class=\"updatebox\" @submit.prevent=\"doneEdit(thing)\">\n\t\t\t\t<textarea name=\"thing_body\" rows=\"{{ thing.rows }}\" v-model=\"thing.body\" v-autosize=\"thing.body\" v-thing-focus=\"thing == editedThing\" @blur=\"doneEdit(thing)\" @keyup.esc=\"cancelEdit(thing)\">{{ thing.body }}</textarea>\n\t\t\t</form>\n\t\t</div>\n\t</div>\n\n\t<form action=\"\" @submit.prevent=\"addNew\">\n\t\t<textarea type=\"text\" name=\"body\" id=\"add-thing\" v-model=\"newThing.body\" v-autosize=\"newThing.body\" rows=\"1\" placeholder=\"I can't forget to...\" autocomplete=\"off\" autofocus=\"\">{{ newThing.body }}</textarea>\n\t</form>\n</div>\n"
 if (module.hot) {(function () {  module.hot.accept()
   var hotAPI = require("vue-hot-reload-api")
   hotAPI.install(require("vue"), true)

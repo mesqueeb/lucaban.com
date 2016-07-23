@@ -19,9 +19,7 @@
 			class="thing-card"
 			:class="{
 				done: thing.done,
-				editing: thing == editedThing,
-				selected: thing == selectedThing,
-				child: thing.parent_id > 0,
+				selected: thing.id == selectedId,
 				}"
 		>
 			<input class="toggle"
@@ -84,8 +82,9 @@ export default {
 				body: '',
 			},
 			editedThing: null,
-			selectedThing: null,
-			selectedThingIndex: null,
+			// selectedThing: null,
+			selectedIndex: null,
+			selectedId: null,
 			visibility: 'all',
 			list: [],
 		};
@@ -111,28 +110,24 @@ export default {
 				}).indexOf(x);
 		},
 		select(thing){
-			this.selectedThing = thing;
-			thing.selected = true;
-			var el_ind = this.getIndexOfId(thing.id);
-			this.selectedThingIndex = el_ind;
+			this.selectedId = thing.id;
+			this.selectedIndex = this.getIndexOfId(thing.id);
 		},
 		selectNext(){
-			if (!this.selectedThing){
-				this.selectedThing = this.list[0];
-				return;
+			if (!this.selectedIndex){
+				this.selectedIndex = 0;
+			} else {
+				this.selectedIndex++;
 			}
-			var el_i = this.getIndexOfId(this.selectedThing.id);
-			this.selectedThing = this.list[el_i+1];
-			this.selectedThingIndex++;
+			this.selectedId = this.list[this.selectedIndex].id;
 		},
 		selectPrevious(){
-			if (!this.selectedThing){
-				this.selectedThing = this.list[0];
-				return;
+			if (!this.selectedIndex){
+				this.selectedIndex = 0;
+			} else {
+				this.selectedIndex--;
 			}
-			var el_i = this.getIndexOfId(this.selectedThing.id);
-			this.selectedThing = this.list[el_i-1];
-			this.selectedThingIndex--;
+			this.selectedId = this.list[this.selectedIndex].id;
 		},
 		indent(){
 			var thing = this.selectedThing;
@@ -193,59 +188,14 @@ export default {
 		fetchAll(){
 			this.$http.get('/api/things').then(function(data) {
   				var data = data.json();
-				var abcd = JSON.stringify(data);
-				console.log(abcd);
   				$.each(data, function(k, v) {
   					var nl = v['body'].split(/\r\n|\r|\n/).length;
   					v['rows'] = nl;
 				});
+				var abcd = JSON.stringify(data);
+				console.log(abcd);
 				this.list = data;
-				console.log('fetchAll');
-
-				// function getParents(obj) {
-				// 	if ('id' in obj && typeof(obj.id) === 'number' && !isNaN(obj.id)) {
-				//     return true;
-				//   } else {
-				//     invalidEntries++;
-				//     return false;
-				//   }
-				// }
-				
-
-				// // find all parent objects, keep only those.
-				// var parents = data.map(function(obj){ 
-				// 	var nl = obj['body'].split(/\r\n|\r|\n/).length;
-				// 	obj['rows'] = nl;
-				// 	if(obj.parent_id == 0){
-				// 		var children = data.filter(function(c_obj){
-				// 			if(obj.id == c_obj.parent_id){
-				// 				console.log('obj.parent_id .. '+obj.parent_id);
-				// 				return true;
-				// 			} else { return false; }
-				// 		});
-				// 		obj['children'] = children;
-				// 		return obj;
-				// 	}
-				// });
-				// for each parent object find the children and keep those.
-				// var parentsWithChildren = parents.map(function(obj){ 
-				// 	if (obj){
-				// 	var p_id = obj.id;
-				// 	var children = {};
-				// 	var children = data.map(function(c_obj){ 
-				// 		if(c_obj.parent_id == p_id){
-				// 			return c_obj;
-				// 		}
-				// 	});
-				// 	obj['children'] = children;
-				// 	}
-				// });
-				// var abc = JSON.stringify(parents);
-				// console.log(abc);
-
-
-				
-				//console.log(JSON.stringify(data));
+				console.log('fetchedAll');
 			});
 		},
 		fetchThis(thing){
@@ -254,7 +204,7 @@ export default {
 				var data = data.json();
 				var nl = data['body'].split(/\r\n|\r|\n/).length;
 				data['rows'] = nl;
-				var el_ind = (this.selectedThingIndex) ? this.selectedThingIndex : this.getIndexOfId(thing.id);
+				var el_ind = (this.selectedIndex) ? this.selectedIndex : this.getIndexOfId(thing.id);
 				console.log('fetched index = '+el_ind);
 				this.list[el_ind] = data;
   			});

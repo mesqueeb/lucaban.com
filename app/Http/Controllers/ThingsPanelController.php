@@ -19,6 +19,14 @@ class ThingsPanelController extends Controller
      */
     public function index()
     {
+        // $things = DB::table('things')->get();
+        // foreach($things as $k => $v){
+        //     $nl = substr_count( $k['body'], "/\r\n|\r|\n/" );
+            
+        //     $k['rows'] = $nl;
+        // }
+        // return $things;
+
         // $parents = DB::table('things')->where('parent_id',0)->get();
 
         // foreach($parents as $k => $v){
