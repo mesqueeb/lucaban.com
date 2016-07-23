@@ -1,4 +1,4 @@
-
+<!-- 
 <div>
 	<task>Go shopping</task>
 	<children>
@@ -11,7 +11,7 @@
 			<children>...</children>
 		</div>
 	</children>
-</div>
+</div> -->
 
 <template id="things-panel-template">
 	<div class="things-panel">
@@ -55,14 +55,16 @@
 		<form action=""
 			@submit.prevent="addNew"
 		>
-			<input type="text"
+			<textarea type="text"
 				name="body"
 				id="add-thing"
 				v-model="newThing.body"
+				v-autosize="newThing.body"
+				rows="1" 
 				placeholder="I can't forget to..."
 				autocomplete="off"
 				autofocus 
-			>
+			>{{ newThing.body }}</textarea>
 		</form>
 	</div>
 </template>
@@ -110,7 +112,8 @@ export default {
 		},
 		select(thing){
 			this.selectedThing = thing;
-			var el_ind = this.getIndexOfId(thing);
+			thing.selected = true;
+			var el_ind = this.getIndexOfId(thing.id);
 			this.selectedThingIndex = el_ind;
 		},
 		selectNext(){
@@ -143,21 +146,17 @@ export default {
 			this.fetchThis(thing);
 		},
 		markDone(thing){
-
-			this.fetchAll();
-			// if (thing){
-			// 	console.log('click comp');
-			// 	var thing = thing;
-			// 	var doneVal = thing.done;
-			// } else {
-			// 	console.log('space comp');
-			// 	var thing = this.selectedThing;
-			// 	var doneVal = !thing.done;
-			// }
-			// console.log(thing);
-			// console.log('thing.done '+thing.done);
-			// console.log('doneVal '+doneVal);
-			// this.$http.patch('/api/things/' + thing.id, {'done':doneVal}).then(this.fetchThis(this));
+			var thing = (thing) ? thing : this.selectedThing;
+			console.log('thing...');
+			console.log(thing);
+			console.log('thing.done = '+thing.done);
+			console.log('!thing.done = '+!thing.done);
+			this.$http.patch('/api/things/' + thing.id, {'done':!thing.done}).then(
+				this.fetchThis(thing)
+				//thing.done = !thing.done
+			);
+			var msg = (thing.done) ? 'done → undo' : 'not done → done!' ;
+			console.log(msg);
 		},
 		startEdit(thing){
 			var thing = (thing) ? thing : this.selectedThing;
@@ -194,41 +193,40 @@ export default {
 		fetchAll(){
 			this.$http.get('/api/things').then(function(data) {
   				var data = data.json();
-
 				var abcd = JSON.stringify(data);
 				console.log(abcd);
-
   				$.each(data, function(k, v) {
   					var nl = v['body'].split(/\r\n|\r|\n/).length;
   					v['rows'] = nl;
 				});
 				this.list = data;
+				console.log('fetchAll');
 
-				function getParents(obj) {
-					if ('id' in obj && typeof(obj.id) === 'number' && !isNaN(obj.id)) {
-				    return true;
-				  } else {
-				    invalidEntries++;
-				    return false;
-				  }
-				}
+				// function getParents(obj) {
+				// 	if ('id' in obj && typeof(obj.id) === 'number' && !isNaN(obj.id)) {
+				//     return true;
+				//   } else {
+				//     invalidEntries++;
+				//     return false;
+				//   }
+				// }
 				
 
-				// find all parent objects, keep only those.
-				var parents = data.map(function(obj){ 
-					var nl = obj['body'].split(/\r\n|\r|\n/).length;
-					obj['rows'] = nl;
-					if(obj.parent_id == 0){
-						var children = data.filter(function(c_obj){
-							if(obj.id == c_obj.parent_id){
-								console.log('obj.parent_id .. '+obj.parent_id);
-								return true;
-							} else { return false; }
-						});
-						obj['children'] = children;
-						return obj;
-					}
-				});
+				// // find all parent objects, keep only those.
+				// var parents = data.map(function(obj){ 
+				// 	var nl = obj['body'].split(/\r\n|\r|\n/).length;
+				// 	obj['rows'] = nl;
+				// 	if(obj.parent_id == 0){
+				// 		var children = data.filter(function(c_obj){
+				// 			if(obj.id == c_obj.parent_id){
+				// 				console.log('obj.parent_id .. '+obj.parent_id);
+				// 				return true;
+				// 			} else { return false; }
+				// 		});
+				// 		obj['children'] = children;
+				// 		return obj;
+				// 	}
+				// });
 				// for each parent object find the children and keep those.
 				// var parentsWithChildren = parents.map(function(obj){ 
 				// 	if (obj){
@@ -242,13 +240,8 @@ export default {
 				// 	obj['children'] = children;
 				// 	}
 				// });
-				var abc = JSON.stringify(parents);
-				console.log(abc);
-
-// var kvArray = [{key:1, value:10}, {key:2, value:20}, {key:3, value: 30}];
-// reformattedArray is now [{1:10}, {2:20}, {3:30}], 
-// kvArray is still [{key:1, value:10}, {key:2, value:20}, {key:3, value: 30}]
-
+				// var abc = JSON.stringify(parents);
+				// console.log(abc);
 
 
 				
@@ -256,10 +249,14 @@ export default {
 			});
 		},
 		fetchThis(thing){
+			var thing = (thing) ? thing : this.selectedThing;
 			this.$http.get('/api/things/'+thing.id).then(function(data) {
-  				thing = data.json();
-  				this.list[selectedThingIndex] = data.json();
-  				// console.log(this.list.thing);
+				var data = data.json();
+				var nl = data['body'].split(/\r\n|\r|\n/).length;
+				data['rows'] = nl;
+				var el_ind = (this.selectedThingIndex) ? this.selectedThingIndex : this.getIndexOfId(thing.id);
+				console.log('fetched index = '+el_ind);
+				this.list[el_ind] = data;
   			});
 		},
 		addNew(){
@@ -268,16 +265,23 @@ export default {
 			this.newThing = {body:''}; // clear input
 			this.$http.post('/api/things',thing); // send
 			this.fetchAll();
+			console.log('addNew♡');
 		},
 	},
 	events: {
-    	selectNext() { this.selectNext(); },
-    	selectPrevious() { this.selectPrevious(); },
-    	markDone() { this.markDone(); },
-    	indent() { this.indent(); },
-    	unindent() { this.unindent(); },
-    	startEdit() { this.startEdit(); },
-    	doneEdit() { this.doneEdit(); },
+    	downArrow() { this.selectNext(); },
+    	upArrow() { this.selectPrevious(); },
+    	spaceBar() { this.markDone(); },
+    	tab() { this.indent(); },
+    	// unindent() { this.unindent(); },
+    	enter() { this.startEdit(); },
+    	enterOnFocussedInput() {
+			if ( $('#add-thing:focus').length > 0 ) {
+				this.addNew();
+			} else {
+				this.doneEdit();
+			}
+    	},
 	},
 	directives: {
 		'thing-focus': function (value) {

@@ -11,36 +11,36 @@ new Vue({
         if ( $('input:focus').length > 0 ||  $('textarea:focus').length > 0 ) {
         	// INPUT AREAS IN FOCUS
 		switch(e.keyCode) { 
-			case 13:
+			case 13: //ENTER
 				if (e.shiftKey){
 					break;
 				}
 				e.preventDefault();
-				vm.$broadcast('doneEdit');
+				vm.$broadcast('enterOnFocussedInput');
 				break;
 		} // end switch
 		} else { 
 			// INPUT AREAS NOT IN FOCUS
         switch(e.keyCode) { 
-			case 40:
+			case 40: //Down arrow
 				e.preventDefault();
-				vm.$broadcast('selectNext');
+				vm.$broadcast('downArrow');
 				break;
-			case 38:
+			case 38: //Up arrow
 				e.preventDefault();
-				vm.$broadcast('selectPrevious');
+				vm.$broadcast('upArrow');
 				break;
-			case 32:
+			case 32: //space
 				e.preventDefault();
-				vm.$broadcast('markDone');
+				vm.$broadcast('spaceBar');
 				break;
-			case 9:
+			case 9: //TAB
 				e.preventDefault();
-				vm.$broadcast('indent');
+				vm.$broadcast('tab');
 				break;
-			case 13:
+			case 13: //ENTER
 				e.preventDefault();
-				vm.$broadcast('startEdit');
+				vm.$broadcast('enter');
 				break;
 			case 'xexx':
 				vm.$broadcast('unindent');

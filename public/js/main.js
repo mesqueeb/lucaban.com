@@ -11156,35 +11156,41 @@ new Vue({
 				// INPUT AREAS IN FOCUS
 				switch (e.keyCode) {
 					case 13:
+						//ENTER
 						if (e.shiftKey) {
 							break;
 						}
 						e.preventDefault();
-						vm.$broadcast('doneEdit');
+						vm.$broadcast('enterOnFocussedInput');
 						break;
 				} // end switch
 			} else {
 				// INPUT AREAS NOT IN FOCUS
 				switch (e.keyCode) {
 					case 40:
+						//Down arrow
 						e.preventDefault();
-						vm.$broadcast('selectNext');
+						vm.$broadcast('downArrow');
 						break;
 					case 38:
+						//Up arrow
 						e.preventDefault();
-						vm.$broadcast('selectPrevious');
+						vm.$broadcast('upArrow');
 						break;
 					case 32:
+						//space
 						e.preventDefault();
-						vm.$broadcast('markDone');
+						vm.$broadcast('spaceBar');
 						break;
 					case 9:
+						//TAB
 						e.preventDefault();
-						vm.$broadcast('indent');
+						vm.$broadcast('tab');
 						break;
 					case 13:
+						//ENTER
 						e.preventDefault();
-						vm.$broadcast('startEdit');
+						vm.$broadcast('enter');
 						break;
 					case 'xexx':
 						vm.$broadcast('unindent');
@@ -11257,7 +11263,8 @@ exports.default = {
 		},
 		select: function select(thing) {
 			this.selectedThing = thing;
-			var el_ind = this.getIndexOfId(thing);
+			thing.selected = true;
+			var el_ind = this.getIndexOfId(thing.id);
 			this.selectedThingIndex = el_ind;
 		},
 		selectNext: function selectNext() {
@@ -11294,21 +11301,16 @@ exports.default = {
 			this.fetchThis(thing);
 		},
 		markDone: function markDone(thing) {
-
-			this.fetchAll();
-			// if (thing){
-			// 	console.log('click comp');
-			// 	var thing = thing;
-			// 	var doneVal = thing.done;
-			// } else {
-			// 	console.log('space comp');
-			// 	var thing = this.selectedThing;
-			// 	var doneVal = !thing.done;
-			// }
-			// console.log(thing);
-			// console.log('thing.done '+thing.done);
-			// console.log('doneVal '+doneVal);
-			// this.$http.patch('/api/things/' + thing.id, {'done':doneVal}).then(this.fetchThis(this));
+			var thing = thing ? thing : this.selectedThing;
+			console.log('thing...');
+			console.log(thing);
+			console.log('thing.done = ' + thing.done);
+			console.log('!thing.done = ' + !thing.done);
+			this.$http.patch('/api/things/' + thing.id, { 'done': !thing.done }).then(this.fetchThis(thing)
+			//thing.done = !thing.done
+			);
+			var msg = thing.done ? 'done → undo' : 'not done → done!';
+			console.log(msg);
 		},
 		startEdit: function startEdit(thing) {
 			var thing = thing ? thing : this.selectedThing;
@@ -11345,42 +11347,39 @@ exports.default = {
 		fetchAll: function fetchAll() {
 			this.$http.get('/api/things').then(function (data) {
 				var data = data.json();
-
 				var abcd = (0, _stringify2.default)(data);
 				console.log(abcd);
-
 				$.each(data, function (k, v) {
 					var nl = v['body'].split(/\r\n|\r|\n/).length;
 					v['rows'] = nl;
 				});
 				this.list = data;
+				console.log('fetchAll');
 
-				function getParents(obj) {
-					if ('id' in obj && typeof obj.id === 'number' && !isNaN(obj.id)) {
-						return true;
-					} else {
-						invalidEntries++;
-						return false;
-					}
-				}
+				// function getParents(obj) {
+				// 	if ('id' in obj && typeof(obj.id) === 'number' && !isNaN(obj.id)) {
+				//     return true;
+				//   } else {
+				//     invalidEntries++;
+				//     return false;
+				//   }
+				// }
 
-				// find all parent objects, keep only those.
-				var parents = data.map(function (obj) {
-					var nl = obj['body'].split(/\r\n|\r|\n/).length;
-					obj['rows'] = nl;
-					if (obj.parent_id == 0) {
-						var children = data.filter(function (c_obj) {
-							if (obj.id == c_obj.parent_id) {
-								console.log('obj.parent_id .. ' + obj.parent_id);
-								return true;
-							} else {
-								return false;
-							}
-						});
-						obj['children'] = children;
-						return obj;
-					}
-				});
+				// // find all parent objects, keep only those.
+				// var parents = data.map(function(obj){ 
+				// 	var nl = obj['body'].split(/\r\n|\r|\n/).length;
+				// 	obj['rows'] = nl;
+				// 	if(obj.parent_id == 0){
+				// 		var children = data.filter(function(c_obj){
+				// 			if(obj.id == c_obj.parent_id){
+				// 				console.log('obj.parent_id .. '+obj.parent_id);
+				// 				return true;
+				// 			} else { return false; }
+				// 		});
+				// 		obj['children'] = children;
+				// 		return obj;
+				// 	}
+				// });
 				// for each parent object find the children and keep those.
 				// var parentsWithChildren = parents.map(function(obj){ 
 				// 	if (obj){
@@ -11394,21 +11393,21 @@ exports.default = {
 				// 	obj['children'] = children;
 				// 	}
 				// });
-				var abc = (0, _stringify2.default)(parents);
-				console.log(abc);
-
-				// var kvArray = [{key:1, value:10}, {key:2, value:20}, {key:3, value: 30}];
-				// reformattedArray is now [{1:10}, {2:20}, {3:30}], 
-				// kvArray is still [{key:1, value:10}, {key:2, value:20}, {key:3, value: 30}]
+				// var abc = JSON.stringify(parents);
+				// console.log(abc);
 
 				//console.log(JSON.stringify(data));
 			});
 		},
 		fetchThis: function fetchThis(thing) {
+			var thing = thing ? thing : this.selectedThing;
 			this.$http.get('/api/things/' + thing.id).then(function (data) {
-				thing = data.json();
-				this.list[selectedThingIndex] = data.json();
-				// console.log(this.list.thing);
+				var data = data.json();
+				var nl = data['body'].split(/\r\n|\r|\n/).length;
+				data['rows'] = nl;
+				var el_ind = this.selectedThingIndex ? this.selectedThingIndex : this.getIndexOfId(thing.id);
+				console.log('fetched index = ' + el_ind);
+				this.list[el_ind] = data;
 			});
 		},
 		addNew: function addNew() {
@@ -11419,29 +11418,33 @@ exports.default = {
 			this.newThing = { body: '' }; // clear input
 			this.$http.post('/api/things', thing); // send
 			this.fetchAll();
+			console.log('addNew♡');
 		}
 	},
 	events: {
-		selectNext: function selectNext() {
+		downArrow: function downArrow() {
 			this.selectNext();
 		},
-		selectPrevious: function selectPrevious() {
+		upArrow: function upArrow() {
 			this.selectPrevious();
 		},
-		markDone: function markDone() {
+		spaceBar: function spaceBar() {
 			this.markDone();
 		},
-		indent: function indent() {
+		tab: function tab() {
 			this.indent();
 		},
-		unindent: function unindent() {
-			this.unindent();
-		},
-		startEdit: function startEdit() {
+
+		// unindent() { this.unindent(); },
+		enter: function enter() {
 			this.startEdit();
 		},
-		doneEdit: function doneEdit() {
-			this.doneEdit();
+		enterOnFocussedInput: function enterOnFocussedInput() {
+			if ($('#add-thing:focus').length > 0) {
+				this.addNew();
+			} else {
+				this.doneEdit();
+			}
 		}
 	},
 	directives: {
@@ -11463,7 +11466,7 @@ exports.default = {
 	}
 };
 if (module.exports.__esModule) module.exports = module.exports.default
-;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\n<div class=\"things-panel\">\n\t<div v-for=\"thing in list\" class=\"thing-card\" :class=\"{\n\t\t\tdone: thing.done,\n\t\t\tediting: thing == editedThing,\n\t\t\tselected: thing == selectedThing,\n\t\t\tchild: thing.parent_id > 0,\n\t\t\t}\">\n\t\t<input class=\"toggle\" type=\"checkbox\" v-model=\"thing.done\" @click=\"markDone(thing)\">\n\t\t<div @dblclick=\"startEdit(thing)\" @click=\"select(thing)\">\n\t\t\t<span class=\"bodybox\" v-show=\"thing != editedThing\">{{ thing.body }}</span>\n\t\t\t<form action=\"update\" class=\"updatebox\" @submit.prevent=\"doneEdit(thing)\">\n\t\t\t\t<textarea name=\"thing_body\" rows=\"{{ thing.rows }}\" v-model=\"thing.body\" v-autosize=\"thing.body\" v-thing-focus=\"thing == editedThing\" @blur=\"doneEdit(thing)\" @keyup.esc=\"cancelEdit(thing)\">{{ thing.body }}</textarea>\n\t\t\t</form>\n\t\t</div>\n\t</div>\n\n\t<form action=\"\" @submit.prevent=\"addNew\">\n\t\t<input type=\"text\" name=\"body\" id=\"add-thing\" v-model=\"newThing.body\" placeholder=\"I can't forget to...\" autocomplete=\"off\" autofocus=\"\">\n\t</form>\n</div>\n"
+;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\n<div class=\"things-panel\">\n\t<div v-for=\"thing in list\" class=\"thing-card\" :class=\"{\n\t\t\tdone: thing.done,\n\t\t\tediting: thing == editedThing,\n\t\t\tselected: thing == selectedThing,\n\t\t\tchild: thing.parent_id > 0,\n\t\t\t}\">\n\t\t<input class=\"toggle\" type=\"checkbox\" v-model=\"thing.done\" @click=\"markDone(thing)\">\n\t\t<div @dblclick=\"startEdit(thing)\" @click=\"select(thing)\">\n\t\t\t<span class=\"bodybox\" v-show=\"thing != editedThing\">{{ thing.body }}</span>\n\t\t\t<form action=\"update\" class=\"updatebox\" @submit.prevent=\"doneEdit(thing)\">\n\t\t\t\t<textarea name=\"thing_body\" rows=\"{{ thing.rows }}\" v-model=\"thing.body\" v-autosize=\"thing.body\" v-thing-focus=\"thing == editedThing\" @blur=\"doneEdit(thing)\" @keyup.esc=\"cancelEdit(thing)\">{{ thing.body }}</textarea>\n\t\t\t</form>\n\t\t</div>\n\t</div>\n\n\t<form action=\"\" @submit.prevent=\"addNew\">\n\t\t<textarea type=\"text\" name=\"body\" id=\"add-thing\" v-model=\"newThing.body\" v-autosize=\"newThing.body\" rows=\"1\" placeholder=\"I can't forget to...\" autocomplete=\"off\" autofocus=\"\">{{ newThing.body }}</textarea>\n\t</form>\n</div>\n"
 if (module.hot) {(function () {  module.hot.accept()
   var hotAPI = require("vue-hot-reload-api")
   hotAPI.install(require("vue"), true)

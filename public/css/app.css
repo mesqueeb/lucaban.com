@@ -42,18 +42,21 @@ input {
 .child {
   margin-left: 1.5em; }
 
-input#add-thing {
+textarea {
+  outline: 0px !important;
+  resize: none; }
+
+textarea#add-thing {
   padding: 0.5em;
   width: 100%;
+  border: none;
   border-bottom: dashed 1px #ededed; }
 
 .updatebox input,
 .updatebox textarea {
   display: none;
   width: 97%;
-  outline: 0px !important;
-  border-color: rgba(245, 215, 110, 0.5);
-  resize: none; }
+  border-color: rgba(245, 215, 110, 0.5); }
 
 .editing .updatebox input,
 .editing .updatebox textarea {
