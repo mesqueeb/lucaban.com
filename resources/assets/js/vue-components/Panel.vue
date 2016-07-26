@@ -15,7 +15,7 @@
 
 <template id="things-panel-template">
 	<div class="things-panel">
-		<div v-for="thing in list"
+		<div 
 			class="thing-card"
 			:class="{
 				done: thing.done,
@@ -48,21 +48,16 @@
 						@keyup.esc="cancelEdit(thing)"
 					>{{ thing.body }}</textarea>
 				</form>
+				<span
+					@click="deleteThing(thing)"
+				>✗</span>
 			</div>
 		</div>
-
-		<form action=""
-			@submit.prevent="addNew"
-		>
-			<input type="text"
-				name="body"
-				id="add-thing"
-				v-model="newThing.body"
-				placeholder="I can't forget to..."
-				autocomplete="off"
-				autofocus 
-			>
-		</form>
+		<div class="children" v-if="thing.children">
+			<Panel v-for="childPanel in thing.children"
+				:thing="childPanel"
+			></Panel>
+		</div>
 	</div>
 </template>
 
@@ -70,11 +65,15 @@
 <script>
 
 export default {
+	name: 'Panel',
 	template:'#things-panel-template',
 	created(){
-		this.fetchAll();
 
 	},
+	// props: {
+	// 	list: Array,
+	// },
+	props: ['thing'],
 	data: function(){
 		return {
 			newThing: {
@@ -85,28 +84,20 @@ export default {
 			selectedIndex: null,
 			selectedId: null,
 			visibility: 'all',
-			list: [],
+			// list: null,
 		};
 	},
 	computed: {
-		validation(){
-			return {
-				body: !!this.newThing.body.trim(),
-			};
-		},
-		isValid(){
-			var validation = this.validation;
-			return Object.keys(validation).every(function(key){
-				return validation[key]
-			});
-		},
 
 	},
 	methods: {
 		getIndexOfId(x){
+			// ARRAYの場合
 			return this.list.map(function(obj){
-					return obj.id;
-				}).indexOf(x);
+				return obj.id;
+			}).indexOf(x);
+			// OBJECTの場合
+			// return Object.keys(this.list).indexOf(x.toString());
 		},
 		select(thing){
 			this.selectedId = thing.id;
@@ -131,15 +122,14 @@ export default {
 			this.selectedId = this.list[this.selectedIndex].id;
 		},
 		indent(){
-			var thing = this.selectedThing;
+			var thing = this.list[this.selectedIndex];
+			console.log('indent: '+thing);
 			if (!thing){ return; }
-			var el_i = this.list.map(function(obj){
-					return obj.id;
-				}).indexOf(thing.id);
-			if (el_i == 0){ return; }
-			var prevThingId = this.list[el_i-1].id;
-			this.$http.patch('/api/things/' + thing.id, {'parent_id':prevThingId});
-			this.fetchThis(thing);
+			if (this.selectedIndex == 0){ return; }
+			var prevThingId = this.list[this.selectedIndex-1].id;
+			var id = thing.id;
+			console.log('parent: '+prevThingId+" // thing: "+id);
+			this.$http.patch('/api/things/'+id+'/indent', {'parent_id':prevThingId});
 		},
 		markDone(thing){
 			if(!thing){
@@ -173,20 +163,8 @@ export default {
 			thing.body = this.beforeEditCache;
 		},
 		deleteThing(thing){
+			this.$http.delete('/api/things/' + thing.id);
 			this.list.$remove(thing);
-		},
-		fetchAll(){
-			this.$http.get('/api/things').then(function(data) {
-  				var data = data.json();
-  				$.each(data, function(k, v) {
-  					var nl = v['body'].split(/\r\n|\r|\n/).length;
-  					v['rows'] = nl;
-				});
-				this.list = data;
-				var abcd = JSON.stringify(data);
-				console.log(abcd);
-				console.log('fetchedAll');
-			});
 		},
 		fetchThis(thing){
 			this.$http.get('/api/things/'+thing.id).then(function(data) {

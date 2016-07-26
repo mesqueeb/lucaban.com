@@ -13,7 +13,19 @@
 		<div class="panel-body">
 			@include('common.errors')
 			
-			<panel></panel>
+			<Panel :thing="import_data"></Panel>
+			{{-- <form action=""
+				@submit.prevent="addNew"
+			>
+				<input type="text"
+					name="body"
+					id="add-thing"
+					v-model="newThing.body"
+					placeholder="I can't forget to..."
+					autocomplete="off"
+					autofocus 
+				>
+			</form> --}}
 
 		</div>
 	</div>

@@ -274,349 +274,6 @@
 	module.exports = autosize;
 });
 },{}],2:[function(require,module,exports){
-module.exports = { "default": require("core-js/library/fn/json/stringify"), __esModule: true };
-},{"core-js/library/fn/json/stringify":4}],3:[function(require,module,exports){
-module.exports = { "default": require("core-js/library/fn/object/keys"), __esModule: true };
-},{"core-js/library/fn/object/keys":5}],4:[function(require,module,exports){
-var core  = require('../../modules/_core')
-  , $JSON = core.JSON || (core.JSON = {stringify: JSON.stringify});
-module.exports = function stringify(it){ // eslint-disable-line no-unused-vars
-  return $JSON.stringify.apply($JSON, arguments);
-};
-},{"../../modules/_core":10}],5:[function(require,module,exports){
-require('../../modules/es6.object.keys');
-module.exports = require('../../modules/_core').Object.keys;
-},{"../../modules/_core":10,"../../modules/es6.object.keys":38}],6:[function(require,module,exports){
-module.exports = function(it){
-  if(typeof it != 'function')throw TypeError(it + ' is not a function!');
-  return it;
-};
-},{}],7:[function(require,module,exports){
-var isObject = require('./_is-object');
-module.exports = function(it){
-  if(!isObject(it))throw TypeError(it + ' is not an object!');
-  return it;
-};
-},{"./_is-object":23}],8:[function(require,module,exports){
-// false -> Array#indexOf
-// true  -> Array#includes
-var toIObject = require('./_to-iobject')
-  , toLength  = require('./_to-length')
-  , toIndex   = require('./_to-index');
-module.exports = function(IS_INCLUDES){
-  return function($this, el, fromIndex){
-    var O      = toIObject($this)
-      , length = toLength(O.length)
-      , index  = toIndex(fromIndex, length)
-      , value;
-    // Array#includes uses SameValueZero equality algorithm
-    if(IS_INCLUDES && el != el)while(length > index){
-      value = O[index++];
-      if(value != value)return true;
-    // Array#toIndex ignores holes, Array#includes - not
-    } else for(;length > index; index++)if(IS_INCLUDES || index in O){
-      if(O[index] === el)return IS_INCLUDES || index || 0;
-    } return !IS_INCLUDES && -1;
-  };
-};
-},{"./_to-index":31,"./_to-iobject":33,"./_to-length":34}],9:[function(require,module,exports){
-var toString = {}.toString;
-
-module.exports = function(it){
-  return toString.call(it).slice(8, -1);
-};
-},{}],10:[function(require,module,exports){
-var core = module.exports = {version: '2.4.0'};
-if(typeof __e == 'number')__e = core; // eslint-disable-line no-undef
-},{}],11:[function(require,module,exports){
-// optional / simple context binding
-var aFunction = require('./_a-function');
-module.exports = function(fn, that, length){
-  aFunction(fn);
-  if(that === undefined)return fn;
-  switch(length){
-    case 1: return function(a){
-      return fn.call(that, a);
-    };
-    case 2: return function(a, b){
-      return fn.call(that, a, b);
-    };
-    case 3: return function(a, b, c){
-      return fn.call(that, a, b, c);
-    };
-  }
-  return function(/* ...args */){
-    return fn.apply(that, arguments);
-  };
-};
-},{"./_a-function":6}],12:[function(require,module,exports){
-// 7.2.1 RequireObjectCoercible(argument)
-module.exports = function(it){
-  if(it == undefined)throw TypeError("Can't call method on  " + it);
-  return it;
-};
-},{}],13:[function(require,module,exports){
-// Thank's IE8 for his funny defineProperty
-module.exports = !require('./_fails')(function(){
-  return Object.defineProperty({}, 'a', {get: function(){ return 7; }}).a != 7;
-});
-},{"./_fails":17}],14:[function(require,module,exports){
-var isObject = require('./_is-object')
-  , document = require('./_global').document
-  // in old IE typeof document.createElement is 'object'
-  , is = isObject(document) && isObject(document.createElement);
-module.exports = function(it){
-  return is ? document.createElement(it) : {};
-};
-},{"./_global":18,"./_is-object":23}],15:[function(require,module,exports){
-// IE 8- don't enum bug keys
-module.exports = (
-  'constructor,hasOwnProperty,isPrototypeOf,propertyIsEnumerable,toLocaleString,toString,valueOf'
-).split(',');
-},{}],16:[function(require,module,exports){
-var global    = require('./_global')
-  , core      = require('./_core')
-  , ctx       = require('./_ctx')
-  , hide      = require('./_hide')
-  , PROTOTYPE = 'prototype';
-
-var $export = function(type, name, source){
-  var IS_FORCED = type & $export.F
-    , IS_GLOBAL = type & $export.G
-    , IS_STATIC = type & $export.S
-    , IS_PROTO  = type & $export.P
-    , IS_BIND   = type & $export.B
-    , IS_WRAP   = type & $export.W
-    , exports   = IS_GLOBAL ? core : core[name] || (core[name] = {})
-    , expProto  = exports[PROTOTYPE]
-    , target    = IS_GLOBAL ? global : IS_STATIC ? global[name] : (global[name] || {})[PROTOTYPE]
-    , key, own, out;
-  if(IS_GLOBAL)source = name;
-  for(key in source){
-    // contains in native
-    own = !IS_FORCED && target && target[key] !== undefined;
-    if(own && key in exports)continue;
-    // export native or passed
-    out = own ? target[key] : source[key];
-    // prevent global pollution for namespaces
-    exports[key] = IS_GLOBAL && typeof target[key] != 'function' ? source[key]
-    // bind timers to global for call from export context
-    : IS_BIND && own ? ctx(out, global)
-    // wrap global constructors for prevent change them in library
-    : IS_WRAP && target[key] == out ? (function(C){
-      var F = function(a, b, c){
-        if(this instanceof C){
-          switch(arguments.length){
-            case 0: return new C;
-            case 1: return new C(a);
-            case 2: return new C(a, b);
-          } return new C(a, b, c);
-        } return C.apply(this, arguments);
-      };
-      F[PROTOTYPE] = C[PROTOTYPE];
-      return F;
-    // make static versions for prototype methods
-    })(out) : IS_PROTO && typeof out == 'function' ? ctx(Function.call, out) : out;
-    // export proto methods to core.%CONSTRUCTOR%.methods.%NAME%
-    if(IS_PROTO){
-      (exports.virtual || (exports.virtual = {}))[key] = out;
-      // export proto methods to core.%CONSTRUCTOR%.prototype.%NAME%
-      if(type & $export.R && expProto && !expProto[key])hide(expProto, key, out);
-    }
-  }
-};
-// type bitmap
-$export.F = 1;   // forced
-$export.G = 2;   // global
-$export.S = 4;   // static
-$export.P = 8;   // proto
-$export.B = 16;  // bind
-$export.W = 32;  // wrap
-$export.U = 64;  // safe
-$export.R = 128; // real proto method for `library` 
-module.exports = $export;
-},{"./_core":10,"./_ctx":11,"./_global":18,"./_hide":20}],17:[function(require,module,exports){
-module.exports = function(exec){
-  try {
-    return !!exec();
-  } catch(e){
-    return true;
-  }
-};
-},{}],18:[function(require,module,exports){
-// https://github.com/zloirock/core-js/issues/86#issuecomment-115759028
-var global = module.exports = typeof window != 'undefined' && window.Math == Math
-  ? window : typeof self != 'undefined' && self.Math == Math ? self : Function('return this')();
-if(typeof __g == 'number')__g = global; // eslint-disable-line no-undef
-},{}],19:[function(require,module,exports){
-var hasOwnProperty = {}.hasOwnProperty;
-module.exports = function(it, key){
-  return hasOwnProperty.call(it, key);
-};
-},{}],20:[function(require,module,exports){
-var dP         = require('./_object-dp')
-  , createDesc = require('./_property-desc');
-module.exports = require('./_descriptors') ? function(object, key, value){
-  return dP.f(object, key, createDesc(1, value));
-} : function(object, key, value){
-  object[key] = value;
-  return object;
-};
-},{"./_descriptors":13,"./_object-dp":24,"./_property-desc":28}],21:[function(require,module,exports){
-module.exports = !require('./_descriptors') && !require('./_fails')(function(){
-  return Object.defineProperty(require('./_dom-create')('div'), 'a', {get: function(){ return 7; }}).a != 7;
-});
-},{"./_descriptors":13,"./_dom-create":14,"./_fails":17}],22:[function(require,module,exports){
-// fallback for non-array-like ES3 and non-enumerable old V8 strings
-var cof = require('./_cof');
-module.exports = Object('z').propertyIsEnumerable(0) ? Object : function(it){
-  return cof(it) == 'String' ? it.split('') : Object(it);
-};
-},{"./_cof":9}],23:[function(require,module,exports){
-module.exports = function(it){
-  return typeof it === 'object' ? it !== null : typeof it === 'function';
-};
-},{}],24:[function(require,module,exports){
-var anObject       = require('./_an-object')
-  , IE8_DOM_DEFINE = require('./_ie8-dom-define')
-  , toPrimitive    = require('./_to-primitive')
-  , dP             = Object.defineProperty;
-
-exports.f = require('./_descriptors') ? Object.defineProperty : function defineProperty(O, P, Attributes){
-  anObject(O);
-  P = toPrimitive(P, true);
-  anObject(Attributes);
-  if(IE8_DOM_DEFINE)try {
-    return dP(O, P, Attributes);
-  } catch(e){ /* empty */ }
-  if('get' in Attributes || 'set' in Attributes)throw TypeError('Accessors not supported!');
-  if('value' in Attributes)O[P] = Attributes.value;
-  return O;
-};
-},{"./_an-object":7,"./_descriptors":13,"./_ie8-dom-define":21,"./_to-primitive":36}],25:[function(require,module,exports){
-var has          = require('./_has')
-  , toIObject    = require('./_to-iobject')
-  , arrayIndexOf = require('./_array-includes')(false)
-  , IE_PROTO     = require('./_shared-key')('IE_PROTO');
-
-module.exports = function(object, names){
-  var O      = toIObject(object)
-    , i      = 0
-    , result = []
-    , key;
-  for(key in O)if(key != IE_PROTO)has(O, key) && result.push(key);
-  // Don't enum bug & hidden keys
-  while(names.length > i)if(has(O, key = names[i++])){
-    ~arrayIndexOf(result, key) || result.push(key);
-  }
-  return result;
-};
-},{"./_array-includes":8,"./_has":19,"./_shared-key":29,"./_to-iobject":33}],26:[function(require,module,exports){
-// 19.1.2.14 / 15.2.3.14 Object.keys(O)
-var $keys       = require('./_object-keys-internal')
-  , enumBugKeys = require('./_enum-bug-keys');
-
-module.exports = Object.keys || function keys(O){
-  return $keys(O, enumBugKeys);
-};
-},{"./_enum-bug-keys":15,"./_object-keys-internal":25}],27:[function(require,module,exports){
-// most Object methods by ES6 should accept primitives
-var $export = require('./_export')
-  , core    = require('./_core')
-  , fails   = require('./_fails');
-module.exports = function(KEY, exec){
-  var fn  = (core.Object || {})[KEY] || Object[KEY]
-    , exp = {};
-  exp[KEY] = exec(fn);
-  $export($export.S + $export.F * fails(function(){ fn(1); }), 'Object', exp);
-};
-},{"./_core":10,"./_export":16,"./_fails":17}],28:[function(require,module,exports){
-module.exports = function(bitmap, value){
-  return {
-    enumerable  : !(bitmap & 1),
-    configurable: !(bitmap & 2),
-    writable    : !(bitmap & 4),
-    value       : value
-  };
-};
-},{}],29:[function(require,module,exports){
-var shared = require('./_shared')('keys')
-  , uid    = require('./_uid');
-module.exports = function(key){
-  return shared[key] || (shared[key] = uid(key));
-};
-},{"./_shared":30,"./_uid":37}],30:[function(require,module,exports){
-var global = require('./_global')
-  , SHARED = '__core-js_shared__'
-  , store  = global[SHARED] || (global[SHARED] = {});
-module.exports = function(key){
-  return store[key] || (store[key] = {});
-};
-},{"./_global":18}],31:[function(require,module,exports){
-var toInteger = require('./_to-integer')
-  , max       = Math.max
-  , min       = Math.min;
-module.exports = function(index, length){
-  index = toInteger(index);
-  return index < 0 ? max(index + length, 0) : min(index, length);
-};
-},{"./_to-integer":32}],32:[function(require,module,exports){
-// 7.1.4 ToInteger
-var ceil  = Math.ceil
-  , floor = Math.floor;
-module.exports = function(it){
-  return isNaN(it = +it) ? 0 : (it > 0 ? floor : ceil)(it);
-};
-},{}],33:[function(require,module,exports){
-// to indexed object, toObject with fallback for non-array-like ES3 strings
-var IObject = require('./_iobject')
-  , defined = require('./_defined');
-module.exports = function(it){
-  return IObject(defined(it));
-};
-},{"./_defined":12,"./_iobject":22}],34:[function(require,module,exports){
-// 7.1.15 ToLength
-var toInteger = require('./_to-integer')
-  , min       = Math.min;
-module.exports = function(it){
-  return it > 0 ? min(toInteger(it), 0x1fffffffffffff) : 0; // pow(2, 53) - 1 == 9007199254740991
-};
-},{"./_to-integer":32}],35:[function(require,module,exports){
-// 7.1.13 ToObject(argument)
-var defined = require('./_defined');
-module.exports = function(it){
-  return Object(defined(it));
-};
-},{"./_defined":12}],36:[function(require,module,exports){
-// 7.1.1 ToPrimitive(input [, PreferredType])
-var isObject = require('./_is-object');
-// instead of the ES6 spec version, we didn't implement @@toPrimitive case
-// and the second argument - flag - preferred type is a string
-module.exports = function(it, S){
-  if(!isObject(it))return it;
-  var fn, val;
-  if(S && typeof (fn = it.toString) == 'function' && !isObject(val = fn.call(it)))return val;
-  if(typeof (fn = it.valueOf) == 'function' && !isObject(val = fn.call(it)))return val;
-  if(!S && typeof (fn = it.toString) == 'function' && !isObject(val = fn.call(it)))return val;
-  throw TypeError("Can't convert object to primitive value");
-};
-},{"./_is-object":23}],37:[function(require,module,exports){
-var id = 0
-  , px = Math.random();
-module.exports = function(key){
-  return 'Symbol('.concat(key === undefined ? '' : key, ')_', (++id + px).toString(36));
-};
-},{}],38:[function(require,module,exports){
-// 19.1.2.14 Object.keys(O)
-var toObject = require('./_to-object')
-  , $keys    = require('./_object-keys');
-
-require('./_object-sap')('keys', function(){
-  return function keys(it){
-    return $keys(toObject(it));
-  };
-});
-},{"./_object-keys":26,"./_object-sap":27,"./_to-object":35}],39:[function(require,module,exports){
 // shim for using process in browser
 
 var process = module.exports = {};
@@ -737,7 +394,7 @@ process.chdir = function (dir) {
 };
 process.umask = function() { return 0; };
 
-},{}],40:[function(require,module,exports){
+},{}],3:[function(require,module,exports){
 var autosize = require('autosize')
 
 exports.install = function(Vue) {
@@ -756,7 +413,7 @@ exports.install = function(Vue) {
     }
   })
 }
-},{"autosize":1}],41:[function(require,module,exports){
+},{"autosize":1}],4:[function(require,module,exports){
 var Vue // late bind
 var map = Object.create(null)
 var shimmed = false
@@ -1057,7 +714,7 @@ function format (id) {
   return match ? match[0] : id
 }
 
-},{}],42:[function(require,module,exports){
+},{}],5:[function(require,module,exports){
 (function (process,global){
 /*!
  * Vue.js v1.0.26
@@ -11134,7 +10791,7 @@ setTimeout(function () {
 
 module.exports = Vue;
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"_process":39}],43:[function(require,module,exports){
+},{"_process":2}],6:[function(require,module,exports){
 'use strict';
 
 var _panel = require('./vue-components/panel.vue');
@@ -11148,7 +10805,31 @@ Vue.use(VueAutosize);
 
 new Vue({
 	el: 'body',
+	data: { import_data: { null: null }
+	},
 	components: { Panel: _panel2.default },
+	methods: {
+		fetchAll: function fetchAll() {
+			this.$http.get('/api/things').then(function (data) {
+				var data = data.json();
+				var data = data[Object.keys(data)[0]];
+				// 		$.each(data, function(k, v) {
+				// 			console.log(k['body']);
+				// 			console.log(v['body']);
+				// 			console.log("k = "+k+" // v = "+v);
+				// 			// var nl = v['body'].split(/\r\n|\r|\n/).length;
+				// 			// v['rows'] = nl;
+				// });
+				this.import_data = data;
+				console.log(JSON.stringify(data));
+				console.log('...fetchedAll!');
+			});
+		}
+	},
+	created: function created() {
+		this.fetchAll();
+	},
+
 	ready: function ready() {
 		var vm = this;
 		window.addEventListener('keydown', function (e) {
@@ -11206,29 +10887,21 @@ new Vue({
 	}
 });
 
-},{"./vue-components/panel.vue":44,"vue-autosize":40}],44:[function(require,module,exports){
+},{"./vue-components/panel.vue":7,"vue-autosize":3}],7:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
 	value: true
 });
-
-var _stringify = require('babel-runtime/core-js/json/stringify');
-
-var _stringify2 = _interopRequireDefault(_stringify);
-
-var _keys = require('babel-runtime/core-js/object/keys');
-
-var _keys2 = _interopRequireDefault(_keys);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
 exports.default = {
+	name: 'Panel',
 	template: '#things-panel-template',
-	created: function created() {
-		this.fetchAll();
-	},
+	created: function created() {},
 
+	// props: {
+	// 	list: Array,
+	// },
+	props: ['thing'],
 	data: function data() {
 		return {
 			newThing: {
@@ -11238,28 +10911,18 @@ exports.default = {
 			// selectedThing: null,
 			selectedIndex: null,
 			selectedId: null,
-			visibility: 'all',
-			list: []
+			visibility: 'all'
 		};
 	},
-	computed: {
-		validation: function validation() {
-			return {
-				body: !!this.newThing.body.trim()
-			};
-		},
-		isValid: function isValid() {
-			var validation = this.validation;
-			return (0, _keys2.default)(validation).every(function (key) {
-				return validation[key];
-			});
-		}
-	},
+	computed: {},
 	methods: {
 		getIndexOfId: function getIndexOfId(x) {
+			// ARRAYの場合
 			return this.list.map(function (obj) {
 				return obj.id;
 			}).indexOf(x);
+			// OBJECTの場合
+			// return Object.keys(this.list).indexOf(x.toString());
 		},
 		select: function select(thing) {
 			this.selectedId = thing.id;
@@ -11284,19 +10947,18 @@ exports.default = {
 			this.selectedId = this.list[this.selectedIndex].id;
 		},
 		indent: function indent() {
-			var thing = this.selectedThing;
+			var thing = this.list[this.selectedIndex];
+			console.log('indent: ' + thing);
 			if (!thing) {
 				return;
 			}
-			var el_i = this.list.map(function (obj) {
-				return obj.id;
-			}).indexOf(thing.id);
-			if (el_i == 0) {
+			if (this.selectedIndex == 0) {
 				return;
 			}
-			var prevThingId = this.list[el_i - 1].id;
-			this.$http.patch('/api/things/' + thing.id, { 'parent_id': prevThingId });
-			this.fetchThis(thing);
+			var prevThingId = this.list[this.selectedIndex - 1].id;
+			var id = thing.id;
+			console.log('parent: ' + prevThingId + " // thing: " + id);
+			this.$http.patch('/api/things/' + id + '/indent', { 'parent_id': prevThingId });
 		},
 		markDone: function markDone(thing) {
 			if (!thing) {
@@ -11330,20 +10992,8 @@ exports.default = {
 			thing.body = this.beforeEditCache;
 		},
 		deleteThing: function deleteThing(thing) {
+			this.$http.delete('/api/things/' + thing.id);
 			this.list.$remove(thing);
-		},
-		fetchAll: function fetchAll() {
-			this.$http.get('/api/things').then(function (data) {
-				var data = data.json();
-				$.each(data, function (k, v) {
-					var nl = v['body'].split(/\r\n|\r|\n/).length;
-					v['rows'] = nl;
-				});
-				this.list = data;
-				var abcd = (0, _stringify2.default)(data);
-				console.log(abcd);
-				console.log('fetchedAll');
-			});
 		},
 		fetchThis: function fetchThis(thing) {
 			this.$http.get('/api/things/' + thing.id).then(function (data) {
@@ -11411,7 +11061,7 @@ exports.default = {
 	}
 };
 if (module.exports.__esModule) module.exports = module.exports.default
-;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\n<div class=\"things-panel\">\n\t<div v-for=\"thing in list\" class=\"thing-card\" :class=\"{\n\t\t\tdone: thing.done,\n\t\t\tselected: thing.id == selectedId,\n\t\t\tediting: thing == editedThing,\n\t\t\t}\">\n\t\t<input class=\"toggle\" type=\"checkbox\" v-model=\"thing.done\" @change=\"markDone(thing)\">\n\t\t<div @dblclick=\"startEdit(thing)\" @click=\"select(thing)\">\n\t\t\t<span class=\"bodybox\" v-show=\"thing != editedThing\">{{ thing.body }}</span>\n\t\t\t<form action=\"update\" class=\"updatebox\" @submit.prevent=\"doneEdit(thing)\">\n\t\t\t\t<textarea name=\"thing_body\" rows=\"{{ thing.rows }}\" v-model=\"thing.body\" v-autosize=\"thing.body\" v-thing-focus=\"thing == editedThing\" @blur=\"doneEdit(thing)\" @keyup.esc=\"cancelEdit(thing)\">{{ thing.body }}</textarea>\n\t\t\t</form>\n\t\t</div>\n\t</div>\n\n\t<form action=\"\" @submit.prevent=\"addNew\">\n\t\t<input type=\"text\" name=\"body\" id=\"add-thing\" v-model=\"newThing.body\" placeholder=\"I can't forget to...\" autocomplete=\"off\" autofocus=\"\">\n\t</form>\n</div>\n"
+;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\n<div class=\"things-panel\">\n\t<div class=\"thing-card\" :class=\"{\n\t\t\tdone: thing.done,\n\t\t\tselected: thing.id == selectedId,\n\t\t\tediting: thing == editedThing,\n\t\t\t}\">\n\t\t<input class=\"toggle\" type=\"checkbox\" v-model=\"thing.done\" @change=\"markDone(thing)\">\n\t\t<div @dblclick=\"startEdit(thing)\" @click=\"select(thing)\">\n\t\t\t<span class=\"bodybox\" v-show=\"thing != editedThing\">{{ thing.body }}</span>\n\t\t\t<form action=\"update\" class=\"updatebox\" @submit.prevent=\"doneEdit(thing)\">\n\t\t\t\t<textarea name=\"thing_body\" rows=\"{{ thing.rows }}\" v-model=\"thing.body\" v-autosize=\"thing.body\" v-thing-focus=\"thing == editedThing\" @blur=\"doneEdit(thing)\" @keyup.esc=\"cancelEdit(thing)\">{{ thing.body }}</textarea>\n\t\t\t</form>\n\t\t\t<span @click=\"deleteThing(thing)\">✗</span>\n\t\t</div>\n\t</div>\n\t<div class=\"children\" v-if=\"thing.children\">\n\t\t<panel v-for=\"childPanel in thing.children\" :thing=\"childPanel\"></panel>\n\t</div>\n</div>\n"
 if (module.hot) {(function () {  module.hot.accept()
   var hotAPI = require("vue-hot-reload-api")
   hotAPI.install(require("vue"), true)
@@ -11422,6 +11072,6 @@ if (module.hot) {(function () {  module.hot.accept()
     hotAPI.update("_v-f86b8dc2", module.exports, (typeof module.exports === "function" ? module.exports.options : module.exports).template)
   }
 })()}
-},{"babel-runtime/core-js/json/stringify":2,"babel-runtime/core-js/object/keys":3,"vue":42,"vue-hot-reload-api":41}]},{},[43]);
+},{"vue":5,"vue-hot-reload-api":4}]},{},[6]);
 
 //# sourceMappingURL=main.js.map

@@ -4,24 +4,48 @@ Vue.use(VueAutosize)
 
 new Vue({
 	el:'body',
+	data: { import_data:
+		{ null }
+	},
 	components: { Panel },
+	methods:{
+		fetchAll(){
+			this.$http.get('/api/things').then(function(data) {
+  				var data = data.json();
+				var data = data[Object.keys(data)[0]];
+  		// 		$.each(data, function(k, v) {
+  		// 			console.log(k['body']);
+  		// 			console.log(v['body']);
+  		// 			console.log("k = "+k+" // v = "+v);
+  		// 			// var nl = v['body'].split(/\r\n|\r|\n/).length;
+  		// 			// v['rows'] = nl;
+				// });
+				this.import_data = data;
+				console.log(JSON.stringify(data));
+				console.log('...fetchedAll!');
+			});
+		},
+	},
+	created(){
+    	this.fetchAll();
+	},
 	ready: function() {
       var vm = this;
       window.addEventListener('keydown', function(e) {
         if ( $('input:focus').length > 0 ||  $('textarea:focus').length > 0 ) {
-        	// INPUT AREAS IN FOCUS
-		switch(e.keyCode) { 
-			case 13:
-				if (e.shiftKey){
-					break;
-				}
-				e.preventDefault();
-				vm.$broadcast('enterOnFocussedInput');
-				break;
-		} // end switch
+          // INPUT AREAS IN FOCUS
+		  switch(e.keyCode) { 
+		  	case 13:
+		  		if (e.shiftKey){
+		  			break;
+		  		}
+		  		e.preventDefault();
+		  		vm.$broadcast('enterOnFocussedInput');
+		  		break;
+		  } // end switch
 		} else { 
-			// INPUT AREAS NOT IN FOCUS
-        switch(e.keyCode) { 
+		  // INPUT AREAS NOT IN FOCUS
+          switch(e.keyCode) { 
 			case 40: // arrowDown
 				e.preventDefault();
 				vm.$broadcast('arrowDown');
@@ -51,7 +75,7 @@ new Vue({
 			case 'xexx':
 				vm.$broadcast('unindent');
 				break;
-        } // end switch
+          } // end switch
     	} // END INPUT AREAS NOT IN FOCUS
       });
     }	

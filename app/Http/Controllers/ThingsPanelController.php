@@ -19,8 +19,11 @@ class ThingsPanelController extends Controller
      */
     public function index()
     {
-        // ==
-        return Thing::get();
+        $god = Thing::where('parent_id', null)->first();
+        if(!$god){
+            return Thing::create(['body' => 'ALL', 'id' => '1']);
+        }
+        return $god->getDescendantsAndSelf()->toHierarchy();
     }
 
     /**
@@ -41,7 +44,7 @@ class ThingsPanelController extends Controller
      */
     public function store(Request $request)
     {
-        return Thing::create($request->all());
+        return Thing::where('parent_id', NULL)->first()->children()->create($request->all());
     }
 
     /**
@@ -79,6 +82,12 @@ class ThingsPanelController extends Controller
         return response()->json($request->all());
     }
 
+    public function indent(Request $request, $id)
+    {
+        return Thing::findOrFail($id)->makeChildOf(request()->parent_id);
+    }
+
+
     /**
      * Remove the specified resource from storage.
      *
@@ -87,6 +96,6 @@ class ThingsPanelController extends Controller
      */
     public function destroy($id)
     {
-        //
+        Thing::findOrFail($id)->delete();
     }
 }
