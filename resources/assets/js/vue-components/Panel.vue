@@ -1,22 +1,13 @@
-
-<div>
-	<task>Go shopping</task>
-	<children>
-		<div>
-			<task>Mall</task>
-			<children>...</children>
-		</div>
-		<div>
-			<task>Supermarket</task>
-			<children>...</children>
-		</div>
-	</children>
-</div>
-
 <template id="things-panel-template">
 	<div class="things-panel">
+		<div class="panel-title"
+			v-if="thing.lft == 1"
+		>
+			{{ thing.body }}
+		</div>
 		<div 
 			class="thing-card"
+			v-if="thing.lft != 1"
 			:class="{
 				done: thing.done,
 				selected: thing.id == selectedId,
@@ -28,19 +19,20 @@
 				v-model="thing.done"
 				@change="markDone(thing)"
 			>
-			<div
+			<div class="body-div"
 				@dblclick="startEdit(thing)"
 				@click="select(thing)"
+				@enter="console.log('yarrr')"
 			>
 				<span class="bodybox"
 					v-show="thing != editedThing"
-				>{{ thing.body }}</span>
+				>{{ thing.id }} - {{ thing.body }}</span>
 				<form action="update"
 					class="updatebox"
 					@submit.prevent="doneEdit(thing)"
 				>
 					<textarea name="thing_body"
-						rows="{{ thing.rows }}"
+						rows="<!-- {{ thing.rows }} -->"
 						v-model="thing.body"
 						v-autosize="thing.body"
 						v-thing-focus="thing == editedThing"
@@ -48,11 +40,27 @@
 						@keyup.esc="cancelEdit(thing)"
 					>{{ thing.body }}</textarea>
 				</form>
-				<span
-					@click="deleteThing(thing)"
-				>✗</span>
+				<div class="thing-nav">
+					<button
+						@click="deleteThing(thing)"
+					>✗</button>
+				</div>
 			</div>
 		</div>
+		<form action=""
+			@submit.prevent="addNew"
+			v-if="true"
+		>
+			<input type="text"
+				name="body"
+				id="add-thing"
+				v-model="newThing.body"
+				placeholder="I can't forget to..."
+				autocomplete="off"
+				autofocus 
+			>
+		</form>
+
 		<div class="children" v-if="thing.children">
 			<Panel v-for="childPanel in thing.children"
 				:thing="childPanel"
@@ -76,15 +84,12 @@ export default {
 	props: ['thing'],
 	data: function(){
 		return {
-			newThing: {
-				body: '',
-			},
+			newThing: { body: '' },
 			editedThing: null,
 			// selectedThing: null,
 			selectedIndex: null,
 			selectedId: null,
 			visibility: 'all',
-			// list: null,
 		};
 	},
 	computed: {
@@ -93,25 +98,27 @@ export default {
 	methods: {
 		getIndexOfId(x){
 			// ARRAYの場合
-			return this.list.map(function(obj){
-				return obj.id;
-			}).indexOf(x);
+			// return this.thing.map(function(obj){
+			// 	return obj.id;
+			// }).indexOf(x);
+
 			// OBJECTの場合
-			// return Object.keys(this.list).indexOf(x.toString());
+			return Object.keys(this.thing).indexOf(x.toString());
 		},
 		select(thing){
+			// console.log(thing.id);
 			this.selectedId = thing.id;
 			this.selectedIndex = this.getIndexOfId(thing.id);
 		},
 		selectNext(){
 			if (this.selectedIndex == null){
 				this.selectedIndex = 0;
-			} else if (this.selectedIndex == this.list.length-1) {
+			} else if (this.selectedIndex == this.thing.length-1) {
 				return;
 			} else {
 				this.selectedIndex = this.selectedIndex+1;
 			}
-			this.selectedId = this.list[this.selectedIndex].id;
+			this.selectedId = this.thing[this.selectedIndex].id;
 		},
 		selectPrevious(){
 			if (!this.selectedIndex){
@@ -119,32 +126,32 @@ export default {
 			} else {
 				this.selectedIndex = this.selectedIndex-1;
 			}
-			this.selectedId = this.list[this.selectedIndex].id;
+			this.selectedId = this.thing[this.selectedIndex].id;
 		},
 		indent(){
-			var thing = this.list[this.selectedIndex];
+			var thing = this.thing[this.selectedIndex];
 			console.log('indent: '+thing);
 			if (!thing){ return; }
 			if (this.selectedIndex == 0){ return; }
-			var prevThingId = this.list[this.selectedIndex-1].id;
+			var prevThingId = this.thing[this.selectedIndex-1].id;
 			var id = thing.id;
 			console.log('parent: '+prevThingId+" // thing: "+id);
 			this.$http.patch('/api/things/'+id+'/indent', {'parent_id':prevThingId});
 		},
 		markDone(thing){
 			if(!thing){
-				var thing = this.list[this.selectedIndex]
+				var thing = this.thing[this.selectedIndex]
 				thing.done = !thing.done;
 			}
 			this.$http.patch('/api/things/' + thing.id, {'done':thing.done});
 		},
 		startEdit(thing){
-			var thing = (thing) ? thing : this.list[this.selectedIndex];
+			var thing = (thing) ? thing : this.thing[this.selectedIndex];
 			this.beforeEditCache = thing.body;
 			this.editedThing = thing;
 		},
 		doneEdit(thing) {
-			var thing = (thing) ? thing : this.list[this.selectedIndex];
+			var thing = (thing) ? thing : this.thing[this.selectedIndex];
 			if (!this.editedThing) {
 				return;
 			}
@@ -164,24 +171,45 @@ export default {
 		},
 		deleteThing(thing){
 			this.$http.delete('/api/things/' + thing.id);
-			this.list.$remove(thing);
+			this.thing.$remove(thing);
 		},
 		fetchThis(thing){
 			this.$http.get('/api/things/'+thing.id).then(function(data) {
 				var data = data.json();
-				var nl = data['body'].split(/\r\n|\r|\n/).length;
-				data['rows'] = nl;
-				var el_ind = (this.selectedIndex) ? this.selectedIndex : this.getIndexOfId(thing.id);
-				console.log('fetched index = '+el_ind);
-				this.list[el_ind] = data;
+				// var nl = data['body'].split(/\r\n|\r|\n/).length;
+				// data['rows'] = nl;
+				// var el_ind = (this.selectedIndex) ? this.selectedIndex : this.getIndexOfId(thing.id);
+				// console.log('fetched index = '+el_ind);
+				// this.thing[el_ind] = data;
   			});
 		},
 		addNew(){
 			var thing = this.newThing; // get input
 			if (!thing.body){ return; }
 			this.newThing = {body:''}; // clear input
-			this.$http.post('/api/things',thing); // send
-			this.fetchAll();
+			this.$http.post('/api/things',thing) //SEND
+				.then(function(response){ //response
+				response = response.json();
+				console.log(response.id);
+				this.fetchThis(response);
+				this.fetchAll();
+			});
+		},
+		fetchAll(){
+			this.$http.get('/api/things').then(function(data) {
+  				var data = data.json();
+				var data = data[Object.keys(data)[0]];
+  		// 		$.each(data, function(k, v) {
+  		// 			console.log(k['body']);
+  		// 			console.log(v['body']);
+  		// 			console.log("k = "+k+" // v = "+v);
+  		// 			// var nl = v['body'].split(/\r\n|\r|\n/).length;
+  		// 			// v['rows'] = nl;
+				// });
+				this.import_data = data;
+				console.log(JSON.stringify(data));
+				console.log('...fetchedAll!');
+			});
 		},
 	},
 	events: {

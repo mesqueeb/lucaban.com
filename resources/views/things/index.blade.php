@@ -13,9 +13,11 @@
 		<div class="panel-body">
 			@include('common.errors')
 			
-			<Panel :thing="import_data"></Panel>
+			<Panel :thing="import_data"
+			></Panel>
 			{{-- <form action=""
 				@submit.prevent="addNew"
+				v-if="!import_data"
 			>
 				<input type="text"
 					name="body"

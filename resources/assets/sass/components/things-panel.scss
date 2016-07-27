@@ -1,9 +1,23 @@
-$primary-color: rgba(245,215,110,0.5);
+$selection-color: rgba(245,215,110,0.5);
 
 .panel{
     margin: 0.5em;
 }
-
+.panel-title{
+    text-align: center;
+}
+.thing-nav{
+    margin-left: auto;
+}
+.thing-nav>button{
+    background: none;
+    border: none;
+    font-size: 1.6em;
+    color: #E74C3C;
+}
+.panel-body>.things-panel>.children children{
+    margin-left: 2em;
+}
 .thing-card {
     margin: 0 0 0 0;
     display: flex;
@@ -12,6 +26,10 @@ $primary-color: rgba(245,215,110,0.5);
 .thing-card>div{
     border-bottom: 1px solid #ededed;
     width: 100%;
+}
+.body-div{
+    display: flex;
+    align-items: center;
 }
 .child{
     margin-left: 1.5em;
@@ -27,7 +45,7 @@ input#add-thing{
 	display:none;
     width: 97%;
     outline: 0px !important;
-    border-color: $primary-color;
+    border-color: $selection-color;
     resize: none;
 }
 .editing .updatebox input,
@@ -71,6 +89,6 @@ input#add-thing{
     text-decoration: line-through;
 }
 .selected .bodybox{
-    background: $primary-color;
+    background: $selection-color;
 }
 

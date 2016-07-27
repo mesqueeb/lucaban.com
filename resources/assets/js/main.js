@@ -4,8 +4,8 @@ Vue.use(VueAutosize)
 
 new Vue({
 	el:'body',
-	data: { import_data:
-		{ null }
+	data: {
+		import_data: { null },
 	},
 	components: { Panel },
 	methods:{
@@ -78,5 +78,5 @@ new Vue({
           } // end switch
     	} // END INPUT AREAS NOT IN FOCUS
       });
-    }	
+    }
 });

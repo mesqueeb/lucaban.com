@@ -1,6 +1,6 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 /*!
-	Autosize 3.0.16
+	Autosize 3.0.17
 	license: MIT
 	http://www.jacklmoore.com/autosize
 */
@@ -49,23 +49,14 @@
 	}
 
 	function assign(ta) {
-		var _ref = arguments[1] === undefined ? {} : arguments[1];
-
-		var _ref$setOverflowX = _ref.setOverflowX;
-		var setOverflowX = _ref$setOverflowX === undefined ? true : _ref$setOverflowX;
-		var _ref$setOverflowY = _ref.setOverflowY;
-		var setOverflowY = _ref$setOverflowY === undefined ? true : _ref$setOverflowY;
-
 		if (!ta || !ta.nodeName || ta.nodeName !== 'TEXTAREA' || set.has(ta)) return;
 
 		var heightOffset = null;
-		var overflowY = null;
 		var clientWidth = ta.clientWidth;
+		var cachedHeight = null;
 
 		function init() {
 			var style = window.getComputedStyle(ta, null);
-
-			overflowY = style.overflowY;
 
 			if (style.resize === 'vertical') {
 				ta.style.resize = 'none';
@@ -100,11 +91,7 @@
 				ta.style.width = width;
 			}
 
-			overflowY = value;
-
-			if (setOverflowY) {
-				ta.style.overflowY = value;
-			}
+			ta.style.overflowY = value;
 
 			resize();
 		}
@@ -155,23 +142,27 @@
 		}
 
 		function update() {
-			var startHeight = ta.style.height;
-
 			resize();
 
-			var style = window.getComputedStyle(ta, null);
+			var computed = window.getComputedStyle(ta, null);
+			var computedHeight = Math.round(parseFloat(computed.height));
+			var styleHeight = Math.round(parseFloat(ta.style.height));
 
-			if (style.height !== ta.style.height) {
-				if (overflowY !== 'visible') {
+			// The computed height not matching the height set via resize indicates that
+			// the max-height has been exceeded, in which case the overflow should be set to visible.
+			if (computedHeight !== styleHeight) {
+				if (computed.overflowY !== 'visible') {
 					changeOverflow('visible');
 				}
 			} else {
-				if (overflowY !== 'hidden') {
+				// Normally keep overflow set to hidden, to avoid flash of scrollbar as the textarea expands.
+				if (computed.overflowY !== 'hidden') {
 					changeOverflow('hidden');
 				}
 			}
 
-			if (startHeight !== ta.style.height) {
+			if (cachedHeight !== computedHeight) {
+				cachedHeight = computedHeight;
 				var evt = createEvent('autosize:resized');
 				ta.dispatchEvent(evt);
 			}
@@ -214,11 +205,8 @@
 		ta.addEventListener('input', update, false);
 		ta.addEventListener('autosize:update', update, false);
 		set.add(ta);
-
-		if (setOverflowX) {
-			ta.style.overflowX = 'hidden';
-			ta.style.wordWrap = 'break-word';
-		}
+		ta.style.overflowX = 'hidden';
+		ta.style.wordWrap = 'break-word';
 
 		init();
 	}
@@ -274,6 +262,139 @@
 	module.exports = autosize;
 });
 },{}],2:[function(require,module,exports){
+module.exports = { "default": require("core-js/library/fn/json/stringify"), __esModule: true };
+},{"core-js/library/fn/json/stringify":4}],3:[function(require,module,exports){
+module.exports = { "default": require("core-js/library/fn/object/keys"), __esModule: true };
+},{"core-js/library/fn/object/keys":5}],4:[function(require,module,exports){
+var core = require('../../modules/$.core');
+module.exports = function stringify(it){ // eslint-disable-line no-unused-vars
+  return (core.JSON && core.JSON.stringify || JSON.stringify).apply(JSON, arguments);
+};
+},{"../../modules/$.core":7}],5:[function(require,module,exports){
+require('../../modules/es6.object.keys');
+module.exports = require('../../modules/$.core').Object.keys;
+},{"../../modules/$.core":7,"../../modules/es6.object.keys":15}],6:[function(require,module,exports){
+module.exports = function(it){
+  if(typeof it != 'function')throw TypeError(it + ' is not a function!');
+  return it;
+};
+},{}],7:[function(require,module,exports){
+var core = module.exports = {version: '1.2.6'};
+if(typeof __e == 'number')__e = core; // eslint-disable-line no-undef
+},{}],8:[function(require,module,exports){
+// optional / simple context binding
+var aFunction = require('./$.a-function');
+module.exports = function(fn, that, length){
+  aFunction(fn);
+  if(that === undefined)return fn;
+  switch(length){
+    case 1: return function(a){
+      return fn.call(that, a);
+    };
+    case 2: return function(a, b){
+      return fn.call(that, a, b);
+    };
+    case 3: return function(a, b, c){
+      return fn.call(that, a, b, c);
+    };
+  }
+  return function(/* ...args */){
+    return fn.apply(that, arguments);
+  };
+};
+},{"./$.a-function":6}],9:[function(require,module,exports){
+// 7.2.1 RequireObjectCoercible(argument)
+module.exports = function(it){
+  if(it == undefined)throw TypeError("Can't call method on  " + it);
+  return it;
+};
+},{}],10:[function(require,module,exports){
+var global    = require('./$.global')
+  , core      = require('./$.core')
+  , ctx       = require('./$.ctx')
+  , PROTOTYPE = 'prototype';
+
+var $export = function(type, name, source){
+  var IS_FORCED = type & $export.F
+    , IS_GLOBAL = type & $export.G
+    , IS_STATIC = type & $export.S
+    , IS_PROTO  = type & $export.P
+    , IS_BIND   = type & $export.B
+    , IS_WRAP   = type & $export.W
+    , exports   = IS_GLOBAL ? core : core[name] || (core[name] = {})
+    , target    = IS_GLOBAL ? global : IS_STATIC ? global[name] : (global[name] || {})[PROTOTYPE]
+    , key, own, out;
+  if(IS_GLOBAL)source = name;
+  for(key in source){
+    // contains in native
+    own = !IS_FORCED && target && key in target;
+    if(own && key in exports)continue;
+    // export native or passed
+    out = own ? target[key] : source[key];
+    // prevent global pollution for namespaces
+    exports[key] = IS_GLOBAL && typeof target[key] != 'function' ? source[key]
+    // bind timers to global for call from export context
+    : IS_BIND && own ? ctx(out, global)
+    // wrap global constructors for prevent change them in library
+    : IS_WRAP && target[key] == out ? (function(C){
+      var F = function(param){
+        return this instanceof C ? new C(param) : C(param);
+      };
+      F[PROTOTYPE] = C[PROTOTYPE];
+      return F;
+    // make static versions for prototype methods
+    })(out) : IS_PROTO && typeof out == 'function' ? ctx(Function.call, out) : out;
+    if(IS_PROTO)(exports[PROTOTYPE] || (exports[PROTOTYPE] = {}))[key] = out;
+  }
+};
+// type bitmap
+$export.F = 1;  // forced
+$export.G = 2;  // global
+$export.S = 4;  // static
+$export.P = 8;  // proto
+$export.B = 16; // bind
+$export.W = 32; // wrap
+module.exports = $export;
+},{"./$.core":7,"./$.ctx":8,"./$.global":12}],11:[function(require,module,exports){
+module.exports = function(exec){
+  try {
+    return !!exec();
+  } catch(e){
+    return true;
+  }
+};
+},{}],12:[function(require,module,exports){
+// https://github.com/zloirock/core-js/issues/86#issuecomment-115759028
+var global = module.exports = typeof window != 'undefined' && window.Math == Math
+  ? window : typeof self != 'undefined' && self.Math == Math ? self : Function('return this')();
+if(typeof __g == 'number')__g = global; // eslint-disable-line no-undef
+},{}],13:[function(require,module,exports){
+// most Object methods by ES6 should accept primitives
+var $export = require('./$.export')
+  , core    = require('./$.core')
+  , fails   = require('./$.fails');
+module.exports = function(KEY, exec){
+  var fn  = (core.Object || {})[KEY] || Object[KEY]
+    , exp = {};
+  exp[KEY] = exec(fn);
+  $export($export.S + $export.F * fails(function(){ fn(1); }), 'Object', exp);
+};
+},{"./$.core":7,"./$.export":10,"./$.fails":11}],14:[function(require,module,exports){
+// 7.1.13 ToObject(argument)
+var defined = require('./$.defined');
+module.exports = function(it){
+  return Object(defined(it));
+};
+},{"./$.defined":9}],15:[function(require,module,exports){
+// 19.1.2.14 Object.keys(O)
+var toObject = require('./$.to-object');
+
+require('./$.object-sap')('keys', function($keys){
+  return function keys(it){
+    return $keys(toObject(it));
+  };
+});
+},{"./$.object-sap":13,"./$.to-object":14}],16:[function(require,module,exports){
 // shim for using process in browser
 
 var process = module.exports = {};
@@ -326,7 +447,7 @@ function drainQueue() {
     if (draining) {
         return;
     }
-    var timeout = cachedSetTimeout(cleanUpNextTick);
+    var timeout = cachedSetTimeout.call(null, cleanUpNextTick);
     draining = true;
 
     var len = queue.length;
@@ -343,7 +464,7 @@ function drainQueue() {
     }
     currentQueue = null;
     draining = false;
-    cachedClearTimeout(timeout);
+    cachedClearTimeout.call(null, timeout);
 }
 
 process.nextTick = function (fun) {
@@ -355,7 +476,7 @@ process.nextTick = function (fun) {
     }
     queue.push(new Item(fun, args));
     if (queue.length === 1 && !draining) {
-        cachedSetTimeout(drainQueue, 0);
+        cachedSetTimeout.call(null, drainQueue, 0);
     }
 };
 
@@ -394,7 +515,7 @@ process.chdir = function (dir) {
 };
 process.umask = function() { return 0; };
 
-},{}],3:[function(require,module,exports){
+},{}],17:[function(require,module,exports){
 var autosize = require('autosize')
 
 exports.install = function(Vue) {
@@ -413,7 +534,7 @@ exports.install = function(Vue) {
     }
   })
 }
-},{"autosize":1}],4:[function(require,module,exports){
+},{"autosize":1}],18:[function(require,module,exports){
 var Vue // late bind
 var map = Object.create(null)
 var shimmed = false
@@ -714,7 +835,7 @@ function format (id) {
   return match ? match[0] : id
 }
 
-},{}],5:[function(require,module,exports){
+},{}],19:[function(require,module,exports){
 (function (process,global){
 /*!
  * Vue.js v1.0.26
@@ -10791,7 +10912,7 @@ setTimeout(function () {
 
 module.exports = Vue;
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"_process":2}],6:[function(require,module,exports){
+},{"_process":16}],20:[function(require,module,exports){
 'use strict';
 
 var _panel = require('./vue-components/panel.vue');
@@ -10805,7 +10926,8 @@ Vue.use(VueAutosize);
 
 new Vue({
 	el: 'body',
-	data: { import_data: { null: null }
+	data: {
+		import_data: { null: null }
 	},
 	components: { Panel: _panel2.default },
 	methods: {
@@ -10887,12 +11009,23 @@ new Vue({
 	}
 });
 
-},{"./vue-components/panel.vue":7,"vue-autosize":3}],7:[function(require,module,exports){
+},{"./vue-components/panel.vue":21,"vue-autosize":17}],21:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
 	value: true
 });
+
+var _stringify = require('babel-runtime/core-js/json/stringify');
+
+var _stringify2 = _interopRequireDefault(_stringify);
+
+var _keys = require('babel-runtime/core-js/object/keys');
+
+var _keys2 = _interopRequireDefault(_keys);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
 exports.default = {
 	name: 'Panel',
 	template: '#things-panel-template',
@@ -10904,9 +11037,7 @@ exports.default = {
 	props: ['thing'],
 	data: function data() {
 		return {
-			newThing: {
-				body: ''
-			},
+			newThing: { body: '' },
 			editedThing: null,
 			// selectedThing: null,
 			selectedIndex: null,
@@ -10918,25 +11049,27 @@ exports.default = {
 	methods: {
 		getIndexOfId: function getIndexOfId(x) {
 			// ARRAYの場合
-			return this.list.map(function (obj) {
-				return obj.id;
-			}).indexOf(x);
+			// return this.thing.map(function(obj){
+			// 	return obj.id;
+			// }).indexOf(x);
+
 			// OBJECTの場合
-			// return Object.keys(this.list).indexOf(x.toString());
+			return (0, _keys2.default)(this.thing).indexOf(x.toString());
 		},
 		select: function select(thing) {
+			// console.log(thing.id);
 			this.selectedId = thing.id;
 			this.selectedIndex = this.getIndexOfId(thing.id);
 		},
 		selectNext: function selectNext() {
 			if (this.selectedIndex == null) {
 				this.selectedIndex = 0;
-			} else if (this.selectedIndex == this.list.length - 1) {
+			} else if (this.selectedIndex == this.thing.length - 1) {
 				return;
 			} else {
 				this.selectedIndex = this.selectedIndex + 1;
 			}
-			this.selectedId = this.list[this.selectedIndex].id;
+			this.selectedId = this.thing[this.selectedIndex].id;
 		},
 		selectPrevious: function selectPrevious() {
 			if (!this.selectedIndex) {
@@ -10944,10 +11077,10 @@ exports.default = {
 			} else {
 				this.selectedIndex = this.selectedIndex - 1;
 			}
-			this.selectedId = this.list[this.selectedIndex].id;
+			this.selectedId = this.thing[this.selectedIndex].id;
 		},
 		indent: function indent() {
-			var thing = this.list[this.selectedIndex];
+			var thing = this.thing[this.selectedIndex];
 			console.log('indent: ' + thing);
 			if (!thing) {
 				return;
@@ -10955,25 +11088,25 @@ exports.default = {
 			if (this.selectedIndex == 0) {
 				return;
 			}
-			var prevThingId = this.list[this.selectedIndex - 1].id;
+			var prevThingId = this.thing[this.selectedIndex - 1].id;
 			var id = thing.id;
 			console.log('parent: ' + prevThingId + " // thing: " + id);
 			this.$http.patch('/api/things/' + id + '/indent', { 'parent_id': prevThingId });
 		},
 		markDone: function markDone(thing) {
 			if (!thing) {
-				var thing = this.list[this.selectedIndex];
+				var thing = this.thing[this.selectedIndex];
 				thing.done = !thing.done;
 			}
 			this.$http.patch('/api/things/' + thing.id, { 'done': thing.done });
 		},
 		startEdit: function startEdit(thing) {
-			var thing = thing ? thing : this.list[this.selectedIndex];
+			var thing = thing ? thing : this.thing[this.selectedIndex];
 			this.beforeEditCache = thing.body;
 			this.editedThing = thing;
 		},
 		doneEdit: function doneEdit(thing) {
-			var thing = thing ? thing : this.list[this.selectedIndex];
+			var thing = thing ? thing : this.thing[this.selectedIndex];
 			if (!this.editedThing) {
 				return;
 			}
@@ -10993,16 +11126,16 @@ exports.default = {
 		},
 		deleteThing: function deleteThing(thing) {
 			this.$http.delete('/api/things/' + thing.id);
-			this.list.$remove(thing);
+			this.thing.$remove(thing);
 		},
 		fetchThis: function fetchThis(thing) {
 			this.$http.get('/api/things/' + thing.id).then(function (data) {
 				var data = data.json();
-				var nl = data['body'].split(/\r\n|\r|\n/).length;
-				data['rows'] = nl;
-				var el_ind = this.selectedIndex ? this.selectedIndex : this.getIndexOfId(thing.id);
-				console.log('fetched index = ' + el_ind);
-				this.list[el_ind] = data;
+				// var nl = data['body'].split(/\r\n|\r|\n/).length;
+				// data['rows'] = nl;
+				// var el_ind = (this.selectedIndex) ? this.selectedIndex : this.getIndexOfId(thing.id);
+				// console.log('fetched index = '+el_ind);
+				// this.thing[el_ind] = data;
 			});
 		},
 		addNew: function addNew() {
@@ -11011,8 +11144,30 @@ exports.default = {
 				return;
 			}
 			this.newThing = { body: '' }; // clear input
-			this.$http.post('/api/things', thing); // send
-			this.fetchAll();
+			this.$http.post('/api/things', thing) //SEND
+			.then(function (response) {
+				//response
+				response = response.json();
+				console.log(response.id);
+				this.fetchThis(response);
+				this.fetchAll();
+			});
+		},
+		fetchAll: function fetchAll() {
+			this.$http.get('/api/things').then(function (data) {
+				var data = data.json();
+				var data = data[(0, _keys2.default)(data)[0]];
+				// 		$.each(data, function(k, v) {
+				// 			console.log(k['body']);
+				// 			console.log(v['body']);
+				// 			console.log("k = "+k+" // v = "+v);
+				// 			// var nl = v['body'].split(/\r\n|\r|\n/).length;
+				// 			// v['rows'] = nl;
+				// });
+				this.import_data = data;
+				console.log((0, _stringify2.default)(data));
+				console.log('...fetchedAll!');
+			});
 		}
 	},
 	events: {
@@ -11061,7 +11216,7 @@ exports.default = {
 	}
 };
 if (module.exports.__esModule) module.exports = module.exports.default
-;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\n<div class=\"things-panel\">\n\t<div class=\"thing-card\" :class=\"{\n\t\t\tdone: thing.done,\n\t\t\tselected: thing.id == selectedId,\n\t\t\tediting: thing == editedThing,\n\t\t\t}\">\n\t\t<input class=\"toggle\" type=\"checkbox\" v-model=\"thing.done\" @change=\"markDone(thing)\">\n\t\t<div @dblclick=\"startEdit(thing)\" @click=\"select(thing)\">\n\t\t\t<span class=\"bodybox\" v-show=\"thing != editedThing\">{{ thing.body }}</span>\n\t\t\t<form action=\"update\" class=\"updatebox\" @submit.prevent=\"doneEdit(thing)\">\n\t\t\t\t<textarea name=\"thing_body\" rows=\"{{ thing.rows }}\" v-model=\"thing.body\" v-autosize=\"thing.body\" v-thing-focus=\"thing == editedThing\" @blur=\"doneEdit(thing)\" @keyup.esc=\"cancelEdit(thing)\">{{ thing.body }}</textarea>\n\t\t\t</form>\n\t\t\t<span @click=\"deleteThing(thing)\">✗</span>\n\t\t</div>\n\t</div>\n\t<div class=\"children\" v-if=\"thing.children\">\n\t\t<panel v-for=\"childPanel in thing.children\" :thing=\"childPanel\"></panel>\n\t</div>\n</div>\n"
+;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\n<div class=\"things-panel\">\n\t<div class=\"panel-title\" v-if=\"thing.lft == 1\">\n\t\t{{ thing.body }}\n\t</div>\n\t<div class=\"thing-card\" v-if=\"thing.lft != 1\" :class=\"{\n\t\t\tdone: thing.done,\n\t\t\tselected: thing.id == selectedId,\n\t\t\tediting: thing == editedThing,\n\t\t\t}\">\n\t\t<input class=\"toggle\" type=\"checkbox\" v-model=\"thing.done\" @change=\"markDone(thing)\">\n\t\t<div class=\"body-div\" @dblclick=\"startEdit(thing)\" @click=\"select(thing)\" @enter=\"console.log('yarrr')\">\n\t\t\t<span class=\"bodybox\" v-show=\"thing != editedThing\">{{ thing.id }} - {{ thing.body }}</span>\n\t\t\t<form action=\"update\" class=\"updatebox\" @submit.prevent=\"doneEdit(thing)\">\n\t\t\t\t<textarea name=\"thing_body\" rows=\"<!-- {{ thing.rows }} -->\" v-model=\"thing.body\" v-autosize=\"thing.body\" v-thing-focus=\"thing == editedThing\" @blur=\"doneEdit(thing)\" @keyup.esc=\"cancelEdit(thing)\">{{ thing.body }}</textarea>\n\t\t\t</form>\n\t\t\t<div class=\"thing-nav\">\n\t\t\t\t<button @click=\"deleteThing(thing)\">✗</button>\n\t\t\t</div>\n\t\t</div>\n\t</div>\n\t<form action=\"\" @submit.prevent=\"addNew\" v-if=\"true\">\n\t\t<input type=\"text\" name=\"body\" id=\"add-thing\" v-model=\"newThing.body\" placeholder=\"I can't forget to...\" autocomplete=\"off\" autofocus=\"\">\n\t</form>\n\n\t<div class=\"children\" v-if=\"thing.children\">\n\t\t<panel v-for=\"childPanel in thing.children\" :thing=\"childPanel\"></panel>\n\t</div>\n</div>\n"
 if (module.hot) {(function () {  module.hot.accept()
   var hotAPI = require("vue-hot-reload-api")
   hotAPI.install(require("vue"), true)
@@ -11072,6 +11227,6 @@ if (module.hot) {(function () {  module.hot.accept()
     hotAPI.update("_v-f86b8dc2", module.exports, (typeof module.exports === "function" ? module.exports.options : module.exports).template)
   }
 })()}
-},{"vue":5,"vue-hot-reload-api":4}]},{},[6]);
+},{"babel-runtime/core-js/json/stringify":2,"babel-runtime/core-js/object/keys":3,"vue":19,"vue-hot-reload-api":18}]},{},[20]);
 
 //# sourceMappingURL=main.js.map
