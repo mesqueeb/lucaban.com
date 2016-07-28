@@ -87,15 +87,37 @@ export default {
 			newThing: { body: '' },
 			editedThing: null,
 			// selectedThing: null,
-			selectedIndex: null,
 			selectedId: null,
+			selectedIndex: null,
+			selectedLft: null,
+			selectedDpt: null,
+			childrenMeta: {}, // shows `lft:id` per child
 			visibility: 'all',
 		};
 	},
 	computed: {
 
 	},
+	ready(){
+    	this.dispatchChildMeta();
+	},
 	methods: {
+		dispatchChildMeta(){ // send child's `lft:id` to parent
+			var lft = this.thing.lft;
+			var id = this.thing.id;
+			var childMeta = {};
+			childMeta[lft] = id;
+			this.$dispatch('childMetaSent', childMeta);
+		},
+		broadcastParentMeta(){
+			var lft = this.selectedLft;
+			var id = this.selectedId;
+			var parentMeta = {};
+			parentMeta[lft] = id;
+			console.log('broadcastParentMeta');
+			console.log(parentMeta);
+			this.$broadcast('parentMetaSent', parentMeta);
+		},
 		getIndexOfId(x){
 			// ARRAYの場合
 			// return this.thing.map(function(obj){
@@ -105,20 +127,35 @@ export default {
 			// OBJECTの場合
 			return Object.keys(this.thing).indexOf(x.toString());
 		},
+		getNextLft(){
+			var allLfts = Object.keys(this.childrenMeta).sort();
+			var currLftInd = allLfts.indexOf(this.selectedLft);
+			var nextLft = allLfts[currLftInd+1];
+			console.log('currlft = '+this.selectedLft+'// nextlft = '+nextLft);
+			this.selectedLft = nextLft;
+			this.selectedId = this.childrenMeta.nextLft;
+		},
 		select(thing){
 			// console.log(thing.id);
 			this.selectedId = thing.id;
 			this.selectedIndex = this.getIndexOfId(thing.id);
+			this.$dispatch('selectedId', this.selectedId);
+			this.$dispatch('selectedIndex', this.selectedIndex);
+			this.$dispatch('selectedLft', this.thing.lft);
+			this.$dispatch('selectedDept', this.thing.dept);
+			this.broadcastParentMeta();
 		},
 		selectNext(){
-			if (this.selectedIndex == null){
-				this.selectedIndex = 0;
-			} else if (this.selectedIndex == this.thing.length-1) {
-				return;
-			} else {
-				this.selectedIndex = this.selectedIndex+1;
-			}
-			this.selectedId = this.thing[this.selectedIndex].id;
+			this.getNextLft();
+			this.broadcastParentMeta();
+			// if (this.selectedIndex == null){
+			// 	this.selectedIndex = 0;
+			// } else if (this.selectedIndex == this.thing.length-1) {
+			// 	return;
+			// } else {
+			// 	this.selectedIndex = this.selectedIndex+1;
+			// }
+			// this.selectedId = this.thing[this.selectedIndex].id;
 		},
 		selectPrevious(){
 			if (!this.selectedIndex){
@@ -226,6 +263,23 @@ export default {
 				this.doneEdit();
 			}
     	},
+	    selectedId(x){ this.selectedId = x; },
+		selectedIndex(x){ this.selectedIndex = x; },
+		selectedLft(x){ this.selectedLft = x; },
+		selectedDept(x){ this.selectedDept = x; },
+		childMetaSent(x){ 
+			var lft = Object.keys(x);
+			var id = x[lft];
+			this.childrenMeta[lft] = id;
+		},
+		parentMetaSent(x){
+			//if(this.thing.lft == 1){ return; }
+			var lft = Object.keys(x);
+			var id = x[lft];
+			console.log('current sel-lft = '+this.selectedLft);
+			this.selectedLft = lft;
+			this.selectedId = id;
+		},
 	},
 	directives: {
 		'thing-focus': function (value) {
