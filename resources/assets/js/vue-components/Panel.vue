@@ -236,9 +236,9 @@ export default {
 				this.doneEdit();
 			}
     	},
-	    selectedId(x){ if(this.thing.lft == 1){ this.selectedId = x; } },
-		selectedLft(x){ if(this.thing.lft == 1){ this.selectedLft = x; } },
-		selectedDept(x){ if(this.thing.lft == 1){ this.selectedDept = x; } },
+	    selectedId(x){ console.log('climb'); this.selectedId = x; },
+		selectedLft(x){ this.selectedLft = x; },
+		selectedDept(x){ this.selectedDept = x; },
 		childMetaSent(x){ 
 			var lft = Object.keys(x)[0].toString();
 			var id = x[lft];
