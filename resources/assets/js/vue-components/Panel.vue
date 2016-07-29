@@ -86,9 +86,7 @@ export default {
 		return {
 			newThing: { body: '' },
 			editedThing: null,
-			// selectedThing: null,
 			selectedId: null,
-			selectedIndex: null,
 			selectedLft: null,
 			selectedDpt: null,
 			childrenMeta: {}, // shows `lft:id` per child
@@ -118,15 +116,6 @@ export default {
 			console.log(parentMeta);
 			this.$broadcast('parentMetaSent', parentMeta);
 		},
-		getIndexOfId(x){
-			// ARRAYの場合
-			// return this.thing.map(function(obj){
-			// 	return obj.id;
-			// }).indexOf(x);
-
-			// OBJECTの場合
-			return Object.keys(this.thing).indexOf(x.toString());
-		},
 		getNextLft(){
 			var allLfts = Object.keys(this.childrenMeta).sort();
 			var currLftInd = allLfts.indexOf(this.selectedLft);
@@ -137,33 +126,17 @@ export default {
 		},
 		select(thing){
 			// console.log(thing.id);
-			this.selectedId = thing.id;
-			this.selectedIndex = this.getIndexOfId(thing.id);
-			this.$dispatch('selectedId', this.selectedId);
-			this.$dispatch('selectedIndex', this.selectedIndex);
-			this.$dispatch('selectedLft', this.thing.lft);
-			this.$dispatch('selectedDept', this.thing.dept);
-			this.broadcastParentMeta();
+			// this.selectedId = thing.id;
+			this.$dispatch('selectedId', thing.id);
+			this.$dispatch('selectedLft', thing.lft);
+			this.$dispatch('selectedDept', thing.dept);
+			// this.broadcastParentMeta();
 		},
 		selectNext(){
 			this.getNextLft();
 			this.broadcastParentMeta();
-			// if (this.selectedIndex == null){
-			// 	this.selectedIndex = 0;
-			// } else if (this.selectedIndex == this.thing.length-1) {
-			// 	return;
-			// } else {
-			// 	this.selectedIndex = this.selectedIndex+1;
-			// }
-			// this.selectedId = this.thing[this.selectedIndex].id;
 		},
 		selectPrevious(){
-			if (!this.selectedIndex){
-				this.selectedIndex = 0;
-			} else {
-				this.selectedIndex = this.selectedIndex-1;
-			}
-			this.selectedId = this.thing[this.selectedIndex].id;
 		},
 		indent(){
 			var thing = this.thing[this.selectedIndex];
@@ -244,8 +217,8 @@ export default {
   		// 			// v['rows'] = nl;
 				// });
 				this.import_data = data;
-				console.log(JSON.stringify(data));
-				console.log('...fetchedAll!');
+				// console.log(JSON.stringify(data));
+				// console.log('...fetchedAll!');
 			});
 		},
 	},
@@ -263,22 +236,23 @@ export default {
 				this.doneEdit();
 			}
     	},
-	    selectedId(x){ this.selectedId = x; },
-		selectedIndex(x){ this.selectedIndex = x; },
-		selectedLft(x){ this.selectedLft = x; },
-		selectedDept(x){ this.selectedDept = x; },
+	    selectedId(x){ if(this.thing.lft == 1){ this.selectedId = x; } },
+		selectedLft(x){ if(this.thing.lft == 1){ this.selectedLft = x; } },
+		selectedDept(x){ if(this.thing.lft == 1){ this.selectedDept = x; } },
 		childMetaSent(x){ 
-			var lft = Object.keys(x);
+			var lft = Object.keys(x)[0].toString();
 			var id = x[lft];
 			this.childrenMeta[lft] = id;
 		},
 		parentMetaSent(x){
 			//if(this.thing.lft == 1){ return; }
-			var lft = Object.keys(x);
+			var lft = Object.keys(x)[0].toString();
+			console.log(lft);
 			var id = x[lft];
 			console.log('current sel-lft = '+this.selectedLft);
 			this.selectedLft = lft;
 			this.selectedId = id;
+			console.log('new sel-lft = '+this.selectedLft);
 		},
 	},
 	directives: {
