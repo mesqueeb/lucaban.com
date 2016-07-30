@@ -91,7 +91,9 @@ class ThingsPanelController extends Controller
 
     public function makeChildOf(Request $request, $id)
     {
-        return Thing::findOrFail($id)->makeChildOf(request()->target_id);
+        $thing = Thing::findOrFail($id);
+        $target_id = request()->target_id;
+        return $thing->makeChildOf($target_id);
     }
     public function makeSiblingOf($id)
     {
