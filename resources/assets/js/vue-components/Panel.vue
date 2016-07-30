@@ -50,7 +50,7 @@
 		<form action=""
 			@submit.prevent="addNew"
 			v-if="true"
-		>
+		><!-- Will hide this later, only show when clicking enter on task. -->
 			<input type="text"
 				class="add-thing"
 				name="body"
@@ -78,9 +78,9 @@ export default {
 	created(){
 
 	},
-	// props: {
-	// 	list: Array,
-	// },
+	ready(){
+    	this.dispatchChildMeta();
+	},
 	props: ['thing'],
 	data: function(){
 		return {
@@ -95,10 +95,6 @@ export default {
 		};
 	},
 	computed: {
-
-	},
-	ready(){
-    	this.dispatchChildMeta();
 	},
 	methods: {
 		dispatchChildMeta(){ // send child's `lft:id` to parent
@@ -186,17 +182,20 @@ export default {
 		},
 		markDone(thing){
 			if(!thing){
+				// ↓ out dated because of recursiveness...
 				var thing = this.thing[this.selectedIndex]
 				thing.done = !thing.done;
 			}
 			this.$http.patch('/api/things/' + thing.id, {'done':thing.done});
 		},
 		startEdit(thing){
+			// ↓ out dated because of recursiveness...
 			var thing = (thing) ? thing : this.thing[this.selectedIndex];
 			this.beforeEditCache = thing.body;
 			this.editedThing = thing;
 		},
 		doneEdit(thing) {
+			// ↓ out dated because of recursiveness...
 			var thing = (thing) ? thing : this.thing[this.selectedIndex];
 			if (!this.editedThing) {
 				return;
@@ -217,6 +216,7 @@ export default {
 		},
 		deleteThing(thing){
 			this.$http.delete('/api/things/' + thing.id);
+			// ↓ DOESN'T WORK!!!
 			this.thing.$remove(thing);
 		},
 		fetchThis(thing){
