@@ -93,10 +93,16 @@ class ThingsPanelController extends Controller
     {
         return Thing::findOrFail($id)->makeChildOf(request()->target_id);
     }
-    public function makeSiblingOf(Request $request, $id)
+    public function makeSiblingOf($id)
     {
-        return Thing::findOrFail($id)->makeSiblingOf(request()->target_id);
+        $thing = Thing::findOrFail($id);
+        $target_id = $thing->parent()->first()->id;
+        return $thing->makeSiblingOf($target_id);
     }
+
+        
+
+
 
     /**
      * Remove the specified resource from storage.

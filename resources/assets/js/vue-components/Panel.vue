@@ -149,20 +149,19 @@ export default {
 			console.log('target_id: '+targetId);
 			this.$http.patch('/api/things/'+id+'/makeChildOf', {'target_id':targetId});
 			this.$root.fetchAll();
+
+			// In case previous thing is not sibling:
+			// Make last child of parent.
+			// In case previous thing is sibling:
+			// Make child of previous thing.
+
 		},
 		unindent(){
 			var vm = this.$root.$children[0];
 			if(!vm.selectedId){ return; };
 			if(!vm.selectedLft == 2){ return; }
-			
-			var fd = this.$root.$children[0].flatData;
-			var allLfts = Object.keys(fd);
-			var currLftInd = allLfts.indexOf(vm.selectedLft.toString());
-			var prevLft = allLfts[currLftInd-1];
-			var targetId = vm.flatData[prevLft].id;
 			var id = vm.selectedId;
-			console.log('target_id: '+targetId);
-			this.$http.patch('/api/things/'+id+'/makeSiblingOf', {'target_id':targetId});
+			this.$http.patch('/api/things/'+id+'/makeSiblingOf');
 			this.$root.fetchAll();
 		},
 		markDone(thing){
