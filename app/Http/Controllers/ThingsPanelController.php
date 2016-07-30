@@ -89,11 +89,14 @@ class ThingsPanelController extends Controller
         return response()->json($request->all());
     }
 
-    public function indent(Request $request, $id)
+    public function makeChildOf(Request $request, $id)
     {
-        return Thing::findOrFail($id)->makeChildOf(request()->parent_id);
+        return Thing::findOrFail($id)->makeChildOf(request()->target_id);
     }
-
+    public function makeSiblingOf(Request $request, $id)
+    {
+        return Thing::findOrFail($id)->makeSiblingOf(request()->target_id);
+    }
 
     /**
      * Remove the specified resource from storage.

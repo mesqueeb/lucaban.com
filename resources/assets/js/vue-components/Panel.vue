@@ -136,14 +136,34 @@ export default {
 			this.getLft('previous');
 		},
 		indent(){
-			var thing = this.thing[this.selectedIndex];
-			console.log('indent: '+thing);
-			if (!thing){ return; }
-			if (this.selectedIndex == 0){ return; }
-			var prevThingId = this.thing[this.selectedIndex-1].id;
-			var id = thing.id;
-			console.log('parent: '+prevThingId+" // thing: "+id);
-			this.$http.patch('/api/things/'+id+'/indent', {'parent_id':prevThingId});
+			var vm = this.$root.$children[0];
+			if(!vm.selectedId){ return; };
+			if(!vm.selectedLft == 2){ return; }
+			
+			var fd = this.$root.$children[0].flatData;
+			var allLfts = Object.keys(fd);
+			var currLftInd = allLfts.indexOf(vm.selectedLft.toString());
+			var prevLft = allLfts[currLftInd-1];
+			var targetId = vm.flatData[prevLft].id;
+			var id = vm.selectedId;
+			console.log('target_id: '+targetId);
+			this.$http.patch('/api/things/'+id+'/makeChildOf', {'target_id':targetId});
+			this.$root.fetchAll();
+		},
+		unindent(){
+			var vm = this.$root.$children[0];
+			if(!vm.selectedId){ return; };
+			if(!vm.selectedLft == 2){ return; }
+			
+			var fd = this.$root.$children[0].flatData;
+			var allLfts = Object.keys(fd);
+			var currLftInd = allLfts.indexOf(vm.selectedLft.toString());
+			var prevLft = allLfts[currLftInd-1];
+			var targetId = vm.flatData[prevLft].id;
+			var id = vm.selectedId;
+			console.log('target_id: '+targetId);
+			this.$http.patch('/api/things/'+id+'/makeSiblingOf', {'target_id':targetId});
+			this.$root.fetchAll();
 		},
 		markDone(thing){
 			if(!thing){
@@ -202,29 +222,13 @@ export default {
 				this.fetchAll();
 			});
 		},
-		fetchAll(){
-			this.$http.get('/api/things').then(function(data) {
-  				var data = data.json();
-				var data = data[Object.keys(data)[0]];
-  		// 		$.each(data, function(k, v) {
-  		// 			console.log(k['body']);
-  		// 			console.log(v['body']);
-  		// 			console.log("k = "+k+" // v = "+v);
-  		// 			// var nl = v['body'].split(/\r\n|\r|\n/).length;
-  		// 			// v['rows'] = nl;
-				// });
-				this.import_data = data;
-				// console.log(JSON.stringify(data));
-				// console.log('...fetchedAll!');
-			});
-		},
 	},
 	events: {
     	arrowDown() { this.selectNext(); },
     	arrowUp() { this.selectPrevious(); },
     	spaceBar() { this.markDone(); },
     	tab() { this.indent(); },
-    	unindent() { this.unindent(); },
+    	shift_tab() { this.unindent(); },
     	enter() { this.startEdit(); },
     	enterOnFocussedInput() {
 			if ( $('#add-thing:focus').length > 0 ) {

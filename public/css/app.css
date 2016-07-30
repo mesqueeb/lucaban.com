@@ -40,7 +40,7 @@ input {
   font-size: 1.6em;
   color: #E74C3C; }
 
-.panel-body > .things-panel > .children children {
+.panel-body > .things-panel > .children .children {
   margin-left: 2em; }
 
 .thing-card {

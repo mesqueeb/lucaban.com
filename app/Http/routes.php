@@ -10,7 +10,8 @@ Route::get('/things',function(){
 	return view('things.index');
 });
 Route::post('/api/things/fetchTreeMetaFlat','ThingsPanelController@fetchTreeMetaFlat');
-Route::patch('/api/things/{id}/indent','ThingsPanelController@indent');
+Route::patch('/api/things/{id}/makeChildOf','ThingsPanelController@makeChildOf');
+Route::patch('/api/things/{id}/makeSiblingOf','ThingsPanelController@makeSiblingOf');
 Route::resource('/api/things','ThingsPanelController');
 ////////////////////////////////////////////////
 Route::get('/playground',function(){

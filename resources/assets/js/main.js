@@ -23,6 +23,7 @@ new Vue({
 				this.import_data = data;
 				console.log(JSON.stringify(data));
 				console.log('...fetchedAll!');
+				this.fetchTreeMetaFlat();
 			});
 		},
 		fetchTreeMetaFlat(){
@@ -32,16 +33,16 @@ new Vue({
 				for (var i=0; i<data.length; i++) {
 				  result[data[i].lft] = data[i];
 				}
-  				console.log('printing flat data:');
-  				console.log(result);
+  				// console.log('printing flat data:');
+  				// console.log(result);
 				var vm = this.$root.$children[0];
 				vm.flatData = result;
+				console.log('...fetchedFlatData!');
 			});
 		},
 	},
 	created(){
     	this.fetchAll();
-    	this.fetchTreeMetaFlat();
 	},
 	ready: function() {
       var vm = this;
@@ -74,6 +75,10 @@ new Vue({
 				break;
 			case 9: // tab
 				e.preventDefault();
+				if (e.shiftKey){
+		  			vm.$broadcast('shift_tab');
+		  			break;
+		  		}
 				vm.$broadcast('tab');
 				break;
 			case 13: // enter
