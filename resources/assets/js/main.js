@@ -25,9 +25,23 @@ new Vue({
 				console.log('...fetchedAll!');
 			});
 		},
+		fetchTreeMetaFlat(){
+			this.$http.post('/api/things/fetchTreeMetaFlat').then(function(data) {
+  				var data = data.json();
+				var result = {};
+				for (var i=0; i<data.length; i++) {
+				  result[data[i].lft] = data[i];
+				}
+  				console.log('printing flat data:');
+  				console.log(result);
+				var vm = this.$root.$children[0];
+				vm.flatData = result;
+			});
+		},
 	},
 	created(){
     	this.fetchAll();
+    	this.fetchTreeMetaFlat();
 	},
 	ready: function() {
       var vm = this;
@@ -78,5 +92,11 @@ new Vue({
           } // end switch
     	} // END INPUT AREAS NOT IN FOCUS
       });
-    }
+    },
+	http: {
+		root: '/root',
+		headers: {
+			'X-CSRF-TOKEN': document.querySelector('#token').getAttribute('value'),
+		},
+    },
 });

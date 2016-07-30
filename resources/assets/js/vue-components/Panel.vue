@@ -10,7 +10,7 @@
 			v-if="thing.lft != 1"
 			:class="{
 				done: thing.done,
-				selected: thing.id == selectedId,
+				selected: thing.id == this.$root.$children[0].selectedId,
 				editing: thing == editedThing,
 				}"
 		>
@@ -88,9 +88,10 @@ export default {
 			editedThing: null,
 			selectedId: null,
 			selectedLft: null,
-			selectedDpt: null,
+			selectedDepth: null,
 			childrenMeta: {}, // shows `lft:id` per child
 			visibility: 'all',
+			flatData: null,
 		};
 	},
 	computed: {
@@ -107,36 +108,46 @@ export default {
 			childMeta[lft] = id;
 			this.$dispatch('childMetaSent', childMeta);
 		},
-		broadcastParentMeta(){
-			var lft = this.selectedLft;
-			var id = this.selectedId;
-			var parentMeta = {};
-			parentMeta[lft] = id;
-			console.log('broadcastParentMeta');
-			console.log(parentMeta);
-			this.$broadcast('parentMetaSent', parentMeta);
-		},
 		getNextLft(){
-			var allLfts = Object.keys(this.childrenMeta).sort();
-			var currLftInd = allLfts.indexOf(this.selectedLft);
+			var vm = this.$root.$children[0];
+			var fd = this.$root.$children[0].flatData;
+			var allLfts = Object.keys(fd).sort();
+			console.log('allLfts = '+allLfts);
+			// console.log('ind of lft=8 = '+allLfts.indexOf("8"));
+			// console.log(allLfts.constructor === Array);
+			var currLftInd = allLfts.indexOf(vm.selectedLft.toString());
+			console.log('vm.selectedLft = '+vm.selectedLft);
+			console.log('currLftInd = '+currLftInd);
 			var nextLft = allLfts[currLftInd+1];
-			console.log('currlft = '+this.selectedLft+'// nextlft = '+nextLft);
-			this.selectedLft = nextLft;
-			this.selectedId = this.childrenMeta.nextLft;
+			console.log('currlft = '+vm.selectedLft+'// nextlft = '+nextLft);
+			vm.selectedLft = nextLft;
+			console.log(vm.flatData[nextLft].id);
+			vm.selectedId = vm.flatData[nextLft].id;
 		},
 		select(thing){
-			// console.log(thing.id);
-			// this.selectedId = thing.id;
-			this.$dispatch('selectedId', thing.id);
-			this.$dispatch('selectedLft', thing.lft);
-			this.$dispatch('selectedDept', thing.dept);
-			// this.broadcastParentMeta();
+			var vm = this.$root.$children[0];
+			vm.selectedId = thing.id;
+			vm.selectedLft = thing.lft;
+			vm.selectedDepth = thing.depth;
 		},
 		selectNext(){
 			this.getNextLft();
-			this.broadcastParentMeta();
 		},
 		selectPrevious(){
+			var vm = this.$root.$children[0];
+			var fd = this.$root.$children[0].flatData;
+			var allLfts = Object.keys(fd).sort();
+			console.log('allLfts = '+allLfts);
+			// console.log('ind of lft=8 = '+allLfts.indexOf("8"));
+			// console.log(allLfts.constructor === Array);
+			var currLftInd = allLfts.indexOf(vm.selectedLft.toString());
+			console.log('vm.selectedLft = '+vm.selectedLft);
+			console.log('currLftInd = '+currLftInd);
+			var nextLft = allLfts[currLftInd-1];
+			console.log('currlft = '+vm.selectedLft+'// nextlft = '+nextLft);
+			vm.selectedLft = nextLft;
+			console.log(vm.flatData[nextLft].id);
+			vm.selectedId = vm.flatData[nextLft].id;
 		},
 		indent(){
 			var thing = this.thing[this.selectedIndex];
@@ -236,24 +247,24 @@ export default {
 				this.doneEdit();
 			}
     	},
-	    selectedId(x){ console.log('climb'); this.selectedId = x; },
-		selectedLft(x){ this.selectedLft = x; },
-		selectedDept(x){ this.selectedDept = x; },
+	 //    selectedId(x){ console.log('climb'); this.selectedId = x; },
+		// selectedLft(x){ this.selectedLft = x; },
+		// selectedDepth(x){ this.selectedDepth = x; },
 		childMetaSent(x){ 
 			var lft = Object.keys(x)[0].toString();
 			var id = x[lft];
 			this.childrenMeta[lft] = id;
 		},
-		parentMetaSent(x){
-			//if(this.thing.lft == 1){ return; }
-			var lft = Object.keys(x)[0].toString();
-			console.log(lft);
-			var id = x[lft];
-			console.log('current sel-lft = '+this.selectedLft);
-			this.selectedLft = lft;
-			this.selectedId = id;
-			console.log('new sel-lft = '+this.selectedLft);
-		},
+		// parentMetaSent(x){
+		// 	//if(this.thing.lft == 1){ return; }
+		// 	var lft = Object.keys(x)[0].toString();
+		// 	console.log(lft);
+		// 	var id = x[lft];
+		// 	console.log('current sel-lft = '+this.selectedLft);
+		// 	this.selectedLft = lft;
+		// 	this.selectedId = id;
+		// 	console.log('new sel-lft = '+this.selectedLft);
+		// },
 	},
 	directives: {
 		'thing-focus': function (value) {

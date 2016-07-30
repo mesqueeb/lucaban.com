@@ -26,6 +26,13 @@ class ThingsPanelController extends Controller
         return $god->getDescendantsAndSelf()->toHierarchy();
     }
 
+    public function fetchTreeMetaFlat()
+    {
+        return Thing::get();
+        // is equal to
+        // return DB::table('things')->get();
+    }
+
     /**
      * Show the form for creating a new resource.
      *
