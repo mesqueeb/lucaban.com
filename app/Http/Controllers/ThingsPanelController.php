@@ -51,7 +51,8 @@ class ThingsPanelController extends Controller
      */
     public function store(Request $request)
     {
-        return Thing::where('parent_id', NULL)->first()->children()->create($request->all());
+        return Thing::where('parent_id', request()->parent_id)->first()->children()->create($request->all());
+        // TODO:      moveToRightOf($otherNode)!!!
     }
 
     /**
@@ -100,6 +101,16 @@ class ThingsPanelController extends Controller
         $thing = Thing::findOrFail($id);
         $target_id = $thing->parent()->first()->id;
         return $thing->makeSiblingOf($target_id);
+    }
+    public function moveThing(Request $request, $id)
+    {
+        $thing = Thing::findOrFail($id);
+        $direction = request()->direction;
+        if($direction=='up'){
+            return $thing->moveLeft();
+        } else if ($direction=='down'){
+            return $thing->moveRight();
+        }
     }
 
         

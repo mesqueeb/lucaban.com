@@ -52,8 +52,8 @@
 			v-if="true"
 		>
 			<input type="text"
+				class="add-thing"
 				name="body"
-				id="add-thing"
 				v-model="newThing.body"
 				placeholder="I can't forget to..."
 				autocomplete="off"
@@ -84,7 +84,7 @@ export default {
 	props: ['thing'],
 	data: function(){
 		return {
-			newThing: { body: '' },
+			newThing: { body: '', parent_id: '' },
 			editedThing: null,
 			selectedId: null,
 			selectedLft: null,
@@ -178,6 +178,12 @@ export default {
 			this.$http.patch('/api/things/'+id+'/makeSiblingOf');
 			this.$root.fetchAll();
 		},
+		move(direction){
+			var vm = this.$root.$children[0];
+			var id = vm.selectedId;
+			this.$http.patch('/api/things/'+id+'/moveThing', {'direction':direction});
+			this.$root.fetchAll();
+		},
 		markDone(thing){
 			if(!thing){
 				var thing = this.thing[this.selectedIndex]
@@ -223,17 +229,26 @@ export default {
 				// this.thing[el_ind] = data;
   			});
 		},
-		addNew(){
-			var thing = this.newThing; // get input
-			if (!thing.body){ return; }
-			this.newThing = {body:''}; // clear input
-			this.$http.post('/api/things',thing) //SEND
-				.then(function(response){ //response
-				response = response.json();
-				console.log(response.id);
-				this.fetchThis(response);
-				this.fetchAll();
-			});
+		addNew(thing){
+			console.log(thing);
+			// var vm = this.$root.$children[0];
+			// var sel_id = vm.selectedId;
+			// var nbody = this.newThing.body;
+			// console.log('pid '+sel_id+' // body '+nbody);
+			// var thing = this.newThing; // get input
+
+			// this.newThing.parent_id = this.$root.selectedId;
+			// if (!this.newThing.body){ return; }
+			// this.newThing = {body:''}; // clear input
+
+			console.log('added this thing...');
+			console.log(thing);
+			// this.$http.post('/api/things',thing) //SEND
+			// 	.then(function(response){ //response
+			// 	// response = response.json();
+			// 	// console.log(response.id);
+			// 	this.$root.fetchAll();
+			// });
 		},
 	},
 	events: {
@@ -242,32 +257,24 @@ export default {
     	spaceBar() { this.markDone(); },
     	tab() { this.indent(); },
     	shift_tab() { this.unindent(); },
+    	meta_arrowUp() { this.move('up'); },
+    	meta_arrowDown() { this.move('down'); },
     	enter() { this.startEdit(); },
     	enterOnFocussedInput() {
-			if ( $('#add-thing:focus').length > 0 ) {
+			if ( $('.add-thing:focus').length) {
+				console.log('run addnew');
+				console.log(this);
+				console.log('↑ this in event');
 				this.addNew();
 			} else {
 				this.doneEdit();
 			}
     	},
-	 //    selectedId(x){ console.log('climb'); this.selectedId = x; },
-		// selectedLft(x){ this.selectedLft = x; },
-		// selectedDepth(x){ this.selectedDepth = x; },
 		childMetaSent(x){ 
 			var lft = Object.keys(x)[0].toString();
 			var id = x[lft];
 			this.childrenMeta[lft] = id;
 		},
-		// parentMetaSent(x){
-		// 	//if(this.thing.lft == 1){ return; }
-		// 	var lft = Object.keys(x)[0].toString();
-		// 	console.log(lft);
-		// 	var id = x[lft];
-		// 	console.log('current sel-lft = '+this.selectedLft);
-		// 	this.selectedLft = lft;
-		// 	this.selectedId = id;
-		// 	console.log('new sel-lft = '+this.selectedLft);
-		// },
 	},
 	directives: {
 		'thing-focus': function (value) {

@@ -13,22 +13,7 @@
 		<div class="panel-body">
 			@include('common.errors')
 			
-			<Panel :thing="import_data"
-			></Panel>
-			{{-- <form action=""
-				@submit.prevent="addNew"
-				v-if="!import_data"
-			>
-				<input type="text"
-					name="body"
-					id="add-thing"
-					v-model="newThing.body"
-					placeholder="I can't forget to..."
-					autocomplete="off"
-					autofocus 
-				>
-			</form> --}}
-
+			<Panel :thing="import_data"></Panel>
 		</div>
 	</div>
 

@@ -10977,15 +10977,25 @@ new Vue({
 			} else {
 				// INPUT AREAS NOT IN FOCUS
 				switch (e.keyCode) {
-					case 40:
-						// arrowDown
-						e.preventDefault();
-						vm.$broadcast('arrowDown');
-						break;
 					case 38:
 						// arrowUp
 						e.preventDefault();
+						if (event.ctrlKey || event.metaKey) {
+							console.log('meta_arrowUp');
+							vm.$broadcast('meta_arrowUp');
+							break;
+						}
 						vm.$broadcast('arrowUp');
+						break;
+					case 40:
+						// arrowDown
+						e.preventDefault();
+						if (event.ctrlKey || event.metaKey) {
+							console.log('meta_arrowDown');
+							vm.$broadcast('meta_arrowDown');
+							break;
+						}
+						vm.$broadcast('arrowDown');
 						break;
 					case 32:
 						// spaceBar
@@ -11051,7 +11061,7 @@ exports.default = {
 	props: ['thing'],
 	data: function data() {
 		return {
-			newThing: { body: '' },
+			newThing: { body: '', parent_id: '' },
 			editedThing: null,
 			selectedId: null,
 			selectedLft: null,
@@ -11157,6 +11167,12 @@ exports.default = {
 			this.$http.patch('/api/things/' + id + '/makeSiblingOf');
 			this.$root.fetchAll();
 		},
+		move: function move(direction) {
+			var vm = this.$root.$children[0];
+			var id = vm.selectedId;
+			this.$http.patch('/api/things/' + id + '/moveThing', { 'direction': direction });
+			this.$root.fetchAll();
+		},
 		markDone: function markDone(thing) {
 			if (!thing) {
 				var thing = this.thing[this.selectedIndex];
@@ -11202,20 +11218,26 @@ exports.default = {
 				// this.thing[el_ind] = data;
 			});
 		},
-		addNew: function addNew() {
-			var thing = this.newThing; // get input
-			if (!thing.body) {
-				return;
-			}
-			this.newThing = { body: '' }; // clear input
-			this.$http.post('/api/things', thing) //SEND
-			.then(function (response) {
-				//response
-				response = response.json();
-				console.log(response.id);
-				this.fetchThis(response);
-				this.fetchAll();
-			});
+		addNew: function addNew(thing) {
+			console.log(thing);
+			// var vm = this.$root.$children[0];
+			// var sel_id = vm.selectedId;
+			// var nbody = this.newThing.body;
+			// console.log('pid '+sel_id+' // body '+nbody);
+			// var thing = this.newThing; // get input
+
+			// this.newThing.parent_id = this.$root.selectedId;
+			// if (!this.newThing.body){ return; }
+			// this.newThing = {body:''}; // clear input
+
+			console.log('added this thing...');
+			console.log(thing);
+			// this.$http.post('/api/things',thing) //SEND
+			// 	.then(function(response){ //response
+			// 	// response = response.json();
+			// 	// console.log(response.id);
+			// 	this.$root.fetchAll();
+			// });
 		}
 	},
 	events: {
@@ -11234,20 +11256,25 @@ exports.default = {
 		shift_tab: function shift_tab() {
 			this.unindent();
 		},
+		meta_arrowUp: function meta_arrowUp() {
+			this.move('up');
+		},
+		meta_arrowDown: function meta_arrowDown() {
+			this.move('down');
+		},
 		enter: function enter() {
 			this.startEdit();
 		},
 		enterOnFocussedInput: function enterOnFocussedInput() {
-			if ($('#add-thing:focus').length > 0) {
+			if ($('.add-thing:focus').length) {
+				console.log('run addnew');
+				console.log(this);
+				console.log('↑ this in event');
 				this.addNew();
 			} else {
 				this.doneEdit();
 			}
 		},
-
-		//    selectedId(x){ console.log('climb'); this.selectedId = x; },
-		// selectedLft(x){ this.selectedLft = x; },
-		// selectedDepth(x){ this.selectedDepth = x; },
 		childMetaSent: function childMetaSent(x) {
 			var lft = (0, _keys2.default)(x)[0].toString();
 			var id = x[lft];
@@ -11273,7 +11300,7 @@ exports.default = {
 	}
 };
 if (module.exports.__esModule) module.exports = module.exports.default
-;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\n<div class=\"things-panel\">\n\t<div class=\"panel-title\" v-if=\"thing.lft == 1\">\n\t\t{{ thing.body }}\n\t</div>\n\t<div class=\"thing-card\" v-if=\"thing.lft != 1\" :class=\"{\n\t\t\tdone: thing.done,\n\t\t\tselected: thing.id == this.$root.$children[0].selectedId,\n\t\t\tediting: thing == editedThing,\n\t\t\t}\">\n\t\t<input class=\"toggle\" type=\"checkbox\" v-model=\"thing.done\" @change=\"markDone(thing)\">\n\t\t<div class=\"body-div\" @dblclick=\"startEdit(thing)\" @click=\"select(thing)\" @enter=\"console.log('yarrr')\">\n\t\t\t<span class=\"bodybox\" v-show=\"thing != editedThing\">{{ thing.id }} - {{ thing.body }}</span>\n\t\t\t<form action=\"update\" class=\"updatebox\" @submit.prevent=\"doneEdit(thing)\">\n\t\t\t\t<textarea name=\"thing_body\" rows=\"<!-- {{ thing.rows }} -->\" v-model=\"thing.body\" v-autosize=\"thing.body\" v-thing-focus=\"thing == editedThing\" @blur=\"doneEdit(thing)\" @keyup.esc=\"cancelEdit(thing)\">{{ thing.body }}</textarea>\n\t\t\t</form>\n\t\t\t<div class=\"thing-nav\">\n\t\t\t\t<button @click=\"deleteThing(thing)\">✗</button>\n\t\t\t</div>\n\t\t</div>\n\t</div>\n\t<form action=\"\" @submit.prevent=\"addNew\" v-if=\"true\">\n\t\t<input type=\"text\" name=\"body\" id=\"add-thing\" v-model=\"newThing.body\" placeholder=\"I can't forget to...\" autocomplete=\"off\" autofocus=\"\">\n\t</form>\n\n\t<div class=\"children\" v-if=\"thing.children\">\n\t\t<panel v-for=\"childPanel in thing.children\" :thing=\"childPanel\"></panel>\n\t</div>\n</div>\n"
+;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\n<div class=\"things-panel\">\n\t<div class=\"panel-title\" v-if=\"thing.lft == 1\">\n\t\t{{ thing.body }}\n\t</div>\n\t<div class=\"thing-card\" v-if=\"thing.lft != 1\" :class=\"{\n\t\t\tdone: thing.done,\n\t\t\tselected: thing.id == this.$root.$children[0].selectedId,\n\t\t\tediting: thing == editedThing,\n\t\t\t}\">\n\t\t<input class=\"toggle\" type=\"checkbox\" v-model=\"thing.done\" @change=\"markDone(thing)\">\n\t\t<div class=\"body-div\" @dblclick=\"startEdit(thing)\" @click=\"select(thing)\" @enter=\"console.log('yarrr')\">\n\t\t\t<span class=\"bodybox\" v-show=\"thing != editedThing\">{{ thing.id }} - {{ thing.body }}</span>\n\t\t\t<form action=\"update\" class=\"updatebox\" @submit.prevent=\"doneEdit(thing)\">\n\t\t\t\t<textarea name=\"thing_body\" rows=\"<!-- {{ thing.rows }} -->\" v-model=\"thing.body\" v-autosize=\"thing.body\" v-thing-focus=\"thing == editedThing\" @blur=\"doneEdit(thing)\" @keyup.esc=\"cancelEdit(thing)\">{{ thing.body }}</textarea>\n\t\t\t</form>\n\t\t\t<div class=\"thing-nav\">\n\t\t\t\t<button @click=\"deleteThing(thing)\">✗</button>\n\t\t\t</div>\n\t\t</div>\n\t</div>\n\t<form action=\"\" @submit.prevent=\"addNew\" v-if=\"true\">\n\t\t<input type=\"text\" class=\"add-thing\" name=\"body\" v-model=\"newThing.body\" placeholder=\"I can't forget to...\" autocomplete=\"off\" autofocus=\"\">\n\t</form>\n\n\t<div class=\"children\" v-if=\"thing.children\">\n\t\t<panel v-for=\"childPanel in thing.children\" :thing=\"childPanel\"></panel>\n\t</div>\n</div>\n"
 if (module.hot) {(function () {  module.hot.accept()
   var hotAPI = require("vue-hot-reload-api")
   hotAPI.install(require("vue"), true)

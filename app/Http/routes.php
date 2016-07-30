@@ -12,6 +12,7 @@ Route::get('/things',function(){
 Route::post('/api/things/fetchTreeMetaFlat','ThingsPanelController@fetchTreeMetaFlat');
 Route::patch('/api/things/{id}/makeChildOf','ThingsPanelController@makeChildOf');
 Route::patch('/api/things/{id}/makeSiblingOf','ThingsPanelController@makeSiblingOf');
+Route::patch('/api/things/{id}/moveThing','ThingsPanelController@moveThing');
 Route::resource('/api/things','ThingsPanelController');
 ////////////////////////////////////////////////
 Route::get('/playground',function(){

@@ -61,13 +61,23 @@ new Vue({
 		} else { 
 		  // INPUT AREAS NOT IN FOCUS
           switch(e.keyCode) { 
-			case 40: // arrowDown
-				e.preventDefault();
-				vm.$broadcast('arrowDown');
-				break;
 			case 38: // arrowUp
 				e.preventDefault();
+				if (event.ctrlKey || event.metaKey){
+		  			console.log('meta_arrowUp');
+		  			vm.$broadcast('meta_arrowUp');
+		  			break;
+		  		}
 				vm.$broadcast('arrowUp');
+				break;
+			case 40: // arrowDown
+				e.preventDefault();
+				if (event.ctrlKey || event.metaKey){
+					console.log('meta_arrowDown');
+		  			vm.$broadcast('meta_arrowDown');
+		  			break;
+		  		}
+				vm.$broadcast('arrowDown');
 				break;
 			case 32: // spaceBar
 				e.preventDefault();
