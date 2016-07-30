@@ -108,20 +108,19 @@ export default {
 			childMeta[lft] = id;
 			this.$dispatch('childMetaSent', childMeta);
 		},
-		getNextLft(){
+		getLft(direction){
 			var vm = this.$root.$children[0];
 			var fd = this.$root.$children[0].flatData;
-			var allLfts = Object.keys(fd).sort();
-			console.log('allLfts = '+allLfts);
-			// console.log('ind of lft=8 = '+allLfts.indexOf("8"));
-			// console.log(allLfts.constructor === Array);
+			var allLfts = Object.keys(fd);
 			var currLftInd = allLfts.indexOf(vm.selectedLft.toString());
-			console.log('vm.selectedLft = '+vm.selectedLft);
-			console.log('currLftInd = '+currLftInd);
-			var nextLft = allLfts[currLftInd+1];
-			console.log('currlft = '+vm.selectedLft+'// nextlft = '+nextLft);
+			if(direction == 'next'){
+				if(currLftInd+1 >= allLfts.length){ return; }
+				var nextLft =  allLfts[currLftInd+1];
+			} else if (direction == 'previous'){ 
+				if(currLftInd-1 < 1){ return; }
+				var nextLft =  allLfts[currLftInd-1];
+			}
 			vm.selectedLft = nextLft;
-			console.log(vm.flatData[nextLft].id);
 			vm.selectedId = vm.flatData[nextLft].id;
 		},
 		select(thing){
@@ -131,23 +130,10 @@ export default {
 			vm.selectedDepth = thing.depth;
 		},
 		selectNext(){
-			this.getNextLft();
+			this.getLft('next');
 		},
 		selectPrevious(){
-			var vm = this.$root.$children[0];
-			var fd = this.$root.$children[0].flatData;
-			var allLfts = Object.keys(fd).sort();
-			console.log('allLfts = '+allLfts);
-			// console.log('ind of lft=8 = '+allLfts.indexOf("8"));
-			// console.log(allLfts.constructor === Array);
-			var currLftInd = allLfts.indexOf(vm.selectedLft.toString());
-			console.log('vm.selectedLft = '+vm.selectedLft);
-			console.log('currLftInd = '+currLftInd);
-			var nextLft = allLfts[currLftInd-1];
-			console.log('currlft = '+vm.selectedLft+'// nextlft = '+nextLft);
-			vm.selectedLft = nextLft;
-			console.log(vm.flatData[nextLft].id);
-			vm.selectedId = vm.flatData[nextLft].id;
+			this.getLft('previous');
 		},
 		indent(){
 			var thing = this.thing[this.selectedIndex];
