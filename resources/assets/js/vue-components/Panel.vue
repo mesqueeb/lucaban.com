@@ -55,7 +55,7 @@
 				class="add-thing"
 				name="body"
 				v-model="newThing.body"
-				placeholder="I can't forget to..."
+				placeholder="..."
 				autocomplete="off"
 				autofocus 
 			>
@@ -98,17 +98,17 @@ export default {
 	},
 	methods: {
 		dispatchChildMeta(){ // send child's `lft:id` to parent
-			var lft = this.thing.lft;
-			var id = this.thing.id;
-			var childMeta = {};
+			let lft = this.thing.lft;
+			let id = this.thing.id;
+			let childMeta = {};
 			childMeta[lft] = id;
 			this.$dispatch('childMetaSent', childMeta);
 		},
 		getLft(direction){
-			var vm = this.$root.$children[0];
-			var fd = this.$root.$children[0].flatData;
-			var allLfts = Object.keys(fd);
-			var currLftInd = allLfts.indexOf(vm.selectedLft.toString());
+			let vm = this.$root.$children[0];
+			let fd = this.$root.$children[0].flatData;
+			let allLfts = Object.keys(fd);
+			let currLftInd = allLfts.indexOf(vm.selectedLft.toString());
 			if(direction == 'next'){
 				if(currLftInd+1 >= allLfts.length){ return; }
 				var nextLft =  allLfts[currLftInd+1];
@@ -132,7 +132,7 @@ export default {
 			this.getLft('previous');
 		},
 		indent(){
-			var vm = this.$root.$children[0];
+			let vm = this.$root.$children[0];
 			if(!vm.selectedId){ return; };
 			if(!vm.selectedLft == 2){ return; }
 			
@@ -141,61 +141,61 @@ export default {
 			// In case previous thing is sibling:
 			// Make child of previous thing.
 
-			var fd = this.$root.$children[0].flatData;
-			var allLfts = Object.keys(fd);
-			var currLftInd = allLfts.indexOf(vm.selectedLft.toString());
-			var prevLft = allLfts[currLftInd-1];
-			var prevThing = vm.flatData[prevLft];
+			let fd = this.$root.$children[0].flatData;
+			let allLfts = Object.keys(fd);
+			let currLftInd = allLfts.indexOf(vm.selectedLft.toString());
+			let prevLft = allLfts[currLftInd-1];
+			let prevThing = vm.flatData[prevLft];
 			if(prevThing.depth == vm.selectedDepth){
 			// CASE: previous things is a sibling
 				var targetId = prevThing.id;
 			} else {
 			// CASE: previous things is NOT a sibling
 				//Find previous sibling with while-loop
-				var climb_x = 0;
+				let climb_x = 0;
 				while(prevThing.depth != vm.selectedDepth){
-					var climb_x = climb_x+1;
-					var prevLft = allLfts[currLftInd-climb_x];
-					var prevThing = vm.flatData[prevLft];
+					climb_x = climb_x+1;
+					prevLft = allLfts[currLftInd-climb_x];
+					prevThing = vm.flatData[prevLft];
 					var targetId = prevThing.id;
 					console.log('cycling through previous ids: '+targetId);
 				}
 			}
 			console.log('target_id: '+targetId);
-			var id = vm.selectedId;
+			let id = vm.selectedId;
 			this.$http.patch('/api/things/'+id+'/makeChildOf', {'target_id':targetId});
 			this.$root.fetchAll();
 		},
 		unindent(){
-			var vm = this.$root.$children[0];
+			let vm = this.$root.$children[0];
 			if(!vm.selectedId){ return; };
 			if(!vm.selectedLft == 2){ return; }
-			var id = vm.selectedId;
+			let id = vm.selectedId;
 			this.$http.patch('/api/things/'+id+'/makeSiblingOf');
 			this.$root.fetchAll();
 		},
 		move(direction){
-			var vm = this.$root.$children[0];
-			var id = vm.selectedId;
+			let vm = this.$root.$children[0];
+			let id = vm.selectedId;
 			this.$http.patch('/api/things/'+id+'/moveThing', {'direction':direction});
 			this.$root.fetchAll();
 		},
 		markDone(thing){
 			if(!thing){
-				// ↓ out dated because of recursiveness...
+				// ↓ out dated because of recursiveness: "this" is not recognised properly...
 				var thing = this.thing[this.selectedIndex]
 				thing.done = !thing.done;
 			}
 			this.$http.patch('/api/things/' + thing.id, {'done':thing.done});
 		},
 		startEdit(thing){
-			// ↓ out dated because of recursiveness...
+			// ↓ out dated because of recursiveness: "this" is not recognised properly...
 			var thing = (thing) ? thing : this.thing[this.selectedIndex];
 			this.beforeEditCache = thing.body;
 			this.editedThing = thing;
 		},
 		doneEdit(thing) {
-			// ↓ out dated because of recursiveness...
+			// ↓ out dated because of recursiveness: "this" is not recognised properly...
 			var thing = (thing) ? thing : this.thing[this.selectedIndex];
 			if (!this.editedThing) {
 				return;
@@ -205,7 +205,7 @@ export default {
 			if (!thing.body) {
 				this.deleteThing(thing);
 			}
-			var id = thing.id;
+			let id = thing.id;
 			this.$http.patch('/api/things/' + id, thing, { method: 'PATCH'});
 			$(':focus').blur();
 		},
@@ -222,20 +222,25 @@ export default {
 		fetchThis(thing){
 			this.$http.get('/api/things/'+thing.id).then(function(data) {
 				var data = data.json();
-				// var nl = data['body'].split(/\r\n|\r|\n/).length;
+				// UNDER CONSTRUCTION. Just messing around a bit down below.
+
+				// let nl = data['body'].split(/\r\n|\r|\n/).length;
 				// data['rows'] = nl;
-				// var el_ind = (this.selectedIndex) ? this.selectedIndex : this.getIndexOfId(thing.id);
+				// let el_ind = (this.selectedIndex) ? this.selectedIndex : this.getIndexOfId(thing.id);
 				// console.log('fetched index = '+el_ind);
 				// this.thing[el_ind] = data;
   			});
 		},
 		addNew(thing){
 			console.log(thing);
-			// var vm = this.$root.$children[0];
-			// var sel_id = vm.selectedId;
-			// var nbody = this.newThing.body;
+
+			// UNDER CONSTRUCTION. I really don't know how to get the correct 'parent_id'...
+
+			// let vm = this.$root.$children[0];
+			// let sel_id = vm.selectedId;
+			// let nbody = this.newThing.body;
 			// console.log('pid '+sel_id+' // body '+nbody);
-			// var thing = this.newThing; // get input
+			// let thing = this.newThing; // get input
 
 			// this.newThing.parent_id = this.$root.selectedId;
 			// if (!this.newThing.body){ return; }
@@ -270,9 +275,9 @@ export default {
 				this.doneEdit();
 			}
     	},
-		childMetaSent(x){ 
-			var lft = Object.keys(x)[0].toString();
-			var id = x[lft];
+		childMetaSent(x){
+			let lft = Object.keys(x)[0].toString();
+			let id = x[lft];
 			this.childrenMeta[lft] = id;
 		},
 	},
@@ -281,7 +286,7 @@ export default {
 			if (!value) {
 				return;
 			}
-			var el = this.el;
+			let el = this.el;
 			Vue.nextTick(function () {
 				el.focus();
 			});

@@ -11360,9 +11360,9 @@ exports.default = {
 				//Find previous sibling with while-loop
 				var climb_x = 0;
 				while (prevThing.depth != vm.selectedDepth) {
-					var climb_x = climb_x + 1;
-					var prevLft = allLfts[currLftInd - climb_x];
-					var prevThing = vm.flatData[prevLft];
+					climb_x = climb_x + 1;
+					prevLft = allLfts[currLftInd - climb_x];
+					prevThing = vm.flatData[prevLft];
 					var targetId = prevThing.id;
 					console.log('cycling through previous ids: ' + targetId);
 				}
@@ -11392,20 +11392,20 @@ exports.default = {
 		},
 		markDone: function markDone(thing) {
 			if (!thing) {
-				// ↓ out dated because of recursiveness...
+				// ↓ out dated because of recursiveness: "this" is not recognised properly...
 				var thing = this.thing[this.selectedIndex];
 				thing.done = !thing.done;
 			}
 			this.$http.patch('/api/things/' + thing.id, { 'done': thing.done });
 		},
 		startEdit: function startEdit(thing) {
-			// ↓ out dated because of recursiveness...
+			// ↓ out dated because of recursiveness: "this" is not recognised properly...
 			var thing = thing ? thing : this.thing[this.selectedIndex];
 			this.beforeEditCache = thing.body;
 			this.editedThing = thing;
 		},
 		doneEdit: function doneEdit(thing) {
-			// ↓ out dated because of recursiveness...
+			// ↓ out dated because of recursiveness: "this" is not recognised properly...
 			var thing = thing ? thing : this.thing[this.selectedIndex];
 			if (!this.editedThing) {
 				return;
@@ -11432,20 +11432,25 @@ exports.default = {
 		fetchThis: function fetchThis(thing) {
 			this.$http.get('/api/things/' + thing.id).then(function (data) {
 				var data = data.json();
-				// var nl = data['body'].split(/\r\n|\r|\n/).length;
+				// UNDER CONSTRUCTION. Just messing around a bit down below.
+
+				// let nl = data['body'].split(/\r\n|\r|\n/).length;
 				// data['rows'] = nl;
-				// var el_ind = (this.selectedIndex) ? this.selectedIndex : this.getIndexOfId(thing.id);
+				// let el_ind = (this.selectedIndex) ? this.selectedIndex : this.getIndexOfId(thing.id);
 				// console.log('fetched index = '+el_ind);
 				// this.thing[el_ind] = data;
 			});
 		},
 		addNew: function addNew(thing) {
 			console.log(thing);
-			// var vm = this.$root.$children[0];
-			// var sel_id = vm.selectedId;
-			// var nbody = this.newThing.body;
+
+			// UNDER CONSTRUCTION. I really don't know how to get the correct 'parent_id'...
+
+			// let vm = this.$root.$children[0];
+			// let sel_id = vm.selectedId;
+			// let nbody = this.newThing.body;
 			// console.log('pid '+sel_id+' // body '+nbody);
-			// var thing = this.newThing; // get input
+			// let thing = this.newThing; // get input
 
 			// this.newThing.parent_id = this.$root.selectedId;
 			// if (!this.newThing.body){ return; }
@@ -11521,7 +11526,7 @@ exports.default = {
 	}
 };
 if (module.exports.__esModule) module.exports = module.exports.default
-;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\n<div class=\"things-panel\">\n\t<div class=\"panel-title\" v-if=\"thing.lft == 1\">\n\t\t{{ thing.body }}\n\t</div>\n\t<div class=\"thing-card\" v-if=\"thing.lft != 1\" :class=\"{\n\t\t\tdone: thing.done,\n\t\t\tselected: thing.id == this.$root.$children[0].selectedId,\n\t\t\tediting: thing == editedThing,\n\t\t\t}\">\n\t\t<input class=\"toggle\" type=\"checkbox\" v-model=\"thing.done\" @change=\"markDone(thing)\">\n\t\t<div class=\"body-div\" @dblclick=\"startEdit(thing)\" @click=\"select(thing)\" @enter=\"console.log('yarrr')\">\n\t\t\t<span class=\"bodybox\" v-show=\"thing != editedThing\">{{ thing.id }} - {{ thing.body }}</span>\n\t\t\t<form action=\"update\" class=\"updatebox\" @submit.prevent=\"doneEdit(thing)\">\n\t\t\t\t<textarea name=\"thing_body\" rows=\"<!-- {{ thing.rows }} -->\" v-model=\"thing.body\" v-autosize=\"thing.body\" v-thing-focus=\"thing == editedThing\" @blur=\"doneEdit(thing)\" @keyup.esc=\"cancelEdit(thing)\">{{ thing.body }}</textarea>\n\t\t\t</form>\n\t\t\t<div class=\"thing-nav\">\n\t\t\t\t<button @click=\"deleteThing(thing)\">✗</button>\n\t\t\t</div>\n\t\t</div>\n\t</div>\n\t<form action=\"\" @submit.prevent=\"addNew\" v-if=\"true\"><!-- Will hide this later, only show when clicking enter on task. -->\n\t\t<input type=\"text\" class=\"add-thing\" name=\"body\" v-model=\"newThing.body\" placeholder=\"I can't forget to...\" autocomplete=\"off\" autofocus=\"\">\n\t</form>\n\n\t<div class=\"children\" v-if=\"thing.children\">\n\t\t<panel v-for=\"childPanel in thing.children\" :thing=\"childPanel\"></panel>\n\t</div>\n</div>\n"
+;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\n<div class=\"things-panel\">\n\t<div class=\"panel-title\" v-if=\"thing.lft == 1\">\n\t\t{{ thing.body }}\n\t</div>\n\t<div class=\"thing-card\" v-if=\"thing.lft != 1\" :class=\"{\n\t\t\tdone: thing.done,\n\t\t\tselected: thing.id == this.$root.$children[0].selectedId,\n\t\t\tediting: thing == editedThing,\n\t\t\t}\">\n\t\t<input class=\"toggle\" type=\"checkbox\" v-model=\"thing.done\" @change=\"markDone(thing)\">\n\t\t<div class=\"body-div\" @dblclick=\"startEdit(thing)\" @click=\"select(thing)\" @enter=\"console.log('yarrr')\">\n\t\t\t<span class=\"bodybox\" v-show=\"thing != editedThing\">{{ thing.id }} - {{ thing.body }}</span>\n\t\t\t<form action=\"update\" class=\"updatebox\" @submit.prevent=\"doneEdit(thing)\">\n\t\t\t\t<textarea name=\"thing_body\" rows=\"<!-- {{ thing.rows }} -->\" v-model=\"thing.body\" v-autosize=\"thing.body\" v-thing-focus=\"thing == editedThing\" @blur=\"doneEdit(thing)\" @keyup.esc=\"cancelEdit(thing)\">{{ thing.body }}</textarea>\n\t\t\t</form>\n\t\t\t<div class=\"thing-nav\">\n\t\t\t\t<button @click=\"deleteThing(thing)\">✗</button>\n\t\t\t</div>\n\t\t</div>\n\t</div>\n\t<form action=\"\" @submit.prevent=\"addNew\" v-if=\"true\"><!-- Will hide this later, only show when clicking enter on task. -->\n\t\t<input type=\"text\" class=\"add-thing\" name=\"body\" v-model=\"newThing.body\" placeholder=\"...\" autocomplete=\"off\" autofocus=\"\">\n\t</form>\n\n\t<div class=\"children\" v-if=\"thing.children\">\n\t\t<panel v-for=\"childPanel in thing.children\" :thing=\"childPanel\"></panel>\n\t</div>\n</div>\n"
 if (module.hot) {(function () {  module.hot.accept()
   var hotAPI = require("vue-hot-reload-api")
   hotAPI.install(require("vue"), true)
