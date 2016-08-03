@@ -48,7 +48,7 @@
 			</div>
 		</div>
 		<form action=""
-			@submit.prevent="addNew"
+			@submit.prevent="addNew(this)"
 			v-if="true"
 		><!-- Will hide this later, only show when clicking enter on task. -->
 			<input type="text"
@@ -232,22 +232,22 @@ export default {
   			});
 		},
 		addNew(thing){
-			console.log(thing);
-
+			console.log(thing, this);
+			
 			// UNDER CONSTRUCTION. I really don't know how to get the correct 'parent_id'...
-
-			// let vm = this.$root.$children[0];
-			// let sel_id = vm.selectedId;
-			// let nbody = this.newThing.body;
-			// console.log('pid '+sel_id+' // body '+nbody);
+			
+			let vm = this.$root.$children[0];
+			let sel_id = vm.selectedId;
+			let nbody = this.newThing.body;
+			console.log('pid '+sel_id+' // body '+nbody);
 			// let thing = this.newThing; // get input
-
+			
 			// this.newThing.parent_id = this.$root.selectedId;
 			// if (!this.newThing.body){ return; }
 			// this.newThing = {body:''}; // clear input
-
-			console.log('added this thing...');
-			console.log(thing);
+			
+			// console.log('added this thing...');
+			// console.log(thing);
 			// this.$http.post('/api/things',thing) //SEND
 			// 	.then(function(response){ //response
 			// 	// response = response.json();

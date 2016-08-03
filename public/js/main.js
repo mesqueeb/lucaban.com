@@ -11169,8 +11169,8 @@ new Vue({
 				for (var i = 0; i < data.length; i++) {
 					result[data[i].lft] = data[i];
 				}
-				// console.log('printing flat data:');
-				// console.log(result);
+				console.log('printing flat data:');
+				console.log(JSON.stringify(result));
 				var vm = this.$root.$children[0];
 				vm.flatData = result;
 				console.log('...fetchedFlatData!');
@@ -11442,22 +11442,22 @@ exports.default = {
 			});
 		},
 		addNew: function addNew(thing) {
-			console.log(thing);
+			console.log(thing, this);
 
 			// UNDER CONSTRUCTION. I really don't know how to get the correct 'parent_id'...
 
-			// let vm = this.$root.$children[0];
-			// let sel_id = vm.selectedId;
-			// let nbody = this.newThing.body;
-			// console.log('pid '+sel_id+' // body '+nbody);
+			var vm = this.$root.$children[0];
+			var sel_id = vm.selectedId;
+			var nbody = this.newThing.body;
+			console.log('pid ' + sel_id + ' // body ' + nbody);
 			// let thing = this.newThing; // get input
 
 			// this.newThing.parent_id = this.$root.selectedId;
 			// if (!this.newThing.body){ return; }
 			// this.newThing = {body:''}; // clear input
 
-			console.log('added this thing...');
-			console.log(thing);
+			// console.log('added this thing...');
+			// console.log(thing);
 			// this.$http.post('/api/things',thing) //SEND
 			// 	.then(function(response){ //response
 			// 	// response = response.json();
@@ -11526,7 +11526,7 @@ exports.default = {
 	}
 };
 if (module.exports.__esModule) module.exports = module.exports.default
-;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\n<div class=\"things-panel\">\n\t<div class=\"panel-title\" v-if=\"thing.lft == 1\">\n\t\t{{ thing.body }}\n\t</div>\n\t<div class=\"thing-card\" v-if=\"thing.lft != 1\" :class=\"{\n\t\t\tdone: thing.done,\n\t\t\tselected: thing.id == this.$root.$children[0].selectedId,\n\t\t\tediting: thing == editedThing,\n\t\t\t}\">\n\t\t<input class=\"toggle\" type=\"checkbox\" v-model=\"thing.done\" @change=\"markDone(thing)\">\n\t\t<div class=\"body-div\" @dblclick=\"startEdit(thing)\" @click=\"select(thing)\" @enter=\"console.log('yarrr')\">\n\t\t\t<span class=\"bodybox\" v-show=\"thing != editedThing\">{{ thing.id }} - {{ thing.body }}</span>\n\t\t\t<form action=\"update\" class=\"updatebox\" @submit.prevent=\"doneEdit(thing)\">\n\t\t\t\t<textarea name=\"thing_body\" rows=\"<!-- {{ thing.rows }} -->\" v-model=\"thing.body\" v-autosize=\"thing.body\" v-thing-focus=\"thing == editedThing\" @blur=\"doneEdit(thing)\" @keyup.esc=\"cancelEdit(thing)\">{{ thing.body }}</textarea>\n\t\t\t</form>\n\t\t\t<div class=\"thing-nav\">\n\t\t\t\t<button @click=\"deleteThing(thing)\">✗</button>\n\t\t\t</div>\n\t\t</div>\n\t</div>\n\t<form action=\"\" @submit.prevent=\"addNew\" v-if=\"true\"><!-- Will hide this later, only show when clicking enter on task. -->\n\t\t<input type=\"text\" class=\"add-thing\" name=\"body\" v-model=\"newThing.body\" placeholder=\"...\" autocomplete=\"off\" autofocus=\"\">\n\t</form>\n\n\t<div class=\"children\" v-if=\"thing.children\">\n\t\t<panel v-for=\"childPanel in thing.children\" :thing=\"childPanel\"></panel>\n\t</div>\n</div>\n"
+;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\n<div class=\"things-panel\">\n\t<div class=\"panel-title\" v-if=\"thing.lft == 1\">\n\t\t{{ thing.body }}\n\t</div>\n\t<div class=\"thing-card\" v-if=\"thing.lft != 1\" :class=\"{\n\t\t\tdone: thing.done,\n\t\t\tselected: thing.id == this.$root.$children[0].selectedId,\n\t\t\tediting: thing == editedThing,\n\t\t\t}\">\n\t\t<input class=\"toggle\" type=\"checkbox\" v-model=\"thing.done\" @change=\"markDone(thing)\">\n\t\t<div class=\"body-div\" @dblclick=\"startEdit(thing)\" @click=\"select(thing)\" @enter=\"console.log('yarrr')\">\n\t\t\t<span class=\"bodybox\" v-show=\"thing != editedThing\">{{ thing.id }} - {{ thing.body }}</span>\n\t\t\t<form action=\"update\" class=\"updatebox\" @submit.prevent=\"doneEdit(thing)\">\n\t\t\t\t<textarea name=\"thing_body\" rows=\"<!-- {{ thing.rows }} -->\" v-model=\"thing.body\" v-autosize=\"thing.body\" v-thing-focus=\"thing == editedThing\" @blur=\"doneEdit(thing)\" @keyup.esc=\"cancelEdit(thing)\">{{ thing.body }}</textarea>\n\t\t\t</form>\n\t\t\t<div class=\"thing-nav\">\n\t\t\t\t<button @click=\"deleteThing(thing)\">✗</button>\n\t\t\t</div>\n\t\t</div>\n\t</div>\n\t<form action=\"\" @submit.prevent=\"addNew(this)\" v-if=\"true\"><!-- Will hide this later, only show when clicking enter on task. -->\n\t\t<input type=\"text\" class=\"add-thing\" name=\"body\" v-model=\"newThing.body\" placeholder=\"...\" autocomplete=\"off\" autofocus=\"\">\n\t</form>\n\n\t<div class=\"children\" v-if=\"thing.children\">\n\t\t<panel v-for=\"childPanel in thing.children\" :thing=\"childPanel\"></panel>\n\t</div>\n</div>\n"
 if (module.hot) {(function () {  module.hot.accept()
   var hotAPI = require("vue-hot-reload-api")
   hotAPI.install(require("vue"), true)

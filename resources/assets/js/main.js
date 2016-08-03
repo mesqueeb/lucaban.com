@@ -33,8 +33,8 @@ new Vue({
 				for (var i=0; i<data.length; i++) {
 				  result[data[i].lft] = data[i];
 				}
-  				// console.log('printing flat data:');
-  				// console.log(result);
+  				console.log('printing flat data:');
+  				console.log(JSON.stringify(result));
 				var vm = this.$root.$children[0];
 				vm.flatData = result;
 				console.log('...fetchedFlatData!');
