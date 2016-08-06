@@ -23,14 +23,7 @@ class ThingsPanelController extends Controller
         if(!$god){
             return Thing::create(['body' => 'ALL', 'id' => '1']);
         }
-        return $god->getDescendantsAndSelf()->toHierarchy();
-    }
-
-    public function fetchTreeMetaFlat()
-    {
         return Thing::get();
-        // is equal to
-        // return DB::table('things')->get();
     }
 
     /**

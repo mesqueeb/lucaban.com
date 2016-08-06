@@ -7,9 +7,9 @@ Route::get('/', function () {
 Route::get('/home', 'HomeController@index');
 ////////////////////////////////////////////////
 Route::get('/things',function(){
-	return view('things.index');
+	$itemz = App\Thing::get();
+	return view('things.index', compact('itemz'));
 });
-Route::post('/api/things/fetchTreeMetaFlat','ThingsPanelController@fetchTreeMetaFlat');
 Route::patch('/api/things/{id}/makeChildOf','ThingsPanelController@makeChildOf');
 Route::patch('/api/things/{id}/makeSiblingOf','ThingsPanelController@makeSiblingOf');
 Route::patch('/api/things/{id}/moveThing','ThingsPanelController@moveThing');

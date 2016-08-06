@@ -1,7 +1,8 @@
 <template id="things-panel-template">
-	<div class="things-panel">
+	<div class="things-panel"
+	>
 		<div class="panel-title"
-			v-if="thing.lft == 1"
+			v-if="thing.depth == 0"
 		>
 			{{ thing.body }}
 		</div>
@@ -10,7 +11,6 @@
 			v-if="thing.lft != 1"
 			:class="{
 				done: thing.done,
-				selected: thing.id == this.$root.$children[0].selectedId,
 				editing: thing == editedThing,
 				}"
 		>
@@ -20,6 +20,7 @@
 				@change="markDone(thing)"
 			>
 			<div class="body-div"
+				:class="{ selected: thing.id == this.$root.selection.selectedId, }"
 				@dblclick="startEdit(thing)"
 				@click="select(thing)"
 				@enter="console.log('yarrr')"
@@ -76,109 +77,35 @@ export default {
 	name: 'Panel',
 	template:'#things-panel-template',
 	created(){
-
 	},
 	ready(){
-    	this.dispatchChildMeta();
 	},
 	props: ['thing'],
 	data: function(){
 		return {
-			newThing: { body: '', parent_id: '' },
 			editedThing: null,
-			selectedId: null,
-			selectedLft: null,
-			selectedDepth: null,
-			childrenMeta: {}, // shows `lft:id` per child
-			visibility: 'all',
-			flatData: null,
+			newThing: { body: '', parent_id: '' },
 		};
 	},
 	computed: {
 	},
 	methods: {
-		dispatchChildMeta(){ // send child's `lft:id` to parent
-			let lft = this.thing.lft;
-			let id = this.thing.id;
-			let childMeta = {};
-			childMeta[lft] = id;
-			this.$dispatch('childMetaSent', childMeta);
-		},
-		getLft(direction){
-			let vm = this.$root.$children[0];
-			let fd = this.$root.$children[0].flatData;
-			let allLfts = Object.keys(fd);
-			let currLftInd = allLfts.indexOf(vm.selectedLft.toString());
-			if(direction == 'next'){
-				if(currLftInd+1 >= allLfts.length){ return; }
-				var nextLft =  allLfts[currLftInd+1];
-			} else if (direction == 'previous'){ 
-				if(currLftInd-1 < 1){ return; }
-				var nextLft =  allLfts[currLftInd-1];
-			}
-			vm.selectedLft = nextLft;
-			vm.selectedId = vm.flatData[nextLft].id;
-		},
 		select(thing){
-			var vm = this.$root.$children[0];
-			vm.selectedId = thing.id;
-			vm.selectedLft = thing.lft;
-			vm.selectedDepth = thing.depth;
-		},
-		selectNext(){
-			this.getLft('next');
-		},
-		selectPrevious(){
-			this.getLft('previous');
+			selection.selectedThing = thing;
+			selection.selectedId = thing.id;
+			selection.selectedLft = thing.lft;
+			selection.selectedDepth = thing.depth;
+			// let ind = allThings.nodesArr.indexOf(selection.selectedThing);
+			// console.log(ind);
 		},
 		indent(){
-			let vm = this.$root.$children[0];
-			if(!vm.selectedId){ return; };
-			if(!vm.selectedLft == 2){ return; }
-			
-			// In case previous thing is not sibling:
-			// Make last child of PREVIOUS sibling.
-			// In case previous thing is sibling:
-			// Make child of previous thing.
 
-			let fd = this.$root.$children[0].flatData;
-			let allLfts = Object.keys(fd);
-			let currLftInd = allLfts.indexOf(vm.selectedLft.toString());
-			let prevLft = allLfts[currLftInd-1];
-			let prevThing = vm.flatData[prevLft];
-			if(prevThing.depth == vm.selectedDepth){
-			// CASE: previous things is a sibling
-				var targetId = prevThing.id;
-			} else {
-			// CASE: previous things is NOT a sibling
-				//Find previous sibling with while-loop
-				let climb_x = 0;
-				while(prevThing.depth != vm.selectedDepth){
-					climb_x = climb_x+1;
-					prevLft = allLfts[currLftInd-climb_x];
-					prevThing = vm.flatData[prevLft];
-					var targetId = prevThing.id;
-					console.log('cycling through previous ids: '+targetId);
-				}
-			}
-			console.log('target_id: '+targetId);
-			let id = vm.selectedId;
-			this.$http.patch('/api/things/'+id+'/makeChildOf', {'target_id':targetId});
-			this.$root.fetchAll();
 		},
 		unindent(){
-			let vm = this.$root.$children[0];
-			if(!vm.selectedId){ return; };
-			if(!vm.selectedLft == 2){ return; }
-			let id = vm.selectedId;
-			this.$http.patch('/api/things/'+id+'/makeSiblingOf');
-			this.$root.fetchAll();
+
 		},
 		move(direction){
-			let vm = this.$root.$children[0];
-			let id = vm.selectedId;
-			this.$http.patch('/api/things/'+id+'/moveThing', {'direction':direction});
-			this.$root.fetchAll();
+
 		},
 		markDone(thing){
 			if(!thing){
@@ -219,40 +146,10 @@ export default {
 			// ↓ DOESN'T WORK!!!
 			this.thing.$remove(thing);
 		},
-		fetchThis(thing){
-			this.$http.get('/api/things/'+thing.id).then(function(data) {
-				var data = data.json();
-				// UNDER CONSTRUCTION. Just messing around a bit down below.
-
-				// let nl = data['body'].split(/\r\n|\r|\n/).length;
-				// data['rows'] = nl;
-				// let el_ind = (this.selectedIndex) ? this.selectedIndex : this.getIndexOfId(thing.id);
-				// console.log('fetched index = '+el_ind);
-				// this.thing[el_ind] = data;
-  			});
-		},
 		addNew(thing){
-			console.log(thing, this);
-			
-			// UNDER CONSTRUCTION. I really don't know how to get the correct 'parent_id'...
-			
-			let vm = this.$root.$children[0];
-			let sel_id = vm.selectedId;
-			let nbody = this.newThing.body;
-			console.log('pid '+sel_id+' // body '+nbody);
-			// let thing = this.newThing; // get input
-			
-			// this.newThing.parent_id = this.$root.selectedId;
-			// if (!this.newThing.body){ return; }
-			// this.newThing = {body:''}; // clear input
-			
-			// console.log('added this thing...');
-			// console.log(thing);
+			console.log(thing, this);		
 			// this.$http.post('/api/things',thing) //SEND
 			// 	.then(function(response){ //response
-			// 	// response = response.json();
-			// 	// console.log(response.id);
-			// 	this.$root.fetchAll();
 			// });
 		},
 	},

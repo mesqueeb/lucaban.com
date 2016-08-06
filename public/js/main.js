@@ -11129,57 +11129,47 @@ module.exports = Vue;
 },{"_process":37}],41:[function(require,module,exports){
 'use strict';
 
-var _panel = require('./vue-components/panel.vue');
+var _Panel = require('./vue-components/Panel.vue');
 
-var _panel2 = _interopRequireDefault(_panel);
+var _Panel2 = _interopRequireDefault(_Panel);
+
+var _dataTree = require('./vue-components/dataTree.js');
+
+var _dataTree2 = _interopRequireDefault(_dataTree);
+
+var _Selection = require('./vue-components/Selection.js');
+
+var _Selection2 = _interopRequireDefault(_Selection);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var VueAutosize = require('vue-autosize');
 Vue.use(VueAutosize);
 
+window.allThings = new _dataTree2.default(fetchedData);
+
+window.selection = new _Selection2.default();
+
 new Vue({
 	el: 'body',
 	data: {
-		import_data: { null: null }
+		import_data: allThings.root,
+		selection: selection
 	},
-	components: { Panel: _panel2.default },
+	components: { Panel: _Panel2.default },
 	methods: {
-		fetchAll: function fetchAll() {
-			this.$http.get('/api/things').then(function (data) {
-				var data = data.json();
-				var data = data[Object.keys(data)[0]];
-				// 		$.each(data, function(k, v) {
-				// 			console.log(k['body']);
-				// 			console.log(v['body']);
-				// 			console.log("k = "+k+" // v = "+v);
-				// 			// var nl = v['body'].split(/\r\n|\r|\n/).length;
-				// 			// v['rows'] = nl;
-				// });
-				this.import_data = data;
-				console.log(JSON.stringify(data));
-				console.log('...fetchedAll!');
-				this.fetchTreeMetaFlat();
-			});
-		},
-		fetchTreeMetaFlat: function fetchTreeMetaFlat() {
-			this.$http.post('/api/things/fetchTreeMetaFlat').then(function (data) {
-				var data = data.json();
-				var result = {};
-				for (var i = 0; i < data.length; i++) {
-					result[data[i].lft] = data[i];
-				}
-				console.log('printing flat data:');
-				console.log(JSON.stringify(result));
-				var vm = this.$root.$children[0];
-				vm.flatData = result;
-				console.log('...fetchedFlatData!');
-			});
+		addThing: function addThing() {
+			var body = 'test';
+			var selId = selection.selectedId;
+			var older_sibling = allThings.nodes[selId];
+			var parent_id = older_sibling.parent_id;
+			var older_sibling_index = allThings.nodes[parent_id].children_order.indexOf(selId);
+			var thing = { id: 10, parent_id: parent_id, body: body, older_sibling_index: older_sibling_index };
+			console.log(thing);
+			allThings.addThing(thing);
 		}
 	},
-	created: function created() {
-		this.fetchAll();
-	},
+	created: function created() {},
 
 	ready: function ready() {
 		var vm = this;
@@ -11258,7 +11248,7 @@ new Vue({
 	}
 });
 
-},{"./vue-components/panel.vue":42,"vue-autosize":38}],42:[function(require,module,exports){
+},{"./vue-components/Panel.vue":42,"./vue-components/Selection.js":43,"./vue-components/dataTree.js":44,"vue-autosize":38}],42:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -11275,121 +11265,28 @@ exports.default = {
 	name: 'Panel',
 	template: '#things-panel-template',
 	created: function created() {},
-	ready: function ready() {
-		this.dispatchChildMeta();
-	},
+	ready: function ready() {},
 
 	props: ['thing'],
 	data: function data() {
 		return {
-			newThing: { body: '', parent_id: '' },
 			editedThing: null,
-			selectedId: null,
-			selectedLft: null,
-			selectedDepth: null,
-			childrenMeta: {}, // shows `lft:id` per child
-			visibility: 'all',
-			flatData: null
+			newThing: { body: '', parent_id: '' }
 		};
 	},
 	computed: {},
 	methods: {
-		dispatchChildMeta: function dispatchChildMeta() {
-			// send child's `lft:id` to parent
-			var lft = this.thing.lft;
-			var id = this.thing.id;
-			var childMeta = {};
-			childMeta[lft] = id;
-			this.$dispatch('childMetaSent', childMeta);
-		},
-		getLft: function getLft(direction) {
-			var vm = this.$root.$children[0];
-			var fd = this.$root.$children[0].flatData;
-			var allLfts = (0, _keys2.default)(fd);
-			var currLftInd = allLfts.indexOf(vm.selectedLft.toString());
-			if (direction == 'next') {
-				if (currLftInd + 1 >= allLfts.length) {
-					return;
-				}
-				var nextLft = allLfts[currLftInd + 1];
-			} else if (direction == 'previous') {
-				if (currLftInd - 1 < 1) {
-					return;
-				}
-				var nextLft = allLfts[currLftInd - 1];
-			}
-			vm.selectedLft = nextLft;
-			vm.selectedId = vm.flatData[nextLft].id;
-		},
 		select: function select(thing) {
-			var vm = this.$root.$children[0];
-			vm.selectedId = thing.id;
-			vm.selectedLft = thing.lft;
-			vm.selectedDepth = thing.depth;
+			selection.selectedThing = thing;
+			selection.selectedId = thing.id;
+			selection.selectedLft = thing.lft;
+			selection.selectedDepth = thing.depth;
+			// let ind = allThings.nodesArr.indexOf(selection.selectedThing);
+			// console.log(ind);
 		},
-		selectNext: function selectNext() {
-			this.getLft('next');
-		},
-		selectPrevious: function selectPrevious() {
-			this.getLft('previous');
-		},
-		indent: function indent() {
-			var vm = this.$root.$children[0];
-			if (!vm.selectedId) {
-				return;
-			};
-			if (!vm.selectedLft == 2) {
-				return;
-			}
-
-			// In case previous thing is not sibling:
-			// Make last child of PREVIOUS sibling.
-			// In case previous thing is sibling:
-			// Make child of previous thing.
-
-			var fd = this.$root.$children[0].flatData;
-			var allLfts = (0, _keys2.default)(fd);
-			var currLftInd = allLfts.indexOf(vm.selectedLft.toString());
-			var prevLft = allLfts[currLftInd - 1];
-			var prevThing = vm.flatData[prevLft];
-			if (prevThing.depth == vm.selectedDepth) {
-				// CASE: previous things is a sibling
-				var targetId = prevThing.id;
-			} else {
-				// CASE: previous things is NOT a sibling
-				//Find previous sibling with while-loop
-				var climb_x = 0;
-				while (prevThing.depth != vm.selectedDepth) {
-					climb_x = climb_x + 1;
-					prevLft = allLfts[currLftInd - climb_x];
-					prevThing = vm.flatData[prevLft];
-					var targetId = prevThing.id;
-					console.log('cycling through previous ids: ' + targetId);
-				}
-			}
-			console.log('target_id: ' + targetId);
-			var id = vm.selectedId;
-			this.$http.patch('/api/things/' + id + '/makeChildOf', { 'target_id': targetId });
-			this.$root.fetchAll();
-		},
-		unindent: function unindent() {
-			var vm = this.$root.$children[0];
-			if (!vm.selectedId) {
-				return;
-			};
-			if (!vm.selectedLft == 2) {
-				return;
-			}
-			var id = vm.selectedId;
-			this.$http.patch('/api/things/' + id + '/makeSiblingOf');
-			this.$root.fetchAll();
-		},
-		move: function move(direction) {
-			var vm = this.$root.$children[0];
-			var id = vm.selectedId;
-			this.$http.patch('/api/things/' + id + '/moveThing', { 'direction': direction });
-			this.$root.fetchAll();
-		},
+		indent: function indent() {},
+		unindent: function unindent() {},
+		move: function move(direction) {},
 		markDone: function markDone(thing) {
 			if (!thing) {
 				// ↓ out dated because of recursiveness: "this" is not recognised properly...
@@ -11429,40 +11326,10 @@ exports.default = {
 			// ↓ DOESN'T WORK!!!
 			this.thing.$remove(thing);
 		},
-		fetchThis: function fetchThis(thing) {
-			this.$http.get('/api/things/' + thing.id).then(function (data) {
-				var data = data.json();
-				// UNDER CONSTRUCTION. Just messing around a bit down below.
-
-				// let nl = data['body'].split(/\r\n|\r|\n/).length;
-				// data['rows'] = nl;
-				// let el_ind = (this.selectedIndex) ? this.selectedIndex : this.getIndexOfId(thing.id);
-				// console.log('fetched index = '+el_ind);
-				// this.thing[el_ind] = data;
-			});
-		},
 		addNew: function addNew(thing) {
 			console.log(thing, this);
-
-			// UNDER CONSTRUCTION. I really don't know how to get the correct 'parent_id'...
-
-			var vm = this.$root.$children[0];
-			var sel_id = vm.selectedId;
-			var nbody = this.newThing.body;
-			console.log('pid ' + sel_id + ' // body ' + nbody);
-			// let thing = this.newThing; // get input
-
-			// this.newThing.parent_id = this.$root.selectedId;
-			// if (!this.newThing.body){ return; }
-			// this.newThing = {body:''}; // clear input
-
-			// console.log('added this thing...');
-			// console.log(thing);
 			// this.$http.post('/api/things',thing) //SEND
 			// 	.then(function(response){ //response
-			// 	// response = response.json();
-			// 	// console.log(response.id);
-			// 	this.$root.fetchAll();
 			// });
 		}
 	},
@@ -11526,7 +11393,7 @@ exports.default = {
 	}
 };
 if (module.exports.__esModule) module.exports = module.exports.default
-;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\n<div class=\"things-panel\">\n\t<div class=\"panel-title\" v-if=\"thing.lft == 1\">\n\t\t{{ thing.body }}\n\t</div>\n\t<div class=\"thing-card\" v-if=\"thing.lft != 1\" :class=\"{\n\t\t\tdone: thing.done,\n\t\t\tselected: thing.id == this.$root.$children[0].selectedId,\n\t\t\tediting: thing == editedThing,\n\t\t\t}\">\n\t\t<input class=\"toggle\" type=\"checkbox\" v-model=\"thing.done\" @change=\"markDone(thing)\">\n\t\t<div class=\"body-div\" @dblclick=\"startEdit(thing)\" @click=\"select(thing)\" @enter=\"console.log('yarrr')\">\n\t\t\t<span class=\"bodybox\" v-show=\"thing != editedThing\">{{ thing.id }} - {{ thing.body }}</span>\n\t\t\t<form action=\"update\" class=\"updatebox\" @submit.prevent=\"doneEdit(thing)\">\n\t\t\t\t<textarea name=\"thing_body\" rows=\"<!-- {{ thing.rows }} -->\" v-model=\"thing.body\" v-autosize=\"thing.body\" v-thing-focus=\"thing == editedThing\" @blur=\"doneEdit(thing)\" @keyup.esc=\"cancelEdit(thing)\">{{ thing.body }}</textarea>\n\t\t\t</form>\n\t\t\t<div class=\"thing-nav\">\n\t\t\t\t<button @click=\"deleteThing(thing)\">✗</button>\n\t\t\t</div>\n\t\t</div>\n\t</div>\n\t<form action=\"\" @submit.prevent=\"addNew(this)\" v-if=\"true\"><!-- Will hide this later, only show when clicking enter on task. -->\n\t\t<input type=\"text\" class=\"add-thing\" name=\"body\" v-model=\"newThing.body\" placeholder=\"...\" autocomplete=\"off\" autofocus=\"\">\n\t</form>\n\n\t<div class=\"children\" v-if=\"thing.children\">\n\t\t<panel v-for=\"childPanel in thing.children\" :thing=\"childPanel\"></panel>\n\t</div>\n</div>\n"
+;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\n<div class=\"things-panel\">\n\t<div class=\"panel-title\" v-if=\"thing.depth == 0\">\n\t\t{{ thing.body }}\n\t</div>\n\t<div class=\"thing-card\" v-if=\"thing.lft != 1\" :class=\"{\n\t\t\tdone: thing.done,\n\t\t\tediting: thing == editedThing,\n\t\t\t}\">\n\t\t<input class=\"toggle\" type=\"checkbox\" v-model=\"thing.done\" @change=\"markDone(thing)\">\n\t\t<div class=\"body-div\" :class=\"{ selected: thing.id == this.$root.selection.selectedId, }\" @dblclick=\"startEdit(thing)\" @click=\"select(thing)\" @enter=\"console.log('yarrr')\">\n\t\t\t<span class=\"bodybox\" v-show=\"thing != editedThing\">{{ thing.id }} - {{ thing.body }}</span>\n\t\t\t<form action=\"update\" class=\"updatebox\" @submit.prevent=\"doneEdit(thing)\">\n\t\t\t\t<textarea name=\"thing_body\" rows=\"<!-- {{ thing.rows }} -->\" v-model=\"thing.body\" v-autosize=\"thing.body\" v-thing-focus=\"thing == editedThing\" @blur=\"doneEdit(thing)\" @keyup.esc=\"cancelEdit(thing)\">{{ thing.body }}</textarea>\n\t\t\t</form>\n\t\t\t<div class=\"thing-nav\">\n\t\t\t\t<button @click=\"deleteThing(thing)\">✗</button>\n\t\t\t</div>\n\t\t</div>\n\t</div>\n\t<form action=\"\" @submit.prevent=\"addNew(this)\" v-if=\"true\"><!-- Will hide this later, only show when clicking enter on task. -->\n\t\t<input type=\"text\" class=\"add-thing\" name=\"body\" v-model=\"newThing.body\" placeholder=\"...\" autocomplete=\"off\" autofocus=\"\">\n\t</form>\n\n\t<div class=\"children\" v-if=\"thing.children\">\n\t\t<panel v-for=\"childPanel in thing.children\" :thing=\"childPanel\"></panel>\n\t</div>\n</div>\n"
 if (module.hot) {(function () {  module.hot.accept()
   var hotAPI = require("vue-hot-reload-api")
   hotAPI.install(require("vue"), true)
@@ -11537,6 +11404,113 @@ if (module.hot) {(function () {  module.hot.accept()
     hotAPI.update("_v-f86b8dc2", module.exports, (typeof module.exports === "function" ? module.exports.options : module.exports).template)
   }
 })()}
-},{"babel-runtime/core-js/object/keys":2,"vue":40,"vue-hot-reload-api":39}]},{},[41]);
+},{"babel-runtime/core-js/object/keys":2,"vue":40,"vue-hot-reload-api":39}],43:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+	value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var Selection = function () {
+	function Selection() {
+		_classCallCheck(this, Selection);
+
+		this.selectedThing = null;
+		this.selectedId = null;
+		this.selectedLft = null;
+		this.selectedDepth = null;
+	}
+
+	_createClass(Selection, [{
+		key: "selectNext",
+		value: function selectNext() {}
+	}, {
+		key: "selectPrevious",
+		value: function selectPrevious() {}
+	}]);
+
+	return Selection;
+}();
+
+exports.default = Selection;
+
+},{}],44:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+	value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var Tree = function () {
+	function Tree(items) {
+		_classCallCheck(this, Tree);
+
+		// properties
+		this.source = items;
+		this.nodes = {}; // →　"id" = { task obj };
+		// this.nodesArr	= []; // →　{ task obj }, ...;
+		this.orphans = [];
+		// process items
+		items.forEach(this.initialize.bind(this));
+	}
+
+	_createClass(Tree, [{
+		key: 'initialize',
+		value: function initialize(item, index) {
+			// variables
+			var node = this.makeNode(item);
+			var parent = this.getNode(node.parent_id);
+			// assign
+			if (node.children_order) {
+				node.children_order = node.children_order.split(',').map(Number);
+			}
+			node.children = [];
+			if (index === 0) {
+				this.root = node;
+			} else if (parent) {
+				parent.children.push(node);
+			} else {
+				this.orphans.push(node);
+			}
+			// register node
+			this.nodes[node.id] = node;
+			// register nodesArr
+			// this.nodesArr.push(node);
+		}
+	}, {
+		key: 'makeNode',
+		value: function makeNode(item) {
+			return JSON.parse(JSON.stringify(item));
+		}
+	}, {
+		key: 'getNode',
+		value: function getNode(id) {
+			return this.nodes[id];
+		}
+	}, {
+		key: 'addThing',
+		value: function addThing(item) {
+			var parent = this.nodes[item.parent_id];
+			parent.children.push(item);
+			this.nodes[item.id] = item;
+			// this.nodesArr.push(item);
+			parent.children_order.splice(item.older_sibling_index + 1, 0, item.id); // will insert item into `arr` at the specified `index` (deleting 0 items first, that is, it's just an insert)
+		}
+	}]);
+
+	return Tree;
+}();
+
+exports.default = Tree;
+
+},{}]},{},[41]);
 
 //# sourceMappingURL=main.js.map

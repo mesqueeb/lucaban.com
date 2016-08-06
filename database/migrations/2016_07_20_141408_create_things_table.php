@@ -19,11 +19,12 @@ class CreateThingsTable extends Migration {
       // We add indexes on parent_id, lft, rgt columns by default.
       $table->increments('id');
       $table->integer('parent_id')->nullable()->index();
-      $table->integer('lft')->nullable()->index();
-      $table->integer('rgt')->nullable()->index();
+      // $table->integer('lft')->nullable()->index();
+      // $table->integer('rgt')->nullable()->index();
       $table->integer('depth')->nullable();
       // Add needed columns here (f.ex: name, slug, path, etc.)
       // $table->string('name', 255);
+      $table->text('children_order');
       $table->string('body');
       $table->text('memo');
       $table->time('planned_time');

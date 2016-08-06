@@ -1,48 +1,32 @@
-import Panel from './vue-components/panel.vue';
+import Panel from './vue-components/Panel.vue';
 var VueAutosize = require('vue-autosize')
 Vue.use(VueAutosize)
+
+import Tree from './vue-components/dataTree.js';
+window.allThings = new Tree(fetchedData);
+import Selection from './vue-components/Selection.js';
+window.selection = new Selection();
 
 new Vue({
 	el:'body',
 	data: {
-		import_data: { null },
+		import_data: allThings.root,
+		selection: selection,
 	},
 	components: { Panel },
 	methods:{
-		fetchAll(){
-			this.$http.get('/api/things').then(function(data) {
-  				var data = data.json();
-				var data = data[Object.keys(data)[0]];
-  		// 		$.each(data, function(k, v) {
-  		// 			console.log(k['body']);
-  		// 			console.log(v['body']);
-  		// 			console.log("k = "+k+" // v = "+v);
-  		// 			// var nl = v['body'].split(/\r\n|\r|\n/).length;
-  		// 			// v['rows'] = nl;
-				// });
-				this.import_data = data;
-				console.log(JSON.stringify(data));
-				console.log('...fetchedAll!');
-				this.fetchTreeMetaFlat();
-			});
-		},
-		fetchTreeMetaFlat(){
-			this.$http.post('/api/things/fetchTreeMetaFlat').then(function(data) {
-  				var data = data.json();
-				var result = {};
-				for (var i=0; i<data.length; i++) {
-				  result[data[i].lft] = data[i];
-				}
-  				console.log('printing flat data:');
-  				console.log(JSON.stringify(result));
-				var vm = this.$root.$children[0];
-				vm.flatData = result;
-				console.log('...fetchedFlatData!');
-			});
+		addThing(){
+			let body = 'test';
+			let selId = selection.selectedId;
+            let older_sibling = allThings.nodes[selId];
+            let parent_id = older_sibling.parent_id;
+            let older_sibling_index = allThings.nodes[parent_id].children_order.indexOf(selId);
+            let thing = {id:10, parent_id:parent_id, body:body, older_sibling_index:older_sibling_index};
+            console.log(thing);
+            allThings.addThing(thing);
 		},
 	},
 	created(){
-    	this.fetchAll();
 	},
 	ready: function() {
       var vm = this;
@@ -115,3 +99,4 @@ new Vue({
 		},
     },
 });
+

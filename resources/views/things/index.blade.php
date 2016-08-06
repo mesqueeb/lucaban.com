@@ -11,12 +11,12 @@
 	@include('elements.menu')
 	<div class="panel panel-default">
 		<div class="panel-body">
-			@include('common.errors')
-			
 			<Panel :thing="import_data"></Panel>
+			<button @click="addThing">Add Thing</button>
 		</div>
 	</div>
 
+<script>window.fetchedData = <? echo $itemz; ?></script>
 <script src="js/vendor.js"></script>
 <script src="js/main.js"></script>
 </body>
