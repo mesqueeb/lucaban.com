@@ -44,7 +44,7 @@ class ThingsPanelController extends Controller
      */
     public function store(Request $request)
     {
-        return Thing::where('parent_id', request()->parent_id)->first()->children()->create($request->all());
+        return Thing::create($request->all());
         // TODO:      moveToRightOf($otherNode)!!!
     }
 

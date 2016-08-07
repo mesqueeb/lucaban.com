@@ -14,7 +14,7 @@ use Baum\Node;
 class Thing extends Node 
 {
 	protected $table = 'things';
-	protected $fillable = ['body','children','parent_id','done'];
+	protected $fillable = ['done','body','parent_id','depth'];
 	// protected $body;
 	// public function savenew($body){
 	// 	$this->body = $body;

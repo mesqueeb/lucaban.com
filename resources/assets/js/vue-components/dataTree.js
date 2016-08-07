@@ -36,10 +36,6 @@ export default class Tree {
 	}
 	addThing(item)
 	{
-		let parent = this.nodes[item.parent_id];
-		parent.children.push(item);
-    	this.nodes[item.id] = item;
-    	// this.nodesArr.push(item);
-    	parent.children_order.splice(item.older_sibling_index+1, 0, item.id);// will insert item into `arr` at the specified `index` (deleting 0 items first, that is, it's just an insert)
+
 	}
 }

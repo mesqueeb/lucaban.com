@@ -32,16 +32,7 @@ new Vue({
       var vm = this;
       window.addEventListener('keydown', function(e) {
         if ( $('input:focus').length > 0 ||  $('textarea:focus').length > 0 ) {
-          // INPUT AREAS IN FOCUS
-		  switch(e.keyCode) { 
-		  	case 13:
-		  		if (e.shiftKey){
-		  			break;
-		  		}
-		  		e.preventDefault();
-		  		vm.$broadcast('enterOnFocussedInput');
-		  		break;
-		  } // end switch
+        	return;
 		} else { 
 		  // INPUT AREAS NOT IN FOCUS
           switch(e.keyCode) { 
