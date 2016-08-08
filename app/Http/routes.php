@@ -7,6 +7,11 @@ Route::get('/', function () {
 Route::get('/home', 'HomeController@index');
 ////////////////////////////////////////////////
 Route::get('/things',function(){
+    $god = App\Thing::where('parent_id', null)->first();
+    if(!$god){
+        $itemz = App\Thing::create(['body' => 'ALL', 'id' => '1']);
+        return view('things.index', compact('itemz'));
+    }
 	$itemz = App\Thing::get();
 	return view('things.index', compact('itemz'));
 });
