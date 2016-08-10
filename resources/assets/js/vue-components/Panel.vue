@@ -107,21 +107,15 @@ export default {
 			editedThing: null,
 			newThing: {
 				body: '',
-				parent_id: this.thing.parent_id,
+				parent_id: (this.thing.parent_id) ? this.thing.parent_id : 1 ,
 				older_sibling_id: this.thing.id,
-				depth: this.thing.depth,
+				depth: (this.thing.depth == 0) ? 1 : this.thing.depth,
 			},
 		};
 	},
 	computed: {
-		nodeIndex(){
-			let pId = this.thing.parent_id;
-			if(!pId){ return; }
-			let siblingsArr = allThings.nodes[pId].children_order;
-			let id = this.thing.id;
-			let ni = siblingsArr.indexOf(id);
-			return ni;
-		},
+		nodeIndex(){ return allThings.nodeIndex(this.thing.id); },
+		olderSiblingId(){ return allThings.olderSiblingId(this.thing.id); },
 		parentsChildren_order(){
 			let pId = this.thing.parent_id;
 			if(!pId){ return; }
@@ -130,18 +124,9 @@ export default {
 	},
 	methods: {
 		select(thing){
-			selection.selectedThing = thing;
 			selection.selectedId = thing.id;
-			selection.selectedLft = thing.lft;
-			selection.selectedDepth = thing.depth;
 			// let ind = allThings.nodesArr.indexOf(selection.selectedThing);
 			// console.log(ind);
-		},
-		indent(){
-
-		},
-		unindent(){
-
 		},
 		move(direction){
 
@@ -198,27 +183,43 @@ export default {
 			console.log('starting patchParentChildren_order...');
 			let OlderSiblingIndex = this.nodeIndex;
 			let index = OlderSiblingIndex+1;
-			console.log('newTaskIndex');
-			console.log(index);
-			let oldChildren_order = this.parentsChildren_order;
-			console.log('oldChildren_order');
-			console.log(oldChildren_order);
-			console.log('storedThing.id');
-			console.log(storedThing.id);
-			// let newChildren_order = oldChildren_order.splice(index, 0, storedThing.id);
-			let newChildren_order = oldChildren_order.splice(index, 0, storedThing.id).toString();
-			console.log('newChildren_order');
-			console.log(newChildren_order);
-			this.$http.patch('/api/things/' + storedThing.parent_id, { children_order: newChildren_order }, { method: 'PATCH'})
+			let children_order = this.parentsChildren_order;
+			if(children_order){
+				children_order.splice(index, 0, storedThing.id);
+			} else {
+				children_order = [storedThing.id];
+			}
+			let c_o = '';
+			children_order.forEach(function(entry) {
+			    c_o = c_o+','+entry;
+			});
+			c_o = c_o.substring(1);
+			console.log(c_o);
+			this.$http.patch('/api/things/' + storedThing.parent_id, { children_order: c_o }, { method: 'PATCH'})
 			.then(function(response){
-			// 	this.updateDOM(storedThing, newChildren_order);
+				this.updateDOM(storedThing, index, children_order);
 			});
 		},
-		updateDOM(storedThing, newChildren_order){
+		updateDOM(storedThing, index, newChildren_order){
+			this.newThing.body = '';
 			let parent = allThings.nodes[storedThing.parent_id];
-			parent.children.push(storedThing);
-		    this.nodes[storedThing.id] = storedThing;
+			parent.children.splice(index, 0, storedThing);
+		    allThings.nodes[storedThing.id] = storedThing;
 		    parent.children_order = newChildren_order;
+		},
+		indent(){
+			let id = selection.selectedId;
+			let new_parent_id = allThings.olderSiblingId(id);
+			console.log('new_parent_id / olderSiblingId: '+new_parent_id);
+			allThings.giveNewParent(id,new_parent_id);
+		},
+		unindent(){
+			let id = selection.selectedId;
+			let olderSiblingId = allThings.olderSiblingId(id);
+			console.log('olderSiblingId: '+olderSiblingId);
+			let new_parent_id = allThings.nodes[olderSiblingId].parent_id;
+			console.log('new_parent_id: '+new_parent_id);
+			allThings.giveNewParent(id,new_parent_id);
 		},
 	},
 	events: {

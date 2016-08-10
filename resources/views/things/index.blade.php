@@ -12,7 +12,6 @@
 	<div class="panel panel-default">
 		<div class="panel-body">
 			<Panel :thing="import_data"></Panel>
-			<button @click="addThing">Add Thing</button>
 		</div>
 	</div>
 

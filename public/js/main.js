@@ -10942,22 +10942,18 @@ exports.default = {
 			editedThing: null,
 			newThing: {
 				body: '',
-				parent_id: this.thing.parent_id,
+				parent_id: this.thing.parent_id ? this.thing.parent_id : 1,
 				older_sibling_id: this.thing.id,
-				depth: this.thing.depth
+				depth: this.thing.depth == 0 ? 1 : this.thing.depth
 			}
 		};
 	},
 	computed: {
 		nodeIndex: function nodeIndex() {
-			var pId = this.thing.parent_id;
-			if (!pId) {
-				return;
-			}
-			var siblingsArr = allThings.nodes[pId].children_order;
-			var id = this.thing.id;
-			var ni = siblingsArr.indexOf(id);
-			return ni;
+			return allThings.nodeIndex(this.thing.id);
+		},
+		olderSiblingId: function olderSiblingId() {
+			return allThings.olderSiblingId(this.thing.id);
 		},
 		parentsChildren_order: function parentsChildren_order() {
 			var pId = this.thing.parent_id;
@@ -10969,15 +10965,10 @@ exports.default = {
 	},
 	methods: {
 		select: function select(thing) {
-			selection.selectedThing = thing;
 			selection.selectedId = thing.id;
-			selection.selectedLft = thing.lft;
-			selection.selectedDepth = thing.depth;
 			// let ind = allThings.nodesArr.indexOf(selection.selectedThing);
 			// console.log(ind);
 		},
-		indent: function indent() {},
-		unindent: function unindent() {},
 		move: function move(direction) {},
 		markDone: function markDone(thing) {
 			if (!thing) {
@@ -11032,26 +11023,42 @@ exports.default = {
 			console.log('starting patchParentChildren_order...');
 			var OlderSiblingIndex = this.nodeIndex;
 			var index = OlderSiblingIndex + 1;
-			console.log('newTaskIndex');
-			console.log(index);
-			var oldChildren_order = this.parentsChildren_order;
-			console.log('oldChildren_order');
-			console.log(oldChildren_order);
-			console.log('storedThing.id');
-			console.log(storedThing.id);
-			// let newChildren_order = oldChildren_order.splice(index, 0, storedThing.id);
-			var newChildren_order = oldChildren_order.splice(index, 0, storedThing.id).toString();
-			console.log('newChildren_order');
-			console.log(newChildren_order);
-			this.$http.patch('/api/things/' + storedThing.parent_id, { children_order: newChildren_order }, { method: 'PATCH' }).then(function (response) {
-				// 	this.updateDOM(storedThing, newChildren_order);
+			var children_order = this.parentsChildren_order;
+			if (children_order) {
+				children_order.splice(index, 0, storedThing.id);
+			} else {
+				children_order = [storedThing.id];
+			}
+			var c_o = '';
+			children_order.forEach(function (entry) {
+				c_o = c_o + ',' + entry;
+			});
+			c_o = c_o.substring(1);
+			console.log(c_o);
+			this.$http.patch('/api/things/' + storedThing.parent_id, { children_order: c_o }, { method: 'PATCH' }).then(function (response) {
+				this.updateDOM(storedThing, index, children_order);
 			});
 		},
-		updateDOM: function updateDOM(storedThing, newChildren_order) {
+		updateDOM: function updateDOM(storedThing, index, newChildren_order) {
+			this.newThing.body = '';
 			var parent = allThings.nodes[storedThing.parent_id];
-			parent.children.push(storedThing);
-			this.nodes[storedThing.id] = storedThing;
+			parent.children.splice(index, 0, storedThing);
+			allThings.nodes[storedThing.id] = storedThing;
 			parent.children_order = newChildren_order;
+		},
+		indent: function indent() {
+			var id = selection.selectedId;
+			var new_parent_id = allThings.olderSiblingId(id);
+			console.log('new_parent_id / olderSiblingId: ' + new_parent_id);
+			allThings.giveNewParent(id, new_parent_id);
+		},
+		unindent: function unindent() {
+			var id = selection.selectedId;
+			var olderSiblingId = allThings.olderSiblingId(id);
+			console.log('olderSiblingId: ' + olderSiblingId);
+			var new_parent_id = allThings.nodes[olderSiblingId].parent_id;
+			console.log('new_parent_id: ' + new_parent_id);
+			allThings.giveNewParent(id, new_parent_id);
 		}
 	},
 	events: {
@@ -11126,6 +11133,7 @@ var Selection = function () {
 		_classCallCheck(this, Selection);
 
 		this.selectedThing = null;
+		this.selectedPanel = null;
 		this.selectedId = null;
 		this.selectedLft = null;
 		this.selectedDepth = null;
@@ -11165,6 +11173,7 @@ var Tree = function () {
 		// this.nodesArr	= []; // →　{ task obj }, ...;
 		this.orphans = [];
 		// process items
+		window.itemsProcessed = 0;
 		items.forEach(this.initialize.bind(this));
 	}
 
@@ -11190,6 +11199,13 @@ var Tree = function () {
 			this.nodes[node.id] = node;
 			// register nodesArr
 			// this.nodesArr.push(node);
+			itemsProcessed++;
+			if (itemsProcessed === this.source.length) {
+				$.each(this.nodes, function (index, value) {
+					// console.log(this.sortChildren());
+					this.sortChildren(value);
+				}.bind(this));
+			}
 		}
 	}, {
 		key: 'makeNode',
@@ -11204,6 +11220,76 @@ var Tree = function () {
 	}, {
 		key: 'addThing',
 		value: function addThing(item) {}
+	}, {
+		key: 'nodeIndex',
+		value: function nodeIndex(id) {
+			var parent_id = allThings.nodes[id].parent_id;
+			if (!parent_id) {
+				return;
+			}
+			var siblingsArr = allThings.nodes[parent_id].children_order;
+			console.log('(nodeIndex) siblingsArr: ' + siblingsArr);
+			return siblingsArr.indexOf(id);
+		}
+	}, {
+		key: 'olderSiblingId',
+		value: function olderSiblingId(id) {
+			var parent_id = allThings.nodes[id].parent_id;
+			if (!parent_id) {
+				return;
+			}
+			var siblingsArr = allThings.nodes[parent_id].children_order;
+			console.log('(olderSiblingId) siblingsArr.length: ' + siblingsArr.length);
+			if (siblingsArr.length <= 1 || allThings.nodeIndex(id) == 0) {
+				return parent_id;
+			}
+			var nodeIndex = siblingsArr.indexOf(id);
+			return allThings.nodes[parent_id].children_order[nodeIndex - 1];
+		}
+	}, {
+		key: 'sortChildren',
+		value: function sortChildren(item) {
+			var order = item.children_order;
+			var things = item.children;
+			if (order instanceof Array) {
+				item.children = order.map(function (id) {
+					return things.find(function (t) {
+						return t.id === id;
+					});
+				});
+			}
+		}
+	}, {
+		key: 'giveNewParent',
+		value: function giveNewParent(id, new_parent_id) {
+			var parent_id = allThings.nodes[id].parent_id;
+			var targetThing = allThings.nodes[id];
+			var newParent = allThings.nodes[new_parent_id];
+			console.log('newParent node ↓ ');
+			console.log(newParent);
+			var prevParent = allThings.nodes[parent_id];
+			var nodeIndex = this.nodeIndex(id);
+			prevParent.children.splice(nodeIndex, 1);
+
+			targetThing.parent_id = new_parent_id;
+			targetThing.depth = newParent.depth + 1;
+			if (!newParent.children_order) {
+				newParent.children_order = [];
+			}
+			newParent.children_order.push(id);
+			newParent.children.push(targetThing);
+			allThings.recalcChildren_order(prevParent);
+			allThings.recalcChildren_order(newParent);
+		}
+	}, {
+		key: 'recalcChildren_order',
+		value: function recalcChildren_order(item) {
+			var theItem = allThings.nodes['1'];
+			var result = theItem.children.map(function (a) {
+				return a.id;
+			});
+			theItem.children_order = result;
+		}
 	}]);
 
 	return Tree;
