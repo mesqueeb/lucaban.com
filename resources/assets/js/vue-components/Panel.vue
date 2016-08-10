@@ -118,7 +118,7 @@ export default {
 		olderSiblingId(){ return allThings.olderSiblingId(this.thing.id); },
 		parentsChildren_order(){
 			let pId = this.thing.parent_id;
-			if(!pId){ return; }
+			if(this.thing.depth == 0){ return allThings.nodes[this.thing.id].children_order; }
 			return allThings.nodes[pId].children_order;
 		},
 	},
@@ -210,15 +210,29 @@ export default {
 		indent(){
 			let id = selection.selectedId;
 			let new_parent_id = allThings.olderSiblingId(id);
+			if(new_parent_id == allThings.nodes[id].parent_id){ console.log('bump! ceiling!'); return; }
 			console.log('new_parent_id / olderSiblingId: '+new_parent_id);
 			allThings.giveNewParent(id,new_parent_id);
 		},
 		unindent(){
 			let id = selection.selectedId;
+			let depth = allThings.nodes[id].depth;
 			let olderSiblingId = allThings.olderSiblingId(id);
-			console.log('olderSiblingId: '+olderSiblingId);
-			let new_parent_id = allThings.nodes[olderSiblingId].parent_id;
-			console.log('new_parent_id: '+new_parent_id);
+			let olderSiblingDepth = allThings.nodes[olderSiblingId].depth;
+
+			while(olderSiblingDepth != depth-1){
+				olderSiblingId = allThings.olderSiblingId(olderSiblingId);
+				olderSiblingDepth = allThings.nodes[olderSiblingId].depth;
+			}
+			let new_parent_id = olderSiblingId;
+			let new_parent_depth = olderSiblingDepth;
+			console.log('new_parent: '+new_parent_id);
+
+			if(!new_parent_id){ console.log('crash! floor!'); return; }
+			if(new_parent_depth == 0 && depth == 1){ console.log('crash! floor!'); return; }
+			if(new_parent_id == allThings.nodes[id].parent_id){
+				new_parent_id = allThings.nodes[new_parent_id].parent_id;
+			}
 			allThings.giveNewParent(id,new_parent_id);
 		},
 	},

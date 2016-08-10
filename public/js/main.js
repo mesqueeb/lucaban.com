@@ -10957,8 +10957,8 @@ exports.default = {
 		},
 		parentsChildren_order: function parentsChildren_order() {
 			var pId = this.thing.parent_id;
-			if (!pId) {
-				return;
+			if (this.thing.depth == 0) {
+				return allThings.nodes[this.thing.id].children_order;
 			}
 			return allThings.nodes[pId].children_order;
 		}
@@ -11049,15 +11049,35 @@ exports.default = {
 		indent: function indent() {
 			var id = selection.selectedId;
 			var new_parent_id = allThings.olderSiblingId(id);
+			if (new_parent_id == allThings.nodes[id].parent_id) {
+				console.log('bump! ceiling!');return;
+			}
 			console.log('new_parent_id / olderSiblingId: ' + new_parent_id);
 			allThings.giveNewParent(id, new_parent_id);
 		},
 		unindent: function unindent() {
 			var id = selection.selectedId;
+			var depth = allThings.nodes[id].depth;
 			var olderSiblingId = allThings.olderSiblingId(id);
-			console.log('olderSiblingId: ' + olderSiblingId);
-			var new_parent_id = allThings.nodes[olderSiblingId].parent_id;
-			console.log('new_parent_id: ' + new_parent_id);
+			var olderSiblingDepth = allThings.nodes[olderSiblingId].depth;
+
+			while (olderSiblingDepth != depth - 1) {
+				olderSiblingId = allThings.olderSiblingId(olderSiblingId);
+				olderSiblingDepth = allThings.nodes[olderSiblingId].depth;
+			}
+			var new_parent_id = olderSiblingId;
+			var new_parent_depth = olderSiblingDepth;
+			console.log('new_parent: ' + new_parent_id);
+
+			if (!new_parent_id) {
+				console.log('crash! floor!');return;
+			}
+			if (new_parent_depth == 0 && depth == 1) {
+				console.log('crash! floor!');return;
+			}
+			if (new_parent_id == allThings.nodes[id].parent_id) {
+				new_parent_id = allThings.nodes[new_parent_id].parent_id;
+			}
 			allThings.giveNewParent(id, new_parent_id);
 		}
 	},
@@ -11228,7 +11248,6 @@ var Tree = function () {
 				return;
 			}
 			var siblingsArr = allThings.nodes[parent_id].children_order;
-			console.log('(nodeIndex) siblingsArr: ' + siblingsArr);
 			return siblingsArr.indexOf(id);
 		}
 	}, {
@@ -11239,7 +11258,6 @@ var Tree = function () {
 				return;
 			}
 			var siblingsArr = allThings.nodes[parent_id].children_order;
-			console.log('(olderSiblingId) siblingsArr.length: ' + siblingsArr.length);
 			if (siblingsArr.length <= 1 || allThings.nodeIndex(id) == 0) {
 				return parent_id;
 			}
@@ -11265,31 +11283,40 @@ var Tree = function () {
 			var parent_id = allThings.nodes[id].parent_id;
 			var targetThing = allThings.nodes[id];
 			var newParent = allThings.nodes[new_parent_id];
-			console.log('newParent node ↓ ');
+			console.log('newParent ↓ ');
 			console.log(newParent);
 			var prevParent = allThings.nodes[parent_id];
+			console.log('prevParent ↓ ');
+			console.log(prevParent);
 			var nodeIndex = this.nodeIndex(id);
 			prevParent.children.splice(nodeIndex, 1);
+			prevParent.children_order.splice(nodeIndex, 1);
 
 			targetThing.parent_id = new_parent_id;
 			targetThing.depth = newParent.depth + 1;
 			if (!newParent.children_order) {
 				newParent.children_order = [];
 			}
-			newParent.children_order.push(id);
-			newParent.children.push(targetThing);
-			allThings.recalcChildren_order(prevParent);
-			allThings.recalcChildren_order(newParent);
+			if (prevParent.depth - 1 == newParent.depth) {
+				// when unindenting
+				var newIndex = this.nodeIndex(prevParent.id) + 1;
+				newParent.children_order.splice(newIndex, 0, id);
+				newParent.children.splice(newIndex, 0, targetThing);
+			} else {
+				// when indenting
+				newParent.children_order.push(id);
+				newParent.children.push(targetThing);
+			}
+
+			// allThings.recalcChildren_order(prevParent);
+			// allThings.recalcChildren_order(newParent);
 		}
-	}, {
-		key: 'recalcChildren_order',
-		value: function recalcChildren_order(item) {
-			var theItem = allThings.nodes['1'];
-			var result = theItem.children.map(function (a) {
-				return a.id;
-			});
-			theItem.children_order = result;
-		}
+		// recalcChildren_order(item){
+		// 	let theItem = allThings.nodes['1'];
+		// 	let result = theItem.children.map(function(a) {return a.id;});
+		// 	theItem.children_order = result;
+		// }
+
 	}]);
 
 	return Tree;
