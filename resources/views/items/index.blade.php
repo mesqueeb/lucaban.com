@@ -8,14 +8,14 @@
 	<link rel="stylesheet" href="/css/app.css">
 </head>
 <body>
+<a href="{{route('home')}}">Go home</a>
 	@include('elements.menu')
-	<div class="panel panel-default">
+	<div class="item item-default">
 		<div class="panel-body">
-			<Panel :thing="import_data"></Panel>
+			<Card :item="import_data"></Card>
 		</div>
 	</div>
 
-<script>window.fetchedData = <? echo $itemz; ?></script>
 <script src="js/vendor.js"></script>
 <script src="js/main.js"></script>
 </body>

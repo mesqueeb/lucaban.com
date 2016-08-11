@@ -1,3 +1,8 @@
+*,*:before,*:after {
+	box-sizing: border-box;
+}
+
+
 body {
 	font-family: 'Calibri', 'Lato';
 	line-height: 1.4em;
@@ -11,7 +16,7 @@ body {
 form {
     margin-bottom: 0;
 }
-input{
+input, textarea{
 	outline: none;
     border-style: none;
 }

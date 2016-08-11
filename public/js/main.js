@@ -10795,9 +10795,9 @@ module.exports = Vue;
 },{"_process":2}],6:[function(require,module,exports){
 'use strict';
 
-var _Panel = require('./vue-components/Panel.vue');
+var _Card = require('./vue-components/Card.vue');
 
-var _Panel2 = _interopRequireDefault(_Panel);
+var _Card2 = _interopRequireDefault(_Card);
 
 var _dataTree = require('./vue-components/dataTree.js');
 
@@ -10812,112 +10812,193 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 var VueAutosize = require('vue-autosize');
 Vue.use(VueAutosize);
 
-window.allThings = new _dataTree2.default(fetchedData);
+$.getJSON('/api/items', function (fetchedData) {
 
-window.selection = new _Selection2.default();
+	//response
 
-new Vue({
-	el: 'body',
-	data: {
-		import_data: allThings.root,
-		selection: selection
-	},
-	components: { Panel: _Panel2.default },
-	methods: {
-		addThing: function addThing() {
-			var body = 'test';
-			var selId = selection.selectedId;
-			var older_sibling = allThings.nodes[selId];
-			var parent_id = older_sibling.parent_id;
-			var older_sibling_index = allThings.nodes[parent_id].children_order.indexOf(selId);
-			var thing = { id: 10, parent_id: parent_id, body: body, older_sibling_index: older_sibling_index };
-			console.log(thing);
-			allThings.addThing(thing);
+	window.allItems = new _dataTree2.default(fetchedData);
+	window.selection = new _Selection2.default();
+
+	new Vue({
+		el: 'body',
+		data: {
+			import_data: allItems.root,
+			selection: selection,
+			editing: { null: null }
+		},
+		components: { Card: _Card2.default },
+		methods: {
+			markDone: function markDone() {
+				var item = allItems.nodes[selection.selectedId];
+				item.done = !item.done;
+				this.$http.patch('/api/items/' + item.id, { 'done': item.done });
+			},
+			indent: function indent() {
+				var id = selection.selectedId;
+				var new_parent_id = allItems.olderSiblingId(id);
+				if (new_parent_id == allItems.nodes[id].parent_id) {
+					console.log('bump! ceiling!');return;
+				}
+				console.log('new_parent_id / olderSiblingId: ' + new_parent_id);
+				allItems.giveNewParent(id, new_parent_id);
+				// this.$broadcast('updateDepth');
+			},
+			unindent: function unindent() {
+				var id = selection.selectedId;
+				var depth = allItems.nodes[id].depth;
+				var olderSiblingId = allItems.olderSiblingId(id);
+				var olderSiblingDepth = allItems.nodes[olderSiblingId].depth;
+
+				while (olderSiblingDepth != depth - 1) {
+					olderSiblingId = allItems.olderSiblingId(olderSiblingId);
+					olderSiblingDepth = allItems.nodes[olderSiblingId].depth;
+				}
+				var new_parent_id = olderSiblingId;
+				var new_parent_depth = olderSiblingDepth;
+				console.log('new_parent: ' + new_parent_id);
+
+				if (!new_parent_id) {
+					console.log('crash! floor!');return;
+				}
+				if (new_parent_depth == 0 && depth == 1) {
+					console.log('crash! floor!');return;
+				}
+				if (new_parent_id == allItems.nodes[id].parent_id) {
+					new_parent_id = allItems.nodes[new_parent_id].parent_id;
+				}
+				allItems.giveNewParent(id, new_parent_id);
+			},
+			select: function select(direction) {
+				var id = selection.selectedId;
+				var sel = '';
+				if (direction == 'next') {
+					sel = allItems.nextItemId(id);
+				} else if (direction == 'prev') {
+					sel = allItems.olderSiblingId(id);
+				}
+				selection.selectedId = sel;
+			},
+			showAddNewItem: function showAddNewItem() {
+				this.editing = selection.selectedId;
+			},
+			keystroke: function keystroke(_keystroke) {
+				switch (_keystroke) {
+					case 'arrowUp':
+						this.select('prev');
+						break;
+					case 'arrowDown':
+						this.select('next');
+						break;
+					case 'meta_arrowUp':
+						this.meta_arrowUp();
+						break;
+					case 'meta_arrowDown':
+						this.meta_arrowDown();
+						break;
+					case 'spaceBar':
+						this.markDone();
+						break;
+					case 'shift_tab':
+						this.unindent();
+						break;
+					case 'tab':
+						this.indent();
+						break;
+					case 'enter':
+						this.showAddNewItem();
+						break;
+					case 'meta_enter':
+						this.$broadcast('startEdit');
+						break;
+				}
+			}
+		},
+		created: function created() {},
+
+		ready: function ready() {
+			var vm = this;
+			window.addEventListener('keydown', function (e) {
+				if ($('input:focus').length > 0 || $('textarea:focus').length > 0) {
+					return;
+				} else {
+					// INPUT AREAS NOT IN FOCUS
+					switch (e.keyCode) {
+						case 38:
+							// arrowUp
+							e.preventDefault();
+							if (event.ctrlKey || event.metaKey) {
+								vm.keystroke('meta_arrowUp');
+								break;
+							}
+							vm.keystroke('arrowUp');
+							break;
+						case 40:
+							// arrowDown
+							e.preventDefault();
+							if (event.ctrlKey || event.metaKey) {
+								vm.keystroke('meta_arrowDown');
+								break;
+							}
+							vm.keystroke('arrowDown');
+							break;
+						case 32:
+							// spaceBar
+							e.preventDefault();
+							vm.keystroke('spaceBar');
+							break;
+						case 9:
+							// tab
+							e.preventDefault();
+							if (e.shiftKey) {
+								vm.keystroke('shift_tab');
+								break;
+							}
+							vm.keystroke('tab');
+							break;
+						case 13:
+							// enter
+							e.preventDefault();
+							if (event.ctrlKey || event.metaKey) {
+								vm.keystroke('meta_enter');
+								break;
+							}
+							vm.keystroke('enter');
+							break;
+						case 'xexx':
+							vm.keystroke('unindent');
+							break;
+						case 'xexx':
+							vm.keystroke('unindent');
+							break;
+						case 'xexx':
+							vm.keystroke('unindent');
+							break;
+					} // end switch
+				} // END INPUT AREAS NOT IN FOCUS
+			});
+		},
+		http: {
+			root: '/root',
+			headers: {
+				'X-CSRF-TOKEN': document.querySelector('#token').getAttribute('value')
+			}
 		}
-	},
-	created: function created() {},
+	});
+}); // end ajax
 
-	ready: function ready() {
-		var vm = this;
-		window.addEventListener('keydown', function (e) {
-			if ($('input:focus').length > 0 || $('textarea:focus').length > 0) {
-				return;
-			} else {
-				// INPUT AREAS NOT IN FOCUS
-				switch (e.keyCode) {
-					case 38:
-						// arrowUp
-						e.preventDefault();
-						if (event.ctrlKey || event.metaKey) {
-							console.log('meta_arrowUp');
-							vm.$broadcast('meta_arrowUp');
-							break;
-						}
-						vm.$broadcast('arrowUp');
-						break;
-					case 40:
-						// arrowDown
-						e.preventDefault();
-						if (event.ctrlKey || event.metaKey) {
-							console.log('meta_arrowDown');
-							vm.$broadcast('meta_arrowDown');
-							break;
-						}
-						vm.$broadcast('arrowDown');
-						break;
-					case 32:
-						// spaceBar
-						e.preventDefault();
-						vm.$broadcast('spaceBar');
-						break;
-					case 9:
-						// tab
-						e.preventDefault();
-						if (e.shiftKey) {
-							vm.$broadcast('shift_tab');
-							break;
-						}
-						vm.$broadcast('tab');
-						break;
-					case 13:
-						// enter
-						e.preventDefault();
-						vm.$broadcast('enter');
-						break;
-					case 'xexx':
-						vm.$broadcast('unindent');
-						break;
-					case 'xexx':
-						vm.$broadcast('unindent');
-						break;
-					case 'xexx':
-						vm.$broadcast('unindent');
-						break;
-				} // end switch
-			} // END INPUT AREAS NOT IN FOCUS
-		});
-	},
-	http: {
-		root: '/root',
-		headers: {
-			'X-CSRF-TOKEN': document.querySelector('#token').getAttribute('value')
-		}
-	}
-});
-
-},{"./vue-components/Panel.vue":7,"./vue-components/Selection.js":8,"./vue-components/dataTree.js":9,"vue-autosize":3}],7:[function(require,module,exports){
+},{"./vue-components/Card.vue":7,"./vue-components/Selection.js":8,"./vue-components/dataTree.js":9,"vue-autosize":3}],7:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
 	value: true
 });
 exports.default = {
-	name: 'Panel',
-	template: '#things-panel-template',
+	name: 'Card',
+	template: '#items-card-template',
 	created: function created() {},
 	ready: function ready() {
 		var vm = this;
-		var form = "#new-under-" + this.thing.id + ">textarea";
+		var form = "#new-under-" + this.item.id + ">textarea";
 		window.addEventListener('keydown', function (e) {
 			if ($(form + ':focus').length > 0) {
 				// INPUT AREAS IN FOCUS
@@ -10936,179 +11017,112 @@ exports.default = {
 		});
 	},
 
-	props: ['thing'],
+	props: ['item'],
 	data: function data() {
 		return {
-			editedThing: null,
-			newThing: {
+			editedItem: null,
+			newItem: {
 				body: '',
-				parent_id: this.thing.parent_id ? this.thing.parent_id : 1,
-				older_sibling_id: this.thing.id,
-				depth: this.thing.depth == 0 ? 1 : this.thing.depth
+				parent_id: this.item.parent_id ? this.item.parent_id : 1,
+				older_sibling_id: this.item.id,
+				depth: this.item.depth == 0 ? 1 : this.item.depth
 			}
 		};
 	},
 	computed: {
 		nodeIndex: function nodeIndex() {
-			return allThings.nodeIndex(this.thing.id);
+			return allItems.nodeIndex(this.item.id);
 		},
 		olderSiblingId: function olderSiblingId() {
-			return allThings.olderSiblingId(this.thing.id);
+			return allItems.olderSiblingId(this.item.id);
 		},
 		parentsChildren_order: function parentsChildren_order() {
-			var pId = this.thing.parent_id;
-			if (this.thing.depth == 0) {
-				return allThings.nodes[this.thing.id].children_order;
+			var pId = this.item.parent_id;
+			if (this.item.depth == 0) {
+				return allItems.nodes[this.item.id].children_order;
 			}
-			return allThings.nodes[pId].children_order;
+			return allItems.nodes[pId].children_order;
 		}
 	},
 	methods: {
-		select: function select(thing) {
-			selection.selectedId = thing.id;
-			// let ind = allThings.nodesArr.indexOf(selection.selectedThing);
-			// console.log(ind);
+		select: function select(item) {
+			selection.selectedId = item.id;
 		},
 		move: function move(direction) {},
-		markDone: function markDone(thing) {
-			if (!thing) {
-				// ↓ out dated because of recursiveness: "this" is not recognised properly...
-				var thing = this.thing[this.selectedIndex];
-				thing.done = !thing.done;
-			}
-			this.$http.patch('/api/things/' + thing.id, { 'done': thing.done });
+		markDone: function markDone(item) {
+			this.$http.patch('/api/items/' + item.id, { 'done': item.done });
 		},
-		startEdit: function startEdit(thing) {
-			// ↓ out dated because of recursiveness: "this" is not recognised properly...
-			var thing = thing ? thing : this.thing[this.selectedIndex];
-			this.beforeEditCache = thing.body;
-			this.editedThing = thing;
+		startEdit: function startEdit(item) {
+			console.log('startEdit');
+			item = item ? item : allItems.nodes[selection.selectedId];
+			console.log(item);
+			this.beforeEditCache = item.body;
+			this.editedItem = item;
 		},
-		doneEdit: function doneEdit(thing) {
-			// ↓ out dated because of recursiveness: "this" is not recognised properly...
-			var thing = thing ? thing : this.thing[this.selectedIndex];
-			if (!this.editedThing) {
+		doneEdit: function doneEdit(item) {
+			item = item ? item : allItems.nodes[selection.selectedId];
+			if (!this.editedItem) {
 				return;
 			}
-			this.editedThing = null;
-			thing.body = thing.body.trim();
-			if (!thing.body) {
-				this.deleteThing(thing);
+			this.editedItem = null;
+			item.body = item.body.trim();
+			if (!item.body) {
+				this.deleteItem(item);
 			}
-			var id = thing.id;
-			this.$http.patch('/api/things/' + id, thing, { method: 'PATCH' });
+			var id = item.id;
+			this.$http.patch('/api/items/' + id, item, { method: 'PATCH' });
 			$(':focus').blur();
 		},
-		cancelEdit: function cancelEdit(thing) {
-			this.editedThing = null;
+		cancelEdit: function cancelEdit(item) {
+			this.editedItem = null;
 			console.log(this.beforeEditCache);
-			thing.body = this.beforeEditCache;
+			item.body = this.beforeEditCache;
 		},
-		deleteThing: function deleteThing(thing) {
-			this.$http.delete('/api/things/' + thing.id);
+		deleteItem: function deleteItem(item) {
+			this.$http.delete('/api/items/' + item.id);
 			// ↓ DOESN'T WORK!!!
-			this.thing.$remove(thing);
+			this.item.$remove(item);
 		},
 		addNew: function addNew() {
-			console.log('sending newThing:');
-			console.log(this.newThing);
-			this.$http.post('/api/things', this.newThing) //SEND
+			console.log('sending newItem:');
+			console.log(this.newItem);
+			this.$http.post('/api/items', this.newItem) //SEND
 			.then(function (response) {
 				//response
-				var storedThing = response.data;
-				this.patchParentChildren_order(storedThing);
+				this.newItem.body = '';
+				var storedItem = response.data;
+				console.log('starting dom update...');
+				var OlderSiblingIndex = this.nodeIndex;
+				var index = OlderSiblingIndex + 1;
+				allItems.addItem(storedItem, index);
+				this.$root.editing = storedItem.id;
+				console.log("#new-under-" + storedItem.id + ">textarea");
+				setTimeout(function () {
+					$("#new-under-" + storedItem.id + ">textarea").focus();
+				}, 10);
+				this.patchChildren_order(storedItem.parent_id);
 			});
 		},
-		patchParentChildren_order: function patchParentChildren_order(storedThing) {
-			console.log('starting patchParentChildren_order...');
-			var OlderSiblingIndex = this.nodeIndex;
-			var index = OlderSiblingIndex + 1;
-			var children_order = this.parentsChildren_order;
-			if (children_order) {
-				children_order.splice(index, 0, storedThing.id);
-			} else {
-				children_order = [storedThing.id];
-			}
+		patchChildren_order: function patchChildren_order(id) {
+			var childrenArray = allItems.nodes[id].children_order;
 			var c_o = '';
-			children_order.forEach(function (entry) {
+			childrenArray.forEach(function (entry) {
 				c_o = c_o + ',' + entry;
 			});
 			c_o = c_o.substring(1);
 			console.log(c_o);
-			this.$http.patch('/api/things/' + storedThing.parent_id, { children_order: c_o }, { method: 'PATCH' }).then(function (response) {
-				this.updateDOM(storedThing, index, children_order);
+			this.$http.patch('/api/items/' + id, { children_order: c_o }, { method: 'PATCH' }).then(function (response) {
+				console.log('patched children_order');
 			});
-		},
-		updateDOM: function updateDOM(storedThing, index, newChildren_order) {
-			this.newThing.body = '';
-			var parent = allThings.nodes[storedThing.parent_id];
-			parent.children.splice(index, 0, storedThing);
-			allThings.nodes[storedThing.id] = storedThing;
-			parent.children_order = newChildren_order;
-		},
-		indent: function indent() {
-			var id = selection.selectedId;
-			var new_parent_id = allThings.olderSiblingId(id);
-			if (new_parent_id == allThings.nodes[id].parent_id) {
-				console.log('bump! ceiling!');return;
-			}
-			console.log('new_parent_id / olderSiblingId: ' + new_parent_id);
-			allThings.giveNewParent(id, new_parent_id);
-		},
-		unindent: function unindent() {
-			var id = selection.selectedId;
-			var depth = allThings.nodes[id].depth;
-			var olderSiblingId = allThings.olderSiblingId(id);
-			var olderSiblingDepth = allThings.nodes[olderSiblingId].depth;
-
-			while (olderSiblingDepth != depth - 1) {
-				olderSiblingId = allThings.olderSiblingId(olderSiblingId);
-				olderSiblingDepth = allThings.nodes[olderSiblingId].depth;
-			}
-			var new_parent_id = olderSiblingId;
-			var new_parent_depth = olderSiblingDepth;
-			console.log('new_parent: ' + new_parent_id);
-
-			if (!new_parent_id) {
-				console.log('crash! floor!');return;
-			}
-			if (new_parent_depth == 0 && depth == 1) {
-				console.log('crash! floor!');return;
-			}
-			if (new_parent_id == allThings.nodes[id].parent_id) {
-				new_parent_id = allThings.nodes[new_parent_id].parent_id;
-			}
-			allThings.giveNewParent(id, new_parent_id);
 		}
 	},
 	events: {
-		arrowDown: function arrowDown() {
-			this.selectNext();
-		},
-		arrowUp: function arrowUp() {
-			this.selectPrevious();
-		},
-		spaceBar: function spaceBar() {
-			this.markDone();
-		},
-		tab: function tab() {
-			this.indent();
-		},
-		shift_tab: function shift_tab() {
-			this.unindent();
-		},
-		meta_arrowUp: function meta_arrowUp() {
-			this.move('up');
-		},
-		meta_arrowDown: function meta_arrowDown() {
-			this.move('down');
-		},
-		enter: function enter() {
+		startEdit: function startEdit() {
 			this.startEdit();
 		}
 	},
 	directives: {
-		'thing-focus': function thingFocus(value) {
+		'item-focus': function itemFocus(value) {
 			if (!value) {
 				return;
 			}
@@ -11126,15 +11140,15 @@ exports.default = {
 	}
 };
 if (module.exports.__esModule) module.exports = module.exports.default
-;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\n<div class=\"things-panel\">\n\t<div class=\"panel-title\" v-if=\"thing.depth == 0\">\n\t\t{{ thing.body }}\n\t</div>\n\t<div class=\"thing-card\" v-if=\"thing.lft != 1\" :class=\"{\n\t\t\tdone: thing.done,\n\t\t\tediting: thing == editedThing,\n\t\t\t}\">\n\t\t<input class=\"toggle\" type=\"checkbox\" v-model=\"thing.done\" @change=\"markDone(thing)\">\n\t\t<div class=\"body-div\" :class=\"{ selected: thing.id == this.$root.selection.selectedId, }\" @dblclick=\"startEdit(thing)\" @click=\"select(thing)\" @enter=\"console.log('yarrr')\">\n\t\t\t<span class=\"bodybox\" v-show=\"thing != editedThing\">{{ thing.id }} - {{ thing.body }}</span>\n\t\t\t<form action=\"update\" class=\"updatebox\" @submit.prevent=\"doneEdit(thing)\">\n\t\t\t\t<textarea name=\"thing_body\" rows=\"<!-- {{ thing.rows }} -->\" v-model=\"thing.body\" v-autosize=\"thing.body\" v-thing-focus=\"thing == editedThing\" @blur=\"doneEdit(thing)\" @keyup.esc=\"cancelEdit(thing)\">{{ thing.body }}</textarea>\n\t\t\t</form>\n\t\t\t<div class=\"thing-nav\">\n\t\t\t\t<button @click=\"deleteThing(thing)\">✗</button>\n\t\t\t</div>\n\t\t</div>\n\t</div>\n\t<form action=\"\" v-if=\"true\" @submit.prevent=\"\" id=\"new-under-{{thing.id}}\"><!-- Will hide this later, only show when clicking enter on task. -->\n\t\t<textarea type=\"text\" class=\"add-thing\" name=\"body\" v-model=\"newThing.body\" v-autosize=\"newThing.body\" placeholder=\"...\" autocomplete=\"off\" autofocus=\"\" rows=\"1\"></textarea>\n\t</form>\n\n\t<div class=\"children\" v-if=\"thing.children\">\n\t\t<panel v-for=\"childPanel in thing.children\" :thing=\"childPanel\"></panel>\n\t</div>\n</div>\n"
+;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\n<div class=\"items-card\">\n\t<div class=\"card-title\" v-if=\"item.depth == 0\">\n\t\t{{ item.body }} [{{ item.children_order }}]\n\t</div>\n\t<div class=\"item-card\" v-if=\"item.lft != 1\" :class=\"{\n\t\t\tdone: item.done,\n\t\t\tediting: item == editedItem,\n\t\t\t}\">\n\t\t<input class=\"toggle\" type=\"checkbox\" v-model=\"item.done\" @change=\"markDone(item)\">\n\t\t<div class=\"body-div\" :class=\"{ selected: item.id == this.$root.selection.selectedId, }\" @dblclick=\"startEdit(item)\" @click=\"select(\n\t\t\titem)\" @enter=\"console.log('yarrr')\">\n\t\t\t<span class=\"bodybox\" v-show=\"item != editedItem\">{{ item.id }} (d: {{ item.depth }})- {{ item.body }}: [{{ item.children_order }}]</span>\n\t\t\t<form action=\"update\" class=\"updatebox\" @submit.prevent=\"doneEdit(item)\">\n\t\t\t\t<textarea name=\"item_body\" rows=\"<!-- {{ item.rows }} -->\" v-model=\"item.body\" v-autosize=\"item.body\" v-item-focus=\"item == editedItem\" @blur=\"doneEdit(item)\" @keyup.esc=\"cancelEdit(item)\">{{ item.body }}</textarea>\n\t\t\t</form>\n\t\t\t<div class=\"item-nav\">\n\t\t\t\t<button @click=\"deleteItem(item)\">✗</button>\n\t\t\t</div>\n\t\t</div>\n\t</div>\n\t<form action=\"\" v-if=\"this.$root.editing == item.id\" @submit.prevent=\"\" id=\"new-under-{{item.id}}\"><!-- Will hide this later, only show when clicking enter on task. -->\n\t\t<textarea type=\"text\" class=\"add-item\" name=\"body\" v-model=\"newItem.body\" v-autosize=\"newItem.body\" placeholder=\"...\" autocomplete=\"off\" autofocus=\"\" rows=\"1\"></textarea>\n\t</form>\n\n\t<div class=\"children\" v-if=\"item.children\">\n\t\t<card v-for=\"childCard in item.children\" :item=\"childCard\"></card>\n\t</div>\n</div>\n"
 if (module.hot) {(function () {  module.hot.accept()
   var hotAPI = require("vue-hot-reload-api")
   hotAPI.install(require("vue"), true)
   if (!hotAPI.compatible) return
   if (!module.hot.data) {
-    hotAPI.createRecord("_v-4a2f74d3", module.exports)
+    hotAPI.createRecord("_v-15342891", module.exports)
   } else {
-    hotAPI.update("_v-4a2f74d3", module.exports, (typeof module.exports === "function" ? module.exports.options : module.exports).template)
+    hotAPI.update("_v-15342891", module.exports, (typeof module.exports === "function" ? module.exports.options : module.exports).template)
   }
 })()}
 },{"vue":5,"vue-hot-reload-api":4}],8:[function(require,module,exports){
@@ -11152,7 +11166,7 @@ var Selection = function () {
 	function Selection() {
 		_classCallCheck(this, Selection);
 
-		this.selectedThing = null;
+		this.selectedItem = null;
 		this.selectedPanel = null;
 		this.selectedId = null;
 		this.selectedLft = null;
@@ -11190,7 +11204,6 @@ var Tree = function () {
 		// properties
 		this.source = items;
 		this.nodes = {}; // →　"id" = { task obj };
-		// this.nodesArr	= []; // →　{ task obj }, ...;
 		this.orphans = [];
 		// process items
 		window.itemsProcessed = 0;
@@ -11217,12 +11230,11 @@ var Tree = function () {
 			}
 			// register node
 			this.nodes[node.id] = node;
-			// register nodesArr
-			// this.nodesArr.push(node);
+
+			//Sort all nodes after making sure you got all of them.
 			itemsProcessed++;
 			if (itemsProcessed === this.source.length) {
 				$.each(this.nodes, function (index, value) {
-					// console.log(this.sortChildren());
 					this.sortChildren(value);
 				}.bind(this));
 			}
@@ -11238,40 +11250,79 @@ var Tree = function () {
 			return this.nodes[id];
 		}
 	}, {
-		key: 'addThing',
-		value: function addThing(item) {}
+		key: 'addItem',
+		value: function addItem(item, index) {
+			var parent = allItems.nodes[item.parent_id];
+			if (!parent.children_order) {
+				parent.children_order = [];
+			}
+			parent.children.splice(index, 0, item);
+			parent.children_order.splice(index, 0, item.id);
+			allItems.nodes[item.id] = item;
+		}
 	}, {
 		key: 'nodeIndex',
 		value: function nodeIndex(id) {
-			var parent_id = allThings.nodes[id].parent_id;
+			var parent_id = allItems.nodes[id].parent_id;
 			if (!parent_id) {
 				return;
 			}
-			var siblingsArr = allThings.nodes[parent_id].children_order;
+			var siblingsArr = allItems.nodes[parent_id].children_order;
 			return siblingsArr.indexOf(id);
 		}
 	}, {
 		key: 'olderSiblingId',
 		value: function olderSiblingId(id) {
-			var parent_id = allThings.nodes[id].parent_id;
+			var parent_id = allItems.nodes[id].parent_id;
 			if (!parent_id) {
 				return;
 			}
-			var siblingsArr = allThings.nodes[parent_id].children_order;
-			if (siblingsArr.length <= 1 || allThings.nodeIndex(id) == 0) {
+			var siblingsArr = allItems.nodes[parent_id].children_order;
+			if (siblingsArr.length <= 1 || allItems.nodeIndex(id) == 0) {
 				return parent_id;
 			}
 			var nodeIndex = siblingsArr.indexOf(id);
-			return allThings.nodes[parent_id].children_order[nodeIndex - 1];
+			return allItems.nodes[parent_id].children_order[nodeIndex - 1];
+		}
+	}, {
+		key: 'nextItemId',
+		value: function nextItemId(id) {
+			// first check if item has children, if so select the first child.
+			if (allItems.nodes[id].children.length > 0) {
+				return allItems.nodes[id].children_order[0];
+			}
+			// if no children look at parent node's children order.
+			var parent_id = allItems.nodes[id].parent_id;
+			if (!parent_id) {
+				return;
+			}
+			var siblingsArr = allItems.nodes[parent_id].children_order;
+
+			if (allItems.nodeIndex(id) + 1 == siblingsArr.length) {
+				console.log('this was the last node');
+				return this.nextItemRecursion(id, parent_id);
+			}
+			var nodeIndex = siblingsArr.indexOf(id);
+			return allItems.nodes[parent_id].children_order[nodeIndex + 1];
+		}
+	}, {
+		key: 'nextItemRecursion',
+		value: function nextItemRecursion(id, parent_id) {
+			var nextIndex = allItems.nodeIndex(id) + 1;
+			if (nextIndex != allItems.nodes[parent_id].children_order.length) {
+				return allItems.nodes[parent_id].children_order[nextIndex];
+			} else {
+				return this.nextItemRecursion(parent_id, allItems.nodes[parent_id].parent_id);
+			}
 		}
 	}, {
 		key: 'sortChildren',
 		value: function sortChildren(item) {
 			var order = item.children_order;
-			var things = item.children;
+			var items = item.children;
 			if (order instanceof Array) {
 				item.children = order.map(function (id) {
-					return things.find(function (t) {
+					return items.find(function (t) {
 						return t.id === id;
 					});
 				});
@@ -11280,39 +11331,49 @@ var Tree = function () {
 	}, {
 		key: 'giveNewParent',
 		value: function giveNewParent(id, new_parent_id) {
-			var parent_id = allThings.nodes[id].parent_id;
-			var targetThing = allThings.nodes[id];
-			var newParent = allThings.nodes[new_parent_id];
+			var parent_id = allItems.nodes[id].parent_id;
+			var targetItem = allItems.nodes[id];
+			var newParent = allItems.nodes[new_parent_id];
 			console.log('newParent ↓ ');
 			console.log(newParent);
-			var prevParent = allThings.nodes[parent_id];
+			var prevParent = allItems.nodes[parent_id];
 			console.log('prevParent ↓ ');
 			console.log(prevParent);
 			var nodeIndex = this.nodeIndex(id);
-			prevParent.children.splice(nodeIndex, 1);
-			prevParent.children_order.splice(nodeIndex, 1);
-
-			targetThing.parent_id = new_parent_id;
-			targetThing.depth = newParent.depth + 1;
+			targetItem.parent_id = new_parent_id;
+			targetItem.depth = newParent.depth + 1;
 			if (!newParent.children_order) {
 				newParent.children_order = [];
 			}
 			if (prevParent.depth - 1 == newParent.depth) {
 				// when unindenting
 				var newIndex = this.nodeIndex(prevParent.id) + 1;
+				newParent.children.splice(newIndex, 0, targetItem);
 				newParent.children_order.splice(newIndex, 0, id);
-				newParent.children.splice(newIndex, 0, targetThing);
 			} else {
 				// when indenting
+				newParent.children.push(targetItem);
 				newParent.children_order.push(id);
-				newParent.children.push(targetThing);
 			}
-
-			// allThings.recalcChildren_order(prevParent);
-			// allThings.recalcChildren_order(newParent);
+			// Delete items attached to previous parent
+			prevParent.children.splice(nodeIndex, 1);
+			prevParent.children_order.splice(nodeIndex, 1);
+			// update children recursively
+			this.updateChildrenDepth(targetItem);
 		}
+	}, {
+		key: 'updateChildrenDepth',
+		value: function updateChildrenDepth(targetItem) {
+			targetItem.children.forEach(function (child) {
+				// console.log(child);
+				child.depth = allItems.nodes[child.parent_id].depth + 1;
+				this.updateChildrenDepth(child);
+				return true;
+			}.bind(this));
+		}
+
 		// recalcChildren_order(item){
-		// 	let theItem = allThings.nodes['1'];
+		// 	let theItem = allItems.nodes['1'];
 		// 	let result = theItem.children.map(function(a) {return a.id;});
 		// 	theItem.children_order = result;
 		// }

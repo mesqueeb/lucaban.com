@@ -1,29 +1,108 @@
-import Panel from './vue-components/Panel.vue';
+import Card from './vue-components/Card.vue';
 var VueAutosize = require('vue-autosize')
 Vue.use(VueAutosize)
 
 import Tree from './vue-components/dataTree.js';
-window.allThings = new Tree(fetchedData);
 import Selection from './vue-components/Selection.js';
-window.selection = new Selection();
+
+$.getJSON('/api/items',function(fetchedData){
+
+	//response
+
+	window.allItems = new Tree(fetchedData);
+	window.selection = new Selection();
+
+
+	
+
+
 
 new Vue({
 	el:'body',
 	data: {
-		import_data: allThings.root,
+		import_data: allItems.root,
 		selection: selection,
+		editing: { null },
 	},
-	components: { Panel },
+	components: { Card },
 	methods:{
-		addThing(){
-			let body = 'test';
-			let selId = selection.selectedId;
-            let older_sibling = allThings.nodes[selId];
-            let parent_id = older_sibling.parent_id;
-            let older_sibling_index = allThings.nodes[parent_id].children_order.indexOf(selId);
-            let thing = {id:10, parent_id:parent_id, body:body, older_sibling_index:older_sibling_index};
-            console.log(thing);
-            allThings.addThing(thing);
+		markDone(){
+			let item = allItems.nodes[selection.selectedId];
+			item.done = !item.done;
+			this.$http.patch('/api/items/' + item.id, {'done':item.done});
+		},
+		indent(){
+			let id = selection.selectedId;
+			let new_parent_id = allItems.olderSiblingId(id);
+			if(new_parent_id == allItems.nodes[id].parent_id){ console.log('bump! ceiling!'); return; }
+			console.log('new_parent_id / olderSiblingId: '+new_parent_id);
+			allItems.giveNewParent(id,new_parent_id);
+			// this.$broadcast('updateDepth');
+		},
+		unindent(){
+			let id = selection.selectedId;
+			let depth = allItems.nodes[id].depth;
+			let olderSiblingId = allItems.olderSiblingId(id);
+			let olderSiblingDepth = allItems.nodes[olderSiblingId].depth;
+
+			while(olderSiblingDepth != depth-1){
+				olderSiblingId = allItems.olderSiblingId(olderSiblingId);
+				olderSiblingDepth = allItems.nodes[olderSiblingId].depth;
+			}
+			let new_parent_id = olderSiblingId;
+			let new_parent_depth = olderSiblingDepth;
+			console.log('new_parent: '+new_parent_id);
+
+			if(!new_parent_id){ console.log('crash! floor!'); return; }
+			if(new_parent_depth == 0 && depth == 1){ console.log('crash! floor!'); return; }
+			if(new_parent_id == allItems.nodes[id].parent_id){
+				new_parent_id = allItems.nodes[new_parent_id].parent_id;
+			}
+			allItems.giveNewParent(id,new_parent_id);
+		},
+		select(direction){
+			let id = selection.selectedId;
+			let sel = '';
+			if(direction == 'next'){
+				sel = allItems.nextItemId(id)
+			} else if (direction == 'prev'){
+				sel = allItems.olderSiblingId(id)
+			}
+			selection.selectedId = sel;
+		},
+		showAddNewItem(){
+			this.editing = selection.selectedId;
+		},
+		keystroke(keystroke){
+			switch(keystroke) { 
+				case 'arrowUp':
+					this.select('prev');
+					break;
+				case 'arrowDown':
+					this.select('next');
+					break;
+				case 'meta_arrowUp':
+					this.meta_arrowUp();
+					break;
+				case 'meta_arrowDown':
+					this.meta_arrowDown();
+					break;
+				case 'spaceBar':
+					this.markDone();
+					break;
+				case 'shift_tab':
+					this.unindent();
+					break;
+				case 'tab':
+					this.indent();
+					break;
+				case 'enter':
+					this.showAddNewItem();
+					break;
+				case 'meta_enter':
+					this.$broadcast('startEdit');
+					break;
+			}
 		},
 	},
 	created(){
@@ -39,45 +118,47 @@ new Vue({
 			case 38: // arrowUp
 				e.preventDefault();
 				if (event.ctrlKey || event.metaKey){
-		  			console.log('meta_arrowUp');
-		  			vm.$broadcast('meta_arrowUp');
+		  			vm.keystroke('meta_arrowUp');
 		  			break;
 		  		}
-				vm.$broadcast('arrowUp');
+				vm.keystroke('arrowUp');
 				break;
 			case 40: // arrowDown
 				e.preventDefault();
 				if (event.ctrlKey || event.metaKey){
-					console.log('meta_arrowDown');
-		  			vm.$broadcast('meta_arrowDown');
+		  			vm.keystroke('meta_arrowDown');
 		  			break;
 		  		}
-				vm.$broadcast('arrowDown');
+				vm.keystroke('arrowDown');
 				break;
 			case 32: // spaceBar
 				e.preventDefault();
-				vm.$broadcast('spaceBar');
+				vm.keystroke('spaceBar');
 				break;
 			case 9: // tab
 				e.preventDefault();
 				if (e.shiftKey){
-		  			vm.$broadcast('shift_tab');
+		  			vm.keystroke('shift_tab');
 		  			break;
 		  		}
-				vm.$broadcast('tab');
+				vm.keystroke('tab');
 				break;
 			case 13: // enter
 				e.preventDefault();
-				vm.$broadcast('enter');
+				if (event.ctrlKey || event.metaKey){
+		  			vm.keystroke('meta_enter');
+		  			break;
+		  		}
+				vm.keystroke('enter');
 				break;
 			case 'xexx':
-				vm.$broadcast('unindent');
+				vm.keystroke('unindent');
 				break;
 			case 'xexx':
-				vm.$broadcast('unindent');
+				vm.keystroke('unindent');
 				break;
 			case 'xexx':
-				vm.$broadcast('unindent');
+				vm.keystroke('unindent');
 				break;
           } // end switch
     	} // END INPUT AREAS NOT IN FOCUS
@@ -91,3 +172,6 @@ new Vue({
     },
 });
 
+
+
+}); // end ajax

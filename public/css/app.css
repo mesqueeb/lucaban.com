@@ -1,3 +1,6 @@
+*, *:before, *:after {
+  box-sizing: border-box; }
+
 body {
   font-family: 'Calibri', 'Lato';
   line-height: 1.4em;
@@ -11,7 +14,7 @@ body {
 form {
   margin-bottom: 0; }
 
-input {
+input, textarea {
   outline: none;
   border-style: none; }
 
@@ -25,32 +28,35 @@ input {
 .alert-error {
   background: salmon; }
 
-.panel {
+.card {
   margin: 0.5em; }
 
-.panel-title {
+.card-title {
   text-align: center; }
 
-.thing-nav {
+.item-nav {
   margin-left: auto; }
 
-.thing-nav > button {
+.item-nav > button {
   background: none;
   border: none;
   font-size: 1.6em;
   color: rgba(231, 76, 60, 0.3); }
 
-.panel-body > .things-panel > .children .children {
+.panel-body {
+  background: white; }
+
+.panel-body > .items-card > .children .children {
   margin-left: 2em; }
 
-.thing-card {
+.item-card {
   margin: 0 0 0 0;
   display: -ms-flexbox;
   display: flex;
   -ms-flex-align: center;
   align-items: center; }
 
-.thing-card > div {
+.item-card > div {
   border-bottom: 1px solid #ededed;
   width: 100%; }
 
@@ -63,10 +69,11 @@ input {
 .child {
   margin-left: 1.5em; }
 
-input#add-thing {
+.add-item {
   padding: 0.5em;
   width: 100%;
-  border-bottom: dashed 1px #ededed; }
+  border-bottom: dashed 1px #ededed;
+  resize: none; }
 
 .updatebox input,
 .updatebox textarea {

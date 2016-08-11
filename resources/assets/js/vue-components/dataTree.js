@@ -3,7 +3,6 @@ export default class Tree {
 		// properties
 		this.source		= items;
 		this.nodes 		= {}; // →　"id" = { task obj };
-		// this.nodesArr	= []; // →　{ task obj }, ...;
 		this.orphans	= [];
 		// process items
 		window.itemsProcessed = 0;
@@ -24,12 +23,11 @@ export default class Tree {
 		else { this.orphans.push(node); }
 		// register node
 		this.nodes[node.id] = node;
-		// register nodesArr
-		// this.nodesArr.push(node);
+
+		//Sort all nodes after making sure you got all of them.
 		itemsProcessed++;
 	    if(itemsProcessed === this.source.length) {
 	    	$.each(this.nodes, function(index, value) {
-			    // console.log(this.sortChildren());
 			    this.sortChildren(value);
 			}.bind(this));
 	    }
@@ -42,69 +40,113 @@ export default class Tree {
 	{
 		return this.nodes[id];
 	}
-	addThing(item)
+	addItem(item, index)
 	{
-
+		let parent = allItems.nodes[item.parent_id];
+		if (!parent.children_order){
+			parent.children_order = [];
+		}
+		parent.children.splice(index, 0, item);
+		parent.children_order.splice(index, 0, item.id);
+	    allItems.nodes[item.id] = item;
 	}
-	nodeIndex(id){
-		let parent_id = allThings.nodes[id].parent_id;
+	nodeIndex(id)
+	{
+		let parent_id = allItems.nodes[id].parent_id;
 		if(!parent_id){ return; }
-		let siblingsArr = allThings.nodes[parent_id].children_order;
+		let siblingsArr = allItems.nodes[parent_id].children_order;
 		return siblingsArr.indexOf(id);
 	}
-	olderSiblingId(id){
-		let parent_id = allThings.nodes[id].parent_id;
+	olderSiblingId(id)
+	{
+		let parent_id = allItems.nodes[id].parent_id;
 		if(!parent_id){ return; }
-		let siblingsArr = allThings.nodes[parent_id].children_order;
-		if(siblingsArr.length <= 1 || allThings.nodeIndex(id) == 0){
+		let siblingsArr = allItems.nodes[parent_id].children_order;
+		if(siblingsArr.length <= 1 || allItems.nodeIndex(id) == 0){
 			return parent_id;
 		}
 		let nodeIndex = siblingsArr.indexOf(id);
-		return allThings.nodes[parent_id].children_order[nodeIndex-1];
+		return allItems.nodes[parent_id].children_order[nodeIndex-1];
+	}
+	nextItemId(id)
+	{
+		// first check if item has children, if so select the first child.
+		if (allItems.nodes[id].children.length > 0){
+			return allItems.nodes[id].children_order[0];
+		}
+		// if no children look at parent node's children order.
+		let parent_id = allItems.nodes[id].parent_id;
+		if(!parent_id){ return; }
+		let siblingsArr = allItems.nodes[parent_id].children_order;
+
+		if(allItems.nodeIndex(id)+1 == siblingsArr.length){
+			console.log('this was the last node');
+			return this.nextItemRecursion(id,parent_id);
+		}
+		let nodeIndex = siblingsArr.indexOf(id);
+		return allItems.nodes[parent_id].children_order[nodeIndex+1];
+	}
+	nextItemRecursion(id,parent_id){
+		var nextIndex = allItems.nodeIndex(id)+1;
+		if(nextIndex != allItems.nodes[parent_id].children_order.length){
+			return allItems.nodes[parent_id].children_order[nextIndex];
+		}
+		else {
+			return this.nextItemRecursion(parent_id,allItems.nodes[parent_id].parent_id);
+		}
 	}
 	sortChildren(item)
 	{
 		let order = item.children_order;
-		let things = item.children;
+		let items = item.children;
 		if (order instanceof Array){
-			item.children = order.map(id => things.find(t => t.id === id));
+			item.children = order.map(id => items.find(t => t.id === id));
 		}
 	}
 	giveNewParent(id, new_parent_id)
 	{
-		let parent_id = allThings.nodes[id].parent_id;
-		let targetThing = allThings.nodes[id];
-		let newParent = allThings.nodes[new_parent_id];
-		console.log('newParent ↓ ');
-		console.log(newParent);
-		let prevParent = allThings.nodes[parent_id];
-		console.log('prevParent ↓ ');
-		console.log(prevParent);
+		let parent_id = allItems.nodes[id].parent_id;
+		let targetItem = allItems.nodes[id];
+		let newParent = allItems.nodes[new_parent_id];
+			console.log('newParent ↓ ');
+			console.log(newParent);
+		let prevParent = allItems.nodes[parent_id];
+			console.log('prevParent ↓ ');
+			console.log(prevParent);
 		let nodeIndex = this.nodeIndex(id);
-		prevParent.children.splice(nodeIndex,1);
-		prevParent.children_order.splice(nodeIndex,1);
-		
-		targetThing.parent_id = new_parent_id;
-		targetThing.depth = newParent.depth+1;
+		targetItem.parent_id = new_parent_id;
+		targetItem.depth = newParent.depth+1;
 		if (!newParent.children_order){
 			newParent.children_order = [];
 		}
 		if(prevParent.depth-1 == newParent.depth){
 			// when unindenting
 			let newIndex = this.nodeIndex(prevParent.id)+1;
+			newParent.children.splice(newIndex,0,targetItem);
 			newParent.children_order.splice(newIndex,0,id);
-			newParent.children.splice(newIndex,0,targetThing);
 		}else{
 			// when indenting
+			newParent.children.push(targetItem);
 			newParent.children_order.push(id)
-			newParent.children.push(targetThing);
 		}
-
-		// allThings.recalcChildren_order(prevParent);
-		// allThings.recalcChildren_order(newParent);
+		// Delete items attached to previous parent
+		prevParent.children.splice(nodeIndex,1);
+		prevParent.children_order.splice(nodeIndex,1);
+		// update children recursively
+		this.updateChildrenDepth(targetItem);
 	}
+	updateChildrenDepth(targetItem)
+	{
+		targetItem.children.forEach(function(child){
+			// console.log(child);
+			child.depth = allItems.nodes[child.parent_id].depth+1;
+			this.updateChildrenDepth(child);
+			return true;
+		}.bind(this))
+	}
+
 	// recalcChildren_order(item){
-	// 	let theItem = allThings.nodes['1'];
+	// 	let theItem = allItems.nodes['1'];
 	// 	let result = theItem.children.map(function(a) {return a.id;});
 	// 	theItem.children_order = result;
 	// }
