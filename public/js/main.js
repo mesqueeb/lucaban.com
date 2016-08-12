@@ -10819,12 +10819,12 @@ $.getJSON('/api/items', function (fetchedData) {
 	window.allItems = new _dataTree2.default(fetchedData);
 	window.selection = new _Selection2.default();
 
-	new Vue({
+	window.vm = new Vue({
 		el: 'body',
 		data: {
 			import_data: allItems.root,
 			selection: selection,
-			editing: { null: null }
+			addingNewUnder: null
 		},
 		components: { Card: _Card2.default },
 		methods: {
@@ -10878,8 +10878,32 @@ $.getJSON('/api/items', function (fetchedData) {
 				}
 				selection.selectedId = sel;
 			},
-			showAddNewItem: function showAddNewItem() {
-				this.editing = selection.selectedId;
+			showAddNewItem: function showAddNewItem(id) {
+				id = id ? id : selection.selectedId;
+				console.log('showAddNewItem for ' + id);
+				this.addingNewUnder = id;
+				setTimeout(function () {
+					$("#new-under-" + id + ">textarea").focus();
+				}, 10);
+			},
+			patchChildren_order: function patchChildren_order(id, newItem) {
+				var childrenArray = allItems.nodes[id].children_order;
+				var c_o = '';
+				childrenArray.forEach(function (entry) {
+					c_o = c_o + ',' + entry;
+				});
+				c_o = c_o.substring(1);
+				console.log("sending new Parent's child_order: " + c_o);
+
+				// When patching the parent's child_order,
+				// this.$root.addingNewUnder get's set to 'null' without any reason...
+				// That's why I patch it like so:
+
+
+				this.$http.patch('/api/items/' + id, { children_order: c_o }, { method: 'PATCH' }).then(function (response) {
+					console.log('patched children_order');
+					this.showAddNewItem(newItem);
+				});
 			},
 			keystroke: function keystroke(_keystroke) {
 				switch (_keystroke) {
@@ -11030,8 +11054,8 @@ exports.default = {
 		};
 	},
 	computed: {
-		nodeIndex: function nodeIndex() {
-			return allItems.nodeIndex(this.item.id);
+		siblingIndex: function siblingIndex() {
+			return allItems.siblingIndex(this.item.id);
 		},
 		olderSiblingId: function olderSiblingId() {
 			return allItems.olderSiblingId(this.item.id);
@@ -11092,28 +11116,15 @@ exports.default = {
 				this.newItem.body = '';
 				var storedItem = response.data;
 				console.log('starting dom update...');
-				var OlderSiblingIndex = this.nodeIndex;
+				var OlderSiblingIndex = this.siblingIndex;
 				var index = OlderSiblingIndex + 1;
 				allItems.addItem(storedItem, index);
-				this.$root.editing = storedItem.id;
-				console.log("#new-under-" + storedItem.id + ">textarea");
-				setTimeout(function () {
-					$("#new-under-" + storedItem.id + ">textarea").focus();
-				}, 10);
-				this.patchChildren_order(storedItem.parent_id);
 			});
 		},
-		patchChildren_order: function patchChildren_order(id) {
-			var childrenArray = allItems.nodes[id].children_order;
-			var c_o = '';
-			childrenArray.forEach(function (entry) {
-				c_o = c_o + ',' + entry;
-			});
-			c_o = c_o.substring(1);
-			console.log(c_o);
-			this.$http.patch('/api/items/' + id, { children_order: c_o }, { method: 'PATCH' }).then(function (response) {
-				console.log('patched children_order');
-			});
+		cancelAddNew: function cancelAddNew() {
+			this.newItem.body = '';
+			this.$root.addingNewUnder = '';
+			$(':focus').blur();
 		}
 	},
 	events: {
@@ -11140,7 +11151,7 @@ exports.default = {
 	}
 };
 if (module.exports.__esModule) module.exports = module.exports.default
-;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\n<div class=\"items-card\">\n\t<div class=\"card-title\" v-if=\"item.depth == 0\">\n\t\t{{ item.body }} [{{ item.children_order }}]\n\t</div>\n\t<div class=\"item-card\" v-if=\"item.lft != 1\" :class=\"{\n\t\t\tdone: item.done,\n\t\t\tediting: item == editedItem,\n\t\t\t}\">\n\t\t<input class=\"toggle\" type=\"checkbox\" v-model=\"item.done\" @change=\"markDone(item)\">\n\t\t<div class=\"body-div\" :class=\"{ selected: item.id == this.$root.selection.selectedId, }\" @dblclick=\"startEdit(item)\" @click=\"select(\n\t\t\titem)\" @enter=\"console.log('yarrr')\">\n\t\t\t<span class=\"bodybox\" v-show=\"item != editedItem\">{{ item.id }} (d: {{ item.depth }})- {{ item.body }}: [{{ item.children_order }}]</span>\n\t\t\t<form action=\"update\" class=\"updatebox\" @submit.prevent=\"doneEdit(item)\">\n\t\t\t\t<textarea name=\"item_body\" rows=\"<!-- {{ item.rows }} -->\" v-model=\"item.body\" v-autosize=\"item.body\" v-item-focus=\"item == editedItem\" @blur=\"doneEdit(item)\" @keyup.esc=\"cancelEdit(item)\">{{ item.body }}</textarea>\n\t\t\t</form>\n\t\t\t<div class=\"item-nav\">\n\t\t\t\t<button @click=\"deleteItem(item)\">✗</button>\n\t\t\t</div>\n\t\t</div>\n\t</div>\n\t<form action=\"\" v-if=\"this.$root.editing == item.id\" @submit.prevent=\"\" id=\"new-under-{{item.id}}\"><!-- Will hide this later, only show when clicking enter on task. -->\n\t\t<textarea type=\"text\" class=\"add-item\" name=\"body\" v-model=\"newItem.body\" v-autosize=\"newItem.body\" placeholder=\"...\" autocomplete=\"off\" autofocus=\"\" rows=\"1\"></textarea>\n\t</form>\n\n\t<div class=\"children\" v-if=\"item.children\">\n\t\t<card v-for=\"childCard in item.children\" :item=\"childCard\"></card>\n\t</div>\n</div>\n"
+;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\n<div class=\"items-card\">\n\t<div class=\"card-title\" v-if=\"item.depth == 0\">\n\t\t{{ item.body }} [{{ item.children_order }}]\n\t</div>\n\t<div class=\"item-card\" v-if=\"item.lft != 1\" :class=\"{\n\t\t\tdone: item.done,\n\t\t\tediting: item == editedItem,\n\t\t\t}\">\n\t\t<input class=\"toggle\" type=\"checkbox\" v-model=\"item.done\" @change=\"markDone(item)\">\n\t\t<div class=\"body-div\" :class=\"{ selected: item.id == this.$root.selection.selectedId, }\" @dblclick=\"startEdit(item)\" @click=\"select(\n\t\t\titem)\" @enter=\"console.log('yarrr')\">\n\t\t\t<span class=\"bodybox\" v-show=\"item != editedItem\">{{ item.id }} (d: {{ item.depth }})- {{ item.body }}: [{{ item.children_order }}]</span>\n\t\t\t<form action=\"update\" class=\"updatebox\" @submit.prevent=\"doneEdit(item)\">\n\t\t\t\t<textarea name=\"item_body\" rows=\"<!-- {{ item.rows }} -->\" v-model=\"item.body\" v-autosize=\"item.body\" v-item-focus=\"item == editedItem\" @blur=\"doneEdit(item)\" @keyup.esc=\"cancelEdit(item)\">{{ item.body }}</textarea>\n\t\t\t</form>\n\t\t\t<div class=\"item-nav\">\n\t\t\t\t<button @click=\"deleteItem(item)\">✗</button>\n\t\t\t</div>\n\t\t</div>\n\t</div>\n\t<form action=\"\" v-if=\"this.$root.addingNewUnder == item.id\" @submit.prevent=\"\" id=\"new-under-{{item.id}}\"><!-- Will hide this later, only show when clicking enter on task. -->\n\t\t<textarea type=\"text\" class=\"add-item\" name=\"body\" v-model=\"newItem.body\" v-autosize=\"newItem.body\" @blur=\"cancelAddNew()\" @keyup.esc=\"cancelAddNew()\" placeholder=\"...\" autocomplete=\"off\" autofocus=\"\" rows=\"1\"></textarea>\n\t</form>\n\n\t<div class=\"children\" v-if=\"item.children\">\n\t\t<card v-for=\"childCard in item.children\" :item=\"childCard\"></card>\n\t</div>\n</div>\n"
 if (module.hot) {(function () {  module.hot.accept()
   var hotAPI = require("vue-hot-reload-api")
   hotAPI.install(require("vue"), true)
@@ -11259,10 +11270,12 @@ var Tree = function () {
 			parent.children.splice(index, 0, item);
 			parent.children_order.splice(index, 0, item.id);
 			allItems.nodes[item.id] = item;
+			vm.patchChildren_order(item.parent_id, item.id);
+			// vm.showAddNewItem(item.id);
 		}
 	}, {
-		key: 'nodeIndex',
-		value: function nodeIndex(id) {
+		key: 'siblingIndex',
+		value: function siblingIndex(id) {
 			var parent_id = allItems.nodes[id].parent_id;
 			if (!parent_id) {
 				return;
@@ -11278,11 +11291,11 @@ var Tree = function () {
 				return;
 			}
 			var siblingsArr = allItems.nodes[parent_id].children_order;
-			if (siblingsArr.length <= 1 || allItems.nodeIndex(id) == 0) {
+			if (siblingsArr.length <= 1 || allItems.siblingIndex(id) == 0) {
 				return parent_id;
 			}
-			var nodeIndex = siblingsArr.indexOf(id);
-			return allItems.nodes[parent_id].children_order[nodeIndex - 1];
+			var siblingIndex = siblingsArr.indexOf(id);
+			return allItems.nodes[parent_id].children_order[siblingIndex - 1];
 		}
 	}, {
 		key: 'nextItemId',
@@ -11298,17 +11311,17 @@ var Tree = function () {
 			}
 			var siblingsArr = allItems.nodes[parent_id].children_order;
 
-			if (allItems.nodeIndex(id) + 1 == siblingsArr.length) {
+			if (allItems.siblingIndex(id) + 1 == siblingsArr.length) {
 				console.log('this was the last node');
 				return this.nextItemRecursion(id, parent_id);
 			}
-			var nodeIndex = siblingsArr.indexOf(id);
-			return allItems.nodes[parent_id].children_order[nodeIndex + 1];
+			var siblingIndex = siblingsArr.indexOf(id);
+			return allItems.nodes[parent_id].children_order[siblingIndex + 1];
 		}
 	}, {
 		key: 'nextItemRecursion',
 		value: function nextItemRecursion(id, parent_id) {
-			var nextIndex = allItems.nodeIndex(id) + 1;
+			var nextIndex = allItems.siblingIndex(id) + 1;
 			if (nextIndex != allItems.nodes[parent_id].children_order.length) {
 				return allItems.nodes[parent_id].children_order[nextIndex];
 			} else {
@@ -11339,7 +11352,7 @@ var Tree = function () {
 			var prevParent = allItems.nodes[parent_id];
 			console.log('prevParent ↓ ');
 			console.log(prevParent);
-			var nodeIndex = this.nodeIndex(id);
+			var siblingIndex = this.siblingIndex(id);
 			targetItem.parent_id = new_parent_id;
 			targetItem.depth = newParent.depth + 1;
 			if (!newParent.children_order) {
@@ -11347,7 +11360,7 @@ var Tree = function () {
 			}
 			if (prevParent.depth - 1 == newParent.depth) {
 				// when unindenting
-				var newIndex = this.nodeIndex(prevParent.id) + 1;
+				var newIndex = this.siblingIndex(prevParent.id) + 1;
 				newParent.children.splice(newIndex, 0, targetItem);
 				newParent.children_order.splice(newIndex, 0, id);
 			} else {
@@ -11356,8 +11369,8 @@ var Tree = function () {
 				newParent.children_order.push(id);
 			}
 			// Delete items attached to previous parent
-			prevParent.children.splice(nodeIndex, 1);
-			prevParent.children_order.splice(nodeIndex, 1);
+			prevParent.children.splice(siblingIndex, 1);
+			prevParent.children_order.splice(siblingIndex, 1);
 			// update children recursively
 			this.updateChildrenDepth(targetItem);
 		}

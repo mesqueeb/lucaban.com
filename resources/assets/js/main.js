@@ -13,19 +13,16 @@ $.getJSON('/api/items',function(fetchedData){
 	window.selection = new Selection();
 
 
-	
-
-
-
-new Vue({
+window.vm = new Vue({
 	el:'body',
 	data: {
 		import_data: allItems.root,
 		selection: selection,
-		editing: { null },
+		addingNewUnder: null,
 	},
 	components: { Card },
 	methods:{
+
 		markDone(){
 			let item = allItems.nodes[selection.selectedId];
 			item.done = !item.done;
@@ -70,8 +67,31 @@ new Vue({
 			}
 			selection.selectedId = sel;
 		},
-		showAddNewItem(){
-			this.editing = selection.selectedId;
+		showAddNewItem(id){
+			id = (id) ? id : selection.selectedId;
+			console.log('showAddNewItem for '+id);
+			this.addingNewUnder = id;
+			setTimeout(function(){$("#new-under-"+id+">textarea").focus();},10);
+		},
+		patchChildren_order(id, newItem){
+			let childrenArray = allItems.nodes[id].children_order;
+			let c_o = '';
+			childrenArray.forEach(function(entry) {
+			    c_o = c_o+','+entry;
+			});
+			c_o = c_o.substring(1);
+			console.log("sending new Parent's child_order: "+c_o);
+
+			// When patching the parent's child_order,
+			// this.$root.addingNewUnder get's set to 'null' without any reason...
+			// That's why I patch it like so:
+			
+
+			this.$http.patch('/api/items/' + id, { children_order: c_o }, { method: 'PATCH'})
+			.then(function(response){
+				console.log('patched children_order');
+				this.showAddNewItem(newItem);
+			});
 		},
 		keystroke(keystroke){
 			switch(keystroke) { 

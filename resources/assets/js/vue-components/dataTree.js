@@ -49,8 +49,10 @@ export default class Tree {
 		parent.children.splice(index, 0, item);
 		parent.children_order.splice(index, 0, item.id);
 	    allItems.nodes[item.id] = item;
+	    vm.patchChildren_order(item.parent_id, item.id);
+	    // vm.showAddNewItem(item.id);
 	}
-	nodeIndex(id)
+	siblingIndex(id)
 	{
 		let parent_id = allItems.nodes[id].parent_id;
 		if(!parent_id){ return; }
@@ -62,11 +64,11 @@ export default class Tree {
 		let parent_id = allItems.nodes[id].parent_id;
 		if(!parent_id){ return; }
 		let siblingsArr = allItems.nodes[parent_id].children_order;
-		if(siblingsArr.length <= 1 || allItems.nodeIndex(id) == 0){
+		if(siblingsArr.length <= 1 || allItems.siblingIndex(id) == 0){
 			return parent_id;
 		}
-		let nodeIndex = siblingsArr.indexOf(id);
-		return allItems.nodes[parent_id].children_order[nodeIndex-1];
+		let siblingIndex = siblingsArr.indexOf(id);
+		return allItems.nodes[parent_id].children_order[siblingIndex-1];
 	}
 	nextItemId(id)
 	{
@@ -79,15 +81,15 @@ export default class Tree {
 		if(!parent_id){ return; }
 		let siblingsArr = allItems.nodes[parent_id].children_order;
 
-		if(allItems.nodeIndex(id)+1 == siblingsArr.length){
+		if(allItems.siblingIndex(id)+1 == siblingsArr.length){
 			console.log('this was the last node');
 			return this.nextItemRecursion(id,parent_id);
 		}
-		let nodeIndex = siblingsArr.indexOf(id);
-		return allItems.nodes[parent_id].children_order[nodeIndex+1];
+		let siblingIndex = siblingsArr.indexOf(id);
+		return allItems.nodes[parent_id].children_order[siblingIndex+1];
 	}
 	nextItemRecursion(id,parent_id){
-		var nextIndex = allItems.nodeIndex(id)+1;
+		var nextIndex = allItems.siblingIndex(id)+1;
 		if(nextIndex != allItems.nodes[parent_id].children_order.length){
 			return allItems.nodes[parent_id].children_order[nextIndex];
 		}
@@ -113,7 +115,7 @@ export default class Tree {
 		let prevParent = allItems.nodes[parent_id];
 			console.log('prevParent ↓ ');
 			console.log(prevParent);
-		let nodeIndex = this.nodeIndex(id);
+		let siblingIndex = this.siblingIndex(id);
 		targetItem.parent_id = new_parent_id;
 		targetItem.depth = newParent.depth+1;
 		if (!newParent.children_order){
@@ -121,7 +123,7 @@ export default class Tree {
 		}
 		if(prevParent.depth-1 == newParent.depth){
 			// when unindenting
-			let newIndex = this.nodeIndex(prevParent.id)+1;
+			let newIndex = this.siblingIndex(prevParent.id)+1;
 			newParent.children.splice(newIndex,0,targetItem);
 			newParent.children_order.splice(newIndex,0,id);
 		}else{
@@ -130,8 +132,8 @@ export default class Tree {
 			newParent.children_order.push(id)
 		}
 		// Delete items attached to previous parent
-		prevParent.children.splice(nodeIndex,1);
-		prevParent.children_order.splice(nodeIndex,1);
+		prevParent.children.splice(siblingIndex,1);
+		prevParent.children_order.splice(siblingIndex,1);
 		// update children recursively
 		this.updateChildrenDepth(targetItem);
 	}

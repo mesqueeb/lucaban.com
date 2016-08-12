@@ -50,7 +50,7 @@
 			</div>
 		</div>
 		<form action=""
-			v-if="this.$root.editing == item.id"
+			v-if="this.$root.addingNewUnder == item.id"
 			@submit.prevent
 			id="new-under-{{item.id}}"
 		><!-- Will hide this later, only show when clicking enter on task. -->
@@ -59,6 +59,8 @@
 				name="body"
 				v-model="newItem.body"
 				v-autosize="newItem.body"
+				@blur="cancelAddNew()"
+				@keyup.esc="cancelAddNew()"
 				placeholder="..."
 				autocomplete="off"
 				autofocus 
@@ -115,7 +117,7 @@ export default {
 		};
 	},
 	computed: {
-		nodeIndex(){ return allItems.nodeIndex(this.item.id); },
+		siblingIndex(){ return allItems.siblingIndex(this.item.id); },
 		olderSiblingId(){ return allItems.olderSiblingId(this.item.id); },
 		parentsChildren_order(){
 			let pId = this.item.parent_id;
@@ -172,27 +174,15 @@ export default {
 				this.newItem.body = '';
 				let storedItem = response.data;
 				console.log('starting dom update...');
-				let OlderSiblingIndex = this.nodeIndex;
+				let OlderSiblingIndex = this.siblingIndex;
 				let index = OlderSiblingIndex+1;
 				allItems.addItem(storedItem, index);
-				this.$root.editing = storedItem.id;
-				console.log("#new-under-"+storedItem.id+">textarea");
-				setTimeout(function(){$("#new-under-"+storedItem.id+">textarea").focus();},10);
-				this.patchChildren_order(storedItem.parent_id);
 			});
 		},
-		patchChildren_order(id){
-			let childrenArray = allItems.nodes[id].children_order;
-			let c_o = '';
-			childrenArray.forEach(function(entry) {
-			    c_o = c_o+','+entry;
-			});
-			c_o = c_o.substring(1);
-			console.log(c_o);
-			this.$http.patch('/api/items/' + id, { children_order: c_o }, { method: 'PATCH'})
-			.then(function(response){
-				console.log('patched children_order');
-			});
+		cancelAddNew(){
+			this.newItem.body = '';
+			this.$root.addingNewUnder = '';
+			$(':focus').blur();
 		},
 	},
 	events: {
