@@ -1,18 +1,17 @@
 <template id="items-card-template">
-	<div class="items-card"
-	>
+	<div class="items-card">
 		<div class="card-title"
 			v-if="item.depth == 0"
 		>
-			{{ item.body }} [{{ item.children_order }}]
+			{{ item.body }}
 		</div>
 		<div 
 			class="item-card"
-			v-if="item.lft != 1"
+			v-if="item.depth != 0"
 			:class="{
 				done: item.done,
 				editing: item == editedItem,
-				}"
+			}"
 		>
 			<input class="toggle"
 				type="checkbox"
@@ -22,13 +21,13 @@
 			<div class="body-div"
 				:class="{ selected: item.id == this.$root.selection.selectedId, }"
 				@dblclick="startEdit(item)"
-				@click="select(
-				item)"
+				@click="select(item)"
 				@enter="console.log('yarrr')"
 			>
 				<span class="bodybox"
 					v-show="item != editedItem"
-				>{{ item.id }} (d: {{ item.depth }})- {{ item.body }}: [{{ item.children_order }}]</span>
+				>{{ item.body }}</span>
+				<span v-show="true"> ({{item.id}}) D-{{item.depth}}) [{{item.children_order}}]</span>
 				<form action="update"
 					class="updatebox"
 					@submit.prevent="doneEdit(item)"
@@ -50,7 +49,7 @@
 			</div>
 		</div>
 		<form action=""
-			v-if="this.$root.addingNewUnder == item.id"
+			v-if="addneww"
 			@submit.prevent
 			id="new-under-{{item.id}}"
 		><!-- Will hide this later, only show when clicking enter on task. -->
@@ -110,9 +109,9 @@ export default {
 			editedItem: null,
 			newItem: {
 				body: '',
-				parent_id: (this.item.parent_id) ? this.item.parent_id : 1 ,
-				older_sibling_id: this.item.id,
+				parent_id: (this.item.parent_id) ? this.item.parent_id : 1,
 				depth: (this.item.depth == 0) ? 1 : this.item.depth,
+				older_sibling_id: this.item.id,
 			},
 		};
 	},
@@ -124,13 +123,13 @@ export default {
 			if(this.item.depth == 0){ return allItems.nodes[this.item.id].children_order; }
 			return allItems.nodes[pId].children_order;
 		},
+		addneww(){
+			if(this.$root.addingNewUnder == this.item.id || this.item.depth == 0){ return true; } else { return null; }
+		},
 	},
 	methods: {
 		select(item){
 			selection.selectedId = item.id;
-		},
-		move(direction){
-
 		},
 		markDone(item){
 			this.$http.patch('/api/items/' + item.id, {'done':item.done});

@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Http\Requests;
-use App\Thing;
+use App\Item;
 use DB;
 use Illuminate\Http\Response;
 
@@ -19,11 +19,11 @@ class CardController extends Controller
      */
     public function index()
     {
-        $god = Thing::where('parent_id', null)->first();
+        $god = Item::where('parent_id', null)->first();
         if(!$god){
-            return Thing::create(['body' => 'ALL', 'id' => '1']);
+            return Item::create(['body' => 'ALL', 'id' => '1', 'depth' => '0']);
         }
-        return Thing::get();
+        return Item::orderBy('depth', 'asc')->get();
     }
 
     /**
@@ -44,7 +44,7 @@ class CardController extends Controller
      */
     public function store(Request $request)
     {
-        return Thing::create($request->all());
+        return Item::create($request->all());
         // TODO:      moveToRightOf($otherNode)!!!
     }
 
@@ -56,7 +56,7 @@ class CardController extends Controller
      */
     public function show($id)
     {
-        return Thing::findOrFail($id);
+        return Item::findOrFail($id);
     }
 
     /**
@@ -79,30 +79,30 @@ class CardController extends Controller
      */
     public function update(Request $request, $id)
     {
-        Thing::findOrFail($id)->update(request()->all());
+        Item::findOrFail($id)->update(request()->all());
         return response()->json($request->all());
     }
 
     public function makeChildOf(Request $request, $id)
     {
-        $thing = Thing::findOrFail($id);
+        $item = Item::findOrFail($id);
         $target_id = request()->target_id;
-        return $thing->makeChildOf($target_id);
+        return $item->makeChildOf($target_id);
     }
     public function makeSiblingOf($id)
     {
-        $thing = Thing::findOrFail($id);
-        $target_id = $thing->parent()->first()->id;
-        return $thing->makeSiblingOf($target_id);
+        $item = Item::findOrFail($id);
+        $target_id = $item->parent()->first()->id;
+        return $item->makeSiblingOf($target_id);
     }
-    public function moveThing(Request $request, $id)
+    public function Item(Request $request, $id)
     {
-        $thing = Thing::findOrFail($id);
+        $item = Item::findOrFail($id);
         $direction = request()->direction;
         if($direction=='up'){
-            return $thing->moveLeft();
+            return $item->moveLeft();
         } else if ($direction=='down'){
-            return $thing->moveRight();
+            return $item->moveRight();
         }
     }
 
@@ -118,6 +118,6 @@ class CardController extends Controller
      */
     public function destroy($id)
     {
-        Thing::findOrFail($id)->delete();
+        Item::findOrFail($id)->delete();
     }
 }

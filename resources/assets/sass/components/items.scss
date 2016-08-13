@@ -33,7 +33,11 @@ $selection-color: rgba(245,215,110,0.5);
 .body-div{
     display: flex;
     align-items: center;
+    span{
+        display:table;
+    }
 }
+
 .child{
     margin-left: 1.5em;
 }

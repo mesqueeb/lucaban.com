@@ -43,6 +43,8 @@ export default class Tree {
 	addItem(item, index)
 	{
 		let parent = allItems.nodes[item.parent_id];
+		console.log('item.parent_id in additem');
+		console.log(item.parent_id);
 		if (!parent.children_order){
 			parent.children_order = [];
 		}
@@ -87,6 +89,33 @@ export default class Tree {
 		}
 		let siblingIndex = siblingsArr.indexOf(id);
 		return allItems.nodes[parent_id].children_order[siblingIndex+1];
+	}
+	prevItemId(id)
+	{
+		let parent_id = allItems.nodes[id].parent_id;
+		if(!parent_id){ return; }
+		let siblingsArr = allItems.nodes[parent_id].children_order;
+		if(allItems.siblingIndex(id) == 0){
+			return parent_id;
+		}
+		let siblingIndex = siblingsArr.indexOf(id);
+		let prevItemId = allItems.nodes[parent_id].children_order[siblingIndex-1];
+		// check if upper sibling item has children
+		prevItemId = this.prevItemRecursion(prevItemId);
+		return prevItemId;
+	}
+	prevItemRecursion(id)
+	{
+		let childrenLength = allItems.nodes[id].children.length;
+		console.log('childrenLength: '+childrenLength+' // id: '+id);
+		if(childrenLength>0){
+			id = allItems.nodes[id].children[childrenLength-1].id;
+			console.log('childrenLength: '+childrenLength+' // id: '+id);
+			return this.prevItemRecursion(id);
+		} else {
+			console.log('last cycle id: '+id);//THIS VALUE LOOKS FINE
+			return id;
+		}
 	}
 	nextItemRecursion(id,parent_id){
 		var nextIndex = allItems.siblingIndex(id)+1;
@@ -135,14 +164,20 @@ export default class Tree {
 		prevParent.children.splice(siblingIndex,1);
 		prevParent.children_order.splice(siblingIndex,1);
 		// update children recursively
-		this.updateChildrenDepth(targetItem);
+		vm.patchDepth(id);
+		vm.patchParent_id(id);
+		vm.patchChildren_order(new_parent_id);
+		vm.patchChildren_order(parent_id);
+		this.updateChildrenDepth(targetItem.id);
 	}
-	updateChildrenDepth(targetItem)
+	updateChildrenDepth(id)
 	{
-		targetItem.children.forEach(function(child){
-			// console.log(child);
+		let targetChildren = allItems.nodes[id].children;
+		targetChildren.forEach(function(child){
+			console.log(child);
 			child.depth = allItems.nodes[child.parent_id].depth+1;
-			this.updateChildrenDepth(child);
+			vm.patchDepth(child.id);
+			this.updateChildrenDepth(child.id);
 			return true;
 		}.bind(this))
 	}

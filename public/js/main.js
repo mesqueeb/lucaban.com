@@ -1,6 +1,6 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 /*!
-	Autosize 3.0.17
+	Autosize 3.0.16
 	license: MIT
 	http://www.jacklmoore.com/autosize
 */
@@ -49,14 +49,23 @@
 	}
 
 	function assign(ta) {
+		var _ref = arguments[1] === undefined ? {} : arguments[1];
+
+		var _ref$setOverflowX = _ref.setOverflowX;
+		var setOverflowX = _ref$setOverflowX === undefined ? true : _ref$setOverflowX;
+		var _ref$setOverflowY = _ref.setOverflowY;
+		var setOverflowY = _ref$setOverflowY === undefined ? true : _ref$setOverflowY;
+
 		if (!ta || !ta.nodeName || ta.nodeName !== 'TEXTAREA' || set.has(ta)) return;
 
 		var heightOffset = null;
+		var overflowY = null;
 		var clientWidth = ta.clientWidth;
-		var cachedHeight = null;
 
 		function init() {
 			var style = window.getComputedStyle(ta, null);
+
+			overflowY = style.overflowY;
 
 			if (style.resize === 'vertical') {
 				ta.style.resize = 'none';
@@ -91,7 +100,11 @@
 				ta.style.width = width;
 			}
 
-			ta.style.overflowY = value;
+			overflowY = value;
+
+			if (setOverflowY) {
+				ta.style.overflowY = value;
+			}
 
 			resize();
 		}
@@ -142,27 +155,23 @@
 		}
 
 		function update() {
+			var startHeight = ta.style.height;
+
 			resize();
 
-			var computed = window.getComputedStyle(ta, null);
-			var computedHeight = Math.round(parseFloat(computed.height));
-			var styleHeight = Math.round(parseFloat(ta.style.height));
+			var style = window.getComputedStyle(ta, null);
 
-			// The computed height not matching the height set via resize indicates that
-			// the max-height has been exceeded, in which case the overflow should be set to visible.
-			if (computedHeight !== styleHeight) {
-				if (computed.overflowY !== 'visible') {
+			if (style.height !== ta.style.height) {
+				if (overflowY !== 'visible') {
 					changeOverflow('visible');
 				}
 			} else {
-				// Normally keep overflow set to hidden, to avoid flash of scrollbar as the textarea expands.
-				if (computed.overflowY !== 'hidden') {
+				if (overflowY !== 'hidden') {
 					changeOverflow('hidden');
 				}
 			}
 
-			if (cachedHeight !== computedHeight) {
-				cachedHeight = computedHeight;
+			if (startHeight !== ta.style.height) {
 				var evt = createEvent('autosize:resized');
 				ta.dispatchEvent(evt);
 			}
@@ -205,8 +214,11 @@
 		ta.addEventListener('input', update, false);
 		ta.addEventListener('autosize:update', update, false);
 		set.add(ta);
-		ta.style.overflowX = 'hidden';
-		ta.style.wordWrap = 'break-word';
+
+		if (setOverflowX) {
+			ta.style.overflowX = 'hidden';
+			ta.style.wordWrap = 'break-word';
+		}
 
 		init();
 	}
@@ -263,6 +275,7 @@
 });
 },{}],2:[function(require,module,exports){
 // shim for using process in browser
+
 var process = module.exports = {};
 
 // cached from whatever global is present so that test runners that stub it
@@ -274,35 +287,21 @@ var cachedSetTimeout;
 var cachedClearTimeout;
 
 (function () {
-    try {
-        cachedSetTimeout = setTimeout;
-    } catch (e) {
-        cachedSetTimeout = function () {
-            throw new Error('setTimeout is not defined');
-        }
+  try {
+    cachedSetTimeout = setTimeout;
+  } catch (e) {
+    cachedSetTimeout = function () {
+      throw new Error('setTimeout is not defined');
     }
-    try {
-        cachedClearTimeout = clearTimeout;
-    } catch (e) {
-        cachedClearTimeout = function () {
-            throw new Error('clearTimeout is not defined');
-        }
+  }
+  try {
+    cachedClearTimeout = clearTimeout;
+  } catch (e) {
+    cachedClearTimeout = function () {
+      throw new Error('clearTimeout is not defined');
     }
+  }
 } ())
-function runTimeout(fun) {
-    if (cachedSetTimeout === setTimeout) {
-        return setTimeout(fun, 0);
-    } else {
-        return cachedSetTimeout.call(null, fun, 0);
-    }
-}
-function runClearTimeout(marker) {
-    if (cachedClearTimeout === clearTimeout) {
-        clearTimeout(marker);
-    } else {
-        cachedClearTimeout.call(null, marker);
-    }
-}
 var queue = [];
 var draining = false;
 var currentQueue;
@@ -327,7 +326,7 @@ function drainQueue() {
     if (draining) {
         return;
     }
-    var timeout = runTimeout(cleanUpNextTick);
+    var timeout = cachedSetTimeout(cleanUpNextTick);
     draining = true;
 
     var len = queue.length;
@@ -344,7 +343,7 @@ function drainQueue() {
     }
     currentQueue = null;
     draining = false;
-    runClearTimeout(timeout);
+    cachedClearTimeout(timeout);
 }
 
 process.nextTick = function (fun) {
@@ -356,7 +355,7 @@ process.nextTick = function (fun) {
     }
     queue.push(new Item(fun, args));
     if (queue.length === 1 && !draining) {
-        runTimeout(drainQueue);
+        cachedSetTimeout(drainQueue, 0);
     }
 };
 
@@ -10818,7 +10817,6 @@ $.getJSON('/api/items', function (fetchedData) {
 
 	window.allItems = new _dataTree2.default(fetchedData);
 	window.selection = new _Selection2.default();
-
 	window.vm = new Vue({
 		el: 'body',
 		data: {
@@ -10874,7 +10872,7 @@ $.getJSON('/api/items', function (fetchedData) {
 				if (direction == 'next') {
 					sel = allItems.nextItemId(id);
 				} else if (direction == 'prev') {
-					sel = allItems.olderSiblingId(id);
+					sel = allItems.prevItemId(id);
 				}
 				selection.selectedId = sel;
 			},
@@ -10893,16 +10891,21 @@ $.getJSON('/api/items', function (fetchedData) {
 					c_o = c_o + ',' + entry;
 				});
 				c_o = c_o.substring(1);
-				console.log("sending new Parent's child_order: " + c_o);
-
-				// When patching the parent's child_order,
-				// this.$root.addingNewUnder get's set to 'null' without any reason...
-				// That's why I patch it like so:
-
-
 				this.$http.patch('/api/items/' + id, { children_order: c_o }, { method: 'PATCH' }).then(function (response) {
-					console.log('patched children_order');
-					this.showAddNewItem(newItem);
+					console.log('patched item[' + id + '].children_order = ' + c_o + ';');
+					// this.showAddNewItem(newItem);
+				});
+			},
+			patchDepth: function patchDepth(id) {
+				var depth = allItems.nodes[id].depth;
+				this.$http.patch('/api/items/' + id, { depth: depth }, { method: 'PATCH' }).then(function (response) {
+					console.log('patched item[' + id + '].depth = ' + depth + ';');
+				});
+			},
+			patchParent_id: function patchParent_id(id) {
+				var parent_id = allItems.nodes[id].parent_id;
+				this.$http.patch('/api/items/' + id, { parent_id: parent_id }, { method: 'PATCH' }).then(function (response) {
+					console.log('patched item[' + id + '].parent_id = ' + parent_id + ';');
 				});
 			},
 			keystroke: function keystroke(_keystroke) {
@@ -11048,8 +11051,8 @@ exports.default = {
 			newItem: {
 				body: '',
 				parent_id: this.item.parent_id ? this.item.parent_id : 1,
-				older_sibling_id: this.item.id,
-				depth: this.item.depth == 0 ? 1 : this.item.depth
+				depth: this.item.depth == 0 ? 1 : this.item.depth,
+				older_sibling_id: this.item.id
 			}
 		};
 	},
@@ -11066,13 +11069,19 @@ exports.default = {
 				return allItems.nodes[this.item.id].children_order;
 			}
 			return allItems.nodes[pId].children_order;
+		},
+		addneww: function addneww() {
+			if (this.$root.addingNewUnder == this.item.id || this.item.depth == 0) {
+				return true;
+			} else {
+				return null;
+			}
 		}
 	},
 	methods: {
 		select: function select(item) {
 			selection.selectedId = item.id;
 		},
-		move: function move(direction) {},
 		markDone: function markDone(item) {
 			this.$http.patch('/api/items/' + item.id, { 'done': item.done });
 		},
@@ -11151,15 +11160,15 @@ exports.default = {
 	}
 };
 if (module.exports.__esModule) module.exports = module.exports.default
-;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\n<div class=\"items-card\">\n\t<div class=\"card-title\" v-if=\"item.depth == 0\">\n\t\t{{ item.body }} [{{ item.children_order }}]\n\t</div>\n\t<div class=\"item-card\" v-if=\"item.lft != 1\" :class=\"{\n\t\t\tdone: item.done,\n\t\t\tediting: item == editedItem,\n\t\t\t}\">\n\t\t<input class=\"toggle\" type=\"checkbox\" v-model=\"item.done\" @change=\"markDone(item)\">\n\t\t<div class=\"body-div\" :class=\"{ selected: item.id == this.$root.selection.selectedId, }\" @dblclick=\"startEdit(item)\" @click=\"select(\n\t\t\titem)\" @enter=\"console.log('yarrr')\">\n\t\t\t<span class=\"bodybox\" v-show=\"item != editedItem\">{{ item.id }} (d: {{ item.depth }})- {{ item.body }}: [{{ item.children_order }}]</span>\n\t\t\t<form action=\"update\" class=\"updatebox\" @submit.prevent=\"doneEdit(item)\">\n\t\t\t\t<textarea name=\"item_body\" rows=\"<!-- {{ item.rows }} -->\" v-model=\"item.body\" v-autosize=\"item.body\" v-item-focus=\"item == editedItem\" @blur=\"doneEdit(item)\" @keyup.esc=\"cancelEdit(item)\">{{ item.body }}</textarea>\n\t\t\t</form>\n\t\t\t<div class=\"item-nav\">\n\t\t\t\t<button @click=\"deleteItem(item)\">✗</button>\n\t\t\t</div>\n\t\t</div>\n\t</div>\n\t<form action=\"\" v-if=\"this.$root.addingNewUnder == item.id\" @submit.prevent=\"\" id=\"new-under-{{item.id}}\"><!-- Will hide this later, only show when clicking enter on task. -->\n\t\t<textarea type=\"text\" class=\"add-item\" name=\"body\" v-model=\"newItem.body\" v-autosize=\"newItem.body\" @blur=\"cancelAddNew()\" @keyup.esc=\"cancelAddNew()\" placeholder=\"...\" autocomplete=\"off\" autofocus=\"\" rows=\"1\"></textarea>\n\t</form>\n\n\t<div class=\"children\" v-if=\"item.children\">\n\t\t<card v-for=\"childCard in item.children\" :item=\"childCard\"></card>\n\t</div>\n</div>\n"
+;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\n<div class=\"items-card\">\n\t<div class=\"card-title\" v-if=\"item.depth == 0\">\n\t\t{{ item.body }}\n\t</div>\n\t<div class=\"item-card\" v-if=\"item.depth != 0\" :class=\"{\n\t\t\tdone: item.done,\n\t\t\tediting: item == editedItem,\n\t\t}\">\n\t\t<input class=\"toggle\" type=\"checkbox\" v-model=\"item.done\" @change=\"markDone(item)\">\n\t\t<div class=\"body-div\" :class=\"{ selected: item.id == this.$root.selection.selectedId, }\" @dblclick=\"startEdit(item)\" @click=\"select(item)\" @enter=\"console.log('yarrr')\">\n\t\t\t<span class=\"bodybox\" v-show=\"item != editedItem\">{{ item.body }}</span>\n\t\t\t<span v-show=\"true\"> ({{item.id}}) D-{{item.depth}}) [{{item.children_order}}]</span>\n\t\t\t<form action=\"update\" class=\"updatebox\" @submit.prevent=\"doneEdit(item)\">\n\t\t\t\t<textarea name=\"item_body\" rows=\"<!-- {{ item.rows }} -->\" v-model=\"item.body\" v-autosize=\"item.body\" v-item-focus=\"item == editedItem\" @blur=\"doneEdit(item)\" @keyup.esc=\"cancelEdit(item)\">{{ item.body }}</textarea>\n\t\t\t</form>\n\t\t\t<div class=\"item-nav\">\n\t\t\t\t<button @click=\"deleteItem(item)\">✗</button>\n\t\t\t</div>\n\t\t</div>\n\t</div>\n\t<form action=\"\" v-if=\"addneww\" @submit.prevent=\"\" id=\"new-under-{{item.id}}\"><!-- Will hide this later, only show when clicking enter on task. -->\n\t\t<textarea type=\"text\" class=\"add-item\" name=\"body\" v-model=\"newItem.body\" v-autosize=\"newItem.body\" @blur=\"cancelAddNew()\" @keyup.esc=\"cancelAddNew()\" placeholder=\"...\" autocomplete=\"off\" autofocus=\"\" rows=\"1\"></textarea>\n\t</form>\n\n\t<div class=\"children\" v-if=\"item.children\">\n\t\t<card v-for=\"childCard in item.children\" :item=\"childCard\"></card>\n\t</div>\n</div>\n"
 if (module.hot) {(function () {  module.hot.accept()
   var hotAPI = require("vue-hot-reload-api")
   hotAPI.install(require("vue"), true)
   if (!hotAPI.compatible) return
   if (!module.hot.data) {
-    hotAPI.createRecord("_v-15342891", module.exports)
+    hotAPI.createRecord("_v-036caa76", module.exports)
   } else {
-    hotAPI.update("_v-15342891", module.exports, (typeof module.exports === "function" ? module.exports.options : module.exports).template)
+    hotAPI.update("_v-036caa76", module.exports, (typeof module.exports === "function" ? module.exports.options : module.exports).template)
   }
 })()}
 },{"vue":5,"vue-hot-reload-api":4}],8:[function(require,module,exports){
@@ -11177,11 +11186,7 @@ var Selection = function () {
 	function Selection() {
 		_classCallCheck(this, Selection);
 
-		this.selectedItem = null;
-		this.selectedPanel = null;
 		this.selectedId = null;
-		this.selectedLft = null;
-		this.selectedDepth = null;
 	}
 
 	_createClass(Selection, [{
@@ -11264,6 +11269,8 @@ var Tree = function () {
 		key: 'addItem',
 		value: function addItem(item, index) {
 			var parent = allItems.nodes[item.parent_id];
+			console.log('item.parent_id in additem');
+			console.log(item.parent_id);
 			if (!parent.children_order) {
 				parent.children_order = [];
 			}
@@ -11319,6 +11326,37 @@ var Tree = function () {
 			return allItems.nodes[parent_id].children_order[siblingIndex + 1];
 		}
 	}, {
+		key: 'prevItemId',
+		value: function prevItemId(id) {
+			var parent_id = allItems.nodes[id].parent_id;
+			if (!parent_id) {
+				return;
+			}
+			var siblingsArr = allItems.nodes[parent_id].children_order;
+			if (allItems.siblingIndex(id) == 0) {
+				return parent_id;
+			}
+			var siblingIndex = siblingsArr.indexOf(id);
+			var prevItemId = allItems.nodes[parent_id].children_order[siblingIndex - 1];
+			// check if upper sibling item has children
+			prevItemId = this.prevItemRecursion(prevItemId);
+			return prevItemId;
+		}
+	}, {
+		key: 'prevItemRecursion',
+		value: function prevItemRecursion(id) {
+			var childrenLength = allItems.nodes[id].children.length;
+			console.log('childrenLength: ' + childrenLength + ' // id: ' + id);
+			if (childrenLength > 0) {
+				id = allItems.nodes[id].children[childrenLength - 1].id;
+				console.log('childrenLength: ' + childrenLength + ' // id: ' + id);
+				return this.prevItemRecursion(id);
+			} else {
+				console.log('last cycle id: ' + id); //THIS VALUE LOOKS FINE
+				return id;
+			}
+		}
+	}, {
 		key: 'nextItemRecursion',
 		value: function nextItemRecursion(id, parent_id) {
 			var nextIndex = allItems.siblingIndex(id) + 1;
@@ -11372,15 +11410,21 @@ var Tree = function () {
 			prevParent.children.splice(siblingIndex, 1);
 			prevParent.children_order.splice(siblingIndex, 1);
 			// update children recursively
-			this.updateChildrenDepth(targetItem);
+			vm.patchDepth(id);
+			vm.patchParent_id(id);
+			vm.patchChildren_order(new_parent_id);
+			vm.patchChildren_order(parent_id);
+			this.updateChildrenDepth(targetItem.id);
 		}
 	}, {
 		key: 'updateChildrenDepth',
-		value: function updateChildrenDepth(targetItem) {
-			targetItem.children.forEach(function (child) {
-				// console.log(child);
+		value: function updateChildrenDepth(id) {
+			var targetChildren = allItems.nodes[id].children;
+			targetChildren.forEach(function (child) {
+				console.log(child);
 				child.depth = allItems.nodes[child.parent_id].depth + 1;
-				this.updateChildrenDepth(child);
+				vm.patchDepth(child.id);
+				this.updateChildrenDepth(child.id);
 				return true;
 			}.bind(this));
 		}

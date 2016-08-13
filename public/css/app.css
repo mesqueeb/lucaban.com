@@ -65,6 +65,8 @@ input, textarea {
   display: flex;
   -ms-flex-align: center;
   align-items: center; }
+  .body-div span {
+    display: table; }
 
 .child {
   margin-left: 1.5em; }

@@ -3,7 +3,7 @@
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateLinkThingsUsers extends Migration
+class CreateLinkItemsUsers extends Migration
 {
     /**
      * Run the migrations.
@@ -12,7 +12,7 @@ class CreateLinkThingsUsers extends Migration
      */
     public function up()
     {
-        Schema::create('link_things_users', function (Blueprint $table) {
+        Schema::table('link_items_users', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('thing_id')->unsigned()->index();
             $table->integer('user_id')->unsigned()->index();
@@ -26,6 +26,6 @@ class CreateLinkThingsUsers extends Migration
      */
     public function down()
     {
-        Schema::drop('link_things_users');
+        Schema::drop('link_items_users');
     }
 }
