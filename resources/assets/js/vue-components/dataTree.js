@@ -24,6 +24,10 @@ export default class Tree {
 		// register node
 		this.nodes[node.id] = node;
 
+		// Add amount of rows
+		let nl = node.body.split(/\r\n|\r|\n/).length;
+		node['rows'] = nl;
+
 		//Sort all nodes after making sure you got all of them.
 		itemsProcessed++;
 	    if(itemsProcessed === this.source.length) {

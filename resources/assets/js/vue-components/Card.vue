@@ -33,12 +33,13 @@
 					@submit.prevent="doneEdit(item)"
 				>
 					<textarea name="item_body"
-						rows="<!-- {{ item.rows }} -->"
+						rows="{{ item.rows }}"
 						v-model="item.body"
 						v-autosize="item.body"
 						v-item-focus="item == editedItem"
 						@blur="doneEdit(item)"
 						@keyup.esc="cancelEdit(item)"
+						@keydown.enter="enterOnEdit"
 					>{{ item.body }}</textarea>
 				</form>
 				<div class="item-nav">
@@ -48,18 +49,17 @@
 				</div>
 			</div>
 		</div>
-		<form action=""
-			v-if="addneww"
+		<form v-if="addneww"
 			@submit.prevent
-			id="new-under-{{item.id}}"
-		><!-- Will hide this later, only show when clicking enter on task. -->
+		>
 			<textarea type="text"
 				class="add-item"
 				name="body"
 				v-model="newItem.body"
 				v-autosize="newItem.body"
-				@blur="cancelAddNew()"
-				@keyup.esc="cancelAddNew()"
+				@blur="cancelAddNew"
+				@keyup.esc="cancelAddNew"
+				@keydown.enter="enterOnNew"
 				placeholder="..."
 				autocomplete="off"
 				autofocus 
@@ -84,24 +84,6 @@ export default {
 	created(){
 	},
 	ready(){
-		let vm = this;
-        let form = "#new-under-"+this.item.id+">textarea";
-      	window.addEventListener('keydown', function(e) {
-	        if ( $(form+':focus').length > 0 ) {
-	          // INPUT AREAS IN FOCUS
-			  switch(e.keyCode) { 
-			  	case 13:
-			  		if (e.shiftKey){
-			  			console.log('shift enter');
-			  			break;
-			  		}
-		  			console.log('normal enter');
-			  		e.preventDefault();
-			  		vm.addNew();
-			  		break;
-			  } // end switch
-			}
-		});
 	},
 	props: ['item'],
 	data: function(){
@@ -131,6 +113,18 @@ export default {
 		select(item){
 			selection.selectedId = item.id;
 		},
+		enterOnNew(e) {
+			if (e.keyCode === 13 && !e.shiftKey && !e.altKey) {
+	        	e.preventDefault();
+			  	this.addNew();
+			}
+	    },
+		enterOnEdit(e) {
+			if (e.keyCode === 13 && !e.shiftKey && !e.altKey) {
+	        	e.preventDefault();
+				this.doneEdit();
+			}
+	    },
 		markDone(item){
 			this.$http.patch('/api/items/' + item.id, {'done':item.done});
 		},
@@ -152,7 +146,7 @@ export default {
 				this.deleteItem(item);
 			}
 			let id = item.id;
-			this.$http.patch('/api/items/' + id, item, { method: 'PATCH'});
+			this.$http.patch('/api/items/' + id, { body: item.body}, { method: 'PATCH'});
 			$(':focus').blur();
 		},
 		cancelEdit(item) {

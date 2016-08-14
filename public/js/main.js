@@ -11023,26 +11023,7 @@ exports.default = {
 	name: 'Card',
 	template: '#items-card-template',
 	created: function created() {},
-	ready: function ready() {
-		var vm = this;
-		var form = "#new-under-" + this.item.id + ">textarea";
-		window.addEventListener('keydown', function (e) {
-			if ($(form + ':focus').length > 0) {
-				// INPUT AREAS IN FOCUS
-				switch (e.keyCode) {
-					case 13:
-						if (e.shiftKey) {
-							console.log('shift enter');
-							break;
-						}
-						console.log('normal enter');
-						e.preventDefault();
-						vm.addNew();
-						break;
-				} // end switch
-			}
-		});
-	},
+	ready: function ready() {},
 
 	props: ['item'],
 	data: function data() {
@@ -11082,6 +11063,18 @@ exports.default = {
 		select: function select(item) {
 			selection.selectedId = item.id;
 		},
+		enterOnNew: function enterOnNew(e) {
+			if (e.keyCode === 13 && !e.shiftKey && !e.altKey) {
+				e.preventDefault();
+				this.addNew();
+			}
+		},
+		enterOnEdit: function enterOnEdit(e) {
+			if (e.keyCode === 13 && !e.shiftKey && !e.altKey) {
+				e.preventDefault();
+				this.doneEdit();
+			}
+		},
 		markDone: function markDone(item) {
 			this.$http.patch('/api/items/' + item.id, { 'done': item.done });
 		},
@@ -11103,7 +11096,7 @@ exports.default = {
 				this.deleteItem(item);
 			}
 			var id = item.id;
-			this.$http.patch('/api/items/' + id, item, { method: 'PATCH' });
+			this.$http.patch('/api/items/' + id, { body: item.body }, { method: 'PATCH' });
 			$(':focus').blur();
 		},
 		cancelEdit: function cancelEdit(item) {
@@ -11160,7 +11153,7 @@ exports.default = {
 	}
 };
 if (module.exports.__esModule) module.exports = module.exports.default
-;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\n<div class=\"items-card\">\n\t<div class=\"card-title\" v-if=\"item.depth == 0\">\n\t\t{{ item.body }}\n\t</div>\n\t<div class=\"item-card\" v-if=\"item.depth != 0\" :class=\"{\n\t\t\tdone: item.done,\n\t\t\tediting: item == editedItem,\n\t\t}\">\n\t\t<input class=\"toggle\" type=\"checkbox\" v-model=\"item.done\" @change=\"markDone(item)\">\n\t\t<div class=\"body-div\" :class=\"{ selected: item.id == this.$root.selection.selectedId, }\" @dblclick=\"startEdit(item)\" @click=\"select(item)\" @enter=\"console.log('yarrr')\">\n\t\t\t<span class=\"bodybox\" v-show=\"item != editedItem\">{{ item.body }}</span>\n\t\t\t<span v-show=\"true\"> ({{item.id}}) D-{{item.depth}}) [{{item.children_order}}]</span>\n\t\t\t<form action=\"update\" class=\"updatebox\" @submit.prevent=\"doneEdit(item)\">\n\t\t\t\t<textarea name=\"item_body\" rows=\"<!-- {{ item.rows }} -->\" v-model=\"item.body\" v-autosize=\"item.body\" v-item-focus=\"item == editedItem\" @blur=\"doneEdit(item)\" @keyup.esc=\"cancelEdit(item)\">{{ item.body }}</textarea>\n\t\t\t</form>\n\t\t\t<div class=\"item-nav\">\n\t\t\t\t<button @click=\"deleteItem(item)\">✗</button>\n\t\t\t</div>\n\t\t</div>\n\t</div>\n\t<form action=\"\" v-if=\"addneww\" @submit.prevent=\"\" id=\"new-under-{{item.id}}\"><!-- Will hide this later, only show when clicking enter on task. -->\n\t\t<textarea type=\"text\" class=\"add-item\" name=\"body\" v-model=\"newItem.body\" v-autosize=\"newItem.body\" @blur=\"cancelAddNew()\" @keyup.esc=\"cancelAddNew()\" placeholder=\"...\" autocomplete=\"off\" autofocus=\"\" rows=\"1\"></textarea>\n\t</form>\n\n\t<div class=\"children\" v-if=\"item.children\">\n\t\t<card v-for=\"childCard in item.children\" :item=\"childCard\"></card>\n\t</div>\n</div>\n"
+;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\n<div class=\"items-card\">\n\t<div class=\"card-title\" v-if=\"item.depth == 0\">\n\t\t{{ item.body }}\n\t</div>\n\t<div class=\"item-card\" v-if=\"item.depth != 0\" :class=\"{\n\t\t\tdone: item.done,\n\t\t\tediting: item == editedItem,\n\t\t}\">\n\t\t<input class=\"toggle\" type=\"checkbox\" v-model=\"item.done\" @change=\"markDone(item)\">\n\t\t<div class=\"body-div\" :class=\"{ selected: item.id == this.$root.selection.selectedId, }\" @dblclick=\"startEdit(item)\" @click=\"select(item)\" @enter=\"console.log('yarrr')\">\n\t\t\t<span class=\"bodybox\" v-show=\"item != editedItem\">{{ item.body }}</span>\n\t\t\t<span v-show=\"true\"> ({{item.id}}) D-{{item.depth}}) [{{item.children_order}}]</span>\n\t\t\t<form action=\"update\" class=\"updatebox\" @submit.prevent=\"doneEdit(item)\">\n\t\t\t\t<textarea name=\"item_body\" rows=\"{{ item.rows }}\" v-model=\"item.body\" v-autosize=\"item.body\" v-item-focus=\"item == editedItem\" @blur=\"doneEdit(item)\" @keyup.esc=\"cancelEdit(item)\" @keydown.enter=\"enterOnEdit\">{{ item.body }}</textarea>\n\t\t\t</form>\n\t\t\t<div class=\"item-nav\">\n\t\t\t\t<button @click=\"deleteItem(item)\">✗</button>\n\t\t\t</div>\n\t\t</div>\n\t</div>\n\t<form v-if=\"addneww\" @submit.prevent=\"\">\n\t\t<textarea type=\"text\" class=\"add-item\" name=\"body\" v-model=\"newItem.body\" v-autosize=\"newItem.body\" @blur=\"cancelAddNew\" @keyup.esc=\"cancelAddNew\" @keydown.enter=\"enterOnNew\" placeholder=\"...\" autocomplete=\"off\" autofocus=\"\" rows=\"1\"></textarea>\n\t</form>\n\n\t<div class=\"children\" v-if=\"item.children\">\n\t\t<card v-for=\"childCard in item.children\" :item=\"childCard\"></card>\n\t</div>\n</div>\n"
 if (module.hot) {(function () {  module.hot.accept()
   var hotAPI = require("vue-hot-reload-api")
   hotAPI.install(require("vue"), true)
@@ -11246,6 +11239,10 @@ var Tree = function () {
 			}
 			// register node
 			this.nodes[node.id] = node;
+
+			// Add amount of rows
+			var nl = node.body.split(/\r\n|\r|\n/).length;
+			node['rows'] = nl;
 
 			//Sort all nodes after making sure you got all of them.
 			itemsProcessed++;
