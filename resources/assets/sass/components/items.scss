@@ -1,5 +1,22 @@
 $selection-color: rgba(245,215,110,0.5);
+$theme-color: #5dc2af;
+$duration-color: #5dacce;
+$duration-color-dark: #4679a7;
 
+label{
+    font-weight: 300;
+}
+
+
+.navigation{
+    button{
+        background: none;
+        border: none;
+    }
+    .active{
+        color: $theme-color;
+    }
+}
 .card{
     margin: 0.5em;
 }
@@ -9,7 +26,7 @@ $selection-color: rgba(245,215,110,0.5);
 .item-nav{
     margin-left: auto;
 }
-.item-nav>button{
+.item-nav>button {
     background: none;
     border: none;
     font-size: 1.6em;
@@ -18,7 +35,7 @@ $selection-color: rgba(245,215,110,0.5);
 .panel-body{
     background: white;
 }
-.panel-body>.items-card>.children .children{
+.panel-body>.items-card>.children .children {
     margin-left: 2em;
 }
 .item-card {
@@ -26,11 +43,9 @@ $selection-color: rgba(245,215,110,0.5);
     display: flex;
     align-items: center;
 }
-.item-card>div{
+.body-div{
     border-bottom: 1px solid #ededed;
     width: 100%;
-}
-.body-div{
     display: flex;
     align-items: center;
     span{
@@ -48,21 +63,41 @@ $selection-color: rgba(245,215,110,0.5);
     border-bottom: dashed 1px #ededed;
     resize: none;
 }
-.updatebox input,
-.updatebox textarea{
-    display:none;
-    width: 97%;
-    outline: 0px !important;
-    border-color: $selection-color;
-    resize: none;
+.updatebox {
+    width: 100%;
+    display: flex;
+    align-items: baseline;
+    textarea, input{
+        outline: 0px !important;
+        border-color: $selection-color;
+        resize: none;
+    }
+    textarea{
+        width: 100%;
+    }
+    input{
+        padding: 0.2em 0.4em;
+        border-radius: 0.3em;
+        background: $duration-color;
+        color: white;
+        width: 44px;
+    }
+    span{
+        font-size: 0.85em;
+        width: 145px; // codementor
+    }
+    label{
+        padding-right: 0.2em;
+    }
 }
-
-.editing .updatebox input,
-.editing .updatebox textarea{
-	display: block;
-    // margin-top: -11;
+.toggle-div{
+    width: 2em;
+    div, input{
+        margin: 0; // reset margins
+    }
 }
 .toggle {
+    cursor: pointer;
     text-align: center;
     -webkit-appearance: none;
     -moz-appearance: none;
@@ -73,17 +108,13 @@ $selection-color: rgba(245,215,110,0.5);
     content: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="-10 -18 100 135"><circle cx="50" cy="50" r="50" fill="none" stroke="#ededed" stroke-width="3"/></svg>');
     transform: scale(0.7);
     display: block;
-    width: 100%;
-    height: 2em;
-    margin: -1em 0 0 -1em;
+    margin: 0 0 0 -1em;
 }
 .toggle:checked:after {
     content: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="-10 -18 100 135"><circle cx="50" cy="50" r="50" fill="none" stroke="#bddad5" stroke-width="3"/><path fill="#5dc2af" d="M72 25L42 71 27 56l-4 4 20 20 34-52z"/></svg>');
     transform: scale(0.7);
     display: block;
-    width: 100%;
-    height: 2em;
-    margin: -1em 0 0 -1em;
+    margin: 0 0 0 -1em;
 }
 .bodybox{
     padding: 0.5em;
@@ -100,4 +131,24 @@ $selection-color: rgba(245,215,110,0.5);
 .selected .bodybox{
     background: $selection-color;
 }
-
+.item-tags {
+    display: flex;
+    font-size: 0.85em;
+    span {
+        padding: 0.2em 0.4em;
+        border-radius: 0.3em;
+    }
+    .done {
+        color: #5a5a5a;
+        background: #e6e6e6;
+    }
+    .duration {
+        background: $duration-color;
+        color: white;
+    }
+    .total-duration{
+        background:$duration-color-dark;
+        color: white;
+    }
+    .total-duration:before {content: 'total ';}
+}

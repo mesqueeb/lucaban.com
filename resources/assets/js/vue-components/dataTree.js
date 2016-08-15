@@ -28,6 +28,9 @@ export default class Tree {
 		let nl = node.body.split(/\r\n|\r|\n/).length;
 		node['rows'] = nl;
 
+		// Change format:
+		node['planned_time'] = node['planned_time'].substring(0, 5);
+
 		//Sort all nodes after making sure you got all of them.
 		itemsProcessed++;
 	    if(itemsProcessed === this.source.length) {
@@ -46,6 +49,8 @@ export default class Tree {
 	}
 	addItem(item, index)
 	{
+		item.children_order = (!item.children_order) ? [] : item.children_order;
+		item.children = (!item.children) ? [] : item.children;
 		let parent = allItems.nodes[item.parent_id];
 		console.log('item.parent_id in additem');
 		console.log(item.parent_id);
@@ -185,7 +190,23 @@ export default class Tree {
 			return true;
 		}.bind(this))
 	}
-
+	deleteItem(id)
+	{
+		let parent_id = allItems.nodes[id].parent_id;
+		let targetItem = allItems.nodes[id];
+		let prevParent = allItems.nodes[parent_id];
+		let siblingIndex = this.siblingIndex(id);
+		// Delete items attached to previous parent
+		prevParent.children.splice(siblingIndex,1);
+		prevParent.children_order.splice(siblingIndex,1);
+		vm.patchChildren_order(parent_id);
+	}
+	updateDoneState(id)
+	{
+		let done_date = new Date();
+		allItems.nodes[id].done_date = done_date;
+		vm.patchDone(id);
+	}
 	// recalcChildren_order(item){
 	// 	let theItem = allItems.nodes['1'];
 	// 	let result = theItem.children.map(function(a) {return a.id;});

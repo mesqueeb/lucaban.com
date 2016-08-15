@@ -12,6 +12,11 @@
 	@include('elements.menu')
 	<div class="item item-default">
 		<div class="panel-body">
+			<div class="navigation">
+				<button>All</button>
+				<button>Today</button>
+				<button>Done</button>
+			</div>
 			<Card :item="import_data"></Card>
 		</div>
 	</div>

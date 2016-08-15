@@ -10,14 +10,17 @@
 			v-if="item.depth != 0"
 			:class="{
 				done: item.done,
-				editing: item == editedItem,
+				editing: item.id == this.$root.editingItem,
 			}"
 		>
-			<input class="toggle"
-				type="checkbox"
-				v-model="item.done"
-				@change="markDone(item)"
-			>
+			<div class="toggle-div">
+				<input class="toggle"
+					type="checkbox"
+					v-if="item.children_order.length==0 || item.done == true"
+					v-model="item.done"
+					@change="markDone(item.id)"
+				>
+			</div>
 			<div class="body-div"
 				:class="{ selected: item.id == this.$root.selection.selectedId, }"
 				@dblclick="startEdit(item)"
@@ -25,25 +28,59 @@
 				@enter="console.log('yarrr')"
 			>
 				<span class="bodybox"
-					v-show="item != editedItem"
+					v-show="item.id != this.$root.editingItem"
 				>{{ item.body }}</span>
-				<span v-show="true"> ({{item.id}}) D-{{item.depth}}) [{{item.children_order}}]</span>
+				<!-- For debugging: -->
+				<span v-show="false"> ({{item.id}}) D-{{item.depth}}) [{{item.children_order}}]</span>
+				
 				<form action="update"
 					class="updatebox"
+					v-show="item.id == this.$root.editingItem"
 					@submit.prevent="doneEdit(item)"
 				>
 					<textarea name="item_body"
 						rows="{{ item.rows }}"
 						v-model="item.body"
 						v-autosize="item.body"
-						v-item-focus="item == editedItem"
-						@blur="doneEdit(item)"
+						v-item-focus="item.id == this.$root.editingItem"
+						@blur="<!-- blurOnEdit(item) -->"
 						@keyup.esc="cancelEdit(item)"
 						@keydown.enter="enterOnEdit"
 					>{{ item.body }}</textarea>
+					<span>
+						<label for="planned_time">duration:</label>
+						<input name="planned_time"
+							type="text"
+							v-model="item.planned_time"
+							@blur="<!-- blurOnEdit(item) -->"
+							@keyup.esc="cancelEdit(item)"
+							@keydown.enter="doneEdit(item)"
+						/>
+					</span>
 				</form>
-				<div class="item-nav">
-					<button
+				<div class="item-tags"
+					v-show="this.$root.editingItem != item.id"
+				>
+					<span v-if="item.done" class="done">
+						done {{ item.done_date | mm/dd }}
+					</span>
+					
+					<span v-if="hasPlannedTime"
+						:class="{
+							'duration':!item.children.length,
+							'total-duration':item.children.length,
+						}"
+					>{{ calcPlannedTime }}</span>
+
+					<span v-if="hasDueDate" class="duedate">
+						{{ item.due_date | mm/dd }}
+					</span>
+				</div>
+				<div class="item-nav"
+					v-show="this.$root.editingItem != item.id"
+				>
+					<button 
+						v-if="item.children_order.length==0"
 						@click="deleteItem(item)"
 					>✗</button>
 				</div>
@@ -51,6 +88,7 @@
 		</div>
 		<form v-if="addneww"
 			@submit.prevent
+			id="new-under-{{ item.id }}"
 		>
 			<textarea type="text"
 				class="add-item"
@@ -88,7 +126,6 @@ export default {
 	props: ['item'],
 	data: function(){
 		return {
-			editedItem: null,
 			newItem: {
 				body: '',
 				parent_id: (this.item.parent_id) ? this.item.parent_id : 1,
@@ -108,6 +145,23 @@ export default {
 		addneww(){
 			if(this.$root.addingNewUnder == this.item.id || this.item.depth == 0){ return true; } else { return null; }
 		},
+		calcPlannedTime(){
+			if(!this.item.children.length){
+				return this.item.planned_time;
+			} else {
+				return this.item.planned_time;//codementor
+				//how to calculate all planned_time upwards. I'd like to do it on the Tree class, but there are no computed properties there...
+			}
+		},
+		hasDueDate(){
+		    return this.item.due_date != '0000-00-00 00:00:00';
+		},
+		hasDoneDate(){
+		    return this.item.done_date != '0000-00-00 00:00:00';
+		},
+		hasPlannedTime(){
+		    return this.item.planned_time != '00:00';
+		},
 	},
 	methods: {
 		select(item){
@@ -125,39 +179,48 @@ export default {
 				this.doneEdit();
 			}
 	    },
-		markDone(item){
-			this.$http.patch('/api/items/' + item.id, {'done':item.done});
+	    blurOnEdit(item) {
+	    	if ( $('.updatebox input:focus').length > 0 ||  $('.updatebox textarea:focus').length > 0 ) {
+        		return;
+			}
+	    	this.doneEdit(item);
+	    },
+		markDone(id){
+			allItems.updateDoneState(id);
 		},
 		startEdit(item){
 			console.log('startEdit');
 			item = (item) ? item : allItems.nodes[selection.selectedId];
 			console.log(item);
 			this.beforeEditCache = item.body;
-			this.editedItem = item;
+			this.$root.editingItem = item.id;
 		},
 		doneEdit(item) {
 			item = (item) ? item : allItems.nodes[selection.selectedId];
-			if (!this.editedItem) {
+			if (!this.$root.editingItem) {
 				return;
 			}
-			this.editedItem = null;
+			this.$root.editingItem = null;
 			item.body = item.body.trim();
 			if (!item.body) {
 				this.deleteItem(item);
 			}
 			let id = item.id;
-			this.$http.patch('/api/items/' + id, { body: item.body}, { method: 'PATCH'});
+			let body = item.body;
+			let planned_time = item.planned_time;
+			this.$http.patch('/api/items/' + id, { body: body, planned_time: planned_time }, { method: 'PATCH'});
 			$(':focus').blur();
 		},
 		cancelEdit(item) {
-			this.editedItem = null;
+			this.$root.editingItem = null;
+			console.log("cancel edit. Reverting to:");
 			console.log(this.beforeEditCache);
 			item.body = this.beforeEditCache;
 		},
 		deleteItem(item){
-			this.$http.delete('/api/items/' + item.id);
-			// ↓ DOESN'T WORK!!!
-			this.item.$remove(item);
+			let id = item.id;
+			allItems.deleteItem(id);
+			this.$http.delete('/api/items/' + id);
 		},
 		addNew(){
 			console.log('sending newItem:');

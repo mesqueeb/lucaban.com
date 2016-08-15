@@ -28,6 +28,16 @@ input, textarea {
 .alert-error {
   background: salmon; }
 
+label {
+  font-weight: 300; }
+
+.navigation button {
+  background: none;
+  border: none; }
+
+.navigation .active {
+  color: #5dc2af; }
+
 .card {
   margin: 0.5em; }
 
@@ -56,11 +66,9 @@ input, textarea {
   -ms-flex-align: center;
   align-items: center; }
 
-.item-card > div {
-  border-bottom: 1px solid #ededed;
-  width: 100%; }
-
 .body-div {
+  border-bottom: 1px solid #ededed;
+  width: 100%;
   display: -ms-flexbox;
   display: flex;
   -ms-flex-align: center;
@@ -77,19 +85,37 @@ input, textarea {
   border-bottom: dashed 1px #ededed;
   resize: none; }
 
-.updatebox input,
-.updatebox textarea {
-  display: none;
-  width: 97%;
-  outline: 0px !important;
-  border-color: rgba(245, 215, 110, 0.5);
-  resize: none; }
+.updatebox {
+  width: 100%;
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-align: baseline;
+  align-items: baseline; }
+  .updatebox textarea, .updatebox input {
+    outline: 0px !important;
+    border-color: rgba(245, 215, 110, 0.5);
+    resize: none; }
+  .updatebox textarea {
+    width: 100%; }
+  .updatebox input {
+    padding: 0.2em 0.4em;
+    border-radius: 0.3em;
+    background: #5dacce;
+    color: white;
+    width: 44px; }
+  .updatebox span {
+    font-size: 0.85em;
+    width: 145px; }
+  .updatebox label {
+    padding-right: 0.2em; }
 
-.editing .updatebox input,
-.editing .updatebox textarea {
-  display: block; }
+.toggle-div {
+  width: 2em; }
+  .toggle-div div, .toggle-div input {
+    margin: 0; }
 
 .toggle {
+  cursor: pointer;
   text-align: center;
   -webkit-appearance: none;
   -moz-appearance: none;
@@ -100,17 +126,13 @@ input, textarea {
   content: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="-10 -18 100 135"><circle cx="50" cy="50" r="50" fill="none" stroke="#ededed" stroke-width="3"/></svg>');
   transform: scale(0.7);
   display: block;
-  width: 100%;
-  height: 2em;
-  margin: -1em 0 0 -1em; }
+  margin: 0 0 0 -1em; }
 
 .toggle:checked:after {
   content: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="-10 -18 100 135"><circle cx="50" cy="50" r="50" fill="none" stroke="#bddad5" stroke-width="3"/><path fill="#5dc2af" d="M72 25L42 71 27 56l-4 4 20 20 34-52z"/></svg>');
   transform: scale(0.7);
   display: block;
-  width: 100%;
-  height: 2em;
-  margin: -1em 0 0 -1em; }
+  margin: 0 0 0 -1em; }
 
 .bodybox {
   padding: 0.5em;
@@ -126,5 +148,24 @@ input, textarea {
 
 .selected .bodybox {
   background: rgba(245, 215, 110, 0.5); }
+
+.item-tags {
+  display: -ms-flexbox;
+  display: flex;
+  font-size: 0.85em; }
+  .item-tags span {
+    padding: 0.2em 0.4em;
+    border-radius: 0.3em; }
+  .item-tags .done {
+    color: #5a5a5a;
+    background: #e6e6e6; }
+  .item-tags .duration {
+    background: #5dacce;
+    color: white; }
+  .item-tags .total-duration {
+    background: #4679a7;
+    color: white; }
+  .item-tags .total-duration:before {
+    content: 'total '; }
 
 /*# sourceMappingURL=app.css.map */

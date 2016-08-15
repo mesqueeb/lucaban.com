@@ -10811,6 +10811,24 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 var VueAutosize = require('vue-autosize');
 Vue.use(VueAutosize);
 
+window.formatDate = {
+	mmdd: function mmdd(val) {
+		console.log('val in mmdd: ' + val);
+		var d = val ? new Date(val) : new Date();
+		console.log('d: ' + d);
+		var dd = d.getDate();
+		var mm = d.getMonth();
+		return mm + '/' + dd;
+	}
+};
+Vue.filter('mm/dd', {
+	// model -> view
+	// formats the value when updating the input element.
+	read: function read(val) {
+		return formatDate.mmdd(val);
+	}
+});
+
 $.getJSON('/api/items', function (fetchedData) {
 
 	//response
@@ -10822,14 +10840,27 @@ $.getJSON('/api/items', function (fetchedData) {
 		data: {
 			import_data: allItems.root,
 			selection: selection,
-			addingNewUnder: null
+			addingNewUnder: null,
+			editingItem: null
 		},
 		components: { Card: _Card2.default },
 		methods: {
 			markDone: function markDone() {
 				var item = allItems.nodes[selection.selectedId];
+				// swap done value because of iniciation with with spacebar:
 				item.done = !item.done;
-				this.$http.patch('/api/items/' + item.id, { 'done': item.done });
+				allItems.updateDoneState(item.id);
+			},
+			patchDone: function patchDone(id) {
+				var done_date = void 0;
+				var doneValue = allItems.nodes[id].done;
+				if (doneValue) {
+					var d = new Date();
+					done_date = d.toJSON();
+				} else {
+					done_date = '0000-00-00 00:00:00';
+				}
+				this.$http.patch('/api/items/' + id, { 'done': doneValue, 'done_date': done_date });
 			},
 			indent: function indent() {
 				var id = selection.selectedId;
@@ -10839,7 +10870,6 @@ $.getJSON('/api/items', function (fetchedData) {
 				}
 				console.log('new_parent_id / olderSiblingId: ' + new_parent_id);
 				allItems.giveNewParent(id, new_parent_id);
-				// this.$broadcast('updateDepth');
 			},
 			unindent: function unindent() {
 				var id = selection.selectedId;
@@ -10881,7 +10911,7 @@ $.getJSON('/api/items', function (fetchedData) {
 				console.log('showAddNewItem for ' + id);
 				this.addingNewUnder = id;
 				setTimeout(function () {
-					$("#new-under-" + id + ">textarea").focus();
+					$("#new-under-" + id + " textarea").focus();
 				}, 10);
 			},
 			patchChildren_order: function patchChildren_order(id, newItem) {
@@ -11028,7 +11058,6 @@ exports.default = {
 	props: ['item'],
 	data: function data() {
 		return {
-			editedItem: null,
 			newItem: {
 				body: '',
 				parent_id: this.item.parent_id ? this.item.parent_id : 1,
@@ -11057,6 +11086,23 @@ exports.default = {
 			} else {
 				return null;
 			}
+		},
+		calcPlannedTime: function calcPlannedTime() {
+			if (!this.item.children.length) {
+				return this.item.planned_time;
+			} else {
+				return this.item.planned_time; //codementor
+				//how to calculate all planned_time upwards. I'd like to do it on the Tree class, but there are no computed properties there...
+			}
+		},
+		hasDueDate: function hasDueDate() {
+			return this.item.due_date != '0000-00-00 00:00:00';
+		},
+		hasDoneDate: function hasDoneDate() {
+			return this.item.done_date != '0000-00-00 00:00:00';
+		},
+		hasPlannedTime: function hasPlannedTime() {
+			return this.item.planned_time != '00:00';
 		}
 	},
 	methods: {
@@ -11075,39 +11121,48 @@ exports.default = {
 				this.doneEdit();
 			}
 		},
-		markDone: function markDone(item) {
-			this.$http.patch('/api/items/' + item.id, { 'done': item.done });
+		blurOnEdit: function blurOnEdit(item) {
+			if ($('.updatebox input:focus').length > 0 || $('.updatebox textarea:focus').length > 0) {
+				return;
+			}
+			this.doneEdit(item);
+		},
+		markDone: function markDone(id) {
+			allItems.updateDoneState(id);
 		},
 		startEdit: function startEdit(item) {
 			console.log('startEdit');
 			item = item ? item : allItems.nodes[selection.selectedId];
 			console.log(item);
 			this.beforeEditCache = item.body;
-			this.editedItem = item;
+			this.$root.editingItem = item.id;
 		},
 		doneEdit: function doneEdit(item) {
 			item = item ? item : allItems.nodes[selection.selectedId];
-			if (!this.editedItem) {
+			if (!this.$root.editingItem) {
 				return;
 			}
-			this.editedItem = null;
+			this.$root.editingItem = null;
 			item.body = item.body.trim();
 			if (!item.body) {
 				this.deleteItem(item);
 			}
 			var id = item.id;
-			this.$http.patch('/api/items/' + id, { body: item.body }, { method: 'PATCH' });
+			var body = item.body;
+			var planned_time = item.planned_time;
+			this.$http.patch('/api/items/' + id, { body: body, planned_time: planned_time }, { method: 'PATCH' });
 			$(':focus').blur();
 		},
 		cancelEdit: function cancelEdit(item) {
-			this.editedItem = null;
+			this.$root.editingItem = null;
+			console.log("cancel edit. Reverting to:");
 			console.log(this.beforeEditCache);
 			item.body = this.beforeEditCache;
 		},
 		deleteItem: function deleteItem(item) {
-			this.$http.delete('/api/items/' + item.id);
-			// ↓ DOESN'T WORK!!!
-			this.item.$remove(item);
+			var id = item.id;
+			allItems.deleteItem(id);
+			this.$http.delete('/api/items/' + id);
 		},
 		addNew: function addNew() {
 			console.log('sending newItem:');
@@ -11153,7 +11208,7 @@ exports.default = {
 	}
 };
 if (module.exports.__esModule) module.exports = module.exports.default
-;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\n<div class=\"items-card\">\n\t<div class=\"card-title\" v-if=\"item.depth == 0\">\n\t\t{{ item.body }}\n\t</div>\n\t<div class=\"item-card\" v-if=\"item.depth != 0\" :class=\"{\n\t\t\tdone: item.done,\n\t\t\tediting: item == editedItem,\n\t\t}\">\n\t\t<input class=\"toggle\" type=\"checkbox\" v-model=\"item.done\" @change=\"markDone(item)\">\n\t\t<div class=\"body-div\" :class=\"{ selected: item.id == this.$root.selection.selectedId, }\" @dblclick=\"startEdit(item)\" @click=\"select(item)\" @enter=\"console.log('yarrr')\">\n\t\t\t<span class=\"bodybox\" v-show=\"item != editedItem\">{{ item.body }}</span>\n\t\t\t<span v-show=\"true\"> ({{item.id}}) D-{{item.depth}}) [{{item.children_order}}]</span>\n\t\t\t<form action=\"update\" class=\"updatebox\" @submit.prevent=\"doneEdit(item)\">\n\t\t\t\t<textarea name=\"item_body\" rows=\"{{ item.rows }}\" v-model=\"item.body\" v-autosize=\"item.body\" v-item-focus=\"item == editedItem\" @blur=\"doneEdit(item)\" @keyup.esc=\"cancelEdit(item)\" @keydown.enter=\"enterOnEdit\">{{ item.body }}</textarea>\n\t\t\t</form>\n\t\t\t<div class=\"item-nav\">\n\t\t\t\t<button @click=\"deleteItem(item)\">✗</button>\n\t\t\t</div>\n\t\t</div>\n\t</div>\n\t<form v-if=\"addneww\" @submit.prevent=\"\">\n\t\t<textarea type=\"text\" class=\"add-item\" name=\"body\" v-model=\"newItem.body\" v-autosize=\"newItem.body\" @blur=\"cancelAddNew\" @keyup.esc=\"cancelAddNew\" @keydown.enter=\"enterOnNew\" placeholder=\"...\" autocomplete=\"off\" autofocus=\"\" rows=\"1\"></textarea>\n\t</form>\n\n\t<div class=\"children\" v-if=\"item.children\">\n\t\t<card v-for=\"childCard in item.children\" :item=\"childCard\"></card>\n\t</div>\n</div>\n"
+;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\n<div class=\"items-card\">\n\t<div class=\"card-title\" v-if=\"item.depth == 0\">\n\t\t{{ item.body }}\n\t</div>\n\t<div class=\"item-card\" v-if=\"item.depth != 0\" :class=\"{\n\t\t\tdone: item.done,\n\t\t\tediting: item.id == this.$root.editingItem,\n\t\t}\">\n\t\t<div class=\"toggle-div\">\n\t\t\t<input class=\"toggle\" type=\"checkbox\" v-if=\"item.children_order.length==0 || item.done == true\" v-model=\"item.done\" @change=\"markDone(item.id)\">\n\t\t</div>\n\t\t<div class=\"body-div\" :class=\"{ selected: item.id == this.$root.selection.selectedId, }\" @dblclick=\"startEdit(item)\" @click=\"select(item)\" @enter=\"console.log('yarrr')\">\n\t\t\t<span class=\"bodybox\" v-show=\"item.id != this.$root.editingItem\">{{ item.body }}</span>\n\t\t\t<!-- For debugging: -->\n\t\t\t<span v-show=\"false\"> ({{item.id}}) D-{{item.depth}}) [{{item.children_order}}]</span>\n\t\t\t\n\t\t\t<form action=\"update\" class=\"updatebox\" v-show=\"item.id == this.$root.editingItem\" @submit.prevent=\"doneEdit(item)\">\n\t\t\t\t<textarea name=\"item_body\" rows=\"{{ item.rows }}\" v-model=\"item.body\" v-autosize=\"item.body\" v-item-focus=\"item.id == this.$root.editingItem\" @blur=\"<!-- blurOnEdit(item) -->\" @keyup.esc=\"cancelEdit(item)\" @keydown.enter=\"enterOnEdit\">{{ item.body }}</textarea>\n\t\t\t\t<span>\n\t\t\t\t\t<label for=\"planned_time\">duration:</label>\n\t\t\t\t\t<input name=\"planned_time\" type=\"text\" v-model=\"item.planned_time\" @blur=\"<!-- blurOnEdit(item) -->\" @keyup.esc=\"cancelEdit(item)\" @keydown.enter=\"doneEdit(item)\">\n\t\t\t\t</span>\n\t\t\t</form>\n\t\t\t<div class=\"item-tags\" v-show=\"this.$root.editingItem != item.id\">\n\t\t\t\t<span v-if=\"item.done\" class=\"done\">\n\t\t\t\t\tdone {{ item.done_date | mm/dd }}\n\t\t\t\t</span>\n\t\t\t\t\n\t\t\t\t<span v-if=\"hasPlannedTime\" :class=\"{\n\t\t\t\t\t\t'duration':!item.children.length,\n\t\t\t\t\t\t'total-duration':item.children.length,\n\t\t\t\t\t}\">{{ calcPlannedTime }}</span>\n\n\t\t\t\t<span v-if=\"hasDueDate\" class=\"duedate\">\n\t\t\t\t\t{{ item.due_date | mm/dd }}\n\t\t\t\t</span>\n\t\t\t</div>\n\t\t\t<div class=\"item-nav\" v-show=\"this.$root.editingItem != item.id\">\n\t\t\t\t<button v-if=\"item.children_order.length==0\" @click=\"deleteItem(item)\">✗</button>\n\t\t\t</div>\n\t\t</div>\n\t</div>\n\t<form v-if=\"addneww\" @submit.prevent=\"\" id=\"new-under-{{ item.id }}\">\n\t\t<textarea type=\"text\" class=\"add-item\" name=\"body\" v-model=\"newItem.body\" v-autosize=\"newItem.body\" @blur=\"cancelAddNew\" @keyup.esc=\"cancelAddNew\" @keydown.enter=\"enterOnNew\" placeholder=\"...\" autocomplete=\"off\" autofocus=\"\" rows=\"1\"></textarea>\n\t</form>\n\n\t<div class=\"children\" v-if=\"item.children\">\n\t\t<card v-for=\"childCard in item.children\" :item=\"childCard\"></card>\n\t</div>\n</div>\n"
 if (module.hot) {(function () {  module.hot.accept()
   var hotAPI = require("vue-hot-reload-api")
   hotAPI.install(require("vue"), true)
@@ -11244,6 +11299,9 @@ var Tree = function () {
 			var nl = node.body.split(/\r\n|\r|\n/).length;
 			node['rows'] = nl;
 
+			// Change format:
+			node['planned_time'] = node['planned_time'].substring(0, 5);
+
 			//Sort all nodes after making sure you got all of them.
 			itemsProcessed++;
 			if (itemsProcessed === this.source.length) {
@@ -11265,6 +11323,8 @@ var Tree = function () {
 	}, {
 		key: 'addItem',
 		value: function addItem(item, index) {
+			item.children_order = !item.children_order ? [] : item.children_order;
+			item.children = !item.children ? [] : item.children;
 			var parent = allItems.nodes[item.parent_id];
 			console.log('item.parent_id in additem');
 			console.log(item.parent_id);
@@ -11425,7 +11485,25 @@ var Tree = function () {
 				return true;
 			}.bind(this));
 		}
-
+	}, {
+		key: 'deleteItem',
+		value: function deleteItem(id) {
+			var parent_id = allItems.nodes[id].parent_id;
+			var targetItem = allItems.nodes[id];
+			var prevParent = allItems.nodes[parent_id];
+			var siblingIndex = this.siblingIndex(id);
+			// Delete items attached to previous parent
+			prevParent.children.splice(siblingIndex, 1);
+			prevParent.children_order.splice(siblingIndex, 1);
+			vm.patchChildren_order(parent_id);
+		}
+	}, {
+		key: 'updateDoneState',
+		value: function updateDoneState(id) {
+			var done_date = new Date();
+			allItems.nodes[id].done_date = done_date;
+			vm.patchDone(id);
+		}
 		// recalcChildren_order(item){
 		// 	let theItem = allItems.nodes['1'];
 		// 	let result = theItem.children.map(function(a) {return a.id;});

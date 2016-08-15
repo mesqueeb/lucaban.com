@@ -5,6 +5,31 @@ Vue.use(VueAutosize)
 import Tree from './vue-components/dataTree.js';
 import Selection from './vue-components/Selection.js';
 
+window.formatDate =
+{
+	mmdd(val){
+	    console.log('val in mmdd: '+val);
+	    let d = (val) ? new Date(val) : new Date() ;
+	    console.log('d: '+d);
+	    let dd = d.getDate();
+		let mm = d.getMonth();
+	    return mm+'/'+dd;
+	}
+};
+Vue.filter('mm/dd', {
+  // model -> view
+  // formats the value when updating the input element.
+  read: function(val) {
+  	return formatDate.mmdd(val);
+  },
+  // // view -> model
+  // // formats the value when writing to the data.
+  // write: function(val, oldVal) {
+  //   var number = +val.replace(/[^\d.]/g, '')
+  //   return isNaN(number) ? 0 : parseFloat(number.toFixed(2))
+  // }
+});
+
 $.getJSON('/api/items',function(fetchedData){
 
 	//response
@@ -17,13 +42,26 @@ window.vm = new Vue({
 		import_data: allItems.root,
 		selection: selection,
 		addingNewUnder: null,
+		editingItem: null,
 	},
 	components: { Card },
 	methods:{
 		markDone(){
 			let item = allItems.nodes[selection.selectedId];
+			// swap done value because of iniciation with with spacebar:
 			item.done = !item.done;
-			this.$http.patch('/api/items/' + item.id, {'done':item.done});
+			allItems.updateDoneState(item.id);
+		},
+		patchDone(id){
+			let done_date;
+			let doneValue = allItems.nodes[id].done;
+			if (doneValue){
+				let d = new Date();
+				done_date = d.toJSON();
+			} else {
+				done_date = '0000-00-00 00:00:00';
+			}
+			this.$http.patch('/api/items/' + id, {'done':doneValue, 'done_date':done_date});
 		},
 		indent(){
 			let id = selection.selectedId;
@@ -31,7 +69,6 @@ window.vm = new Vue({
 			if(new_parent_id == allItems.nodes[id].parent_id){ console.log('bump! ceiling!'); return; }
 			console.log('new_parent_id / olderSiblingId: '+new_parent_id);
 			allItems.giveNewParent(id,new_parent_id);
-			// this.$broadcast('updateDepth');
 		},
 		unindent(){
 			let id = selection.selectedId;
@@ -68,7 +105,7 @@ window.vm = new Vue({
 			id = (id) ? id : selection.selectedId;
 			console.log('showAddNewItem for '+id);
 			this.addingNewUnder = id;
-			setTimeout(function(){$("#new-under-"+id+">textarea").focus();},10);
+			setTimeout(function(){$("#new-under-"+id+" textarea").focus();},10);
 		},
 		patchChildren_order(id, newItem){
 			let childrenArray = allItems.nodes[id].children_order;
