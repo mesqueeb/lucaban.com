@@ -19,8 +19,8 @@ class CreateItemsTable extends Migration
         $table->text('children_order');
         $table->string('body');
         $table->text('memo');
-        $table->time('planned_time');
-        $table->time('total_used_time');
+        $table->integer('planned_time')->default(0);
+        $table->integer('total_used_time')->default(0);
         $table->decimal('completion_rate', 5, 4);
         $table->dateTime('due_date');
         $table->dateTime('done_date');

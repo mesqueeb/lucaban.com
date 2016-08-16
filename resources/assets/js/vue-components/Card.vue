@@ -50,7 +50,7 @@
 					<span>
 						<label for="planned_time">duration:</label>
 						<input name="planned_time"
-							type="text"
+							type="number"
 							v-model="item.planned_time"
 							@blur="blurOnEdit(item)"
 							@keyup.esc="cancelEdit(item)"
@@ -146,12 +146,8 @@ export default {
 			if(this.$root.addingNewUnder == this.item.id || this.item.depth == 0){ return true; } else { return null; }
 		},
 		calcPlannedTime(){
-			if(!this.item.children.length){
-				return this.item.planned_time;
-			} else {
-				return this.item.planned_time;//codementor
-				//how to calculate all planned_time upwards. I'd like to do it on the Tree class, but there are no computed properties there...
-			}
+			let a = allItems.calculateDuration(this.item);
+			return a.totalTime;
 		},
 		hasDueDate(){
 		    return this.item.due_date != '0000-00-00 00:00:00';
@@ -160,7 +156,7 @@ export default {
 		    return this.item.done_date != '0000-00-00 00:00:00';
 		},
 		hasPlannedTime(){
-		    return this.item.planned_time != '00:00';
+		    return this.calcPlannedTime != '0';
 		},
 	},
 	methods: {

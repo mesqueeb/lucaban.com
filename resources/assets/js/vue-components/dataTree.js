@@ -27,10 +27,6 @@ export default class Tree {
 		// Add amount of rows
 		let nl = node.body.split(/\r\n|\r|\n/).length;
 		node['rows'] = nl;
-
-		// Change format:
-		node['planned_time'] = node['planned_time'].substring(0, 5);
-
 		//Sort all nodes after making sure you got all of them.
 		itemsProcessed++;
 	    if(itemsProcessed === this.source.length) {
@@ -52,10 +48,17 @@ export default class Tree {
 		let obj = allItems.nodes;
 		let arr = Object.keys( obj ).map(function ( key ) { return obj[key].depth; });
 		let max = Math.max.apply( null, arr );
-		let step;
-		for (step = max; step > 0; step--) {
-			//Loop through every layer of depth. From max depth → 0
-		}
+		let depthStep;
+for (depthStep = max; depthStep > 0; depthStep--) {
+	// get all tasks with depth = depthStep
+	// foreach(){}
+	// if has children{
+		//make 'total time' = sum of all 'total time' on children + 'own time'
+	// } else if no childern {
+		//make 'total time' = 'own time'
+	//}
+	//if all done, end the loop and decrement depthStep
+}
 	}
 	addItem(item, index)
 	{
@@ -217,7 +220,27 @@ export default class Tree {
 		allItems.nodes[id].done_date = done_date;
 		vm.patchDone(id);
 	}
-	// recalcChildren_order(item){
+	calculateDuration(item)
+	{
+	    // if we don't have children, do nothing, leave the time as-is
+	    if (!(Array.isArray(item.children) && item.children.length)) {
+	      item['totalTime'] = item.planned_time;
+	      return item;
+	    }
+	    //recursively call this on children
+	    item.children = item.children.map(this.calculateDuration);
+	    // add up all the times of our direct children (they'll already have been reconciled)
+	    item['totalTime'] = item.children.reduce((prev, next) => {
+	        return allItems.addTime(prev, next.totalTime);
+	    }, item.planned_time);
+	    return item;
+	}
+	addTime(a, b)
+	{
+	    return parseFloat(a) + parseFloat(b);
+	}
+	// recalcChildren_order(item)
+	// {
 	// 	let theItem = allItems.nodes['1'];
 	// 	let result = theItem.children.map(function(a) {return a.id;});
 	// 	theItem.children_order = result;

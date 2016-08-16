@@ -11088,12 +11088,8 @@ exports.default = {
 			}
 		},
 		calcPlannedTime: function calcPlannedTime() {
-			if (!this.item.children.length) {
-				return this.item.planned_time;
-			} else {
-				return this.item.planned_time; //codementor
-				//how to calculate all planned_time upwards. I'd like to do it on the Tree class, but there are no computed properties there...
-			}
+			var a = allItems.calculateDuration(this.item);
+			return a.totalTime;
 		},
 		hasDueDate: function hasDueDate() {
 			return this.item.due_date != '0000-00-00 00:00:00';
@@ -11102,7 +11098,7 @@ exports.default = {
 			return this.item.done_date != '0000-00-00 00:00:00';
 		},
 		hasPlannedTime: function hasPlannedTime() {
-			return this.item.planned_time != '00:00';
+			return this.calcPlannedTime != '0';
 		}
 	},
 	methods: {
@@ -11213,7 +11209,7 @@ exports.default = {
 	}
 };
 if (module.exports.__esModule) module.exports = module.exports.default
-;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\n<div class=\"items-card\">\n\t<div class=\"card-title\" v-if=\"item.depth == 0\">\n\t\t{{ item.body }}\n\t</div>\n\t<div class=\"item-card\" v-if=\"item.depth != 0\" :class=\"{\n\t\t\tdone: item.done,\n\t\t\tediting: item.id == this.$root.editingItem,\n\t\t}\">\n\t\t<div class=\"toggle-div\">\n\t\t\t<input class=\"toggle\" type=\"checkbox\" v-if=\"item.children_order.length==0 || item.done == true\" v-model=\"item.done\" @change=\"markDone(item.id)\">\n\t\t</div>\n\t\t<div class=\"body-div\" :class=\"{ selected: item.id == this.$root.selection.selectedId, }\" @dblclick=\"startEdit(item)\" @click=\"select(item)\" @enter=\"console.log('yarrr')\">\n\t\t\t<span class=\"bodybox\" v-show=\"item.id != this.$root.editingItem\">{{ item.body }}</span>\n\t\t\t<!-- For debugging: -->\n\t\t\t<span v-show=\"false\"> ({{item.id}}) D-{{item.depth}}) [{{item.children_order}}]</span>\n\t\t\t\n\t\t\t<form action=\"update\" class=\"updatebox\" v-show=\"item.id == this.$root.editingItem\" @submit.prevent=\"doneEdit(item)\">\n\t\t\t\t<textarea name=\"item_body\" rows=\"{{ item.rows }}\" v-model=\"item.body\" v-autosize=\"item.body\" v-item-focus=\"item.id == this.$root.editingItem\" @blur=\"blurOnEdit(item)\" @keyup.esc=\"cancelEdit(item)\" @keydown.enter=\"enterOnEdit\">{{ item.body }}</textarea>\n\t\t\t\t<span>\n\t\t\t\t\t<label for=\"planned_time\">duration:</label>\n\t\t\t\t\t<input name=\"planned_time\" type=\"text\" v-model=\"item.planned_time\" @blur=\"blurOnEdit(item)\" @keyup.esc=\"cancelEdit(item)\" @keydown.enter=\"doneEdit(item)\">\n\t\t\t\t</span>\n\t\t\t</form>\n\t\t\t<div class=\"item-tags\" v-show=\"this.$root.editingItem != item.id\">\n\t\t\t\t<span v-if=\"item.done\" class=\"done\">\n\t\t\t\t\tdone {{ item.done_date | mm/dd }}\n\t\t\t\t</span>\n\t\t\t\t\n\t\t\t\t<span v-if=\"hasPlannedTime\" :class=\"{\n\t\t\t\t\t\t'duration':!item.children.length,\n\t\t\t\t\t\t'total-duration':item.children.length,\n\t\t\t\t\t}\">{{ calcPlannedTime }}</span>\n\n\t\t\t\t<span v-if=\"hasDueDate\" class=\"duedate\">\n\t\t\t\t\t{{ item.due_date | mm/dd }}\n\t\t\t\t</span>\n\t\t\t</div>\n\t\t\t<div class=\"item-nav\" v-show=\"this.$root.editingItem != item.id\">\n\t\t\t\t<button v-if=\"item.children_order.length==0\" @click=\"deleteItem(item)\">✗</button>\n\t\t\t</div>\n\t\t</div>\n\t</div>\n\t<form v-if=\"addneww\" @submit.prevent=\"\" id=\"new-under-{{ item.id }}\">\n\t\t<textarea type=\"text\" class=\"add-item\" name=\"body\" v-model=\"newItem.body\" v-autosize=\"newItem.body\" @blur=\"cancelAddNew\" @keyup.esc=\"cancelAddNew\" @keydown.enter=\"enterOnNew\" placeholder=\"...\" autocomplete=\"off\" autofocus=\"\" rows=\"1\"></textarea>\n\t</form>\n\n\t<div class=\"children\" v-if=\"item.children\">\n\t\t<card v-for=\"childCard in item.children\" :item=\"childCard\"></card>\n\t</div>\n</div>\n"
+;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\n<div class=\"items-card\">\n\t<div class=\"card-title\" v-if=\"item.depth == 0\">\n\t\t{{ item.body }}\n\t</div>\n\t<div class=\"item-card\" v-if=\"item.depth != 0\" :class=\"{\n\t\t\tdone: item.done,\n\t\t\tediting: item.id == this.$root.editingItem,\n\t\t}\">\n\t\t<div class=\"toggle-div\">\n\t\t\t<input class=\"toggle\" type=\"checkbox\" v-if=\"item.children_order.length==0 || item.done == true\" v-model=\"item.done\" @change=\"markDone(item.id)\">\n\t\t</div>\n\t\t<div class=\"body-div\" :class=\"{ selected: item.id == this.$root.selection.selectedId, }\" @dblclick=\"startEdit(item)\" @click=\"select(item)\" @enter=\"console.log('yarrr')\">\n\t\t\t<span class=\"bodybox\" v-show=\"item.id != this.$root.editingItem\">{{ item.body }}</span>\n\t\t\t<!-- For debugging: -->\n\t\t\t<span v-show=\"false\"> ({{item.id}}) D-{{item.depth}}) [{{item.children_order}}]</span>\n\t\t\t\n\t\t\t<form action=\"update\" class=\"updatebox\" v-show=\"item.id == this.$root.editingItem\" @submit.prevent=\"doneEdit(item)\">\n\t\t\t\t<textarea name=\"item_body\" rows=\"{{ item.rows }}\" v-model=\"item.body\" v-autosize=\"item.body\" v-item-focus=\"item.id == this.$root.editingItem\" @blur=\"blurOnEdit(item)\" @keyup.esc=\"cancelEdit(item)\" @keydown.enter=\"enterOnEdit\">{{ item.body }}</textarea>\n\t\t\t\t<span>\n\t\t\t\t\t<label for=\"planned_time\">duration:</label>\n\t\t\t\t\t<input name=\"planned_time\" type=\"number\" v-model=\"item.planned_time\" @blur=\"blurOnEdit(item)\" @keyup.esc=\"cancelEdit(item)\" @keydown.enter=\"doneEdit(item)\">\n\t\t\t\t</span>\n\t\t\t</form>\n\t\t\t<div class=\"item-tags\" v-show=\"this.$root.editingItem != item.id\">\n\t\t\t\t<span v-if=\"item.done\" class=\"done\">\n\t\t\t\t\tdone {{ item.done_date | mm/dd }}\n\t\t\t\t</span>\n\t\t\t\t\n\t\t\t\t<span v-if=\"hasPlannedTime\" :class=\"{\n\t\t\t\t\t\t'duration':!item.children.length,\n\t\t\t\t\t\t'total-duration':item.children.length,\n\t\t\t\t\t}\">{{ calcPlannedTime }}</span>\n\n\t\t\t\t<span v-if=\"hasDueDate\" class=\"duedate\">\n\t\t\t\t\t{{ item.due_date | mm/dd }}\n\t\t\t\t</span>\n\t\t\t</div>\n\t\t\t<div class=\"item-nav\" v-show=\"this.$root.editingItem != item.id\">\n\t\t\t\t<button v-if=\"item.children_order.length==0\" @click=\"deleteItem(item)\">✗</button>\n\t\t\t</div>\n\t\t</div>\n\t</div>\n\t<form v-if=\"addneww\" @submit.prevent=\"\" id=\"new-under-{{ item.id }}\">\n\t\t<textarea type=\"text\" class=\"add-item\" name=\"body\" v-model=\"newItem.body\" v-autosize=\"newItem.body\" @blur=\"cancelAddNew\" @keyup.esc=\"cancelAddNew\" @keydown.enter=\"enterOnNew\" placeholder=\"...\" autocomplete=\"off\" autofocus=\"\" rows=\"1\"></textarea>\n\t</form>\n\n\t<div class=\"children\" v-if=\"item.children\">\n\t\t<card v-for=\"childCard in item.children\" :item=\"childCard\"></card>\n\t</div>\n</div>\n"
 if (module.hot) {(function () {  module.hot.accept()
   var hotAPI = require("vue-hot-reload-api")
   hotAPI.install(require("vue"), true)
@@ -11303,10 +11299,6 @@ var Tree = function () {
 			// Add amount of rows
 			var nl = node.body.split(/\r\n|\r|\n/).length;
 			node['rows'] = nl;
-
-			// Change format:
-			node['planned_time'] = node['planned_time'].substring(0, 5);
-
 			//Sort all nodes after making sure you got all of them.
 			itemsProcessed++;
 			if (itemsProcessed === this.source.length) {
@@ -11333,9 +11325,16 @@ var Tree = function () {
 				return obj[key].depth;
 			});
 			var max = Math.max.apply(null, arr);
-			var step = void 0;
-			for (step = max; step > 0; step--) {
-				//Loop through every layer of depth. From max depth → 0
+			var depthStep = void 0;
+			for (depthStep = max; depthStep > 0; depthStep--) {
+				// get all tasks with depth = depthStep
+				// foreach(){}
+				// if has children{
+				//make 'total time' = sum of all 'total time' on children + 'own time'
+				// } else if no childern {
+				//make 'total time' = 'own time'
+				//}
+				//if all done, end the loop and decrement depthStep
 			}
 		}
 	}, {
@@ -11522,7 +11521,29 @@ var Tree = function () {
 			allItems.nodes[id].done_date = done_date;
 			vm.patchDone(id);
 		}
-		// recalcChildren_order(item){
+	}, {
+		key: 'calculateDuration',
+		value: function calculateDuration(item) {
+			// if we don't have children, do nothing, leave the time as-is
+			if (!(Array.isArray(item.children) && item.children.length)) {
+				item['totalTime'] = item.planned_time;
+				return item;
+			}
+			//recursively call this on children
+			item.children = item.children.map(this.calculateDuration);
+			// add up all the times of our direct children (they'll already have been reconciled)
+			item['totalTime'] = item.children.reduce(function (prev, next) {
+				return allItems.addTime(prev, next.totalTime);
+			}, item.planned_time);
+			return item;
+		}
+	}, {
+		key: 'addTime',
+		value: function addTime(a, b) {
+			return parseFloat(a) + parseFloat(b);
+		}
+		// recalcChildren_order(item)
+		// {
 		// 	let theItem = allItems.nodes['1'];
 		// 	let result = theItem.children.map(function(a) {return a.id;});
 		// 	theItem.children_order = result;
