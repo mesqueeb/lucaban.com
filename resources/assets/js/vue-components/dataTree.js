@@ -47,6 +47,16 @@ export default class Tree {
 	{
 		return this.nodes[id];
 	}
+	calcAllPlannedTime()
+	{
+		let obj = allItems.nodes;
+		let arr = Object.keys( obj ).map(function ( key ) { return obj[key].depth; });
+		let max = Math.max.apply( null, arr );
+		let step;
+		for (step = max; step > 0; step--) {
+			//Loop through every layer of depth. From max depth → 0
+		}
+	}
 	addItem(item, index)
 	{
 		item.children_order = (!item.children_order) ? [] : item.children_order;

@@ -43,7 +43,7 @@
 						v-model="item.body"
 						v-autosize="item.body"
 						v-item-focus="item.id == this.$root.editingItem"
-						@blur="<!-- blurOnEdit(item) -->"
+						@blur="blurOnEdit(item)"
 						@keyup.esc="cancelEdit(item)"
 						@keydown.enter="enterOnEdit"
 					>{{ item.body }}</textarea>
@@ -52,7 +52,7 @@
 						<input name="planned_time"
 							type="text"
 							v-model="item.planned_time"
-							@blur="<!-- blurOnEdit(item) -->"
+							@blur="blurOnEdit(item)"
 							@keyup.esc="cancelEdit(item)"
 							@keydown.enter="doneEdit(item)"
 						/>
@@ -180,10 +180,15 @@ export default {
 			}
 	    },
 	    blurOnEdit(item) {
-	    	if ( $('.updatebox input:focus').length > 0 ||  $('.updatebox textarea:focus').length > 0 ) {
-        		return;
-			}
-	    	this.doneEdit(item);
+	    	let component = this;
+	    	setTimeout(function(){
+		    	if ( $('.updatebox input:focus').length > 0 ||  $('.updatebox textarea:focus').length > 0 ) {
+	        		return;
+				}　else {
+					component.doneEdit(item);
+				}
+	    	},20);
+	    	// Codementor: is there any better way than this?
 	    },
 		markDone(id){
 			allItems.updateDoneState(id);

@@ -11122,10 +11122,15 @@ exports.default = {
 			}
 		},
 		blurOnEdit: function blurOnEdit(item) {
-			if ($('.updatebox input:focus').length > 0 || $('.updatebox textarea:focus').length > 0) {
-				return;
-			}
-			this.doneEdit(item);
+			var component = this;
+			setTimeout(function () {
+				if ($('.updatebox input:focus').length > 0 || $('.updatebox textarea:focus').length > 0) {
+					return;
+				} else {
+					component.doneEdit(item);
+				}
+			}, 20);
+			// Codementor: is there any better way than this?
 		},
 		markDone: function markDone(id) {
 			allItems.updateDoneState(id);
@@ -11208,7 +11213,7 @@ exports.default = {
 	}
 };
 if (module.exports.__esModule) module.exports = module.exports.default
-;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\n<div class=\"items-card\">\n\t<div class=\"card-title\" v-if=\"item.depth == 0\">\n\t\t{{ item.body }}\n\t</div>\n\t<div class=\"item-card\" v-if=\"item.depth != 0\" :class=\"{\n\t\t\tdone: item.done,\n\t\t\tediting: item.id == this.$root.editingItem,\n\t\t}\">\n\t\t<div class=\"toggle-div\">\n\t\t\t<input class=\"toggle\" type=\"checkbox\" v-if=\"item.children_order.length==0 || item.done == true\" v-model=\"item.done\" @change=\"markDone(item.id)\">\n\t\t</div>\n\t\t<div class=\"body-div\" :class=\"{ selected: item.id == this.$root.selection.selectedId, }\" @dblclick=\"startEdit(item)\" @click=\"select(item)\" @enter=\"console.log('yarrr')\">\n\t\t\t<span class=\"bodybox\" v-show=\"item.id != this.$root.editingItem\">{{ item.body }}</span>\n\t\t\t<!-- For debugging: -->\n\t\t\t<span v-show=\"false\"> ({{item.id}}) D-{{item.depth}}) [{{item.children_order}}]</span>\n\t\t\t\n\t\t\t<form action=\"update\" class=\"updatebox\" v-show=\"item.id == this.$root.editingItem\" @submit.prevent=\"doneEdit(item)\">\n\t\t\t\t<textarea name=\"item_body\" rows=\"{{ item.rows }}\" v-model=\"item.body\" v-autosize=\"item.body\" v-item-focus=\"item.id == this.$root.editingItem\" @blur=\"<!-- blurOnEdit(item) -->\" @keyup.esc=\"cancelEdit(item)\" @keydown.enter=\"enterOnEdit\">{{ item.body }}</textarea>\n\t\t\t\t<span>\n\t\t\t\t\t<label for=\"planned_time\">duration:</label>\n\t\t\t\t\t<input name=\"planned_time\" type=\"text\" v-model=\"item.planned_time\" @blur=\"<!-- blurOnEdit(item) -->\" @keyup.esc=\"cancelEdit(item)\" @keydown.enter=\"doneEdit(item)\">\n\t\t\t\t</span>\n\t\t\t</form>\n\t\t\t<div class=\"item-tags\" v-show=\"this.$root.editingItem != item.id\">\n\t\t\t\t<span v-if=\"item.done\" class=\"done\">\n\t\t\t\t\tdone {{ item.done_date | mm/dd }}\n\t\t\t\t</span>\n\t\t\t\t\n\t\t\t\t<span v-if=\"hasPlannedTime\" :class=\"{\n\t\t\t\t\t\t'duration':!item.children.length,\n\t\t\t\t\t\t'total-duration':item.children.length,\n\t\t\t\t\t}\">{{ calcPlannedTime }}</span>\n\n\t\t\t\t<span v-if=\"hasDueDate\" class=\"duedate\">\n\t\t\t\t\t{{ item.due_date | mm/dd }}\n\t\t\t\t</span>\n\t\t\t</div>\n\t\t\t<div class=\"item-nav\" v-show=\"this.$root.editingItem != item.id\">\n\t\t\t\t<button v-if=\"item.children_order.length==0\" @click=\"deleteItem(item)\">✗</button>\n\t\t\t</div>\n\t\t</div>\n\t</div>\n\t<form v-if=\"addneww\" @submit.prevent=\"\" id=\"new-under-{{ item.id }}\">\n\t\t<textarea type=\"text\" class=\"add-item\" name=\"body\" v-model=\"newItem.body\" v-autosize=\"newItem.body\" @blur=\"cancelAddNew\" @keyup.esc=\"cancelAddNew\" @keydown.enter=\"enterOnNew\" placeholder=\"...\" autocomplete=\"off\" autofocus=\"\" rows=\"1\"></textarea>\n\t</form>\n\n\t<div class=\"children\" v-if=\"item.children\">\n\t\t<card v-for=\"childCard in item.children\" :item=\"childCard\"></card>\n\t</div>\n</div>\n"
+;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\n<div class=\"items-card\">\n\t<div class=\"card-title\" v-if=\"item.depth == 0\">\n\t\t{{ item.body }}\n\t</div>\n\t<div class=\"item-card\" v-if=\"item.depth != 0\" :class=\"{\n\t\t\tdone: item.done,\n\t\t\tediting: item.id == this.$root.editingItem,\n\t\t}\">\n\t\t<div class=\"toggle-div\">\n\t\t\t<input class=\"toggle\" type=\"checkbox\" v-if=\"item.children_order.length==0 || item.done == true\" v-model=\"item.done\" @change=\"markDone(item.id)\">\n\t\t</div>\n\t\t<div class=\"body-div\" :class=\"{ selected: item.id == this.$root.selection.selectedId, }\" @dblclick=\"startEdit(item)\" @click=\"select(item)\" @enter=\"console.log('yarrr')\">\n\t\t\t<span class=\"bodybox\" v-show=\"item.id != this.$root.editingItem\">{{ item.body }}</span>\n\t\t\t<!-- For debugging: -->\n\t\t\t<span v-show=\"false\"> ({{item.id}}) D-{{item.depth}}) [{{item.children_order}}]</span>\n\t\t\t\n\t\t\t<form action=\"update\" class=\"updatebox\" v-show=\"item.id == this.$root.editingItem\" @submit.prevent=\"doneEdit(item)\">\n\t\t\t\t<textarea name=\"item_body\" rows=\"{{ item.rows }}\" v-model=\"item.body\" v-autosize=\"item.body\" v-item-focus=\"item.id == this.$root.editingItem\" @blur=\"blurOnEdit(item)\" @keyup.esc=\"cancelEdit(item)\" @keydown.enter=\"enterOnEdit\">{{ item.body }}</textarea>\n\t\t\t\t<span>\n\t\t\t\t\t<label for=\"planned_time\">duration:</label>\n\t\t\t\t\t<input name=\"planned_time\" type=\"text\" v-model=\"item.planned_time\" @blur=\"blurOnEdit(item)\" @keyup.esc=\"cancelEdit(item)\" @keydown.enter=\"doneEdit(item)\">\n\t\t\t\t</span>\n\t\t\t</form>\n\t\t\t<div class=\"item-tags\" v-show=\"this.$root.editingItem != item.id\">\n\t\t\t\t<span v-if=\"item.done\" class=\"done\">\n\t\t\t\t\tdone {{ item.done_date | mm/dd }}\n\t\t\t\t</span>\n\t\t\t\t\n\t\t\t\t<span v-if=\"hasPlannedTime\" :class=\"{\n\t\t\t\t\t\t'duration':!item.children.length,\n\t\t\t\t\t\t'total-duration':item.children.length,\n\t\t\t\t\t}\">{{ calcPlannedTime }}</span>\n\n\t\t\t\t<span v-if=\"hasDueDate\" class=\"duedate\">\n\t\t\t\t\t{{ item.due_date | mm/dd }}\n\t\t\t\t</span>\n\t\t\t</div>\n\t\t\t<div class=\"item-nav\" v-show=\"this.$root.editingItem != item.id\">\n\t\t\t\t<button v-if=\"item.children_order.length==0\" @click=\"deleteItem(item)\">✗</button>\n\t\t\t</div>\n\t\t</div>\n\t</div>\n\t<form v-if=\"addneww\" @submit.prevent=\"\" id=\"new-under-{{ item.id }}\">\n\t\t<textarea type=\"text\" class=\"add-item\" name=\"body\" v-model=\"newItem.body\" v-autosize=\"newItem.body\" @blur=\"cancelAddNew\" @keyup.esc=\"cancelAddNew\" @keydown.enter=\"enterOnNew\" placeholder=\"...\" autocomplete=\"off\" autofocus=\"\" rows=\"1\"></textarea>\n\t</form>\n\n\t<div class=\"children\" v-if=\"item.children\">\n\t\t<card v-for=\"childCard in item.children\" :item=\"childCard\"></card>\n\t</div>\n</div>\n"
 if (module.hot) {(function () {  module.hot.accept()
   var hotAPI = require("vue-hot-reload-api")
   hotAPI.install(require("vue"), true)
@@ -11319,6 +11324,19 @@ var Tree = function () {
 		key: 'getNode',
 		value: function getNode(id) {
 			return this.nodes[id];
+		}
+	}, {
+		key: 'calcAllPlannedTime',
+		value: function calcAllPlannedTime() {
+			var obj = allItems.nodes;
+			var arr = Object.keys(obj).map(function (key) {
+				return obj[key].depth;
+			});
+			var max = Math.max.apply(null, arr);
+			var step = void 0;
+			for (step = max; step > 0; step--) {
+				//Loop through every layer of depth. From max depth → 0
+			}
 		}
 	}, {
 		key: 'addItem',
