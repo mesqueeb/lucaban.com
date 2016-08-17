@@ -79,35 +79,37 @@ label {
 .child {
   margin-left: 1.5em; }
 
-.add-item {
-  padding: 0.5em;
-  width: 100%;
-  border-bottom: dashed 1px #ededed;
-  resize: none; }
-
-.updatebox {
+.updatebox, .addnewbox {
   width: 100%;
   display: -ms-flexbox;
   display: flex;
   -ms-flex-align: baseline;
-  align-items: baseline; }
-  .updatebox textarea, .updatebox input {
+  align-items: baseline;
+  border: rgba(245, 215, 110, 0.5) solid thin; }
+  .updatebox textarea, .updatebox input, .addnewbox textarea, .addnewbox input {
     outline: 0px !important;
-    border-color: rgba(245, 215, 110, 0.5);
-    resize: none; }
-  .updatebox textarea {
-    width: 100%; }
-  .updatebox input {
     padding: 0.2em 0.4em;
+    resize: none; }
+  .updatebox textarea, .addnewbox textarea {
+    width: 100%; }
+  .updatebox input, .addnewbox input {
     border-radius: 0.3em;
     background: #5dacce;
     color: white;
     width: 44px; }
-  .updatebox span {
+  .updatebox span, .addnewbox span {
     font-size: 0.85em;
     width: 145px; }
-  .updatebox label {
-    padding-right: 0.2em; }
+  .updatebox label, .addnewbox label {
+    margin: 0;
+    margin-right: 0.2em; }
+
+.addnewbox {
+  margin: 0.6em 0 0 1.9em;
+  width: 97%; }
+
+.add-item {
+  padding: 0.4em; }
 
 .toggle-div {
   width: 2em; }

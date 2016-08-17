@@ -44,7 +44,9 @@ window.vm = new Vue({
 		addingNewUnder: null,
 		editingItem: null,
 	},
-	components: { Card },
+	components: {
+		Card,
+	},
 	methods:{
 		markDone(){
 			let item = allItems.nodes[selection.selectedId];
@@ -62,6 +64,11 @@ window.vm = new Vue({
 				done_date = '0000-00-00 00:00:00';
 			}
 			this.$http.patch('/api/items/' + id, {'done':doneValue, 'done_date':done_date});
+		},
+		moveItem(direction){
+			let id = selection.selectedId;
+			if(!id){ return; }
+			allItems.moveItem(id, direction);
 		},
 		indent(){
 			let id = selection.selectedId;
@@ -93,11 +100,20 @@ window.vm = new Vue({
 		},
 		select(direction){
 			let id = selection.selectedId;
-			let sel = '';
+			let sel;
 			if(direction == 'next'){
-				sel = allItems.nextItemId(id)
+				if(!id || id == allItems.root.id){
+					sel = allItems.nodes['1'].children_order[0]; }
+				else {
+					sel = allItems.nextItemId(id)
+				}
 			} else if (direction == 'prev'){
-				sel = allItems.prevItemId(id)
+				if(!id || id == allItems.root.id){
+					let l = allItems.root.children_order.length;
+					sel = allItems.root.children_order[l-1]; }
+				else {
+					sel = allItems.prevItemId(id)
+				}
 			}
 			selection.selectedId = sel;
 		},
@@ -134,36 +150,16 @@ window.vm = new Vue({
 				console.log('patched item['+id+'].parent_id = '+parent_id+';');
 			});	
 		},
-		keystroke(keystroke){
-			switch(keystroke) { 
-				case 'arrowUp':
-					this.select('prev');
-					break;
-				case 'arrowDown':
-					this.select('next');
-					break;
-				case 'meta_arrowUp':
-					this.meta_arrowUp();
-					break;
-				case 'meta_arrowDown':
-					this.meta_arrowDown();
-					break;
-				case 'spaceBar':
-					this.markDone();
-					break;
-				case 'shift_tab':
-					this.unindent();
-					break;
-				case 'tab':
-					this.indent();
-					break;
-				case 'enter':
-					this.showAddNewItem();
-					break;
-				case 'meta_enter':
-					this.$broadcast('startEdit');
-					break;
-			}
+		keystroke(k){
+			if(k == 'arrowUp'){ this.select('prev')}
+			if(k == 'arrowDown'){ this.select('next')}
+			if(k == 'meta_arrowUp'){ this.moveItem('up')}
+			if(k == 'meta_arrowDown'){ this.moveItem('down')}
+			if(k == 'spaceBar'){ this.markDone()}
+			if(k == 'shift_tab'){ this.unindent()}
+			if(k == 'tab'){ this.indent()}
+			if(k == 'enter'){ this.showAddNewItem()}
+			if(k == 'meta_enter'){ this.$broadcast('startEdit')}
 		},
 	},
 	created(){

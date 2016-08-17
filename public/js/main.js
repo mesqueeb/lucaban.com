@@ -10843,7 +10843,9 @@ $.getJSON('/api/items', function (fetchedData) {
 			addingNewUnder: null,
 			editingItem: null
 		},
-		components: { Card: _Card2.default },
+		components: {
+			Card: _Card2.default
+		},
 		methods: {
 			markDone: function markDone() {
 				var item = allItems.nodes[selection.selectedId];
@@ -10861,6 +10863,13 @@ $.getJSON('/api/items', function (fetchedData) {
 					done_date = '0000-00-00 00:00:00';
 				}
 				this.$http.patch('/api/items/' + id, { 'done': doneValue, 'done_date': done_date });
+			},
+			moveItem: function moveItem(direction) {
+				var id = selection.selectedId;
+				if (!id) {
+					return;
+				}
+				allItems.moveItem(id, direction);
 			},
 			indent: function indent() {
 				var id = selection.selectedId;
@@ -10898,11 +10907,20 @@ $.getJSON('/api/items', function (fetchedData) {
 			},
 			select: function select(direction) {
 				var id = selection.selectedId;
-				var sel = '';
+				var sel = void 0;
 				if (direction == 'next') {
-					sel = allItems.nextItemId(id);
+					if (!id || id == allItems.root.id) {
+						sel = allItems.nodes['1'].children_order[0];
+					} else {
+						sel = allItems.nextItemId(id);
+					}
 				} else if (direction == 'prev') {
-					sel = allItems.prevItemId(id);
+					if (!id || id == allItems.root.id) {
+						var l = allItems.root.children_order.length;
+						sel = allItems.root.children_order[l - 1];
+					} else {
+						sel = allItems.prevItemId(id);
+					}
 				}
 				selection.selectedId = sel;
 			},
@@ -10938,35 +10956,33 @@ $.getJSON('/api/items', function (fetchedData) {
 					console.log('patched item[' + id + '].parent_id = ' + parent_id + ';');
 				});
 			},
-			keystroke: function keystroke(_keystroke) {
-				switch (_keystroke) {
-					case 'arrowUp':
-						this.select('prev');
-						break;
-					case 'arrowDown':
-						this.select('next');
-						break;
-					case 'meta_arrowUp':
-						this.meta_arrowUp();
-						break;
-					case 'meta_arrowDown':
-						this.meta_arrowDown();
-						break;
-					case 'spaceBar':
-						this.markDone();
-						break;
-					case 'shift_tab':
-						this.unindent();
-						break;
-					case 'tab':
-						this.indent();
-						break;
-					case 'enter':
-						this.showAddNewItem();
-						break;
-					case 'meta_enter':
-						this.$broadcast('startEdit');
-						break;
+			keystroke: function keystroke(k) {
+				if (k == 'arrowUp') {
+					this.select('prev');
+				}
+				if (k == 'arrowDown') {
+					this.select('next');
+				}
+				if (k == 'meta_arrowUp') {
+					this.moveItem('up');
+				}
+				if (k == 'meta_arrowDown') {
+					this.moveItem('down');
+				}
+				if (k == 'spaceBar') {
+					this.markDone();
+				}
+				if (k == 'shift_tab') {
+					this.unindent();
+				}
+				if (k == 'tab') {
+					this.indent();
+				}
+				if (k == 'enter') {
+					this.showAddNewItem();
+				}
+				if (k == 'meta_enter') {
+					this.$broadcast('startEdit');
 				}
 			}
 		},
@@ -11060,6 +11076,7 @@ exports.default = {
 		return {
 			newItem: {
 				body: '',
+				planned_time: 0,
 				parent_id: this.item.parent_id ? this.item.parent_id : 1,
 				depth: this.item.depth == 0 ? 1 : this.item.depth,
 				older_sibling_id: this.item.id
@@ -11080,14 +11097,14 @@ exports.default = {
 			}
 			return allItems.nodes[pId].children_order;
 		},
-		addneww: function addneww() {
-			if (this.$root.addingNewUnder == this.item.id || this.item.depth == 0) {
+		showAddNewBox: function showAddNewBox() {
+			if (this.$root.addingNewUnder == this.item.id || this.item.depth == 0 && allItems.root.children_order.length == 0) {
 				return true;
 			} else {
-				return null;
+				return false;
 			}
 		},
-		calcPlannedTime: function calcPlannedTime() {
+		calcTotalTime: function calcTotalTime() {
 			var a = allItems.calculateDuration(this.item);
 			return a.totalTime;
 		},
@@ -11097,8 +11114,11 @@ exports.default = {
 		hasDoneDate: function hasDoneDate() {
 			return this.item.done_date != '0000-00-00 00:00:00';
 		},
+		hasTotalTime: function hasTotalTime() {
+			return this.calcTotalTime != '0' && this.item.children_order.length;
+		},
 		hasPlannedTime: function hasPlannedTime() {
-			return this.calcPlannedTime != '0';
+			return this.item.planned_time != '0';
 		}
 	},
 	methods: {
@@ -11108,6 +11128,9 @@ exports.default = {
 		enterOnNew: function enterOnNew(e) {
 			if (e.keyCode === 13 && !e.shiftKey && !e.altKey) {
 				e.preventDefault();
+				if (!this.newItem.body) {
+					return;
+				}
 				this.addNew();
 			}
 		},
@@ -11128,6 +11151,16 @@ exports.default = {
 			}, 20);
 			// Codementor: is there any better way than this?
 		},
+		blurOnAddNew: function blurOnAddNew(item) {
+			var component = this;
+			setTimeout(function () {
+				if ($('.addnewbox input:focus').length > 0 || $('.addnewbox textarea:focus').length > 0) {
+					return;
+				} else {
+					component.cancelAddNew;
+				}
+			}, 20);
+		},
 		markDone: function markDone(id) {
 			allItems.updateDoneState(id);
 		},
@@ -11135,7 +11168,8 @@ exports.default = {
 			console.log('startEdit');
 			item = item ? item : allItems.nodes[selection.selectedId];
 			console.log(item);
-			this.beforeEditCache = item.body;
+			this.$root.beforeEditCache_body = item.body;
+			this.$root.beforeEditCache_planned_time = item.planned_time;
 			this.$root.editingItem = item.id;
 		},
 		doneEdit: function doneEdit(item) {
@@ -11157,8 +11191,9 @@ exports.default = {
 		cancelEdit: function cancelEdit(item) {
 			this.$root.editingItem = null;
 			console.log("cancel edit. Reverting to:");
-			console.log(this.beforeEditCache);
-			item.body = this.beforeEditCache;
+			console.log(this.$root.beforeEditCache_body);
+			item.body = this.$root.beforeEditCache_body;
+			item.planned_time = this.$root.beforeEditCache_planned_time;
 		},
 		deleteItem: function deleteItem(item) {
 			var id = item.id;
@@ -11209,7 +11244,7 @@ exports.default = {
 	}
 };
 if (module.exports.__esModule) module.exports = module.exports.default
-;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\n<div class=\"items-card\">\n\t<div class=\"card-title\" v-if=\"item.depth == 0\">\n\t\t{{ item.body }}\n\t</div>\n\t<div class=\"item-card\" v-if=\"item.depth != 0\" :class=\"{\n\t\t\tdone: item.done,\n\t\t\tediting: item.id == this.$root.editingItem,\n\t\t}\">\n\t\t<div class=\"toggle-div\">\n\t\t\t<input class=\"toggle\" type=\"checkbox\" v-if=\"item.children_order.length==0 || item.done == true\" v-model=\"item.done\" @change=\"markDone(item.id)\">\n\t\t</div>\n\t\t<div class=\"body-div\" :class=\"{ selected: item.id == this.$root.selection.selectedId, }\" @dblclick=\"startEdit(item)\" @click=\"select(item)\" @enter=\"console.log('yarrr')\">\n\t\t\t<span class=\"bodybox\" v-show=\"item.id != this.$root.editingItem\">{{ item.body }}</span>\n\t\t\t<!-- For debugging: -->\n\t\t\t<span v-show=\"false\"> ({{item.id}}) D-{{item.depth}}) [{{item.children_order}}]</span>\n\t\t\t\n\t\t\t<form action=\"update\" class=\"updatebox\" v-show=\"item.id == this.$root.editingItem\" @submit.prevent=\"doneEdit(item)\">\n\t\t\t\t<textarea name=\"item_body\" rows=\"{{ item.rows }}\" v-model=\"item.body\" v-autosize=\"item.body\" v-item-focus=\"item.id == this.$root.editingItem\" @blur=\"blurOnEdit(item)\" @keyup.esc=\"cancelEdit(item)\" @keydown.enter=\"enterOnEdit\">{{ item.body }}</textarea>\n\t\t\t\t<span>\n\t\t\t\t\t<label for=\"planned_time\">duration:</label>\n\t\t\t\t\t<input name=\"planned_time\" type=\"number\" v-model=\"item.planned_time\" @blur=\"blurOnEdit(item)\" @keyup.esc=\"cancelEdit(item)\" @keydown.enter=\"doneEdit(item)\">\n\t\t\t\t</span>\n\t\t\t</form>\n\t\t\t<div class=\"item-tags\" v-show=\"this.$root.editingItem != item.id\">\n\t\t\t\t<span v-if=\"item.done\" class=\"done\">\n\t\t\t\t\tdone {{ item.done_date | mm/dd }}\n\t\t\t\t</span>\n\t\t\t\t\n\t\t\t\t<span v-if=\"hasPlannedTime\" :class=\"{\n\t\t\t\t\t\t'duration':!item.children.length,\n\t\t\t\t\t\t'total-duration':item.children.length,\n\t\t\t\t\t}\">{{ calcPlannedTime }}</span>\n\n\t\t\t\t<span v-if=\"hasDueDate\" class=\"duedate\">\n\t\t\t\t\t{{ item.due_date | mm/dd }}\n\t\t\t\t</span>\n\t\t\t</div>\n\t\t\t<div class=\"item-nav\" v-show=\"this.$root.editingItem != item.id\">\n\t\t\t\t<button v-if=\"item.children_order.length==0\" @click=\"deleteItem(item)\">✗</button>\n\t\t\t</div>\n\t\t</div>\n\t</div>\n\t<form v-if=\"addneww\" @submit.prevent=\"\" id=\"new-under-{{ item.id }}\">\n\t\t<textarea type=\"text\" class=\"add-item\" name=\"body\" v-model=\"newItem.body\" v-autosize=\"newItem.body\" @blur=\"cancelAddNew\" @keyup.esc=\"cancelAddNew\" @keydown.enter=\"enterOnNew\" placeholder=\"...\" autocomplete=\"off\" autofocus=\"\" rows=\"1\"></textarea>\n\t</form>\n\n\t<div class=\"children\" v-if=\"item.children\">\n\t\t<card v-for=\"childCard in item.children\" :item=\"childCard\"></card>\n\t</div>\n</div>\n"
+;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\n<div class=\"items-card\">\n\t<div class=\"card-title\" v-if=\"item.depth == 0\">\n\t\t{{ item.body }}\n\t</div>\n\t<div class=\"item-card\" v-if=\"item.depth != 0\" :class=\"{\n\t\t\tdone: item.done,\n\t\t\tediting: item.id == this.$root.editingItem,\n\t\t}\">\n\t\t<div class=\"toggle-div\">\n\t\t\t<input class=\"toggle\" type=\"checkbox\" v-if=\"item.children_order.length==0 || item.done == true\" v-model=\"item.done\" @change=\"markDone(item.id)\">\n\t\t</div>\n\t\t<div class=\"body-div\" :class=\"{ selected: item.id == this.$root.selection.selectedId, }\" @dblclick=\"startEdit(item)\" @click=\"select(item)\" @enter=\"console.log('yarrr')\">\n\t\t\t<span class=\"bodybox\" v-show=\"item.id != this.$root.editingItem\">{{ item.body }}</span>\n\t\t\t<!-- For debugging: -->\n\t\t\t<span v-show=\"false\"> ({{item.id}}) D-{{item.depth}}) [{{item.children_order}}]</span>\n\t\t\t\n\t\t\t<form action=\"update\" class=\"updatebox\" v-show=\"item.id == this.$root.editingItem\" @submit.prevent=\"doneEdit(item)\">\n\t\t\t\t<textarea name=\"item_body\" rows=\"{{ item.rows }}\" v-model=\"item.body\" v-autosize=\"item.body\" v-item-focus=\"item.id == this.$root.editingItem\" @blur=\"blurOnEdit(item)\" @keyup.esc=\"cancelEdit(item)\" @keydown.enter=\"enterOnEdit\">{{ item.body }}</textarea>\n\t\t\t\t<span>\n\t\t\t\t\t<label for=\"planned_time\">duration:</label>\n\t\t\t\t\t<input name=\"planned_time\" type=\"number\" v-model=\"item.planned_time\" @blur=\"blurOnEdit(item)\" @keyup.esc=\"cancelEdit(item)\" @keydown.enter=\"doneEdit(item)\">\n\t\t\t\t</span>\n\t\t\t</form>\n\t\t\t<div class=\"item-tags\" v-show=\"this.$root.editingItem != item.id\">\n\t\t\t\t<span v-if=\"item.done\" class=\"done\">\n\t\t\t\t\tdone {{ item.done_date | mm/dd }}\n\t\t\t\t</span>\n\t\t\t\t\n\t\t\t\t<span v-if=\"hasTotalTime\" class=\"total-duration\">\n\t\t\t\t\t{{ calcTotalTime }}\n\t\t\t\t</span>\n\n\t\t\t\t<span v-if=\"hasPlannedTime\" class=\"duration\">\n\t\t\t\t\t{{ item.planned_time }}\n\t\t\t\t</span>\n\n\t\t\t\t<span v-if=\"hasDueDate\" class=\"duedate\">\n\t\t\t\t\t{{ item.due_date | mm/dd }}\n\t\t\t\t</span>\n\t\t\t</div>\n\t\t\t<div class=\"item-nav\" v-show=\"this.$root.editingItem != item.id\">\n\t\t\t\t<button v-if=\"item.children_order.length==0\" @click=\"deleteItem(item)\">✗</button>\n\t\t\t</div>\n\t\t</div>\n\t</div>\n\n\t<div class=\"children\" v-if=\"item.children\">\n\t\t<card v-for=\"childCard in item.children\" :item=\"childCard\"></card>\n\t</div>\n\n\t<form class=\"addnewbox\" id=\"new-under-{{ item.id }}\" v-if=\"showAddNewBox\" @submit.prevent=\"\">\n\t\t<textarea type=\"text\" class=\"add-item\" name=\"body\" v-model=\"newItem.body\" v-autosize=\"newItem.body\" @blur=\"blurOnAddNew(item)\" @keyup.esc=\"cancelAddNew\" @keydown.enter=\"enterOnNew\" placeholder=\"...\" autocomplete=\"off\" autofocus=\"\" rows=\"1\"></textarea>\n\t\t<span>\n\t\t\t<label for=\"planned_time\">duration:</label>\n\t\t\t<input name=\"planned_time\" type=\"number\" v-model=\"newItem.planned_time\" @blur=\"blurOnAddNew(item)\" @keyup.esc=\"cancelAddNew\" @keydown.enter=\"enterOnNew\">\n\t\t</span>\n\t</form>\n</div>\n"
 if (module.hot) {(function () {  module.hot.accept()
   var hotAPI = require("vue-hot-reload-api")
   hotAPI.install(require("vue"), true)
@@ -11303,7 +11338,7 @@ var Tree = function () {
 			itemsProcessed++;
 			if (itemsProcessed === this.source.length) {
 				$.each(this.nodes, function (index, value) {
-					this.sortChildren(value);
+					this.sortChildren(value.id);
 				}.bind(this));
 			}
 		}
@@ -11393,7 +11428,7 @@ var Tree = function () {
 			var siblingsArr = allItems.nodes[parent_id].children_order;
 
 			if (allItems.siblingIndex(id) + 1 == siblingsArr.length) {
-				console.log('this was the last node');
+				// console.log('this was the last node');
 				return this.nextItemRecursion(id, parent_id);
 			}
 			var siblingIndex = siblingsArr.indexOf(id);
@@ -11420,13 +11455,13 @@ var Tree = function () {
 		key: 'prevItemRecursion',
 		value: function prevItemRecursion(id) {
 			var childrenLength = allItems.nodes[id].children.length;
-			console.log('childrenLength: ' + childrenLength + ' // id: ' + id);
+			// console.log('childrenLength: '+childrenLength+' // id: '+id);
 			if (childrenLength > 0) {
 				id = allItems.nodes[id].children[childrenLength - 1].id;
-				console.log('childrenLength: ' + childrenLength + ' // id: ' + id);
+				// console.log('childrenLength: '+childrenLength+' // id: '+id);
 				return this.prevItemRecursion(id);
 			} else {
-				console.log('last cycle id: ' + id); //THIS VALUE LOOKS FINE
+				// console.log('last cycle id: '+id);//THIS VALUE LOOKS FINE
 				return id;
 			}
 		}
@@ -11442,7 +11477,8 @@ var Tree = function () {
 		}
 	}, {
 		key: 'sortChildren',
-		value: function sortChildren(item) {
+		value: function sortChildren(id) {
+			var item = this.nodes[id];
 			var order = item.children_order;
 			var items = item.children;
 			if (order instanceof Array) {
@@ -11530,7 +11566,7 @@ var Tree = function () {
 				return item;
 			}
 			//recursively call this on children
-			item.children = item.children.map(this.calculateDuration);
+			item.children = item.children.map(allItems.calculateDuration);
 			// add up all the times of our direct children (they'll already have been reconciled)
 			item['totalTime'] = item.children.reduce(function (prev, next) {
 				return allItems.addTime(prev, next.totalTime);
@@ -11541,6 +11577,31 @@ var Tree = function () {
 		key: 'addTime',
 		value: function addTime(a, b) {
 			return parseFloat(a) + parseFloat(b);
+		}
+	}, {
+		key: 'moveItem',
+		value: function moveItem(id, direction) {
+			clearTimeout(window.patchDelay);
+			var pid = this.nodes[id].parent_id;
+			var parent = this.nodes[pid];
+			var index = this.siblingIndex(id);
+			if (direction == 'up' || direction == 'left') {
+				if (index == 0) {
+					return;
+				};
+				parent.children_order.splice(index, 1);
+				parent.children_order.splice(index - 1, 0, id);
+			} else if (direction == 'down' || direction == 'right') {
+				if (index + 1 == parent.children_order.length) {
+					return;
+				};
+				parent.children_order.splice(index, 1);
+				parent.children_order.splice(index + 1, 0, id);
+			}
+			this.sortChildren(pid);
+			window.patchDelay = setTimeout(function () {
+				vm.patchChildren_order(pid);
+			}, 1000);
 		}
 		// recalcChildren_order(item)
 		// {

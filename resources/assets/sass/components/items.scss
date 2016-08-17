@@ -57,26 +57,20 @@ label{
     margin-left: 1.5em;
 }
 
-.add-item {
-    padding: 0.5em;
-    width: 100%;
-    border-bottom: dashed 1px #ededed;
-    resize: none;
-}
-.updatebox {
+.updatebox, .addnewbox {
     width: 100%;
     display: flex;
     align-items: baseline;
+    border: $selection-color solid thin;
     textarea, input{
         outline: 0px !important;
-        border-color: $selection-color;
+        padding: 0.2em 0.4em;
         resize: none;
     }
     textarea{
         width: 100%;
     }
     input{
-        padding: 0.2em 0.4em;
         border-radius: 0.3em;
         background: $duration-color;
         color: white;
@@ -87,9 +81,18 @@ label{
         width: 145px; // codementor
     }
     label{
-        padding-right: 0.2em;
+        margin: 0;
+        margin-right: 0.2em;
     }
 }
+.addnewbox {
+    margin: 0.6em 0 0 1.9em;
+    width: 97%;
+}
+.add-item {
+    padding: 0.4em;
+}
+
 .toggle-div{
     width: 2em;
     div, input{

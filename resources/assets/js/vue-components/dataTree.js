@@ -31,7 +31,7 @@ export default class Tree {
 		itemsProcessed++;
 	    if(itemsProcessed === this.source.length) {
 	    	$.each(this.nodes, function(index, value) {
-			    this.sortChildren(value);
+			    this.sortChildren(value.id);
 			}.bind(this));
 	    }
 	}
@@ -106,7 +106,7 @@ for (depthStep = max; depthStep > 0; depthStep--) {
 		let siblingsArr = allItems.nodes[parent_id].children_order;
 
 		if(allItems.siblingIndex(id)+1 == siblingsArr.length){
-			console.log('this was the last node');
+			// console.log('this was the last node');
 			return this.nextItemRecursion(id,parent_id);
 		}
 		let siblingIndex = siblingsArr.indexOf(id);
@@ -129,13 +129,13 @@ for (depthStep = max; depthStep > 0; depthStep--) {
 	prevItemRecursion(id)
 	{
 		let childrenLength = allItems.nodes[id].children.length;
-		console.log('childrenLength: '+childrenLength+' // id: '+id);
+		// console.log('childrenLength: '+childrenLength+' // id: '+id);
 		if(childrenLength>0){
 			id = allItems.nodes[id].children[childrenLength-1].id;
-			console.log('childrenLength: '+childrenLength+' // id: '+id);
+			// console.log('childrenLength: '+childrenLength+' // id: '+id);
 			return this.prevItemRecursion(id);
 		} else {
-			console.log('last cycle id: '+id);//THIS VALUE LOOKS FINE
+			// console.log('last cycle id: '+id);//THIS VALUE LOOKS FINE
 			return id;
 		}
 	}
@@ -148,8 +148,9 @@ for (depthStep = max; depthStep > 0; depthStep--) {
 			return this.nextItemRecursion(parent_id,allItems.nodes[parent_id].parent_id);
 		}
 	}
-	sortChildren(item)
+	sortChildren(id)
 	{
+		let item = this.nodes[id];
 		let order = item.children_order;
 		let items = item.children;
 		if (order instanceof Array){
@@ -228,7 +229,7 @@ for (depthStep = max; depthStep > 0; depthStep--) {
 	      return item;
 	    }
 	    //recursively call this on children
-	    item.children = item.children.map(this.calculateDuration);
+	    item.children = item.children.map(allItems.calculateDuration);
 	    // add up all the times of our direct children (they'll already have been reconciled)
 	    item['totalTime'] = item.children.reduce((prev, next) => {
 	        return allItems.addTime(prev, next.totalTime);
@@ -238,6 +239,26 @@ for (depthStep = max; depthStep > 0; depthStep--) {
 	addTime(a, b)
 	{
 	    return parseFloat(a) + parseFloat(b);
+	}
+	moveItem(id, direction)
+	{
+		clearTimeout(window.patchDelay);
+		let pid = this.nodes[id].parent_id;
+		let parent = this.nodes[pid];
+		let index = this.siblingIndex(id);
+		if(direction == 'up' || direction == 'left')
+		{
+			if(index==0){return;};
+			parent.children_order.splice(index,1);
+			parent.children_order.splice(index-1, 0, id);
+		} else if (direction == 'down' || direction == 'right')
+		{
+			if(index+1==parent.children_order.length){return;};
+			parent.children_order.splice(index,1);
+			parent.children_order.splice(index+1, 0, id);
+		}
+		this.sortChildren(pid);
+		window.patchDelay = setTimeout(function(){ vm.patchChildren_order(pid); },1000);
 	}
 	// recalcChildren_order(item)
 	// {

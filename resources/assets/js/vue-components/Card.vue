@@ -65,12 +65,13 @@
 						done {{ item.done_date | mm/dd }}
 					</span>
 					
-					<span v-if="hasPlannedTime"
-						:class="{
-							'duration':!item.children.length,
-							'total-duration':item.children.length,
-						}"
-					>{{ calcPlannedTime }}</span>
+					<span v-if="hasTotalTime" class="total-duration">
+						{{ calcTotalTime }}
+					</span>
+
+					<span v-if="hasPlannedTime" class="duration">
+						{{ item.planned_time }}
+					</span>
 
 					<span v-if="hasDueDate" class="duedate">
 						{{ item.due_date | mm/dd }}
@@ -86,16 +87,24 @@
 				</div>
 			</div>
 		</div>
-		<form v-if="addneww"
-			@submit.prevent
+
+		<div class="children" v-if="item.children">
+			<Card v-for="childCard in item.children"
+				:item="childCard"
+			></Card>
+		</div>
+
+		<form class="addnewbox" 
 			id="new-under-{{ item.id }}"
+			v-if="showAddNewBox"
+			@submit.prevent
 		>
 			<textarea type="text"
 				class="add-item"
 				name="body"
 				v-model="newItem.body"
 				v-autosize="newItem.body"
-				@blur="cancelAddNew"
+				@blur="blurOnAddNew(item)"
 				@keyup.esc="cancelAddNew"
 				@keydown.enter="enterOnNew"
 				placeholder="..."
@@ -103,13 +112,17 @@
 				autofocus 
 				rows="1"
 			></textarea>
+			<span>
+				<label for="planned_time">duration:</label>
+				<input name="planned_time"
+					type="number"
+					v-model="newItem.planned_time"
+					@blur="blurOnAddNew(item)"
+					@keyup.esc="cancelAddNew"
+					@keydown.enter="enterOnNew"
+				/>
+			</span>
 		</form>
-
-		<div class="children" v-if="item.children">
-			<Card v-for="childCard in item.children"
-				:item="childCard"
-			></Card>
-		</div>
 	</div>
 </template>
 
@@ -128,6 +141,7 @@ export default {
 		return {
 			newItem: {
 				body: '',
+				planned_time:0,
 				parent_id: (this.item.parent_id) ? this.item.parent_id : 1,
 				depth: (this.item.depth == 0) ? 1 : this.item.depth,
 				older_sibling_id: this.item.id,
@@ -142,10 +156,12 @@ export default {
 			if(this.item.depth == 0){ return allItems.nodes[this.item.id].children_order; }
 			return allItems.nodes[pId].children_order;
 		},
-		addneww(){
-			if(this.$root.addingNewUnder == this.item.id || this.item.depth == 0){ return true; } else { return null; }
+		showAddNewBox(){
+			if(this.$root.addingNewUnder == this.item.id || (this.item.depth == 0 && allItems.root.children_order.length == 0)){
+				return true;
+			} else { return false; }
 		},
-		calcPlannedTime(){
+		calcTotalTime(){
 			let a = allItems.calculateDuration(this.item);
 			return a.totalTime;
 		},
@@ -155,8 +171,11 @@ export default {
 		hasDoneDate(){
 		    return this.item.done_date != '0000-00-00 00:00:00';
 		},
+		hasTotalTime(){
+		    return (this.calcTotalTime != '0' && this.item.children_order.length);
+		},
 		hasPlannedTime(){
-		    return this.calcPlannedTime != '0';
+		    return (this.item.planned_time != '0');
 		},
 	},
 	methods: {
@@ -166,6 +185,7 @@ export default {
 		enterOnNew(e) {
 			if (e.keyCode === 13 && !e.shiftKey && !e.altKey) {
 	        	e.preventDefault();
+			  	if(!this.newItem.body){ return; }
 			  	this.addNew();
 			}
 	    },
@@ -186,6 +206,16 @@ export default {
 	    	},20);
 	    	// Codementor: is there any better way than this?
 	    },
+	    blurOnAddNew(item) {
+	    	let component = this;
+	    	setTimeout(function(){
+		    	if ( $('.addnewbox input:focus').length > 0 ||  $('.addnewbox textarea:focus').length > 0 ) {
+	        		return;
+				}　else {
+					component.cancelAddNew;
+				}
+	    	},20);
+	    },
 		markDone(id){
 			allItems.updateDoneState(id);
 		},
@@ -193,7 +223,8 @@ export default {
 			console.log('startEdit');
 			item = (item) ? item : allItems.nodes[selection.selectedId];
 			console.log(item);
-			this.beforeEditCache = item.body;
+			this.$root.beforeEditCache_body = item.body;
+			this.$root.beforeEditCache_planned_time = item.planned_time;
 			this.$root.editingItem = item.id;
 		},
 		doneEdit(item) {
@@ -215,8 +246,9 @@ export default {
 		cancelEdit(item) {
 			this.$root.editingItem = null;
 			console.log("cancel edit. Reverting to:");
-			console.log(this.beforeEditCache);
-			item.body = this.beforeEditCache;
+			console.log(this.$root.beforeEditCache_body);
+			item.body = this.$root.beforeEditCache_body;
+			item.planned_time = this.$root.beforeEditCache_planned_time;
 		},
 		deleteItem(item){
 			let id = item.id;
