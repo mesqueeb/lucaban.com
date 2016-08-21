@@ -3,23 +3,43 @@
 	<meta charset="UTF-8">
 	<meta name="token" id="token" value="{{ csrf_token() }}">
 	<title>THINGS</title>
-	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
-
 	<link rel="stylesheet" href="/css/app.css">
 </head>
 <body>
 <a href="{{route('home')}}">Go home</a>
-	@include('elements.menu')
-	<div class="item item-default">
-		<div class="panel-body">
-			<div class="navigation">
-				<button>All</button>
-				<button>Today</button>
-				<button>Done</button>
-			</div>
-			<Card :item="import_data"></Card>
+	{{-- @include('elements.menu') --}}
+	
+	<div class="panel-body">
+		<div class="navigation">
+			<a href="#"
+				:class="{active: selection.filter == 'all'}"
+				@click="filter('all')"
+			>All</a>
+			<a href="#"
+				:class="{active: selection.filter == 'today'}"
+				@click="filter('today')"
+			>Today</a>
+			<a href="#"
+				:class="{active: selection.filter == 'done'}"
+				@click="selection.filter = 'done'"
+			>Done</a>
+		</div>
+		<div class="panel-title">
+			@{{ selection.filter | capitalize }}
+			<span v-show="false">[@{{allData.children_order}}]</span>
+		</div>
+		<div class="items-wrapper"
+			v-show="selection.filter != 'done'"
+		>
+			<Card :item="allData"></Card>
+		</div>
+		<div class="journal-wrapper"
+			v-show="selection.filter == 'done'"
+		>
+			<Journal :records-per-date="doneData"></Journal>
 		</div>
 	</div>
+
 
 <script src="js/vendor.js"></script>
 <script src="js/main.js"></script>

@@ -1,10 +1,5 @@
 <template id="items-card-template">
 	<div class="items-card">
-		<div class="card-title"
-			v-if="item.depth == 0"
-		>
-			{{ item.body }}
-		</div>
 		<div 
 			class="item-card"
 			v-if="item.depth != 0"
@@ -62,20 +57,25 @@
 					v-show="this.$root.editingItem != item.id"
 				>
 					<span v-if="item.done" class="done">
-						done {{ item.done_date | mm/dd }}
+						done {{ item.done_date | momentRelative }}
 					</span>
 					
 					<span v-if="hasTotalTime" class="total-duration">
-						{{ calcTotalTime }}
+						total {{ calcTotalTime }} min
 					</span>
 
 					<span v-if="hasPlannedTime" class="duration">
-						{{ item.planned_time }}
+						{{ item.planned_time }} min
 					</span>
 
 					<span v-if="hasDueDate" class="duedate">
-						{{ item.due_date | mm/dd }}
+						{{ item.due_date | momentCalendar }}
 					</span>
+
+					<span v-if="item.dueDateParent" class="duedate-parent">
+						{{ item.dueDateParent | momentCalendar }}
+					</span>
+
 				</div>
 				<div class="item-nav"
 					v-show="this.$root.editingItem != item.id"
@@ -106,7 +106,7 @@
 				v-autosize="newItem.body"
 				@blur="blurOnAddNew(item)"
 				@keyup.esc="cancelAddNew"
-				@keydown.enter="enterOnNew"
+				@keydown="keydownOnNew"
 				placeholder="..."
 				autocomplete="off"
 				autofocus 
@@ -119,7 +119,7 @@
 					v-model="newItem.planned_time"
 					@blur="blurOnAddNew(item)"
 					@keyup.esc="cancelAddNew"
-					@keydown.enter="enterOnNew"
+					@keydown="keydownOnNew"
 				/>
 			</span>
 		</form>
@@ -142,7 +142,7 @@ export default {
 			newItem: {
 				body: '',
 				planned_time:0,
-				parent_id: (this.item.parent_id) ? this.item.parent_id : 1,
+				parent_id: (this.item.parent_id) ? this.item.parent_id : allItems.root.id,
 				depth: (this.item.depth == 0) ? 1 : this.item.depth,
 				older_sibling_id: this.item.id,
 			},
@@ -166,16 +166,16 @@ export default {
 			return a.totalTime;
 		},
 		hasDueDate(){
-		    return this.item.due_date != '0000-00-00 00:00:00';
+		    return (this.item.due_date && this.item.due_date != '0000-00-00 00:00:00');
 		},
 		hasDoneDate(){
-		    return this.item.done_date != '0000-00-00 00:00:00';
+		    return (this.item.done_date && this.item.done_date != '0000-00-00 00:00:00');
 		},
 		hasTotalTime(){
-		    return (this.calcTotalTime != '0' && this.item.children_order.length);
+		    return (this.item.children_order.length && this.calcTotalTime != '0' && this.item.planned_time != this.calcTotalTime);
 		},
 		hasPlannedTime(){
-		    return (this.item.planned_time != '0');
+		    return (this.item.planned_time && this.item.planned_time != '0');
 		},
 	},
 	methods: {
@@ -183,10 +183,29 @@ export default {
 			selection.selectedId = item.id;
 		},
 		enterOnNew(e) {
+	    },
+		keydownOnNew(e) {
+			console.log('run keydownOnNew:');
+			console.log(e);
+			// ENTER
 			if (e.keyCode === 13 && !e.shiftKey && !e.altKey) {
 	        	e.preventDefault();
 			  	if(!this.newItem.body){ return; }
 			  	this.addNew();
+			}
+			// ArrowUp
+			if (e.keyCode === 38) {
+				if (!this.newItem.body) {
+		        	e.preventDefault();
+		        	this.cancelAddNew();
+				}
+			}
+			// ArrowDown
+			if (e.keyCode === 40) {
+				if (!this.newItem.body) {
+		        	e.preventDefault();
+		        	this.cancelAddNew();
+				}
 			}
 	    },
 		enterOnEdit(e) {
@@ -212,7 +231,7 @@ export default {
 		    	if ( $('.addnewbox input:focus').length > 0 ||  $('.addnewbox textarea:focus').length > 0 ) {
 	        		return;
 				}　else {
-					component.cancelAddNew;
+					component.cancelAddNew();
 				}
 	    	},20);
 	    },
@@ -241,7 +260,6 @@ export default {
 			let body = item.body;
 			let planned_time = item.planned_time;
 			this.$http.patch('/api/items/' + id, { body: body, planned_time: planned_time }, { method: 'PATCH'});
-			$(':focus').blur();
 		},
 		cancelEdit(item) {
 			this.$root.editingItem = null;

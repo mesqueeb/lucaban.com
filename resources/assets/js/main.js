@@ -1,26 +1,16 @@
 import Card from './vue-components/Card.vue';
+import Journal from './vue-components/Journal.vue';
 var VueAutosize = require('vue-autosize')
 Vue.use(VueAutosize)
 
 import Tree from './vue-components/dataTree.js';
 import Selection from './vue-components/Selection.js';
 
-window.formatDate =
-{
-	mmdd(val){
-	    console.log('val in mmdd: '+val);
-	    let d = (val) ? new Date(val) : new Date() ;
-	    console.log('d: '+d);
-	    let dd = d.getDate();
-		let mm = d.getMonth();
-	    return mm+'/'+dd;
-	}
-};
-Vue.filter('mm/dd', {
+Vue.filter('M/D', {
   // model -> view
   // formats the value when updating the input element.
   read: function(val) {
-  	return formatDate.mmdd(val);
+  	return moment(val).format("M/D");
   },
   // // view -> model
   // // formats the value when writing to the data.
@@ -29,23 +19,43 @@ Vue.filter('mm/dd', {
   //   return isNaN(number) ? 0 : parseFloat(number.toFixed(2))
   // }
 });
+Vue.filter('momentRelative', {
+	read: function(val) {
+  		return moment(val).fromNow();
+	},
+});
+Vue.filter('momentCalendar', {
+	read: function(val) {
+	  	return moment(val).startOf('day').calendar(null, {
+		    sameDay: '[Today]',
+		    nextDay: '[Tomorrow]',
+		    nextWeek: 'dddd',
+		    lastDay: '[Yesterday]',
+		    lastWeek: '[Last] dddd',
+		    sameElse: 'YYYY/MM/DD'
+		});
+  	},
+});
 
 $.getJSON('/api/items',function(fetchedData){
 
 	//response
 
 window.allItems = new Tree(fetchedData);
+window.doneItems = allItems.getFiltered('done');
 window.selection = new Selection();
 window.vm = new Vue({
 	el:'body',
 	data: {
-		import_data: allItems.root,
+		allData: allItems.root,
+		doneData: doneItems,
 		selection: selection,
 		addingNewUnder: null,
 		editingItem: null,
 	},
 	components: {
 		Card,
+		Journal,
 	},
 	methods:{
 		markDone(){
@@ -58,8 +68,7 @@ window.vm = new Vue({
 			let done_date;
 			let doneValue = allItems.nodes[id].done;
 			if (doneValue){
-				let d = new Date();
-				done_date = d.toJSON();
+				done_date = moment().format();
 			} else {
 				done_date = '0000-00-00 00:00:00';
 			}
@@ -103,7 +112,7 @@ window.vm = new Vue({
 			let sel;
 			if(direction == 'next'){
 				if(!id || id == allItems.root.id){
-					sel = allItems.nodes['1'].children_order[0]; }
+					sel = allItems.root.children_order[0]; }
 				else {
 					sel = allItems.nextItemId(id)
 				}
@@ -116,6 +125,19 @@ window.vm = new Vue({
 				}
 			}
 			selection.selectedId = sel;
+		},
+		setToday(){
+			let id = selection.selectedId;
+			allItems.setDueDate(id);
+		},
+		patchDueDate(id, duedate){
+			if (duedate == '0000-00-00 00:00:00'){
+				this.$http.patch('/api/items/' + id, {'due_date':duedate});
+				return;
+			}
+			duedate = moment(duedate).format();
+			console.log('PatchDueDate: '+duedate);
+			this.$http.patch('/api/items/' + id, {'due_date':duedate});
 		},
 		showAddNewItem(id){
 			id = (id) ? id : selection.selectedId;
@@ -150,7 +172,22 @@ window.vm = new Vue({
 				console.log('patched item['+id+'].parent_id = '+parent_id+';');
 			});	
 		},
+		filter(value){
+			if(value=='all'){
+				selection.filter = 'all';
+				allItems.filter('all');
+			}
+			if(value=='today'){
+				selection.filter = 'today';
+				allItems.filter('duedate','today');
+			}
+			if(value=='done'){
+				selection.filter = 'done';
+				allItems.filter('today');
+			}
+		},
 		keystroke(k){
+			console.log(k);
 			if(k == 'arrowUp'){ this.select('prev')}
 			if(k == 'arrowDown'){ this.select('next')}
 			if(k == 'meta_arrowUp'){ this.moveItem('up')}
@@ -160,6 +197,7 @@ window.vm = new Vue({
 			if(k == 'tab'){ this.indent()}
 			if(k == 'enter'){ this.showAddNewItem()}
 			if(k == 'meta_enter'){ this.$broadcast('startEdit')}
+			if(k == 't'){ this.setToday()}
 		},
 	},
 	created(){
@@ -208,8 +246,8 @@ window.vm = new Vue({
 		  		}
 				vm.keystroke('enter');
 				break;
-			case 'xexx':
-				vm.keystroke('unindent');
+			case 84: // t
+				vm.keystroke('t');
 				break;
 			case 'xexx':
 				vm.keystroke('unindent');

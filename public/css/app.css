@@ -9,12 +9,21 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-font-smoothing: antialiased;
   font-smoothing: antialiased;
-  font-weight: 300; }
+  font-weight: 300;
+  font-size: 14px; }
 
 form {
   margin-bottom: 0; }
 
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  /* display: none; <- Crashes Chrome on hover */
+  -webkit-appearance: none;
+  margin: 0;
+  /* <-- Apparently some margin are still there even though it's hidden */ }
+
 input, textarea {
+  font-size: 14px;
   outline: none;
   border-style: none; }
 
@@ -35,14 +44,20 @@ label {
   background: none;
   border: none; }
 
+.navigation a {
+  text-decoration: none;
+  color: #4d4d4d;
+  margin: 0em 0.5em; }
+
 .navigation .active {
   color: #5dc2af; }
 
 .card {
   margin: 0.5em; }
 
-.card-title {
-  text-align: center; }
+.panel-title {
+  text-align: center;
+  font-size: 1.2em; }
 
 .item-nav {
   margin-left: auto; }
@@ -54,9 +69,10 @@ label {
   color: rgba(231, 76, 60, 0.3); }
 
 .panel-body {
-  background: white; }
+  background: white;
+  padding: 1em; }
 
-.panel-body > .items-card > .children .children {
+.items-wrapper > .items-card > .children .children {
   margin-left: 2em; }
 
 .item-card {
@@ -80,15 +96,14 @@ label {
   margin-left: 1.5em; }
 
 .updatebox, .addnewbox {
-  width: 100%;
   display: -ms-flexbox;
   display: flex;
-  -ms-flex-align: baseline;
-  align-items: baseline;
+  -ms-flex-align: center;
+  align-items: center;
   border: rgba(245, 215, 110, 0.5) solid thin; }
   .updatebox textarea, .updatebox input, .addnewbox textarea, .addnewbox input {
     outline: 0px !important;
-    padding: 0.2em 0.4em;
+    padding: 0.3em 0.5em 0.7em 0.4em;
     resize: none; }
   .updatebox textarea, .addnewbox textarea {
     width: 100%; }
@@ -96,20 +111,21 @@ label {
     border-radius: 0.3em;
     background: #5dacce;
     color: white;
+    font-size: 1em;
     width: 44px; }
   .updatebox span, .addnewbox span {
     font-size: 0.85em;
-    width: 145px; }
+    margin-right: 0.5em;
+    display: inline-table; }
   .updatebox label, .addnewbox label {
     margin: 0;
     margin-right: 0.2em; }
 
 .addnewbox {
-  margin: 0.6em 0 0 1.9em;
-  width: 97%; }
+  margin-left: 1.9em; }
 
-.add-item {
-  padding: 0.4em; }
+.updatebox {
+  width: 100%; }
 
 .toggle-div {
   width: 2em; }
@@ -141,33 +157,45 @@ label {
   display: inline-block;
   white-space: pre-line; }
 
+.selected {
+  background: rgba(245, 215, 110, 0.5); }
+
+.editing .selected {
+  background: white; }
+
 .editing .bodybox {
   display: none; }
+
+.editing .body-div {
+  border-bottom: none; }
 
 .done .bodybox {
   color: #d9d9d9;
   text-decoration: line-through; }
 
-.selected .bodybox {
-  background: rgba(245, 215, 110, 0.5); }
-
 .item-tags {
   display: -ms-flexbox;
   display: flex;
+  -ms-flex-align: baseline;
+  align-items: baseline;
   font-size: 0.85em; }
   .item-tags span {
     padding: 0.2em 0.4em;
-    border-radius: 0.3em; }
+    margin-left: 0.2em;
+    border-radius: 0.3em;
+    color: white; }
   .item-tags .done {
     color: #5a5a5a;
     background: #e6e6e6; }
   .item-tags .duration {
-    background: #5dacce;
-    color: white; }
+    background: #5dacce; }
+  .item-tags .duedate {
+    background: #e65e4d; }
+  .item-tags .duedate-parent {
+    background: rgba(230, 94, 77, 0.5);
+    padding: 0 0.2em !important;
+    font-size: 0.9em; }
   .item-tags .total-duration {
-    background: #4679a7;
-    color: white; }
-  .item-tags .total-duration:before {
-    content: 'total '; }
+    background: #4679a7; }
 
 /*# sourceMappingURL=app.css.map */

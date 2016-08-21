@@ -2,7 +2,7 @@ export default class Tree {
 	constructor(items){
 		// properties
 		this.source		= items;
-		this.nodes 		= {}; // →　"id" = { task obj };
+		this.nodes 		= {}; // →　"id":{ task obj };
 		this.orphans	= [];
 		// process items
 		window.itemsProcessed = 0;
@@ -32,6 +32,8 @@ export default class Tree {
 	    if(itemsProcessed === this.source.length) {
 	    	$.each(this.nodes, function(index, value) {
 			    this.sortChildren(value.id);
+			    this.updateChildrenDueDate(value.id);
+			    window.allItemsBackup = this.root.children;
 			}.bind(this));
 	    }
 	}
@@ -73,8 +75,9 @@ for (depthStep = max; depthStep > 0; depthStep--) {
 		parent.children.splice(index, 0, item);
 		parent.children_order.splice(index, 0, item.id);
 	    allItems.nodes[item.id] = item;
+	    selection.selectedId = item.id;
 	    vm.patchChildren_order(item.parent_id, item.id);
-	    // vm.showAddNewItem(item.id);
+	    vm.showAddNewItem(item.id);
 	}
 	siblingIndex(id)
 	{
@@ -186,12 +189,17 @@ for (depthStep = max; depthStep > 0; depthStep--) {
 		// Delete items attached to previous parent
 		prevParent.children.splice(siblingIndex,1);
 		prevParent.children_order.splice(siblingIndex,1);
+		// Fix bug where item would still show if it prevParent has an array of 0 and the moved child was originally the last child...
+		if(prevParent.children.length == 0){ prevParent.children = []; }
+
 		// update children recursively
 		vm.patchDepth(id);
 		vm.patchParent_id(id);
 		vm.patchChildren_order(new_parent_id);
 		vm.patchChildren_order(parent_id);
 		this.updateChildrenDepth(targetItem.id);
+		this.updateChildrenDueDate(new_parent_id);
+		this.updateChildrenDueDate(parent_id);
 	}
 	updateChildrenDepth(id)
 	{
@@ -217,7 +225,7 @@ for (depthStep = max; depthStep > 0; depthStep--) {
 	}
 	updateDoneState(id)
 	{
-		let done_date = new Date();
+		let done_date = moment().format();
 		allItems.nodes[id].done_date = done_date;
 		vm.patchDone(id);
 	}
@@ -235,6 +243,19 @@ for (depthStep = max; depthStep > 0; depthStep--) {
 	        return allItems.addTime(prev, next.totalTime);
 	    }, item.planned_time);
 	    return item;
+	}
+	checkValParentTree(id, val)
+	{
+		let pId = allItems.nodes[id].parent_id;
+		console.log('checkValParentTree pId: '+checkValParentTree);
+		if (!pId){ return false; }
+		let checkVal = allItems.nodes[pId].item[val];
+		console.log('checkValParentTree checkVal: '+checkVal);
+		if (checkVal){
+			return checkVal;
+		} else {
+			return allItems.checkValParentTree(pId, val);
+		}
 	}
 	addTime(a, b)
 	{
@@ -260,12 +281,82 @@ for (depthStep = max; depthStep > 0; depthStep--) {
 		this.sortChildren(pid);
 		window.patchDelay = setTimeout(function(){ vm.patchChildren_order(pid); },1000);
 	}
-	// recalcChildren_order(item)
-	// {
-	// 	let theItem = allItems.nodes['1'];
-	// 	let result = theItem.children.map(function(a) {return a.id;});
-	// 	theItem.children_order = result;
-	// }
+	setDueDate(id, duedate)
+	{
+		let dd = (!duedate) ? moment().format() : duedate;
+		let oriDueDate = allItems.nodes[id].due_date;
+		let diff = moment(oriDueDate).diff(dd, 'days');
+		if (diff == 0){ dd = '0000-00-00 00:00:00'; }
+		allItems.nodes[id].due_date = dd;
+		vm.patchDueDate(id, dd);
+		allItems.updateChildrenDueDate(id);
+	}
+	updateChildrenDueDate(id)
+	{
+		let item = this.nodes[id];
+		if (!item.children.length){ return false; }
+		item.children.forEach(function(child){
+			if (item.dueDateParent == true){
+				child.dueDateParent = item.dueDateParent;
+				this.updateChildrenDueDate(child.id);
+			} else if (item.due_date && item.due_date != '0000-00-00 00:00:00') {
+				child.dueDateParent = item.due_date;
+				this.updateChildrenDueDate(child.id);
+			} else {
+				child.dueDateParent = false;
+				this.updateChildrenDueDate(child.id);
+			}
+		}.bind(this))
+	}
+	filter(keyword, value)
+	{
+    	window.filteredItems = [];
+		if (keyword == 'duedate'){
+			if (value == 'today'){
+		    	$.each(this.nodes, function(index, item) {
+		    		let diff = moment(item.due_date).diff(moment(), 'days');
+					if (diff == 0){
+						filteredItems.push(item);
+					}
+			    });
+			}
+		}
+		if (keyword == 'all'){
+			filteredItems = allItemsBackup;
+		}
+		if (keyword == 'done'){
+	    	$.each(this.nodes, function(index, item) {
+				if (item.done){
+					filteredItems.push(item);
+				}
+		    });
+		}
+		allItems.root.children = filteredItems;
+	}
+	getFiltered(keyword)
+	{
+		if (keyword == 'done'){
+			let nodes = this.nodes;
+			let keys = Object.keys(nodes);
+			let doneItemsObject = keys.reduce(function(prev,item){
+				if(nodes[item].done){
+				  	let donePropName = moment(nodes[item].done_date).format('YYYY/MM/DD');
+				  	// if we don't have a slot for this date, make one
+				  	if(!prev.hasOwnProperty(donePropName)){
+				    	prev[donePropName] = [];
+				  	}
+					prev[donePropName].push(nodes[item]);
+				}
+        		return prev;
+			},{});
+			return Object.keys(doneItemsObject).map(function(k){ 
+			   let rObj = {};
+			   rObj['date'] = k;
+			   rObj['items'] = doneItemsObject[k];
+			   return rObj;
+			});
+	  	}
+	}
 
 }
 

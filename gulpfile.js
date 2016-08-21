@@ -21,11 +21,13 @@ elixir(function(mix) {
     mix.copy(npmDir + 'vue/dist/vue.js', jsDir);
     mix.copy(npmDir + 'vue-resource/dist/vue-resource.js', jsDir);
     mix.copy(npmDir + 'jquery/dist/jquery.min.js', jsDir);
+    mix.copy(npmDir + 'moment/min/moment-with-locales.min.js', jsDir);
 
 	mix.scripts([
 		'vue.js',
 		'vue-resource.js',
 		'jquery.min.js',
+		'moment-with-locales.min.js',
 	], 'public/js/vendor.js');
 
 });

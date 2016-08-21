@@ -10798,6 +10798,10 @@ var _Card = require('./vue-components/Card.vue');
 
 var _Card2 = _interopRequireDefault(_Card);
 
+var _Journal = require('./vue-components/Journal.vue');
+
+var _Journal2 = _interopRequireDefault(_Journal);
+
 var _dataTree = require('./vue-components/dataTree.js');
 
 var _dataTree2 = _interopRequireDefault(_dataTree);
@@ -10811,21 +10815,28 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 var VueAutosize = require('vue-autosize');
 Vue.use(VueAutosize);
 
-window.formatDate = {
-	mmdd: function mmdd(val) {
-		console.log('val in mmdd: ' + val);
-		var d = val ? new Date(val) : new Date();
-		console.log('d: ' + d);
-		var dd = d.getDate();
-		var mm = d.getMonth();
-		return mm + '/' + dd;
-	}
-};
-Vue.filter('mm/dd', {
+Vue.filter('M/D', {
 	// model -> view
 	// formats the value when updating the input element.
 	read: function read(val) {
-		return formatDate.mmdd(val);
+		return moment(val).format("M/D");
+	}
+});
+Vue.filter('momentRelative', {
+	read: function read(val) {
+		return moment(val).fromNow();
+	}
+});
+Vue.filter('momentCalendar', {
+	read: function read(val) {
+		return moment(val).startOf('day').calendar(null, {
+			sameDay: '[Today]',
+			nextDay: '[Tomorrow]',
+			nextWeek: 'dddd',
+			lastDay: '[Yesterday]',
+			lastWeek: '[Last] dddd',
+			sameElse: 'YYYY/MM/DD'
+		});
 	}
 });
 
@@ -10834,17 +10845,20 @@ $.getJSON('/api/items', function (fetchedData) {
 	//response
 
 	window.allItems = new _dataTree2.default(fetchedData);
+	window.doneItems = allItems.getFiltered('done');
 	window.selection = new _Selection2.default();
 	window.vm = new Vue({
 		el: 'body',
 		data: {
-			import_data: allItems.root,
+			allData: allItems.root,
+			doneData: doneItems,
 			selection: selection,
 			addingNewUnder: null,
 			editingItem: null
 		},
 		components: {
-			Card: _Card2.default
+			Card: _Card2.default,
+			Journal: _Journal2.default
 		},
 		methods: {
 			markDone: function markDone() {
@@ -10857,8 +10871,7 @@ $.getJSON('/api/items', function (fetchedData) {
 				var done_date = void 0;
 				var doneValue = allItems.nodes[id].done;
 				if (doneValue) {
-					var d = new Date();
-					done_date = d.toJSON();
+					done_date = moment().format();
 				} else {
 					done_date = '0000-00-00 00:00:00';
 				}
@@ -10910,7 +10923,7 @@ $.getJSON('/api/items', function (fetchedData) {
 				var sel = void 0;
 				if (direction == 'next') {
 					if (!id || id == allItems.root.id) {
-						sel = allItems.nodes['1'].children_order[0];
+						sel = allItems.root.children_order[0];
 					} else {
 						sel = allItems.nextItemId(id);
 					}
@@ -10923,6 +10936,19 @@ $.getJSON('/api/items', function (fetchedData) {
 					}
 				}
 				selection.selectedId = sel;
+			},
+			setToday: function setToday() {
+				var id = selection.selectedId;
+				allItems.setDueDate(id);
+			},
+			patchDueDate: function patchDueDate(id, duedate) {
+				if (duedate == '0000-00-00 00:00:00') {
+					this.$http.patch('/api/items/' + id, { 'due_date': duedate });
+					return;
+				}
+				duedate = moment(duedate).format();
+				console.log('PatchDueDate: ' + duedate);
+				this.$http.patch('/api/items/' + id, { 'due_date': duedate });
 			},
 			showAddNewItem: function showAddNewItem(id) {
 				id = id ? id : selection.selectedId;
@@ -10956,7 +10982,22 @@ $.getJSON('/api/items', function (fetchedData) {
 					console.log('patched item[' + id + '].parent_id = ' + parent_id + ';');
 				});
 			},
+			filter: function filter(value) {
+				if (value == 'all') {
+					selection.filter = 'all';
+					allItems.filter('all');
+				}
+				if (value == 'today') {
+					selection.filter = 'today';
+					allItems.filter('duedate', 'today');
+				}
+				if (value == 'done') {
+					selection.filter = 'done';
+					allItems.filter('today');
+				}
+			},
 			keystroke: function keystroke(k) {
+				console.log(k);
 				if (k == 'arrowUp') {
 					this.select('prev');
 				}
@@ -10983,6 +11024,9 @@ $.getJSON('/api/items', function (fetchedData) {
 				}
 				if (k == 'meta_enter') {
 					this.$broadcast('startEdit');
+				}
+				if (k == 't') {
+					this.setToday();
 				}
 			}
 		},
@@ -11037,8 +11081,9 @@ $.getJSON('/api/items', function (fetchedData) {
 							}
 							vm.keystroke('enter');
 							break;
-						case 'xexx':
-							vm.keystroke('unindent');
+						case 84:
+							// t
+							vm.keystroke('t');
 							break;
 						case 'xexx':
 							vm.keystroke('unindent');
@@ -11059,7 +11104,7 @@ $.getJSON('/api/items', function (fetchedData) {
 	});
 }); // end ajax
 
-},{"./vue-components/Card.vue":7,"./vue-components/Selection.js":8,"./vue-components/dataTree.js":9,"vue-autosize":3}],7:[function(require,module,exports){
+},{"./vue-components/Card.vue":7,"./vue-components/Journal.vue":8,"./vue-components/Selection.js":9,"./vue-components/dataTree.js":10,"vue-autosize":3}],7:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -11077,7 +11122,7 @@ exports.default = {
 			newItem: {
 				body: '',
 				planned_time: 0,
-				parent_id: this.item.parent_id ? this.item.parent_id : 1,
+				parent_id: this.item.parent_id ? this.item.parent_id : allItems.root.id,
 				depth: this.item.depth == 0 ? 1 : this.item.depth,
 				older_sibling_id: this.item.id
 			}
@@ -11109,29 +11154,47 @@ exports.default = {
 			return a.totalTime;
 		},
 		hasDueDate: function hasDueDate() {
-			return this.item.due_date != '0000-00-00 00:00:00';
+			return this.item.due_date && this.item.due_date != '0000-00-00 00:00:00';
 		},
 		hasDoneDate: function hasDoneDate() {
-			return this.item.done_date != '0000-00-00 00:00:00';
+			return this.item.done_date && this.item.done_date != '0000-00-00 00:00:00';
 		},
 		hasTotalTime: function hasTotalTime() {
-			return this.calcTotalTime != '0' && this.item.children_order.length;
+			return this.item.children_order.length && this.calcTotalTime != '0' && this.item.planned_time != this.calcTotalTime;
 		},
 		hasPlannedTime: function hasPlannedTime() {
-			return this.item.planned_time != '0';
+			return this.item.planned_time && this.item.planned_time != '0';
 		}
 	},
 	methods: {
 		select: function select(item) {
 			selection.selectedId = item.id;
 		},
-		enterOnNew: function enterOnNew(e) {
+		enterOnNew: function enterOnNew(e) {},
+		keydownOnNew: function keydownOnNew(e) {
+			console.log('run keydownOnNew:');
+			console.log(e);
+			// ENTER
 			if (e.keyCode === 13 && !e.shiftKey && !e.altKey) {
 				e.preventDefault();
 				if (!this.newItem.body) {
 					return;
 				}
 				this.addNew();
+			}
+			// ArrowUp
+			if (e.keyCode === 38) {
+				if (!this.newItem.body) {
+					e.preventDefault();
+					this.cancelAddNew();
+				}
+			}
+			// ArrowDown
+			if (e.keyCode === 40) {
+				if (!this.newItem.body) {
+					e.preventDefault();
+					this.cancelAddNew();
+				}
 			}
 		},
 		enterOnEdit: function enterOnEdit(e) {
@@ -11157,7 +11220,7 @@ exports.default = {
 				if ($('.addnewbox input:focus').length > 0 || $('.addnewbox textarea:focus').length > 0) {
 					return;
 				} else {
-					component.cancelAddNew;
+					component.cancelAddNew();
 				}
 			}, 20);
 		},
@@ -11186,7 +11249,6 @@ exports.default = {
 			var body = item.body;
 			var planned_time = item.planned_time;
 			this.$http.patch('/api/items/' + id, { body: body, planned_time: planned_time }, { method: 'PATCH' });
-			$(':focus').blur();
 		},
 		cancelEdit: function cancelEdit(item) {
 			this.$root.editingItem = null;
@@ -11244,7 +11306,7 @@ exports.default = {
 	}
 };
 if (module.exports.__esModule) module.exports = module.exports.default
-;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\n<div class=\"items-card\">\n\t<div class=\"card-title\" v-if=\"item.depth == 0\">\n\t\t{{ item.body }}\n\t</div>\n\t<div class=\"item-card\" v-if=\"item.depth != 0\" :class=\"{\n\t\t\tdone: item.done,\n\t\t\tediting: item.id == this.$root.editingItem,\n\t\t}\">\n\t\t<div class=\"toggle-div\">\n\t\t\t<input class=\"toggle\" type=\"checkbox\" v-if=\"item.children_order.length==0 || item.done == true\" v-model=\"item.done\" @change=\"markDone(item.id)\">\n\t\t</div>\n\t\t<div class=\"body-div\" :class=\"{ selected: item.id == this.$root.selection.selectedId, }\" @dblclick=\"startEdit(item)\" @click=\"select(item)\" @enter=\"console.log('yarrr')\">\n\t\t\t<span class=\"bodybox\" v-show=\"item.id != this.$root.editingItem\">{{ item.body }}</span>\n\t\t\t<!-- For debugging: -->\n\t\t\t<span v-show=\"false\"> ({{item.id}}) D-{{item.depth}}) [{{item.children_order}}]</span>\n\t\t\t\n\t\t\t<form action=\"update\" class=\"updatebox\" v-show=\"item.id == this.$root.editingItem\" @submit.prevent=\"doneEdit(item)\">\n\t\t\t\t<textarea name=\"item_body\" rows=\"{{ item.rows }}\" v-model=\"item.body\" v-autosize=\"item.body\" v-item-focus=\"item.id == this.$root.editingItem\" @blur=\"blurOnEdit(item)\" @keyup.esc=\"cancelEdit(item)\" @keydown.enter=\"enterOnEdit\">{{ item.body }}</textarea>\n\t\t\t\t<span>\n\t\t\t\t\t<label for=\"planned_time\">duration:</label>\n\t\t\t\t\t<input name=\"planned_time\" type=\"number\" v-model=\"item.planned_time\" @blur=\"blurOnEdit(item)\" @keyup.esc=\"cancelEdit(item)\" @keydown.enter=\"doneEdit(item)\">\n\t\t\t\t</span>\n\t\t\t</form>\n\t\t\t<div class=\"item-tags\" v-show=\"this.$root.editingItem != item.id\">\n\t\t\t\t<span v-if=\"item.done\" class=\"done\">\n\t\t\t\t\tdone {{ item.done_date | mm/dd }}\n\t\t\t\t</span>\n\t\t\t\t\n\t\t\t\t<span v-if=\"hasTotalTime\" class=\"total-duration\">\n\t\t\t\t\t{{ calcTotalTime }}\n\t\t\t\t</span>\n\n\t\t\t\t<span v-if=\"hasPlannedTime\" class=\"duration\">\n\t\t\t\t\t{{ item.planned_time }}\n\t\t\t\t</span>\n\n\t\t\t\t<span v-if=\"hasDueDate\" class=\"duedate\">\n\t\t\t\t\t{{ item.due_date | mm/dd }}\n\t\t\t\t</span>\n\t\t\t</div>\n\t\t\t<div class=\"item-nav\" v-show=\"this.$root.editingItem != item.id\">\n\t\t\t\t<button v-if=\"item.children_order.length==0\" @click=\"deleteItem(item)\">✗</button>\n\t\t\t</div>\n\t\t</div>\n\t</div>\n\n\t<div class=\"children\" v-if=\"item.children\">\n\t\t<card v-for=\"childCard in item.children\" :item=\"childCard\"></card>\n\t</div>\n\n\t<form class=\"addnewbox\" id=\"new-under-{{ item.id }}\" v-if=\"showAddNewBox\" @submit.prevent=\"\">\n\t\t<textarea type=\"text\" class=\"add-item\" name=\"body\" v-model=\"newItem.body\" v-autosize=\"newItem.body\" @blur=\"blurOnAddNew(item)\" @keyup.esc=\"cancelAddNew\" @keydown.enter=\"enterOnNew\" placeholder=\"...\" autocomplete=\"off\" autofocus=\"\" rows=\"1\"></textarea>\n\t\t<span>\n\t\t\t<label for=\"planned_time\">duration:</label>\n\t\t\t<input name=\"planned_time\" type=\"number\" v-model=\"newItem.planned_time\" @blur=\"blurOnAddNew(item)\" @keyup.esc=\"cancelAddNew\" @keydown.enter=\"enterOnNew\">\n\t\t</span>\n\t</form>\n</div>\n"
+;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\n<div class=\"items-card\">\n\t<div class=\"item-card\" v-if=\"item.depth != 0\" :class=\"{\n\t\t\tdone: item.done,\n\t\t\tediting: item.id == this.$root.editingItem,\n\t\t}\">\n\t\t<div class=\"toggle-div\">\n\t\t\t<input class=\"toggle\" type=\"checkbox\" v-if=\"item.children_order.length==0 || item.done == true\" v-model=\"item.done\" @change=\"markDone(item.id)\">\n\t\t</div>\n\t\t<div class=\"body-div\" :class=\"{ selected: item.id == this.$root.selection.selectedId, }\" @dblclick=\"startEdit(item)\" @click=\"select(item)\" @enter=\"console.log('yarrr')\">\n\t\t\t<span class=\"bodybox\" v-show=\"item.id != this.$root.editingItem\">{{ item.body }}</span>\n\t\t\t<!-- For debugging: -->\n\t\t\t<span v-show=\"false\"> ({{item.id}}) D-{{item.depth}}) [{{item.children_order}}]</span>\n\t\t\t\n\t\t\t<form action=\"update\" class=\"updatebox\" v-show=\"item.id == this.$root.editingItem\" @submit.prevent=\"doneEdit(item)\">\n\t\t\t\t<textarea name=\"item_body\" rows=\"{{ item.rows }}\" v-model=\"item.body\" v-autosize=\"item.body\" v-item-focus=\"item.id == this.$root.editingItem\" @blur=\"blurOnEdit(item)\" @keyup.esc=\"cancelEdit(item)\" @keydown.enter=\"enterOnEdit\">{{ item.body }}</textarea>\n\t\t\t\t<span>\n\t\t\t\t\t<label for=\"planned_time\">duration:</label>\n\t\t\t\t\t<input name=\"planned_time\" type=\"number\" v-model=\"item.planned_time\" @blur=\"blurOnEdit(item)\" @keyup.esc=\"cancelEdit(item)\" @keydown.enter=\"doneEdit(item)\">\n\t\t\t\t</span>\n\t\t\t</form>\n\t\t\t<div class=\"item-tags\" v-show=\"this.$root.editingItem != item.id\">\n\t\t\t\t<span v-if=\"item.done\" class=\"done\">\n\t\t\t\t\tdone {{ item.done_date | momentRelative }}\n\t\t\t\t</span>\n\t\t\t\t\n\t\t\t\t<span v-if=\"hasTotalTime\" class=\"total-duration\">\n\t\t\t\t\ttotal {{ calcTotalTime }} min\n\t\t\t\t</span>\n\n\t\t\t\t<span v-if=\"hasPlannedTime\" class=\"duration\">\n\t\t\t\t\t{{ item.planned_time }} min\n\t\t\t\t</span>\n\n\t\t\t\t<span v-if=\"hasDueDate\" class=\"duedate\">\n\t\t\t\t\t{{ item.due_date | momentCalendar }}\n\t\t\t\t</span>\n\n\t\t\t\t<span v-if=\"item.dueDateParent\" class=\"duedate-parent\">\n\t\t\t\t\t{{ item.dueDateParent | momentCalendar }}\n\t\t\t\t</span>\n\n\t\t\t</div>\n\t\t\t<div class=\"item-nav\" v-show=\"this.$root.editingItem != item.id\">\n\t\t\t\t<button v-if=\"item.children_order.length==0\" @click=\"deleteItem(item)\">✗</button>\n\t\t\t</div>\n\t\t</div>\n\t</div>\n\n\t<div class=\"children\" v-if=\"item.children\">\n\t\t<card v-for=\"childCard in item.children\" :item=\"childCard\"></card>\n\t</div>\n\n\t<form class=\"addnewbox\" id=\"new-under-{{ item.id }}\" v-if=\"showAddNewBox\" @submit.prevent=\"\">\n\t\t<textarea type=\"text\" class=\"add-item\" name=\"body\" v-model=\"newItem.body\" v-autosize=\"newItem.body\" @blur=\"blurOnAddNew(item)\" @keyup.esc=\"cancelAddNew\" @keydown=\"keydownOnNew\" placeholder=\"...\" autocomplete=\"off\" autofocus=\"\" rows=\"1\"></textarea>\n\t\t<span>\n\t\t\t<label for=\"planned_time\">duration:</label>\n\t\t\t<input name=\"planned_time\" type=\"number\" v-model=\"newItem.planned_time\" @blur=\"blurOnAddNew(item)\" @keyup.esc=\"cancelAddNew\" @keydown=\"keydownOnNew\">\n\t\t</span>\n\t</form>\n</div>\n"
 if (module.hot) {(function () {  module.hot.accept()
   var hotAPI = require("vue-hot-reload-api")
   hotAPI.install(require("vue"), true)
@@ -11256,7 +11318,44 @@ if (module.hot) {(function () {  module.hot.accept()
   }
 })()}
 },{"vue":5,"vue-hot-reload-api":4}],8:[function(require,module,exports){
-"use strict";
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+	value: true
+});
+exports.default = {
+	name: 'Journal',
+	template: '#items-journal-template',
+	created: function created() {},
+	ready: function ready() {},
+
+	computed: {
+		hasPlannedTime: function hasPlannedTime() {
+			return this.item.planned_time && this.item.planned_time != '0';
+		}
+	},
+	props: ['records-per-date'],
+	http: {
+		root: '/root',
+		headers: {
+			'X-CSRF-TOKEN': document.querySelector('#token').getAttribute('value')
+		}
+	}
+};
+if (module.exports.__esModule) module.exports = module.exports.default
+;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\n \t<div class=\"items-card\" v-for=\"day in recordsPerDate\">\n \t\t<div>{{ day.date }}</div>\n\t\t<div v-for=\"item in day.items\">\n\t\t\t<span>{{ item.body }}</span>\n\t\t\t<div class=\"item-tags\">\n\t\t\t\t<span v-if=\"item.planned_time\" class=\"duration\">\n\t\t\t\t\t{{ item.planned_time }} min\n\t\t\t\t</span>\n\t\t\t</div>\n\t\t</div>\n<!--    <div \n\t\t\tclass=\"item-card\"\n\t\t\tv-if=\"item.depth != 0\"\n\t\t\t:class=\"{\n\t\t\t\tdone: item.done,\n\t\t\t\tediting: item.id == this.$root.editingItem,\n\t\t\t}\"\n\t\t>\n\t\t\t<div class=\"toggle-div\">\n\t\t\t\t<input class=\"toggle\"\n\t\t\t\t\ttype=\"checkbox\"\n\t\t\t\t\tv-if=\"item.children_order.length==0 || item.done == true\"\n\t\t\t\t\tv-model=\"item.done\"\n\t\t\t\t\t@change=\"markDone(item.id)\"\n\t\t\t\t>\n\t\t\t</div>\n\t\t\t<div class=\"body-div\"\n\t\t\t\t:class=\"{ selected: item.id == this.$root.selection.selectedId, }\"\n\t\t\t\t@dblclick=\"startEdit(item)\"\n\t\t\t\t@click=\"select(item)\"\n\t\t\t\t@enter=\"console.log('yarrr')\"\n\t\t\t>\n\t\t\t\t<span class=\"bodybox\"\n\t\t\t\t\tv-show=\"item.id != this.$root.editingItem\"\n\t\t\t\t>{{ item.body }}</span>\n\t\t\t\t\n\t\t\t\t<span v-show=\"false\"> ({{item.id}}) D-{{item.depth}}) [{{item.children_order}}]</span>\n\t\t\t\t\n\t\t\t\t<form action=\"update\"\n\t\t\t\t\tclass=\"updatebox\"\n\t\t\t\t\tv-show=\"item.id == this.$root.editingItem\"\n\t\t\t\t\t@submit.prevent=\"doneEdit(item)\"\n\t\t\t\t>\n\t\t\t\t\t<textarea name=\"item_body\"\n\t\t\t\t\t\trows=\"{{ item.rows }}\"\n\t\t\t\t\t\tv-model=\"item.body\"\n\t\t\t\t\t\tv-autosize=\"item.body\"\n\t\t\t\t\t\tv-item-focus=\"item.id == this.$root.editingItem\"\n\t\t\t\t\t\t@blur=\"blurOnEdit(item)\"\n\t\t\t\t\t\t@keyup.esc=\"cancelEdit(item)\"\n\t\t\t\t\t\t@keydown.enter=\"enterOnEdit\"\n\t\t\t\t\t>{{ item.body }}</textarea>\n\t\t\t\t\t<span>\n\t\t\t\t\t\t<label for=\"planned_time\">duration:</label>\n\t\t\t\t\t\t<input name=\"planned_time\"\n\t\t\t\t\t\t\ttype=\"number\"\n\t\t\t\t\t\t\tv-model=\"item.planned_time\"\n\t\t\t\t\t\t\t@blur=\"blurOnEdit(item)\"\n\t\t\t\t\t\t\t@keyup.esc=\"cancelEdit(item)\"\n\t\t\t\t\t\t\t@keydown.enter=\"doneEdit(item)\"\n\t\t\t\t\t\t/>\n\t\t\t\t\t</span>\n\t\t\t\t</form>\n\t\t\t\t<div class=\"item-tags\"\n\t\t\t\t\tv-show=\"this.$root.editingItem != item.id\"\n\t\t\t\t>\n\t\t\t\t\t<span v-if=\"item.done\" class=\"done\">\n\t\t\t\t\t\tdone {{ item.done_date | momentRelative }}\n\t\t\t\t\t</span>\n\t\t\t\t\t\n\t\t\t\t\t<span v-if=\"hasTotalTime\" class=\"total-duration\">\n\t\t\t\t\t\ttotal {{ calcTotalTime }} min\n\t\t\t\t\t</span>\n\n\t\t\t\t\t<span v-if=\"hasPlannedTime\" class=\"duration\">\n\t\t\t\t\t\t{{ item.planned_time }} min\n\t\t\t\t\t</span>\n\n\t\t\t\t\t<span v-if=\"hasDueDate\" class=\"duedate\">\n\t\t\t\t\t\t{{ item.due_date | momentCalendar }}\n\t\t\t\t\t</span>\n\n\t\t\t\t\t<span v-if=\"item.dueDateParent\" class=\"duedate-parent\">\n\t\t\t\t\t\t{{ item.dueDateParent | momentCalendar }}\n\t\t\t\t\t</span>\n\n\t\t\t\t</div>\n\t\t\t\t<div class=\"item-nav\"\n\t\t\t\t\tv-show=\"this.$root.editingItem != item.id\"\n\t\t\t\t>\n\t\t\t\t\t<button \n\t\t\t\t\t\tv-if=\"item.children_order.length==0\"\n\t\t\t\t\t\t@click=\"deleteItem(item)\"\n\t\t\t\t\t>✗</button>\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t</div> \n-->\n\n<!--\n \t\t<form class=\"addnewbox\" \n\t\t\tid=\"new-under-{{ item.id }}\"\n\t\t\tv-if=\"showAddNewBox\"\n\t\t\t@submit.prevent\n\t\t>\n\t\t\t<textarea type=\"text\"\n\t\t\t\tclass=\"add-item\"\n\t\t\t\tname=\"body\"\n\t\t\t\tv-model=\"newItem.body\"\n\t\t\t\tv-autosize=\"newItem.body\"\n\t\t\t\t@blur=\"blurOnAddNew(item)\"\n\t\t\t\t@keyup.esc=\"cancelAddNew\"\n\t\t\t\t@keydown=\"keydownOnNew\"\n\t\t\t\tplaceholder=\"...\"\n\t\t\t\tautocomplete=\"off\"\n\t\t\t\tautofocus \n\t\t\t\trows=\"1\"\n\t\t\t></textarea>\n\t\t\t<span>\n\t\t\t\t<label for=\"planned_time\">duration:</label>\n\t\t\t\t<input name=\"planned_time\"\n\t\t\t\t\ttype=\"number\"\n\t\t\t\t\tv-model=\"newItem.planned_time\"\n\t\t\t\t\t@blur=\"blurOnAddNew(item)\"\n\t\t\t\t\t@keyup.esc=\"cancelAddNew\"\n\t\t\t\t\t@keydown=\"keydownOnNew\"\n\t\t\t\t/>\n\t\t\t</span>\n\t\t</form> -->\n\t</div>\n"
+if (module.hot) {(function () {  module.hot.accept()
+  var hotAPI = require("vue-hot-reload-api")
+  hotAPI.install(require("vue"), true)
+  if (!hotAPI.compatible) return
+  if (!module.hot.data) {
+    hotAPI.createRecord("_v-a5850fdc", module.exports)
+  } else {
+    hotAPI.update("_v-a5850fdc", module.exports, (typeof module.exports === "function" ? module.exports.options : module.exports).template)
+  }
+})()}
+},{"vue":5,"vue-hot-reload-api":4}],9:[function(require,module,exports){
+'use strict';
 
 Object.defineProperty(exports, "__esModule", {
 	value: true
@@ -11271,13 +11370,14 @@ var Selection = function () {
 		_classCallCheck(this, Selection);
 
 		this.selectedId = null;
+		this.filter = 'all';
 	}
 
 	_createClass(Selection, [{
-		key: "selectNext",
+		key: 'selectNext',
 		value: function selectNext() {}
 	}, {
-		key: "selectPrevious",
+		key: 'selectPrevious',
 		value: function selectPrevious() {}
 	}]);
 
@@ -11286,12 +11386,14 @@ var Selection = function () {
 
 exports.default = Selection;
 
-},{}],9:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
 	value: true
 });
+
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
@@ -11303,7 +11405,7 @@ var Tree = function () {
 
 		// properties
 		this.source = items;
-		this.nodes = {}; // →　"id" = { task obj };
+		this.nodes = {}; // →　"id":{ task obj };
 		this.orphans = [];
 		// process items
 		window.itemsProcessed = 0;
@@ -11339,6 +11441,8 @@ var Tree = function () {
 			if (itemsProcessed === this.source.length) {
 				$.each(this.nodes, function (index, value) {
 					this.sortChildren(value.id);
+					this.updateChildrenDueDate(value.id);
+					window.allItemsBackup = this.root.children;
 				}.bind(this));
 			}
 		}
@@ -11386,8 +11490,9 @@ var Tree = function () {
 			parent.children.splice(index, 0, item);
 			parent.children_order.splice(index, 0, item.id);
 			allItems.nodes[item.id] = item;
+			selection.selectedId = item.id;
 			vm.patchChildren_order(item.parent_id, item.id);
-			// vm.showAddNewItem(item.id);
+			vm.showAddNewItem(item.id);
 		}
 	}, {
 		key: 'siblingIndex',
@@ -11519,12 +11624,19 @@ var Tree = function () {
 			// Delete items attached to previous parent
 			prevParent.children.splice(siblingIndex, 1);
 			prevParent.children_order.splice(siblingIndex, 1);
+			// Fix bug where item would still show if it prevParent has an array of 0 and the moved child was originally the last child...
+			if (prevParent.children.length == 0) {
+				prevParent.children = [];
+			}
+
 			// update children recursively
 			vm.patchDepth(id);
 			vm.patchParent_id(id);
 			vm.patchChildren_order(new_parent_id);
 			vm.patchChildren_order(parent_id);
 			this.updateChildrenDepth(targetItem.id);
+			this.updateChildrenDueDate(new_parent_id);
+			this.updateChildrenDueDate(parent_id);
 		}
 	}, {
 		key: 'updateChildrenDepth',
@@ -11553,7 +11665,7 @@ var Tree = function () {
 	}, {
 		key: 'updateDoneState',
 		value: function updateDoneState(id) {
-			var done_date = new Date();
+			var done_date = moment().format();
 			allItems.nodes[id].done_date = done_date;
 			vm.patchDone(id);
 		}
@@ -11573,6 +11685,32 @@ var Tree = function () {
 			}, item.planned_time);
 			return item;
 		}
+	}, {
+		key: 'checkValParentTree',
+		value: function (_checkValParentTree) {
+			function checkValParentTree(_x, _x2) {
+				return _checkValParentTree.apply(this, arguments);
+			}
+
+			checkValParentTree.toString = function () {
+				return _checkValParentTree.toString();
+			};
+
+			return checkValParentTree;
+		}(function (id, val) {
+			var pId = allItems.nodes[id].parent_id;
+			console.log('checkValParentTree pId: ' + checkValParentTree);
+			if (!pId) {
+				return false;
+			}
+			var checkVal = allItems.nodes[pId].item[val];
+			console.log('checkValParentTree checkVal: ' + checkVal);
+			if (checkVal) {
+				return checkVal;
+			} else {
+				return allItems.checkValParentTree(pId, val);
+			}
+		})
 	}, {
 		key: 'addTime',
 		value: function addTime(a, b) {
@@ -11603,13 +11741,98 @@ var Tree = function () {
 				vm.patchChildren_order(pid);
 			}, 1000);
 		}
-		// recalcChildren_order(item)
-		// {
-		// 	let theItem = allItems.nodes['1'];
-		// 	let result = theItem.children.map(function(a) {return a.id;});
-		// 	theItem.children_order = result;
-		// }
+	}, {
+		key: 'setDueDate',
+		value: function setDueDate(id, duedate) {
+			var dd = !duedate ? moment().format() : duedate;
+			var oriDueDate = allItems.nodes[id].due_date;
+			var diff = moment(oriDueDate).diff(dd, 'days');
+			if (diff == 0) {
+				dd = '0000-00-00 00:00:00';
+			}
+			allItems.nodes[id].due_date = dd;
+			vm.patchDueDate(id, dd);
+			allItems.updateChildrenDueDate(id);
+		}
+	}, {
+		key: 'updateChildrenDueDate',
+		value: function updateChildrenDueDate(id) {
+			var item = this.nodes[id];
+			if (!item.children.length) {
+				return false;
+			}
+			item.children.forEach(function (child) {
+				if (item.dueDateParent == true) {
+					child.dueDateParent = item.dueDateParent;
+					this.updateChildrenDueDate(child.id);
+				} else if (item.due_date && item.due_date != '0000-00-00 00:00:00') {
+					child.dueDateParent = item.due_date;
+					this.updateChildrenDueDate(child.id);
+				} else {
+					child.dueDateParent = false;
+					this.updateChildrenDueDate(child.id);
+				}
+			}.bind(this));
+		}
+	}, {
+		key: 'filter',
+		value: function filter(keyword, value) {
+			window.filteredItems = [];
+			if (keyword == 'duedate') {
+				if (value == 'today') {
+					$.each(this.nodes, function (index, item) {
+						var diff = moment(item.due_date).diff(moment(), 'days');
+						if (diff == 0) {
+							filteredItems.push(item);
+						}
+					});
+				}
+			}
+			if (keyword == 'all') {
+				filteredItems = allItemsBackup;
+			}
+			if (keyword == 'done') {
+				$.each(this.nodes, function (index, item) {
+					if (item.done) {
+						filteredItems.push(item);
+					}
+				});
+			}
+			allItems.root.children = filteredItems;
+		}
+	}, {
+		key: 'getFiltered',
+		value: function getFiltered(keyword) {
+			var _this = this;
 
+			if (keyword == 'done') {
+				var _ret = function () {
+					var nodes = _this.nodes;
+					var keys = Object.keys(nodes);
+					var doneItemsObject = keys.reduce(function (prev, item) {
+						if (nodes[item].done) {
+							var donePropName = moment(nodes[item].done_date).format('YYYY/MM/DD');
+							// if we don't have a slot for this date, make one
+							if (!prev.hasOwnProperty(donePropName)) {
+								prev[donePropName] = [];
+							}
+							prev[donePropName].push(nodes[item]);
+						}
+						return prev;
+					}, {});
+					return {
+						v: Object.keys(doneItemsObject).map(function (k) {
+							var rObj = {};
+							rObj['date'] = k;
+							rObj['items'] = doneItemsObject[k];
+							return rObj;
+						})
+					};
+				}();
+
+				if ((typeof _ret === 'undefined' ? 'undefined' : _typeof(_ret)) === "object") return _ret.v;
+			}
+		}
 	}]);
 
 	return Tree;

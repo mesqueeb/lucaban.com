@@ -2,6 +2,8 @@ $selection-color: rgba(245,215,110,0.5);
 $theme-color: #5dc2af;
 $duration-color: #5dacce;
 $duration-color-dark: #4679a7;
+$duedate-color: rgba(230, 94, 77, 1);
+$duedate-parent-color: rgba(230, 94, 77, 0.5);
 
 label{
     font-weight: 300;
@@ -13,6 +15,11 @@ label{
         background: none;
         border: none;
     }
+    a {
+        text-decoration: none;
+        color: #4d4d4d;
+        margin: 0em 0.5em;
+    }
     .active{
         color: $theme-color;
     }
@@ -20,8 +27,9 @@ label{
 .card{
     margin: 0.5em;
 }
-.card-title{
+.panel-title{
     text-align: center;
+    font-size: 1.2em;
 }
 .item-nav{
     margin-left: auto;
@@ -34,8 +42,9 @@ label{
 }
 .panel-body{
     background: white;
+    padding: 1em;
 }
-.panel-body>.items-card>.children .children {
+.items-wrapper>.items-card>.children .children {
     margin-left: 2em;
 }
 .item-card {
@@ -58,13 +67,12 @@ label{
 }
 
 .updatebox, .addnewbox {
-    width: 100%;
     display: flex;
-    align-items: baseline;
+    align-items: center;
     border: $selection-color solid thin;
     textarea, input{
         outline: 0px !important;
-        padding: 0.2em 0.4em;
+        padding: 0.3em 0.5em 0.7em 0.4em;
         resize: none;
     }
     textarea{
@@ -74,11 +82,13 @@ label{
         border-radius: 0.3em;
         background: $duration-color;
         color: white;
+        font-size: 1em;
         width: 44px;
     }
     span{
         font-size: 0.85em;
-        width: 145px; // codementor
+        margin-right: 0.5em;
+        display: inline-table;
     }
     label{
         margin: 0;
@@ -86,11 +96,10 @@ label{
     }
 }
 .addnewbox {
-    margin: 0.6em 0 0 1.9em;
-    width: 97%;
+    margin-left: 1.9em;
 }
-.add-item {
-    padding: 0.4em;
+.updatebox{
+    width: 100%;
 }
 
 .toggle-div{
@@ -124,22 +133,34 @@ label{
     display: inline-block;
     white-space: pre-line;
 }
-.editing .bodybox{
-    display: none;
+.selected {
+    background: $selection-color;
+}
+.editing{
+    .selected{
+        background: white;
+    }
+    .bodybox{
+        display: none;
+    }
+    .body-div{
+        border-bottom: none;
+    }
 }
 .done .bodybox{
     color: #d9d9d9;
     text-decoration: line-through;
 }
-.selected .bodybox{
-    background: $selection-color;
-}
+
 .item-tags {
     display: flex;
+    align-items: baseline;
     font-size: 0.85em;
     span {
         padding: 0.2em 0.4em;
+        margin-left: 0.2em;
         border-radius: 0.3em;
+        color: white;
     }
     .done {
         color: #5a5a5a;
@@ -147,11 +168,15 @@ label{
     }
     .duration {
         background: $duration-color;
-        color: white;
     }
+    .duedate{
+        background: $duedate-color;
+    }
+    .duedate-parent{
+        background: $duedate-parent-color;
+        padding: 0 0.2em !important;
+        font-size: 0.9em;    }
     .total-duration{
         background:$duration-color-dark;
-        color: white;
     }
-    .total-duration:before {content: 'total ';}
 }
