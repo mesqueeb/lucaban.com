@@ -6,6 +6,28 @@ Vue.use(VueAutosize)
 import Tree from './vue-components/dataTree.js';
 import Selection from './vue-components/Selection.js';
 
+// set row height each time resize window
+window.setRowHeight = function(){
+	console.log('resized edit windows');
+	$('textarea[name=item_body]').each(function( index ) {
+		let x = $( this ).parent().parent().find('.bodybox').height();
+		$( this ).height(x);
+	});	
+}
+
+$(window).on('resize', function(e) {
+	clearTimeout(window.resizeTimer);
+	window.resizeTimer = setTimeout(function() {
+		setRowHeight();
+	}, 1000);
+});
+$( document ).ready(function() {
+   setTimeout(function() {
+		setRowHeight();
+	}, 2000);
+});
+
+
 Vue.filter('M/D', {
   // model -> view
   // formats the value when updating the input element.
@@ -42,13 +64,12 @@ $.getJSON('/api/items',function(fetchedData){
 	//response
 
 window.allItems = new Tree(fetchedData);
-window.doneItems = allItems.getFiltered('done');
 window.selection = new Selection();
 window.vm = new Vue({
 	el:'body',
 	data: {
 		allData: allItems.root,
-		doneData: doneItems,
+		doneData: null,
 		selection: selection,
 		addingNewUnder: null,
 		editingItem: null,
@@ -143,6 +164,8 @@ window.vm = new Vue({
 			id = (id) ? id : selection.selectedId;
 			console.log('showAddNewItem for '+id);
 			this.addingNewUnder = id;
+			selection.lastSelectedId = id;
+			selection.selectedId = null;
 			setTimeout(function(){$("#new-under-"+id+" textarea").focus();},10);
 		},
 		patchChildren_order(id, newItem){
@@ -171,6 +194,15 @@ window.vm = new Vue({
 			.then(function(response){
 				console.log('patched item['+id+'].parent_id = '+parent_id+';');
 			});	
+		},
+		clickDone(){
+			this.fetchDone();
+			selection.filter = 'done';
+		},
+		fetchDone(){
+			this.$http.get('/api/items/fetchdone').then(function(response){
+				this.doneData = allItems.formatDone(response.json());
+			});
 		},
 		filter(value){
 			if(value=='all'){

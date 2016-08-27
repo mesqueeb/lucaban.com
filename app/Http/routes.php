@@ -18,9 +18,7 @@ Route::get('/items',function(){
 	return view('items.index');
 });
 
-Route::patch('/api/items/{id}/makeChildOf','CardController@makeChildOf');
-Route::patch('/api/items/{id}/makeSiblingOf','CardController@makeSiblingOf');
-Route::patch('/api/items/{id}/moveThing','CardController@moveThing');
+Route::get('/api/items/fetchdone','CardController@getDone');
 Route::resource('/api/items','CardController');
 ////////////////////////////////////////////////
 Route::get('/playground',function(){

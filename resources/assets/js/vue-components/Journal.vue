@@ -1,19 +1,22 @@
 <template id="items-journal-template">
- 	<div class="items-card"
+ 	<div class="done-card"
 		v-for="day in recordsPerDate"
  	>
- 		<div>{{ day.date }}</div>
-		<div v-for="item in day.items"
-						
-		>
-			<span>{{ item.body }}</span>
-			<div class="item-tags"
+ 		<div class="title">{{ day.date }}</div>
+ 		<div class="item-wrapper">
+			<div class="item" 
+				v-for="item in day.items"
 			>
-				<span v-if="item.planned_time" class="duration">
-					{{ item.planned_time }} min
-				</span>
+				<div class="parent-string"></div>
+				<span>・</span>
+				<span class="body">{{ item.body }}</span>
+				<div class="item-tags"
+				>
+					<span v-if="item.planned_time" class="duration">
+						{{ item.planned_time }} min
+					</span>
+				</div>
 			</div>
-		</div>
 <!--    <div 
 			class="item-card"
 			v-if="item.depth != 0"
@@ -133,6 +136,9 @@
 				/>
 			</span>
 		</form> -->
+		</div><!-- End item-wrapper -->
+		<div class="total time">Total time: {{ day.totalTime }}</div>
+		<hr>
 	</div>
 </template>
 
@@ -150,6 +156,9 @@ export default {
 		hasPlannedTime(){
 		    return (this.item.planned_time && this.item.planned_time != '0');
 		},
+	},
+	methods:{
+
 	},
 	props: ['records-per-date'],
 	http: {

@@ -23,7 +23,17 @@ class CardController extends Controller
         if(!$god){
             return Item::create(['body' => 'ALL', 'id' => '1', 'depth' => '0']);
         }
-        return Item::orderBy('depth', 'asc')->get();
+        return Item:://where('done',0)
+            // ->orWhere('done_date', '<=', Carbon::yesterday())
+            orderBy('depth', 'asc')
+            ->get();
+    }
+
+    public function getDone()
+    {
+        return Item::where('done',1)
+                        ->orderBy('done_date', 'desc')
+                        ->get();
     }
 
     /**
@@ -82,33 +92,6 @@ class CardController extends Controller
         Item::findOrFail($id)->update(request()->all());
         return response()->json($request->all());
     }
-
-    public function makeChildOf(Request $request, $id)
-    {
-        $item = Item::findOrFail($id);
-        $target_id = request()->target_id;
-        return $item->makeChildOf($target_id);
-    }
-    public function makeSiblingOf($id)
-    {
-        $item = Item::findOrFail($id);
-        $target_id = $item->parent()->first()->id;
-        return $item->makeSiblingOf($target_id);
-    }
-    public function Item(Request $request, $id)
-    {
-        $item = Item::findOrFail($id);
-        $direction = request()->direction;
-        if($direction=='up'){
-            return $item->moveLeft();
-        } else if ($direction=='down'){
-            return $item->moveRight();
-        }
-    }
-
-        
-
-
 
     /**
      * Remove the specified resource from storage.

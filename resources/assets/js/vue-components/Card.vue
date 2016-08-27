@@ -57,7 +57,7 @@
 					v-show="this.$root.editingItem != item.id"
 				>
 					<span v-if="item.done" class="done">
-						done {{ item.done_date | momentRelative }}
+						done {{ item.done_date | momentCalendar }}
 					</span>
 					
 					<span v-if="hasTotalTime" class="total-duration">
@@ -193,15 +193,8 @@ export default {
 			  	if(!this.newItem.body){ return; }
 			  	this.addNew();
 			}
-			// ArrowUp
-			if (e.keyCode === 38) {
-				if (!this.newItem.body) {
-		        	e.preventDefault();
-		        	this.cancelAddNew();
-				}
-			}
-			// ArrowDown
-			if (e.keyCode === 40) {
+			// ArrowUp or ArrowDown
+			if (e.keyCode === 38 || e.keyCode === 40) {
 				if (!this.newItem.body) {
 		        	e.preventDefault();
 		        	this.cancelAddNew();
@@ -286,9 +279,13 @@ export default {
 				allItems.addItem(storedItem, index);
 			});
 		},
-		cancelAddNew(){
+		cancelAddNew(lastSelectedId){
 			this.newItem.body = '';
-			this.$root.addingNewUnder = '';
+			this.$root.addingNewUnder = null;
+			console.log('sid: '+selection.selectedId);
+			selection.selectedId = selection.lastSelectedId;
+			console.log('sid: '+selection.selectedId);
+			// selection.lastSelectedId = null;
 			$(':focus').blur();
 		},
 	},

@@ -21,7 +21,7 @@
 			>Today</a>
 			<a href="#"
 				:class="{active: selection.filter == 'done'}"
-				@click="selection.filter = 'done'"
+				@click="clickDone()"
 			>Done</a>
 		</div>
 		<div class="panel-title">

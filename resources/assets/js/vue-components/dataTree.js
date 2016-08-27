@@ -24,9 +24,6 @@ export default class Tree {
 		// register node
 		this.nodes[node.id] = node;
 
-		// Add amount of rows
-		let nl = node.body.split(/\r\n|\r|\n/).length;
-		node['rows'] = nl;
 		//Sort all nodes after making sure you got all of them.
 		itemsProcessed++;
 	    if(itemsProcessed === this.source.length) {
@@ -233,7 +230,7 @@ for (depthStep = max; depthStep > 0; depthStep--) {
 	{
 	    // if we don't have children, do nothing, leave the time as-is
 	    if (!(Array.isArray(item.children) && item.children.length)) {
-	      item['totalTime'] = item.planned_time;
+	      item['totalTime'] = (!item.done) ? item.planned_time : 0 ;
 	      return item;
 	    }
 	    //recursively call this on children
@@ -241,7 +238,7 @@ for (depthStep = max; depthStep > 0; depthStep--) {
 	    // add up all the times of our direct children (they'll already have been reconciled)
 	    item['totalTime'] = item.children.reduce((prev, next) => {
 	        return allItems.addTime(prev, next.totalTime);
-	    }, item.planned_time);
+	    }, (!item.done) ? item.planned_time : 0 );
 	    return item;
 	}
 	checkValParentTree(id, val)
@@ -291,12 +288,26 @@ for (depthStep = max; depthStep > 0; depthStep--) {
 		vm.patchDueDate(id, dd);
 		allItems.updateChildrenDueDate(id);
 	}
+	getParentsAsArray(id)
+	{
+		let pArr = [];
+		this.getParentsRecursive(id, pArr);
+		pArr.reverse().shift();
+		return pArr;
+	}
+	getParentsRecursive(id, pArr)
+	{
+		let pId = allItems.nodes[id].parent_id;
+		if (!pId){ return; }
+		pArr.push(allItems.nodes[pId].body);
+		this.getParentsRecursive(pId, pArr);
+	}
 	updateChildrenDueDate(id)
 	{
 		let item = this.nodes[id];
 		if (!item.children.length){ return false; }
 		item.children.forEach(function(child){
-			if (item.dueDateParent == true){
+			if (item.dueDateParent){
 				child.dueDateParent = item.dueDateParent;
 				this.updateChildrenDueDate(child.id);
 			} else if (item.due_date && item.due_date != '0000-00-00 00:00:00') {
@@ -315,7 +326,7 @@ for (depthStep = max; depthStep > 0; depthStep--) {
 			if (value == 'today'){
 		    	$.each(this.nodes, function(index, item) {
 		    		let diff = moment(item.due_date).diff(moment(), 'days');
-					if (diff == 0){
+					if (diff <= 0){
 						filteredItems.push(item);
 					}
 			    });
@@ -333,7 +344,7 @@ for (depthStep = max; depthStep > 0; depthStep--) {
 		}
 		allItems.root.children = filteredItems;
 	}
-	getFiltered(keyword)
+	getFilteredFlat(keyword)
 	{
 		if (keyword == 'done'){
 			let nodes = this.nodes;
@@ -349,6 +360,65 @@ for (depthStep = max; depthStep > 0; depthStep--) {
 				}
         		return prev;
 			},{});
+			return Object.keys(doneItemsObject).map(function(k){ 
+			   let rObj = {};
+			   rObj['date'] = k;
+			   rObj['items'] = doneItemsObject[k];
+			   return rObj;
+			});
+	  	}
+	}
+	formatDone(doneArray)
+	{
+		let doneItemsObject = doneArray.reduce(function(prev,item){
+			if(item.done){
+			  	let donePropName = moment(item.done_date).format('YYYY/MM/DD');
+			  	// if we don't have a slot for this date, make one
+			  	if(!prev.hasOwnProperty(donePropName)){
+			    	prev[donePropName] = [];
+			  	}
+				prev[donePropName].push(item);
+			}
+    		return prev;
+		},{});
+		return Object.keys(doneItemsObject).map(function(k){ 
+			let rObj = {};
+			rObj['date'] = k;
+			rObj['items'] = doneItemsObject[k];
+			rObj['totalTime'] = rObj['items'].reduce((prev, next) => {
+				return allItems.addTime(prev, next.planned_time);
+	    	}, 0);
+			return rObj;
+		});
+	}
+	getDoneTasksRecursively(childrenArray, prev)
+	{
+		if (!prev){ prev = {}; }
+		// let prev = (!prev) ? {} : prev;
+		return childrenArray.reduce(function(prev,item){
+			// console.log('item in getDoneTasksRecursively:');
+			// console.log(item);
+			if(item.done){
+				console.log('item: '+item.body+' ; done = '+item.done);
+			  	let donePropName = moment(item.done_date).format('YYYY/MM/DD');
+			  	// if we don't have a slot for this date, make one
+			  	if(!prev.hasOwnProperty(donePropName)){
+			    	prev[donePropName] = [];
+			  	}
+				prev[donePropName].push(item);
+			} else {
+				// if (!prev){ return; }
+				this.getDoneTasksRecursively(item.children, prev); 
+			}
+    		return prev;
+		}.bind(this),prev);
+	}
+	getFiltered(keyword)
+	{
+		if (keyword == 'done'){
+			let firstItem = this.root.children;
+			let doneItemsObject = this.getDoneTasksRecursively(firstItem);
+			console.log(doneItemsObject);
 			return Object.keys(doneItemsObject).map(function(k){ 
 			   let rObj = {};
 			   rObj['date'] = k;
