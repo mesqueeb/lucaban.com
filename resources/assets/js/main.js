@@ -72,6 +72,7 @@ window.vm = new Vue({
 		doneData: null,
 		selection: selection,
 		addingNewUnder: null,
+		addingNewAsFirstChild: false,
 		editingItem: null,
 	},
 	components: {
@@ -79,10 +80,26 @@ window.vm = new Vue({
 		Journal,
 	},
 	methods:{
-		markDone(){
-			let item = allItems.nodes[selection.selectedId];
-			// swap done value because of iniciation with with spacebar:
-			item.done = !item.done;
+		showChildren(id, show){
+			let item = (!id) ? allItems.nodes[selection.selectedId] : allItems.nodes[id];
+			if (show == 'show'){
+				item.show_children = true;
+			} else if (show == 'hide') {
+				item.show_children = false;
+			} else {
+				item.show_children = !item.show_children;
+			}
+			this.patchShowChildren(item.id);
+		},
+		markDone(id, markAs){
+			let item = (!id) ? allItems.nodes[selection.selectedId] : allItems.nodes[id];
+			if (markAs == 'notDone'){
+				item.done = false;
+			} else if (markAs == 'done') {
+				item.done = true;
+			} else if (!(item.children.length && allItems.allChildrenDone(item.id) == false)){
+				item.done = !item.done;
+			}
 			allItems.updateDoneState(item.id);
 		},
 		patchDone(id){
@@ -130,19 +147,22 @@ window.vm = new Vue({
 		},
 		select(direction){
 			let id = selection.selectedId;
+			let item = allItems.nodes[id];
 			let sel;
 			if(direction == 'next'){
 				if(!id || id == allItems.root.id){
-					sel = allItems.root.children_order[0]; }
-				else {
+					sel = allItems.root.children_order[0];
+				} else {
 					sel = allItems.nextItemId(id)
 				}
 			} else if (direction == 'prev'){
+				let olderSiblingId = allItems.olderSiblingId(id);
+				let olderSibling = allItems.nodes[olderSiblingId];
 				if(!id || id == allItems.root.id){
 					let l = allItems.root.children_order.length;
-					sel = allItems.root.children_order[l-1]; }
-				else {
-					sel = allItems.prevItemId(id)
+					sel = allItems.root.children_order[l-1];
+				} else {
+					sel = allItems.prevItemId(id);
 				}
 			}
 			selection.selectedId = sel;
@@ -170,11 +190,7 @@ window.vm = new Vue({
 		},
 		patchChildren_order(id, newItem){
 			let childrenArray = allItems.nodes[id].children_order;
-			let c_o = '';
-			childrenArray.forEach(function(entry) {
-			    c_o = c_o+','+entry;
-			});
-			c_o = c_o.substring(1);
+			let c_o = allItems.arrayToString(childrenArray);
 			this.$http.patch('/api/items/' + id, { children_order: c_o }, { method: 'PATCH'})
 			.then(function(response){
 				console.log('patched item['+id+'].children_order = '+c_o+';');
@@ -187,6 +203,13 @@ window.vm = new Vue({
 			.then(function(response){
 				console.log('patched item['+id+'].depth = '+depth+';');
 			});	
+		},
+		patchShowChildren(id){
+			let showChildren = allItems.nodes[id].show_children;
+			this.$http.patch('/api/items/' + id, { show_children: showChildren }, { method: 'PATCH'})
+			.then(function(response){
+				console.log('patched item['+id+'].show_children = '+showChildren+';');
+			});
 		},
 		patchParent_id(id){
 			let parent_id = allItems.nodes[id].parent_id;
@@ -218,18 +241,39 @@ window.vm = new Vue({
 				allItems.filter('today');
 			}
 		},
+		duplicate(){
+			let item = allItems.nodes[selection.selectedId];
+			item.children_order = allItems.arrayToString(item.children_order);			
+			console.log('dupe item.children_order = '+item.children_order);
+			console.log(typeof item.children_order);
+			console.log(item.children_order);
+			let OlderSiblingIndex = allItems.siblingIndex(selection.selectedId);
+			let index = parseInt(OlderSiblingIndex)+1;
+			this.$http.post('/api/items',item) //SEND
+			.then(function(response){ //response
+				let storedItem = response.data;
+				console.log('starting dom update...');
+				console.log('ind on duplicate: '+index);
+				allItems.addItem(storedItem, index);
+			});
+		},
+
 		keystroke(k){
 			console.log(k);
+			if(k == 'arrowRight'){ this.showChildren(null, 'show')}
+			if(k == 'arrowLeft'){ this.showChildren(null, 'hide')}
 			if(k == 'arrowUp'){ this.select('prev')}
 			if(k == 'arrowDown'){ this.select('next')}
 			if(k == 'meta_arrowUp'){ this.moveItem('up')}
 			if(k == 'meta_arrowDown'){ this.moveItem('down')}
-			if(k == 'spaceBar'){ this.markDone()}
+			if(k == 'spaceBar'){ this.markDone() }
 			if(k == 'shift_tab'){ this.unindent()}
 			if(k == 'tab'){ this.indent()}
 			if(k == 'enter'){ this.showAddNewItem()}
 			if(k == 'meta_enter'){ this.$broadcast('startEdit')}
+			if(k == 'shift_enter'){ this.showAddNewItem()}
 			if(k == 't'){ this.setToday()}
+			if(k == 'meta_shift_d'){ this.duplicate()}
 		},
 	},
 	created(){
@@ -242,9 +286,17 @@ window.vm = new Vue({
 		} else { 
 		  // INPUT AREAS NOT IN FOCUS
           switch(e.keyCode) { 
+			case 37: // arrowLeft
+				e.preventDefault();
+				vm.keystroke('arrowLeft');
+				break;
+			case 39: // arrowRight
+				e.preventDefault();
+				vm.keystroke('arrowRight');
+				break;
 			case 38: // arrowUp
 				e.preventDefault();
-				if (event.ctrlKey || event.metaKey){
+				if (e.ctrlKey || e.metaKey){
 		  			vm.keystroke('meta_arrowUp');
 		  			break;
 		  		}
@@ -252,7 +304,7 @@ window.vm = new Vue({
 				break;
 			case 40: // arrowDown
 				e.preventDefault();
-				if (event.ctrlKey || event.metaKey){
+				if (e.ctrlKey || e.metaKey){
 		  			vm.keystroke('meta_arrowDown');
 		  			break;
 		  		}
@@ -272,17 +324,23 @@ window.vm = new Vue({
 				break;
 			case 13: // enter
 				e.preventDefault();
-				if (event.ctrlKey || event.metaKey){
+				if (e.ctrlKey || e.metaKey){
 		  			vm.keystroke('meta_enter');
-		  			break;
+		  		} else if (e.shiftKey) {
+					vm.keystroke('shift_enter');
+		  		} else {
+					vm.keystroke('enter');
 		  		}
-				vm.keystroke('enter');
 				break;
 			case 84: // t
 				vm.keystroke('t');
 				break;
-			case 'xexx':
-				vm.keystroke('unindent');
+			case 68: // d
+				e.preventDefault();
+				if ((e.ctrlKey || e.metaKey) && e.shiftKey){
+					vm.keystroke('meta_shift_d');
+		  			break;
+		  		}
 				break;
 			case 'xexx':
 				vm.keystroke('unindent');

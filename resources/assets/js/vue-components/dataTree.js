@@ -16,6 +16,8 @@ export default class Tree {
 		// assign
 		if(node.children_order){
 			node.children_order = node.children_order.split(',').map(Number);
+		} else {
+			node.children_order = [];
 		}
 		node.children = [];
 		if(index === 0) { this.root = node; }
@@ -42,30 +44,14 @@ export default class Tree {
 	{
 		return this.nodes[id];
 	}
-	calcAllPlannedTime()
-	{
-		let obj = allItems.nodes;
-		let arr = Object.keys( obj ).map(function ( key ) { return obj[key].depth; });
-		let max = Math.max.apply( null, arr );
-		let depthStep;
-for (depthStep = max; depthStep > 0; depthStep--) {
-	// get all tasks with depth = depthStep
-	// foreach(){}
-	// if has children{
-		//make 'total time' = sum of all 'total time' on children + 'own time'
-	// } else if no childern {
-		//make 'total time' = 'own time'
-	//}
-	//if all done, end the loop and decrement depthStep
-}
-	}
 	addItem(item, index)
 	{
+		item.show_children = (!item.show_children) ? 1 : item.show_children;
 		item.children_order = (!item.children_order) ? [] : item.children_order;
 		item.children = (!item.children) ? [] : item.children;
 		let parent = allItems.nodes[item.parent_id];
-		console.log('item.parent_id in additem');
-		console.log(item.parent_id);
+		// console.log('item.parent_id in additem');
+		// console.log(item.parent_id);
 		if (!parent.children_order){
 			parent.children_order = [];
 		}
@@ -74,7 +60,19 @@ for (depthStep = max; depthStep > 0; depthStep--) {
 	    allItems.nodes[item.id] = item;
 	    selection.selectedId = item.id;
 	    vm.patchChildren_order(item.parent_id, item.id);
-	    vm.showAddNewItem(item.id);
+	    let siblingId = this.olderSiblingId(item.id);
+	    let siblingBody = this.nodes[siblingId].body;
+	    if(siblingBody != item.body){
+		    vm.showAddNewItem(item.id);
+	    }
+	}
+	arrayToString(arr)
+	{
+		let c_o = '';
+		arr.forEach(function(entry) {
+		    c_o = c_o+','+entry;
+		});
+		return c_o.substring(1);
 	}
 	siblingIndex(id)
 	{
@@ -96,12 +94,13 @@ for (depthStep = max; depthStep > 0; depthStep--) {
 	}
 	nextItemId(id)
 	{
+		let item = allItems.nodes[id];
 		// first check if item has children, if so select the first child.
-		if (allItems.nodes[id].children.length > 0){
-			return allItems.nodes[id].children_order[0];
+		if (item.show_children && item.children.length > 0){
+			return item.children_order[0];
 		}
 		// if no children look at parent node's children order.
-		let parent_id = allItems.nodes[id].parent_id;
+		let parent_id = item.parent_id;
 		if(!parent_id){ return; }
 		let siblingsArr = allItems.nodes[parent_id].children_order;
 
@@ -128,9 +127,10 @@ for (depthStep = max; depthStep > 0; depthStep--) {
 	}
 	prevItemRecursion(id)
 	{
-		let childrenLength = allItems.nodes[id].children.length;
+		let item = allItems.nodes[id];
+		let childrenLength = item.children.length;
 		// console.log('childrenLength: '+childrenLength+' // id: '+id);
-		if(childrenLength>0){
+		if(item.show_children && childrenLength>0){
 			id = allItems.nodes[id].children[childrenLength-1].id;
 			// console.log('childrenLength: '+childrenLength+' // id: '+id);
 			return this.prevItemRecursion(id);
@@ -157,7 +157,7 @@ for (depthStep = max; depthStep > 0; depthStep--) {
 			item.children = order.map(id => items.find(t => t.id === id));
 		}
 	}
-	giveNewParent(id, new_parent_id)
+	giveNewParent(id, new_parent_id, specificNewIndex)
 	{
 		let parent_id = allItems.nodes[id].parent_id;
 		let targetItem = allItems.nodes[id];
@@ -173,12 +173,15 @@ for (depthStep = max; depthStep > 0; depthStep--) {
 		if (!newParent.children_order){
 			newParent.children_order = [];
 		}
-		if(prevParent.depth-1 == newParent.depth){
+		if (specificNewIndex || specificNewIndex == 0) {
+			newParent.children.splice(specificNewIndex,0,targetItem);
+			newParent.children_order.splice(specificNewIndex,0,id);
+		} else if (prevParent.depth-1 == newParent.depth && new_parent_id == prevParent.parent_id) {
 			// when unindenting
 			let newIndex = this.siblingIndex(prevParent.id)+1;
 			newParent.children.splice(newIndex,0,targetItem);
 			newParent.children_order.splice(newIndex,0,id);
-		}else{
+		} else {
 			// when indenting
 			newParent.children.push(targetItem);
 			newParent.children_order.push(id)
@@ -225,6 +228,33 @@ for (depthStep = max; depthStep > 0; depthStep--) {
 		let done_date = moment().format();
 		allItems.nodes[id].done_date = done_date;
 		vm.patchDone(id);
+		this.updateParentDoneState(allItems.nodes[id].parent_id);
+	}
+	updateParentDoneState(parentId)
+	{
+		if (this.nodes[parentId].depth == 0){ return; }
+		if (this.allChildrenDone(parentId) == true){
+			// console.log('switch around done state of: '+this.nodes[parentId].body);
+			vm.markDone(parentId, 'done');
+		} else {
+			// console.log('make '+this.nodes[parentId].body+' NOT Done!');
+			vm.markDone(parentId, 'notDone');
+		}
+	}
+	allChildrenDone(id)
+	{
+		let children = allItems.nodes[id].children;
+		let doneAmount = children.reduce(function (prev, child){
+			let a = (child.done) ? 1 : 0 ;
+			return this.AplusB(a,prev);
+		}.bind(this), 0);	
+		if(children.length == doneAmount){
+			// console.log('all children done of '+allItems.nodes[id].body);
+			return true;
+		} else {
+			// console.log('NOT all children done of '+allItems.nodes[id].body);
+			return false;
+		}
 	}
 	calculateDuration(item)
 	{
@@ -237,7 +267,7 @@ for (depthStep = max; depthStep > 0; depthStep--) {
 	    item.children = item.children.map(allItems.calculateDuration);
 	    // add up all the times of our direct children (they'll already have been reconciled)
 	    item['totalTime'] = item.children.reduce((prev, next) => {
-	        return allItems.addTime(prev, next.totalTime);
+	        return allItems.AplusB(prev, next.totalTime);
 	    }, (!item.done) ? item.planned_time : 0 );
 	    return item;
 	}
@@ -254,29 +284,51 @@ for (depthStep = max; depthStep > 0; depthStep--) {
 			return allItems.checkValParentTree(pId, val);
 		}
 	}
-	addTime(a, b)
+	AplusB(a, b)
 	{
 	    return parseFloat(a) + parseFloat(b);
 	}
 	moveItem(id, direction)
 	{
 		clearTimeout(window.patchDelay);
-		let pid = this.nodes[id].parent_id;
-		let parent = this.nodes[pid];
+		let pId = this.nodes[id].parent_id;
+		let parent = this.nodes[pId];
 		let index = this.siblingIndex(id);
 		if(direction == 'up' || direction == 'left')
 		{
-			if(index==0){return;};
-			parent.children_order.splice(index,1);
-			parent.children_order.splice(index-1, 0, id);
-		} else if (direction == 'down' || direction == 'right')
-		{
-			if(index+1==parent.children_order.length){return;};
-			parent.children_order.splice(index,1);
-			parent.children_order.splice(index+1, 0, id);
+			if(index == 0){
+				// Jump to last child of previous Sibling
+				let parentOlderSiblingId = this.olderSiblingId(pId);
+				let newInd = (parentOlderSiblingId == parent.parent_id) ? 0 : null;
+				this.giveNewParent(id, parentOlderSiblingId, newInd);
+			} else {
+				parent.children_order.splice(index,1);
+				parent.children_order.splice(index-1, 0, id);
+				this.sortChildren(pId);
+				window.patchDelay = setTimeout(function(){ vm.patchChildren_order(pId); },1000);
+			}
 		}
-		this.sortChildren(pid);
-		window.patchDelay = setTimeout(function(){ vm.patchChildren_order(pid); },1000);
+		else if (direction == 'down' || direction == 'right')
+		{
+			if( index+1 == parent.children_order.length ){
+				this.giveNewParent(id, this.nextItemId(id), 0);
+			} else {
+				parent.children_order.splice(index,1);
+				parent.children_order.splice(index+1, 0, id);
+				this.sortChildren(pId);
+				window.patchDelay = setTimeout(function(){ vm.patchChildren_order(pId); },1000);
+			}
+		}
+	}
+	flushDoneItems() // Do not use yet. Not sure how to best implement this...
+	{
+		let nodes = this.nodes;
+		let keys = Object.keys(nodes);
+		let doneItemsObject = keys.reduce((prev,id) => {
+			if(nodes[id].done){
+				this.deleteItem(id);
+			}
+		});
 	}
 	setDueDate(id, duedate)
 	{
@@ -301,6 +353,13 @@ for (depthStep = max; depthStep > 0; depthStep--) {
 		if (!pId){ return; }
 		pArr.push(allItems.nodes[pId].body);
 		this.getParentsRecursive(pId, pArr);
+	}
+	getLastChildId(id)
+	{
+		let l = this.nodes[id].children.length;
+		if(!l){ return false; }
+		let n = this.nodes[id].children[l-1];
+		return n.id;
 	}
 	updateChildrenDueDate(id)
 	{
@@ -349,7 +408,7 @@ for (depthStep = max; depthStep > 0; depthStep--) {
 		if (keyword == 'done'){
 			let nodes = this.nodes;
 			let keys = Object.keys(nodes);
-			let doneItemsObject = keys.reduce(function(prev,item){
+			let doneItemsObject = keys.reduce((prev,item) => {
 				if(nodes[item].done){
 				  	let donePropName = moment(nodes[item].done_date).format('YYYY/MM/DD');
 				  	// if we don't have a slot for this date, make one
@@ -370,7 +429,7 @@ for (depthStep = max; depthStep > 0; depthStep--) {
 	}
 	formatDone(doneArray)
 	{
-		let doneItemsObject = doneArray.reduce(function(prev,item){
+		let doneItemsObject = doneArray.reduce((prev,item) => {
 			if(item.done){
 			  	let donePropName = moment(item.done_date).format('YYYY/MM/DD');
 			  	// if we don't have a slot for this date, make one
@@ -386,7 +445,7 @@ for (depthStep = max; depthStep > 0; depthStep--) {
 			rObj['date'] = k;
 			rObj['items'] = doneItemsObject[k];
 			rObj['totalTime'] = rObj['items'].reduce((prev, next) => {
-				return allItems.addTime(prev, next.planned_time);
+				return allItems.AplusB(prev, next.planned_time);
 	    	}, 0);
 			return rObj;
 		});
@@ -395,7 +454,7 @@ for (depthStep = max; depthStep > 0; depthStep--) {
 	{
 		if (!prev){ prev = {}; }
 		// let prev = (!prev) ? {} : prev;
-		return childrenArray.reduce(function(prev,item){
+		return childrenArray.reduce(function (prev,item) {
 			// console.log('item in getDoneTasksRecursively:');
 			// console.log(item);
 			if(item.done){

@@ -26,6 +26,7 @@ class CreateItemsTable extends Migration
         $table->dateTime('done_date');
         $table->boolean('done');
         $table->text('completion_memo');
+        $table->boolean('show_children')->default(1);
         $table->softDeletes();
         $table->morphs('taggable');
         $table->integer('created_by')->unsigned()->index();     

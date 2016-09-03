@@ -10794,6 +10794,8 @@ module.exports = Vue;
 },{"_process":2}],6:[function(require,module,exports){
 'use strict';
 
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
+
 var _Card = require('./vue-components/Card.vue');
 
 var _Card2 = _interopRequireDefault(_Card);
@@ -10874,6 +10876,7 @@ $.getJSON('/api/items', function (fetchedData) {
 			doneData: null,
 			selection: selection,
 			addingNewUnder: null,
+			addingNewAsFirstChild: false,
 			editingItem: null
 		},
 		components: {
@@ -10881,10 +10884,26 @@ $.getJSON('/api/items', function (fetchedData) {
 			Journal: _Journal2.default
 		},
 		methods: {
-			markDone: function markDone() {
-				var item = allItems.nodes[selection.selectedId];
-				// swap done value because of iniciation with with spacebar:
-				item.done = !item.done;
+			showChildren: function showChildren(id, show) {
+				var item = !id ? allItems.nodes[selection.selectedId] : allItems.nodes[id];
+				if (show == 'show') {
+					item.show_children = true;
+				} else if (show == 'hide') {
+					item.show_children = false;
+				} else {
+					item.show_children = !item.show_children;
+				}
+				this.patchShowChildren(item.id);
+			},
+			markDone: function markDone(id, markAs) {
+				var item = !id ? allItems.nodes[selection.selectedId] : allItems.nodes[id];
+				if (markAs == 'notDone') {
+					item.done = false;
+				} else if (markAs == 'done') {
+					item.done = true;
+				} else if (!(item.children.length && allItems.allChildrenDone(item.id) == false)) {
+					item.done = !item.done;
+				}
 				allItems.updateDoneState(item.id);
 			},
 			patchDone: function patchDone(id) {
@@ -10940,6 +10959,7 @@ $.getJSON('/api/items', function (fetchedData) {
 			},
 			select: function select(direction) {
 				var id = selection.selectedId;
+				var item = allItems.nodes[id];
 				var sel = void 0;
 				if (direction == 'next') {
 					if (!id || id == allItems.root.id) {
@@ -10948,6 +10968,8 @@ $.getJSON('/api/items', function (fetchedData) {
 						sel = allItems.nextItemId(id);
 					}
 				} else if (direction == 'prev') {
+					var olderSiblingId = allItems.olderSiblingId(id);
+					var olderSibling = allItems.nodes[olderSiblingId];
 					if (!id || id == allItems.root.id) {
 						var l = allItems.root.children_order.length;
 						sel = allItems.root.children_order[l - 1];
@@ -10982,11 +11004,7 @@ $.getJSON('/api/items', function (fetchedData) {
 			},
 			patchChildren_order: function patchChildren_order(id, newItem) {
 				var childrenArray = allItems.nodes[id].children_order;
-				var c_o = '';
-				childrenArray.forEach(function (entry) {
-					c_o = c_o + ',' + entry;
-				});
-				c_o = c_o.substring(1);
+				var c_o = allItems.arrayToString(childrenArray);
 				this.$http.patch('/api/items/' + id, { children_order: c_o }, { method: 'PATCH' }).then(function (response) {
 					console.log('patched item[' + id + '].children_order = ' + c_o + ';');
 					// this.showAddNewItem(newItem);
@@ -10996,6 +11014,12 @@ $.getJSON('/api/items', function (fetchedData) {
 				var depth = allItems.nodes[id].depth;
 				this.$http.patch('/api/items/' + id, { depth: depth }, { method: 'PATCH' }).then(function (response) {
 					console.log('patched item[' + id + '].depth = ' + depth + ';');
+				});
+			},
+			patchShowChildren: function patchShowChildren(id) {
+				var showChildren = allItems.nodes[id].show_children;
+				this.$http.patch('/api/items/' + id, { show_children: showChildren }, { method: 'PATCH' }).then(function (response) {
+					console.log('patched item[' + id + '].show_children = ' + showChildren + ';');
 				});
 			},
 			patchParent_id: function patchParent_id(id) {
@@ -11027,8 +11051,31 @@ $.getJSON('/api/items', function (fetchedData) {
 					allItems.filter('today');
 				}
 			},
+			duplicate: function duplicate() {
+				var item = allItems.nodes[selection.selectedId];
+				item.children_order = allItems.arrayToString(item.children_order);
+				console.log('dupe item.children_order = ' + item.children_order);
+				console.log(_typeof(item.children_order));
+				console.log(item.children_order);
+				var OlderSiblingIndex = allItems.siblingIndex(selection.selectedId);
+				var index = parseInt(OlderSiblingIndex) + 1;
+				this.$http.post('/api/items', item) //SEND
+				.then(function (response) {
+					//response
+					var storedItem = response.data;
+					console.log('starting dom update...');
+					console.log('ind on duplicate: ' + index);
+					allItems.addItem(storedItem, index);
+				});
+			},
 			keystroke: function keystroke(k) {
 				console.log(k);
+				if (k == 'arrowRight') {
+					this.showChildren(null, 'show');
+				}
+				if (k == 'arrowLeft') {
+					this.showChildren(null, 'hide');
+				}
 				if (k == 'arrowUp') {
 					this.select('prev');
 				}
@@ -11056,8 +11103,14 @@ $.getJSON('/api/items', function (fetchedData) {
 				if (k == 'meta_enter') {
 					this.$broadcast('startEdit');
 				}
+				if (k == 'shift_enter') {
+					this.showAddNewItem();
+				}
 				if (k == 't') {
 					this.setToday();
+				}
+				if (k == 'meta_shift_d') {
+					this.duplicate();
 				}
 			}
 		},
@@ -11071,10 +11124,20 @@ $.getJSON('/api/items', function (fetchedData) {
 				} else {
 					// INPUT AREAS NOT IN FOCUS
 					switch (e.keyCode) {
+						case 37:
+							// arrowLeft
+							e.preventDefault();
+							vm.keystroke('arrowLeft');
+							break;
+						case 39:
+							// arrowRight
+							e.preventDefault();
+							vm.keystroke('arrowRight');
+							break;
 						case 38:
 							// arrowUp
 							e.preventDefault();
-							if (event.ctrlKey || event.metaKey) {
+							if (e.ctrlKey || e.metaKey) {
 								vm.keystroke('meta_arrowUp');
 								break;
 							}
@@ -11083,7 +11146,7 @@ $.getJSON('/api/items', function (fetchedData) {
 						case 40:
 							// arrowDown
 							e.preventDefault();
-							if (event.ctrlKey || event.metaKey) {
+							if (e.ctrlKey || e.metaKey) {
 								vm.keystroke('meta_arrowDown');
 								break;
 							}
@@ -11106,18 +11169,25 @@ $.getJSON('/api/items', function (fetchedData) {
 						case 13:
 							// enter
 							e.preventDefault();
-							if (event.ctrlKey || event.metaKey) {
+							if (e.ctrlKey || e.metaKey) {
 								vm.keystroke('meta_enter');
-								break;
+							} else if (e.shiftKey) {
+								vm.keystroke('shift_enter');
+							} else {
+								vm.keystroke('enter');
 							}
-							vm.keystroke('enter');
 							break;
 						case 84:
 							// t
 							vm.keystroke('t');
 							break;
-						case 'xexx':
-							vm.keystroke('unindent');
+						case 68:
+							// d
+							e.preventDefault();
+							if ((e.ctrlKey || e.metaKey) && e.shiftKey) {
+								vm.keystroke('meta_shift_d');
+								break;
+							}
 							break;
 						case 'xexx':
 							vm.keystroke('unindent');
@@ -11151,11 +11221,11 @@ exports.default = {
 	data: function data() {
 		return {
 			newItem: {
+				as: 'sibling',
 				body: '',
 				planned_time: 0,
 				parent_id: this.item.parent_id ? this.item.parent_id : allItems.root.id,
-				depth: this.item.depth == 0 ? 1 : this.item.depth,
-				older_sibling_id: this.item.id
+				depth: this.item.depth == 0 ? 1 : this.item.depth
 			}
 		};
 	},
@@ -11175,6 +11245,13 @@ exports.default = {
 		},
 		showAddNewBox: function showAddNewBox() {
 			if (this.$root.addingNewUnder == this.item.id || this.item.depth == 0 && allItems.root.children_order.length == 0) {
+				return true;
+			} else {
+				return false;
+			}
+		},
+		showAddNewBoxFirstChild: function showAddNewBoxFirstChild() {
+			if (this.$root.addingNewUnder == this.item.id && this.$root.addingNewAsFirstChild) {
 				return true;
 			} else {
 				return false;
@@ -11203,8 +11280,8 @@ exports.default = {
 		},
 		enterOnNew: function enterOnNew(e) {},
 		keydownOnNew: function keydownOnNew(e) {
-			console.log('run keydownOnNew:');
-			console.log(e);
+			// console.log('run keydownOnNew:');
+			// console.log(e);
 			// ENTER
 			if (e.keyCode === 13 && !e.shiftKey && !e.altKey) {
 				e.preventDefault();
@@ -11213,18 +11290,64 @@ exports.default = {
 				}
 				this.addNew();
 			}
-			// ArrowUp or ArrowDown
-			if (e.keyCode === 38 || e.keyCode === 40) {
+			// ArrowUp or ArrowDown or Esc
+			if (e.keyCode === 38 || e.keyCode === 40 || e.keyCode === 27) {
 				if (!this.newItem.body) {
 					e.preventDefault();
 					this.cancelAddNew();
 				}
 			}
 		},
-		enterOnEdit: function enterOnEdit(e) {
+		keydownOnEdit: function keydownOnEdit(e) {
+			// Enter
 			if (e.keyCode === 13 && !e.shiftKey && !e.altKey) {
 				e.preventDefault();
 				this.doneEdit();
+			}
+		},
+		tabOnFirstInput: function tabOnFirstInput(e) {
+			// Tab
+			if (e.keyCode === 9 && e.shiftKey) {
+				e.preventDefault();
+				return;
+			}
+		},
+		tabOnLastInput: function tabOnLastInput(e) {
+			// Tab
+			if (e.keyCode === 9 && !e.shiftKey) {
+				e.preventDefault();
+				return;
+			}
+		},
+		tabOnFirstInputNew: function tabOnFirstInputNew(e) {
+			// Tab
+			if (e.keyCode === 9 && e.shiftKey) {
+				e.preventDefault();
+				if (this.newItem.depth == 1) {
+					return;
+				}
+				vm.$root.showAddNewItem(this.item.parent_id);
+				return;
+			}
+		},
+		tabOnLastInputNew: function tabOnLastInputNew(e) {
+			// Tab
+			if (e.keyCode === 9 && !e.shiftKey) {
+				e.preventDefault();
+				var lastChild = allItems.getLastChildId(this.item.id);
+				if (lastChild) {
+					console.log("tab -- parent's lastChild: " + lastChild);
+					vm.$root.showAddNewItem(lastChild);
+				} else {
+					if (this.newItem.as == 'child') {
+						return;
+					}
+					this.newItem.depth++;
+					this.newItem.parent_id = this.item.id;
+					this.newItem.as = 'child';
+					$("#new-under-" + this.item.id + " textarea").focus();
+				}
+				return;
 			}
 		},
 		blurOnEdit: function blurOnEdit(item) {
@@ -11248,8 +11371,11 @@ exports.default = {
 				}
 			}, 20);
 		},
-		markDone: function markDone(id) {
+		updateDone: function updateDone(id) {
 			allItems.updateDoneState(id);
+		},
+		updateShowChildren: function updateShowChildren(id) {
+			allItems.patchShowChildren(id);
 		},
 		startEdit: function startEdit(item) {
 			console.log('startEdit');
@@ -11306,7 +11432,11 @@ exports.default = {
 			console.log('sid: ' + selection.selectedId);
 			selection.selectedId = selection.lastSelectedId;
 			console.log('sid: ' + selection.selectedId);
-			// selection.lastSelectedId = null;
+			// Reset newItem to sibling stance.
+			this.newItem.as = 'sibling';
+			this.newItem.parent_id = this.item.parent_id ? this.item.parent_id : allItems.root.id;
+			this.newItem.depth = this.item.depth == 0 ? 1 : this.item.depth;
+
 			$(':focus').blur();
 		}
 	},
@@ -11334,7 +11464,7 @@ exports.default = {
 	}
 };
 if (module.exports.__esModule) module.exports = module.exports.default
-;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\n<div class=\"items-card\">\n\t<div class=\"item-card\" v-if=\"item.depth != 0\" :class=\"{\n\t\t\tdone: item.done,\n\t\t\tediting: item.id == this.$root.editingItem,\n\t\t}\">\n\t\t<div class=\"toggle-div\">\n\t\t\t<input class=\"toggle\" type=\"checkbox\" v-if=\"item.children_order.length==0 || item.done == true\" v-model=\"item.done\" @change=\"markDone(item.id)\">\n\t\t</div>\n\t\t<div class=\"body-div\" :class=\"{ selected: item.id == this.$root.selection.selectedId, }\" @dblclick=\"startEdit(item)\" @click=\"select(item)\" @enter=\"console.log('yarrr')\">\n\t\t\t<span class=\"bodybox\" v-show=\"item.id != this.$root.editingItem\">{{ item.body }}</span>\n\t\t\t<!-- For debugging: -->\n\t\t\t<span v-show=\"false\"> ({{item.id}}) D-{{item.depth}}) [{{item.children_order}}]</span>\n\t\t\t\n\t\t\t<form action=\"update\" class=\"updatebox\" v-show=\"item.id == this.$root.editingItem\" @submit.prevent=\"doneEdit(item)\">\n\t\t\t\t<textarea name=\"item_body\" rows=\"{{ item.rows }}\" v-model=\"item.body\" v-autosize=\"item.body\" v-item-focus=\"item.id == this.$root.editingItem\" @blur=\"blurOnEdit(item)\" @keyup.esc=\"cancelEdit(item)\" @keydown.enter=\"enterOnEdit\">{{ item.body }}</textarea>\n\t\t\t\t<span>\n\t\t\t\t\t<label for=\"planned_time\">duration:</label>\n\t\t\t\t\t<input name=\"planned_time\" type=\"number\" v-model=\"item.planned_time\" @blur=\"blurOnEdit(item)\" @keyup.esc=\"cancelEdit(item)\" @keydown.enter=\"doneEdit(item)\">\n\t\t\t\t</span>\n\t\t\t</form>\n\t\t\t<div class=\"item-tags\" v-show=\"this.$root.editingItem != item.id\">\n\t\t\t\t<span v-if=\"item.done\" class=\"done\">\n\t\t\t\t\tdone {{ item.done_date | momentCalendar }}\n\t\t\t\t</span>\n\t\t\t\t\n\t\t\t\t<span v-if=\"hasTotalTime\" class=\"total-duration\">\n\t\t\t\t\ttotal {{ calcTotalTime }} min\n\t\t\t\t</span>\n\n\t\t\t\t<span v-if=\"hasPlannedTime\" class=\"duration\">\n\t\t\t\t\t{{ item.planned_time }} min\n\t\t\t\t</span>\n\n\t\t\t\t<span v-if=\"hasDueDate\" class=\"duedate\">\n\t\t\t\t\t{{ item.due_date | momentCalendar }}\n\t\t\t\t</span>\n\n\t\t\t\t<span v-if=\"item.dueDateParent\" class=\"duedate-parent\">\n\t\t\t\t\t{{ item.dueDateParent | momentCalendar }}\n\t\t\t\t</span>\n\n\t\t\t</div>\n\t\t\t<div class=\"item-nav\" v-show=\"this.$root.editingItem != item.id\">\n\t\t\t\t<button v-if=\"item.children_order.length==0\" @click=\"deleteItem(item)\">✗</button>\n\t\t\t</div>\n\t\t</div>\n\t</div>\n\n\t<div class=\"children\" v-if=\"item.children\">\n\t\t<card v-for=\"childCard in item.children\" :item=\"childCard\"></card>\n\t</div>\n\n\t<form class=\"addnewbox\" id=\"new-under-{{ item.id }}\" v-if=\"showAddNewBox\" @submit.prevent=\"\">\n\t\t<textarea type=\"text\" class=\"add-item\" name=\"body\" v-model=\"newItem.body\" v-autosize=\"newItem.body\" @blur=\"blurOnAddNew(item)\" @keyup.esc=\"cancelAddNew\" @keydown=\"keydownOnNew\" placeholder=\"...\" autocomplete=\"off\" autofocus=\"\" rows=\"1\"></textarea>\n\t\t<span>\n\t\t\t<label for=\"planned_time\">duration:</label>\n\t\t\t<input name=\"planned_time\" type=\"number\" v-model=\"newItem.planned_time\" @blur=\"blurOnAddNew(item)\" @keyup.esc=\"cancelAddNew\" @keydown=\"keydownOnNew\">\n\t\t</span>\n\t</form>\n</div>\n"
+;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\n<div class=\"items-card\">\n\t<div class=\"item-card\" v-if=\"item.depth != 0\" :class=\"{\n\t\t\tdone: item.done,\n\t\t\tshow_children: item.show_children,\n\t\t\tediting: item.id == this.$root.editingItem,\n\t\t}\">\n\t\t<div class=\"toggle-div\">\n\t\t\t<input class=\"toggle\" type=\"checkbox\" v-if=\"item.children_order.length==0 || item.done == true\" v-model=\"item.done\" @change=\"updateDone(item.id)\">\n\t\t\t<input class=\"show_children_toggle\" id=\"show_children_{{item.id}}\" type=\"checkbox\" v-if=\"item.children_order.length>0\" v-model=\"item.show_children\" @change=\"updateShowChildren(item.id)\">\n\t\t\t<label class=\"show_children_svg\" for=\"show_children_{{item.id}}\">\n\t\t\t\t<!-- This label is not yet used! -->\n\t\t\t</label>\n\t\t</div>\n\t\t<div class=\"body-div\" :class=\"{ selected: item.id == this.$root.selection.selectedId, }\" @dblclick=\"startEdit(item)\" @click=\"select(item)\" @enter=\"console.log('yarrr')\">\n\t\t\t<span class=\"bodybox\" v-show=\"item.id != this.$root.editingItem\">{{ item.body }}</span>\n\t\t\t<!-- For debugging: -->\n\t\t\t<span v-show=\"false\"> ({{item.id}}) D-{{item.depth}}) [{{item.children_order}}]</span>\n\t\t\t\n\t\t\t<form action=\"update\" class=\"updatebox\" v-show=\"item.id == this.$root.editingItem\" @submit.prevent=\"doneEdit(item)\">\n\t\t\t\t<textarea name=\"item_body\" rows=\"{{ item.rows }}\" v-model=\"item.body\" v-autosize=\"item.body\" v-item-focus=\"item.id == this.$root.editingItem\" @blur=\"blurOnEdit(item)\" @keyup.esc=\"cancelEdit(item)\" @keydown.tab=\"tabOnFirstInput\" @keydown=\"keydownOnEdit\">{{ item.body }}</textarea>\n\t\t\t\t<span>\n\t\t\t\t\t<label for=\"planned_time\">duration:</label>\n\t\t\t\t\t<input name=\"planned_time\" type=\"number\" v-model=\"item.planned_time\" @blur=\"blurOnEdit(item)\" @keyup.esc=\"cancelEdit(item)\" @keydown.tab=\"tabOnLastInput\" @keydown=\"keydownOnEdit\">\n\t\t\t\t</span>\n\t\t\t</form>\n\t\t\t<div class=\"item-tags\" v-show=\"this.$root.editingItem != item.id\">\n\t\t\t\t<span v-if=\"item.done\" class=\"done\">\n\t\t\t\t\tdone {{ item.done_date | momentCalendar }}\n\t\t\t\t</span>\n\t\t\t\t\n\t\t\t\t<span v-if=\"hasTotalTime &amp;&amp; !item.done\" class=\"total-duration\">\n\t\t\t\t\ttotal {{ calcTotalTime }} min\n\t\t\t\t</span>\n\n\t\t\t\t<span v-if=\"hasPlannedTime &amp;&amp; !item.done\" class=\"duration\">\n\t\t\t\t\t{{ item.planned_time }} min\n\t\t\t\t</span>\n\n\t\t\t\t<span v-if=\"hasDueDate &amp;&amp; !item.done\" class=\"duedate\">\n\t\t\t\t\t{{ item.due_date | momentCalendar }}\n\t\t\t\t</span>\n\n\t\t\t\t<span v-if=\"item.dueDateParent &amp;&amp; !item.done\" class=\"duedate-parent\">\n\t\t\t\t\t{{ item.dueDateParent | momentCalendar }}\n\t\t\t\t</span>\n\n\t\t\t</div>\n\t\t\t<div class=\"item-nav\" v-show=\"this.$root.editingItem != item.id\">\n\t\t\t\t<button v-if=\"item.children_order.length==0\" @click=\"deleteItem(item)\">✗</button>\n\t\t\t</div>\n\t\t</div>\n\t</div>\n\n\t<form :class=\"['addnewbox-firstchild']\" id=\"new-firstchild-of-{{ item.id }}\" v-if=\"showAddNewBoxFirstChild\" @submit.prevent=\"\">\n\t\t<textarea type=\"text\" class=\"add-item\" name=\"body\" v-model=\"newItem.body\" v-autosize=\"newItem.body\" @blur=\"blurOnAddNew(item)\" @keydown.tab=\"tabOnFirstInputNew\" @keydown=\"keydownOnNew\" placeholder=\"...\" autocomplete=\"off\" autofocus=\"\" rows=\"1\"></textarea>\n\t\t<span>\n\t\t\t<label for=\"planned_time\">duration:</label>\n\t\t\t<input name=\"planned_time\" type=\"number\" v-model=\"newItem.planned_time\" @blur=\"blurOnAddNew(item)\" @keydown=\"keydownOnNew\">\n\t\t</span>\n\t</form>\n\n\n\t<div class=\"children\" v-if=\"item.children\" v-show=\"item.show_children\">\n\t\t<card v-for=\"childCard in item.children\" :item=\"childCard\"></card>\n\t</div>\n\n\t<form :class=\"['addnewbox', this.newItem.as]\" id=\"new-under-{{ item.id }}\" v-if=\"showAddNewBox\" @submit.prevent=\"\">\n\t\t<textarea type=\"text\" class=\"add-item\" name=\"body\" v-model=\"newItem.body\" v-autosize=\"newItem.body\" @blur=\"blurOnAddNew(item)\" @keydown.tab=\"tabOnFirstInputNew\" @keydown=\"keydownOnNew\" placeholder=\"...\" autocomplete=\"off\" autofocus=\"\" rows=\"1\"></textarea>\n\t\t<span>\n\t\t\t<label for=\"planned_time\">duration:</label>\n\t\t\t<input name=\"planned_time\" type=\"number\" v-model=\"newItem.planned_time\" @blur=\"blurOnAddNew(item)\" @keydown.tab=\"tabOnLastInputNew\" @keydown=\"keydownOnNew\">\n\t\t</span>\n\t</form>\n</div>\n"
 if (module.hot) {(function () {  module.hot.accept()
   var hotAPI = require("vue-hot-reload-api")
   hotAPI.install(require("vue"), true)
@@ -11451,6 +11581,8 @@ var Tree = function () {
 			// assign
 			if (node.children_order) {
 				node.children_order = node.children_order.split(',').map(Number);
+			} else {
+				node.children_order = [];
 			}
 			node.children = [];
 			if (index === 0) {
@@ -11484,33 +11616,14 @@ var Tree = function () {
 			return this.nodes[id];
 		}
 	}, {
-		key: 'calcAllPlannedTime',
-		value: function calcAllPlannedTime() {
-			var obj = allItems.nodes;
-			var arr = Object.keys(obj).map(function (key) {
-				return obj[key].depth;
-			});
-			var max = Math.max.apply(null, arr);
-			var depthStep = void 0;
-			for (depthStep = max; depthStep > 0; depthStep--) {
-				// get all tasks with depth = depthStep
-				// foreach(){}
-				// if has children{
-				//make 'total time' = sum of all 'total time' on children + 'own time'
-				// } else if no childern {
-				//make 'total time' = 'own time'
-				//}
-				//if all done, end the loop and decrement depthStep
-			}
-		}
-	}, {
 		key: 'addItem',
 		value: function addItem(item, index) {
+			item.show_children = !item.show_children ? 1 : item.show_children;
 			item.children_order = !item.children_order ? [] : item.children_order;
 			item.children = !item.children ? [] : item.children;
 			var parent = allItems.nodes[item.parent_id];
-			console.log('item.parent_id in additem');
-			console.log(item.parent_id);
+			// console.log('item.parent_id in additem');
+			// console.log(item.parent_id);
 			if (!parent.children_order) {
 				parent.children_order = [];
 			}
@@ -11519,7 +11632,20 @@ var Tree = function () {
 			allItems.nodes[item.id] = item;
 			selection.selectedId = item.id;
 			vm.patchChildren_order(item.parent_id, item.id);
-			vm.showAddNewItem(item.id);
+			var siblingId = this.olderSiblingId(item.id);
+			var siblingBody = this.nodes[siblingId].body;
+			if (siblingBody != item.body) {
+				vm.showAddNewItem(item.id);
+			}
+		}
+	}, {
+		key: 'arrayToString',
+		value: function arrayToString(arr) {
+			var c_o = '';
+			arr.forEach(function (entry) {
+				c_o = c_o + ',' + entry;
+			});
+			return c_o.substring(1);
 		}
 	}, {
 		key: 'siblingIndex',
@@ -11548,12 +11674,13 @@ var Tree = function () {
 	}, {
 		key: 'nextItemId',
 		value: function nextItemId(id) {
+			var item = allItems.nodes[id];
 			// first check if item has children, if so select the first child.
-			if (allItems.nodes[id].children.length > 0) {
-				return allItems.nodes[id].children_order[0];
+			if (item.show_children && item.children.length > 0) {
+				return item.children_order[0];
 			}
 			// if no children look at parent node's children order.
-			var parent_id = allItems.nodes[id].parent_id;
+			var parent_id = item.parent_id;
 			if (!parent_id) {
 				return;
 			}
@@ -11586,9 +11713,10 @@ var Tree = function () {
 	}, {
 		key: 'prevItemRecursion',
 		value: function prevItemRecursion(id) {
-			var childrenLength = allItems.nodes[id].children.length;
+			var item = allItems.nodes[id];
+			var childrenLength = item.children.length;
 			// console.log('childrenLength: '+childrenLength+' // id: '+id);
-			if (childrenLength > 0) {
+			if (item.show_children && childrenLength > 0) {
 				id = allItems.nodes[id].children[childrenLength - 1].id;
 				// console.log('childrenLength: '+childrenLength+' // id: '+id);
 				return this.prevItemRecursion(id);
@@ -11623,7 +11751,7 @@ var Tree = function () {
 		}
 	}, {
 		key: 'giveNewParent',
-		value: function giveNewParent(id, new_parent_id) {
+		value: function giveNewParent(id, new_parent_id, specificNewIndex) {
 			var parent_id = allItems.nodes[id].parent_id;
 			var targetItem = allItems.nodes[id];
 			var newParent = allItems.nodes[new_parent_id];
@@ -11638,7 +11766,10 @@ var Tree = function () {
 			if (!newParent.children_order) {
 				newParent.children_order = [];
 			}
-			if (prevParent.depth - 1 == newParent.depth) {
+			if (specificNewIndex || specificNewIndex == 0) {
+				newParent.children.splice(specificNewIndex, 0, targetItem);
+				newParent.children_order.splice(specificNewIndex, 0, id);
+			} else if (prevParent.depth - 1 == newParent.depth && new_parent_id == prevParent.parent_id) {
 				// when unindenting
 				var newIndex = this.siblingIndex(prevParent.id) + 1;
 				newParent.children.splice(newIndex, 0, targetItem);
@@ -11695,6 +11826,37 @@ var Tree = function () {
 			var done_date = moment().format();
 			allItems.nodes[id].done_date = done_date;
 			vm.patchDone(id);
+			this.updateParentDoneState(allItems.nodes[id].parent_id);
+		}
+	}, {
+		key: 'updateParentDoneState',
+		value: function updateParentDoneState(parentId) {
+			if (this.nodes[parentId].depth == 0) {
+				return;
+			}
+			if (this.allChildrenDone(parentId) == true) {
+				// console.log('switch around done state of: '+this.nodes[parentId].body);
+				vm.markDone(parentId, 'done');
+			} else {
+				// console.log('make '+this.nodes[parentId].body+' NOT Done!');
+				vm.markDone(parentId, 'notDone');
+			}
+		}
+	}, {
+		key: 'allChildrenDone',
+		value: function allChildrenDone(id) {
+			var children = allItems.nodes[id].children;
+			var doneAmount = children.reduce(function (prev, child) {
+				var a = child.done ? 1 : 0;
+				return this.AplusB(a, prev);
+			}.bind(this), 0);
+			if (children.length == doneAmount) {
+				// console.log('all children done of '+allItems.nodes[id].body);
+				return true;
+			} else {
+				// console.log('NOT all children done of '+allItems.nodes[id].body);
+				return false;
+			}
 		}
 	}, {
 		key: 'calculateDuration',
@@ -11708,7 +11870,7 @@ var Tree = function () {
 			item.children = item.children.map(allItems.calculateDuration);
 			// add up all the times of our direct children (they'll already have been reconciled)
 			item['totalTime'] = item.children.reduce(function (prev, next) {
-				return allItems.addTime(prev, next.totalTime);
+				return allItems.AplusB(prev, next.totalTime);
 			}, !item.done ? item.planned_time : 0);
 			return item;
 		}
@@ -11739,34 +11901,57 @@ var Tree = function () {
 			}
 		})
 	}, {
-		key: 'addTime',
-		value: function addTime(a, b) {
+		key: 'AplusB',
+		value: function AplusB(a, b) {
 			return parseFloat(a) + parseFloat(b);
 		}
 	}, {
 		key: 'moveItem',
 		value: function moveItem(id, direction) {
 			clearTimeout(window.patchDelay);
-			var pid = this.nodes[id].parent_id;
-			var parent = this.nodes[pid];
+			var pId = this.nodes[id].parent_id;
+			var parent = this.nodes[pId];
 			var index = this.siblingIndex(id);
 			if (direction == 'up' || direction == 'left') {
 				if (index == 0) {
-					return;
-				};
-				parent.children_order.splice(index, 1);
-				parent.children_order.splice(index - 1, 0, id);
+					// Jump to last child of previous Sibling
+					var parentOlderSiblingId = this.olderSiblingId(pId);
+					var newInd = parentOlderSiblingId == parent.parent_id ? 0 : null;
+					this.giveNewParent(id, parentOlderSiblingId, newInd);
+				} else {
+					parent.children_order.splice(index, 1);
+					parent.children_order.splice(index - 1, 0, id);
+					this.sortChildren(pId);
+					window.patchDelay = setTimeout(function () {
+						vm.patchChildren_order(pId);
+					}, 1000);
+				}
 			} else if (direction == 'down' || direction == 'right') {
 				if (index + 1 == parent.children_order.length) {
-					return;
-				};
-				parent.children_order.splice(index, 1);
-				parent.children_order.splice(index + 1, 0, id);
+					this.giveNewParent(id, this.nextItemId(id), 0);
+				} else {
+					parent.children_order.splice(index, 1);
+					parent.children_order.splice(index + 1, 0, id);
+					this.sortChildren(pId);
+					window.patchDelay = setTimeout(function () {
+						vm.patchChildren_order(pId);
+					}, 1000);
+				}
 			}
-			this.sortChildren(pid);
-			window.patchDelay = setTimeout(function () {
-				vm.patchChildren_order(pid);
-			}, 1000);
+		}
+	}, {
+		key: 'flushDoneItems',
+		value: function flushDoneItems() // Do not use yet. Not sure how to best implement this...
+		{
+			var _this = this;
+
+			var nodes = this.nodes;
+			var keys = Object.keys(nodes);
+			var doneItemsObject = keys.reduce(function (prev, id) {
+				if (nodes[id].done) {
+					_this.deleteItem(id);
+				}
+			});
 		}
 	}, {
 		key: 'setDueDate',
@@ -11798,6 +11983,16 @@ var Tree = function () {
 			}
 			pArr.push(allItems.nodes[pId].body);
 			this.getParentsRecursive(pId, pArr);
+		}
+	}, {
+		key: 'getLastChildId',
+		value: function getLastChildId(id) {
+			var l = this.nodes[id].children.length;
+			if (!l) {
+				return false;
+			}
+			var n = this.nodes[id].children[l - 1];
+			return n.id;
 		}
 	}, {
 		key: 'updateChildrenDueDate',
@@ -11848,11 +12043,11 @@ var Tree = function () {
 	}, {
 		key: 'getFilteredFlat',
 		value: function getFilteredFlat(keyword) {
-			var _this = this;
+			var _this2 = this;
 
 			if (keyword == 'done') {
 				var _ret = function () {
-					var nodes = _this.nodes;
+					var nodes = _this2.nodes;
 					var keys = Object.keys(nodes);
 					var doneItemsObject = keys.reduce(function (prev, item) {
 						if (nodes[item].done) {
@@ -11897,7 +12092,7 @@ var Tree = function () {
 				rObj['date'] = k;
 				rObj['items'] = doneItemsObject[k];
 				rObj['totalTime'] = rObj['items'].reduce(function (prev, next) {
-					return allItems.addTime(prev, next.planned_time);
+					return allItems.AplusB(prev, next.planned_time);
 				}, 0);
 				return rObj;
 			});
@@ -11930,12 +12125,12 @@ var Tree = function () {
 	}, {
 		key: 'getFiltered',
 		value: function getFiltered(keyword) {
-			var _this2 = this;
+			var _this3 = this;
 
 			if (keyword == 'done') {
 				var _ret2 = function () {
-					var firstItem = _this2.root.children;
-					var doneItemsObject = _this2.getDoneTasksRecursively(firstItem);
+					var firstItem = _this3.root.children;
+					var doneItemsObject = _this3.getDoneTasksRecursively(firstItem);
 					console.log(doneItemsObject);
 					return {
 						v: Object.keys(doneItemsObject).map(function (k) {

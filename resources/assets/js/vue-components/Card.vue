@@ -5,6 +5,7 @@
 			v-if="item.depth != 0"
 			:class="{
 				done: item.done,
+				show_children: item.show_children,
 				editing: item.id == this.$root.editingItem,
 			}"
 		>
@@ -13,8 +14,19 @@
 					type="checkbox"
 					v-if="item.children_order.length==0 || item.done == true"
 					v-model="item.done"
-					@change="markDone(item.id)"
+					@change="updateDone(item.id)"
 				>
+				<input class="show_children_toggle"
+					id="show_children_{{item.id}}"
+					type="checkbox"
+					v-if="item.children_order.length>0"
+					v-model="item.show_children"
+					@change="updateShowChildren(item.id)"
+				>
+				<label class="show_children_svg" 
+					for="show_children_{{item.id}}">
+					<!-- This label is not yet used! -->
+				</label>
 			</div>
 			<div class="body-div"
 				:class="{ selected: item.id == this.$root.selection.selectedId, }"
@@ -40,7 +52,8 @@
 						v-item-focus="item.id == this.$root.editingItem"
 						@blur="blurOnEdit(item)"
 						@keyup.esc="cancelEdit(item)"
-						@keydown.enter="enterOnEdit"
+						@keydown.tab="tabOnFirstInput"
+						@keydown="keydownOnEdit"
 					>{{ item.body }}</textarea>
 					<span>
 						<label for="planned_time">duration:</label>
@@ -49,7 +62,8 @@
 							v-model="item.planned_time"
 							@blur="blurOnEdit(item)"
 							@keyup.esc="cancelEdit(item)"
-							@keydown.enter="doneEdit(item)"
+							@keydown.tab="tabOnLastInput"
+							@keydown="keydownOnEdit"
 						/>
 					</span>
 				</form>
@@ -60,19 +74,19 @@
 						done {{ item.done_date | momentCalendar }}
 					</span>
 					
-					<span v-if="hasTotalTime" class="total-duration">
+					<span v-if="hasTotalTime && !item.done" class="total-duration">
 						total {{ calcTotalTime }} min
 					</span>
 
-					<span v-if="hasPlannedTime" class="duration">
+					<span v-if="hasPlannedTime && !item.done" class="duration">
 						{{ item.planned_time }} min
 					</span>
 
-					<span v-if="hasDueDate" class="duedate">
+					<span v-if="hasDueDate && !item.done" class="duedate">
 						{{ item.due_date | momentCalendar }}
 					</span>
 
-					<span v-if="item.dueDateParent" class="duedate-parent">
+					<span v-if="item.dueDateParent && !item.done" class="duedate-parent">
 						{{ item.dueDateParent | momentCalendar }}
 					</span>
 
@@ -88,15 +102,10 @@
 			</div>
 		</div>
 
-		<div class="children" v-if="item.children">
-			<Card v-for="childCard in item.children"
-				:item="childCard"
-			></Card>
-		</div>
-
-		<form class="addnewbox" 
-			id="new-under-{{ item.id }}"
-			v-if="showAddNewBox"
+		<form 
+			:class="['addnewbox-firstchild']"
+			id="new-firstchild-of-{{ item.id }}"
+			v-if="showAddNewBoxFirstChild"
 			@submit.prevent
 		>
 			<textarea type="text"
@@ -105,7 +114,7 @@
 				v-model="newItem.body"
 				v-autosize="newItem.body"
 				@blur="blurOnAddNew(item)"
-				@keyup.esc="cancelAddNew"
+				@keydown.tab="tabOnFirstInputNew"
 				@keydown="keydownOnNew"
 				placeholder="..."
 				autocomplete="off"
@@ -118,7 +127,47 @@
 					type="number"
 					v-model="newItem.planned_time"
 					@blur="blurOnAddNew(item)"
-					@keyup.esc="cancelAddNew"
+					@keydown="keydownOnNew"
+				/>
+			</span>
+		</form>
+
+
+		<div class="children"
+			v-if="item.children"
+			v-show="item.show_children"
+		>
+			<Card v-for="childCard in item.children"
+				:item="childCard"
+			></Card>
+		</div>
+
+		<form 
+			:class="['addnewbox', this.newItem.as]"
+			id="new-under-{{ item.id }}"
+			v-if="showAddNewBox"
+			@submit.prevent
+		>
+			<textarea type="text"
+				class="add-item"
+				name="body"
+				v-model="newItem.body"
+				v-autosize="newItem.body"
+				@blur="blurOnAddNew(item)"
+				@keydown.tab="tabOnFirstInputNew"
+				@keydown="keydownOnNew"
+				placeholder="..."
+				autocomplete="off"
+				autofocus 
+				rows="1"
+			></textarea>
+			<span>
+				<label for="planned_time">duration:</label>
+				<input name="planned_time"
+					type="number"
+					v-model="newItem.planned_time"
+					@blur="blurOnAddNew(item)"
+					@keydown.tab="tabOnLastInputNew"
 					@keydown="keydownOnNew"
 				/>
 			</span>
@@ -140,11 +189,11 @@ export default {
 	data: function(){
 		return {
 			newItem: {
+				as: 'sibling',
 				body: '',
 				planned_time:0,
 				parent_id: (this.item.parent_id) ? this.item.parent_id : allItems.root.id,
 				depth: (this.item.depth == 0) ? 1 : this.item.depth,
-				older_sibling_id: this.item.id,
 			},
 		};
 	},
@@ -158,6 +207,11 @@ export default {
 		},
 		showAddNewBox(){
 			if(this.$root.addingNewUnder == this.item.id || (this.item.depth == 0 && allItems.root.children_order.length == 0)){
+				return true;
+			} else { return false; }
+		},
+		showAddNewBoxFirstChild(){
+			if(this.$root.addingNewUnder == this.item.id && this.$root.addingNewAsFirstChild){
 				return true;
 			} else { return false; }
 		},
@@ -185,26 +239,68 @@ export default {
 		enterOnNew(e) {
 	    },
 		keydownOnNew(e) {
-			console.log('run keydownOnNew:');
-			console.log(e);
+			// console.log('run keydownOnNew:');
+			// console.log(e);
 			// ENTER
 			if (e.keyCode === 13 && !e.shiftKey && !e.altKey) {
 	        	e.preventDefault();
 			  	if(!this.newItem.body){ return; }
 			  	this.addNew();
 			}
-			// ArrowUp or ArrowDown
-			if (e.keyCode === 38 || e.keyCode === 40) {
+			// ArrowUp or ArrowDown or Esc
+			if (e.keyCode === 38 || e.keyCode === 40 || e.keyCode === 27) {
 				if (!this.newItem.body) {
 		        	e.preventDefault();
 		        	this.cancelAddNew();
 				}
 			}
 	    },
-		enterOnEdit(e) {
+		keydownOnEdit(e) {
+			// Enter
 			if (e.keyCode === 13 && !e.shiftKey && !e.altKey) {
 	        	e.preventDefault();
 				this.doneEdit();
+			}
+	    },
+	    tabOnFirstInput(e){
+			// Tab
+			if (e.keyCode === 9 && e.shiftKey) {
+	        	e.preventDefault();
+	        	return;
+			}
+	    },
+	    tabOnLastInput(e){
+			// Tab
+			if (e.keyCode === 9 && !e.shiftKey) {
+	        	e.preventDefault();
+	        	return;
+			}
+	    },
+	    tabOnFirstInputNew(e){
+			// Tab
+			if (e.keyCode === 9 && e.shiftKey) {
+	        	e.preventDefault();
+	        	if (this.newItem.depth == 1){ return; }
+	        	vm.$root.showAddNewItem(this.item.parent_id);
+	        	return;
+			}
+	    },
+	    tabOnLastInputNew(e){
+			// Tab
+			if (e.keyCode === 9 && !e.shiftKey) {
+	        	e.preventDefault();
+	        	let lastChild = allItems.getLastChildId(this.item.id);
+	        	if (lastChild){
+	        		console.log("tab -- parent's lastChild: "+lastChild);
+	        		vm.$root.showAddNewItem(lastChild);
+	        	} else {
+					if (this.newItem.as == 'child'){ return; }
+					this.newItem.depth++;
+	        		this.newItem.parent_id = this.item.id;
+	        		this.newItem.as = 'child';
+	        		$("#new-under-"+this.item.id+" textarea").focus();
+	        	}
+        		return;
 			}
 	    },
 	    blurOnEdit(item) {
@@ -228,8 +324,11 @@ export default {
 				}
 	    	},20);
 	    },
-		markDone(id){
+		updateDone(id){
 			allItems.updateDoneState(id);
+		},
+		updateShowChildren(id){
+			allItems.patchShowChildren(id);
 		},
 		startEdit(item){
 			console.log('startEdit');
@@ -285,7 +384,11 @@ export default {
 			console.log('sid: '+selection.selectedId);
 			selection.selectedId = selection.lastSelectedId;
 			console.log('sid: '+selection.selectedId);
-			// selection.lastSelectedId = null;
+			// Reset newItem to sibling stance.
+			this.newItem.as = 'sibling';
+       		this.newItem.parent_id = (this.item.parent_id) ? this.item.parent_id : allItems.root.id;
+			this.newItem.depth = (this.item.depth == 0) ? 1 : this.item.depth;
+			
 			$(':focus').blur();
 		},
 	},

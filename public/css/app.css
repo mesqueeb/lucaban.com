@@ -23,7 +23,7 @@ input::-webkit-inner-spin-button {
   /* <-- Apparently some margin are still there even though it's hidden */ }
 
 input, textarea {
-  font-size: 14px;
+  font-size: 12px;
   outline: none;
   border-style: none; }
 
@@ -125,6 +125,9 @@ label {
 .addnewbox {
   margin-left: 1.9em; }
 
+.addnewbox.child {
+  margin-left: 3.8em; }
+
 .updatebox {
   width: 100%; }
 
@@ -133,7 +136,7 @@ label {
   .toggle-div div, .toggle-div input {
     margin: 0; }
 
-.toggle {
+.toggle, .show_children_toggle {
   cursor: pointer;
   text-align: center;
   -webkit-appearance: none;
@@ -150,6 +153,18 @@ label {
 .toggle:checked:after {
   content: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="-10 -18 100 135"><circle cx="50" cy="50" r="50" fill="none" stroke="#bddad5" stroke-width="3"/><path fill="#5dc2af" d="M72 25L42 71 27 56l-4 4 20 20 34-52z"/></svg>');
   transform: scale(0.7);
+  display: block;
+  margin: 0 0 0 -1em; }
+
+.show_children_toggle:after {
+  content: url("svg/arrow-right2.svg");
+  transform: scale(2);
+  display: block;
+  margin: 0 0 0 -1em; }
+
+.show_children_toggle:checked:after {
+  content: url("svg/arrow-down2.svg");
+  transform: scale(2);
   display: block;
   margin: 0 0 0 -1em; }
 

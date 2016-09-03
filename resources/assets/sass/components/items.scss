@@ -8,8 +8,6 @@ $duedate-parent-color: rgba(230, 94, 77, 0.5);
 label{
     font-weight: 300;
 }
-
-
 .navigation{
     button{
         background: none;
@@ -98,6 +96,9 @@ label{
 .addnewbox {
     margin-left: 1.9em;
 }
+.addnewbox.child{
+    margin-left: 3.8em;  
+}
 .updatebox{
     width: 100%;
 }
@@ -108,7 +109,7 @@ label{
         margin: 0; // reset margins
     }
 }
-.toggle {
+.toggle, .show_children_toggle {
     cursor: pointer;
     text-align: center;
     -webkit-appearance: none;
@@ -127,6 +128,22 @@ label{
     transform: scale(0.7);
     display: block;
     margin: 0 0 0 -1em;
+}
+
+.show_children_toggle:after {
+    content: url("svg/arrow-right2.svg");
+    transform: scale(2);
+    display: block;
+    margin: 0 0 0 -1em;
+}
+.show_children_toggle:checked:after {
+    content: url("svg/arrow-down2.svg");
+    transform: scale(2);
+    display: block;
+    margin: 0 0 0 -1em;
+}
+.show_children_svg {
+
 }
 .bodybox{
     padding: 0.5em;
@@ -202,3 +219,4 @@ label{
 
     }
 }
+
