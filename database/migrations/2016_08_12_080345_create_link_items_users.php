@@ -12,7 +12,7 @@ class CreateLinkItemsUsers extends Migration
      */
     public function up()
     {
-        Schema::table('link_items_users', function (Blueprint $table) {
+        Schema::create('link_items_users', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('thing_id')->unsigned()->index();
             $table->integer('user_id')->unsigned()->index();
