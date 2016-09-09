@@ -1,7 +1,11 @@
+var VueAutosize = require('vue-autosize');
+Vue.use(VueAutosize)
+
+require('moment-countdown');
+var Timer = require('timer-machine');
+
 import Card from './vue-components/Card.vue';
 import Journal from './vue-components/Journal.vue';
-var VueAutosize = require('vue-autosize')
-Vue.use(VueAutosize)
 
 import Tree from './vue-components/dataTree.js';
 import Selection from './vue-components/Selection.js';
@@ -82,6 +86,7 @@ window.vm = new Vue({
 	methods:{
 		showChildren(id, show){
 			let item = (!id) ? allItems.nodes[selection.selectedId] : allItems.nodes[id];
+			if (!item.children || !item.children.length){ return; }
 			if (show == 'show'){
 				item.show_children = true;
 			} else if (show == 'hide') {
@@ -100,7 +105,7 @@ window.vm = new Vue({
 			} else if (!(item.children.length && allItems.allChildrenDone(item.id) == false)){
 				item.done = !item.done;
 			}
-			allItems.updateDoneState(item.id);
+			allItems.prepareDonePatch(item.id);
 		},
 		patchDone(id){
 			let done_date;

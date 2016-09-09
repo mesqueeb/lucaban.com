@@ -20,7 +20,7 @@ class CreateItemsTable extends Migration
         $table->string('body');
         $table->text('memo');
         $table->integer('planned_time')->default(0);
-        $table->integer('total_used_time')->default(0);
+        $table->integer('used_time')->default(0);
         $table->decimal('completion_rate', 5, 4);
         $table->dateTime('due_date');
         $table->dateTime('done_date');

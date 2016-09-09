@@ -200,6 +200,8 @@ export default class Tree {
 		this.updateChildrenDepth(targetItem.id);
 		this.updateChildrenDueDate(new_parent_id);
 		this.updateChildrenDueDate(parent_id);
+		this.autoCalculateDoneState(new_parent_id);
+		this.autoCalculateDoneState(parent_id);
 	}
 	updateChildrenDepth(id)
 	{
@@ -223,15 +225,16 @@ export default class Tree {
 		prevParent.children_order.splice(siblingIndex,1);
 		vm.patchChildren_order(parent_id);
 	}
-	updateDoneState(id)
+	prepareDonePatch(id)
 	{
 		let done_date = moment().format();
 		allItems.nodes[id].done_date = done_date;
 		vm.patchDone(id);
-		this.updateParentDoneState(allItems.nodes[id].parent_id);
+		this.autoCalculateDoneState(this.nodes[id].parent_id);
 	}
-	updateParentDoneState(parentId)
+	autoCalculateDoneState(id)
 	{
+		let parentId = id;
 		if (this.nodes[parentId].depth == 0){ return; }
 		if (this.allChildrenDone(parentId) == true){
 			// console.log('switch around done state of: '+this.nodes[parentId].body);

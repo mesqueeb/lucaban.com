@@ -206,7 +206,7 @@ export default {
 			return allItems.nodes[pId].children_order;
 		},
 		showAddNewBox(){
-			if(this.$root.addingNewUnder == this.item.id || (this.item.depth == 0 && allItems.root.children_order.length == 0)){
+			if((this.$root.addingNewUnder == this.item.id && !this.$root.addingNewAsFirstChild) || (this.item.depth == 0 && allItems.root.children_order.length == 0)){
 				return true;
 			} else { return false; }
 		},
@@ -325,7 +325,7 @@ export default {
 	    	},20);
 	    },
 		updateDone(id){
-			allItems.updateDoneState(id);
+			allItems.prepareDonePatch(id);
 		},
 		updateShowChildren(id){
 			allItems.patchShowChildren(id);
