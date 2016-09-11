@@ -1,14 +1,20 @@
 var VueAutosize = require('vue-autosize');
 Vue.use(VueAutosize)
 
-require('moment-countdown');
-var Timer = require('timer-machine');
-
 import Card from './vue-components/Card.vue';
 import Journal from './vue-components/Journal.vue';
 
 import Tree from './vue-components/dataTree.js';
 import Selection from './vue-components/Selection.js';
+
+
+$(window).on("scroll", function(e) {
+  if ($(this).scrollTop() > 33) {
+    $("body").addClass("fix-timer");
+  } else {
+    $("body").removeClass("fix-timer");
+  }
+});
 
 // set row height each time resize window
 window.setRowHeight = function(){
@@ -45,6 +51,60 @@ Vue.filter('M/D', {
   //   return isNaN(number) ? 0 : parseFloat(number.toFixed(2))
   // }
 });
+Vue.filter('hhmmss', {
+	read: function(val) {
+		function pad(num){
+		    return ("0"+num).slice(-2);
+		}
+		let secs;
+		let minutes = Math.floor(val/60);
+		secs = val%60;
+		let hours = Math.floor(minutes/60)
+		minutes = minutes%60;
+		if (hours>0){
+			return pad(hours)+":"+pad(minutes)+":"+pad(secs);
+		} else {
+			return pad(minutes)+":"+pad(secs);
+		}
+	},
+});
+Vue.filter('hourminsec', {
+	read: function(val) {
+		function pad(num, unit){
+		    if (num>0){
+		    	return num+" "+unit;
+		    } return '';
+		}
+		let secs;
+		let minutes = Math.floor(val/60);
+		secs = val%60;
+		let hours = Math.floor(minutes/60)
+		minutes = minutes%60;
+		if (hours>0){
+			return pad(hours,'hour ')+pad(minutes, 'min');
+		} else if (minutes>0) {
+			return pad(minutes,'min ')+pad(secs,'sec');
+		} else {
+			return pad(secs,'sec');
+		}
+	},
+});
+Vue.filter('hourmin', {
+	read: function(val) {
+		function pad(num, unit){
+		    if (num>0){
+		    	return num+" "+unit;
+		    } return '';
+		}
+		let minutes = val%60;
+		let hours = Math.floor(val/60)
+		if (hours>0){
+			return pad(hours,'hour ')+pad(minutes, 'min');
+		} else {
+			return pad(minutes,'min')
+		}
+	},
+});
 Vue.filter('momentRelative', {
 	read: function(val) {
   		return moment(val).fromNow();
@@ -78,12 +138,48 @@ window.vm = new Vue({
 		addingNewUnder: null,
 		addingNewAsFirstChild: false,
 		editingItem: null,
+		timerItems: [],
 	},
 	components: {
 		Card,
 		Journal,
 	},
 	methods:{
+		btnEffect(id, identifier){
+			let $el = $('#timer-'+id+' .'+identifier);
+			$el.addClass("btn--click");
+			setTimeout(function(){
+				$el.removeClass("btn--click");
+			}, 400);
+		},
+		playTimer(item){
+			this.btnEffect(item.id, 'play');
+			let update = function(){
+				item.used_time = ++item.used_time;
+			}
+			window.timers = (!window.timers) ? {} : timers;
+			if(timers[item.id]){ return; }
+			timers[item.id] = setInterval(update,1000);
+		},
+		pauseTimer(item){
+			this.btnEffect(item.id, 'pause');
+			clearInterval(window.timers[item.id]);
+			delete window.timers[item.id];
+			this.patch(item.id, 'used_time');
+		},
+		resetTimer(item){
+			this.btnEffect(item.id, 'reset');
+			item.used_time = 0;
+			this.patch(item.id, 'used_time');
+		},
+		removeTimer(item){
+			this.btnEffect(item.id, 'close');
+			clearInterval(window.timers[item.id]);
+			delete window.timers[item.id];
+			this.patch(item.id, 'used_time');
+			document.getElementById('timer-'+item.id).className += ' fade-out';
+			setTimeout(function(){ this.timerItems.$remove(item) }.bind(this),1000);
+		},
 		showChildren(id, show){
 			let item = (!id) ? allItems.nodes[selection.selectedId] : allItems.nodes[id];
 			if (!item.children || !item.children.length){ return; }
@@ -94,7 +190,7 @@ window.vm = new Vue({
 			} else {
 				item.show_children = !item.show_children;
 			}
-			this.patchShowChildren(item.id);
+			this.patch(item.id, 'show_children');
 		},
 		markDone(id, markAs){
 			let item = (!id) ? allItems.nodes[selection.selectedId] : allItems.nodes[id];
@@ -150,7 +246,7 @@ window.vm = new Vue({
 			}
 			allItems.giveNewParent(id,new_parent_id);
 		},
-		select(direction){
+		selectItem(direction){
 			let id = selection.selectedId;
 			let item = allItems.nodes[id];
 			let sel;
@@ -171,6 +267,7 @@ window.vm = new Vue({
 				}
 			}
 			selection.selectedId = sel;
+			document.getElementById('card-'+sel).scrollIntoViewIfNeeded();
 		},
 		setToday(){
 			let id = selection.selectedId;
@@ -193,35 +290,17 @@ window.vm = new Vue({
 			selection.selectedId = null;
 			setTimeout(function(){$("#new-under-"+id+" textarea").focus();},10);
 		},
-		patchChildren_order(id, newItem){
-			let childrenArray = allItems.nodes[id].children_order;
-			let c_o = allItems.arrayToString(childrenArray);
-			this.$http.patch('/api/items/' + id, { children_order: c_o }, { method: 'PATCH'})
+		patch(id, arg){
+			let patchObj = {};
+			let patchVal = allItems.nodes[id][arg];
+			if(arg == 'children_order'){
+				patchVal = allItems.arrayToString(patchVal);
+			}
+			patchObj[arg] = patchVal;
+			this.$http.patch('/api/items/' + id, patchObj, { method: 'PATCH'})
 			.then(function(response){
-				console.log('patched item['+id+'].children_order = '+c_o+';');
-				// this.showAddNewItem(newItem);
+				console.log('patched item['+id+'].'+arg+' = '+patchObj[arg]+';');
 			});
-		},
-		patchDepth(id){
-			let depth = allItems.nodes[id].depth;
-			this.$http.patch('/api/items/' + id, { depth: depth }, { method: 'PATCH'})
-			.then(function(response){
-				console.log('patched item['+id+'].depth = '+depth+';');
-			});	
-		},
-		patchShowChildren(id){
-			let showChildren = allItems.nodes[id].show_children;
-			this.$http.patch('/api/items/' + id, { show_children: showChildren }, { method: 'PATCH'})
-			.then(function(response){
-				console.log('patched item['+id+'].show_children = '+showChildren+';');
-			});
-		},
-		patchParent_id(id){
-			let parent_id = allItems.nodes[id].parent_id;
-			this.$http.patch('/api/items/' + id, { parent_id: parent_id }, { method: 'PATCH'})
-			.then(function(response){
-				console.log('patched item['+id+'].parent_id = '+parent_id+';');
-			});	
 		},
 		clickDone(){
 			this.fetchDone();
@@ -267,8 +346,8 @@ window.vm = new Vue({
 			console.log(k);
 			if(k == 'arrowRight'){ this.showChildren(null, 'show')}
 			if(k == 'arrowLeft'){ this.showChildren(null, 'hide')}
-			if(k == 'arrowUp'){ this.select('prev')}
-			if(k == 'arrowDown'){ this.select('next')}
+			if(k == 'arrowUp'){ this.selectItem('prev')}
+			if(k == 'arrowDown'){ this.selectItem('next')}
 			if(k == 'meta_arrowUp'){ this.moveItem('up')}
 			if(k == 'meta_arrowDown'){ this.moveItem('down')}
 			if(k == 'spaceBar'){ this.markDone() }

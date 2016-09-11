@@ -1,5 +1,5 @@
 <template id="items-card-template">
-	<div class="items-card">
+	<div class="items-card" id="card-{{ item.id }}">
 		<div 
 			class="item-card"
 			v-if="item.depth != 0"
@@ -16,7 +16,18 @@
 					v-model="item.done"
 					@change="updateDone(item.id)"
 				>
-				<input class="show_children_toggle"
+				<input type="checkbox"
+					class="styled-check"
+					id="show_children_{{item.id}}"
+					v-model="item.show_children"
+					@change="updateShowChildren(item.id)"
+				>
+				<label class="arrow"
+					for="show_children_{{item.id}}"
+					v-if="item.children_order.length>0"
+				></label>
+
+				<!-- <input class="show_children_toggle"
 					id="show_children_{{item.id}}"
 					type="checkbox"
 					v-if="item.children_order.length>0"
@@ -25,13 +36,13 @@
 				>
 				<label class="show_children_svg" 
 					for="show_children_{{item.id}}">
-					<!-- This label is not yet used! -->
-				</label>
+					//// This label is not yet used!
+				</label> -->
 			</div>
 			<div class="body-div"
 				:class="{ selected: item.id == this.$root.selection.selectedId, }"
 				@dblclick="startEdit(item)"
-				@click="select(item)"
+				@click="selectItem(item)"
 				@enter="console.log('yarrr')"
 			>
 				<span class="bodybox"
@@ -71,17 +82,21 @@
 					v-show="this.$root.editingItem != item.id"
 				>
 					<span v-if="item.done" class="done">
-						done {{ item.done_date | momentCalendar }}
+						Done {{ item.done_date | momentCalendar }}
 					</span>
 					
 					<span v-if="hasTotalTime && !item.done" class="total-duration">
-						total {{ calcTotalTime }} min
+						Total {{ calcTotalTime }} min
 					</span>
 
-					<span v-if="hasPlannedTime && !item.done" class="duration">
-						{{ item.planned_time }} min
+					<span v-if="(hasPlannedTime || hasUsedTime) && !item.done" class="duration">
+						<span v-if="hasUsedTime">Used {{ item.used_time | hourminsec }}</span>
+						<span v-if="(hasPlannedTime && hasUsedTime)">/</span>
+						<span v-if="hasPlannedTime">
+							{{ item.planned_time | hourmin }}
+						</span>
 					</span>
-
+						
 					<span v-if="hasDueDate && !item.done" class="duedate">
 						{{ item.due_date | momentCalendar }}
 					</span>
@@ -92,12 +107,25 @@
 
 				</div>
 				<div class="item-nav"
-					v-show="this.$root.editingItem != item.id"
+					v-if="this.$root.editingItem != item.id && this.$root.selection.selectedId == item.id"
 				>
-					<button 
+					
+					<button class="timer"
+						@click="addTimer(item)"
+					><i class="zmdi zmdi-timer"></i>
+					</button>
+					<!--
+					- font icon / woff format [font awesome]
+					  material design iconic fonts
+					- add svg as background to button
+					- or image tag inside button
+					- svg tag -> add as pattern
+					-->
+					<button class="delete" 
 						v-if="item.children_order.length==0"
 						@click="deleteItem(item)"
-					>✗</button>
+					><i class="zmdi zmdi-delete"></i>
+					</button>
 				</div>
 			</div>
 		</div>
@@ -216,8 +244,16 @@ export default {
 			} else { return false; }
 		},
 		calcTotalTime(){
-			let a = allItems.calculateDuration(this.item);
-			return a.totalTime;
+			// let a = allItems.calculateDuration(this.item);
+			// return a.totalTime;
+			// console.log("runCalc");
+			// if(this.$children.length === 0){
+			// 	return this.item.planned_time ? this.item.planned_time : 0;
+			// } else {
+			// 	return this.$children.reduce(function(prev,curr){
+			// 		return prev+ curr.calcTotalTime
+			// 	},0)
+			// }
 		},
 		hasDueDate(){
 		    return (this.item.due_date && this.item.due_date != '0000-00-00 00:00:00');
@@ -225,15 +261,22 @@ export default {
 		hasDoneDate(){
 		    return (this.item.done_date && this.item.done_date != '0000-00-00 00:00:00');
 		},
-		hasTotalTime(){
-		    return (this.item.children_order.length && this.calcTotalTime != '0' && this.item.planned_time != this.calcTotalTime);
-		},
+		// hasTotalTime(){
+		//     return (this.item.children_order.length && this.calcTotalTime != '0' && this.item.planned_time != this.calcTotalTime);
+		// },
 		hasPlannedTime(){
 		    return (this.item.planned_time && this.item.planned_time != '0');
 		},
+		hasUsedTime(){
+		    return (this.item.used_time && this.item.used_time != '0');
+		},
 	},
 	methods: {
-		select(item){
+		addTimer(item){
+			this.$root.timerItems.push(item);
+			this.$root.playTimer(item);
+		},
+		selectItem(item){
 			selection.selectedId = item.id;
 		},
 		enterOnNew(e) {
@@ -362,6 +405,9 @@ export default {
 		},
 		deleteItem(item){
 			let id = item.id;
+			if (confirm("Do you really want to delete: "+item.body) == false) {
+		        return;
+		    }
 			allItems.deleteItem(id);
 			this.$http.delete('/api/items/' + id);
 		},

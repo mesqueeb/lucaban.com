@@ -24,7 +24,8 @@ input::-webkit-inner-spin-button {
     margin: 0; /* <-- Apparently some margin are still there even though it's hidden */
 }
 input, textarea{
-	font-size: 12px ;
+	font-family: 'Calibri', 'Lato';
+	font-size: 14px ;
 	outline: none;
     border-style: none;
 }

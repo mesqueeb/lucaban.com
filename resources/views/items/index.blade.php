@@ -4,12 +4,51 @@
 	<meta name="token" id="token" value="{{ csrf_token() }}">
 	<title>THINGS</title>
 	<link rel="stylesheet" href="/css/app.css">
+	<link rel="stylesheet" href="/css/fonts/material-design-iconic-font.min.css">
+
 </head>
 <body>
 <a href="{{route('home')}}">Go home</a>
 	{{-- @include('elements.menu') --}}
 	
 	<div class="panel-body">
+		<div id="timer-area" class=""
+			v-show="timerItems.length"
+		>
+			<div class="timer" id="timer-@{{ item.id }}"
+				v-for="item in timerItems"
+			>
+				<div class="toggle-div">
+					<input class="toggle"
+						type="checkbox"
+						v-if="item.children_order.length==0 || item.done == true"
+						v-model="item.done"
+						@click.prevent="markDone(item)"
+					>
+
+				</div>
+				<span class="body">@{{ item.body }}</span>
+				<span class="timer-time">@{{ item.used_time | hhmmss }}</span>
+				<span class="nav">
+					<button class="play btn btn-dipclick"
+						@click="playTimer(item)"
+					><i class="zmdi zmdi-play"></i>
+					</button>
+					<button class="pause btn btn-dipclick"
+						@click="pauseTimer(item)"
+					><i class="zmdi zmdi-pause"></i>
+					</button>
+					<button class="reset btn btn-dipclick"
+						@click="resetTimer(item)"
+					><i class="zmdi zmdi-time-restore"></i>
+					</button>
+					<button class="stop btn btn-dipclick"
+						@click="removeTimer(item)"
+					><i class="zmdi zmdi-close"></i>
+					</button>
+				</span>
+			</div>
+		</div>
 		<div class="navigation">
 			<a href="#"
 				:class="{active: selection.filter == 'all'}"

@@ -8,7 +8,7 @@ use App\Http\Requests;
 use App\Item;
 use DB;
 use Illuminate\Http\Response;
-
+use Carbon\Carbon;
 
 class CardController extends Controller
 {
@@ -23,9 +23,9 @@ class CardController extends Controller
         if(!$god){
             return Item::create(['body' => 'ALL', 'id' => '1', 'depth' => '0']);
         }
-        return Item:://where('done',0)
-            // ->orWhere('done_date', '<=', Carbon::yesterday())
-            orderBy('depth', 'asc')
+        return Item::where('done',0)
+            ->orWhere('done_date', '>', Carbon::now()->subHour(12))
+            ->orderBy('depth', 'asc')
             ->get();
     }
 

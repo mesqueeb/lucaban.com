@@ -59,7 +59,7 @@ export default class Tree {
 		parent.children_order.splice(index, 0, item.id);
 	    allItems.nodes[item.id] = item;
 	    selection.selectedId = item.id;
-	    vm.patchChildren_order(item.parent_id, item.id);
+	    vm.patch(item.parent_id, 'children_order');
 	    let siblingId = this.olderSiblingId(item.id);
 	    let siblingBody = this.nodes[siblingId].body;
 	    if(siblingBody != item.body){
@@ -151,6 +151,7 @@ export default class Tree {
 	sortChildren(id)
 	{
 		let item = this.nodes[id];
+		item.children_order = item.children_order.filter(id => ~item.children.indexOf(this.nodes[id]));
 		let order = item.children_order;
 		let items = item.children;
 		if (order instanceof Array){
@@ -193,10 +194,10 @@ export default class Tree {
 		if(prevParent.children.length == 0){ prevParent.children = []; }
 
 		// update children recursively
-		vm.patchDepth(id);
-		vm.patchParent_id(id);
-		vm.patchChildren_order(new_parent_id);
-		vm.patchChildren_order(parent_id);
+		vm.patch(id, 'depth');
+		vm.patch(id, 'parent_id');
+		vm.patch(new_parent_id, 'children_order');
+		vm.patch(parent_id, 'children_order');
 		this.updateChildrenDepth(targetItem.id);
 		this.updateChildrenDueDate(new_parent_id);
 		this.updateChildrenDueDate(parent_id);
@@ -209,7 +210,7 @@ export default class Tree {
 		targetChildren.forEach(function(child){
 			console.log(child);
 			child.depth = allItems.nodes[child.parent_id].depth+1;
-			vm.patchDepth(child.id);
+			vm.patch(child.id, 'depth');
 			this.updateChildrenDepth(child.id);
 			return true;
 		}.bind(this))
@@ -223,7 +224,7 @@ export default class Tree {
 		// Delete items attached to previous parent
 		prevParent.children.splice(siblingIndex,1);
 		prevParent.children_order.splice(siblingIndex,1);
-		vm.patchChildren_order(parent_id);
+		vm.patch(parent_id, 'children_order');
 	}
 	prepareDonePatch(id)
 	{
@@ -297,29 +298,30 @@ export default class Tree {
 		let pId = this.nodes[id].parent_id;
 		let parent = this.nodes[pId];
 		let index = this.siblingIndex(id);
-		if(direction == 'up' || direction == 'left')
+		if(direction == 'up')
 		{
 			if(index == 0){
 				// Jump to last child of previous Sibling
 				let parentOlderSiblingId = this.olderSiblingId(pId);
 				let newInd = (parentOlderSiblingId == parent.parent_id) ? 0 : null;
 				this.giveNewParent(id, parentOlderSiblingId, newInd);
-			} else {
+			} else { // When moving through siblings
 				parent.children_order.splice(index,1);
 				parent.children_order.splice(index-1, 0, id);
 				this.sortChildren(pId);
-				window.patchDelay = setTimeout(function(){ vm.patchChildren_order(pId); },1000);
+				window.patchDelay = setTimeout(function(){ vm.patch(pId, 'children_order'); },1000);
 			}
 		}
-		else if (direction == 'down' || direction == 'right')
+		else if (direction == 'down')
 		{
 			if( index+1 == parent.children_order.length ){
+				// Jump to First child of next Sibling
 				this.giveNewParent(id, this.nextItemId(id), 0);
-			} else {
+			} else { // When moving through siblings
 				parent.children_order.splice(index,1);
 				parent.children_order.splice(index+1, 0, id);
 				this.sortChildren(pId);
-				window.patchDelay = setTimeout(function(){ vm.patchChildren_order(pId); },1000);
+				window.patchDelay = setTimeout(function(){ vm.patch(pId, 'children_order'); },1000);
 			}
 		}
 	}
