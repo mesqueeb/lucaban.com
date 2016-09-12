@@ -85,9 +85,14 @@
 						Done {{ item.done_date | momentCalendar }}
 					</span>
 					
-					<span v-if="hasTotalTime && !item.done" class="total-duration">
-						Total {{ calcTotalTime }} min
-					</span>
+					<span v-if="(hasTotalUsedTime || hasTotalPlannedTime) && !item.done" class="total-duration">
+						<span>Total </span>
+						<span v-if="hasTotalUsedTime">used {{ item.totalUsedTime | hourminsec }}</span>
+						<span v-if="(hasTotalUsedTime && hasTotalPlannedTime)">/</span>
+						<span v-if="hasTotalPlannedTime">
+							{{ item.totalPlannedTime | hourmin }}
+						</span>
+ 					</span>
 
 					<span v-if="(hasPlannedTime || hasUsedTime) && !item.done" class="duration">
 						<span v-if="hasUsedTime">Used {{ item.used_time | hourminsec }}</span>
@@ -261,9 +266,18 @@ export default {
 		hasDoneDate(){
 		    return (this.item.done_date && this.item.done_date != '0000-00-00 00:00:00');
 		},
-		// hasTotalTime(){
-		//     return (this.item.children_order.length && this.calcTotalTime != '0' && this.item.planned_time != this.calcTotalTime);
-		// },
+		hasTotalUsedTime(){
+		    return (this.item.children_order.length
+		    	&& this.item.totalUsedTime
+		    	&& this.item.totalUsedTime != '0'
+		    	&& this.item.used_time != this.item.totalUsedTime);
+		},
+		hasTotalPlannedTime(){
+		    return (this.item.children_order.length
+		    	&& this.item.totalPlannedTime
+		    	&& this.item.totalPlannedTime != '0'
+		    	&& this.item.planned_time != this.item.totalPlannedTime);
+		},
 		hasPlannedTime(){
 		    return (this.item.planned_time && this.item.planned_time != '0');
 		},
@@ -371,7 +385,7 @@ export default {
 			allItems.prepareDonePatch(id);
 		},
 		updateShowChildren(id){
-			allItems.patchShowChildren(id);
+			this.$root.patch(id,'show_children');
 		},
 		startEdit(item){
 			console.log('startEdit');
@@ -395,6 +409,7 @@ export default {
 			let body = item.body;
 			let planned_time = item.planned_time;
 			this.$http.patch('/api/items/' + id, { body: body, planned_time: planned_time }, { method: 'PATCH'});
+			allItems.calculateTotalTime(item.id);
 		},
 		cancelEdit(item) {
 			this.$root.editingItem = null;

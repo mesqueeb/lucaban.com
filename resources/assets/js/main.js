@@ -166,17 +166,20 @@ window.vm = new Vue({
 			clearInterval(window.timers[item.id]);
 			delete window.timers[item.id];
 			this.patch(item.id, 'used_time');
+			allItems.calculateTotalTime(item.id);
 		},
 		resetTimer(item){
 			this.btnEffect(item.id, 'reset');
 			item.used_time = 0;
 			this.patch(item.id, 'used_time');
+			allItems.calculateTotalTime(item.id);
 		},
 		removeTimer(item){
 			this.btnEffect(item.id, 'close');
 			clearInterval(window.timers[item.id]);
 			delete window.timers[item.id];
 			this.patch(item.id, 'used_time');
+			allItems.calculateTotalTime(item.id);
 			document.getElementById('timer-'+item.id).className += ' fade-out';
 			setTimeout(function(){ this.timerItems.$remove(item) }.bind(this),1000);
 		},

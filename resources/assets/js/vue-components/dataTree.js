@@ -29,9 +29,12 @@ export default class Tree {
 		//Sort all nodes after making sure you got all of them.
 		itemsProcessed++;
 	    if(itemsProcessed === this.source.length) {
-	    	$.each(this.nodes, function(index, value) {
-			    this.sortChildren(value.id);
-			    this.updateChildrenDueDate(value.id);
+	    	$.each(this.nodes, function(index, node) {
+			    this.sortChildren(node.id);
+			    this.updateChildrenDueDate(node.id);
+			    if (node.used_time || node.planned_time){
+				    this.calculateTotalTime(node.id);
+			    }
 			    window.allItemsBackup = this.root.children;
 			}.bind(this));
 	    }
@@ -65,6 +68,7 @@ export default class Tree {
 	    if(siblingBody != item.body){
 		    vm.showAddNewItem(item.id);
 	    }
+	    this.calculateTotalTime(item.id);
 	}
 	arrayToString(arr)
 	{
@@ -110,6 +114,17 @@ export default class Tree {
 		}
 		let siblingIndex = siblingsArr.indexOf(id);
 		return allItems.nodes[parent_id].children_order[siblingIndex+1];
+	}
+	nextSiblingOrParentsSiblingId(id)
+	{
+		let parent_id = allItems.nodes[id].parent_id;
+		let children_order = allItems.nodes[parent_id].children_order;
+		let nextIndex = this.siblingIndex(id)+1;
+		if (nextIndex == children_order.length){
+			return this.nextSiblingOrParentsSiblingId(parent_id);
+		} else {
+			return children_order[nextIndex];
+		}
 	}
 	prevItemId(id)
 	{
@@ -160,6 +175,7 @@ export default class Tree {
 	}
 	giveNewParent(id, new_parent_id, specificNewIndex)
 	{
+		console.log('giving new parent');
 		let parent_id = allItems.nodes[id].parent_id;
 		let targetItem = allItems.nodes[id];
 		let newParent = allItems.nodes[new_parent_id];
@@ -187,26 +203,34 @@ export default class Tree {
 			newParent.children.push(targetItem);
 			newParent.children_order.push(id)
 		}
+		// Open newParent show_children if closed
+		newParent.show_children = 1;
+
 		// Delete items attached to previous parent
 		prevParent.children.splice(siblingIndex,1);
 		prevParent.children_order.splice(siblingIndex,1);
 		// Fix bug where item would still show if it prevParent has an array of 0 and the moved child was originally the last child...
 		if(prevParent.children.length == 0){ prevParent.children = []; }
 
+
 		// update children recursively
 		vm.patch(id, 'depth');
 		vm.patch(id, 'parent_id');
 		vm.patch(new_parent_id, 'children_order');
+		vm.patch(new_parent_id, 'show_children');
 		vm.patch(parent_id, 'children_order');
 		this.updateChildrenDepth(targetItem.id);
 		this.updateChildrenDueDate(new_parent_id);
 		this.updateChildrenDueDate(parent_id);
 		this.autoCalculateDoneState(new_parent_id);
 		this.autoCalculateDoneState(parent_id);
+		this.calculateTotalTime(new_parent_id);
+		this.calculateTotalTime(parent_id);
 	}
 	updateChildrenDepth(id)
 	{
 		let targetChildren = allItems.nodes[id].children;
+		if (!(targetChildren || targetChildren.length)){ return false; }
 		targetChildren.forEach(function(child){
 			console.log(child);
 			child.depth = allItems.nodes[child.parent_id].depth+1;
@@ -235,23 +259,23 @@ export default class Tree {
 	}
 	autoCalculateDoneState(id)
 	{
-		let parentId = id;
-		if (this.nodes[parentId].depth == 0){ return; }
-		if (this.allChildrenDone(parentId) == true){
-			// console.log('switch around done state of: '+this.nodes[parentId].body);
-			vm.markDone(parentId, 'done');
+		if (this.nodes[id].depth == 0){ return; }
+		if (this.allChildrenDone(id) == true){
+			// console.log('switch around done state of: '+this.nodes[id].body);
+			vm.markDone(id, 'done');
 		} else {
-			// console.log('make '+this.nodes[parentId].body+' NOT Done!');
-			vm.markDone(parentId, 'notDone');
+			// console.log('make '+this.nodes[id].body+' NOT Done!');
+			vm.markDone(id, 'notDone');
 		}
 	}
 	allChildrenDone(id)
 	{
 		let children = allItems.nodes[id].children;
+		if (!children.length){ return false; }
 		let doneAmount = children.reduce(function (prev, child){
 			let a = (child.done) ? 1 : 0 ;
 			return this.AplusB(a,prev);
-		}.bind(this), 0);	
+		}.bind(this), 0);
 		if(children.length == doneAmount){
 			// console.log('all children done of '+allItems.nodes[id].body);
 			return true;
@@ -260,20 +284,29 @@ export default class Tree {
 			return false;
 		}
 	}
-	calculateDuration(item)
+	calculateTotalTime(id)
 	{
-	    // if we don't have children, do nothing, leave the time as-is
+		let item = this.nodes[id];
+		// console.log('item in calculateTotalTime ↓');
+		// console.log(id);
+		// console.log(item);
 	    if (!(Array.isArray(item.children) && item.children.length)) {
-	      item['totalTime'] = (!item.done) ? item.planned_time : 0 ;
-	      return item;
+	    	// if we don't have children, do nothing, leave the time as-is
+			item['totalPlannedTime'] = (!item.done) ? item.planned_time : 0 ;
+			item['totalUsedTime'] = (!item.done) ? item.used_time : 0 ;
+	    } else {
+			// add up all the times of our direct children
+		    item['totalPlannedTime'] = item.children.reduce((prev, next) => {
+		        return this.AplusB(prev, next.totalPlannedTime);
+		    }, (!item.done) ? item.planned_time : 0 );
+		    item['totalUsedTime'] = item.children.reduce((prev, next) => {
+		        return this.AplusB(prev, next.totalUsedTime);
+		    }, (!item.done) ? item.used_time : 0 );
 	    }
-	    //recursively call this on children
-	    item.children = item.children.map(allItems.calculateDuration);
-	    // add up all the times of our direct children (they'll already have been reconciled)
-	    item['totalTime'] = item.children.reduce((prev, next) => {
-	        return allItems.AplusB(prev, next.totalTime);
-	    }, (!item.done) ? item.planned_time : 0 );
-	    return item;
+	    //call this on PARENT -> climb up the parent tree
+	    if (item.parent_id){
+		    this.calculateTotalTime(item.parent_id);
+	    }
 	}
 	checkValParentTree(id, val)
 	{
@@ -316,7 +349,9 @@ export default class Tree {
 		{
 			if( index+1 == parent.children_order.length ){
 				// Jump to First child of next Sibling
-				this.giveNewParent(id, this.nextItemId(id), 0);
+				let new_parent_id = this.nextSiblingOrParentsSiblingId(id);
+				console.log('new_parent_id: '+new_parent_id);
+				this.giveNewParent(id, new_parent_id, 0);
 			} else { // When moving through siblings
 				parent.children_order.splice(index,1);
 				parent.children_order.splice(index+1, 0, id);
