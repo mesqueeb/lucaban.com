@@ -4,13 +4,18 @@
 	<meta name="token" id="token" value="{{ csrf_token() }}">
 	<title>THINGS</title>
 	<link rel="stylesheet" href="/css/app.css">
-	<link rel="stylesheet" href="/css/fonts/material-design-iconic-font.min.css">
+	{{-- <link rel="stylesheet" href="/css/fonts/material-design-iconic-font.min.css"> --}}
 
 </head>
 <body>
 <a href="{{route('home')}}">Go home</a>
 	{{-- @include('elements.menu') --}}
-	
+	<img id="loading-icon"
+		src="/css/icons/loading_64x64.gif"
+		alt="Loading"
+		v-show="patching"
+	/>
+
 	<div class="panel-body">
 		<div id="timer-area" class=""
 			v-show="timerItems.length"

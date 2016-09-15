@@ -1,5 +1,6 @@
 // @import "node_modules/bootstrap-sass/assets/stylesheets/bootstrap";
-// @import 'node_modules/material-design-iconic-font/scss/material-design-iconic-font.scss';
+@import '../../../node_modules/material-design-iconic-font/scss/material-design-iconic-font.scss';
+@import '../../../node_modules/flatpickr/dist/flatpickr.min.css';
 @import 'main.scss';
 @import 'components/transition_effects.scss';
 @import 'components/alert.sass';

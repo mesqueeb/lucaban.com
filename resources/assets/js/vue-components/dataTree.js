@@ -13,17 +13,23 @@ export default class Tree {
 		// variables
 		let node 	= this.makeNode(item);
 		let parent 	= this.getNode(node.parent_id);
-		// assign
+		// assign extra item values
 		if(node.children_order){
 			node.children_order = node.children_order.split(',').map(Number);
 		} else {
 			node.children_order = [];
 		}
 		node.children = [];
+			// assign total Time to nodes with no children:
+		if (!node.children.length){
+	    	node['totalPlannedTime'] = (!item.done && node.planned_time) ? parseFloat(item.planned_time) : 0 ;
+			node['totalUsedTime'] = (!item.done && node.used_time) ? parseFloat(item.used_time) : 0 ;
+		}
+
+		// Register and organize nodes:
 		if(index === 0) { this.root = node; }
 		else if (parent) { parent.children.push(node); }
 		else { this.orphans.push(node); }
-		// register node
 		this.nodes[node.id] = node;
 
 		//Sort all nodes after making sure you got all of them.
@@ -32,7 +38,7 @@ export default class Tree {
 	    	$.each(this.nodes, function(index, node) {
 			    this.sortChildren(node.id);
 			    this.updateChildrenDueDate(node.id);
-			    if (node.used_time || node.planned_time){
+			    if (!node.children.length && (node.used_time || node.planned_time)){
 				    this.calculateTotalTime(node.id);
 			    }
 			    window.allItemsBackup = this.root.children;
@@ -58,17 +64,24 @@ export default class Tree {
 		if (!parent.children_order){
 			parent.children_order = [];
 		}
+		//Actually ADD the item!
 		parent.children.splice(index, 0, item);
 		parent.children_order.splice(index, 0, item.id);
-	    allItems.nodes[item.id] = item;
+		this.nodes[item.id] = item;
+
+		// Patches etc.
 	    selection.selectedId = item.id;
 	    vm.patch(item.parent_id, 'children_order');
+		this.autoCalculateDoneState(item.parent_id);
+	    if (item.used_time || item.planned_time){
+		    this.calculateTotalTime(item.id);
+	    }
+	    // Don't show adding a new task dialogue when Duplicating!
 	    let siblingId = this.olderSiblingId(item.id);
 	    let siblingBody = this.nodes[siblingId].body;
 	    if(siblingBody != item.body){
 		    vm.showAddNewItem(item.id);
 	    }
-	    this.calculateTotalTime(item.id);
 	}
 	arrayToString(arr)
 	{
@@ -213,7 +226,6 @@ export default class Tree {
 		if(prevParent.children.length == 0){ prevParent.children = []; }
 
 
-		// update children recursively
 		vm.patch(id, 'depth');
 		vm.patch(id, 'parent_id');
 		vm.patch(new_parent_id, 'children_order');
@@ -239,6 +251,14 @@ export default class Tree {
 			return true;
 		}.bind(this))
 	}
+	isProject(id)
+	{
+		if (this.nodes[id].body.slice(-1) == ':'){
+			return true;
+		} else {
+			return false;
+		}
+	}
 	deleteItem(id)
 	{
 		let parent_id = allItems.nodes[id].parent_id;
@@ -249,6 +269,8 @@ export default class Tree {
 		prevParent.children.splice(siblingIndex,1);
 		prevParent.children_order.splice(siblingIndex,1);
 		vm.patch(parent_id, 'children_order');
+		this.autoCalculateDoneState(parent_id);
+	    this.calculateTotalTime(parent_id);
 	}
 	prepareDonePatch(id)
 	{
@@ -260,11 +282,9 @@ export default class Tree {
 	autoCalculateDoneState(id)
 	{
 		if (this.nodes[id].depth == 0){ return; }
-		if (this.allChildrenDone(id) == true){
-			// console.log('switch around done state of: '+this.nodes[id].body);
+		if (this.allChildrenDone(id) == true && !this.isProject(id)){
 			vm.markDone(id, 'done');
 		} else {
-			// console.log('make '+this.nodes[id].body+' NOT Done!');
 			vm.markDone(id, 'notDone');
 		}
 	}
@@ -277,32 +297,38 @@ export default class Tree {
 			return this.AplusB(a,prev);
 		}.bind(this), 0);
 		if(children.length == doneAmount){
-			// console.log('all children done of '+allItems.nodes[id].body);
 			return true;
 		} else {
-			// console.log('NOT all children done of '+allItems.nodes[id].body);
 			return false;
 		}
 	}
 	calculateTotalTime(id)
 	{
 		let item = this.nodes[id];
-		// console.log('item in calculateTotalTime ↓');
+		// console.log('item in calculateTotalTime ↓ ['+item.id+']'+item.body);
 		// console.log(id);
 		// console.log(item);
+		let totalPlannedTime;
+		let totalUsedTime;
 	    if (!(Array.isArray(item.children) && item.children.length)) {
 	    	// if we don't have children, do nothing, leave the time as-is
-			item['totalPlannedTime'] = (!item.done) ? item.planned_time : 0 ;
-			item['totalUsedTime'] = (!item.done) ? item.used_time : 0 ;
+			totalPlannedTime = (!item.done) ? parseFloat(item.planned_time) : 0 ;
+			totalUsedTime = (!item.done) ? parseFloat(item.used_time) : 0 ;
 	    } else {
 			// add up all the times of our direct children
-		    item['totalPlannedTime'] = item.children.reduce((prev, next) => {
-		        return this.AplusB(prev, next.totalPlannedTime);
-		    }, (!item.done) ? item.planned_time : 0 );
-		    item['totalUsedTime'] = item.children.reduce((prev, next) => {
-		        return this.AplusB(prev, next.totalUsedTime);
-		    }, (!item.done) ? item.used_time : 0 );
+		    totalPlannedTime = item.children.reduce((prev, next) => {
+		        // return this.AplusB(prev, next.totalPlannedTime);
+		        return prev+parseFloat(next.totalPlannedTime);
+		    }, (!item.done) ? parseFloat(item.planned_time) : 0 );
+		    totalUsedTime = item.children.reduce((prev, next) => {
+		        // return this.AplusB(prev, next.totalUsedTime);
+		        return prev+parseFloat(next.totalUsedTime);
+		    }, (!item.done) ? parseFloat(item.used_time) : 0 );
 	    }
+	    // console.log('totalPlannedTime = '+parseFloat(totalPlannedTime));
+	    item['totalPlannedTime'] = parseFloat(totalPlannedTime);
+		// console.log('totalUsedTime = '+parseFloat(totalUsedTime));
+	    item['totalUsedTime'] = parseFloat(totalUsedTime);
 	    //call this on PARENT -> climb up the parent tree
 	    if (item.parent_id){
 		    this.calculateTotalTime(item.parent_id);

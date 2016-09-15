@@ -1,3 +1,5 @@
+require('flatpickr');
+
 var VueAutosize = require('vue-autosize');
 Vue.use(VueAutosize)
 
@@ -136,9 +138,13 @@ window.vm = new Vue({
 		doneData: null,
 		selection: selection,
 		addingNewUnder: null,
+		addingNewAsChild: false,
 		addingNewAsFirstChild: false,
 		editingItem: null,
+		editingDoneDateItem: null,
 		timerItems: [],
+		loading: true,
+		patching: false,
 	},
 	components: {
 		Card,
@@ -199,22 +205,18 @@ window.vm = new Vue({
 			let item = (!id) ? allItems.nodes[selection.selectedId] : allItems.nodes[id];
 			if (markAs == 'notDone'){
 				item.done = false;
-			} else if (markAs == 'done') {
+				allItems.prepareDonePatch(item.id);
+				return;
+			}
+			if (item.children.length && !allItems.allChildrenDone(item.id)){
+				return;
+			}
+			if (markAs == 'done') {
 				item.done = true;
-			} else if (!(item.children.length && allItems.allChildrenDone(item.id) == false)){
+			} else {
 				item.done = !item.done;
 			}
 			allItems.prepareDonePatch(item.id);
-		},
-		patchDone(id){
-			let done_date;
-			let doneValue = allItems.nodes[id].done;
-			if (doneValue){
-				done_date = moment().format();
-			} else {
-				done_date = '0000-00-00 00:00:00';
-			}
-			this.$http.patch('/api/items/' + id, {'done':doneValue, 'done_date':done_date});
 		},
 		moveItem(direction){
 			let id = selection.selectedId;
@@ -276,24 +278,23 @@ window.vm = new Vue({
 			let id = selection.selectedId;
 			allItems.setDueDate(id);
 		},
-		patchDueDate(id, duedate){
-			if (duedate == '0000-00-00 00:00:00'){
-				this.$http.patch('/api/items/' + id, {'due_date':duedate});
-				return;
-			}
-			duedate = moment(duedate).format();
-			console.log('PatchDueDate: '+duedate);
-			this.$http.patch('/api/items/' + id, {'due_date':duedate});
-		},
-		showAddNewItem(id){
+		showAddNewItem(id, addAs){
 			id = (id) ? id : selection.selectedId;
-			console.log('showAddNewItem for '+id);
+			if(!id){ return; }
+			console.log('showAddNewItem for ['+allItems.nodes[id].body+']');
 			this.addingNewUnder = id;
 			selection.lastSelectedId = id;
 			selection.selectedId = null;
-			setTimeout(function(){$("#new-under-"+id+" textarea").focus();},10);
+			if(addAs == 'child'){
+				this.addingNewAsFirstChild = true;
+				setTimeout(function(){$("#new-firstchild-of-"+id+" textarea").focus();},10);
+			} else {
+				this.addingNewAsFirstChild = false;
+				setTimeout(function(){$("#new-under-"+id+" textarea").focus();},10);
+			}
 		},
 		patch(id, arg){
+			this.patching = true;
 			let patchObj = {};
 			let patchVal = allItems.nodes[id][arg];
 			if(arg == 'children_order'){
@@ -303,6 +304,34 @@ window.vm = new Vue({
 			this.$http.patch('/api/items/' + id, patchObj, { method: 'PATCH'})
 			.then(function(response){
 				console.log('patched item['+id+'].'+arg+' = '+patchObj[arg]+';');
+				this.patching = false;
+			});
+		},
+		patchDueDate(id, duedate){
+			this.patching = true;
+			if (duedate == '0000-00-00 00:00:00'){
+				this.$http.patch('/api/items/' + id, {'due_date':duedate});
+				return;
+			}
+			duedate = moment(duedate).format();
+			console.log('PatchDueDate: '+duedate);
+			this.$http.patch('/api/items/' + id, {'due_date':duedate})
+			.then(function(response){
+				this.patching = false;
+			});
+		},
+		patchDone(id){
+			this.patching = true;
+			let done_date;
+			let doneValue = allItems.nodes[id].done;
+			if (doneValue){
+				done_date = moment().format();
+			} else {
+				done_date = '0000-00-00 00:00:00';
+			}
+			this.$http.patch('/api/items/' + id, {'done':doneValue, 'done_date':done_date})
+			.then(function(response){
+				this.patching = false;
 			});
 		},
 		clickDone(){
@@ -357,8 +386,8 @@ window.vm = new Vue({
 			if(k == 'shift_tab'){ this.unindent()}
 			if(k == 'tab'){ this.indent()}
 			if(k == 'enter'){ this.showAddNewItem()}
+			if(k == 'shift_enter'){ this.showAddNewItem(null, 'child')}
 			if(k == 'meta_enter'){ this.$broadcast('startEdit')}
-			if(k == 'shift_enter'){ this.showAddNewItem()}
 			if(k == 't'){ this.setToday()}
 			if(k == 'meta_shift_d'){ this.duplicate()}
 		},
@@ -428,9 +457,6 @@ window.vm = new Vue({
 					vm.keystroke('meta_shift_d');
 		  			break;
 		  		}
-				break;
-			case 'xexx':
-				vm.keystroke('unindent');
 				break;
           } // end switch
     	} // END INPUT AREAS NOT IN FOCUS

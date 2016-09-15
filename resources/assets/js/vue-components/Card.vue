@@ -1,8 +1,10 @@
 <template id="items-card-template">
-	<div class="items-card" id="card-{{ item.id }}">
+	<div class="items-card"
+		id="card-{{ item.id }}"
+	>
 		<div 
-			class="item-card"
 			v-if="item.depth != 0"
+			class="item-card"
 			:class="{
 				done: item.done,
 				show_children: item.show_children,
@@ -40,7 +42,7 @@
 				</label> -->
 			</div>
 			<div class="body-div"
-				:class="{ selected: item.id == this.$root.selection.selectedId, }"
+				:class="{ selected: item.id == this.$root.selection.selectedId, project: isProject}"
 				@dblclick="startEdit(item)"
 				@click="selectItem(item)"
 				@enter="console.log('yarrr')"
@@ -81,8 +83,19 @@
 				<div class="item-tags"
 					v-show="this.$root.editingItem != item.id"
 				>
-					<span v-if="item.done" class="done">
+					<span class="done"
+						v-if="item.done"
+						@dblclick="startEditDoneDate(item)"
+					>
 						Done {{ item.done_date | momentCalendar }}
+					</span>
+					<span class="done"
+						v-if="item.id == this.$root.editingDoneDateItem"
+					>
+						<input class="flatpickr"
+							id="done-date-edit-{{ item.id }}"
+							data-date-format="d-m-Y"
+						>
 					</span>
 					
 					<span v-if="(hasTotalUsedTime || hasTotalPlannedTime) && !item.done" class="total-duration">
@@ -136,7 +149,7 @@
 		</div>
 
 		<form 
-			:class="['addnewbox-firstchild']"
+			:class="['addnewbox-firstchild', 'addnewbox', 'child']"
 			id="new-firstchild-of-{{ item.id }}"
 			v-if="showAddNewBoxFirstChild"
 			@submit.prevent
@@ -147,7 +160,6 @@
 				v-model="newItem.body"
 				v-autosize="newItem.body"
 				@blur="blurOnAddNew(item)"
-				@keydown.tab="tabOnFirstInputNew"
 				@keydown="keydownOnNew"
 				placeholder="..."
 				autocomplete="off"
@@ -176,7 +188,7 @@
 		</div>
 
 		<form 
-			:class="['addnewbox', this.newItem.as]"
+			:class="{addnewbox: true, child: this.$root.addingNewAsChild}"
 			id="new-under-{{ item.id }}"
 			v-if="showAddNewBox"
 			@submit.prevent
@@ -187,7 +199,6 @@
 				v-model="newItem.body"
 				v-autosize="newItem.body"
 				@blur="blurOnAddNew(item)"
-				@keydown.tab="tabOnFirstInputNew"
 				@keydown="keydownOnNew"
 				placeholder="..."
 				autocomplete="off"
@@ -200,7 +211,6 @@
 					type="number"
 					v-model="newItem.planned_time"
 					@blur="blurOnAddNew(item)"
-					@keydown.tab="tabOnLastInputNew"
 					@keydown="keydownOnNew"
 				/>
 			</span>
@@ -222,7 +232,6 @@ export default {
 	data: function(){
 		return {
 			newItem: {
-				as: 'sibling',
 				body: '',
 				planned_time:0,
 				parent_id: (this.item.parent_id) ? this.item.parent_id : allItems.root.id,
@@ -231,6 +240,10 @@ export default {
 		};
 	},
 	computed: {
+		isProject(){
+			console.log('checking isProject');
+			return allItems.isProject(this.item.id);
+		},
 		siblingIndex(){ return allItems.siblingIndex(this.item.id); },
 		olderSiblingId(){ return allItems.olderSiblingId(this.item.id); },
 		parentsChildren_order(){
@@ -295,21 +308,63 @@ export default {
 		},
 		enterOnNew(e) {
 	    },
+		makeNewItemAChild(){
+			let lastChild = allItems.getLastChildId(this.item.id);
+        	if (lastChild){
+        	// If item already has children
+        		console.log("Adding instead under: ["+allItems.nodes[lastChild].body+']');
+        		vm.$root.showAddNewItem(lastChild);
+        	} else {
+        	// If item has no children yet
+				this.$root.addingNewAsChild = true;
+        		$("#new-under-"+this.item.id+" textarea").focus();
+        	}
+		},
 		keydownOnNew(e) {
-			// console.log('run keydownOnNew:');
-			// console.log(e);
+			// SHIFT-TAB on body
+			if (e.srcElement.name == 'body' && e.keyCode === 9 && e.shiftKey) {
+	        	e.preventDefault();
+	        	vm.$root.showAddNewItem(this.item.parent_id);
+			}
+			// TAB on planned_time
+			if (e.srcElement.name == 'planned_time' && e.keyCode === 9 && !e.shiftKey) {
+	        	e.preventDefault();
+	        	this.makeNewItemAChild();
+			}
 			// ENTER
 			if (e.keyCode === 13 && !e.shiftKey && !e.altKey) {
 	        	e.preventDefault();
 			  	if(!this.newItem.body){ return; }
 			  	this.addNew();
 			}
-			// ArrowUp or ArrowDown or Esc
-			if (e.keyCode === 38 || e.keyCode === 40 || e.keyCode === 27) {
+			// ArrowLeft
+			if (e.keyCode === 37){
+				// If in an EMPTY BODY
+				if (e.srcElement.name != 'body' || (e.srcElement.name == 'body' && !this.newItem.body)) {
+					e.preventDefault();
+		        	vm.$root.showAddNewItem(this.item.parent_id);
+				}
+			}
+			// ArrowRight
+			if (e.keyCode === 39){
+				// If in an EMPTY BODY
+				if (e.srcElement.name != 'body' || (e.srcElement.name == 'body' && !this.newItem.body)) {
+					e.preventDefault();
+		        	this.makeNewItemAChild();
+				}
+			}
+			// ArrowUp or ArrowDown
+			if (e.keyCode === 38 || e.keyCode === 40) {
+				// If body is empty!
 				if (!this.newItem.body) {
 		        	e.preventDefault();
 		        	this.cancelAddNew();
 				}
+			}
+			// ESC
+			if (e.keyCode === 27){
+			   	e.preventDefault();
+	        	this.cancelAddNew();
 			}
 	    },
 		keydownOnEdit(e) {
@@ -331,33 +386,6 @@ export default {
 			if (e.keyCode === 9 && !e.shiftKey) {
 	        	e.preventDefault();
 	        	return;
-			}
-	    },
-	    tabOnFirstInputNew(e){
-			// Tab
-			if (e.keyCode === 9 && e.shiftKey) {
-	        	e.preventDefault();
-	        	if (this.newItem.depth == 1){ return; }
-	        	vm.$root.showAddNewItem(this.item.parent_id);
-	        	return;
-			}
-	    },
-	    tabOnLastInputNew(e){
-			// Tab
-			if (e.keyCode === 9 && !e.shiftKey) {
-	        	e.preventDefault();
-	        	let lastChild = allItems.getLastChildId(this.item.id);
-	        	if (lastChild){
-	        		console.log("tab -- parent's lastChild: "+lastChild);
-	        		vm.$root.showAddNewItem(lastChild);
-	        	} else {
-					if (this.newItem.as == 'child'){ return; }
-					this.newItem.depth++;
-	        		this.newItem.parent_id = this.item.id;
-	        		this.newItem.as = 'child';
-	        		$("#new-under-"+this.item.id+" textarea").focus();
-	        	}
-        		return;
 			}
 	    },
 	    blurOnEdit(item) {
@@ -418,6 +446,15 @@ export default {
 			item.body = this.$root.beforeEditCache_body;
 			item.planned_time = this.$root.beforeEditCache_planned_time;
 		},
+		startEditDoneDate(item){
+			console.log('startEditDoneDate');
+			item = (item) ? item : allItems.nodes[selection.selectedId];
+			console.log(item);
+			this.$root.beforeEditCache_done_date = item.done_date;
+			this.$root.editingDoneDateItem = item.id;
+
+			document.getElementById("done-date-edit-"+item.id).flatpickr();
+		},
 		deleteItem(item){
 			let id = item.id;
 			if (confirm("Do you really want to delete: "+item.body) == false) {
@@ -428,10 +465,16 @@ export default {
 		},
 		addNew(){
 			console.log('sending newItem:');
-			console.log(this.newItem);
-			this.$http.post('/api/items',this.newItem) //SEND
+			let newItem = this.newItem;
+			if (this.$root.addingNewAsChild){
+				newItem.depth++;
+        		newItem.parent_id = this.item.id;
+			}
+			console.log(newItem);
+			this.$http.post('/api/items',newItem) //SEND
 			.then(function(response){ //response
 				this.newItem.body = '';
+				this.newItem.planned_time = '';
 				let storedItem = response.data;
 				console.log('starting dom update...');
 				let OlderSiblingIndex = this.siblingIndex;
@@ -442,14 +485,9 @@ export default {
 		cancelAddNew(lastSelectedId){
 			this.newItem.body = '';
 			this.$root.addingNewUnder = null;
-			console.log('sid: '+selection.selectedId);
 			selection.selectedId = selection.lastSelectedId;
-			console.log('sid: '+selection.selectedId);
 			// Reset newItem to sibling stance.
-			this.newItem.as = 'sibling';
-       		this.newItem.parent_id = (this.item.parent_id) ? this.item.parent_id : allItems.root.id;
-			this.newItem.depth = (this.item.depth == 0) ? 1 : this.item.depth;
-			
+			this.$root.addingNewAsChild = false;			
 			$(':focus').blur();
 		},
 	},

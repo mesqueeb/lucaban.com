@@ -18,6 +18,7 @@
   },
   "dependencies": {
     "countdown": "^2.6.0",
+    "flatpickr": "^1.9.1",
     "jquery": "^3.1.0",
     "laravel-elixir-vueify": "^1.0.3",
     "material-design-iconic-font": "^2.2.0",

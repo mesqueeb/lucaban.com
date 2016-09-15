@@ -17,6 +17,7 @@ elixir(function(mix) {
 
 	var npmDir = 'node_modules/',
     	jsDir = 'resources/assets/js/';
+        
     // Copy MATERIAL FONT
     mix.copy(npmDir + 'material-design-iconic-font/dist/css/material-design-iconic-font.min.css', 'public/css');
     mix.copy(npmDir + 'material-design-iconic-font/dist/fonts', 'public/css/fonts');
@@ -27,6 +28,7 @@ elixir(function(mix) {
     mix.copy(npmDir + 'countdown/countdown.js', jsDir);
     mix.copy(npmDir + 'moment/min/moment-with-locales.min.js', jsDir);
     mix.copy(npmDir + 'moment-countdown/dist/moment-countdown.min.js', jsDir);
+    mix.copy(npmDir + 'flatpickr/dist/flatpickr.min.js', jsDir);
 
 	mix.scripts([
 		'vue.js',
@@ -35,6 +37,7 @@ elixir(function(mix) {
 		'countdown.js',
 		'moment-with-locales.min.js',
 		'moment-countdown.min.js',
+        'flatpickr.min.js',
 	], 'public/js/vendor.js');
 
 });

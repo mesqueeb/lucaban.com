@@ -274,6 +274,1340 @@
 	module.exports = autosize;
 });
 },{}],2:[function(require,module,exports){
+"use strict";
+
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
+
+var flatpickr = function flatpickr(selector, config) {
+	var elements = void 0;
+
+	var createInstance = function createInstance(element) {
+		if (element._flatpickr) {
+			element._flatpickr.destroy();
+		}
+
+		element._flatpickr = new flatpickr.init(element, config);
+		return element._flatpickr;
+	};
+
+	if (selector.nodeName) {
+		return createInstance(selector);
+	}
+	/*
+ Utilize the performance of native getters if applicable
+ https://jsperf.com/getelementsbyclassname-vs-queryselectorall/18
+ https://jsperf.com/jquery-vs-javascript-performance-comparison/22
+ */
+	else if (/^#[a-zA-Z0-9\-_]*$/.test(selector)) {
+			return createInstance(document.getElementById(selector.slice(1)));
+		} else if (/^\.[a-zA-Z0-9\-_]*$/.test(selector)) {
+			elements = document.getElementsByClassName(selector.slice(1));
+		} else {
+			elements = document.querySelectorAll(selector);
+		}
+
+	var instances = [];
+
+	for (var i = 0; i < elements.length; i++) {
+		instances.push(createInstance(elements[i]));
+	}
+
+	if (instances.length === 1) {
+		return instances[0];
+	}
+
+	return {
+		calendars: instances,
+		byID: function byID(id) {
+			return document.getElementById(id)._flatpickr;
+		}
+	};
+};
+
+/**
+ * @constructor
+ */
+flatpickr.init = function (element, instanceConfig) {
+	function createElement(tag, className, content) {
+		var newElement = document.createElement(tag);
+
+		if (content) {
+			newElement.textContent = content;
+		}
+
+		if (className) {
+			newElement.className = className;
+		}
+
+		return newElement;
+	}
+
+	var debounce = function debounce(func, wait, immediate) {
+		var timeout = void 0;
+		return function () {
+			for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
+				args[_key] = arguments[_key];
+			}
+
+			var context = this;
+
+			var later = function later() {
+				timeout = null;
+				if (!immediate) {
+					func.apply(context, args);
+				}
+			};
+
+			clearTimeout(timeout);
+			timeout = setTimeout(later, wait);
+			if (immediate && !timeout) {
+				func.apply(context, args);
+			}
+		};
+	};
+
+	// functions
+	var self = this;
+	var parseConfig = void 0,
+	    init = void 0,
+	    wrap = void 0,
+	    uDate = void 0,
+	    equalDates = void 0,
+	    pad = void 0,
+	    monthToStr = void 0,
+	    isEnabled = void 0,
+	    buildMonthNavigation = void 0,
+	    buildWeekdays = void 0,
+	    buildCalendar = void 0,
+	    buildDays = void 0,
+	    buildWeeks = void 0,
+	    buildTime = void 0,
+	    timeWrapper = void 0,
+	    yearScroll = void 0,
+	    updateValue = void 0,
+	    amPMToggle = void 0,
+	    onKeyDown = void 0,
+	    onResize = void 0,
+	    updateNavigationCurrentMonth = void 0,
+	    handleYearChange = void 0,
+	    changeMonth = void 0,
+	    getDaysinMonth = void 0,
+	    documentClick = void 0,
+	    selectDate = void 0,
+	    getRandomCalendarIdStr = void 0,
+	    bind = void 0,
+	    triggerChange = void 0;
+
+	// elements & variables
+	var calendarContainer = void 0,
+	    weekdayContainer = void 0,
+	    timeContainer = void 0,
+	    navigationCurrentMonth = void 0,
+	    monthsNav = void 0,
+	    prevMonthNav = void 0,
+	    currentYearElement = void 0,
+	    currentMonthElement = void 0,
+	    nextMonthNav = void 0,
+	    calendar = void 0,
+	    weekNumbers = void 0,
+	    now = new Date(),
+	    wrapperElement = void 0,
+	    clickEvt = void 0;
+
+	self.formats = {
+		// weekday name, short, e.g. Thu
+		D: function D() {
+			return self.l10n.weekdays.shorthand[self.formats.w()];
+		},
+
+		// full month name e.g. January
+		F: function F() {
+			return monthToStr(self.formats.n() - 1, false);
+		},
+
+		// hours with leading zero e.g. 03
+		H: function H() {
+			return pad(self.selectedDateObj.getHours());
+		},
+
+		// day (1-30) with ordinal suffix e.g. 1st, 2nd
+		J: function J() {
+			return self.formats.j() + self.l10n.ordinal(self.formats.j());
+		},
+
+		// AM/PM
+		K: function K() {
+			return self.selectedDateObj.getHours() > 11 ? "PM" : "AM";
+		},
+
+		// shorthand month e.g. Jan, Sep, Oct, etc
+		M: function M() {
+			return monthToStr(self.formats.n() - 1, true);
+		},
+
+		// seconds 00-59
+		S: function S() {
+			return pad(self.selectedDateObj.getSeconds());
+		},
+
+		// unix timestamp
+		U: function U() {
+			return self.selectedDateObj.getTime() / 1000;
+		},
+
+		// full year e.g. 2016
+		Y: function Y() {
+			return self.selectedDateObj.getFullYear();
+		},
+
+		// day in month, padded (01-30)
+		d: function d() {
+			return pad(self.formats.j());
+		},
+
+		// hour from 1-12 (am/pm)
+		h: function h() {
+			return self.selectedDateObj.getHours() % 12 ? self.selectedDateObj.getHours() % 12 : 12;
+		},
+
+		// minutes, padded with leading zero e.g. 09
+		i: function i() {
+			return pad(self.selectedDateObj.getMinutes());
+		},
+
+		// day in month (1-30)
+		j: function j() {
+			return self.selectedDateObj.getDate();
+		},
+
+		// weekday name, full, e.g. Thursday
+		l: function l() {
+			return self.l10n.weekdays.longhand[self.formats.w()];
+		},
+
+		// padded month number (01-12)
+		m: function m() {
+			return pad(self.formats.n());
+		},
+
+		// the month number (1-12)
+		n: function n() {
+			return self.selectedDateObj.getMonth() + 1;
+		},
+
+		// seconds 0-59
+		s: function s() {
+			return self.selectedDateObj.getSeconds();
+		},
+
+		// number of the day of the week
+		w: function w() {
+			return self.selectedDateObj.getDay();
+		},
+
+		// last two digits of year e.g. 16 for 2016
+		y: function y() {
+			return String(self.formats.Y()).substring(2);
+		}
+	};
+
+	self.defaultConfig = {
+		/* if true, dates will be parsed, formatted, and displayed in UTC.
+  preloading date strings w/ timezones is recommended but not necessary */
+		utc: false,
+
+		// wrap: see https://chmln.github.io/flatpickr/#strap
+		wrap: false,
+
+		// enables week numbers
+		weekNumbers: false,
+
+		allowInput: false,
+
+		/*
+  	clicking on input opens the date(time)picker.
+  	disable if you wish to open the calendar manually with .open()
+  */
+		clickOpens: true,
+
+		// display time picker in 24 hour mode
+		time_24hr: false,
+
+		// enables the time picker functionality
+		enableTime: false,
+
+		// noCalendar: true will hide the calendar. use for a time picker along w/ enableTime
+		noCalendar: false,
+
+		// more date format chars at https://chmln.github.io/flatpickr/#dateformat
+		dateFormat: "Y-m-d",
+
+		// altInput - see https://chmln.github.io/flatpickr/#altinput
+		altInput: false,
+
+		// the created altInput element will have this class.
+		altInputClass: "",
+
+		// same as dateFormat, but for altInput
+		altFormat: "F j, Y", // defaults to e.g. June 10, 2016
+
+		// defaultDate - either a datestring or a date object. used for datetimepicker"s initial value
+		defaultDate: null,
+
+		// the minimum date that user can pick (inclusive)
+		minDate: null,
+
+		// the maximum date that user can pick (inclusive)
+		maxDate: null,
+
+		// dateparser that transforms a given string to a date object
+		parseDate: null,
+
+		// see https://chmln.github.io/flatpickr/#disable
+		enable: [],
+
+		// see https://chmln.github.io/flatpickr/#disable
+		disable: [],
+
+		// display the short version of month names - e.g. Sep instead of September
+		shorthandCurrentMonth: false,
+
+		// displays calendar inline. see https://chmln.github.io/flatpickr/#inline-calendar
+		inline: false,
+
+		// position calendar inside wrapper and next to the input element
+		// leave at false unless you know what you"re doing
+		static: false,
+
+		// code for previous/next icons. this is where you put your custom icon code e.g. fontawesome
+		prevArrow: "&lt;",
+		nextArrow: "&gt;",
+
+		// enables seconds in the time picker
+		enableSeconds: false,
+
+		// step size used when scrolling/incrementing the hour element
+		hourIncrement: 1,
+
+		// step size used when scrolling/incrementing the minute element
+		minuteIncrement: 5,
+
+		// onChange callback when user selects a date or time
+		onChange: null, // function (dateObj, dateStr) {}
+
+		// called every time calendar is opened
+		onOpen: null, // function (dateObj, dateStr) {}
+
+		// called every time calendar is closed
+		onClose: null, // function (dateObj, dateStr) {}
+
+		onValueUpdate: null
+	};
+
+	init = function init() {
+		instanceConfig = instanceConfig || {};
+
+		self.element = element;
+
+		parseConfig();
+
+		self.input = self.config.wrap ? element.querySelector("[data-input]") : element;
+		self.input.classList.add("flatpickr-input");
+
+		if (self.config.defaultDate) {
+			self.config.defaultDate = uDate(self.config.defaultDate);
+		}
+
+		if (self.input.value || self.config.defaultDate) {
+			self.selectedDateObj = uDate(self.config.defaultDate || self.input.value);
+		}
+
+		wrap();
+		buildCalendar();
+		bind();
+
+		self.uDate = uDate;
+		self.jumpToDate();
+		updateValue();
+	};
+
+	parseConfig = function parseConfig() {
+		self.config = {};
+
+		Object.keys(self.defaultConfig).forEach(function (key) {
+			if (instanceConfig.hasOwnProperty(key)) {
+				self.config[key] = instanceConfig[key];
+			} else if (self.element.dataset && self.element.dataset.hasOwnProperty(key.toLowerCase())) {
+				self.config[key] = self.element.dataset[key.toLowerCase()];
+			} else if (!self.element.dataset && self.element.hasAttribute("data-" + key)) {
+				self.config[key] = self.element.getAttribute("data-" + key);
+			} else {
+				self.config[key] = flatpickr.init.prototype.defaultConfig[key] || self.defaultConfig[key];
+			}
+
+			if (typeof self.defaultConfig[key] === "boolean") {
+				self.config[key] = self.config[key] === true || self.config[key] === "" || self.config[key] === "true";
+			}
+
+			if (key === "enableTime" && self.config[key]) {
+				self.defaultConfig.dateFormat = !self.config.time_24hr ? "Y-m-d h:i K" : "Y-m-d H:i";
+				self.defaultConfig.altFormat = !self.config.time_24hr ? "F j Y, h:i K" : "F j, Y H:i";
+			} else if (key === "noCalendar" && self.config[key]) {
+				self.defaultConfig.dateFormat = "h:i K";
+				self.defaultConfig.altFormat = "h:i K";
+			}
+		});
+	};
+
+	getRandomCalendarIdStr = function getRandomCalendarIdStr() {
+		var randNum = void 0,
+		    idStr = void 0;
+		do {
+			randNum = Math.round(Math.random() * Math.pow(10, 10));
+			idStr = "flatpickr-" + randNum;
+		} while (document.getElementById(idStr) !== null);
+
+		return idStr;
+	};
+
+	uDate = function uDate(date, timeless) {
+		timeless = timeless || false;
+
+		if (date === "today") {
+			date = new Date();
+			timeless = true;
+		} else if (typeof date === "string") {
+			date = date.trim();
+
+			if (self.config.parseDate) {
+				date = self.config.parseDate(date);
+			} else if (/^\d\d\d\d\-\d{1,2}\-\d\d$/.test(date)) {
+				// this utc datestring gets parsed, but incorrectly by Date.parse
+				date = new Date(date.replace(/(\d)-(\d)/g, "$1/$2"));
+			} else if (Date.parse(date)) {
+				date = new Date(date);
+			} else if (/^\d\d\d\d\-\d\d\-\d\d/.test(date)) {
+				// disable special utc datestring
+				date = new Date(date.replace(/(\d)-(\d)/g, "$1/$2"));
+			} else if (/^(\d?\d):(\d\d)/.test(date)) {
+				// time-only picker
+				var matches = date.match(/^(\d?\d):(\d\d)(:(\d\d))?/),
+				    seconds = matches[4] !== undefined ? matches[4] : 0;
+
+				date = new Date();
+				date.setHours(matches[1], matches[2], seconds, 0);
+			} else {
+				console.error("flatpickr: invalid date string " + date);
+				console.info(self.element);
+			}
+		}
+
+		if (!(date instanceof Date) || !date.getTime()) {
+			return null;
+		}
+
+		if (self.config.utc && !date.fp_isUTC) {
+			date = date.fp_toUTC();
+		}
+
+		if (timeless) {
+			date.setHours(0, 0, 0, 0);
+		}
+
+		return date;
+	};
+
+	equalDates = function equalDates(date1, date2) {
+		return date1.getDate() === date2.getDate() && date1.getMonth() === date2.getMonth() && date1.getFullYear() === date2.getFullYear();
+	};
+
+	wrap = function wrap() {
+		wrapperElement = createElement("div", "flatpickr-wrapper");
+
+		if (self.config.inline || self.config.static) {
+			// Wrap input and place calendar underneath
+			self.element.parentNode.insertBefore(wrapperElement, self.element);
+			wrapperElement.appendChild(self.element);
+
+			wrapperElement.classList.add(self.config.inline ? "inline" : "static");
+		} else {
+			// Insert at bottom of BODY tag to display outside
+			// of relative positioned elements with css "overflow: hidden;"
+			// property set.
+			document.body.appendChild(wrapperElement);
+		}
+
+		if (self.config.altInput) {
+			// replicate self.element
+			self.altInput = createElement(self.input.nodeName, self.config.altInputClass + " flatpickr-input");
+			self.altInput.placeholder = self.input.placeholder;
+			self.altInput.type = "text";
+
+			self.input.type = "hidden";
+			self.input.parentNode.insertBefore(self.altInput, self.input.nextSibling);
+		}
+	};
+
+	getDaysinMonth = function getDaysinMonth() {
+		var month = arguments.length <= 0 || arguments[0] === undefined ? self.currentMonth : arguments[0];
+
+		var yr = self.currentYear;
+
+		if (month === 1 && (yr % 4 === 0 && yr % 100 !== 0 || yr % 400 === 0)) {
+			return 29;
+		}
+
+		return self.l10n.daysInMonth[month];
+	};
+
+	updateValue = function updateValue(e) {
+		if (self.config.noCalendar && !self.selectedDateObj) {
+			// picking time only and method triggered from picker
+			self.selectedDateObj = new Date();
+		} else if (!self.selectedDateObj) {
+			return;
+		}
+
+		if (e) {
+			e.target.blur();
+		}
+
+		var timeHasChanged = void 0;
+
+		if (self.config.enableTime) {
+			var previousTimestamp = self.selectedDateObj.getTime();
+
+			// update time
+			var hours = parseInt(self.hourElement.value, 10) || 0,
+			    seconds = void 0;
+
+			var minutes = (60 + (parseInt(self.minuteElement.value, 10) || 0)) % 60;
+
+			if (self.config.enableSeconds) {
+				seconds = (60 + parseInt(self.secondElement.value, 10) || 0) % 60;
+			}
+
+			if (!self.config.time_24hr) {
+				// the real number of hours for the date object
+				hours = hours % 12 + 12 * (self.amPM.innerHTML === "PM");
+			}
+
+			self.selectedDateObj.setHours(hours, minutes, seconds === undefined ? self.selectedDateObj.getSeconds() : seconds);
+
+			self.hourElement.value = pad(!self.config.time_24hr ? (12 + hours) % 12 + 12 * (hours % 12 === 0) : hours);
+			self.minuteElement.value = pad(minutes);
+
+			if (seconds !== undefined) {
+				self.secondElement.value = pad(seconds);
+			}
+
+			timeHasChanged = self.selectedDateObj.getTime() !== previousTimestamp;
+		}
+
+		self.input.value = self.formatDate(self.config.dateFormat);
+
+		if (self.altInput) {
+			self.altInput.value = self.formatDate(self.config.altFormat);
+		}
+
+		if (e && (timeHasChanged || e.target.classList.contains("flatpickr-day"))) {
+			triggerChange();
+		}
+
+		if (self.config.onValueUpdate) {
+			self.config.onValueUpdate(self.selectedDateObj, self.input.value, self);
+		}
+	};
+
+	pad = function pad(num) {
+		return ("0" + num).slice(-2);
+	};
+
+	self.formatDate = function (dateFormat) {
+		var formattedDate = "";
+		var formatPieces = dateFormat.split("");
+
+		for (var i = 0; i < formatPieces.length; i++) {
+			var c = formatPieces[i];
+			if (self.formats.hasOwnProperty(c) && formatPieces[i - 1] !== "\\") {
+				formattedDate += self.formats[c]();
+			} else if (c !== "\\") {
+				formattedDate += c;
+			}
+		}
+
+		return formattedDate;
+	};
+
+	monthToStr = function monthToStr(date, shorthand) {
+		if (shorthand || self.config.shorthandCurrentMonth) {
+			return self.l10n.months.shorthand[date];
+		}
+
+		return self.l10n.months.longhand[date];
+	};
+
+	isEnabled = function isEnabled(dateToCheck) {
+		if (self.config.minDate && dateToCheck < self.config.minDate || self.config.maxDate && dateToCheck > self.config.maxDate) {
+			return false;
+		}
+
+		dateToCheck = uDate(dateToCheck, true); // timeless
+
+		var bool = self.config.enable.length > 0,
+		    array = bool ? self.config.enable : self.config.disable;
+
+		var d = void 0;
+
+		for (var i = 0; i < array.length; i++) {
+			d = array[i];
+
+			if (d instanceof Function && d(dateToCheck)) {
+				// disabled by function
+				return bool;
+			} else if ( // disabled weekday
+			typeof d === "string" && /^wkd/.test(d) && dateToCheck.getDay() === (parseInt(d.slice(-1), 10) + self.l10n.firstDayOfWeek - 1) % 7) {
+				return bool;
+			} else if ((d instanceof Date || typeof d === "string" && !/^wkd/.test(d)) && uDate(d, true).getTime() === dateToCheck.getTime()) {
+				// disabled by date string
+				return bool;
+			} else if ( // disabled by range
+			(typeof d === "undefined" ? "undefined" : _typeof(d)) === "object" && d.hasOwnProperty("from") && dateToCheck >= uDate(d.from) && dateToCheck <= uDate(d.to)) {
+				return bool;
+			}
+		}
+
+		return !bool;
+	};
+
+	yearScroll = function yearScroll(event) {
+		event.preventDefault();
+
+		var delta = Math.max(-1, Math.min(1, event.wheelDelta || -event.deltaY));
+		self.currentYear = event.target.value = parseInt(event.target.value, 10) + delta;
+		self.redraw();
+	};
+
+	timeWrapper = function timeWrapper(e) {
+		e.preventDefault();
+
+		var min = parseInt(e.target.min, 10),
+		    max = parseInt(e.target.max, 10),
+		    step = parseInt(e.target.step, 10),
+		    value = parseInt(e.target.value, 10);
+
+		var newValue = value;
+
+		if (e.type === "wheel") {
+			newValue = value + step * Math.max(-1, Math.min(1, e.wheelDelta || -e.deltaY));
+		}
+
+		if (newValue <= min) {
+			newValue = max - step;
+		} else if (newValue >= max) {
+			newValue = min + step;
+		}
+
+		e.target.value = pad(newValue);
+	};
+
+	updateNavigationCurrentMonth = function updateNavigationCurrentMonth() {
+		currentMonthElement.textContent = monthToStr(self.currentMonth) + " ";
+		currentYearElement.value = self.currentYear;
+	};
+
+	handleYearChange = function handleYearChange() {
+		if (self.currentMonth < 0 || self.currentMonth > 11) {
+			self.currentYear += self.currentMonth % 11;
+			self.currentMonth = (self.currentMonth + 12) % 12;
+		}
+	};
+
+	documentClick = function documentClick(e) {
+		var isCalendarElement = wrapperElement.contains(e.relatedTarget || e.target),
+		    isInput = self.element.contains(e.relatedTarget || e.target) || e.relatedTarget || e.target === self.altInput;
+
+		if (self.isOpen && !isCalendarElement && !isInput) {
+			self.close();
+		}
+	};
+
+	changeMonth = function changeMonth(offset) {
+		self.currentMonth += offset;
+
+		handleYearChange();
+		updateNavigationCurrentMonth();
+		buildDays();
+		(self.config.noCalendar ? timeContainer : calendar).focus();
+	};
+
+	selectDate = function selectDate(e) {
+		e.preventDefault();
+		e.stopPropagation();
+
+		if (self.config.allowInput && e.target === (self.altInput || self.input) && e.which === 13) {
+			self.setDate((self.altInput || self.input).value);
+			self.redraw();
+		} else if (e.target.classList.contains("flatpickr-day")) {
+			var isPrevMonthDay = e.target.classList.contains("prevMonthDay"),
+			    isNextMonthDay = e.target.classList.contains("nextMonthDay"),
+			    monthNum = self.currentMonth - isPrevMonthDay + isNextMonthDay;
+
+			if (isPrevMonthDay || isNextMonthDay) {
+				changeMonth(+isNextMonthDay - isPrevMonthDay);
+			}
+
+			self.selectedDateObj = new Date(self.currentYear, monthNum, e.target.innerHTML);
+
+			updateValue(e);
+			buildDays();
+
+			if (!self.config.enableTime) {
+				self.close();
+			}
+		}
+	};
+
+	buildCalendar = function buildCalendar() {
+		calendarContainer = createElement("div", "flatpickr-calendar");
+		calendarContainer.id = getRandomCalendarIdStr();
+
+		calendar = createElement("div", "flatpickr-days");
+		calendar.tabIndex = -1;
+
+		if (!self.config.noCalendar) {
+			buildMonthNavigation();
+			buildWeekdays();
+
+			if (self.config.weekNumbers) {
+				buildWeeks();
+			}
+
+			buildDays();
+
+			calendarContainer.appendChild(calendar);
+		}
+
+		wrapperElement.appendChild(calendarContainer);
+
+		if (self.config.enableTime) {
+			buildTime();
+		}
+	};
+
+	buildMonthNavigation = function buildMonthNavigation() {
+		monthsNav = createElement("div", "flatpickr-month");
+
+		prevMonthNav = createElement("span", "flatpickr-prev-month");
+		prevMonthNav.innerHTML = self.config.prevArrow;
+
+		currentMonthElement = createElement("span", "cur_month");
+
+		currentYearElement = createElement("input", "cur_year");
+		currentYearElement.type = "number";
+		currentYearElement.title = self.l10n.scrollTitle;
+
+		nextMonthNav = createElement("span", "flatpickr-next-month");
+		nextMonthNav.innerHTML = self.config.nextArrow;
+
+		navigationCurrentMonth = createElement("span", "flatpickr-current-month");
+		navigationCurrentMonth.appendChild(currentMonthElement);
+		navigationCurrentMonth.appendChild(currentYearElement);
+
+		monthsNav.appendChild(prevMonthNav);
+		monthsNav.appendChild(navigationCurrentMonth);
+		monthsNav.appendChild(nextMonthNav);
+
+		calendarContainer.appendChild(monthsNav);
+		updateNavigationCurrentMonth();
+	};
+
+	buildWeekdays = function buildWeekdays() {
+		weekdayContainer = createElement("div", "flatpickr-weekdays");
+		var firstDayOfWeek = self.l10n.firstDayOfWeek;
+
+		var weekdays = self.l10n.weekdays.shorthand.slice();
+
+		if (firstDayOfWeek > 0 && firstDayOfWeek < weekdays.length) {
+			weekdays = [].concat(weekdays.splice(firstDayOfWeek, weekdays.length), weekdays.splice(0, firstDayOfWeek));
+		}
+
+		if (self.config.weekNumbers) {
+			weekdayContainer.innerHTML = "<span>" + self.l10n.weekAbbreviation + "</span>";
+		}
+
+		weekdayContainer.innerHTML += "<span>" + weekdays.join("</span><span>") + "</span>";
+
+		calendarContainer.appendChild(weekdayContainer);
+	};
+
+	buildWeeks = function buildWeeks() {
+		calendarContainer.classList.add("hasWeeks");
+
+		weekNumbers = createElement("div", "flatpickr-weeks");
+		calendarContainer.appendChild(weekNumbers);
+	};
+
+	buildDays = function buildDays() {
+		var firstOfMonth = (new Date(self.currentYear, self.currentMonth, 1).getDay() - self.l10n.firstDayOfWeek + 7) % 7,
+		    daysInMonth = getDaysinMonth(),
+		    prevMonthDays = getDaysinMonth((self.currentMonth - 1 + 12) % 12),
+		    days = document.createDocumentFragment();
+
+		var dayNumber = prevMonthDays + 1 - firstOfMonth,
+		    currentDate = void 0,
+		    dateIsDisabled = void 0;
+
+		if (self.config.weekNumbers) {
+			weekNumbers.innerHTML = "";
+		}
+
+		calendar.innerHTML = "";
+
+		self.config.minDate = uDate(self.config.minDate, true);
+		self.config.maxDate = uDate(self.config.maxDate, true);
+
+		// prepend days from the ending of previous month
+		for (; dayNumber <= prevMonthDays; dayNumber++) {
+			var curDate = new Date(self.currentYear, self.currentMonth - 1, dayNumber, 0, 0, 0, 0, 0),
+			    dateIsEnabled = isEnabled(curDate),
+			    dayElem = createElement("span", dateIsEnabled ? "flatpickr-day prevMonthDay" : "disabled", dayNumber);
+
+			if (dateIsEnabled) {
+				dayElem.tabIndex = 0;
+			}
+
+			days.appendChild(dayElem);
+		}
+
+		// Start at 1 since there is no 0th day
+		for (dayNumber = 1; dayNumber <= daysInMonth; dayNumber++) {
+			currentDate = new Date(self.currentYear, self.currentMonth, dayNumber, 0, 0, 0, 0, 0);
+
+			if (self.config.weekNumbers && dayNumber % 7 === 1) {
+				weekNumbers.appendChild(createElement("span", "disabled flatpickr-day", currentDate.fp_getWeek()));
+			}
+
+			dateIsDisabled = !isEnabled(currentDate);
+
+			var dayElement = createElement("span", dateIsDisabled ? "disabled" : "flatpickr-day", dayNumber);
+
+			if (!dateIsDisabled) {
+				dayElement.tabIndex = 0;
+
+				if (equalDates(currentDate, now)) {
+					dayElement.classList.add("today");
+				}
+
+				if (self.selectedDateObj && equalDates(currentDate, self.selectedDateObj)) {
+					dayElement.classList.add("selected");
+				}
+			}
+
+			days.appendChild(dayElement);
+		}
+
+		// append days from the next month
+		for (var dayNum = daysInMonth + 1; dayNum <= 42 - firstOfMonth; dayNum++) {
+			var _curDate = new Date(self.currentYear, self.currentMonth + 1, dayNum % daysInMonth, 0, 0, 0, 0, 0),
+			    _dateIsEnabled = isEnabled(_curDate),
+			    _dayElement = createElement("span", _dateIsEnabled ? "nextMonthDay flatpickr-day" : "disabled", dayNum % daysInMonth);
+
+			if (self.config.weekNumbers && dayNum % 7 === 1) {
+				weekNumbers.appendChild(createElement("span", "disabled", _curDate.fp_getWeek()));
+			}
+
+			if (_dateIsEnabled) {
+				_dayElement.tabIndex = 0;
+			}
+
+			days.appendChild(_dayElement);
+		}
+
+		calendar.appendChild(days);
+	};
+
+	buildTime = function buildTime() {
+		timeContainer = createElement("div", "flatpickr-time");
+		timeContainer.tabIndex = -1;
+		var separator = createElement("span", "flatpickr-time-separator", ":");
+
+		self.hourElement = createElement("input", "flatpickr-hour");
+		self.minuteElement = createElement("input", "flatpickr-minute");
+
+		self.hourElement.tabIndex = self.minuteElement.tabIndex = 0;
+		self.hourElement.type = self.minuteElement.type = "number";
+
+		self.hourElement.value = self.selectedDateObj ? pad(self.selectedDateObj.getHours()) : 12;
+
+		self.minuteElement.value = self.selectedDateObj ? pad(self.selectedDateObj.getMinutes()) : "00";
+
+		self.hourElement.step = self.config.hourIncrement;
+		self.minuteElement.step = self.config.minuteIncrement;
+
+		self.hourElement.min = -self.config.time_24hr;
+		self.hourElement.max = self.config.time_24hr ? 24 : 13;
+
+		self.minuteElement.min = -self.minuteElement.step;
+		self.minuteElement.max = 60;
+
+		self.hourElement.title = self.minuteElement.title = self.l10n.scrollTitle;
+
+		timeContainer.appendChild(self.hourElement);
+		timeContainer.appendChild(separator);
+		timeContainer.appendChild(self.minuteElement);
+
+		if (self.config.enableSeconds) {
+			timeContainer.classList.add("has-seconds");
+
+			self.secondElement = createElement("input", "flatpickr-second");
+			self.secondElement.type = "number";
+			self.secondElement.value = self.selectedDateObj ? pad(self.selectedDateObj.getSeconds()) : "00";
+
+			self.secondElement.step = self.minuteElement.step;
+			self.secondElement.min = self.minuteElement.min;
+			self.secondElement.max = self.minuteElement.max;
+
+			timeContainer.appendChild(createElement("span", "flatpickr-time-separator", ":"));
+			timeContainer.appendChild(self.secondElement);
+		}
+
+		if (!self.config.time_24hr) {
+			// add self.amPM if appropriate
+			self.amPM = createElement("span", "flatpickr-am-pm", ["AM", "PM"][self.hourElement.value > 11 | 0]);
+			self.amPM.title = self.l10n.toggleTitle;
+			self.amPM.tabIndex = 0;
+			timeContainer.appendChild(self.amPM);
+		}
+
+		calendarContainer.appendChild(timeContainer);
+	};
+
+	bind = function bind() {
+		document.addEventListener("keydown", onKeyDown);
+		window.addEventListener("resize", onResize);
+
+		if (self.config.clickOpens) {
+			(self.altInput || self.input).addEventListener("click", self.open);
+			(self.altInput || self.input).addEventListener("focus", self.open);
+		}
+
+		if (self.config.wrap && self.element.querySelector("[data-open]")) {
+			self.element.querySelector("[data-open]").addEventListener("click", self.open);
+		}
+
+		if (self.config.wrap && self.element.querySelector("[data-close]")) {
+			self.element.querySelector("[data-close]").addEventListener("click", self.close);
+		}
+
+		if (self.config.wrap && self.element.querySelector("[data-toggle]")) {
+			self.element.querySelector("[data-toggle]").addEventListener("click", self.toggle);
+		}
+
+		if (self.config.wrap && self.element.querySelector("[data-clear]")) {
+			self.element.querySelector("[data-clear]").addEventListener("click", self.clear);
+		}
+
+		if (!self.config.noCalendar) {
+			prevMonthNav.addEventListener("click", function () {
+				changeMonth(-1);
+			});
+
+			nextMonthNav.addEventListener("click", function () {
+				changeMonth(1);
+			});
+
+			currentYearElement.addEventListener("wheel", yearScroll);
+			currentYearElement.addEventListener("focus", currentYearElement.select);
+
+			currentYearElement.addEventListener("input", function (event) {
+				self.currentYear = parseInt(event.target.value, 10);
+				self.redraw();
+			});
+
+			calendar.addEventListener("click", selectDate);
+		}
+
+		document.addEventListener("click", documentClick, true);
+		document.addEventListener("focus", documentClick, true);
+
+		if (self.config.enableTime) {
+			self.hourElement.addEventListener("wheel", timeWrapper);
+			self.minuteElement.addEventListener("wheel", timeWrapper);
+
+			self.hourElement.addEventListener("input", timeWrapper);
+			self.minuteElement.addEventListener("input", timeWrapper);
+
+			self.hourElement.addEventListener("mouseout", updateValue);
+			self.minuteElement.addEventListener("mouseout", updateValue);
+
+			self.hourElement.addEventListener("change", updateValue);
+			self.minuteElement.addEventListener("change", updateValue);
+
+			self.hourElement.addEventListener("focus", self.hourElement.select);
+			self.minuteElement.addEventListener("focus", self.minuteElement.select);
+
+			if (self.config.enableSeconds) {
+				self.secondElement.addEventListener("wheel", timeWrapper);
+				self.secondElement.addEventListener("input", timeWrapper);
+				self.secondElement.addEventListener("mouseout", updateValue);
+				self.secondElement.addEventListener("change", updateValue);
+				self.secondElement.addEventListener("focus", self.secondElement.select);
+			}
+
+			if (!self.config.time_24hr) {
+				self.amPM.addEventListener("click", amPMToggle);
+
+				self.amPM.addEventListener("wheel", amPMToggle);
+				self.amPM.addEventListener("mouseout", updateValue);
+
+				self.amPM.addEventListener("keydown", function (e) {
+					if (e.which === 38 || e.which === 40) {
+						amPMToggle(e);
+					}
+				});
+			}
+		}
+
+		if (document.createEvent) {
+			clickEvt = document.createEvent("MouseEvent");
+			// without all these args ms edge spergs out
+			clickEvt.initMouseEvent("click", true, true, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
+		} else {
+			clickEvt = new MouseEvent("click", {
+				view: window,
+				bubbles: true,
+				cancelable: true
+			});
+		}
+	};
+
+	self.open = function () {
+		if (self.isOpen || (self.altInput || self.input).disabled || self.config.inline) {
+			return;
+		} else if (!self.config.static) {
+			self.positionCalendar();
+		}
+
+		self.isOpen = true;
+
+		wrapperElement.classList.add("open");
+
+		if (!self.config.allowInput) {
+			(self.altInput || self.input).blur();
+			(self.config.noCalendar ? timeContainer : calendar).focus();
+		}
+
+		(self.altInput || self.input).classList.add("active");
+
+		if (self.config.onOpen) {
+			self.config.onOpen(self.selectedDateObj, self.input.value, self);
+		}
+	};
+
+	// For calendars inserted in BODY (as opposed to inline wrapper)
+	// it"s necessary to properly calculate top/left position.
+	self.positionCalendar = function () {
+		var calendarHeight = calendarContainer.offsetHeight,
+		    input = self.altInput || self.input,
+		    inputBounds = input.getBoundingClientRect(),
+		    distanceFromBottom = window.innerHeight - inputBounds.bottom + input.offsetHeight;
+
+		var top = void 0,
+		    left = window.pageXOffset + inputBounds.left;
+
+		if (distanceFromBottom < calendarHeight) {
+			top = window.pageYOffset - calendarHeight + inputBounds.top - 2;
+			calendarContainer.classList.remove("arrowTop");
+			calendarContainer.classList.add("arrowBottom");
+		} else {
+			top = window.pageYOffset + input.offsetHeight + inputBounds.top + 2;
+			calendarContainer.classList.remove("arrowBottom");
+			calendarContainer.classList.add("arrowTop");
+		}
+
+		wrapperElement.style.top = top + "px";
+		wrapperElement.style.left = left + "px";
+	};
+
+	self.toggle = function () {
+		if (self.isOpen) {
+			self.close();
+		} else {
+			self.open();
+		}
+	};
+
+	self.close = function () {
+		self.isOpen = false;
+		wrapperElement.classList.remove("open");
+		(self.altInput || self.input).classList.remove("active");
+
+		if (self.config.onClose) {
+			self.config.onClose(self.selectedDateObj, self.input.value, self);
+		}
+	};
+
+	self.clear = function () {
+		self.input.value = "";
+
+		if (self.altInput) {
+			self.altInput.value = "";
+		}
+
+		self.selectedDateObj = null;
+
+		triggerChange();
+		self.jumpToDate();
+	};
+
+	triggerChange = function triggerChange() {
+		self.input.dispatchEvent(clickEvt);
+
+		if (self.config.onChange) {
+			self.config.onChange(self.selectedDateObj, self.input.value, self);
+		}
+	};
+
+	self.destroy = function () {
+		document.removeEventListener("click", documentClick, false);
+
+		if (self.altInput) {
+			self.altInput.parentNode.removeChild(self.altInput);
+		}
+
+		if (self.config.inline) {
+			var parent = self.element.parentNode,
+			    removedElement = parent.removeChild(self.element);
+
+			parent.removeChild(calendarContainer);
+			parent.parentNode.replaceChild(removedElement, parent);
+		} else {
+			document.getElementsByTagName("body")[0].removeChild(wrapperElement);
+		}
+	};
+
+	self.redraw = function () {
+		if (self.config.noCalendar) {
+			return;
+		}
+
+		updateNavigationCurrentMonth();
+		buildDays();
+	};
+
+	self.jumpToDate = function (jumpDate) {
+		jumpDate = uDate(jumpDate || self.selectedDateObj || self.config.defaultDate || self.config.minDate || now);
+
+		self.currentYear = jumpDate.getFullYear();
+		self.currentMonth = jumpDate.getMonth();
+		self.redraw();
+	};
+
+	self.setDate = function (date, triggerChangeEvent) {
+		date = uDate(date);
+
+		if (date instanceof Date && date.getTime()) {
+			self.selectedDateObj = uDate(date);
+			self.jumpToDate(self.selectedDateObj);
+			updateValue();
+
+			if (triggerChangeEvent) {
+				triggerChange();
+			}
+		}
+	};
+
+	self.setTime = function (hour, minute, triggerChangeEvent) {
+		if (!self.selectedDateObj) {
+			return;
+		}
+
+		self.hourElement.value = parseInt(hour, 10) % 24;
+		self.minuteElement.value = parseInt(minute || 0, 10) % 60;
+
+		if (!self.config.time_24hr) {
+			self.amPM.innerHTML = hour > 11 ? "PM" : "AM";
+		}
+
+		updateValue();
+
+		if (triggerChangeEvent) {
+			triggerChange();
+		}
+	};
+
+	self.set = function (key, value) {
+		if (key in self.config) {
+			self.config[key] = value;
+			self.jumpToDate();
+		}
+	};
+
+	amPMToggle = function amPMToggle(e) {
+		e.preventDefault();
+		self.amPM.textContent = ["AM", "PM"][self.amPM.innerHTML === "AM" | 0];
+	};
+
+	onKeyDown = function onKeyDown(e) {
+		if (!self.isOpen || self.config.enableTime && timeContainer.contains(e.target)) {
+			return;
+		}
+
+		switch (e.which) {
+			case 13:
+				selectDate(e);
+				break;
+
+			case 27:
+				self.close();
+				break;
+
+			case 37:
+				changeMonth(-1);
+				break;
+
+			case 38:
+				e.preventDefault();
+				self.currentYear++;
+				self.redraw();
+				break;
+
+			case 39:
+				changeMonth(1);
+				break;
+
+			case 40:
+				e.preventDefault();
+				self.currentYear--;
+				self.redraw();
+				break;
+
+			default:
+				break;
+		}
+	};
+
+	onResize = debounce(function () {
+		if (self.isOpen && !self.config.inline && !self.config.static) {
+			self.positionCalendar();
+		}
+	}, 300);
+
+	try {
+		init();
+	} catch (error) {
+		// skip and carry on
+		console.error(error);
+		console.info(self.element);
+	}
+
+	return self;
+};
+
+flatpickr.init.prototype = {
+
+	defaultConfig: {},
+
+	l10n: {
+		weekdays: {
+			shorthand: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
+			longhand: ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
+		},
+		months: {
+			shorthand: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+			longhand: ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
+		},
+		daysInMonth: [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31],
+		firstDayOfWeek: 0,
+		ordinal: function ordinal(nth) {
+			var s = nth % 100;
+			if (s > 3 && s < 21) return "th";
+			switch (s % 10) {
+				case 1:
+					return "st";
+				case 2:
+					return "nd";
+				case 3:
+					return "rd";
+				default:
+					return "th";
+			}
+		},
+		weekAbbreviation: "Wk",
+		scrollTitle: "Scroll to increment",
+		toggleTitle: "Click to toggle"
+	}
+
+};
+
+Date.prototype.fp_incr = function (days) {
+	return new Date(this.getFullYear(), this.getMonth(), this.getDate() + parseInt(days, 10));
+};
+
+Date.prototype.fp_isUTC = false;
+Date.prototype.fp_toUTC = function () {
+	var newDate = new Date(this.getTime() + this.getTimezoneOffset() * 60000);
+	newDate.fp_isUTC = true;
+
+	return newDate;
+};
+
+Date.prototype.fp_getWeek = function () {
+	var date = new Date(this.getTime());
+	date.setHours(0, 0, 0, 0);
+
+	// Thursday in current week decides the year.
+	date.setDate(date.getDate() + 3 - (date.getDay() + 6) % 7);
+	// January 4 is always in week 1.
+	var week1 = new Date(date.getFullYear(), 0, 4);
+	// Adjust to Thursday in week 1 and count number of weeks from date to week1.
+	return 1 + Math.round(((date.getTime() - week1.getTime()) / 86400000 - 3 + (week1.getDay() + 6) % 7) / 7);
+};
+
+// classList polyfill
+if (!("classList" in document.documentElement) && Object.defineProperty && typeof HTMLElement !== "undefined") {
+	Object.defineProperty(HTMLElement.prototype, "classList", {
+		get: function get() {
+			var selfElements = this;
+			function update(fn) {
+				return function (value) {
+					var classes = selfElements.className.split(/\s+/);
+					var index = classes.indexOf(value);
+
+					fn(classes, index, value);
+					selfElements.className = classes.join(" ");
+				};
+			}
+
+			var ret = {
+				add: update(function (classes, index, value) {
+					return ~index || classes.push(value);
+				}),
+				remove: update(function (classes, index) {
+					return ~index && classes.splice(index, 1);
+				}),
+				toggle: update(function (classes, index, value) {
+					if (~index) {
+						classes.splice(index, 1);
+					} else {
+						classes.push(value);
+					}
+				}),
+				contains: function contains(value) {
+					return !! ~selfElements.className.split(/\s+/).indexOf(value);
+				}
+			};
+
+			return ret;
+		}
+	});
+}
+
+if (typeof module !== "undefined") {
+	module.exports = flatpickr;
+}
+},{}],3:[function(require,module,exports){
 // shim for using process in browser
 
 var process = module.exports = {};
@@ -394,7 +1728,7 @@ process.chdir = function (dir) {
 };
 process.umask = function() { return 0; };
 
-},{}],3:[function(require,module,exports){
+},{}],4:[function(require,module,exports){
 var autosize = require('autosize')
 
 exports.install = function(Vue) {
@@ -413,7 +1747,7 @@ exports.install = function(Vue) {
     }
   })
 }
-},{"autosize":1}],4:[function(require,module,exports){
+},{"autosize":1}],5:[function(require,module,exports){
 var Vue // late bind
 var map = Object.create(null)
 var shimmed = false
@@ -714,7 +2048,7 @@ function format (id) {
   return match ? match[0] : id
 }
 
-},{}],5:[function(require,module,exports){
+},{}],6:[function(require,module,exports){
 (function (process,global){
 /*!
  * Vue.js v1.0.26
@@ -10791,7 +12125,7 @@ setTimeout(function () {
 
 module.exports = Vue;
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"_process":2}],6:[function(require,module,exports){
+},{"_process":3}],7:[function(require,module,exports){
 'use strict';
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
@@ -10813,6 +12147,8 @@ var _Selection = require('./vue-components/Selection.js');
 var _Selection2 = _interopRequireDefault(_Selection);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+require('flatpickr');
 
 var VueAutosize = require('vue-autosize');
 Vue.use(VueAutosize);
@@ -10938,9 +12274,13 @@ $.getJSON('/api/items', function (fetchedData) {
 			doneData: null,
 			selection: selection,
 			addingNewUnder: null,
+			addingNewAsChild: false,
 			addingNewAsFirstChild: false,
 			editingItem: null,
-			timerItems: []
+			editingDoneDateItem: null,
+			timerItems: [],
+			loading: true,
+			patching: false
 		},
 		components: {
 			Card: _Card2.default,
@@ -11007,22 +12347,18 @@ $.getJSON('/api/items', function (fetchedData) {
 				var item = !id ? allItems.nodes[selection.selectedId] : allItems.nodes[id];
 				if (markAs == 'notDone') {
 					item.done = false;
-				} else if (markAs == 'done') {
+					allItems.prepareDonePatch(item.id);
+					return;
+				}
+				if (item.children.length && !allItems.allChildrenDone(item.id)) {
+					return;
+				}
+				if (markAs == 'done') {
 					item.done = true;
-				} else if (!(item.children.length && allItems.allChildrenDone(item.id) == false)) {
+				} else {
 					item.done = !item.done;
 				}
 				allItems.prepareDonePatch(item.id);
-			},
-			patchDone: function patchDone(id) {
-				var done_date = void 0;
-				var doneValue = allItems.nodes[id].done;
-				if (doneValue) {
-					done_date = moment().format();
-				} else {
-					done_date = '0000-00-00 00:00:00';
-				}
-				this.$http.patch('/api/items/' + id, { 'done': doneValue, 'done_date': done_date });
 			},
 			moveItem: function moveItem(direction) {
 				var id = selection.selectedId;
@@ -11092,26 +12428,29 @@ $.getJSON('/api/items', function (fetchedData) {
 				var id = selection.selectedId;
 				allItems.setDueDate(id);
 			},
-			patchDueDate: function patchDueDate(id, duedate) {
-				if (duedate == '0000-00-00 00:00:00') {
-					this.$http.patch('/api/items/' + id, { 'due_date': duedate });
+			showAddNewItem: function showAddNewItem(id, addAs) {
+				id = id ? id : selection.selectedId;
+				if (!id) {
 					return;
 				}
-				duedate = moment(duedate).format();
-				console.log('PatchDueDate: ' + duedate);
-				this.$http.patch('/api/items/' + id, { 'due_date': duedate });
-			},
-			showAddNewItem: function showAddNewItem(id) {
-				id = id ? id : selection.selectedId;
-				console.log('showAddNewItem for ' + id);
+				console.log('showAddNewItem for [' + allItems.nodes[id].body + ']');
 				this.addingNewUnder = id;
 				selection.lastSelectedId = id;
 				selection.selectedId = null;
-				setTimeout(function () {
-					$("#new-under-" + id + " textarea").focus();
-				}, 10);
+				if (addAs == 'child') {
+					this.addingNewAsFirstChild = true;
+					setTimeout(function () {
+						$("#new-firstchild-of-" + id + " textarea").focus();
+					}, 10);
+				} else {
+					this.addingNewAsFirstChild = false;
+					setTimeout(function () {
+						$("#new-under-" + id + " textarea").focus();
+					}, 10);
+				}
 			},
 			patch: function patch(id, arg) {
+				this.patching = true;
 				var patchObj = {};
 				var patchVal = allItems.nodes[id][arg];
 				if (arg == 'children_order') {
@@ -11120,6 +12459,32 @@ $.getJSON('/api/items', function (fetchedData) {
 				patchObj[arg] = patchVal;
 				this.$http.patch('/api/items/' + id, patchObj, { method: 'PATCH' }).then(function (response) {
 					console.log('patched item[' + id + '].' + arg + ' = ' + patchObj[arg] + ';');
+					this.patching = false;
+				});
+			},
+			patchDueDate: function patchDueDate(id, duedate) {
+				this.patching = true;
+				if (duedate == '0000-00-00 00:00:00') {
+					this.$http.patch('/api/items/' + id, { 'due_date': duedate });
+					return;
+				}
+				duedate = moment(duedate).format();
+				console.log('PatchDueDate: ' + duedate);
+				this.$http.patch('/api/items/' + id, { 'due_date': duedate }).then(function (response) {
+					this.patching = false;
+				});
+			},
+			patchDone: function patchDone(id) {
+				this.patching = true;
+				var done_date = void 0;
+				var doneValue = allItems.nodes[id].done;
+				if (doneValue) {
+					done_date = moment().format();
+				} else {
+					done_date = '0000-00-00 00:00:00';
+				}
+				this.$http.patch('/api/items/' + id, { 'done': doneValue, 'done_date': done_date }).then(function (response) {
+					this.patching = false;
 				});
 			},
 			clickDone: function clickDone() {
@@ -11194,11 +12559,11 @@ $.getJSON('/api/items', function (fetchedData) {
 				if (k == 'enter') {
 					this.showAddNewItem();
 				}
+				if (k == 'shift_enter') {
+					this.showAddNewItem(null, 'child');
+				}
 				if (k == 'meta_enter') {
 					this.$broadcast('startEdit');
-				}
-				if (k == 'shift_enter') {
-					this.showAddNewItem();
 				}
 				if (k == 't') {
 					this.setToday();
@@ -11283,9 +12648,6 @@ $.getJSON('/api/items', function (fetchedData) {
 								break;
 							}
 							break;
-						case 'xexx':
-							vm.keystroke('unindent');
-							break;
 					} // end switch
 				} // END INPUT AREAS NOT IN FOCUS
 			});
@@ -11299,7 +12661,7 @@ $.getJSON('/api/items', function (fetchedData) {
 	});
 }); // end ajax
 
-},{"./vue-components/Card.vue":7,"./vue-components/Journal.vue":8,"./vue-components/Selection.js":9,"./vue-components/dataTree.js":10,"vue-autosize":3}],7:[function(require,module,exports){
+},{"./vue-components/Card.vue":8,"./vue-components/Journal.vue":9,"./vue-components/Selection.js":10,"./vue-components/dataTree.js":11,"flatpickr":2,"vue-autosize":4}],8:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -11315,7 +12677,6 @@ exports.default = {
 	data: function data() {
 		return {
 			newItem: {
-				as: 'sibling',
 				body: '',
 				planned_time: 0,
 				parent_id: this.item.parent_id ? this.item.parent_id : allItems.root.id,
@@ -11324,6 +12685,10 @@ exports.default = {
 		};
 	},
 	computed: {
+		isProject: function isProject() {
+			console.log('checking isProject');
+			return allItems.isProject(this.item.id);
+		},
 		siblingIndex: function siblingIndex() {
 			return allItems.siblingIndex(this.item.id);
 		},
@@ -11391,9 +12756,29 @@ exports.default = {
 			selection.selectedId = item.id;
 		},
 		enterOnNew: function enterOnNew(e) {},
+		makeNewItemAChild: function makeNewItemAChild() {
+			var lastChild = allItems.getLastChildId(this.item.id);
+			if (lastChild) {
+				// If item already has children
+				console.log("Adding instead under: [" + allItems.nodes[lastChild].body + ']');
+				vm.$root.showAddNewItem(lastChild);
+			} else {
+				// If item has no children yet
+				this.$root.addingNewAsChild = true;
+				$("#new-under-" + this.item.id + " textarea").focus();
+			}
+		},
 		keydownOnNew: function keydownOnNew(e) {
-			// console.log('run keydownOnNew:');
-			// console.log(e);
+			// SHIFT-TAB on body
+			if (e.srcElement.name == 'body' && e.keyCode === 9 && e.shiftKey) {
+				e.preventDefault();
+				vm.$root.showAddNewItem(this.item.parent_id);
+			}
+			// TAB on planned_time
+			if (e.srcElement.name == 'planned_time' && e.keyCode === 9 && !e.shiftKey) {
+				e.preventDefault();
+				this.makeNewItemAChild();
+			}
 			// ENTER
 			if (e.keyCode === 13 && !e.shiftKey && !e.altKey) {
 				e.preventDefault();
@@ -11402,12 +12787,34 @@ exports.default = {
 				}
 				this.addNew();
 			}
-			// ArrowUp or ArrowDown or Esc
-			if (e.keyCode === 38 || e.keyCode === 40 || e.keyCode === 27) {
+			// ArrowLeft
+			if (e.keyCode === 37) {
+				// If in an EMPTY BODY
+				if (e.srcElement.name != 'body' || e.srcElement.name == 'body' && !this.newItem.body) {
+					e.preventDefault();
+					vm.$root.showAddNewItem(this.item.parent_id);
+				}
+			}
+			// ArrowRight
+			if (e.keyCode === 39) {
+				// If in an EMPTY BODY
+				if (e.srcElement.name != 'body' || e.srcElement.name == 'body' && !this.newItem.body) {
+					e.preventDefault();
+					this.makeNewItemAChild();
+				}
+			}
+			// ArrowUp or ArrowDown
+			if (e.keyCode === 38 || e.keyCode === 40) {
+				// If body is empty!
 				if (!this.newItem.body) {
 					e.preventDefault();
 					this.cancelAddNew();
 				}
+			}
+			// ESC
+			if (e.keyCode === 27) {
+				e.preventDefault();
+				this.cancelAddNew();
 			}
 		},
 		keydownOnEdit: function keydownOnEdit(e) {
@@ -11428,37 +12835,6 @@ exports.default = {
 			// Tab
 			if (e.keyCode === 9 && !e.shiftKey) {
 				e.preventDefault();
-				return;
-			}
-		},
-		tabOnFirstInputNew: function tabOnFirstInputNew(e) {
-			// Tab
-			if (e.keyCode === 9 && e.shiftKey) {
-				e.preventDefault();
-				if (this.newItem.depth == 1) {
-					return;
-				}
-				vm.$root.showAddNewItem(this.item.parent_id);
-				return;
-			}
-		},
-		tabOnLastInputNew: function tabOnLastInputNew(e) {
-			// Tab
-			if (e.keyCode === 9 && !e.shiftKey) {
-				e.preventDefault();
-				var lastChild = allItems.getLastChildId(this.item.id);
-				if (lastChild) {
-					console.log("tab -- parent's lastChild: " + lastChild);
-					vm.$root.showAddNewItem(lastChild);
-				} else {
-					if (this.newItem.as == 'child') {
-						return;
-					}
-					this.newItem.depth++;
-					this.newItem.parent_id = this.item.id;
-					this.newItem.as = 'child';
-					$("#new-under-" + this.item.id + " textarea").focus();
-				}
 				return;
 			}
 		},
@@ -11520,6 +12896,15 @@ exports.default = {
 			item.body = this.$root.beforeEditCache_body;
 			item.planned_time = this.$root.beforeEditCache_planned_time;
 		},
+		startEditDoneDate: function startEditDoneDate(item) {
+			console.log('startEditDoneDate');
+			item = item ? item : allItems.nodes[selection.selectedId];
+			console.log(item);
+			this.$root.beforeEditCache_done_date = item.done_date;
+			this.$root.editingDoneDateItem = item.id;
+
+			document.getElementById("done-date-edit-" + item.id).flatpickr();
+		},
 		deleteItem: function deleteItem(item) {
 			var id = item.id;
 			if (confirm("Do you really want to delete: " + item.body) == false) {
@@ -11530,11 +12915,17 @@ exports.default = {
 		},
 		addNew: function addNew() {
 			console.log('sending newItem:');
-			console.log(this.newItem);
-			this.$http.post('/api/items', this.newItem) //SEND
+			var newItem = this.newItem;
+			if (this.$root.addingNewAsChild) {
+				newItem.depth++;
+				newItem.parent_id = this.item.id;
+			}
+			console.log(newItem);
+			this.$http.post('/api/items', newItem) //SEND
 			.then(function (response) {
 				//response
 				this.newItem.body = '';
+				this.newItem.planned_time = '';
 				var storedItem = response.data;
 				console.log('starting dom update...');
 				var OlderSiblingIndex = this.siblingIndex;
@@ -11545,14 +12936,9 @@ exports.default = {
 		cancelAddNew: function cancelAddNew(lastSelectedId) {
 			this.newItem.body = '';
 			this.$root.addingNewUnder = null;
-			console.log('sid: ' + selection.selectedId);
 			selection.selectedId = selection.lastSelectedId;
-			console.log('sid: ' + selection.selectedId);
 			// Reset newItem to sibling stance.
-			this.newItem.as = 'sibling';
-			this.newItem.parent_id = this.item.parent_id ? this.item.parent_id : allItems.root.id;
-			this.newItem.depth = this.item.depth == 0 ? 1 : this.item.depth;
-
+			this.$root.addingNewAsChild = false;
 			$(':focus').blur();
 		}
 	},
@@ -11580,7 +12966,7 @@ exports.default = {
 	}
 };
 if (module.exports.__esModule) module.exports = module.exports.default
-;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\n\t<div class=\"items-card\" id=\"card-{{ item.id }}\">\n\t\t<div class=\"item-card\" v-if=\"item.depth != 0\" :class=\"{\n\t\t\t\tdone: item.done,\n\t\t\t\tshow_children: item.show_children,\n\t\t\t\tediting: item.id == this.$root.editingItem,\n\t\t\t}\">\n\t\t\t<div class=\"toggle-div\">\n\t\t\t\t<input class=\"toggle\" type=\"checkbox\" v-if=\"item.children_order.length==0 || item.done == true\" v-model=\"item.done\" @change=\"updateDone(item.id)\">\n\t\t\t\t<input type=\"checkbox\" class=\"styled-check\" id=\"show_children_{{item.id}}\" v-model=\"item.show_children\" @change=\"updateShowChildren(item.id)\">\n\t\t\t\t<label class=\"arrow\" for=\"show_children_{{item.id}}\" v-if=\"item.children_order.length>0\"></label>\n\n\t\t\t\t<!-- <input class=\"show_children_toggle\"\n\t\t\t\t\tid=\"show_children_{{item.id}}\"\n\t\t\t\t\ttype=\"checkbox\"\n\t\t\t\t\tv-if=\"item.children_order.length>0\"\n\t\t\t\t\tv-model=\"item.show_children\"\n\t\t\t\t\t@change=\"updateShowChildren(item.id)\"\n\t\t\t\t>\n\t\t\t\t<label class=\"show_children_svg\" \n\t\t\t\t\tfor=\"show_children_{{item.id}}\">\n\t\t\t\t\t//// This label is not yet used!\n\t\t\t\t</label> -->\n\t\t\t</div>\n\t\t\t<div class=\"body-div\" :class=\"{ selected: item.id == this.$root.selection.selectedId, }\" @dblclick=\"startEdit(item)\" @click=\"selectItem(item)\" @enter=\"console.log('yarrr')\">\n\t\t\t\t<span class=\"bodybox\" v-show=\"item.id != this.$root.editingItem\">{{ item.body }}</span>\n\t\t\t\t<!-- For debugging: -->\n\t\t\t\t<span v-show=\"false\"> ({{item.id}}) D-{{item.depth}}) [{{item.children_order}}]</span>\n\t\t\t\t\n\t\t\t\t<form action=\"update\" class=\"updatebox\" v-show=\"item.id == this.$root.editingItem\" @submit.prevent=\"doneEdit(item)\">\n\t\t\t\t\t<textarea name=\"item_body\" rows=\"{{ item.rows }}\" v-model=\"item.body\" v-autosize=\"item.body\" v-item-focus=\"item.id == this.$root.editingItem\" @blur=\"blurOnEdit(item)\" @keyup.esc=\"cancelEdit(item)\" @keydown.tab=\"tabOnFirstInput\" @keydown=\"keydownOnEdit\">{{ item.body }}</textarea>\n\t\t\t\t\t<span>\n\t\t\t\t\t\t<label for=\"planned_time\">duration:</label>\n\t\t\t\t\t\t<input name=\"planned_time\" type=\"number\" v-model=\"item.planned_time\" @blur=\"blurOnEdit(item)\" @keyup.esc=\"cancelEdit(item)\" @keydown.tab=\"tabOnLastInput\" @keydown=\"keydownOnEdit\">\n\t\t\t\t\t</span>\n\t\t\t\t</form>\n\t\t\t\t<div class=\"item-tags\" v-show=\"this.$root.editingItem != item.id\">\n\t\t\t\t\t<span v-if=\"item.done\" class=\"done\">\n\t\t\t\t\t\tDone {{ item.done_date | momentCalendar }}\n\t\t\t\t\t</span>\n\t\t\t\t\t\n\t\t\t\t\t<span v-if=\"(hasTotalUsedTime || hasTotalPlannedTime) &amp;&amp; !item.done\" class=\"total-duration\">\n\t\t\t\t\t\t<span>Total </span>\n\t\t\t\t\t\t<span v-if=\"hasTotalUsedTime\">used {{ item.totalUsedTime | hourminsec }}</span>\n\t\t\t\t\t\t<span v-if=\"(hasTotalUsedTime &amp;&amp; hasTotalPlannedTime)\">/</span>\n\t\t\t\t\t\t<span v-if=\"hasTotalPlannedTime\">\n\t\t\t\t\t\t\t{{ item.totalPlannedTime | hourmin }}\n\t\t\t\t\t\t</span>\n \t\t\t\t\t</span>\n\n\t\t\t\t\t<span v-if=\"(hasPlannedTime || hasUsedTime) &amp;&amp; !item.done\" class=\"duration\">\n\t\t\t\t\t\t<span v-if=\"hasUsedTime\">Used {{ item.used_time | hourminsec }}</span>\n\t\t\t\t\t\t<span v-if=\"(hasPlannedTime &amp;&amp; hasUsedTime)\">/</span>\n\t\t\t\t\t\t<span v-if=\"hasPlannedTime\">\n\t\t\t\t\t\t\t{{ item.planned_time | hourmin }}\n\t\t\t\t\t\t</span>\n\t\t\t\t\t</span>\n\t\t\t\t\t\t\n\t\t\t\t\t<span v-if=\"hasDueDate &amp;&amp; !item.done\" class=\"duedate\">\n\t\t\t\t\t\t{{ item.due_date | momentCalendar }}\n\t\t\t\t\t</span>\n\n\t\t\t\t\t<span v-if=\"item.dueDateParent &amp;&amp; !item.done\" class=\"duedate-parent\">\n\t\t\t\t\t\t{{ item.dueDateParent | momentCalendar }}\n\t\t\t\t\t</span>\n\n\t\t\t\t</div>\n\t\t\t\t<div class=\"item-nav\" v-if=\"this.$root.editingItem != item.id &amp;&amp; this.$root.selection.selectedId == item.id\">\n\t\t\t\t\t\n\t\t\t\t\t<button class=\"timer\" @click=\"addTimer(item)\"><i class=\"zmdi zmdi-timer\"></i>\n\t\t\t\t\t</button>\n\t\t\t\t\t<!--\n\t\t\t\t\t- font icon / woff format [font awesome]\n\t\t\t\t\t  material design iconic fonts\n\t\t\t\t\t- add svg as background to button\n\t\t\t\t\t- or image tag inside button\n\t\t\t\t\t- svg tag -> add as pattern\n\t\t\t\t\t-->\n\t\t\t\t\t<button class=\"delete\" v-if=\"item.children_order.length==0\" @click=\"deleteItem(item)\"><i class=\"zmdi zmdi-delete\"></i>\n\t\t\t\t\t</button>\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t</div>\n\n\t\t<form :class=\"['addnewbox-firstchild']\" id=\"new-firstchild-of-{{ item.id }}\" v-if=\"showAddNewBoxFirstChild\" @submit.prevent=\"\">\n\t\t\t<textarea type=\"text\" class=\"add-item\" name=\"body\" v-model=\"newItem.body\" v-autosize=\"newItem.body\" @blur=\"blurOnAddNew(item)\" @keydown.tab=\"tabOnFirstInputNew\" @keydown=\"keydownOnNew\" placeholder=\"...\" autocomplete=\"off\" autofocus=\"\" rows=\"1\"></textarea>\n\t\t\t<span>\n\t\t\t\t<label for=\"planned_time\">duration:</label>\n\t\t\t\t<input name=\"planned_time\" type=\"number\" v-model=\"newItem.planned_time\" @blur=\"blurOnAddNew(item)\" @keydown=\"keydownOnNew\">\n\t\t\t</span>\n\t\t</form>\n\n\n\t\t<div class=\"children\" v-if=\"item.children\" v-show=\"item.show_children\">\n\t\t\t<card v-for=\"childCard in item.children\" :item=\"childCard\"></card>\n\t\t</div>\n\n\t\t<form :class=\"['addnewbox', this.newItem.as]\" id=\"new-under-{{ item.id }}\" v-if=\"showAddNewBox\" @submit.prevent=\"\">\n\t\t\t<textarea type=\"text\" class=\"add-item\" name=\"body\" v-model=\"newItem.body\" v-autosize=\"newItem.body\" @blur=\"blurOnAddNew(item)\" @keydown.tab=\"tabOnFirstInputNew\" @keydown=\"keydownOnNew\" placeholder=\"...\" autocomplete=\"off\" autofocus=\"\" rows=\"1\"></textarea>\n\t\t\t<span>\n\t\t\t\t<label for=\"planned_time\">duration:</label>\n\t\t\t\t<input name=\"planned_time\" type=\"number\" v-model=\"newItem.planned_time\" @blur=\"blurOnAddNew(item)\" @keydown.tab=\"tabOnLastInputNew\" @keydown=\"keydownOnNew\">\n\t\t\t</span>\n\t\t</form>\n\t</div>\n"
+;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\n\t<div class=\"items-card\" id=\"card-{{ item.id }}\">\n\t\t<div v-if=\"item.depth != 0\" class=\"item-card\" :class=\"{\n\t\t\t\tdone: item.done,\n\t\t\t\tshow_children: item.show_children,\n\t\t\t\tediting: item.id == this.$root.editingItem,\n\t\t\t}\">\n\t\t\t<div class=\"toggle-div\">\n\t\t\t\t<input class=\"toggle\" type=\"checkbox\" v-if=\"item.children_order.length==0 || item.done == true\" v-model=\"item.done\" @change=\"updateDone(item.id)\">\n\t\t\t\t<input type=\"checkbox\" class=\"styled-check\" id=\"show_children_{{item.id}}\" v-model=\"item.show_children\" @change=\"updateShowChildren(item.id)\">\n\t\t\t\t<label class=\"arrow\" for=\"show_children_{{item.id}}\" v-if=\"item.children_order.length>0\"></label>\n\n\t\t\t\t<!-- <input class=\"show_children_toggle\"\n\t\t\t\t\tid=\"show_children_{{item.id}}\"\n\t\t\t\t\ttype=\"checkbox\"\n\t\t\t\t\tv-if=\"item.children_order.length>0\"\n\t\t\t\t\tv-model=\"item.show_children\"\n\t\t\t\t\t@change=\"updateShowChildren(item.id)\"\n\t\t\t\t>\n\t\t\t\t<label class=\"show_children_svg\" \n\t\t\t\t\tfor=\"show_children_{{item.id}}\">\n\t\t\t\t\t//// This label is not yet used!\n\t\t\t\t</label> -->\n\t\t\t</div>\n\t\t\t<div class=\"body-div\" :class=\"{ selected: item.id == this.$root.selection.selectedId, project: isProject}\" @dblclick=\"startEdit(item)\" @click=\"selectItem(item)\" @enter=\"console.log('yarrr')\">\n\t\t\t\t<span class=\"bodybox\" v-show=\"item.id != this.$root.editingItem\">{{ item.body }}</span>\n\t\t\t\t<!-- For debugging: -->\n\t\t\t\t<span v-show=\"false\"> ({{item.id}}) D-{{item.depth}}) [{{item.children_order}}]</span>\n\t\t\t\t\n\t\t\t\t<form action=\"update\" class=\"updatebox\" v-show=\"item.id == this.$root.editingItem\" @submit.prevent=\"doneEdit(item)\">\n\t\t\t\t\t<textarea name=\"item_body\" rows=\"{{ item.rows }}\" v-model=\"item.body\" v-autosize=\"item.body\" v-item-focus=\"item.id == this.$root.editingItem\" @blur=\"blurOnEdit(item)\" @keyup.esc=\"cancelEdit(item)\" @keydown.tab=\"tabOnFirstInput\" @keydown=\"keydownOnEdit\">{{ item.body }}</textarea>\n\t\t\t\t\t<span>\n\t\t\t\t\t\t<label for=\"planned_time\">duration:</label>\n\t\t\t\t\t\t<input name=\"planned_time\" type=\"number\" v-model=\"item.planned_time\" @blur=\"blurOnEdit(item)\" @keyup.esc=\"cancelEdit(item)\" @keydown.tab=\"tabOnLastInput\" @keydown=\"keydownOnEdit\">\n\t\t\t\t\t</span>\n\t\t\t\t</form>\n\t\t\t\t<div class=\"item-tags\" v-show=\"this.$root.editingItem != item.id\">\n\t\t\t\t\t<span class=\"done\" v-if=\"item.done\" @dblclick=\"startEditDoneDate(item)\">\n\t\t\t\t\t\tDone {{ item.done_date | momentCalendar }}\n\t\t\t\t\t</span>\n\t\t\t\t\t<span class=\"done\" v-if=\"item.id == this.$root.editingDoneDateItem\">\n\t\t\t\t\t\t<input class=\"flatpickr\" id=\"done-date-edit-{{ item.id }}\" data-date-format=\"d-m-Y\">\n\t\t\t\t\t</span>\n\t\t\t\t\t\n\t\t\t\t\t<span v-if=\"(hasTotalUsedTime || hasTotalPlannedTime) &amp;&amp; !item.done\" class=\"total-duration\">\n\t\t\t\t\t\t<span>Total </span>\n\t\t\t\t\t\t<span v-if=\"hasTotalUsedTime\">used {{ item.totalUsedTime | hourminsec }}</span>\n\t\t\t\t\t\t<span v-if=\"(hasTotalUsedTime &amp;&amp; hasTotalPlannedTime)\">/</span>\n\t\t\t\t\t\t<span v-if=\"hasTotalPlannedTime\">\n\t\t\t\t\t\t\t{{ item.totalPlannedTime | hourmin }}\n\t\t\t\t\t\t</span>\n \t\t\t\t\t</span>\n\n\t\t\t\t\t<span v-if=\"(hasPlannedTime || hasUsedTime) &amp;&amp; !item.done\" class=\"duration\">\n\t\t\t\t\t\t<span v-if=\"hasUsedTime\">Used {{ item.used_time | hourminsec }}</span>\n\t\t\t\t\t\t<span v-if=\"(hasPlannedTime &amp;&amp; hasUsedTime)\">/</span>\n\t\t\t\t\t\t<span v-if=\"hasPlannedTime\">\n\t\t\t\t\t\t\t{{ item.planned_time | hourmin }}\n\t\t\t\t\t\t</span>\n\t\t\t\t\t</span>\n\t\t\t\t\t\t\n\t\t\t\t\t<span v-if=\"hasDueDate &amp;&amp; !item.done\" class=\"duedate\">\n\t\t\t\t\t\t{{ item.due_date | momentCalendar }}\n\t\t\t\t\t</span>\n\n\t\t\t\t\t<span v-if=\"item.dueDateParent &amp;&amp; !item.done\" class=\"duedate-parent\">\n\t\t\t\t\t\t{{ item.dueDateParent | momentCalendar }}\n\t\t\t\t\t</span>\n\n\t\t\t\t</div>\n\t\t\t\t<div class=\"item-nav\" v-if=\"this.$root.editingItem != item.id &amp;&amp; this.$root.selection.selectedId == item.id\">\n\t\t\t\t\t\n\t\t\t\t\t<button class=\"timer\" @click=\"addTimer(item)\"><i class=\"zmdi zmdi-timer\"></i>\n\t\t\t\t\t</button>\n\t\t\t\t\t<!--\n\t\t\t\t\t- font icon / woff format [font awesome]\n\t\t\t\t\t  material design iconic fonts\n\t\t\t\t\t- add svg as background to button\n\t\t\t\t\t- or image tag inside button\n\t\t\t\t\t- svg tag -> add as pattern\n\t\t\t\t\t-->\n\t\t\t\t\t<button class=\"delete\" v-if=\"item.children_order.length==0\" @click=\"deleteItem(item)\"><i class=\"zmdi zmdi-delete\"></i>\n\t\t\t\t\t</button>\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t</div>\n\n\t\t<form :class=\"['addnewbox-firstchild', 'addnewbox', 'child']\" id=\"new-firstchild-of-{{ item.id }}\" v-if=\"showAddNewBoxFirstChild\" @submit.prevent=\"\">\n\t\t\t<textarea type=\"text\" class=\"add-item\" name=\"body\" v-model=\"newItem.body\" v-autosize=\"newItem.body\" @blur=\"blurOnAddNew(item)\" @keydown=\"keydownOnNew\" placeholder=\"...\" autocomplete=\"off\" autofocus=\"\" rows=\"1\"></textarea>\n\t\t\t<span>\n\t\t\t\t<label for=\"planned_time\">duration:</label>\n\t\t\t\t<input name=\"planned_time\" type=\"number\" v-model=\"newItem.planned_time\" @blur=\"blurOnAddNew(item)\" @keydown=\"keydownOnNew\">\n\t\t\t</span>\n\t\t</form>\n\n\n\t\t<div class=\"children\" v-if=\"item.children\" v-show=\"item.show_children\">\n\t\t\t<card v-for=\"childCard in item.children\" :item=\"childCard\"></card>\n\t\t</div>\n\n\t\t<form :class=\"{addnewbox: true, child: this.$root.addingNewAsChild}\" id=\"new-under-{{ item.id }}\" v-if=\"showAddNewBox\" @submit.prevent=\"\">\n\t\t\t<textarea type=\"text\" class=\"add-item\" name=\"body\" v-model=\"newItem.body\" v-autosize=\"newItem.body\" @blur=\"blurOnAddNew(item)\" @keydown=\"keydownOnNew\" placeholder=\"...\" autocomplete=\"off\" autofocus=\"\" rows=\"1\"></textarea>\n\t\t\t<span>\n\t\t\t\t<label for=\"planned_time\">duration:</label>\n\t\t\t\t<input name=\"planned_time\" type=\"number\" v-model=\"newItem.planned_time\" @blur=\"blurOnAddNew(item)\" @keydown=\"keydownOnNew\">\n\t\t\t</span>\n\t\t</form>\n\t</div>\n"
 if (module.hot) {(function () {  module.hot.accept()
   var hotAPI = require("vue-hot-reload-api")
   hotAPI.install(require("vue"), true)
@@ -11591,7 +12977,7 @@ if (module.hot) {(function () {  module.hot.accept()
     hotAPI.update("_v-036caa76", module.exports, (typeof module.exports === "function" ? module.exports.options : module.exports).template)
   }
 })()}
-},{"vue":5,"vue-hot-reload-api":4}],8:[function(require,module,exports){
+},{"vue":6,"vue-hot-reload-api":5}],9:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -11629,7 +13015,7 @@ if (module.hot) {(function () {  module.hot.accept()
     hotAPI.update("_v-a5850fdc", module.exports, (typeof module.exports === "function" ? module.exports.options : module.exports).template)
   }
 })()}
-},{"vue":5,"vue-hot-reload-api":4}],9:[function(require,module,exports){
+},{"vue":6,"vue-hot-reload-api":5}],10:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -11662,7 +13048,7 @@ var Selection = function () {
 
 exports.default = Selection;
 
-},{}],10:[function(require,module,exports){
+},{}],11:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -11694,13 +13080,20 @@ var Tree = function () {
 			// variables
 			var node = this.makeNode(item);
 			var parent = this.getNode(node.parent_id);
-			// assign
+			// assign extra item values
 			if (node.children_order) {
 				node.children_order = node.children_order.split(',').map(Number);
 			} else {
 				node.children_order = [];
 			}
 			node.children = [];
+			// assign total Time to nodes with no children:
+			if (!node.children.length) {
+				node['totalPlannedTime'] = !item.done && node.planned_time ? parseFloat(item.planned_time) : 0;
+				node['totalUsedTime'] = !item.done && node.used_time ? parseFloat(item.used_time) : 0;
+			}
+
+			// Register and organize nodes:
 			if (index === 0) {
 				this.root = node;
 			} else if (parent) {
@@ -11708,7 +13101,6 @@ var Tree = function () {
 			} else {
 				this.orphans.push(node);
 			}
-			// register node
 			this.nodes[node.id] = node;
 
 			//Sort all nodes after making sure you got all of them.
@@ -11717,7 +13109,7 @@ var Tree = function () {
 				$.each(this.nodes, function (index, node) {
 					this.sortChildren(node.id);
 					this.updateChildrenDueDate(node.id);
-					if (node.used_time || node.planned_time) {
+					if (!node.children.length && (node.used_time || node.planned_time)) {
 						this.calculateTotalTime(node.id);
 					}
 					window.allItemsBackup = this.root.children;
@@ -11746,17 +13138,24 @@ var Tree = function () {
 			if (!parent.children_order) {
 				parent.children_order = [];
 			}
+			//Actually ADD the item!
 			parent.children.splice(index, 0, item);
 			parent.children_order.splice(index, 0, item.id);
-			allItems.nodes[item.id] = item;
+			this.nodes[item.id] = item;
+
+			// Patches etc.
 			selection.selectedId = item.id;
 			vm.patch(item.parent_id, 'children_order');
+			this.autoCalculateDoneState(item.parent_id);
+			if (item.used_time || item.planned_time) {
+				this.calculateTotalTime(item.id);
+			}
+			// Don't show adding a new task dialogue when Duplicating!
 			var siblingId = this.olderSiblingId(item.id);
 			var siblingBody = this.nodes[siblingId].body;
 			if (siblingBody != item.body) {
 				vm.showAddNewItem(item.id);
 			}
-			this.calculateTotalTime(item.id);
 		}
 	}, {
 		key: 'arrayToString',
@@ -11928,7 +13327,6 @@ var Tree = function () {
 				prevParent.children = [];
 			}
 
-			// update children recursively
 			vm.patch(id, 'depth');
 			vm.patch(id, 'parent_id');
 			vm.patch(new_parent_id, 'children_order');
@@ -11958,6 +13356,15 @@ var Tree = function () {
 			}.bind(this));
 		}
 	}, {
+		key: 'isProject',
+		value: function isProject(id) {
+			if (this.nodes[id].body.slice(-1) == ':') {
+				return true;
+			} else {
+				return false;
+			}
+		}
+	}, {
 		key: 'deleteItem',
 		value: function deleteItem(id) {
 			var parent_id = allItems.nodes[id].parent_id;
@@ -11968,6 +13375,8 @@ var Tree = function () {
 			prevParent.children.splice(siblingIndex, 1);
 			prevParent.children_order.splice(siblingIndex, 1);
 			vm.patch(parent_id, 'children_order');
+			this.autoCalculateDoneState(parent_id);
+			this.calculateTotalTime(parent_id);
 		}
 	}, {
 		key: 'prepareDonePatch',
@@ -11983,11 +13392,9 @@ var Tree = function () {
 			if (this.nodes[id].depth == 0) {
 				return;
 			}
-			if (this.allChildrenDone(id) == true) {
-				// console.log('switch around done state of: '+this.nodes[id].body);
+			if (this.allChildrenDone(id) == true && !this.isProject(id)) {
 				vm.markDone(id, 'done');
 			} else {
-				// console.log('make '+this.nodes[id].body+' NOT Done!');
 				vm.markDone(id, 'notDone');
 			}
 		}
@@ -12003,35 +13410,39 @@ var Tree = function () {
 				return this.AplusB(a, prev);
 			}.bind(this), 0);
 			if (children.length == doneAmount) {
-				// console.log('all children done of '+allItems.nodes[id].body);
 				return true;
 			} else {
-				// console.log('NOT all children done of '+allItems.nodes[id].body);
 				return false;
 			}
 		}
 	}, {
 		key: 'calculateTotalTime',
 		value: function calculateTotalTime(id) {
-			var _this2 = this;
-
 			var item = this.nodes[id];
-			// console.log('item in calculateTotalTime ↓');
+			// console.log('item in calculateTotalTime ↓ ['+item.id+']'+item.body);
 			// console.log(id);
 			// console.log(item);
+			var totalPlannedTime = void 0;
+			var totalUsedTime = void 0;
 			if (!(Array.isArray(item.children) && item.children.length)) {
 				// if we don't have children, do nothing, leave the time as-is
-				item['totalPlannedTime'] = !item.done ? item.planned_time : 0;
-				item['totalUsedTime'] = !item.done ? item.used_time : 0;
+				totalPlannedTime = !item.done ? parseFloat(item.planned_time) : 0;
+				totalUsedTime = !item.done ? parseFloat(item.used_time) : 0;
 			} else {
 				// add up all the times of our direct children
-				item['totalPlannedTime'] = item.children.reduce(function (prev, next) {
-					return _this2.AplusB(prev, next.totalPlannedTime);
-				}, !item.done ? item.planned_time : 0);
-				item['totalUsedTime'] = item.children.reduce(function (prev, next) {
-					return _this2.AplusB(prev, next.totalUsedTime);
-				}, !item.done ? item.used_time : 0);
+				totalPlannedTime = item.children.reduce(function (prev, next) {
+					// return this.AplusB(prev, next.totalPlannedTime);
+					return prev + parseFloat(next.totalPlannedTime);
+				}, !item.done ? parseFloat(item.planned_time) : 0);
+				totalUsedTime = item.children.reduce(function (prev, next) {
+					// return this.AplusB(prev, next.totalUsedTime);
+					return prev + parseFloat(next.totalUsedTime);
+				}, !item.done ? parseFloat(item.used_time) : 0);
 			}
+			// console.log('totalPlannedTime = '+parseFloat(totalPlannedTime));
+			item['totalPlannedTime'] = parseFloat(totalPlannedTime);
+			// console.log('totalUsedTime = '+parseFloat(totalUsedTime));
+			item['totalUsedTime'] = parseFloat(totalUsedTime);
 			//call this on PARENT -> climb up the parent tree
 			if (item.parent_id) {
 				this.calculateTotalTime(item.parent_id);
@@ -12111,13 +13522,13 @@ var Tree = function () {
 		key: 'flushDoneItems',
 		value: function flushDoneItems() // Do not use yet. Not sure how to best implement this...
 		{
-			var _this3 = this;
+			var _this2 = this;
 
 			var nodes = this.nodes;
 			var keys = Object.keys(nodes);
 			var doneItemsObject = keys.reduce(function (prev, id) {
 				if (nodes[id].done) {
-					_this3.deleteItem(id);
+					_this2.deleteItem(id);
 				}
 			});
 		}
@@ -12211,11 +13622,11 @@ var Tree = function () {
 	}, {
 		key: 'getFilteredFlat',
 		value: function getFilteredFlat(keyword) {
-			var _this4 = this;
+			var _this3 = this;
 
 			if (keyword == 'done') {
 				var _ret = function () {
-					var nodes = _this4.nodes;
+					var nodes = _this3.nodes;
 					var keys = Object.keys(nodes);
 					var doneItemsObject = keys.reduce(function (prev, item) {
 						if (nodes[item].done) {
@@ -12293,12 +13704,12 @@ var Tree = function () {
 	}, {
 		key: 'getFiltered',
 		value: function getFiltered(keyword) {
-			var _this5 = this;
+			var _this4 = this;
 
 			if (keyword == 'done') {
 				var _ret2 = function () {
-					var firstItem = _this5.root.children;
-					var doneItemsObject = _this5.getDoneTasksRecursively(firstItem);
+					var firstItem = _this4.root.children;
+					var doneItemsObject = _this4.getDoneTasksRecursively(firstItem);
 					console.log(doneItemsObject);
 					return {
 						v: Object.keys(doneItemsObject).map(function (k) {
@@ -12320,6 +13731,6 @@ var Tree = function () {
 
 exports.default = Tree;
 
-},{}]},{},[6]);
+},{}]},{},[7]);
 
 //# sourceMappingURL=main.js.map
