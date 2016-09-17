@@ -64,6 +64,9 @@ export default class Tree {
 		if (!parent.children_order){
 			parent.children_order = [];
 		}
+		item.due_date = "0000-00-00 00:00:00";
+		item.done_date = "0000-00-00 00:00:00";
+		item.done = false;
 		//Actually ADD the item!
 		parent.children.splice(index, 0, item);
 		parent.children_order.splice(index, 0, item.id);

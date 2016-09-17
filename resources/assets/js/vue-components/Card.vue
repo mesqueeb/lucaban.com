@@ -43,7 +43,7 @@
 			</div>
 			<div class="body-div"
 				:class="{ selected: item.id == this.$root.selection.selectedId, project: isProject}"
-				@dblclick="startEdit(item)"
+				@dblclick="startEdit"
 				@click="selectItem(item)"
 				@enter="console.log('yarrr')"
 			>
@@ -415,9 +415,14 @@ export default {
 		updateShowChildren(id){
 			this.$root.patch(id,'show_children');
 		},
-		startEdit(item){
+		startEdit(e){
+        	e.preventDefault();
+			if (e.srcElement.className == 'done'){
+				return;
+			}
 			console.log('startEdit');
-			item = (item) ? item : allItems.nodes[selection.selectedId];
+			// let item = (item) ? item : allItems.nodes[selection.selectedId];
+			let item = allItems.nodes[selection.selectedId];
 			console.log(item);
 			this.$root.beforeEditCache_body = item.body;
 			this.$root.beforeEditCache_planned_time = item.planned_time;
@@ -446,7 +451,8 @@ export default {
 			item.body = this.$root.beforeEditCache_body;
 			item.planned_time = this.$root.beforeEditCache_planned_time;
 		},
-		startEditDoneDate(item){
+		startEditDoneDate(e){
+			console.log(e);
 			console.log('startEditDoneDate');
 			item = (item) ? item : allItems.nodes[selection.selectedId];
 			console.log(item);

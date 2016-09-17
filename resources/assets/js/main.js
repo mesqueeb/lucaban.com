@@ -1,4 +1,5 @@
-require('flatpickr');
+var flatpickr = require('flatpickr');
+window.Element.prototype.flatpickr = function(config){ return flatpickr(this,config)};
 
 var VueAutosize = require('vue-autosize');
 Vue.use(VueAutosize)
@@ -39,6 +40,12 @@ $( document ).ready(function() {
 	}, 2000);
 });
 
+// export default function(Vue){
+
+// }
+
+// import VueFilters from 
+// VueFilters(Vue);
 
 Vue.filter('M/D', {
   // model -> view
