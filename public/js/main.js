@@ -12189,23 +12189,35 @@ Vue.filter('M/D', {
 		return moment(val).format("M/D");
 	}
 });
-Vue.filter('hhmmss', {
+Vue.filter('countdown', {
 	read: function read(val) {
-		function pad(num) {
-			return ("0" + num).slice(-2);
-		}
-		var secs = void 0;
-		var minutes = Math.floor(val / 60);
-		secs = val % 60;
-		var hours = Math.floor(minutes / 60);
-		minutes = minutes % 60;
-		if (hours > 0) {
-			return pad(hours) + ":" + pad(minutes) + ":" + pad(secs);
-		} else {
-			return pad(minutes) + ":" + pad(secs);
-		}
+		var item = allItems.nodes[val];
+		var p = item.planned_time;
+		var u = item.used_time;
+		var time = parseFloat(p) * 60 - parseFloat(u);
+		return calc_hhmmss(time);
 	}
 });
+Vue.filter('hhmmss', {
+	read: function read(val) {
+		return calc_hhmmss(val);
+	}
+});
+function calc_hhmmss(val) {
+	function pad(num) {
+		return ("0" + num).slice(-2);
+	}
+	var secs = void 0;
+	var minutes = Math.floor(val / 60);
+	secs = val % 60;
+	var hours = Math.floor(minutes / 60);
+	minutes = minutes % 60;
+	if (hours > 0) {
+		return pad(hours) + ":" + pad(minutes) + ":" + pad(secs);
+	} else {
+		return pad(minutes) + ":" + pad(secs);
+	}
+}
 Vue.filter('hourminsec', {
 	read: function read(val) {
 		function pad(num, unit) {
@@ -12294,10 +12306,25 @@ $.getJSON('/api/items', function (fetchedData) {
 					$el.removeClass("btn--click");
 				}, 400);
 			},
+			addTimer: function addTimer(id) {
+				id = !id ? selection.selectedId : id;
+				var item = allItems.nodes[id];
+				var timerExists = this.timerItems.filter(function (item) {
+					return item.id === id;
+				})[0];
+				if (!timerExists) {
+					this.timerItems.push(item);
+					this.playTimer(item);
+				}
+			},
 			playTimer: function playTimer(item) {
 				this.btnEffect(item.id, 'play');
 				var update = function update() {
-					item.used_time = ++item.used_time;
+					if (item.planned_time > 0) {
+						item.used_time = ++item.used_time;
+					} else {
+						item.used_time = ++item.used_time;
+					}
 				};
 				window.timers = !window.timers ? {} : timers;
 				if (timers[item.id]) {
@@ -12312,6 +12339,10 @@ $.getJSON('/api/items', function (fetchedData) {
 				this.patch(item.id, 'used_time');
 				allItems.calculateTotalTime(item.id);
 			},
+			forwardTimer: function forwardTimer(item) {
+				this.btnEffect(item.id, 'forward');
+				item.used_time = item.used_time + 60;
+			},
 			resetTimer: function resetTimer(item) {
 				this.btnEffect(item.id, 'reset');
 				item.used_time = 0;
@@ -12322,8 +12353,12 @@ $.getJSON('/api/items', function (fetchedData) {
 				this.btnEffect(item.id, 'close');
 				clearInterval(window.timers[item.id]);
 				delete window.timers[item.id];
-				this.patch(item.id, 'used_time');
-				allItems.calculateTotalTime(item.id);
+				if (item.used_time < 5) {
+					item.used_time = 0;
+				} else {
+					this.patch(item.id, 'used_time');
+					allItems.calculateTotalTime(item.id);
+				}
 				document.getElementById('timer-' + item.id).className += ' fade-out';
 				setTimeout(function () {
 					this.timerItems.$remove(item);
@@ -12749,8 +12784,7 @@ exports.default = {
 	},
 	methods: {
 		addTimer: function addTimer(item) {
-			this.$root.timerItems.push(item);
-			this.$root.playTimer(item);
+			this.$root.addTimer(item.id);
 		},
 		selectItem: function selectItem(item) {
 			selection.selectedId = item.id;
@@ -12966,7 +13000,7 @@ exports.default = {
 	}
 };
 if (module.exports.__esModule) module.exports = module.exports.default
-;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\n\t<div class=\"items-card\" id=\"card-{{ item.id }}\">\n\t\t<div v-if=\"item.depth != 0\" class=\"item-card\" :class=\"{\n\t\t\t\tdone: item.done,\n\t\t\t\tshow_children: item.show_children,\n\t\t\t\tediting: item.id == this.$root.editingItem,\n\t\t\t}\">\n\t\t\t<div class=\"toggle-div\">\n\t\t\t\t<input class=\"toggle\" type=\"checkbox\" v-if=\"item.children_order.length==0 || item.done == true\" v-model=\"item.done\" @change=\"updateDone(item.id)\">\n\t\t\t\t<input type=\"checkbox\" class=\"styled-check\" id=\"show_children_{{item.id}}\" v-model=\"item.show_children\" @change=\"updateShowChildren(item.id)\">\n\t\t\t\t<label class=\"arrow\" for=\"show_children_{{item.id}}\" v-if=\"item.children_order.length>0\"></label>\n\n\t\t\t\t<!-- <input class=\"show_children_toggle\"\n\t\t\t\t\tid=\"show_children_{{item.id}}\"\n\t\t\t\t\ttype=\"checkbox\"\n\t\t\t\t\tv-if=\"item.children_order.length>0\"\n\t\t\t\t\tv-model=\"item.show_children\"\n\t\t\t\t\t@change=\"updateShowChildren(item.id)\"\n\t\t\t\t>\n\t\t\t\t<label class=\"show_children_svg\" \n\t\t\t\t\tfor=\"show_children_{{item.id}}\">\n\t\t\t\t\t//// This label is not yet used!\n\t\t\t\t</label> -->\n\t\t\t</div>\n\t\t\t<div class=\"body-div\" :class=\"{ selected: item.id == this.$root.selection.selectedId, project: isProject}\" @dblclick=\"startEdit(item)\" @click=\"selectItem(item)\" @enter=\"console.log('yarrr')\">\n\t\t\t\t<span class=\"bodybox\" v-show=\"item.id != this.$root.editingItem\">{{ item.body }}</span>\n\t\t\t\t<!-- For debugging: -->\n\t\t\t\t<span v-show=\"false\"> ({{item.id}}) D-{{item.depth}}) [{{item.children_order}}]</span>\n\t\t\t\t\n\t\t\t\t<form action=\"update\" class=\"updatebox\" v-show=\"item.id == this.$root.editingItem\" @submit.prevent=\"doneEdit(item)\">\n\t\t\t\t\t<textarea name=\"item_body\" rows=\"{{ item.rows }}\" v-model=\"item.body\" v-autosize=\"item.body\" v-item-focus=\"item.id == this.$root.editingItem\" @blur=\"blurOnEdit(item)\" @keyup.esc=\"cancelEdit(item)\" @keydown.tab=\"tabOnFirstInput\" @keydown=\"keydownOnEdit\">{{ item.body }}</textarea>\n\t\t\t\t\t<span>\n\t\t\t\t\t\t<label for=\"planned_time\">duration:</label>\n\t\t\t\t\t\t<input name=\"planned_time\" type=\"number\" v-model=\"item.planned_time\" @blur=\"blurOnEdit(item)\" @keyup.esc=\"cancelEdit(item)\" @keydown.tab=\"tabOnLastInput\" @keydown=\"keydownOnEdit\">\n\t\t\t\t\t</span>\n\t\t\t\t</form>\n\t\t\t\t<div class=\"item-tags\" v-show=\"this.$root.editingItem != item.id\">\n\t\t\t\t\t<span class=\"done\" v-if=\"item.done\" @dblclick=\"startEditDoneDate(item)\">\n\t\t\t\t\t\tDone {{ item.done_date | momentCalendar }}\n\t\t\t\t\t</span>\n\t\t\t\t\t<span class=\"done\" v-if=\"item.id == this.$root.editingDoneDateItem\">\n\t\t\t\t\t\t<input class=\"flatpickr\" id=\"done-date-edit-{{ item.id }}\" data-date-format=\"d-m-Y\">\n\t\t\t\t\t</span>\n\t\t\t\t\t\n\t\t\t\t\t<span v-if=\"(hasTotalUsedTime || hasTotalPlannedTime) &amp;&amp; !item.done\" class=\"total-duration\">\n\t\t\t\t\t\t<span>Total </span>\n\t\t\t\t\t\t<span v-if=\"hasTotalUsedTime\">used {{ item.totalUsedTime | hourminsec }}</span>\n\t\t\t\t\t\t<span v-if=\"(hasTotalUsedTime &amp;&amp; hasTotalPlannedTime)\">/</span>\n\t\t\t\t\t\t<span v-if=\"hasTotalPlannedTime\">\n\t\t\t\t\t\t\t{{ item.totalPlannedTime | hourmin }}\n\t\t\t\t\t\t</span>\n \t\t\t\t\t</span>\n\n\t\t\t\t\t<span v-if=\"(hasPlannedTime || hasUsedTime) &amp;&amp; !item.done\" class=\"duration\">\n\t\t\t\t\t\t<span v-if=\"hasUsedTime\">Used {{ item.used_time | hourminsec }}</span>\n\t\t\t\t\t\t<span v-if=\"(hasPlannedTime &amp;&amp; hasUsedTime)\">/</span>\n\t\t\t\t\t\t<span v-if=\"hasPlannedTime\">\n\t\t\t\t\t\t\t{{ item.planned_time | hourmin }}\n\t\t\t\t\t\t</span>\n\t\t\t\t\t</span>\n\t\t\t\t\t\t\n\t\t\t\t\t<span v-if=\"hasDueDate &amp;&amp; !item.done\" class=\"duedate\">\n\t\t\t\t\t\t{{ item.due_date | momentCalendar }}\n\t\t\t\t\t</span>\n\n\t\t\t\t\t<span v-if=\"item.dueDateParent &amp;&amp; !item.done\" class=\"duedate-parent\">\n\t\t\t\t\t\t{{ item.dueDateParent | momentCalendar }}\n\t\t\t\t\t</span>\n\n\t\t\t\t</div>\n\t\t\t\t<div class=\"item-nav\" v-if=\"this.$root.editingItem != item.id &amp;&amp; this.$root.selection.selectedId == item.id\">\n\t\t\t\t\t\n\t\t\t\t\t<button class=\"timer\" @click=\"addTimer(item)\"><i class=\"zmdi zmdi-timer\"></i>\n\t\t\t\t\t</button>\n\t\t\t\t\t<!--\n\t\t\t\t\t- font icon / woff format [font awesome]\n\t\t\t\t\t  material design iconic fonts\n\t\t\t\t\t- add svg as background to button\n\t\t\t\t\t- or image tag inside button\n\t\t\t\t\t- svg tag -> add as pattern\n\t\t\t\t\t-->\n\t\t\t\t\t<button class=\"delete\" v-if=\"item.children_order.length==0\" @click=\"deleteItem(item)\"><i class=\"zmdi zmdi-delete\"></i>\n\t\t\t\t\t</button>\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t</div>\n\n\t\t<form :class=\"['addnewbox-firstchild', 'addnewbox', 'child']\" id=\"new-firstchild-of-{{ item.id }}\" v-if=\"showAddNewBoxFirstChild\" @submit.prevent=\"\">\n\t\t\t<textarea type=\"text\" class=\"add-item\" name=\"body\" v-model=\"newItem.body\" v-autosize=\"newItem.body\" @blur=\"blurOnAddNew(item)\" @keydown=\"keydownOnNew\" placeholder=\"...\" autocomplete=\"off\" autofocus=\"\" rows=\"1\"></textarea>\n\t\t\t<span>\n\t\t\t\t<label for=\"planned_time\">duration:</label>\n\t\t\t\t<input name=\"planned_time\" type=\"number\" v-model=\"newItem.planned_time\" @blur=\"blurOnAddNew(item)\" @keydown=\"keydownOnNew\">\n\t\t\t</span>\n\t\t</form>\n\n\n\t\t<div class=\"children\" v-if=\"item.children\" v-show=\"item.show_children\">\n\t\t\t<card v-for=\"childCard in item.children\" :item=\"childCard\"></card>\n\t\t</div>\n\n\t\t<form :class=\"{addnewbox: true, child: this.$root.addingNewAsChild}\" id=\"new-under-{{ item.id }}\" v-if=\"showAddNewBox\" @submit.prevent=\"\">\n\t\t\t<textarea type=\"text\" class=\"add-item\" name=\"body\" v-model=\"newItem.body\" v-autosize=\"newItem.body\" @blur=\"blurOnAddNew(item)\" @keydown=\"keydownOnNew\" placeholder=\"...\" autocomplete=\"off\" autofocus=\"\" rows=\"1\"></textarea>\n\t\t\t<span>\n\t\t\t\t<label for=\"planned_time\">duration:</label>\n\t\t\t\t<input name=\"planned_time\" type=\"number\" v-model=\"newItem.planned_time\" @blur=\"blurOnAddNew(item)\" @keydown=\"keydownOnNew\">\n\t\t\t</span>\n\t\t</form>\n\t</div>\n"
+;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\n\t<div class=\"items-card\" id=\"card-{{ item.id }}\">\n\t\t<div v-if=\"item.depth != 0\" class=\"item-card\" :class=\"{\n\t\t\t\tdone: item.done,\n\t\t\t\tshow_children: item.show_children,\n\t\t\t\tediting: item.id == this.$root.editingItem,\n\t\t\t}\">\n\t\t\t<div class=\"toggle-div\">\n\t\t\t\t<input class=\"toggle\" type=\"checkbox\" v-if=\"item.children_order.length==0 || item.done == true\" v-model=\"item.done\" @change=\"updateDone(item.id)\">\n\t\t\t\t<input type=\"checkbox\" class=\"styled-check\" id=\"show_children_{{item.id}}\" v-model=\"item.show_children\" @change=\"updateShowChildren(item.id)\">\n\t\t\t\t<label class=\"arrow\" for=\"show_children_{{item.id}}\" v-if=\"item.children_order.length>0\"></label>\n\n\t\t\t\t<!-- <input class=\"show_children_toggle\"\n\t\t\t\t\tid=\"show_children_{{item.id}}\"\n\t\t\t\t\ttype=\"checkbox\"\n\t\t\t\t\tv-if=\"item.children_order.length>0\"\n\t\t\t\t\tv-model=\"item.show_children\"\n\t\t\t\t\t@change=\"updateShowChildren(item.id)\"\n\t\t\t\t>\n\t\t\t\t<label class=\"show_children_svg\" \n\t\t\t\t\tfor=\"show_children_{{item.id}}\">\n\t\t\t\t\t//// This label is not yet used!\n\t\t\t\t</label> -->\n\t\t\t</div>\n\t\t\t<div class=\"body-div\" :class=\"{ selected: item.id == this.$root.selection.selectedId, project: isProject}\" @dblclick=\"startEdit(item)\" @click=\"selectItem(item)\" @enter=\"console.log('yarrr')\">\n\t\t\t\t<span class=\"bodybox\" v-show=\"item.id != this.$root.editingItem\">{{ item.body }}</span>\n\t\t\t\t<!-- For debugging: -->\n\t\t\t\t<span v-show=\"false\"> ({{item.id}}) D-{{item.depth}}) [{{item.children_order}}]</span>\n\t\t\t\t\n\t\t\t\t<form action=\"update\" class=\"updatebox\" v-show=\"item.id == this.$root.editingItem\" @submit.prevent=\"doneEdit(item)\">\n\t\t\t\t\t<textarea name=\"item_body\" rows=\"{{ item.rows }}\" v-model=\"item.body\" v-autosize=\"item.body\" v-item-focus=\"item.id == this.$root.editingItem\" @blur=\"blurOnEdit(item)\" @keyup.esc=\"cancelEdit(item)\" @keydown.tab=\"tabOnFirstInput\" @keydown=\"keydownOnEdit\">{{ item.body }}</textarea>\n\t\t\t\t\t<span>\n\t\t\t\t\t\t<label for=\"planned_time\">duration:</label>\n\t\t\t\t\t\t<input name=\"planned_time\" type=\"number\" v-model=\"item.planned_time\" @blur=\"blurOnEdit(item)\" @keyup.esc=\"cancelEdit(item)\" @keydown.tab=\"tabOnLastInput\" @keydown=\"keydownOnEdit\">\n\t\t\t\t\t</span>\n\t\t\t\t</form>\n\t\t\t\t<div class=\"item-tags\" v-show=\"this.$root.editingItem != item.id\">\n\t\t\t\t\t<span class=\"done\" v-if=\"item.done &amp;&amp; item.id != this.$root.editingDoneDateItem\" @dblclick=\"startEditDoneDate(item)\">\n\t\t\t\t\t\tDone {{ item.done_date | momentCalendar }}\n\t\t\t\t\t</span>\n\t\t\t\t\t<span class=\"done\" v-if=\"item.id == this.$root.editingDoneDateItem\">\n\t\t\t\t\t\t<input class=\"flatpickr\" id=\"done-date-edit-{{ item.id }}\" data-date-format=\"d-m-Y\" v-model=\"item.done_date\">\n\t\t\t\t\t</span>\n\t\t\t\t\t\n\t\t\t\t\t<span v-if=\"(hasTotalUsedTime || hasTotalPlannedTime) &amp;&amp; !item.done\" class=\"total-duration\">\n\t\t\t\t\t\t<span>Total </span>\n\t\t\t\t\t\t<span v-if=\"hasTotalUsedTime\">used {{ item.totalUsedTime | hourminsec }}</span>\n\t\t\t\t\t\t<span v-if=\"(hasTotalUsedTime &amp;&amp; hasTotalPlannedTime)\">/</span>\n\t\t\t\t\t\t<span v-if=\"hasTotalPlannedTime\">\n\t\t\t\t\t\t\t{{ item.totalPlannedTime | hourmin }}\n\t\t\t\t\t\t</span>\n \t\t\t\t\t</span>\n\n\t\t\t\t\t<span v-if=\"(hasPlannedTime || hasUsedTime) &amp;&amp; !item.done\" class=\"duration\">\n\t\t\t\t\t\t<span v-if=\"hasUsedTime\">Used {{ item.used_time | hourminsec }}</span>\n\t\t\t\t\t\t<span v-if=\"(hasPlannedTime &amp;&amp; hasUsedTime)\">/</span>\n\t\t\t\t\t\t<span v-if=\"hasPlannedTime\">\n\t\t\t\t\t\t\t{{ item.planned_time | hourmin }}\n\t\t\t\t\t\t</span>\n\t\t\t\t\t</span>\n\t\t\t\t\t\t\n\t\t\t\t\t<span v-if=\"hasDueDate &amp;&amp; !item.done\" class=\"duedate\">\n\t\t\t\t\t\t{{ item.due_date | momentCalendar }}\n\t\t\t\t\t</span>\n\n\t\t\t\t\t<span v-if=\"item.dueDateParent &amp;&amp; !item.done\" class=\"duedate-parent\">\n\t\t\t\t\t\t{{ item.dueDateParent | momentCalendar }}\n\t\t\t\t\t</span>\n\n\t\t\t\t</div>\n\t\t\t\t<div class=\"item-nav\" v-if=\"this.$root.editingItem != item.id &amp;&amp; this.$root.selection.selectedId == item.id\">\n\t\t\t\t\t\n\t\t\t\t\t<button class=\"timer\" @click=\"addTimer(item)\"><i class=\"zmdi zmdi-timer\"></i>\n\t\t\t\t\t</button>\n\t\t\t\t\t<!--\n\t\t\t\t\t- font icon / woff format [font awesome]\n\t\t\t\t\t  material design iconic fonts\n\t\t\t\t\t- add svg as background to button\n\t\t\t\t\t- or image tag inside button\n\t\t\t\t\t- svg tag -> add as pattern\n\t\t\t\t\t-->\n\t\t\t\t\t<button class=\"delete\" v-if=\"item.children_order.length==0\" @click=\"deleteItem(item)\"><i class=\"zmdi zmdi-delete\"></i>\n\t\t\t\t\t</button>\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t</div>\n\n\t\t<form :class=\"['addnewbox-firstchild', 'addnewbox', 'child']\" id=\"new-firstchild-of-{{ item.id }}\" v-if=\"showAddNewBoxFirstChild\" @submit.prevent=\"\">\n\t\t\t<textarea type=\"text\" class=\"add-item\" name=\"body\" v-model=\"newItem.body\" v-autosize=\"newItem.body\" @blur=\"blurOnAddNew(item)\" @keydown=\"keydownOnNew\" placeholder=\"...\" autocomplete=\"off\" autofocus=\"\" rows=\"1\"></textarea>\n\t\t\t<span>\n\t\t\t\t<label for=\"planned_time\">duration:</label>\n\t\t\t\t<input name=\"planned_time\" type=\"number\" v-model=\"newItem.planned_time\" @blur=\"blurOnAddNew(item)\" @keydown=\"keydownOnNew\">\n\t\t\t</span>\n\t\t</form>\n\n\n\t\t<div class=\"children\" v-if=\"item.children\" v-show=\"item.show_children\">\n\t\t\t<card v-for=\"childCard in item.children\" :item=\"childCard\"></card>\n\t\t</div>\n\n\t\t<form :class=\"{addnewbox: true, child: this.$root.addingNewAsChild}\" id=\"new-under-{{ item.id }}\" v-if=\"showAddNewBox\" @submit.prevent=\"\">\n\t\t\t<textarea type=\"text\" class=\"add-item\" name=\"body\" v-model=\"newItem.body\" v-autosize=\"newItem.body\" @blur=\"blurOnAddNew(item)\" @keydown=\"keydownOnNew\" placeholder=\"...\" autocomplete=\"off\" autofocus=\"\" rows=\"1\"></textarea>\n\t\t\t<span>\n\t\t\t\t<label for=\"planned_time\">duration:</label>\n\t\t\t\t<input name=\"planned_time\" type=\"number\" v-model=\"newItem.planned_time\" @blur=\"blurOnAddNew(item)\" @keydown=\"keydownOnNew\">\n\t\t\t</span>\n\t\t</form>\n\t</div>\n"
 if (module.hot) {(function () {  module.hot.accept()
   var hotAPI = require("vue-hot-reload-api")
   hotAPI.install(require("vue"), true)

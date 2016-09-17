@@ -84,7 +84,7 @@
 					v-show="this.$root.editingItem != item.id"
 				>
 					<span class="done"
-						v-if="item.done"
+						v-if="item.done && item.id != this.$root.editingDoneDateItem"
 						@dblclick="startEditDoneDate(item)"
 					>
 						Done {{ item.done_date | momentCalendar }}
@@ -95,6 +95,7 @@
 						<input class="flatpickr"
 							id="done-date-edit-{{ item.id }}"
 							data-date-format="d-m-Y"
+							v-model="item.done_date"
 						>
 					</span>
 					
@@ -300,8 +301,7 @@ export default {
 	},
 	methods: {
 		addTimer(item){
-			this.$root.timerItems.push(item);
-			this.$root.playTimer(item);
+			this.$root.addTimer(item.id);
 		},
 		selectItem(item){
 			selection.selectedId = item.id;

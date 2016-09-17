@@ -53,23 +53,35 @@ Vue.filter('M/D', {
   //   return isNaN(number) ? 0 : parseFloat(number.toFixed(2))
   // }
 });
-Vue.filter('hhmmss', {
+Vue.filter('countdown', {
 	read: function(val) {
-		function pad(num){
-		    return ("0"+num).slice(-2);
-		}
-		let secs;
-		let minutes = Math.floor(val/60);
-		secs = val%60;
-		let hours = Math.floor(minutes/60)
-		minutes = minutes%60;
-		if (hours>0){
-			return pad(hours)+":"+pad(minutes)+":"+pad(secs);
-		} else {
-			return pad(minutes)+":"+pad(secs);
-		}
+		let item = allItems.nodes[val];
+		let p = item.planned_time;
+		let u = item.used_time;
+		let time = parseFloat(p)*60-parseFloat(u);
+		return calc_hhmmss(time);
 	},
 });
+Vue.filter('hhmmss', {
+	read: function(val) {
+		return calc_hhmmss(val);
+	},
+});
+function calc_hhmmss(val){	
+	function pad(num){
+	    return ("0"+num).slice(-2);
+	}
+	let secs;
+	let minutes = Math.floor(val/60);
+	secs = val%60;
+	let hours = Math.floor(minutes/60)
+	minutes = minutes%60;
+	if (hours>0){
+		return pad(hours)+":"+pad(minutes)+":"+pad(secs);
+	} else {
+		return pad(minutes)+":"+pad(secs);
+	}
+}
 Vue.filter('hourminsec', {
 	read: function(val) {
 		function pad(num, unit){
@@ -158,10 +170,24 @@ window.vm = new Vue({
 				$el.removeClass("btn--click");
 			}, 400);
 		},
+		addTimer(id){
+			id = (!id) ? selection.selectedId : id ;
+			let item = allItems.nodes[id];
+			let timerExists = this.timerItems.filter(function (item) { return item.id === id; })[0];
+			if (!timerExists){
+				this.timerItems.push(item);
+				this.playTimer(item);
+			}
+		},
 		playTimer(item){
 			this.btnEffect(item.id, 'play');
 			let update = function(){
-				item.used_time = ++item.used_time;
+				if(item.planned_time>0){
+					item.used_time = ++item.used_time;
+				} else {
+					item.used_time = ++item.used_time;
+				}
+
 			}
 			window.timers = (!window.timers) ? {} : timers;
 			if(timers[item.id]){ return; }
@@ -174,6 +200,10 @@ window.vm = new Vue({
 			this.patch(item.id, 'used_time');
 			allItems.calculateTotalTime(item.id);
 		},
+		forwardTimer(item){
+			this.btnEffect(item.id, 'forward');
+			item.used_time = item.used_time+60;
+		},
 		resetTimer(item){
 			this.btnEffect(item.id, 'reset');
 			item.used_time = 0;
@@ -184,8 +214,12 @@ window.vm = new Vue({
 			this.btnEffect(item.id, 'close');
 			clearInterval(window.timers[item.id]);
 			delete window.timers[item.id];
-			this.patch(item.id, 'used_time');
-			allItems.calculateTotalTime(item.id);
+			if(item.used_time < 5){
+				item.used_time = 0;
+			} else {
+				this.patch(item.id, 'used_time');
+				allItems.calculateTotalTime(item.id);
+			}
 			document.getElementById('timer-'+item.id).className += ' fade-out';
 			setTimeout(function(){ this.timerItems.$remove(item) }.bind(this),1000);
 		},

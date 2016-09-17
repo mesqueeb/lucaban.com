@@ -33,7 +33,12 @@
 
 				</div>
 				<span class="body">@{{ item.body }}</span>
-				<span class="timer-time">@{{ item.used_time | hhmmss }}</span>
+				<span v-if="!item.planned_time"
+					class="timer-time" 
+				>@{{ item.used_time | hhmmss }}</span>
+				<span v-if="item.planned_time"
+					class="timer-time countdown"
+				>@{{ item.id | countdown }}</span>
 				<span class="nav">
 					<button class="play btn btn-dipclick"
 						@click="playTimer(item)"
@@ -42,6 +47,10 @@
 					<button class="pause btn btn-dipclick"
 						@click="pauseTimer(item)"
 					><i class="zmdi zmdi-pause"></i>
+					</button>
+					<button class="forward btn btn-dipclick"
+						@click="forwardTimer(item)"
+					><i class="zmdi zmdi-forward-10"></i>
 					</button>
 					<button class="reset btn btn-dipclick"
 						@click="resetTimer(item)"
