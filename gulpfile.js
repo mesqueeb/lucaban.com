@@ -17,9 +17,6 @@ elixir(function(mix) {
     mix.copy('node_modules/material-design-iconic-font/dist/fonts', 'public/css/fonts');
     var NPM = '../../../node_modules/';
 	mix.scripts([
-		NPM+'vue/dist/vue.js',
-		NPM+'vue-resource/dist/vue-resource.js',
-		NPM+'jquery/dist/jquery.min.js',
 		NPM+'countdown/countdown.js',
 		NPM+'moment/min/moment-with-locales.min.js',
 		NPM+'moment-countdown/dist/moment-countdown.min.js',

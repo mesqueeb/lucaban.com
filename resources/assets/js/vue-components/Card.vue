@@ -41,15 +41,17 @@
 					//// This label is not yet used!
 				</label> -->
 			</div>
-			<div class="body-div"
+			<div class="body-div textarea-wrap"
 				:class="{ selected: item.id == this.$root.selection.selectedId, project: isProject}"
-				@dblclick="startEdit"
+				@dblclick="startEdit(item, $event)"
 				@click="selectItem(item)"
 				@enter="console.log('yarrr')"
 			>
-				<span class="bodybox"
+				<div class="bodybox"
 					v-show="item.id != this.$root.editingItem"
-				>{{ item.body }}</span>
+				>{{ item.body }}</div>
+				<!-- <div class="hidden-sizer">{{item.body + "|"}}</div> -->
+				
 				<!-- For debugging: -->
 				<span v-show="false"> ({{item.id}}) D-{{item.depth}}) [{{item.children_order}}]</span>
 				
@@ -83,21 +85,16 @@
 				<div class="item-tags"
 					v-show="this.$root.editingItem != item.id"
 				>
-					<span class="done"
+					<label class="done"
 						v-if="item.done && item.id != this.$root.editingDoneDateItem"
-						@dblclick="startEditDoneDate(item)"
+						
 					>
 						Done {{ item.done_date | momentCalendar }}
-					</span>
-					<span class="done"
-						v-if="item.id == this.$root.editingDoneDateItem"
-					>
 						<input class="flatpickr"
 							id="done-date-edit-{{ item.id }}"
-							data-date-format="d-m-Y"
 							v-model="item.done_date"
 						>
-					</span>
+					</label>
 					
 					<span v-if="(hasTotalUsedTime || hasTotalPlannedTime) && !item.done" class="total-duration">
 						<span>Total </span>
@@ -415,15 +412,12 @@ export default {
 		updateShowChildren(id){
 			this.$root.patch(id,'show_children');
 		},
-		startEdit(e){
-        	e.preventDefault();
-			if (e.srcElement.className == 'done'){
+		startEdit(item, event){
+			if (event && event.srcElement.hasClass('done')){
 				return;
 			}
 			console.log('startEdit');
-			// let item = (item) ? item : allItems.nodes[selection.selectedId];
-			let item = allItems.nodes[selection.selectedId];
-			console.log(item);
+			item = (item) ? item : allItems.nodes[selection.selectedId];
 			this.$root.beforeEditCache_body = item.body;
 			this.$root.beforeEditCache_planned_time = item.planned_time;
 			this.$root.editingItem = item.id;
@@ -451,15 +445,16 @@ export default {
 			item.body = this.$root.beforeEditCache_body;
 			item.planned_time = this.$root.beforeEditCache_planned_time;
 		},
-		startEditDoneDate(e){
-			console.log(e);
+		startEditDoneDate(item, event){
 			console.log('startEditDoneDate');
 			item = (item) ? item : allItems.nodes[selection.selectedId];
-			console.log(item);
 			this.$root.beforeEditCache_done_date = item.done_date;
 			this.$root.editingDoneDateItem = item.id;
-
-			document.getElementById("done-date-edit-"+item.id).flatpickr();
+			setTimeout(function(){
+				let el = "done-date-edit-"+item.id;
+				document.getElementById(el).flatpickr();
+				// window.flatpickr(event.target);
+	    	},20);
 		},
 		deleteItem(item){
 			let id = item.id;

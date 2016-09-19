@@ -72,14 +72,13 @@ button:focus {outline:0;}
 .child{
     margin-left: 1.5em;
 }
-
 .updatebox, .addnewbox {
     display: flex;
     align-items: center;
     border: $selection-color solid thin;
     textarea, input{
         outline: 0px !important;
-        padding: 0.3em 0.5em 0.7em 0.4em;
+        padding: 0.5em;
         resize: none;
     }
     textarea{
@@ -201,7 +200,8 @@ button:focus {outline:0;}
     flex-wrap: wrap;
     align-items: baseline;
     font-size: 0.7em;
-    >span {
+    >span, >label {
+        position:relative;
         padding: 0.1em 0.5em;
         margin-left: 0.2em;
         border-radius: 0.3em;
@@ -210,6 +210,11 @@ button:focus {outline:0;}
     .done {
         color: #5a5a5a;
         background: #e6e6e6;
+    }
+    .flatpickr {
+        z-index: -1;
+        position: absolute;
+        left: 0;
     }
     .duration {
         background: $duration-color;

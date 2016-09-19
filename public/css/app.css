@@ -5377,14 +5377,14 @@
 
 body {
   font-family: 'Calibri', 'Lato';
-  line-height: 1.4em;
-  background: #f5f5f5;
   color: #4d4d4d;
+  font-size: 14px;
+  font-weight: 300;
+  line-height: 1.4em;
   -webkit-font-smoothing: antialiased;
   -moz-font-smoothing: antialiased;
   font-smoothing: antialiased;
-  font-weight: 300;
-  font-size: 14px; }
+  background: #f5f5f5; }
 
 form {
   margin-bottom: 0; }
@@ -5398,7 +5398,13 @@ input::-webkit-inner-spin-button {
 
 input, textarea {
   font-family: 'Calibri', 'Lato';
+  color: #4d4d4d;
   font-size: 14px;
+  font-weight: 300;
+  line-height: 1.4em;
+  -webkit-font-smoothing: antialiased;
+  -moz-font-smoothing: antialiased;
+  font-smoothing: antialiased;
   outline: none;
   border-style: none; }
 
@@ -5539,7 +5545,7 @@ button:focus {
   border: rgba(245, 215, 110, 0.5) solid thin; }
   .updatebox textarea, .updatebox input, .addnewbox textarea, .addnewbox input {
     outline: 0px !important;
-    padding: 0.3em 0.5em 0.7em 0.4em;
+    padding: 0.5em;
     resize: none; }
   .updatebox textarea, .addnewbox textarea {
     width: 100%; }
@@ -5650,7 +5656,8 @@ button:focus {
   -ms-flex-align: baseline;
   align-items: baseline;
   font-size: 0.7em; }
-  .item-tags > span {
+  .item-tags > span, .item-tags > label {
+    position: relative;
     padding: 0.1em 0.5em;
     margin-left: 0.2em;
     border-radius: 0.3em;
@@ -5658,6 +5665,10 @@ button:focus {
   .item-tags .done {
     color: #5a5a5a;
     background: #e6e6e6; }
+  .item-tags .flatpickr {
+    z-index: -1;
+    position: absolute;
+    left: 0; }
   .item-tags .duration {
     background: #5dacce; }
   .item-tags .duedate {

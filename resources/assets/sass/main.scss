@@ -1,18 +1,20 @@
 *,*:before,*:after {
 	box-sizing: border-box;
 }
-
-
-body {
+@mixin text-settings() {
 	font-family: 'Calibri', 'Lato';
-	line-height: 1.4em;
-	background: #f5f5f5;
 	color: #4d4d4d;
+	font-size: 14px;
+	font-weight: 300;
+	line-height: 1.4em;
 	-webkit-font-smoothing: antialiased;
     -moz-font-smoothing: antialiased;
 	font-smoothing: antialiased;
-	font-weight: 300;
-	font-size: 14px;
+}
+
+body {
+	@include text-settings();
+	background: #f5f5f5;
 }
 form {
     margin-bottom: 0;
@@ -24,8 +26,7 @@ input::-webkit-inner-spin-button {
     margin: 0; /* <-- Apparently some margin are still there even though it's hidden */
 }
 input, textarea{
-	font-family: 'Calibri', 'Lato';
-	font-size: 14px ;
+	@include text-settings();
 	outline: none;
     border-style: none;
 }
