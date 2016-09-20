@@ -23866,6 +23866,9 @@ _jquery2.default.getJSON('/api/items', function (fetchedData) {
 			},
 			deleteItem: function deleteItem(id) {
 				id = !id ? selection.selectedId : id;
+				if (confirm("Do you really want to delete: " + item.body + "?") == false) {
+					return;
+				}
 				allItems.deleteItem(id);
 			},
 			deleteItemApi: function deleteItemApi(idOrArray) {
@@ -24336,7 +24339,7 @@ exports.default = {
 		},
 		deleteItem: function deleteItem(item) {
 			var id = item.id;
-			if (confirm("Do you really want to delete: " + item.body) == false) {
+			if (confirm("Do you really want to delete: " + item.body + "?") == false) {
 				return;
 			}
 			allItems.deleteItem(id);
@@ -24986,23 +24989,25 @@ var Tree = function () {
 			allItems.nodes[id].done_date = done_date;
 			vm.patchDone(id);
 			this.autoCalculateDoneState(this.nodes[id].parent_id);
-			//Add Flatpickr
-			setTimeout(function () {
-				var fpId = "done-date-edit-" + id;
-				var fpEl = document.getElementById(fpId);
-				console.log(fpId);
-				console.log(fpEl);
-				fpEl.flatpickr({
-					dateFormat: 'Y-m-d H:i:S',
-					maxDate: 'today',
-					enableTime: true,
-					time_24hr: true,
-					onChange: function onChange(dateObj, dateStr, instance) {
-						var el = instance.element.id;
-						document.getElementById(el).focus();
-					}
-				});
-			}, 100);
+			//Add Flatpickr (only if it gets the Done Tag.)
+			if (allItems.nodes[id].done) {
+				setTimeout(function () {
+					var fpId = "done-date-edit-" + id;
+					var fpEl = document.getElementById(fpId);
+					console.log(fpId);
+					console.log(fpEl);
+					fpEl.flatpickr({
+						dateFormat: 'Y-m-d H:i:S',
+						maxDate: 'today',
+						enableTime: true,
+						time_24hr: true,
+						onChange: function onChange(dateObj, dateStr, instance) {
+							var el = instance.element.id;
+							document.getElementById(el).focus();
+						}
+					});
+				}, 100);
+			} // end add Flatpickr
 		}
 	}, {
 		key: 'autoCalculateDoneState',

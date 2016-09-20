@@ -288,23 +288,25 @@ export default class Tree {
 		allItems.nodes[id].done_date = done_date;
 		vm.patchDone(id);
 		this.autoCalculateDoneState(this.nodes[id].parent_id);
-		//Add Flatpickr
-		setTimeout(function(){
-			let fpId = "done-date-edit-"+id;
-			let fpEl = document.getElementById(fpId);
-			console.log(fpId);
-			console.log(fpEl);
-			fpEl.flatpickr({
-		    	dateFormat: 'Y-m-d H:i:S',
-		    	maxDate: 'today',
-		    	enableTime: true,
-		    	time_24hr: true,
-		    	onChange: function(dateObj, dateStr, instance){
-					let el = instance.element.id;
-					document.getElementById(el).focus();
-				},
-		    });
-		},100);
+		//Add Flatpickr (only if it gets the Done Tag.)
+		if (allItems.nodes[id].done){
+			setTimeout(function(){
+				let fpId = "done-date-edit-"+id;
+				let fpEl = document.getElementById(fpId);
+				console.log(fpId);
+				console.log(fpEl);
+				fpEl.flatpickr({
+			    	dateFormat: 'Y-m-d H:i:S',
+			    	maxDate: 'today',
+			    	enableTime: true,
+			    	time_24hr: true,
+			    	onChange: function(dateObj, dateStr, instance){
+						let el = instance.element.id;
+						document.getElementById(el).focus();
+					},
+			    });
+			},100);
+		} // end add Flatpickr
 
 	}
 	autoCalculateDoneState(id)

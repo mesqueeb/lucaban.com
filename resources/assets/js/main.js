@@ -279,6 +279,9 @@ window.vm = new Vue({
 		},
 		deleteItem(id){
 			id = (!id) ? selection.selectedId : id ;
+			if (confirm("Do you really want to delete: "+item.body+"?") == false) {
+		        return;
+		    }
 			allItems.deleteItem(id);
 		},
 		deleteItemApi(idOrArray){

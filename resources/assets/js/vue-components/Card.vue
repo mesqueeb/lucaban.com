@@ -459,7 +459,7 @@ export default {
 		},
 		deleteItem(item){
 			let id = item.id;
-			if (confirm("Do you really want to delete: "+item.body) == false) {
+			if (confirm("Do you really want to delete: "+item.body+"?") == false) {
 		        return;
 		    }
 			allItems.deleteItem(id);
