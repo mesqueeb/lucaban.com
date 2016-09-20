@@ -56,7 +56,7 @@ export default class Tree {
 	addItem(item, index)
 	{
 		item.show_children = (!item.show_children) ? 1 : item.show_children;
-		item.children_order = (!item.children_order) ? [] : item.children_order;
+		item.children_order = (!item.children_order) ? [] : item.children_order.split(',').map(Number);
 		item.children = (!item.children) ? [] : item.children;
 		let parent = allItems.nodes[item.parent_id];
 		// console.log('item.parent_id in additem');
@@ -264,14 +264,21 @@ export default class Tree {
 	}
 	deleteItem(id)
 	{
-		let parent_id = allItems.nodes[id].parent_id;
-		let targetItem = allItems.nodes[id];
+		let item = allItems.nodes[id];
+		// Delete all children as well!
+		if (Array.isArray(item.children) && item.children.length) {
+			let allChildrenIds = this.getAllChildrenIds(id);
+			vm.deleteItemApi(allChildrenIds);
+		}
+		// Delete items attached to previous parent
+		let parent_id = item.parent_id;
 		let prevParent = allItems.nodes[parent_id];
 		let siblingIndex = this.siblingIndex(id);
-		// Delete items attached to previous parent
 		prevParent.children.splice(siblingIndex,1);
 		prevParent.children_order.splice(siblingIndex,1);
+		// Patch and recalculate
 		vm.patch(parent_id, 'children_order');
+	    vm.deleteItemApi(id);
 		this.autoCalculateDoneState(parent_id);
 	    this.calculateTotalTime(parent_id);
 	}
@@ -281,6 +288,24 @@ export default class Tree {
 		allItems.nodes[id].done_date = done_date;
 		vm.patchDone(id);
 		this.autoCalculateDoneState(this.nodes[id].parent_id);
+		//Add Flatpickr
+		setTimeout(function(){
+			let fpId = "done-date-edit-"+id;
+			let fpEl = document.getElementById(fpId);
+			console.log(fpId);
+			console.log(fpEl);
+			fpEl.flatpickr({
+		    	dateFormat: 'Y-m-d H:i:S',
+		    	maxDate: 'today',
+		    	enableTime: true,
+		    	time_24hr: true,
+		    	onChange: function(dateObj, dateStr, instance){
+					let el = instance.element.id;
+					document.getElementById(el).focus();
+				},
+		    });
+		},100);
+
 	}
 	autoCalculateDoneState(id)
 	{
@@ -303,6 +328,22 @@ export default class Tree {
 			return true;
 		} else {
 			return false;
+		}
+	}
+	getAllChildrenIds(id)
+	{
+		let allChildrenIds = [];
+		this.getAllChildrenIdsRecursive(id, allChildrenIds);		
+		return allChildrenIds;
+	}
+	getAllChildrenIdsRecursive(id, allChildrenIds)
+	{
+		let item = this.nodes[id];
+		if (!(Array.isArray(item.children) && item.children.length)) {
+			return;
+		} else {
+			item.children_order.forEach(item => { allChildrenIds.push(item); });
+			item.children_order.forEach(item => { return this.getAllChildrenIdsRecursive(item, allChildrenIds) });
 		}
 	}
 	calculateTotalTime(id)

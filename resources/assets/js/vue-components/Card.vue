@@ -298,7 +298,8 @@ export default {
 	},
 	methods: {
 		addTimer(item){
-			this.$root.addTimer(item.id);
+			//Codementor
+			this.$root.$children[1].addTimer(item.id);
 		},
 		selectItem(item){
 			selection.selectedId = item.id;
@@ -462,7 +463,6 @@ export default {
 		        return;
 		    }
 			allItems.deleteItem(id);
-			this.$http.delete('/api/items/' + id);
 		},
 		addNew(){
 			console.log('sending newItem:');

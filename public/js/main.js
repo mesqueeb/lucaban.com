@@ -23529,9 +23529,6 @@ exports.hasClass = hasClass;
 },{}],10:[function(require,module,exports){
 'use strict';
 
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; }; // IMPORT jQuery
-
-
 var _jquery = require('jquery');
 
 var _jquery2 = _interopRequireDefault(_jquery);
@@ -23562,6 +23559,14 @@ var _Journal = require('./vue-components/Journal.vue');
 
 var _Journal2 = _interopRequireDefault(_Journal);
 
+var _Timer = require('./vue-components/Timer.vue');
+
+var _Timer2 = _interopRequireDefault(_Timer);
+
+var _Popups = require('./vue-components/Popups.vue');
+
+var _Popups2 = _interopRequireDefault(_Popups);
+
 var _dataTree = require('./vue-components/dataTree.js');
 
 var _dataTree2 = _interopRequireDefault(_dataTree);
@@ -23570,9 +23575,14 @@ var _Selection = require('./vue-components/Selection.js');
 
 var _Selection2 = _interopRequireDefault(_Selection);
 
+var _NotificationStore = require('./vue-components/NotificationStore.js');
+
+var _NotificationStore2 = _interopRequireDefault(_NotificationStore);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 // export for others scripts to use
+// IMPORT jQuery
 window.$ = _jquery2.default;
 window.jQuery = _jquery2.default;
 
@@ -23610,10 +23620,6 @@ _vue2.default.use(VueAutosize);
 (0, _vueFilters2.default)(_vue2.default);
 // Vue Components
 
-// import VueFlatpickr from '../../../node_modules/vue-flatpickr/assets/flatpickr-en.js'
-// import VueFlatpickr from '../node_modules/vue-flatpickr/VueFlatpickr-en.vue';
-
-// import VueFlatpickr from '../../../node_modules/vue-flatpickr/VueFlatpickr-en.vue';
 
 // JS Classes
 
@@ -23645,6 +23651,11 @@ window.setRowHeight = function () {
 	setTimeout(function () {
 		setRowHeight();
 	}, 2000);
+});
+
+_vue2.default.transition('fade', {
+	enterClass: 'fadeInDown', // class of animate.css
+	leaveClass: 'fadeOutDown' // class of animate.css
 });
 
 _jquery2.default.getJSON('/api/items', function (fetchedData) {
@@ -23680,80 +23691,17 @@ _jquery2.default.getJSON('/api/items', function (fetchedData) {
 			addingNewAsFirstChild: false,
 			editingItem: null,
 			editingDoneDateItem: null,
-			timerItems: [],
 			loading: true,
-			patching: false
+			patching: true,
+			popups: []
 		},
 		components: {
 			Card: _Card2.default,
-			Journal: _Journal2.default
+			Journal: _Journal2.default,
+			Timer: _Timer2.default,
+			Popups: _Popups2.default
 		},
 		methods: {
-			btnEffect: function btnEffect(id, identifier) {
-				var $el = (0, _jquery2.default)('#timer-' + id + ' .' + identifier);
-				$el.addClass("btn--click");
-				setTimeout(function () {
-					$el.removeClass("btn--click");
-				}, 400);
-			},
-			addTimer: function addTimer(id) {
-				id = !id ? selection.selectedId : id;
-				var item = allItems.nodes[id];
-				var timerExists = this.timerItems.filter(function (item) {
-					return item.id === id;
-				})[0];
-				if (!timerExists) {
-					this.timerItems.push(item);
-					this.playTimer(item);
-				}
-			},
-			playTimer: function playTimer(item) {
-				this.btnEffect(item.id, 'play');
-				var update = function update() {
-					if (item.planned_time > 0) {
-						item.used_time = ++item.used_time;
-					} else {
-						item.used_time = ++item.used_time;
-					}
-				};
-				window.timers = !window.timers ? {} : timers;
-				if (timers[item.id]) {
-					return;
-				}
-				timers[item.id] = setInterval(update, 1000);
-			},
-			pauseTimer: function pauseTimer(item) {
-				this.btnEffect(item.id, 'pause');
-				clearInterval(window.timers[item.id]);
-				delete window.timers[item.id];
-				this.patch(item.id, 'used_time');
-				allItems.calculateTotalTime(item.id);
-			},
-			forwardTimer: function forwardTimer(item) {
-				this.btnEffect(item.id, 'forward');
-				item.used_time = item.used_time + 60;
-			},
-			resetTimer: function resetTimer(item) {
-				this.btnEffect(item.id, 'reset');
-				item.used_time = 0;
-				this.patch(item.id, 'used_time');
-				allItems.calculateTotalTime(item.id);
-			},
-			removeTimer: function removeTimer(item) {
-				this.btnEffect(item.id, 'close');
-				clearInterval(window.timers[item.id]);
-				delete window.timers[item.id];
-				if (item.used_time < 5) {
-					item.used_time = 0;
-				} else {
-					this.patch(item.id, 'used_time');
-					allItems.calculateTotalTime(item.id);
-				}
-				document.getElementById('timer-' + item.id).className += ' fade-out';
-				setTimeout(function () {
-					this.timerItems.$remove(item);
-				}.bind(this), 1000);
-			},
 			showChildren: function showChildren(id, show) {
 				var item = !id ? allItems.nodes[selection.selectedId] : allItems.nodes[id];
 				if (!item.children || !item.children.length) {
@@ -23864,11 +23812,13 @@ _jquery2.default.getJSON('/api/items', function (fetchedData) {
 				selection.selectedId = null;
 				if (addAs == 'child') {
 					this.addingNewAsFirstChild = true;
+					this.addingNewAsChild = true;
 					setTimeout(function () {
 						(0, _jquery2.default)("#new-firstchild-of-" + id + " textarea").focus();
 					}, 10);
 				} else {
 					this.addingNewAsFirstChild = false;
+					this.addingNewAsChild = false;
 					setTimeout(function () {
 						(0, _jquery2.default)("#new-under-" + id + " textarea").focus();
 					}, 10);
@@ -23890,7 +23840,9 @@ _jquery2.default.getJSON('/api/items', function (fetchedData) {
 			patchDueDate: function patchDueDate(id, duedate) {
 				this.patching = true;
 				if (duedate == '0000-00-00 00:00:00') {
-					this.$http.patch('/api/items/' + id, { 'due_date': duedate });
+					this.$http.patch('/api/items/' + id, { 'due_date': duedate }).then(function (response) {
+						this.patching = false;
+					});
 					return;
 				}
 				duedate = moment(duedate).format();
@@ -23912,13 +23864,34 @@ _jquery2.default.getJSON('/api/items', function (fetchedData) {
 					this.patching = false;
 				});
 			},
+			deleteItem: function deleteItem(id) {
+				id = !id ? selection.selectedId : id;
+				allItems.deleteItem(id);
+			},
+			deleteItemApi: function deleteItemApi(idOrArray) {
+				var _this = this;
+
+				this.patching = true;
+				if (Array.isArray(idOrArray) && idOrArray.length) {
+					idOrArray.forEach(function (id) {
+						_this.deleteItemApi(id);
+					});
+				} else {
+					console.log('deleting: ' + idOrArray);
+					this.$http.delete('/api/items/' + idOrArray).then(function (response) {
+						this.patching = false;
+					});
+				}
+			},
 			clickDone: function clickDone() {
 				this.fetchDone();
 				selection.filter = 'done';
 			},
 			fetchDone: function fetchDone() {
+				this.loading = true;
 				this.$http.get('/api/items/fetchdone').then(function (response) {
 					this.doneData = allItems.formatDone(response.json());
+					this.loading = false;
 				});
 			},
 			filter: function filter(value) {
@@ -23935,21 +23908,34 @@ _jquery2.default.getJSON('/api/items', function (fetchedData) {
 					allItems.filter('today');
 				}
 			},
-			duplicate: function duplicate() {
-				var item = allItems.nodes[selection.selectedId];
+			duplicate: function duplicate(id) {
+				this.patching = true;
+				id = !id ? selection.selectedId : id;
+				var item = allItems.nodes[id];
 				item.children_order = allItems.arrayToString(item.children_order);
 				console.log('dupe item.children_order = ' + item.children_order);
-				console.log(_typeof(item.children_order));
-				console.log(item.children_order);
 				var OlderSiblingIndex = allItems.siblingIndex(selection.selectedId);
 				var index = parseInt(OlderSiblingIndex) + 1;
 				this.$http.post('/api/items', item) //SEND
 				.then(function (response) {
 					//response
+					// Revert old item's children_order back to string.
+					item.children_order = !item.children_order ? [] : item.children_order.split(',').map(Number);
+
 					var storedItem = response.data;
 					console.log('starting dom update...');
 					console.log('ind on duplicate: ' + index);
 					allItems.addItem(storedItem, index);
+					this.patching = false;
+				});
+			},
+			popupAddUsedTime: function popupAddUsedTime() {
+				this.popups.push({
+					title: "Add used time:",
+					text: "",
+					type: "usedTime",
+					timeout: true,
+					time: 120
 				});
 			},
 			keystroke: function keystroke(k) {
@@ -23995,6 +23981,9 @@ _jquery2.default.getJSON('/api/items', function (fetchedData) {
 				}
 				if (k == 'meta_shift_d') {
 					this.duplicate();
+				}
+				if (k == 'meta_delete') {
+					this.deleteItem();
 				}
 			}
 		},
@@ -24073,6 +24062,14 @@ _jquery2.default.getJSON('/api/items', function (fetchedData) {
 								break;
 							}
 							break;
+						case 8:
+							// DELETE (backspace)
+							e.preventDefault();
+							if (e.ctrlKey || e.metaKey) {
+								vm.keystroke('meta_delete');
+								break;
+							}
+							break;
 					} // end switch
 				} // END INPUT AREAS NOT IN FOCUS
 			});
@@ -24084,9 +24081,12 @@ _jquery2.default.getJSON('/api/items', function (fetchedData) {
 			}
 		}
 	});
+
+	vm.patching = false;
+	vm.loading = false;
 }); // end ajax
 
-},{"./components/globalFunctions.js":9,"./vue-components/Card.vue":11,"./vue-components/Journal.vue":12,"./vue-components/Selection.js":13,"./vue-components/dataTree.js":14,"./vue-components/vueFilters.js":15,"flatpickr":2,"jquery":3,"vue":8,"vue-autosize":5,"vue-resource":7}],11:[function(require,module,exports){
+},{"./components/globalFunctions.js":9,"./vue-components/Card.vue":11,"./vue-components/Journal.vue":12,"./vue-components/NotificationStore.js":13,"./vue-components/Popups.vue":14,"./vue-components/Selection.js":15,"./vue-components/Timer.vue":16,"./vue-components/dataTree.js":17,"./vue-components/vueFilters.js":18,"flatpickr":2,"jquery":3,"vue":8,"vue-autosize":5,"vue-resource":7}],11:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -24174,7 +24174,8 @@ exports.default = {
 	},
 	methods: {
 		addTimer: function addTimer(item) {
-			this.$root.addTimer(item.id);
+			//Codementor
+			this.$root.$children[1].addTimer(item.id);
 		},
 		selectItem: function selectItem(item) {
 			selection.selectedId = item.id;
@@ -24339,7 +24340,6 @@ exports.default = {
 				return;
 			}
 			allItems.deleteItem(id);
-			this.$http.delete('/api/items/' + id);
 		},
 		addNew: function addNew() {
 			console.log('sending newItem:');
@@ -24444,6 +24444,74 @@ if (module.hot) {(function () {  module.hot.accept()
   }
 })()}
 },{"vue":8,"vue-hot-reload-api":6}],13:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var NotificationStore = function () {
+    function NotificationStore(obj) {
+        _classCallCheck(this, NotificationStore);
+
+        this.state = []; // here the notifications will be added
+        this.state.push(obj);
+    }
+
+    _createClass(NotificationStore, [{
+        key: "addNotification",
+        value: function addNotification(notification) {
+            this.state.push(notification);
+        }
+    }, {
+        key: "removeNotification",
+        value: function removeNotification(notification) {
+            this.state.$remove(notification);
+        }
+    }]);
+
+    return NotificationStore;
+}();
+
+exports.default = NotificationStore;
+
+},{}],14:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+exports.default = {
+    name: 'Popups',
+    template: '#popups-template',
+    props: ['popups'],
+    methods: {
+        addPopup: function addPopup(popup) {
+            this.$root.popups.push(popup);
+        },
+        removePopup: function removePopup(popup) {
+            clearTimeout(this.timer);
+            this.$root.popups.$remove(popup);
+        }
+    }
+};
+if (module.exports.__esModule) module.exports = module.exports.default
+;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\n<div class=\"popups\">\n  <div v-for=\"popup in popups\" class=\"popup callout animated\" :class=\"popup.type ? popup.type : 'secondary'\" transition=\"fade\">\n      <button @click=\"removePopup(popup)\" class=\"close-button\" aria-label=\"Close alert\" type=\"button\">\n          <span aria-hidden=\"true\">×</span>\n      </button>\n      <div v-if=\"popup.title\">{{popup.title}}</div>\n      <div v-if=\"popup.text\">{{popup.text}}</div>\n      <div v-if=\"popup.type=='usedTime'\">\n        <input type=\"number\">\n      </div>\n  </div>\n</div>\n"
+if (module.hot) {(function () {  module.hot.accept()
+  var hotAPI = require("vue-hot-reload-api")
+  hotAPI.install(require("vue"), true)
+  if (!hotAPI.compatible) return
+  if (!module.hot.data) {
+    hotAPI.createRecord("_v-39e00e3c", module.exports)
+  } else {
+    hotAPI.update("_v-39e00e3c", module.exports, (typeof module.exports === "function" ? module.exports.options : module.exports).template)
+  }
+})()}
+},{"vue":8,"vue-hot-reload-api":6}],15:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -24476,7 +24544,102 @@ var Selection = function () {
 
 exports.default = Selection;
 
-},{}],14:[function(require,module,exports){
+},{}],16:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+	value: true
+});
+exports.default = {
+	name: 'Timer',
+	template: '#timer-template',
+	data: function data() {
+		return {
+			timerItems: []
+		};
+	},
+
+	methods: {
+		btnEffect: function btnEffect(id, identifier) {
+			var $el = $('#timer-' + id + ' .' + identifier);
+			$el.addClass("btn--click");
+			setTimeout(function () {
+				$el.removeClass("btn--click");
+			}, 400);
+		},
+		addTimer: function addTimer(id) {
+			id = !id ? selection.selectedId : id;
+			var item = allItems.nodes[id];
+			var timerExists = this.timerItems.filter(function (item) {
+				return item.id === id;
+			})[0];
+			if (!timerExists) {
+				this.timerItems.push(item);
+				this.playTimer(item);
+			}
+		},
+		playTimer: function playTimer(item) {
+			this.btnEffect(item.id, 'play');
+			var update = function update() {
+				if (item.planned_time > 0) {
+					item.used_time = ++item.used_time;
+				} else {
+					item.used_time = ++item.used_time;
+				}
+			};
+			window.timers = !window.timers ? {} : timers;
+			if (timers[item.id]) {
+				return;
+			}
+			timers[item.id] = setInterval(update, 1000);
+		},
+		pauseTimer: function pauseTimer(item) {
+			this.btnEffect(item.id, 'pause');
+			clearInterval(window.timers[item.id]);
+			delete window.timers[item.id];
+			vm.patch(item.id, 'used_time');
+			allItems.calculateTotalTime(item.id);
+		},
+		forwardTimer: function forwardTimer(item) {
+			this.btnEffect(item.id, 'forward');
+			item.used_time = item.used_time + 60;
+		},
+		resetTimer: function resetTimer(item) {
+			this.btnEffect(item.id, 'reset');
+			item.used_time = 0;
+			vm.patch(item.id, 'used_time');
+			allItems.calculateTotalTime(item.id);
+		},
+		removeTimer: function removeTimer(item) {
+			this.btnEffect(item.id, 'close');
+			clearInterval(window.timers[item.id]);
+			delete window.timers[item.id];
+			if (item.used_time < 5) {
+				item.used_time = 0;
+			} else {
+				vm.patch(item.id, 'used_time');
+				allItems.calculateTotalTime(item.id);
+			}
+			document.getElementById('timer-' + item.id).className += ' fade-out';
+			setTimeout(function () {
+				this.timerItems.$remove(item);
+			}.bind(this), 1000);
+		}
+	}
+};
+if (module.exports.__esModule) module.exports = module.exports.default
+;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\n<div id=\"timer-area\" class=\"\" v-show=\"timerItems.length\">\n\t<div class=\"timer\" id=\"timer-{{ item.id }}\" v-for=\"item in timerItems\">\n\t\t<div class=\"toggle-div\">\n\t\t\t<input class=\"toggle\" type=\"checkbox\" v-if=\"item.children_order.length==0 || item.done == true\" v-model=\"item.done\" @click.prevent=\"markDone(item)\">\n\n\t\t</div>\n\t\t<span class=\"body\">{{ item.body }}</span>\n\t\t<span v-if=\"!item.planned_time\" class=\"timer-time\">{{ item.used_time | hhmmss }}</span>\n\t\t<span v-if=\"item.planned_time\" class=\"timer-time countdown\">{{ item.id | countdown }}</span>\n\t\t<span class=\"nav\">\n\t\t\t<button class=\"play btn btn-dipclick\" @click=\"playTimer(item)\"><i class=\"zmdi zmdi-play\"></i>\n\t\t\t</button>\n\t\t\t<button class=\"pause btn btn-dipclick\" @click=\"pauseTimer(item)\"><i class=\"zmdi zmdi-pause\"></i>\n\t\t\t</button>\n\t\t\t<button class=\"forward btn btn-dipclick\" @click=\"forwardTimer(item)\"><i class=\"zmdi zmdi-forward-10\"></i>\n\t\t\t</button>\n\t\t\t<button class=\"reset btn btn-dipclick\" @click=\"resetTimer(item)\"><i class=\"zmdi zmdi-time-restore\"></i>\n\t\t\t</button>\n\t\t\t<button class=\"stop btn btn-dipclick\" @click=\"removeTimer(item)\"><i class=\"zmdi zmdi-close\"></i>\n\t\t\t</button>\n\t\t</span>\n\t</div>\n</div>\n"
+if (module.hot) {(function () {  module.hot.accept()
+  var hotAPI = require("vue-hot-reload-api")
+  hotAPI.install(require("vue"), true)
+  if (!hotAPI.compatible) return
+  if (!module.hot.data) {
+    hotAPI.createRecord("_v-4158a440", module.exports)
+  } else {
+    hotAPI.update("_v-4158a440", module.exports, (typeof module.exports === "function" ? module.exports.options : module.exports).template)
+  }
+})()}
+},{"vue":8,"vue-hot-reload-api":6}],17:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -24558,7 +24721,7 @@ var Tree = function () {
 		key: 'addItem',
 		value: function addItem(item, index) {
 			item.show_children = !item.show_children ? 1 : item.show_children;
-			item.children_order = !item.children_order ? [] : item.children_order;
+			item.children_order = !item.children_order ? [] : item.children_order.split(',').map(Number);
 			item.children = !item.children ? [] : item.children;
 			var parent = allItems.nodes[item.parent_id];
 			// console.log('item.parent_id in additem');
@@ -24798,14 +24961,21 @@ var Tree = function () {
 	}, {
 		key: 'deleteItem',
 		value: function deleteItem(id) {
-			var parent_id = allItems.nodes[id].parent_id;
-			var targetItem = allItems.nodes[id];
+			var item = allItems.nodes[id];
+			// Delete all children as well!
+			if (Array.isArray(item.children) && item.children.length) {
+				var allChildrenIds = this.getAllChildrenIds(id);
+				vm.deleteItemApi(allChildrenIds);
+			}
+			// Delete items attached to previous parent
+			var parent_id = item.parent_id;
 			var prevParent = allItems.nodes[parent_id];
 			var siblingIndex = this.siblingIndex(id);
-			// Delete items attached to previous parent
 			prevParent.children.splice(siblingIndex, 1);
 			prevParent.children_order.splice(siblingIndex, 1);
+			// Patch and recalculate
 			vm.patch(parent_id, 'children_order');
+			vm.deleteItemApi(id);
 			this.autoCalculateDoneState(parent_id);
 			this.calculateTotalTime(parent_id);
 		}
@@ -24816,6 +24986,23 @@ var Tree = function () {
 			allItems.nodes[id].done_date = done_date;
 			vm.patchDone(id);
 			this.autoCalculateDoneState(this.nodes[id].parent_id);
+			//Add Flatpickr
+			setTimeout(function () {
+				var fpId = "done-date-edit-" + id;
+				var fpEl = document.getElementById(fpId);
+				console.log(fpId);
+				console.log(fpEl);
+				fpEl.flatpickr({
+					dateFormat: 'Y-m-d H:i:S',
+					maxDate: 'today',
+					enableTime: true,
+					time_24hr: true,
+					onChange: function onChange(dateObj, dateStr, instance) {
+						var el = instance.element.id;
+						document.getElementById(el).focus();
+					}
+				});
+			}, 100);
 		}
 	}, {
 		key: 'autoCalculateDoneState',
@@ -24844,6 +25031,30 @@ var Tree = function () {
 				return true;
 			} else {
 				return false;
+			}
+		}
+	}, {
+		key: 'getAllChildrenIds',
+		value: function getAllChildrenIds(id) {
+			var allChildrenIds = [];
+			this.getAllChildrenIdsRecursive(id, allChildrenIds);
+			return allChildrenIds;
+		}
+	}, {
+		key: 'getAllChildrenIdsRecursive',
+		value: function getAllChildrenIdsRecursive(id, allChildrenIds) {
+			var _this2 = this;
+
+			var item = this.nodes[id];
+			if (!(Array.isArray(item.children) && item.children.length)) {
+				return;
+			} else {
+				item.children_order.forEach(function (item) {
+					allChildrenIds.push(item);
+				});
+				item.children_order.forEach(function (item) {
+					return _this2.getAllChildrenIdsRecursive(item, allChildrenIds);
+				});
 			}
 		}
 	}, {
@@ -24953,13 +25164,13 @@ var Tree = function () {
 		key: 'flushDoneItems',
 		value: function flushDoneItems() // Do not use yet. Not sure how to best implement this...
 		{
-			var _this2 = this;
+			var _this3 = this;
 
 			var nodes = this.nodes;
 			var keys = Object.keys(nodes);
 			var doneItemsObject = keys.reduce(function (prev, id) {
 				if (nodes[id].done) {
-					_this2.deleteItem(id);
+					_this3.deleteItem(id);
 				}
 			});
 		}
@@ -25053,11 +25264,11 @@ var Tree = function () {
 	}, {
 		key: 'getFilteredFlat',
 		value: function getFilteredFlat(keyword) {
-			var _this3 = this;
+			var _this4 = this;
 
 			if (keyword == 'done') {
 				var _ret = function () {
-					var nodes = _this3.nodes;
+					var nodes = _this4.nodes;
 					var keys = Object.keys(nodes);
 					var doneItemsObject = keys.reduce(function (prev, item) {
 						if (nodes[item].done) {
@@ -25135,12 +25346,12 @@ var Tree = function () {
 	}, {
 		key: 'getFiltered',
 		value: function getFiltered(keyword) {
-			var _this4 = this;
+			var _this5 = this;
 
 			if (keyword == 'done') {
 				var _ret2 = function () {
-					var firstItem = _this4.root.children;
-					var doneItemsObject = _this4.getDoneTasksRecursively(firstItem);
+					var firstItem = _this5.root.children;
+					var doneItemsObject = _this5.getDoneTasksRecursively(firstItem);
 					console.log(doneItemsObject);
 					return {
 						v: Object.keys(doneItemsObject).map(function (k) {
@@ -25162,7 +25373,7 @@ var Tree = function () {
 
 exports.default = Tree;
 
-},{}],15:[function(require,module,exports){
+},{}],18:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {

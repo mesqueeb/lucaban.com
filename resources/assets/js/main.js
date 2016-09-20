@@ -38,18 +38,15 @@ window.Element.prototype.hasClass = function(config){ return hasClass(this,confi
 	import VueFilters from './vue-components/vueFilters.js';
 	VueFilters(Vue);
 	// Vue Components
-	
-	// import VueFlatpickr from '../../../node_modules/vue-flatpickr/assets/flatpickr-en.js'
-	// import VueFlatpickr from '../node_modules/vue-flatpickr/VueFlatpickr-en.vue';
-	
-	// import VueFlatpickr from '../../../node_modules/vue-flatpickr/VueFlatpickr-en.vue';
-
 	import Card from './vue-components/Card.vue';
 	import Journal from './vue-components/Journal.vue';
+	import Timer from './vue-components/Timer.vue';
+	import Popups from './vue-components/Popups.vue';
 
 // JS Classes
 import Tree from './vue-components/dataTree.js';
 import Selection from './vue-components/Selection.js';
+import NotificationStoreClass from './vue-components/NotificationStore.js';
 
 $(window).on("scroll", function(e) {
   if ($(this).scrollTop() > 33) {
@@ -80,6 +77,11 @@ $( document ).ready(function() {
 	}, 2000);
 });
 
+Vue.transition('fade', {
+    enterClass: 'fadeInDown', // class of animate.css
+    leaveClass: 'fadeOutDown' // class of animate.css
+})
+
 
 $.getJSON('/api/items',function(fetchedData){
 
@@ -101,7 +103,6 @@ $.getJSON('/api/items',function(fetchedData){
 		}
 	}, 1000);
 
-
 window.allItems = new Tree(fetchedData);
 window.selection = new Selection();
 window.vm = new Vue({
@@ -115,75 +116,17 @@ window.vm = new Vue({
 		addingNewAsFirstChild: false,
 		editingItem: null,
 		editingDoneDateItem: null,
-		timerItems: [],
 		loading: true,
-		patching: false,
+		patching: true,
+		popups: [],
 	},
 	components: {
 		Card,
 		Journal,
+		Timer,
+		Popups,
 	},
 	methods:{
-		btnEffect(id, identifier){
-			let $el = $('#timer-'+id+' .'+identifier);
-			$el.addClass("btn--click");
-			setTimeout(function(){
-				$el.removeClass("btn--click");
-			}, 400);
-		},
-		addTimer(id){
-			id = (!id) ? selection.selectedId : id ;
-			let item = allItems.nodes[id];
-			let timerExists = this.timerItems.filter(function (item) { return item.id === id; })[0];
-			if (!timerExists){
-				this.timerItems.push(item);
-				this.playTimer(item);
-			}
-		},
-		playTimer(item){
-			this.btnEffect(item.id, 'play');
-			let update = function(){
-				if(item.planned_time>0){
-					item.used_time = ++item.used_time;
-				} else {
-					item.used_time = ++item.used_time;
-				}
-
-			}
-			window.timers = (!window.timers) ? {} : timers;
-			if(timers[item.id]){ return; }
-			timers[item.id] = setInterval(update,1000);
-		},
-		pauseTimer(item){
-			this.btnEffect(item.id, 'pause');
-			clearInterval(window.timers[item.id]);
-			delete window.timers[item.id];
-			this.patch(item.id, 'used_time');
-			allItems.calculateTotalTime(item.id);
-		},
-		forwardTimer(item){
-			this.btnEffect(item.id, 'forward');
-			item.used_time = item.used_time+60;
-		},
-		resetTimer(item){
-			this.btnEffect(item.id, 'reset');
-			item.used_time = 0;
-			this.patch(item.id, 'used_time');
-			allItems.calculateTotalTime(item.id);
-		},
-		removeTimer(item){
-			this.btnEffect(item.id, 'close');
-			clearInterval(window.timers[item.id]);
-			delete window.timers[item.id];
-			if(item.used_time < 5){
-				item.used_time = 0;
-			} else {
-				this.patch(item.id, 'used_time');
-				allItems.calculateTotalTime(item.id);
-			}
-			document.getElementById('timer-'+item.id).className += ' fade-out';
-			setTimeout(function(){ this.timerItems.$remove(item) }.bind(this),1000);
-		},
 		showChildren(id, show){
 			let item = (!id) ? allItems.nodes[selection.selectedId] : allItems.nodes[id];
 			if (!item.children || !item.children.length){ return; }
@@ -282,9 +225,11 @@ window.vm = new Vue({
 			selection.selectedId = null;
 			if(addAs == 'child'){
 				this.addingNewAsFirstChild = true;
+				this.addingNewAsChild = true;
 				setTimeout(function(){$("#new-firstchild-of-"+id+" textarea").focus();},10);
 			} else {
 				this.addingNewAsFirstChild = false;
+				this.addingNewAsChild = false;
 				setTimeout(function(){$("#new-under-"+id+" textarea").focus();},10);
 			}
 		},
@@ -305,7 +250,10 @@ window.vm = new Vue({
 		patchDueDate(id, duedate){
 			this.patching = true;
 			if (duedate == '0000-00-00 00:00:00'){
-				this.$http.patch('/api/items/' + id, {'due_date':duedate});
+				this.$http.patch('/api/items/' + id, {'due_date':duedate})
+				.then(function(response){
+					this.patching = false;
+				});
 				return;
 			}
 			duedate = moment(duedate).format();
@@ -329,13 +277,31 @@ window.vm = new Vue({
 				this.patching = false;
 			});
 		},
+		deleteItem(id){
+			id = (!id) ? selection.selectedId : id ;
+			allItems.deleteItem(id);
+		},
+		deleteItemApi(idOrArray){
+			this.patching = true;
+			if (Array.isArray(idOrArray) && idOrArray.length) {
+				idOrArray.forEach(id => { this.deleteItemApi(id); });
+			} else {
+				console.log('deleting: '+idOrArray);
+				this.$http.delete('/api/items/' + idOrArray)
+				.then(function(response){
+					this.patching = false;
+				});
+			}
+		},
 		clickDone(){
 			this.fetchDone();
 			selection.filter = 'done';
 		},
 		fetchDone(){
+			this.loading = true;
 			this.$http.get('/api/items/fetchdone').then(function(response){
 				this.doneData = allItems.formatDone(response.json());
+				this.loading = false;
 			});
 		},
 		filter(value){
@@ -352,23 +318,35 @@ window.vm = new Vue({
 				allItems.filter('today');
 			}
 		},
-		duplicate(){
-			let item = allItems.nodes[selection.selectedId];
+		duplicate(id){
+			this.patching = true;
+			id = (!id) ? selection.selectedId : id ;
+			let item = allItems.nodes[id];
 			item.children_order = allItems.arrayToString(item.children_order);			
 			console.log('dupe item.children_order = '+item.children_order);
-			console.log(typeof item.children_order);
-			console.log(item.children_order);
 			let OlderSiblingIndex = allItems.siblingIndex(selection.selectedId);
 			let index = parseInt(OlderSiblingIndex)+1;
 			this.$http.post('/api/items',item) //SEND
 			.then(function(response){ //response
+				// Revert old item's children_order back to string.
+				item.children_order = (!item.children_order) ? [] : item.children_order.split(',').map(Number);
+				
 				let storedItem = response.data;
 				console.log('starting dom update...');
 				console.log('ind on duplicate: '+index);
 				allItems.addItem(storedItem, index);
-			});
+				this.patching = false;
+			})
 		},
-
+		popupAddUsedTime() {
+        	this.popups.push({
+            	title: "Add used time:",
+                text: "",
+                type: "usedTime",
+                timeout: true,
+                time: 120,
+            });
+        },
 		keystroke(k){
 			console.log(k);
 			if(k == 'arrowRight'){ this.showChildren(null, 'show')}
@@ -385,6 +363,7 @@ window.vm = new Vue({
 			if(k == 'meta_enter'){ this.$broadcast('startEdit')}
 			if(k == 't'){ this.setToday()}
 			if(k == 'meta_shift_d'){ this.duplicate()}
+			if(k == 'meta_delete'){ this.deleteItem()}
 		},
 	},
 	created(){
@@ -453,6 +432,13 @@ window.vm = new Vue({
 		  			break;
 		  		}
 				break;
+			case 8: // DELETE (backspace)
+				e.preventDefault();
+				if (e.ctrlKey || e.metaKey){
+					vm.keystroke('meta_delete');
+		  			break;
+		  		}
+				break;
           } // end switch
     	} // END INPUT AREAS NOT IN FOCUS
       });
@@ -465,6 +451,7 @@ window.vm = new Vue({
     },
 });
 
-
+vm.patching = false;
+vm.loading = false;
 
 }); // end ajax

@@ -1,0 +1,11 @@
+.popups{
+    top: 1em;
+    position: fixed;
+    width: 100%;
+    z-index: 3;
+}
+.popup {
+    background: #5dacce;
+    color: white;
+    padding: 1em;
+}

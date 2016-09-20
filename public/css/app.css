@@ -5663,6 +5663,7 @@ button:focus {
     border-radius: 0.3em;
     color: white; }
   .item-tags .done {
+    cursor: pointer;
     color: #5a5a5a;
     background: #e6e6e6; }
   .item-tags .flatpickr {
@@ -5714,5 +5715,16 @@ button:focus {
       margin-left: auto; }
     #timer-area .timer .nav i {
       font-size: 1.5em; }
+
+.popups {
+  top: 1em;
+  position: fixed;
+  width: 100%;
+  z-index: 3; }
+
+.popup {
+  background: #5dacce;
+  color: white;
+  padding: 1em; }
 
 /*# sourceMappingURL=app.css.map */
