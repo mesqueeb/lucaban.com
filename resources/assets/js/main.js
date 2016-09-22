@@ -88,7 +88,10 @@ Vue.transition('fade', {
 $.getJSON('/api/items',function(fetchedData){
 
 	//response
-
+	$.getJSON('/api/itemtags',function(tags){
+		console.log(tags);
+		window.tags = tags;
+	
 	setTimeout(function(){
 		let flatpickrInputs = document.getElementsByClassName("flatpickr");
 		for (var i = 0; i < flatpickrInputs.length; i++) {
@@ -121,6 +124,7 @@ window.vm = new Vue({
 		loading: true,
 		patching: true,
 		popups: [],
+		allTags: tags,
 	},
 	components: {
 		Card,
@@ -247,10 +251,23 @@ window.vm = new Vue({
 			patchObj[arg] = patchVal;
 			this.$http.patch('/api/items/' + id, patchObj, { method: 'PATCH'})
 			.then(function(response){
-				console.log('patched item['+id+'].'+arg+' = '+patchObj[arg]+';');
+				console.log('patched ['+allItems.nodes[id].body+'].'+arg+' = '+patchObj[arg]+';');
 				this.patching = false;
 			});
 		},
+		patchTag(id, tags, type){
+			this.patching = true;
+			let patchObj = {};
+			patchObj['request'] = tags;
+			patchObj['type'] = type;
+			this.$http.patch('/api/itemtags/' + id, patchObj, { method: 'PATCH'})
+			.then(function(response){
+				console.log('patched ['+allItems.nodes[id].body+'] TAGS: '+response+';');
+				console.log(response);
+				this.patching = false;
+			});
+		},
+
 		patchDueDate(id, duedate){
 			this.patching = true;
 			if (duedate == '0000-00-00 00:00:00'){
@@ -304,14 +321,14 @@ window.vm = new Vue({
 			this.fetchDone();
 			selection.filter = 'done';
 		},
-		afterDone(id){
+		popup(id, type){
 			id = (!id) ? selection.selectedId : id ;
 			let item = allItems.nodes[id];
 			this.popups.push({
             	item,
             	title: "Completed "+item.body,
                 text: "",
-                type: "afterDone",
+                type: type,
                 timeout: true,
                 time: 10,
             });
@@ -323,18 +340,22 @@ window.vm = new Vue({
 				this.loading = false;
 			});
 		},
-		filter(value){
-			if(value=='all'){
+		filter(type, value){
+			if(type == 'all'){
 				selection.filter = 'all';
 				allItems.filter('all');
 			}
-			if(value=='today'){
+			if(type == 'today'){
 				selection.filter = 'today';
 				allItems.filter('duedate','today');
 			}
-			if(value=='done'){
+			if(type == 'done'){
 				selection.filter = 'done';
 				allItems.filter('today');
+			}
+			if(type == 'tag'){
+				console.log(type);
+				console.log(value);
 			}
 		},
 		duplicate(id){
@@ -357,16 +378,6 @@ window.vm = new Vue({
 				this.patching = false;
 			})
 		},
-		popupAddUsedTime() {
-        	this.popups.push({
-            	title: "",
-                text: "",
-                type: "afterDone",
-                timeout: true,
-                time: 120,
-                radioValue: false,
-            });
-        },
 		keystroke(k){
 			console.log(k);
 			if(k == 'arrowRight'){ this.showChildren(null, 'show')}
@@ -384,6 +395,12 @@ window.vm = new Vue({
 			if(k == 't'){ this.setToday()}
 			if(k == 'meta_shift_d'){ this.duplicate()}
 			if(k == 'meta_delete'){ this.deleteItem()}
+		},
+		test(id){
+			// id = (!id) ? selection.selectedId : id ;
+			id = selection.selectedId;
+			let item = allItems.nodes[id];
+			this.patchTag(id, 'bloem', 'tag');
 		},
 	},
 	created(){
@@ -473,5 +490,5 @@ window.vm = new Vue({
 
 vm.patching = false;
 vm.loading = false;
-
+});
 }); // end ajax

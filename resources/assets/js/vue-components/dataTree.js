@@ -289,7 +289,7 @@ export default class Tree {
 		allItems.nodes[id].done_date = done_date;
 		vm.patchDone(id);
 		if(this.nodes[id].done){
-			vm.afterDone(id);
+			vm.popup(id, 'afterDone');
 		}
 		this.autoCalculateDoneState(this.nodes[id].parent_id);
 		//Add Flatpickr (only if it gets the Done Tag.)

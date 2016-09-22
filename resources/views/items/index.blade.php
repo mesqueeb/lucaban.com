@@ -18,8 +18,8 @@
 />
 
 <Popups :popups="popups"></Popups>
-
 <div class="panel-body">
+	<button @click="test">Test TAGS</button>
 	<Timer></Timer>
 	<div class="navigation">
 		<a href="#"
@@ -34,6 +34,10 @@
 			:class="{active: selection.filter == 'done'}"
 			@click="clickDone()"
 		>Done</a>
+		<a href="#"
+			:class="{active: selection.filter == 'done'}"
+			@click="filter('tag', {{ $tags[0]->slug }})"
+		>{{ $tags[0]->name }}</a>
 	</div>
 	<div class="panel-title">
 		@{{ selection.filter | capitalize }}

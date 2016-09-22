@@ -60,9 +60,12 @@ export default {
         removePopup(popup) {
             clearTimeout(popup.timer);
             if( popup.type=='afterDone' ){
-              
-              this.$root.patch(popup.item.id, 'used_time');
-              this.$root.patch(popup.item.id, 'completion_memo');
+                if(popup.item.used_time){
+                    this.$root.patch(popup.item.id, 'used_time');
+                }
+                if(popup.item.completion_memo){
+                    this.$root.patch(popup.item.id, 'completion_memo');
+                }
             }
             this.$root.popups.$remove(popup);
         },

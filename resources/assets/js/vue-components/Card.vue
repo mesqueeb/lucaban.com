@@ -126,9 +126,15 @@
 					v-if="this.$root.editingItem != item.id && this.$root.selection.selectedId == item.id"
 				>
 					
-					<button class="timer"
+					<button v-if="!item.done"
+						class="timer"
 						@click="addTimer(item)"
 					><i class="zmdi zmdi-timer"></i>
+					</button>
+					<button v-if="item.done"
+						class="more"
+						@click="this.$root.popup(item.id, 'afterDone')"
+					><i class="zmdi zmdi-more"></i>
 					</button>
 					<!--
 					- font icon / woff format [font awesome]

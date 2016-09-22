@@ -15,11 +15,13 @@ Route::get('/items',function(){
  //        return view('items.index', compact('itemz'));
  //    }
 	// $itemz = App\Thing::get();
-	return view('items.index');
+	$tags = App\Item::existingTags();
+	return view('items.index')->with('tags',$tags);
 });
 
 Route::get('/api/items/fetchdone','CardController@getDone');
 Route::resource('/api/items','CardController');
+Route::resource('/api/itemtags','ItemTagController');
 ////////////////////////////////////////////////
 Route::get('/playground',function(){
 	return view('playground.index');

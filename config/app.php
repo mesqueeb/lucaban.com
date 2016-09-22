@@ -157,7 +157,7 @@ return [
         App\Providers\AuthServiceProvider::class,
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
-        Baum\Providers\BaumServiceProvider::class,
+        Conner\Tagging\Providers\TaggingServiceProvider::class,
 
     ],
 
