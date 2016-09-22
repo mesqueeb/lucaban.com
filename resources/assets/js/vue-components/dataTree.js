@@ -67,6 +67,7 @@ export default class Tree {
 		item.due_date = "0000-00-00 00:00:00";
 		item.done_date = "0000-00-00 00:00:00";
 		item.done = false;
+		item.used_time = 0;
 		//Actually ADD the item!
 		parent.children.splice(index, 0, item);
 		parent.children_order.splice(index, 0, item.id);
@@ -287,6 +288,9 @@ export default class Tree {
 		let done_date = moment().format();
 		allItems.nodes[id].done_date = done_date;
 		vm.patchDone(id);
+		if(this.nodes[id].done){
+			vm.afterDone(id);
+		}
 		this.autoCalculateDoneState(this.nodes[id].parent_id);
 		//Add Flatpickr (only if it gets the Done Tag.)
 		if (allItems.nodes[id].done){

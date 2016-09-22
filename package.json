@@ -27,6 +27,7 @@
     "vue-autosize": "^0.1.2",
     "vue-flatpickr": "0.0.3",
     "vue-resource": "^0.9.3",
+    "vue-strap": "^1.1.23",
     "vue-textarea": "^0.2.0"
   },
   "repository": {

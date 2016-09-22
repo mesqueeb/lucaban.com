@@ -5,8 +5,10 @@
 	window.$ = $;
 	window.jQuery = jQuery;
 
-import { hasClass } from './components/globalFunctions.js';
-window.Element.prototype.hasClass = function(config){ return hasClass(this,config)};
+// IMPORT Own jQuery replacement functions
+	import { hasClass } from './components/globalFunctions.js';
+	// Make hasClass(el) available as el.hasClass();
+	window.Element.prototype.hasClass = function(config){ return hasClass(this,config)};
 
 
 
@@ -44,9 +46,9 @@ window.Element.prototype.hasClass = function(config){ return hasClass(this,confi
 	import Popups from './vue-components/Popups.vue';
 
 // JS Classes
-import Tree from './vue-components/dataTree.js';
-import Selection from './vue-components/Selection.js';
-import NotificationStoreClass from './vue-components/NotificationStore.js';
+	import Tree from './vue-components/dataTree.js';
+	import Selection from './vue-components/Selection.js';
+	import NotificationStoreClass from './vue-components/NotificationStore.js';
 
 $(window).on("scroll", function(e) {
   if ($(this).scrollTop() > 33) {
@@ -128,7 +130,8 @@ window.vm = new Vue({
 	},
 	methods:{
 		showChildren(id, show){
-			let item = (!id) ? allItems.nodes[selection.selectedId] : allItems.nodes[id];
+			id = (id) ? id : selection.selectedId;
+			let item = allItems.nodes[id];
 			if (!item.children || !item.children.length){ return; }
 			if (show == 'show'){
 				item.show_children = true;
@@ -137,16 +140,17 @@ window.vm = new Vue({
 			} else {
 				item.show_children = !item.show_children;
 			}
-			this.patch(item.id, 'show_children');
+			this.patch(id, 'show_children');
 		},
 		markDone(id, markAs){
-			let item = (!id) ? allItems.nodes[selection.selectedId] : allItems.nodes[id];
+			id = (id) ? id : selection.selectedId;
+			let item = allItems.nodes[id];
 			if (markAs == 'notDone'){
 				item.done = false;
-				allItems.prepareDonePatch(item.id);
+				allItems.prepareDonePatch(id);
 				return;
 			}
-			if (item.children.length && !allItems.allChildrenDone(item.id)){
+			if (item.children.length && !allItems.allChildrenDone(id)){
 				return;
 			}
 			if (markAs == 'done') {
@@ -154,7 +158,7 @@ window.vm = new Vue({
 			} else {
 				item.done = !item.done;
 			}
-			allItems.prepareDonePatch(item.id);
+			allItems.prepareDonePatch(id);
 		},
 		moveItem(direction){
 			let id = selection.selectedId;
@@ -279,7 +283,7 @@ window.vm = new Vue({
 		},
 		deleteItem(id){
 			id = (!id) ? selection.selectedId : id ;
-			if (confirm("Do you really want to delete: "+item.body+"?") == false) {
+			if (confirm("Do you really want to delete: "+allItems.nodes[id].body+"?") == false) {
 		        return;
 		    }
 			allItems.deleteItem(id);
@@ -299,6 +303,18 @@ window.vm = new Vue({
 		clickDone(){
 			this.fetchDone();
 			selection.filter = 'done';
+		},
+		afterDone(id){
+			id = (!id) ? selection.selectedId : id ;
+			let item = allItems.nodes[id];
+			this.popups.push({
+            	item,
+            	title: "Completed "+item.body,
+                text: "",
+                type: "afterDone",
+                timeout: true,
+                time: 10,
+            });
 		},
 		fetchDone(){
 			this.loading = true;
@@ -343,11 +359,12 @@ window.vm = new Vue({
 		},
 		popupAddUsedTime() {
         	this.popups.push({
-            	title: "Add used time:",
+            	title: "",
                 text: "",
-                type: "usedTime",
+                type: "afterDone",
                 timeout: true,
                 time: 120,
+                radioValue: false,
             });
         },
 		keystroke(k){

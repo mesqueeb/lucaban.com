@@ -7,7 +7,7 @@
 	{{-- <link rel="stylesheet" href="/css/fonts/material-design-iconic-font.min.css"> --}}
 
 </head>
-<body>
+<body class="">
 <a href="{{route('home')}}">Go home</a>
 
 {{-- @include('elements.menu') --}}
@@ -16,8 +16,9 @@
 	alt="Loading"
 	v-show="patching"
 />
+
 <Popups :popups="popups"></Popups>
-<button class="button success" @click="popupAddUsedTime">test popup</button>
+
 <div class="panel-body">
 	<Timer></Timer>
 	<div class="navigation">
@@ -50,7 +51,12 @@
 		<Journal :records-per-date="doneData"></Journal>
 	</div>
 </div>
-
+<!-- firefox svg blurring trick -->
+<svg id="svg-image-blur">
+	<filter id="blur-effect">
+		<feGaussianBlur stdDeviation="10" />
+	</filter>
+</svg>
 
 <script src="js/vendor.js"></script>
 <script src="js/main.js"></script>

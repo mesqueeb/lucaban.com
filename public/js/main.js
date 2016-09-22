@@ -23515,6 +23515,26 @@ setTimeout(function () {
 module.exports = Vue;
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{"_process":4}],9:[function(require,module,exports){
+var inserted = exports.cache = {}
+
+exports.insert = function (css) {
+  if (inserted[css]) return
+  inserted[css] = true
+
+  var elem = document.createElement('style')
+  elem.setAttribute('type', 'text/css')
+
+  if ('textContent' in elem) {
+    elem.textContent = css
+  } else {
+    elem.styleSheet.cssText = css
+  }
+
+  document.getElementsByTagName('head')[0].appendChild(elem)
+  return elem
+}
+
+},{}],10:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -23526,7 +23546,7 @@ function hasClass(element, cls) {
 
 exports.hasClass = hasClass;
 
-},{}],10:[function(require,module,exports){
+},{}],11:[function(require,module,exports){
 'use strict';
 
 var _jquery = require('jquery');
@@ -23586,6 +23606,9 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 window.$ = _jquery2.default;
 window.jQuery = _jquery2.default;
 
+// IMPORT Own jQuery replacement functions
+
+// Make hasClass(el) available as el.hasClass();
 window.Element.prototype.hasClass = function (config) {
 	return (0, _globalFunctions.hasClass)(this, config);
 };
@@ -23703,7 +23726,8 @@ _jquery2.default.getJSON('/api/items', function (fetchedData) {
 		},
 		methods: {
 			showChildren: function showChildren(id, show) {
-				var item = !id ? allItems.nodes[selection.selectedId] : allItems.nodes[id];
+				id = id ? id : selection.selectedId;
+				var item = allItems.nodes[id];
 				if (!item.children || !item.children.length) {
 					return;
 				}
@@ -23714,16 +23738,17 @@ _jquery2.default.getJSON('/api/items', function (fetchedData) {
 				} else {
 					item.show_children = !item.show_children;
 				}
-				this.patch(item.id, 'show_children');
+				this.patch(id, 'show_children');
 			},
 			markDone: function markDone(id, markAs) {
-				var item = !id ? allItems.nodes[selection.selectedId] : allItems.nodes[id];
+				id = id ? id : selection.selectedId;
+				var item = allItems.nodes[id];
 				if (markAs == 'notDone') {
 					item.done = false;
-					allItems.prepareDonePatch(item.id);
+					allItems.prepareDonePatch(id);
 					return;
 				}
-				if (item.children.length && !allItems.allChildrenDone(item.id)) {
+				if (item.children.length && !allItems.allChildrenDone(id)) {
 					return;
 				}
 				if (markAs == 'done') {
@@ -23731,7 +23756,7 @@ _jquery2.default.getJSON('/api/items', function (fetchedData) {
 				} else {
 					item.done = !item.done;
 				}
-				allItems.prepareDonePatch(item.id);
+				allItems.prepareDonePatch(id);
 			},
 			moveItem: function moveItem(direction) {
 				var id = selection.selectedId;
@@ -23866,7 +23891,7 @@ _jquery2.default.getJSON('/api/items', function (fetchedData) {
 			},
 			deleteItem: function deleteItem(id) {
 				id = !id ? selection.selectedId : id;
-				if (confirm("Do you really want to delete: " + item.body + "?") == false) {
+				if (confirm("Do you really want to delete: " + allItems.nodes[id].body + "?") == false) {
 					return;
 				}
 				allItems.deleteItem(id);
@@ -23889,6 +23914,18 @@ _jquery2.default.getJSON('/api/items', function (fetchedData) {
 			clickDone: function clickDone() {
 				this.fetchDone();
 				selection.filter = 'done';
+			},
+			afterDone: function afterDone(id) {
+				id = !id ? selection.selectedId : id;
+				var item = allItems.nodes[id];
+				this.popups.push({
+					item: item,
+					title: "Completed " + item.body,
+					text: "",
+					type: "afterDone",
+					timeout: true,
+					time: 10
+				});
 			},
 			fetchDone: function fetchDone() {
 				this.loading = true;
@@ -23934,11 +23971,12 @@ _jquery2.default.getJSON('/api/items', function (fetchedData) {
 			},
 			popupAddUsedTime: function popupAddUsedTime() {
 				this.popups.push({
-					title: "Add used time:",
+					title: "",
 					text: "",
-					type: "usedTime",
+					type: "afterDone",
 					timeout: true,
-					time: 120
+					time: 120,
+					radioValue: false
 				});
 			},
 			keystroke: function keystroke(k) {
@@ -24089,7 +24127,75 @@ _jquery2.default.getJSON('/api/items', function (fetchedData) {
 	vm.loading = false;
 }); // end ajax
 
-},{"./components/globalFunctions.js":9,"./vue-components/Card.vue":11,"./vue-components/Journal.vue":12,"./vue-components/NotificationStore.js":13,"./vue-components/Popups.vue":14,"./vue-components/Selection.js":15,"./vue-components/Timer.vue":16,"./vue-components/dataTree.js":17,"./vue-components/vueFilters.js":18,"flatpickr":2,"jquery":3,"vue":8,"vue-autosize":5,"vue-resource":7}],11:[function(require,module,exports){
+},{"./components/globalFunctions.js":10,"./vue-components/Card.vue":13,"./vue-components/Journal.vue":14,"./vue-components/NotificationStore.js":15,"./vue-components/Popups.vue":16,"./vue-components/Selection.js":18,"./vue-components/Timer.vue":19,"./vue-components/dataTree.js":20,"./vue-components/vueFilters.js":21,"flatpickr":2,"jquery":3,"vue":8,"vue-autosize":5,"vue-resource":7}],12:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+
+var coerce = {
+  // Convert a string to booleam. Otherwise, return the value without modification, so if is not boolean, Vue throw a warning.
+  boolean: function boolean(val) {
+    return typeof val === 'string' ? val === 'false' || val === 'null' || val === 'undefined' ? false : val === 'true' ? true : val : val;
+  },
+  // Attempt to convert a string value to a Number. Otherwise, return 0.
+  number: function number(val) {
+    var alt = arguments.length <= 1 || arguments[1] === undefined ? null : arguments[1];
+    return typeof val === 'number' ? val : val === undefined || val === null || isNaN(Number(val)) ? alt : Number(val);
+  },
+  // Attempt to convert to string any value, except for null or undefined.
+  string: function string(val) {
+    return val === undefined || val === null ? '' : val + '';
+  },
+  // Pattern accept RegExp, function, or string (converted to RegExp). Otherwise return null.
+  pattern: function pattern(val) {
+    return val instanceof Function || val instanceof RegExp ? val : typeof val === 'string' ? new RegExp(val) : null;
+  }
+};
+exports.default = {
+  name: 'buttonz',
+  template: '#button-group-template',
+  props: {
+    value: null,
+    buttons: {
+      type: Boolean,
+      coerce: coerce.boolean,
+      default: true
+    },
+    type: {
+      type: String,
+      default: 'default'
+    }
+  },
+  watch: {
+    value: {
+      deep: true,
+      handler: function handler(val) {
+        this.$children.forEach(function (el) {
+          if (el.group && el.eval) el.eval();
+        });
+      }
+    }
+  },
+  created: function created() {
+    this._btnGroup = true;
+  }
+};
+if (module.exports.__esModule) module.exports = module.exports.default
+;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\n<div :class=\"{'btn-group':buttons}\" :data-toggle=\"buttons&amp;&amp;'buttons'\">\n  <slot></slot>\n</div>\n"
+if (module.hot) {(function () {  module.hot.accept()
+  var hotAPI = require("vue-hot-reload-api")
+  hotAPI.install(require("vue"), true)
+  if (!hotAPI.compatible) return
+  if (!module.hot.data) {
+    hotAPI.createRecord("_v-962f9a70", module.exports)
+  } else {
+    hotAPI.update("_v-962f9a70", module.exports, (typeof module.exports === "function" ? module.exports.options : module.exports).template)
+  }
+})()}
+},{"vue":8,"vue-hot-reload-api":6}],13:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -24408,7 +24514,7 @@ if (module.hot) {(function () {  module.hot.accept()
     hotAPI.update("_v-036caa76", module.exports, (typeof module.exports === "function" ? module.exports.options : module.exports).template)
   }
 })()}
-},{"vue":8,"vue-hot-reload-api":6}],12:[function(require,module,exports){
+},{"vue":8,"vue-hot-reload-api":6}],14:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -24446,7 +24552,7 @@ if (module.hot) {(function () {  module.hot.accept()
     hotAPI.update("_v-a5850fdc", module.exports, (typeof module.exports === "function" ? module.exports.options : module.exports).template)
   }
 })()}
-},{"vue":8,"vue-hot-reload-api":6}],13:[function(require,module,exports){
+},{"vue":8,"vue-hot-reload-api":6}],15:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -24482,28 +24588,57 @@ var NotificationStore = function () {
 
 exports.default = NotificationStore;
 
-},{}],14:[function(require,module,exports){
+},{}],16:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
     value: true
 });
+
+var _Radio = require('./Radio.vue');
+
+var _Radio2 = _interopRequireDefault(_Radio);
+
+var _ButtonGroup = require('./ButtonGroup.vue');
+
+var _ButtonGroup2 = _interopRequireDefault(_ButtonGroup);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+// import radio from '../../../../node_modules/vue-strap/src/radio'
+// import buttonz from 'vue-strap/src/buttonGroup'
 exports.default = {
     name: 'Popups',
     template: '#popups-template',
+    components: { radio: _Radio2.default, buttonz: _ButtonGroup2.default },
     props: ['popups'],
     methods: {
         addPopup: function addPopup(popup) {
             this.$root.popups.push(popup);
         },
         removePopup: function removePopup(popup) {
-            clearTimeout(this.timer);
+            clearTimeout(popup.timer);
+            if (popup.type == 'afterDone') {
+
+                this.$root.patch(popup.item.id, 'used_time');
+                this.$root.patch(popup.item.id, 'completion_memo');
+            }
             this.$root.popups.$remove(popup);
+        },
+        incrementUsedTime: function incrementUsedTime(item, amount) {
+            if (!item.used_time) {
+                item.used_time = amount;
+            } else {
+                item.used_time = parseFloat(item.used_time) + amount;
+            }
+        },
+        resetUsedTime: function resetUsedTime(item) {
+            item.used_time = 0;
         }
     }
 };
 if (module.exports.__esModule) module.exports = module.exports.default
-;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\n<div class=\"popups\">\n  <div v-for=\"popup in popups\" class=\"popup callout animated\" :class=\"popup.type ? popup.type : 'secondary'\" transition=\"fade\">\n      <button @click=\"removePopup(popup)\" class=\"close-button\" aria-label=\"Close alert\" type=\"button\">\n          <span aria-hidden=\"true\">×</span>\n      </button>\n      <div v-if=\"popup.title\">{{popup.title}}</div>\n      <div v-if=\"popup.text\">{{popup.text}}</div>\n      <div v-if=\"popup.type=='usedTime'\">\n        <input type=\"number\">\n      </div>\n  </div>\n</div>\n"
+;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\n<div class=\"popups\">\n  <div v-for=\"popup in popups\" class=\"popup callout animated\" :class=\"popup.type ? popup.type : 'secondary'\" transition=\"fade\">\n      <div v-if=\"popup.title\" class=\"title\">{{popup.title}}</div>\n      <div v-if=\"popup.text\">{{popup.text}}</div>\n      <div v-if=\"popup.type=='afterDone'\" class=\"body\">\n          <div class=\"completion-memo\">\n            <label>Completion note</label>\n            <textarea name=\"completion_memo\" v-model=\"popup.item.completion_memo\" v-autosize=\"popup.item.completion_memo\">{{ popup.item.completion_memo }}</textarea>\n          </div>\n          <div class=\"used-time\">\n            <div>\n                <label>Used time</label>\n                <input v-model=\"popup.item.used_time\" type=\"number\">\n                <span>{{ popup.item.used_time | hhmmss }}</span>\n            </div>\n            <div>\n                <button class=\"forward\" @click=\"incrementUsedTime(popup.item, 60)\">+1 minute</button>\n                <button class=\"forward\" @click=\"incrementUsedTime(popup.item, 300)\">+5 minutes</button>\n                <button class=\"forward\" @click=\"incrementUsedTime(popup.item, 600)\">+10 minutes</button>\n                <button class=\"reset\" @click=\"resetUsedTime(popup.item)\">Reset</button>\n            </div>\n          </div>\n      </div>\n      <button @click=\"removePopup(popup)\" class=\"close-button\" aria-label=\"Close alert\" type=\"button\">\n          <span aria-hidden=\"true\">×</span>\n      </button>\n  </div>\n</div>\n"
 if (module.hot) {(function () {  module.hot.accept()
   var hotAPI = require("vue-hot-reload-api")
   hotAPI.install(require("vue"), true)
@@ -24514,7 +24649,135 @@ if (module.hot) {(function () {  module.hot.accept()
     hotAPI.update("_v-39e00e3c", module.exports, (typeof module.exports === "function" ? module.exports.options : module.exports).template)
   }
 })()}
-},{"vue":8,"vue-hot-reload-api":6}],15:[function(require,module,exports){
+},{"./ButtonGroup.vue":12,"./Radio.vue":17,"vue":8,"vue-hot-reload-api":6}],17:[function(require,module,exports){
+var __vueify_insert__ = require("vueify/lib/insert-css")
+var __vueify_style__ = __vueify_insert__.insert("\n.radio { position: relative; }\n.radio > label > input {\n  position: absolute;\n  margin: 0;\n  padding: 0;\n  opacity: 0;\n  z-index: -1;\n  box-sizing: border-box;\n}\n.radio > label > .icon {\n  position: absolute;\n  top: .15rem;\n  left: 0;\n  display: block;\n  width: 1.4rem;\n  height: 1.4rem;\n  text-align: center;\n  -webkit-user-select: none;\n     -moz-user-select: none;\n      -ms-user-select: none;\n          user-select: none;\n  border-radius: .7rem;\n  background-repeat: no-repeat;\n  background-position: center center;\n  background-size: 50% 50%;\n}\n.radio:not(.active) > label > .icon {\n  background-color: #ddd;\n  border: 1px solid #bbb;\n}\n.radio > label > input:focus ~ .icon {\n  outline: 0;\n  border: 1px solid #66afe9;\n  box-shadow: inset 0 1px 1px rgba(0,0,0,.075),0 0 8px rgba(102,175,233,.6);\n}\n.radio.active > label > .icon {\n  background-size: 1rem 1rem;\n  background-image: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4NCjxzdmcgdmVyc2lvbj0iMS4xIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxjaXJjbGUgY3g9IjUiIGN5PSI1IiByPSI0IiBmaWxsPSIjZmZmIi8+PC9zdmc+);\n}\n.radio.active .btn-default { -webkit-filter: brightness(75%); filter: brightness(75%); }\n.radio.disabled > label > .icon,\n.radio.readonly > label > .icon,\n.btn.readonly {\n  filter: alpha(opacity=65);\n  box-shadow: none;\n  opacity: .65;\n}\nlabel.btn > input[type=radio] {\n  position: absolute;\n  clip: rect(0,0,0,0);\n  pointer-events: none;\n}\n")
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+
+var coerce = {
+  // Convert a string to booleam. Otherwise, return the value without modification, so if is not boolean, Vue throw a warning.
+  boolean: function boolean(val) {
+    return typeof val === 'string' ? val === 'false' || val === 'null' || val === 'undefined' ? false : val === 'true' ? true : val : val;
+  },
+  // Attempt to convert a string value to a Number. Otherwise, return 0.
+  number: function number(val) {
+    var alt = arguments.length <= 1 || arguments[1] === undefined ? null : arguments[1];
+    return typeof val === 'number' ? val : val === undefined || val === null || isNaN(Number(val)) ? alt : Number(val);
+  },
+  // Attempt to convert to string any value, except for null or undefined.
+  string: function string(val) {
+    return val === undefined || val === null ? '' : val + '';
+  },
+  // Pattern accept RegExp, function, or string (converted to RegExp). Otherwise return null.
+  pattern: function pattern(val) {
+    return val instanceof Function || val instanceof RegExp ? val : typeof val === 'string' ? new RegExp(val) : null;
+  }
+};
+exports.default = {
+  name: 'radio',
+  template: '#radio-row-template',
+  props: {
+    value: {
+      default: true
+    },
+    checked: {
+      twoWay: true
+    },
+    button: {
+      type: Boolean,
+      coerce: coerce.boolean,
+      default: false
+    },
+    disabled: {
+      type: Boolean,
+      coerce: coerce.boolean,
+      default: false
+    },
+    name: {
+      type: String,
+      default: null
+    },
+    readonly: {
+      type: Boolean,
+      coerce: coerce.boolean,
+      default: false
+    },
+    type: {
+      type: String,
+      default: null
+    }
+  },
+  computed: {
+    active: function active() {
+      return this.group ? this.$parent.value === this.value : this.value === this.checked;
+    },
+    buttonStyle: function buttonStyle() {
+      return this.button || this.group && this.$parent.buttons;
+    },
+    group: function group() {
+      return this.$parent && this.$parent._radioGroup;
+    },
+    typeColor: function typeColor() {
+      return this.type || this.$parent && this.$parent.type || 'default';
+    }
+  },
+  created: function created() {
+    var parent = this.$parent;
+    if (!parent) return;
+    if (parent._btnGroup && !parent._checkboxGroup) {
+      parent._radioGroup = true;
+    }
+  },
+  ready: function ready() {
+    if (!this.$parent._radioGroup) return;
+    if (this.$parent.value) {
+      this.checked = this.$parent.value === this.value;
+    } else if (this.checked) {
+      this.$parent.value = this.value;
+    }
+  },
+
+  methods: {
+    focus: function focus() {
+      this.$els.input.focus();
+    },
+    toggle: function toggle() {
+      if (this.disabled) {
+        return;
+      }
+      this.focus();
+      if (this.readonly) {
+        return;
+      }
+      this.checked = this.value;
+      if (this.group) {
+        this.$parent.value = this.value;
+      }
+    }
+  }
+};
+if (module.exports.__esModule) module.exports = module.exports.default
+;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\n<label v-if=\"buttonStyle\" :class=\"['btn btn-'+typeColor,{active:active,disabled:disabled,readonly:readonly}]\" @click.prevent=\"toggle\">\n  <input type=\"radio\" autocomplete=\"off\" v-el:input=\"\" v-show=\"!readonly\" :checked=\"active\" :value=\"value\" :name=\"name\" :readonly=\"readonly\" :disabled=\"disabled\">\n  <slot></slot>\n</label>\n<div v-else=\"\" :class=\"['radio',typeColor,{active:active,disabled:disabled,readonly:readonly}]\" @click.prevent=\"toggle\">\n  <label class=\"open\">\n    <input type=\"radio\" autocomplete=\"off\" v-el:input=\"\" :checked=\"active\" :value=\"value\" :name=\"name\" :readonly=\"readonly\" :disabled=\"disabled\">\n    <span class=\"icon dropdown-toggle\" :class=\"[active?'btn-'+typeColor:'',{bg:typeColor==='default'}]\"></span>\n    <span v-if=\"active&amp;&amp;typeColor==='default'\" class=\"icon\"></span>\n    <slot></slot>\n  </label>\n</div>\n"
+if (module.hot) {(function () {  module.hot.accept()
+  var hotAPI = require("vue-hot-reload-api")
+  hotAPI.install(require("vue"), true)
+  if (!hotAPI.compatible) return
+  module.hot.dispose(function () {
+    __vueify_insert__.cache["\n.radio { position: relative; }\n.radio > label > input {\n  position: absolute;\n  margin: 0;\n  padding: 0;\n  opacity: 0;\n  z-index: -1;\n  box-sizing: border-box;\n}\n.radio > label > .icon {\n  position: absolute;\n  top: .15rem;\n  left: 0;\n  display: block;\n  width: 1.4rem;\n  height: 1.4rem;\n  text-align: center;\n  -webkit-user-select: none;\n     -moz-user-select: none;\n      -ms-user-select: none;\n          user-select: none;\n  border-radius: .7rem;\n  background-repeat: no-repeat;\n  background-position: center center;\n  background-size: 50% 50%;\n}\n.radio:not(.active) > label > .icon {\n  background-color: #ddd;\n  border: 1px solid #bbb;\n}\n.radio > label > input:focus ~ .icon {\n  outline: 0;\n  border: 1px solid #66afe9;\n  box-shadow: inset 0 1px 1px rgba(0,0,0,.075),0 0 8px rgba(102,175,233,.6);\n}\n.radio.active > label > .icon {\n  background-size: 1rem 1rem;\n  background-image: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4NCjxzdmcgdmVyc2lvbj0iMS4xIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxjaXJjbGUgY3g9IjUiIGN5PSI1IiByPSI0IiBmaWxsPSIjZmZmIi8+PC9zdmc+);\n}\n.radio.active .btn-default { -webkit-filter: brightness(75%); filter: brightness(75%); }\n.radio.disabled > label > .icon,\n.radio.readonly > label > .icon,\n.btn.readonly {\n  filter: alpha(opacity=65);\n  box-shadow: none;\n  opacity: .65;\n}\nlabel.btn > input[type=radio] {\n  position: absolute;\n  clip: rect(0,0,0,0);\n  pointer-events: none;\n}\n"] = false
+    document.head.removeChild(__vueify_style__)
+  })
+  if (!module.hot.data) {
+    hotAPI.createRecord("_v-bb5b20d4", module.exports)
+  } else {
+    hotAPI.update("_v-bb5b20d4", module.exports, (typeof module.exports === "function" ? module.exports.options : module.exports).template)
+  }
+})()}
+},{"vue":8,"vue-hot-reload-api":6,"vueify/lib/insert-css":9}],18:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -24547,7 +24810,7 @@ var Selection = function () {
 
 exports.default = Selection;
 
-},{}],16:[function(require,module,exports){
+},{}],19:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -24642,7 +24905,7 @@ if (module.hot) {(function () {  module.hot.accept()
     hotAPI.update("_v-4158a440", module.exports, (typeof module.exports === "function" ? module.exports.options : module.exports).template)
   }
 })()}
-},{"vue":8,"vue-hot-reload-api":6}],17:[function(require,module,exports){
+},{"vue":8,"vue-hot-reload-api":6}],20:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -24735,6 +24998,7 @@ var Tree = function () {
 			item.due_date = "0000-00-00 00:00:00";
 			item.done_date = "0000-00-00 00:00:00";
 			item.done = false;
+			item.used_time = 0;
 			//Actually ADD the item!
 			parent.children.splice(index, 0, item);
 			parent.children_order.splice(index, 0, item.id);
@@ -24988,6 +25252,9 @@ var Tree = function () {
 			var done_date = moment().format();
 			allItems.nodes[id].done_date = done_date;
 			vm.patchDone(id);
+			if (this.nodes[id].done) {
+				vm.afterDone(id);
+			}
 			this.autoCalculateDoneState(this.nodes[id].parent_id);
 			//Add Flatpickr (only if it gets the Done Tag.)
 			if (allItems.nodes[id].done) {
@@ -25378,7 +25645,7 @@ var Tree = function () {
 
 exports.default = Tree;
 
-},{}],18:[function(require,module,exports){
+},{}],21:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -25479,6 +25746,6 @@ exports.default = function (Vue) {
 	});
 };
 
-},{}]},{},[10]);
+},{}]},{},[11]);
 
 //# sourceMappingURL=main.js.map
