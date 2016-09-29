@@ -58,6 +58,18 @@ class ItemTagController extends Controller
             return Item::withAllTags($request['request'])->get(); // only fetch articles with all the tags
         }
     }
+    public function fetchTagged(Request $request)
+    {
+        if($request['type'] == 'withAnyTag'){
+            return Item::withAnyTag($request['request'])->get(); // fetch articles with any tag listed
+        }
+        if($request['type'] == 'withAllTags'){
+            return Item::withAllTags($request['request'])->get(); // only fetch articles with all the tags
+        }
+        if($request['type'] == 'tagNames'){
+            return Item::findOrFail($id)->tagNames();
+        }
+    }
 
     /**
      * Show the form for editing the specified resource.

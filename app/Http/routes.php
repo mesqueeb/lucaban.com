@@ -22,6 +22,7 @@ Route::get('/items',function(){
 Route::get('/api/items/fetchdone','CardController@getDone');
 Route::resource('/api/items','CardController');
 Route::resource('/api/itemtags','ItemTagController');
+Route::post('/api/itemtags/fetchTagged','ItemTagController@fetchTagged');
 ////////////////////////////////////////////////
 Route::get('/playground',function(){
 	return view('playground.index');

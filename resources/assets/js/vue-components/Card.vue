@@ -49,7 +49,7 @@
 			>
 				<div class="bodybox"
 					v-show="item.id != this.$root.editingItem"
-				>{{ item.body }}</div>
+				>{{{ item.body | linkify }}}</div>
 				<!-- <div class="hidden-sizer">{{item.body + "|"}}</div> -->
 				
 				<!-- For debugging: -->
@@ -225,6 +225,7 @@
 
 <script>
 
+
 export default {
 	name: 'Card',
 	template:'#items-card-template',
@@ -336,10 +337,16 @@ export default {
 	        	this.makeNewItemAChild();
 			}
 			// ENTER
-			if (e.keyCode === 13 && !e.shiftKey && !e.altKey) {
+			if (e.keyCode === 13 && !e.shiftKey && !e.altKey && !e.metaKey && !e.ctrlKey) {
 	        	e.preventDefault();
 			  	if(!this.newItem.body){ return; }
 			  	this.addNew();
+			} else if (e.keyCode === 13 && (e.metaKey || e.ctrlKey)) {
+			// Command ENTER
+	        	e.preventDefault();
+			  	if(!this.newItem.body){ return; }
+			  	let addNextItemAs = 'child';
+			  	this.addNew(addNextItemAs);
 			}
 			// ArrowLeft
 			if (e.keyCode === 37){
@@ -470,7 +477,7 @@ export default {
 		    }
 			allItems.deleteItem(id);
 		},
-		addNew(){
+		addNew(addNextItemAs){
 			console.log('sending newItem:');
 			let newItem = this.newItem;
 			if (this.$root.addingNewAsChild){
@@ -486,7 +493,7 @@ export default {
 				console.log('starting dom update...');
 				let OlderSiblingIndex = this.siblingIndex;
 				let index = OlderSiblingIndex+1;
-				allItems.addItem(storedItem, index);
+				allItems.addItem(storedItem, index, addNextItemAs);
 			});
 		},
 		cancelAddNew(lastSelectedId){

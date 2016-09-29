@@ -16,6 +16,7 @@ button{
 button:focus {outline:0;}
 
 .navigation{
+    display: flex;
     a {
         text-decoration: none;
         color: #4d4d4d;
@@ -23,6 +24,9 @@ button:focus {outline:0;}
     }
     .active{
         color: $theme-color;
+    }
+    .tag-menu{
+        margin-left: auto;
     }
 }
 .card{

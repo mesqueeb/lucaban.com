@@ -19,25 +19,31 @@
 
 <Popups :popups="popups"></Popups>
 <div class="panel-body">
-	<button @click="test">Test TAGS</button>
 	<Timer></Timer>
 	<div class="navigation">
-		<a href="#"
-			:class="{active: selection.filter == 'all'}"
-			@click="filter('all')"
-		>All</a>
-		<a href="#"
-			:class="{active: selection.filter == 'today'}"
-			@click="filter('today')"
-		>Today</a>
-		<a href="#"
-			:class="{active: selection.filter == 'done'}"
-			@click="clickDone()"
-		>Done</a>
-		<a href="#"
-			:class="{active: selection.filter == 'done'}"
-			@click="filter('tag', {{ $tags[0]->slug }})"
-		>{{ $tags[0]->name }}</a>
+		<div class="menu">
+			<a href="#"
+				:class="{active: selection.filter == 'all'}"
+				@click="filter('all')"
+			>All</a>
+			<a href="#"
+				:class="{active: selection.filter == 'today'}"
+				@click="filter('today')"
+			>Today</a>
+			<a href="#"
+				:class="{active: selection.filter == 'done'}"
+				@click="clickDone()"
+			>Done</a>
+		</div>
+		<div class="tag-menu">
+
+			<a v-for="tag in allTags"
+				href="#"
+				:class=""
+				@click="filter('tag', tag.slug)"
+			>@{{ tag.name }}</a>
+
+		</div>
 	</div>
 	<div class="panel-title">
 		@{{ selection.filter | capitalize }}
@@ -55,12 +61,6 @@
 		<Journal :records-per-date="doneData"></Journal>
 	</div>
 </div>
-<!-- firefox svg blurring trick -->
-<svg id="svg-image-blur">
-	<filter id="blur-effect">
-		<feGaussianBlur stdDeviation="10" />
-	</filter>
-</svg>
 
 <script src="js/vendor.js"></script>
 <script src="js/main.js"></script>

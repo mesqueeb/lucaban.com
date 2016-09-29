@@ -44,14 +44,9 @@
     </div>
 </template>
 <script>
-import radio from './Radio.vue';
-import buttonz from './ButtonGroup.vue';
-// import radio from '../../../../node_modules/vue-strap/src/radio'
-// import buttonz from 'vue-strap/src/buttonGroup'
 export default {
     name: 'Popups',
     template: '#popups-template',
-    components: {radio, buttonz},
     props: ['popups'],
     methods: {
         addPopup(popup) {

@@ -97,4 +97,12 @@ Vue.filter('momentCalendar', {
   	},
 });
 
+Vue.filter('linkify', {
+	read: function(val) {
+	  	return linkifyHtml(val, {
+			defaultProtocol: 'https'
+		});
+  	},
+});
+
 } // export default function(Vue)

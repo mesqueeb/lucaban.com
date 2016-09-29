@@ -5481,13 +5481,17 @@ button {
 button:focus {
   outline: 0; }
 
-.navigation a {
-  text-decoration: none;
-  color: #4d4d4d;
-  margin: 0em 0.5em; }
-
-.navigation .active {
-  color: #5dc2af; }
+.navigation {
+  display: -ms-flexbox;
+  display: flex; }
+  .navigation a {
+    text-decoration: none;
+    color: #4d4d4d;
+    margin: 0em 0.5em; }
+  .navigation .active {
+    color: #5dc2af; }
+  .navigation .tag-menu {
+    margin-left: auto; }
 
 .card {
   margin: 0.5em; }

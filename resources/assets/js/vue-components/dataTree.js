@@ -4,6 +4,7 @@ export default class Tree {
 		this.source		= items;
 		this.nodes 		= {}; // →　"id":{ task obj };
 		this.orphans	= [];
+		this.filteredTagItems = null;
 		// process items
 		window.itemsProcessed = 0;
 		items.forEach(this.initialize.bind(this))
@@ -53,7 +54,7 @@ export default class Tree {
 	{
 		return this.nodes[id];
 	}
-	addItem(item, index)
+	addItem(item, index, addNextItemAs)
 	{
 		item.show_children = (!item.show_children) ? 1 : item.show_children;
 		item.children_order = (!item.children_order) ? [] : item.children_order.split(',').map(Number);
@@ -84,7 +85,7 @@ export default class Tree {
 	    let siblingId = this.olderSiblingId(item.id);
 	    let siblingBody = this.nodes[siblingId].body;
 	    if(siblingBody != item.body){
-		    vm.showAddNewItem(item.id);
+		    vm.showAddNewItem(item.id, addNextItemAs);
 	    }
 	}
 	arrayToString(arr)
@@ -266,6 +267,7 @@ export default class Tree {
 	deleteItem(id)
 	{
 		let item = allItems.nodes[id];
+		let newSelectedId = this.olderSiblingId(id);
 		// Delete all children as well!
 		if (Array.isArray(item.children) && item.children.length) {
 			let allChildrenIds = this.getAllChildrenIds(id);
@@ -282,6 +284,7 @@ export default class Tree {
 	    vm.deleteItemApi(id);
 		this.autoCalculateDoneState(parent_id);
 	    this.calculateTotalTime(parent_id);
+	    selection.selectedId = newSelectedId;
 	}
 	prepareDonePatch(id)
 	{
@@ -510,13 +513,13 @@ export default class Tree {
 		if (keyword == 'all'){
 			filteredItems = allItemsBackup;
 		}
-		if (keyword == 'done'){
-	    	$.each(this.nodes, function(index, item) {
-				if (item.done){
-					filteredItems.push(item);
-				}
-		    });
-		}
+		// if (keyword == 'done'){
+	 //    	$.each(this.nodes, function(index, item) {
+		// 		if (item.done){
+		// 			filteredItems.push(item);
+		// 		}
+		//     });
+		// }
 		allItems.root.children = filteredItems;
 	}
 	getFilteredFlat(keyword)
