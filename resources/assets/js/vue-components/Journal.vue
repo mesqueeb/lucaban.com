@@ -9,7 +9,8 @@
 			>
 				<div class="parent-string"></div>
 				<span>・</span>
-				<span class="body">{{ item.body }}</span>
+				<span class="body bodybox">{{{ item.body }}}</span>
+				<div class="completion-notes bodybox">{{ item.completion_memo }}</div>
 				<div class="item-tags"
 				>
 					<span v-if="item.planned_time" class="duration">

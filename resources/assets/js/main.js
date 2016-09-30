@@ -106,6 +106,9 @@ $.getJSON('/api/items',function(fetchedData){
 		    	maxDate: 'today',
 		    	enableTime: true,
 		    	time_24hr: true,
+		    	onOpen(dateObj, dateStr, instance){
+					vm.$root.beforeEditCache_doneDate = dateStr;
+		    	},
 		    	onChange: function(dateObj, dateStr, instance){
 					let el = instance.element.id;
 					document.getElementById(el).focus();
@@ -113,6 +116,7 @@ $.getJSON('/api/items',function(fetchedData){
 					console.log(el);
 				},
 				onClose: function(dateObj, dateStr, instance){
+					if (vm.$root.beforeEditCache_doneDate == dateStr){ return; }
 					let el = instance.element.id;
 					let id = el.replace('done-date-edit-', '');
 					vm.patch(id, 'done_date');

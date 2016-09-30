@@ -1,4 +1,4 @@
-export default {
+let VueRoot = Vue.extend({
 	el:'body',
 	data: {
 		allData: allItems.root,
@@ -395,4 +395,5 @@ export default {
 			'X-CSRF-TOKEN': document.querySelector('#token').getAttribute('value'),
 		},
     },
-};
+});
+export { VueRoot }
