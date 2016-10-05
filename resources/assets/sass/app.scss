@@ -1,4 +1,12 @@
 // @import 'node_modules/bootstrap-sass/assets/stylesheets/bootstrap';
+
+$selection-color: rgba(245,215,110,0.5);
+$theme-color: #5dc2af;
+$duration-color: #5dacce;
+$duration-color-dark: #4679a7;
+$duedate-color: rgba(230, 94, 77, 1);
+$duedate-parent-color: rgba(230, 94, 77, 0.5);
+
 @import 'node_modules/material-design-iconic-font/scss/material-design-iconic-font.scss';
 @import 'node_modules/flatpickr/dist/flatpickr.min';
 @import 'main.scss';
@@ -6,3 +14,5 @@
 @import 'components/alert.sass';
 @import 'components/items.scss';
 @import 'components/popups.scss';
+@import 'components/popouts.scss';
+@import 'components/timer.scss';

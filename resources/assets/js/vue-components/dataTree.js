@@ -37,10 +37,12 @@ export default class Tree {
 		itemsProcessed++;
 	    if(itemsProcessed === this.source.length) {
 	    	$.each(this.nodes, function(index, node) {
-			    this.sortChildren(node.id);
-			    this.updateChildrenDueDate(node.id);
+			    let id = node.id;
+			    this.sortChildren(id);
+			    this.updateChildrenDueDate(id);
+				// this.copyParentBodyToChild(id);　//Maybe I should only do this when pressing DONE
 			    if (!node.children.length && (node.used_time || node.planned_time)){
-				    this.calculateTotalTime(node.id);
+				    this.calculateTotalTime(id);
 			    }
 			    window.allItemsBackup = this.root.children;
 			}.bind(this));
@@ -75,6 +77,7 @@ export default class Tree {
 		this.nodes[item.id] = item;
 
 		// Patches etc.
+		// this.copyParentBodyToChild(item.parent_id); 　//Maybe I should only do this when pressing DONE
 	    selection.selectedId = item.id;
 	    vm.patch(item.parent_id, 'children_order');
 		this.autoCalculateDoneState(item.parent_id);
@@ -230,7 +233,7 @@ export default class Tree {
 		// Fix bug where item would still show if it prevParent has an array of 0 and the moved child was originally the last child...
 		if(prevParent.children.length == 0){ prevParent.children = []; }
 
-
+		// this.copyParentBodyToChild(new_parent_id);　//Maybe I should only do this when pressing DONE
 		vm.patch(id, 'depth');
 		vm.patch(id, 'parent_id');
 		vm.patch(new_parent_id, 'children_order');
@@ -255,6 +258,28 @@ export default class Tree {
 			this.updateChildrenDepth(child.id);
 			return true;
 		}.bind(this))
+	}
+	copyParentBodyToAllChildren(parent_id)
+	{
+		if (!parent_id){ return; }
+		let item = this.nodes[parent_id];
+		if (!item.children_order.length){ return; }
+		let b = item.body;
+		item.children_order.forEach(childId => {
+			let child = this.nodes[childId];
+			child.parents_bodies = b;
+			if (!vm){ return; }
+			vm.patch(child.id, 'parents_bodies');
+		});
+	}
+	copyParentBodyToChild(id)
+	{
+		if (!id){ return; }
+		let item = this.nodes[id];
+		if (!item.parent_id){ return; }
+		let parentBody = this.nodes[item.parent_id].body;
+		item.parents_bodies = parentBody;
+		vm.patch(id, 'parents_bodies');
 	}
 	isProject(id)
 	{
@@ -288,15 +313,18 @@ export default class Tree {
 	}
 	prepareDonePatch(id)
 	{
+		let item = this.nodes[id];
 		let done_date = moment().format();
-		allItems.nodes[id].done_date = done_date;
+		item.done_date = done_date;
 		vm.patchDone(id);
-		if(this.nodes[id].done){
+		if(item.done){
 			vm.popup(id, 'afterDone');
 		}
-		this.autoCalculateDoneState(this.nodes[id].parent_id);
-		//Add Flatpickr (only if it gets the Done Tag.)
-		if (allItems.nodes[id].done){
+		this.autoCalculateDoneState(item.parent_id);
+		if (item.done){ // IF DONE:
+			//Add parent's body
+			this.copyParentBodyToChild(id);
+			//Add Flatpickr
 			setTimeout(function(){
 				let fpId = "done-date-edit-"+id;
 				let fpEl = document.getElementById(fpId);

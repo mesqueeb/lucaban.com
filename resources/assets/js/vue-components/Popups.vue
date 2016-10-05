@@ -1,47 +1,47 @@
 <template id="popups-template">
-    <div class="popups">
-      <div v-for="popup in popups"
-          class="popup callout animated"
-          :class="popup.type ? popup.type : 'secondary'"
-          transition="fade"
-      >
-          <div v-if="popup.title" class="title">{{popup.title}}</div>
-          <div v-if="popup.text">{{popup.text}}</div>
-          <div v-if="popup.type=='afterDone'" class="body">
-              <div class="completion-memo">
-                <label>Completion note</label>
-                <textarea name="completion_memo"
-                  v-model="popup.item.completion_memo"
-                  v-autosize="popup.item.completion_memo"
-                >{{ popup.item.completion_memo }}</textarea>
-              </div>
-              <div class="used-time">
-                <div>
-                    <label>Used time</label>
-                    <input v-model="popup.item.used_time" type="number"/>
-                    <span>{{ popup.item.used_time | hhmmss }}</span>
-                </div>
-                <div>
-                    <button class="forward"
-                      @click="incrementUsedTime(popup.item, 60)"
-                    >+1 minute</button>
-                    <button class="forward"
-                      @click="incrementUsedTime(popup.item, 300)"
-                    >+5 minutes</button>
-                    <button class="forward"
-                      @click="incrementUsedTime(popup.item, 600)"
-                    >+10 minutes</button>
-                    <button class="reset"
-                      @click="resetUsedTime(popup.item)"
-                    >Reset</button>
-                </div>
-              </div>
+<div class="popups">
+  <div v-for="popup in popups"
+      class="popup callout animated"
+      :class="popup.type ? popup.type : 'secondary'"
+      transition="fade"
+  >
+      <div v-if="popup.title" class="title">{{popup.title}}</div>
+      <div v-if="popup.text">{{popup.text}}</div>
+      <div v-if="popup.type=='afterDone'" class="body">
+          <div class="completion-memo">
+            <label>Completion note</label>
+            <textarea name="completion_memo"
+              v-model="popup.item.completion_memo"
+              v-autosize="popup.item.completion_memo"
+            >{{ popup.item.completion_memo }}</textarea>
           </div>
-          <button @click="removePopup(popup)" class="close-button" aria-label="Close alert" type="button">
-              <span aria-hidden="true">&times;</span>
-          </button>
+          <div class="used-time">
+            <div>
+                <label>Used time</label>
+                <input v-model="popup.item.used_time" type="number"/>
+                <span>{{ popup.item.used_time | hhmmss }}</span>
+            </div>
+            <div>
+                <button class="forward"
+                  @click="incrementUsedTime(popup.item, 60)"
+                >+1 minute</button>
+                <button class="forward"
+                  @click="incrementUsedTime(popup.item, 300)"
+                >+5 minutes</button>
+                <button class="forward"
+                  @click="incrementUsedTime(popup.item, 600)"
+                >+10 minutes</button>
+                <button class="reset"
+                  @click="resetUsedTime(popup.item)"
+                >Reset</button>
+            </div>
+          </div>
       </div>
-    </div>
+      <button @click="removePopup(popup)" class="close-button" aria-label="Close alert" type="button">
+          <span aria-hidden="true">&times;</span>
+      </button>
+  </div>
+</div>
 </template>
 <script>
 export default {

@@ -8,6 +8,7 @@
 
 </head>
 <body class="">
+<div id="body">
 <a href="{{route('home')}}">Go home</a>
 
 {{-- @include('elements.menu') --}}
@@ -18,8 +19,11 @@
 />
 
 <Popups :popups="popups"></Popups>
+<Popouts :popouts="popouts"
+	
+></Popouts>
 <div class="panel-body">
-	<Timer></Timer>
+	<Timer :timer-items="timerItems"></Timer>
 	<div class="navigation">
 		<div class="menu">
 			<a href="#"
@@ -62,7 +66,9 @@
 	</div>
 </div>
 
+{{-- <script src="https://unpkg.com/vue@2.0.1/dist/vue.js"></script> --}}
 <script src="js/vendor.js"></script>
 <script src="js/main.js"></script>
+</div>
 </body>
 </html>

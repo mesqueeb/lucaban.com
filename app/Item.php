@@ -9,7 +9,7 @@ class Item extends Model
 {
 	use Taggable;
 	protected $table = 'items';
-	protected $fillable = ['done','done_date','body','children_order','parent_id','depth','planned_time','used_time','due_date', 'show_children', 'completion_memo'];
+	protected $fillable = ['done','done_date','body','children_order','parent_id','depth','planned_time','used_time','due_date', 'show_children', 'completion_memo', 'parents_bodies'];
 
 	// public function tags($value='')
 	// {

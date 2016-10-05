@@ -51,6 +51,7 @@
 	import Journal from './vue-components/Journal.vue';
 	import Timer from './vue-components/Timer.vue';
 	import Popups from './vue-components/Popups.vue';
+	import Popouts from './vue-components/Popouts.vue';
 	
 	
 
@@ -61,7 +62,7 @@
 	import NotificationStoreClass from './vue-components/NotificationStore.js';
 
 $(window).on("scroll", function(e) {
-  if ($(this).scrollTop() > 33) {
+  if ($(this).scrollTop() > 33 && vm.timerItems.length) {
     $("body").addClass("fix-timer");
   } else {
     $("body").removeClass("fix-timer");
@@ -89,10 +90,7 @@ $( document ).ready(function() {
 	}, 2000);
 });
 
-Vue.transition('fade', {
-    enterClass: 'fadeInDown', // class of animate.css
-    leaveClass: 'fadeOutDown' // class of animate.css
-})
+
 
 
 $.getJSON('/api/items',function(fetchedData){
@@ -131,7 +129,7 @@ window.allItems = new Tree(fetchedData);
 window.selection = new Selection();
 // import VueRoot from './vue-components/VueRoot.js';
 window.vm = new Vue({
-	el:'body',
+	el:'#body',
 	data: {
 		allData: allItems.root,
 		doneData: null,
@@ -144,6 +142,8 @@ window.vm = new Vue({
 		loading: true,
 		patching: true,
 		popups: [],
+		popouts: [],
+		timerItems: [],
 		allTags: null,
 	},
 	components: {
@@ -151,6 +151,7 @@ window.vm = new Vue({
 		Journal,
 		Timer,
 		Popups,
+		Popouts,
 	},
 	methods:{
 		showChildren(id, show){
@@ -320,19 +321,22 @@ window.vm = new Vue({
 		},
 		deleteItem(id){
 			id = (!id) ? selection.selectedId : id ;
-			if (confirm("Do you really want to delete: "+allItems.nodes[id].body+"?") == false) {
-		        return;
-		    }
-			allItems.deleteItem(id);
+			// if (confirm("Do you really want to delete: "+allItems.nodes[id].body+"?") == false) {
+		 //        return;
+		 //    }
+		 	this.popout(id, 'confirm-delete');
 		},
 		deleteItemApi(idOrArray){
 			this.patching = true;
 			if (Array.isArray(idOrArray) && idOrArray.length) {
-				idOrArray.forEach(id => { this.deleteItemApi(id); });
+				let array = idOrArray; // It's an array!
+				array.forEach(id => { this.deleteItemApi(id); });
 			} else {
-				console.log('deleting: '+idOrArray);
-				this.$http.delete('/api/items/' + idOrArray)
+				let id = idOrArray; // It's an ID!
+				let item = allItems.nodes[id];
+				this.$http.delete('/api/items/' + id)
 				.then(function(response){
+					console.log('deleted: ['+item.body+']');
 					this.patching = false;
 				});
 			}
@@ -352,6 +356,27 @@ window.vm = new Vue({
                 timeout: true,
                 time: 10,
             });
+		},
+		popout(id, type){
+			id = (!id) ? selection.selectedId : id ;
+			let item = allItems.nodes[id];
+			this.popouts.push({
+            	item,
+            	title: "Do you really want to delete ["+item.body+"] ?",
+                text: "",
+                type: type,
+                timeout: true,
+                time: 10,
+            });
+		},
+		addTimer(id){
+			id = (!id) ? selection.selectedId : id ;
+			let item = allItems.nodes[id];
+			let timerExists = this.timerItems.filter(function (item) { return item.id === id; })[0];
+			if (!timerExists){
+				this.timerItems.push(item);
+				this.playTimer(item);
+			}
 		},
 		fetchDone(){
 			this.loading = true;
@@ -444,6 +469,18 @@ window.vm = new Vue({
 			this.patchTag(id, 'bloem', 'tag');
 		},
 	},
+	events: {
+        'confirm-ok': function (id) {
+            console.log('computer says "ok"...');
+            console.log(id);
+            allItems.deleteItem(id);
+        },
+        'confirm-cancel': function (id) {
+            console.log('computer says "no"...');
+            console.log(id);
+            return;
+        },
+    },
 	created(){
 	},
 	ready: function() {

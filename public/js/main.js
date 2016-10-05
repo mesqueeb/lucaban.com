@@ -25824,6 +25824,10 @@ var _Popups = require('./vue-components/Popups.vue');
 
 var _Popups2 = _interopRequireDefault(_Popups);
 
+var _Popouts = require('./vue-components/Popouts.vue');
+
+var _Popouts2 = _interopRequireDefault(_Popouts);
+
 var _dataTree = require('./vue-components/dataTree.js');
 
 var _dataTree2 = _interopRequireDefault(_dataTree);
@@ -25894,7 +25898,7 @@ _vue2.default.use(VueAutosize);
 
 
 (0, _jquery2.default)(window).on("scroll", function (e) {
-	if ((0, _jquery2.default)(this).scrollTop() > 33) {
+	if ((0, _jquery2.default)(this).scrollTop() > 33 && vm.timerItems.length) {
 		(0, _jquery2.default)("body").addClass("fix-timer");
 	} else {
 		(0, _jquery2.default)("body").removeClass("fix-timer");
@@ -25920,11 +25924,6 @@ window.setRowHeight = function () {
 	setTimeout(function () {
 		setRowHeight();
 	}, 2000);
-});
-
-_vue2.default.transition('fade', {
-	enterClass: 'fadeInDown', // class of animate.css
-	leaveClass: 'fadeOutDown' // class of animate.css
 });
 
 _jquery2.default.getJSON('/api/items', function (fetchedData) {
@@ -25966,7 +25965,7 @@ _jquery2.default.getJSON('/api/items', function (fetchedData) {
 	window.selection = new _Selection2.default();
 	// import VueRoot from './vue-components/VueRoot.js';
 	window.vm = new _vue2.default({
-		el: 'body',
+		el: '#body',
 		data: {
 			allData: allItems.root,
 			doneData: null,
@@ -25979,13 +25978,16 @@ _jquery2.default.getJSON('/api/items', function (fetchedData) {
 			loading: true,
 			patching: true,
 			popups: [],
+			popouts: [],
+			timerItems: [],
 			allTags: null
 		},
 		components: {
 			Card: _Card2.default,
 			Journal: _Journal2.default,
 			Timer: _Timer2.default,
-			Popups: _Popups2.default
+			Popups: _Popups2.default,
+			Popouts: _Popouts2.default
 		},
 		methods: {
 			showChildren: function showChildren(id, show) {
@@ -26165,24 +26167,29 @@ _jquery2.default.getJSON('/api/items', function (fetchedData) {
 			},
 			deleteItem: function deleteItem(id) {
 				id = !id ? selection.selectedId : id;
-				if (confirm("Do you really want to delete: " + allItems.nodes[id].body + "?") == false) {
-					return;
-				}
-				allItems.deleteItem(id);
+				// if (confirm("Do you really want to delete: "+allItems.nodes[id].body+"?") == false) {
+				//        return;
+				//    }
+				this.popout(id, 'confirm-delete');
 			},
 			deleteItemApi: function deleteItemApi(idOrArray) {
 				var _this = this;
 
 				this.patching = true;
 				if (Array.isArray(idOrArray) && idOrArray.length) {
-					idOrArray.forEach(function (id) {
+					var array = idOrArray; // It's an array!
+					array.forEach(function (id) {
 						_this.deleteItemApi(id);
 					});
 				} else {
-					console.log('deleting: ' + idOrArray);
-					this.$http.delete('/api/items/' + idOrArray).then(function (response) {
-						this.patching = false;
-					});
+					(function () {
+						var id = idOrArray; // It's an ID!
+						var item = allItems.nodes[id];
+						_this.$http.delete('/api/items/' + id).then(function (response) {
+							console.log('deleted: [' + item.body + ']');
+							this.patching = false;
+						});
+					})();
 				}
 			},
 			clickDone: function clickDone() {
@@ -26200,6 +26207,29 @@ _jquery2.default.getJSON('/api/items', function (fetchedData) {
 					timeout: true,
 					time: 10
 				});
+			},
+			popout: function popout(id, type) {
+				id = !id ? selection.selectedId : id;
+				var item = allItems.nodes[id];
+				this.popouts.push({
+					item: item,
+					title: "Do you really want to delete [" + item.body + "] ?",
+					text: "",
+					type: type,
+					timeout: true,
+					time: 10
+				});
+			},
+			addTimer: function addTimer(id) {
+				id = !id ? selection.selectedId : id;
+				var item = allItems.nodes[id];
+				var timerExists = this.timerItems.filter(function (item) {
+					return item.id === id;
+				})[0];
+				if (!timerExists) {
+					this.timerItems.push(item);
+					this.playTimer(item);
+				}
 			},
 			fetchDone: function fetchDone() {
 				this.loading = true;
@@ -26323,6 +26353,18 @@ _jquery2.default.getJSON('/api/items', function (fetchedData) {
 				this.patchTag(id, 'bloem', 'tag');
 			}
 		},
+		events: {
+			'confirm-ok': function confirmOk(id) {
+				console.log('computer says "ok"...');
+				console.log(id);
+				allItems.deleteItem(id);
+			},
+			'confirm-cancel': function confirmCancel(id) {
+				console.log('computer says "no"...');
+				console.log(id);
+				return;
+			}
+		},
 		created: function created() {},
 
 		ready: function ready() {
@@ -26428,7 +26470,7 @@ _jquery2.default.getJSON('/api/items', function (fetchedData) {
 	vm.loading = false;
 }); // end ajax - get data
 
-},{"./components/globalFunctions.js":30,"./vue-components/Card.vue":32,"./vue-components/Journal.vue":33,"./vue-components/NotificationStore.js":34,"./vue-components/Popups.vue":35,"./vue-components/Selection.js":36,"./vue-components/Timer.vue":37,"./vue-components/dataTree.js":38,"./vue-components/vueFilters.js":39,"flatpickr":2,"jquery":3,"linkifyjs":5,"linkifyjs/html":4,"linkifyjs/plugins/hashtag":24,"vue":29,"vue-autosize":26,"vue-resource":28}],32:[function(require,module,exports){
+},{"./components/globalFunctions.js":30,"./vue-components/Card.vue":32,"./vue-components/Journal.vue":33,"./vue-components/NotificationStore.js":34,"./vue-components/Popouts.vue":35,"./vue-components/Popups.vue":36,"./vue-components/Selection.js":37,"./vue-components/Timer.vue":38,"./vue-components/dataTree.js":39,"./vue-components/vueFilters.js":40,"flatpickr":2,"jquery":3,"linkifyjs":5,"linkifyjs/html":4,"linkifyjs/plugins/hashtag":24,"vue":29,"vue-autosize":26,"vue-resource":28}],32:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -26517,7 +26559,7 @@ exports.default = {
 	methods: {
 		addTimer: function addTimer(item) {
 			//Codementor
-			this.$root.$children[1].addTimer(item.id);
+			this.$root.addTimer(item.id);
 		},
 		selectItem: function selectItem(item) {
 			selection.selectedId = item.id;
@@ -26686,10 +26728,10 @@ exports.default = {
 		},
 		deleteItem: function deleteItem(item) {
 			var id = item.id;
-			if (confirm("Do you really want to delete: " + item.body + "?") == false) {
-				return;
-			}
-			allItems.deleteItem(id);
+			// if (confirm("Do you really want to delete: "+item.body+"?") == false) {
+			//        return;
+			//    }
+			this.$root.deleteItem(id);
 		},
 		addNew: function addNew(addNextItemAs) {
 			console.log('sending newItem:');
@@ -26707,7 +26749,7 @@ exports.default = {
 				var storedItem = response.data;
 				console.log('starting dom update...');
 				var OlderSiblingIndex = this.siblingIndex;
-				var index = OlderSiblingIndex + 1;
+				var index = !OlderSiblingIndex ? 0 : OlderSiblingIndex + 1;
 				allItems.addItem(storedItem, index, addNextItemAs);
 			});
 		},
@@ -26782,7 +26824,7 @@ exports.default = {
 	}
 };
 if (module.exports.__esModule) module.exports = module.exports.default
-;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\n \t<div class=\"done-card\" v-for=\"day in recordsPerDate\">\n \t\t<div class=\"title\">{{ day.date }}</div>\n \t\t<div class=\"item-wrapper\">\n\t\t\t<div class=\"item\" v-for=\"item in day.items\">\n\t\t\t\t<div class=\"parent-string\"></div>\n\t\t\t\t<span>・</span>\n\t\t\t\t<span class=\"body bodybox\">{{{ item.body }}}</span>\n\t\t\t\t<div class=\"completion-notes bodybox\">{{ item.completion_memo }}</div>\n\t\t\t\t<div class=\"item-tags\">\n\t\t\t\t\t<span v-if=\"item.planned_time\" class=\"duration\">\n\t\t\t\t\t\t{{ item.planned_time }} min\n\t\t\t\t\t</span>\n\t\t\t\t</div>\n\t\t\t</div>\n<!--    <div \n\t\t\tclass=\"item-card\"\n\t\t\tv-if=\"item.depth != 0\"\n\t\t\t:class=\"{\n\t\t\t\tdone: item.done,\n\t\t\t\tediting: item.id == this.$root.editingItem,\n\t\t\t}\"\n\t\t>\n\t\t\t<div class=\"toggle-div\">\n\t\t\t\t<input class=\"toggle\"\n\t\t\t\t\ttype=\"checkbox\"\n\t\t\t\t\tv-if=\"item.children_order.length==0 || item.done == true\"\n\t\t\t\t\tv-model=\"item.done\"\n\t\t\t\t\t@change=\"markDone(item.id)\"\n\t\t\t\t>\n\t\t\t</div>\n\t\t\t<div class=\"body-div\"\n\t\t\t\t:class=\"{ selected: item.id == this.$root.selection.selectedId, }\"\n\t\t\t\t@dblclick=\"startEdit(item)\"\n\t\t\t\t@click=\"select(item)\"\n\t\t\t\t@enter=\"console.log('yarrr')\"\n\t\t\t>\n\t\t\t\t<span class=\"bodybox\"\n\t\t\t\t\tv-show=\"item.id != this.$root.editingItem\"\n\t\t\t\t>{{ item.body }}</span>\n\t\t\t\t\n\t\t\t\t<span v-show=\"false\"> ({{item.id}}) D-{{item.depth}}) [{{item.children_order}}]</span>\n\t\t\t\t\n\t\t\t\t<form action=\"update\"\n\t\t\t\t\tclass=\"updatebox\"\n\t\t\t\t\tv-show=\"item.id == this.$root.editingItem\"\n\t\t\t\t\t@submit.prevent=\"doneEdit(item)\"\n\t\t\t\t>\n\t\t\t\t\t<textarea name=\"item_body\"\n\t\t\t\t\t\trows=\"{{ item.rows }}\"\n\t\t\t\t\t\tv-model=\"item.body\"\n\t\t\t\t\t\tv-autosize=\"item.body\"\n\t\t\t\t\t\tv-item-focus=\"item.id == this.$root.editingItem\"\n\t\t\t\t\t\t@blur=\"blurOnEdit(item)\"\n\t\t\t\t\t\t@keyup.esc=\"cancelEdit(item)\"\n\t\t\t\t\t\t@keydown.enter=\"enterOnEdit\"\n\t\t\t\t\t>{{ item.body }}</textarea>\n\t\t\t\t\t<span>\n\t\t\t\t\t\t<label for=\"planned_time\">duration:</label>\n\t\t\t\t\t\t<input name=\"planned_time\"\n\t\t\t\t\t\t\ttype=\"number\"\n\t\t\t\t\t\t\tv-model=\"item.planned_time\"\n\t\t\t\t\t\t\t@blur=\"blurOnEdit(item)\"\n\t\t\t\t\t\t\t@keyup.esc=\"cancelEdit(item)\"\n\t\t\t\t\t\t\t@keydown.enter=\"doneEdit(item)\"\n\t\t\t\t\t\t/>\n\t\t\t\t\t</span>\n\t\t\t\t</form>\n\t\t\t\t<div class=\"item-tags\"\n\t\t\t\t\tv-show=\"this.$root.editingItem != item.id\"\n\t\t\t\t>\n\t\t\t\t\t<span v-if=\"item.done\" class=\"done\">\n\t\t\t\t\t\tdone {{ item.done_date | momentRelative }}\n\t\t\t\t\t</span>\n\t\t\t\t\t\n\t\t\t\t\t<span v-if=\"hasTotalTime\" class=\"total-duration\">\n\t\t\t\t\t\ttotal {{ calcTotalTime }} min\n\t\t\t\t\t</span>\n\n\t\t\t\t\t<span v-if=\"hasPlannedTime\" class=\"duration\">\n\t\t\t\t\t\t{{ item.planned_time }} min\n\t\t\t\t\t</span>\n\n\t\t\t\t\t<span v-if=\"hasDueDate\" class=\"duedate\">\n\t\t\t\t\t\t{{ item.due_date | momentCalendar }}\n\t\t\t\t\t</span>\n\n\t\t\t\t\t<span v-if=\"item.dueDateParent\" class=\"duedate-parent\">\n\t\t\t\t\t\t{{ item.dueDateParent | momentCalendar }}\n\t\t\t\t\t</span>\n\n\t\t\t\t</div>\n\t\t\t\t<div class=\"item-nav\"\n\t\t\t\t\tv-show=\"this.$root.editingItem != item.id\"\n\t\t\t\t>\n\t\t\t\t\t<button \n\t\t\t\t\t\tv-if=\"item.children_order.length==0\"\n\t\t\t\t\t\t@click=\"deleteItem(item)\"\n\t\t\t\t\t>✗</button>\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t</div> \n-->\n\n<!--\n \t\t<form class=\"addnewbox\" \n\t\t\tid=\"new-under-{{ item.id }}\"\n\t\t\tv-if=\"showAddNewBox\"\n\t\t\t@submit.prevent\n\t\t>\n\t\t\t<textarea type=\"text\"\n\t\t\t\tclass=\"add-item\"\n\t\t\t\tname=\"body\"\n\t\t\t\tv-model=\"newItem.body\"\n\t\t\t\tv-autosize=\"newItem.body\"\n\t\t\t\t@blur=\"blurOnAddNew(item)\"\n\t\t\t\t@keyup.esc=\"cancelAddNew\"\n\t\t\t\t@keydown=\"keydownOnNew\"\n\t\t\t\tplaceholder=\"...\"\n\t\t\t\tautocomplete=\"off\"\n\t\t\t\tautofocus \n\t\t\t\trows=\"1\"\n\t\t\t></textarea>\n\t\t\t<span>\n\t\t\t\t<label for=\"planned_time\">duration:</label>\n\t\t\t\t<input name=\"planned_time\"\n\t\t\t\t\ttype=\"number\"\n\t\t\t\t\tv-model=\"newItem.planned_time\"\n\t\t\t\t\t@blur=\"blurOnAddNew(item)\"\n\t\t\t\t\t@keyup.esc=\"cancelAddNew\"\n\t\t\t\t\t@keydown=\"keydownOnNew\"\n\t\t\t\t/>\n\t\t\t</span>\n\t\t</form> -->\n\t\t</div><!-- End item-wrapper -->\n\t\t<div class=\"total time\">Total time: {{ day.totalTime }}</div>\n\t\t<hr>\n\t</div>\n"
+;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\n \t<div class=\"done-card\" v-for=\"day in recordsPerDate\">\n \t\t<div class=\"title\">{{ day.date }}</div>\n \t\t<div class=\"item-wrapper\">\n\t\t\t<div class=\"item\" v-for=\"item in day.items\">\n\t\t\t\t<div class=\"parent-string\">{{ item.parents_bodies }}</div>\n\t\t\t\t<span>・</span>\n\t\t\t\t<span class=\"body bodybox\">{{{ item.body }}}</span>\n\t\t\t\t<div class=\"completion-notes bodybox\">{{ item.completion_memo }}</div>\n\t\t\t\t<div class=\"item-tags\">\n\t\t\t\t\t<span v-if=\"item.planned_time\" class=\"duration\">\n\t\t\t\t\t\t{{ item.planned_time }} min\n\t\t\t\t\t</span>\n\t\t\t\t</div>\n\t\t\t</div>\n<!--    <div \n\t\t\tclass=\"item-card\"\n\t\t\tv-if=\"item.depth != 0\"\n\t\t\t:class=\"{\n\t\t\t\tdone: item.done,\n\t\t\t\tediting: item.id == this.$root.editingItem,\n\t\t\t}\"\n\t\t>\n\t\t\t<div class=\"toggle-div\">\n\t\t\t\t<input class=\"toggle\"\n\t\t\t\t\ttype=\"checkbox\"\n\t\t\t\t\tv-if=\"item.children_order.length==0 || item.done == true\"\n\t\t\t\t\tv-model=\"item.done\"\n\t\t\t\t\t@change=\"markDone(item.id)\"\n\t\t\t\t>\n\t\t\t</div>\n\t\t\t<div class=\"body-div\"\n\t\t\t\t:class=\"{ selected: item.id == this.$root.selection.selectedId, }\"\n\t\t\t\t@dblclick=\"startEdit(item)\"\n\t\t\t\t@click=\"select(item)\"\n\t\t\t\t@enter=\"console.log('yarrr')\"\n\t\t\t>\n\t\t\t\t<span class=\"bodybox\"\n\t\t\t\t\tv-show=\"item.id != this.$root.editingItem\"\n\t\t\t\t>{{ item.body }}</span>\n\t\t\t\t\n\t\t\t\t<span v-show=\"false\"> ({{item.id}}) D-{{item.depth}}) [{{item.children_order}}]</span>\n\t\t\t\t\n\t\t\t\t<form action=\"update\"\n\t\t\t\t\tclass=\"updatebox\"\n\t\t\t\t\tv-show=\"item.id == this.$root.editingItem\"\n\t\t\t\t\t@submit.prevent=\"doneEdit(item)\"\n\t\t\t\t>\n\t\t\t\t\t<textarea name=\"item_body\"\n\t\t\t\t\t\trows=\"{{ item.rows }}\"\n\t\t\t\t\t\tv-model=\"item.body\"\n\t\t\t\t\t\tv-autosize=\"item.body\"\n\t\t\t\t\t\tv-item-focus=\"item.id == this.$root.editingItem\"\n\t\t\t\t\t\t@blur=\"blurOnEdit(item)\"\n\t\t\t\t\t\t@keyup.esc=\"cancelEdit(item)\"\n\t\t\t\t\t\t@keydown.enter=\"enterOnEdit\"\n\t\t\t\t\t>{{ item.body }}</textarea>\n\t\t\t\t\t<span>\n\t\t\t\t\t\t<label for=\"planned_time\">duration:</label>\n\t\t\t\t\t\t<input name=\"planned_time\"\n\t\t\t\t\t\t\ttype=\"number\"\n\t\t\t\t\t\t\tv-model=\"item.planned_time\"\n\t\t\t\t\t\t\t@blur=\"blurOnEdit(item)\"\n\t\t\t\t\t\t\t@keyup.esc=\"cancelEdit(item)\"\n\t\t\t\t\t\t\t@keydown.enter=\"doneEdit(item)\"\n\t\t\t\t\t\t/>\n\t\t\t\t\t</span>\n\t\t\t\t</form>\n\t\t\t\t<div class=\"item-tags\"\n\t\t\t\t\tv-show=\"this.$root.editingItem != item.id\"\n\t\t\t\t>\n\t\t\t\t\t<span v-if=\"item.done\" class=\"done\">\n\t\t\t\t\t\tdone {{ item.done_date | momentRelative }}\n\t\t\t\t\t</span>\n\t\t\t\t\t\n\t\t\t\t\t<span v-if=\"hasTotalTime\" class=\"total-duration\">\n\t\t\t\t\t\ttotal {{ calcTotalTime }} min\n\t\t\t\t\t</span>\n\n\t\t\t\t\t<span v-if=\"hasPlannedTime\" class=\"duration\">\n\t\t\t\t\t\t{{ item.planned_time }} min\n\t\t\t\t\t</span>\n\n\t\t\t\t\t<span v-if=\"hasDueDate\" class=\"duedate\">\n\t\t\t\t\t\t{{ item.due_date | momentCalendar }}\n\t\t\t\t\t</span>\n\n\t\t\t\t\t<span v-if=\"item.dueDateParent\" class=\"duedate-parent\">\n\t\t\t\t\t\t{{ item.dueDateParent | momentCalendar }}\n\t\t\t\t\t</span>\n\n\t\t\t\t</div>\n\t\t\t\t<div class=\"item-nav\"\n\t\t\t\t\tv-show=\"this.$root.editingItem != item.id\"\n\t\t\t\t>\n\t\t\t\t\t<button \n\t\t\t\t\t\tv-if=\"item.children_order.length==0\"\n\t\t\t\t\t\t@click=\"deleteItem(item)\"\n\t\t\t\t\t>✗</button>\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t</div> \n-->\n\n<!--\n \t\t<form class=\"addnewbox\" \n\t\t\tid=\"new-under-{{ item.id }}\"\n\t\t\tv-if=\"showAddNewBox\"\n\t\t\t@submit.prevent\n\t\t>\n\t\t\t<textarea type=\"text\"\n\t\t\t\tclass=\"add-item\"\n\t\t\t\tname=\"body\"\n\t\t\t\tv-model=\"newItem.body\"\n\t\t\t\tv-autosize=\"newItem.body\"\n\t\t\t\t@blur=\"blurOnAddNew(item)\"\n\t\t\t\t@keyup.esc=\"cancelAddNew\"\n\t\t\t\t@keydown=\"keydownOnNew\"\n\t\t\t\tplaceholder=\"...\"\n\t\t\t\tautocomplete=\"off\"\n\t\t\t\tautofocus \n\t\t\t\trows=\"1\"\n\t\t\t></textarea>\n\t\t\t<span>\n\t\t\t\t<label for=\"planned_time\">duration:</label>\n\t\t\t\t<input name=\"planned_time\"\n\t\t\t\t\ttype=\"number\"\n\t\t\t\t\tv-model=\"newItem.planned_time\"\n\t\t\t\t\t@blur=\"blurOnAddNew(item)\"\n\t\t\t\t\t@keyup.esc=\"cancelAddNew\"\n\t\t\t\t\t@keydown=\"keydownOnNew\"\n\t\t\t\t/>\n\t\t\t</span>\n\t\t</form> -->\n\t\t</div><!-- End item-wrapper -->\n\t\t<div class=\"total time\">Total time: {{ day.totalTime }}</div>\n\t\t<hr>\n\t</div>\n"
 if (module.hot) {(function () {  module.hot.accept()
   var hotAPI = require("vue-hot-reload-api")
   hotAPI.install(require("vue"), true)
@@ -26836,6 +26878,40 @@ Object.defineProperty(exports, "__esModule", {
     value: true
 });
 exports.default = {
+    name: 'Popouts',
+    template: '#popouts-template',
+    props: ['popouts'],
+    methods: {
+        removePopout: function removePopout(popout) {
+            clearTimeout(popout.timer);
+            this.$root.popouts.$remove(popout);
+        },
+        popoutCall: function popoutCall(msg, popout) {
+            this.$dispatch(msg, popout.item.id);
+            this.removePopout(popout);
+        }
+    }
+
+};
+if (module.exports.__esModule) module.exports = module.exports.default
+;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\n<div class=\"popouts\" v-if=\"popouts.length\">\n\t<div v-for=\"popout in popouts\" class=\"popout\">\n\t\t<div class=\"body bodybox\">{{ popout.title }}</div>\n\t\t<div class=\"nav\">\n\t\t\t<a href=\"#\" @click=\"popoutCall('confirm-cancel', popout)\">Cancel</a>\n\t\t\t<a href=\"#\" @click=\"popoutCall('confirm-ok', popout)\">OK</a>\n\t\t</div>\n\t</div>\n</div>\n"
+if (module.hot) {(function () {  module.hot.accept()
+  var hotAPI = require("vue-hot-reload-api")
+  hotAPI.install(require("vue"), true)
+  if (!hotAPI.compatible) return
+  if (!module.hot.data) {
+    hotAPI.createRecord("_v-be8b63de", module.exports)
+  } else {
+    hotAPI.update("_v-be8b63de", module.exports, (typeof module.exports === "function" ? module.exports.options : module.exports).template)
+  }
+})()}
+},{"vue":29,"vue-hot-reload-api":27}],36:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+exports.default = {
     name: 'Popups',
     template: '#popups-template',
     props: ['popups'],
@@ -26879,7 +26955,7 @@ if (module.hot) {(function () {  module.hot.accept()
     hotAPI.update("_v-39e00e3c", module.exports, (typeof module.exports === "function" ? module.exports.options : module.exports).template)
   }
 })()}
-},{"vue":29,"vue-hot-reload-api":27}],36:[function(require,module,exports){
+},{"vue":29,"vue-hot-reload-api":27}],37:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -26913,7 +26989,7 @@ var Selection = function () {
 
 exports.default = Selection;
 
-},{}],37:[function(require,module,exports){
+},{}],38:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -26922,12 +26998,7 @@ Object.defineProperty(exports, "__esModule", {
 exports.default = {
 	name: 'Timer',
 	template: '#timer-template',
-	data: function data() {
-		return {
-			timerItems: []
-		};
-	},
-
+	props: ['timer-items'],
 	methods: {
 		btnEffect: function btnEffect(id, identifier) {
 			var $el = $('#timer-' + id + ' .' + identifier);
@@ -26936,17 +27007,7 @@ exports.default = {
 				$el.removeClass("btn--click");
 			}, 400);
 		},
-		addTimer: function addTimer(id) {
-			id = !id ? selection.selectedId : id;
-			var item = allItems.nodes[id];
-			var timerExists = this.timerItems.filter(function (item) {
-				return item.id === id;
-			})[0];
-			if (!timerExists) {
-				this.timerItems.push(item);
-				this.playTimer(item);
-			}
-		},
+		addTimer: function addTimer(id) {},
 		playTimer: function playTimer(item) {
 			this.btnEffect(item.id, 'play');
 			var update = function update() {
@@ -26981,8 +27042,10 @@ exports.default = {
 		},
 		removeTimer: function removeTimer(item) {
 			this.btnEffect(item.id, 'close');
-			clearInterval(window.timers[item.id]);
-			delete window.timers[item.id];
+			if (window.timers && window.timers[item.id]) {
+				clearInterval(window.timers[item.id]);
+				delete window.timers[item.id];
+			}
 			if (item.used_time < 5) {
 				item.used_time = 0;
 			} else {
@@ -27008,7 +27071,7 @@ if (module.hot) {(function () {  module.hot.accept()
     hotAPI.update("_v-4158a440", module.exports, (typeof module.exports === "function" ? module.exports.options : module.exports).template)
   }
 })()}
-},{"vue":29,"vue-hot-reload-api":27}],38:[function(require,module,exports){
+},{"vue":29,"vue-hot-reload-api":27}],39:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -27068,10 +27131,12 @@ var Tree = function () {
 			itemsProcessed++;
 			if (itemsProcessed === this.source.length) {
 				$.each(this.nodes, function (index, node) {
-					this.sortChildren(node.id);
-					this.updateChildrenDueDate(node.id);
+					var id = node.id;
+					this.sortChildren(id);
+					this.updateChildrenDueDate(id);
+					// this.copyParentBodyToChild(id);　//Maybe I should only do this when pressing DONE
 					if (!node.children.length && (node.used_time || node.planned_time)) {
-						this.calculateTotalTime(node.id);
+						this.calculateTotalTime(id);
 					}
 					window.allItemsBackup = this.root.children;
 				}.bind(this));
@@ -27109,6 +27174,7 @@ var Tree = function () {
 			this.nodes[item.id] = item;
 
 			// Patches etc.
+			// this.copyParentBodyToChild(item.parent_id); 　//Maybe I should only do this when pressing DONE
 			selection.selectedId = item.id;
 			vm.patch(item.parent_id, 'children_order');
 			this.autoCalculateDoneState(item.parent_id);
@@ -27292,6 +27358,7 @@ var Tree = function () {
 				prevParent.children = [];
 			}
 
+			// this.copyParentBodyToChild(new_parent_id);　//Maybe I should only do this when pressing DONE
 			vm.patch(id, 'depth');
 			vm.patch(id, 'parent_id');
 			vm.patch(new_parent_id, 'children_order');
@@ -27319,6 +27386,42 @@ var Tree = function () {
 				this.updateChildrenDepth(child.id);
 				return true;
 			}.bind(this));
+		}
+	}, {
+		key: 'copyParentBodyToAllChildren',
+		value: function copyParentBodyToAllChildren(parent_id) {
+			var _this2 = this;
+
+			if (!parent_id) {
+				return;
+			}
+			var item = this.nodes[parent_id];
+			if (!item.children_order.length) {
+				return;
+			}
+			var b = item.body;
+			item.children_order.forEach(function (childId) {
+				var child = _this2.nodes[childId];
+				child.parents_bodies = b;
+				if (!vm) {
+					return;
+				}
+				vm.patch(child.id, 'parents_bodies');
+			});
+		}
+	}, {
+		key: 'copyParentBodyToChild',
+		value: function copyParentBodyToChild(id) {
+			if (!id) {
+				return;
+			}
+			var item = this.nodes[id];
+			if (!item.parent_id) {
+				return;
+			}
+			var parentBody = this.nodes[item.parent_id].body;
+			item.parents_bodies = parentBody;
+			vm.patch(id, 'parents_bodies');
 		}
 	}, {
 		key: 'isProject',
@@ -27355,15 +27458,19 @@ var Tree = function () {
 	}, {
 		key: 'prepareDonePatch',
 		value: function prepareDonePatch(id) {
+			var item = this.nodes[id];
 			var done_date = moment().format();
-			allItems.nodes[id].done_date = done_date;
+			item.done_date = done_date;
 			vm.patchDone(id);
-			if (this.nodes[id].done) {
+			if (item.done) {
 				vm.popup(id, 'afterDone');
 			}
-			this.autoCalculateDoneState(this.nodes[id].parent_id);
-			//Add Flatpickr (only if it gets the Done Tag.)
-			if (allItems.nodes[id].done) {
+			this.autoCalculateDoneState(item.parent_id);
+			if (item.done) {
+				// IF DONE:
+				//Add parent's body
+				this.copyParentBodyToChild(id);
+				//Add Flatpickr
 				setTimeout(function () {
 					var fpId = "done-date-edit-" + id;
 					var fpEl = document.getElementById(fpId);
@@ -27421,7 +27528,7 @@ var Tree = function () {
 	}, {
 		key: 'getAllChildrenIdsRecursive',
 		value: function getAllChildrenIdsRecursive(id, allChildrenIds) {
-			var _this2 = this;
+			var _this3 = this;
 
 			var item = this.nodes[id];
 			if (!(Array.isArray(item.children) && item.children.length)) {
@@ -27431,7 +27538,7 @@ var Tree = function () {
 					allChildrenIds.push(item);
 				});
 				item.children_order.forEach(function (item) {
-					return _this2.getAllChildrenIdsRecursive(item, allChildrenIds);
+					return _this3.getAllChildrenIdsRecursive(item, allChildrenIds);
 				});
 			}
 		}
@@ -27542,13 +27649,13 @@ var Tree = function () {
 		key: 'flushDoneItems',
 		value: function flushDoneItems() // Do not use yet. Not sure how to best implement this...
 		{
-			var _this3 = this;
+			var _this4 = this;
 
 			var nodes = this.nodes;
 			var keys = Object.keys(nodes);
 			var doneItemsObject = keys.reduce(function (prev, id) {
 				if (nodes[id].done) {
-					_this3.deleteItem(id);
+					_this4.deleteItem(id);
 				}
 			});
 		}
@@ -27642,11 +27749,11 @@ var Tree = function () {
 	}, {
 		key: 'getFilteredFlat',
 		value: function getFilteredFlat(keyword) {
-			var _this4 = this;
+			var _this5 = this;
 
 			if (keyword == 'done') {
 				var _ret = function () {
-					var nodes = _this4.nodes;
+					var nodes = _this5.nodes;
 					var keys = Object.keys(nodes);
 					var doneItemsObject = keys.reduce(function (prev, item) {
 						if (nodes[item].done) {
@@ -27724,12 +27831,12 @@ var Tree = function () {
 	}, {
 		key: 'getFiltered',
 		value: function getFiltered(keyword) {
-			var _this5 = this;
+			var _this6 = this;
 
 			if (keyword == 'done') {
 				var _ret2 = function () {
-					var firstItem = _this5.root.children;
-					var doneItemsObject = _this5.getDoneTasksRecursively(firstItem);
+					var firstItem = _this6.root.children;
+					var doneItemsObject = _this6.getDoneTasksRecursively(firstItem);
 					console.log(doneItemsObject);
 					return {
 						v: Object.keys(doneItemsObject).map(function (k) {
@@ -27751,7 +27858,7 @@ var Tree = function () {
 
 exports.default = Tree;
 
-},{}],39:[function(require,module,exports){
+},{}],40:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {

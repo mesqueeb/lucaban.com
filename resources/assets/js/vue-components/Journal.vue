@@ -7,7 +7,7 @@
 			<div class="item" 
 				v-for="item in day.items"
 			>
-				<div class="parent-string"></div>
+				<div class="parent-string">{{ item.parents_bodies }}</div>
 				<span>・</span>
 				<span class="body bodybox">{{{ item.body }}}</span>
 				<div class="completion-notes bodybox">{{ item.completion_memo }}</div>

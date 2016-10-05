@@ -50,11 +50,7 @@
 export default {
 	name: 'Timer',
 	template:'#timer-template',
-	data (){
-		return {
-			timerItems: [],
-		};
-	},
+	props: ['timer-items'],
 	methods: {
 		btnEffect(id, identifier){
 			let $el = $('#timer-'+id+' .'+identifier);
@@ -64,13 +60,7 @@ export default {
 			}, 400);
 		},
 		addTimer(id){
-			id = (!id) ? selection.selectedId : id ;
-			let item = allItems.nodes[id];
-			let timerExists = this.timerItems.filter(function (item) { return item.id === id; })[0];
-			if (!timerExists){
-				this.timerItems.push(item);
-				this.playTimer(item);
-			}
+
 		},
 		playTimer(item){
 			this.btnEffect(item.id, 'play');
@@ -80,7 +70,6 @@ export default {
 				} else {
 					item.used_time = ++item.used_time;
 				}
-
 			}
 			window.timers = (!window.timers) ? {} : timers;
 			if(timers[item.id]){ return; }
@@ -105,8 +94,10 @@ export default {
 		},
 		removeTimer(item){
 			this.btnEffect(item.id, 'close');
-			clearInterval(window.timers[item.id]);
-			delete window.timers[item.id];
+			if (window.timers && window.timers[item.id]){
+				clearInterval(window.timers[item.id]);
+				delete window.timers[item.id];
+			}
 			if(item.used_time < 5){
 				item.used_time = 0;
 			} else {

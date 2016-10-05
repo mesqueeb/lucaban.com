@@ -247,7 +247,7 @@ export default {
 	computed: {
 		isProject(){
 			console.log('checking isProject');
-			return allItems.isProject(this.item.id);
+			return allItems.isProject(this.item.id);			
 		},
 		siblingIndex(){ return allItems.siblingIndex(this.item.id); },
 		olderSiblingId(){ return allItems.olderSiblingId(this.item.id); },
@@ -306,7 +306,7 @@ export default {
 	methods: {
 		addTimer(item){
 			//Codementor
-			this.$root.$children[1].addTimer(item.id);
+			this.$root.addTimer(item.id);
 		},
 		selectItem(item){
 			selection.selectedId = item.id;
@@ -472,10 +472,10 @@ export default {
 		},
 		deleteItem(item){
 			let id = item.id;
-			if (confirm("Do you really want to delete: "+item.body+"?") == false) {
-		        return;
-		    }
-			allItems.deleteItem(id);
+			// if (confirm("Do you really want to delete: "+item.body+"?") == false) {
+		 //        return;
+		 //    }
+			this.$root.deleteItem(id);
 		},
 		addNew(addNextItemAs){
 			console.log('sending newItem:');
@@ -492,7 +492,7 @@ export default {
 				let storedItem = response.data;
 				console.log('starting dom update...');
 				let OlderSiblingIndex = this.siblingIndex;
-				let index = OlderSiblingIndex+1;
+				let index = (!OlderSiblingIndex) ? 0 : OlderSiblingIndex+1;
 				allItems.addItem(storedItem, index, addNextItemAs);
 			});
 		},

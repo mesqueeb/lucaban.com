@@ -1,0 +1,33 @@
+.fix-timer {
+    #timer-area{
+        background: #f5f5f5;
+        position: fixed;
+        z-index: 2;
+        top: 0;
+        right: 0;
+        left: 0;
+        padding: 0.5em 1.5em 0;
+    }
+
+}
+#timer-area{
+    margin-bottom: 0.6em;
+    .timer{
+        display: flex;
+        align-items: baseline;
+        font-size: 1.3em;
+        padding-bottom: 0.5em;
+        .timer-time {
+            margin-right: 1em;
+            margin-left: auto;
+        }
+        .nav{
+            i{
+                font-size: 1.5em;
+            }
+        }
+    }
+}
+.fix-timer #timer-area+div {
+    margin-top: 3em;
+}

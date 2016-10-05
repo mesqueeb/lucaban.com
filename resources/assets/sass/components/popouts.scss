@@ -1,0 +1,32 @@
+.popouts {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 4;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, .5);
+    transition: opacity .3s ease;	
+}
+.popout {
+    z-index: 5;
+    background: white;
+    border-radius: 0.3em;
+	>.body {
+		padding: 1em;
+		border-bottom: 1px solid #e3e3e3;
+	}
+	>.nav {
+	    padding: 0.6em 1em;
+	    text-align: right;
+	}
+	a {
+	    padding: 0 0.4em;
+	    margin: 0 0.3em;
+	    text-decoration: none;
+	    color: $theme-color;
+	}
+}
