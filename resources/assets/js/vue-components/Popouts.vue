@@ -1,16 +1,19 @@
 <template id="popouts-template">
-<div class="popouts" v-if="popouts.length">
+<div id="popouts-mask"
+	v-if="popouts.length"
+	@click="clearAll"
+>
 	<div v-for="popout in popouts"
 		class="popout"
 	>
 		<div class="body bodybox">{{ popout.title }}</div>
 		<div class="nav">
-			<a href="#"
+			<button class="btn-cancel" 
 				@click="popoutCall('confirm-cancel', popout)"
-			>Cancel</a>
-			<a href="#"
+			>Cancel</button>
+			<button class="btn-ok" 
 				@click="popoutCall('confirm-ok', popout)"
-			>OK</a>
+			>OK</button>
 		</div>
 	</div>
 </div>
@@ -29,7 +32,15 @@ export default {
         	this.$dispatch(msg, popout.item.id);
         	this.removePopout(popout);
         },
+        clearAll(){
+        	vm.popouts = [];
+        },
     },
+ //    ready() {
+	// 	var vm = this;		
+	// 	window.addEventListener('keydown', function(e) {
 
+	// 	});
+	// },
 }
 </script>

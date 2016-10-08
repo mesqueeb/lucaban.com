@@ -26219,6 +26219,10 @@ _jquery2.default.getJSON('/api/items', function (fetchedData) {
 					timeout: true,
 					time: 10
 				});
+				setTimeout(function () {
+					console.log((0, _jquery2.default)(".btn-ok"));
+					(0, _jquery2.default)(".btn-ok").focus();
+				}, 20);
 			},
 			addTimer: function addTimer(id) {
 				id = !id ? selection.selectedId : id;
@@ -26300,17 +26304,17 @@ _jquery2.default.getJSON('/api/items', function (fetchedData) {
 			},
 			keystroke: function keystroke(k) {
 				console.log(k);
-				if (k == 'arrowRight') {
-					this.showChildren(null, 'show');
-				}
-				if (k == 'arrowLeft') {
-					this.showChildren(null, 'hide');
-				}
 				if (k == 'arrowUp') {
 					this.selectItem('prev');
 				}
 				if (k == 'arrowDown') {
 					this.selectItem('next');
+				}
+				if (k == 'arrowRight') {
+					this.showChildren(null, 'show');
+				}
+				if (k == 'arrowLeft') {
+					this.showChildren(null, 'hide');
 				}
 				if (k == 'meta_arrowUp') {
 					this.moveItem('up');
@@ -26318,14 +26322,20 @@ _jquery2.default.getJSON('/api/items', function (fetchedData) {
 				if (k == 'meta_arrowDown') {
 					this.moveItem('down');
 				}
+				if (k == 'meta_arrowRight') {
+					this.indent();
+				}
+				if (k == 'meta_arrowLeft') {
+					this.unindent();
+				}
 				if (k == 'spaceBar') {
 					this.markDone();
 				}
-				if (k == 'shift_tab') {
-					this.unindent();
-				}
 				if (k == 'tab') {
 					this.indent();
+				}
+				if (k == 'shift_tab') {
+					this.unindent();
 				}
 				if (k == 'enter') {
 					this.showAddNewItem();
@@ -26343,6 +26353,9 @@ _jquery2.default.getJSON('/api/items', function (fetchedData) {
 					this.duplicate();
 				}
 				if (k == 'meta_delete') {
+					this.deleteItem();
+				}
+				if (k == 'delete') {
 					this.deleteItem();
 				}
 			},
@@ -26370,7 +26383,15 @@ _jquery2.default.getJSON('/api/items', function (fetchedData) {
 		ready: function ready() {
 			var vm = this;
 			window.addEventListener('keydown', function (e) {
-				if ((0, _jquery2.default)('input:focus').length > 0 || (0, _jquery2.default)('textarea:focus').length > 0) {
+				if ((0, _jquery2.default)('input:focus').length > 0 || (0, _jquery2.default)('textarea:focus').length > 0 || (0, _jquery2.default)('button:focus').length > 0 || (0, _jquery2.default)('a:focus').length > 0) {
+					var x = e.keyCode;
+					if (x == 27) {
+						// escape
+						if (vm.popouts.length) {
+							e.preventDefault();
+							vm.popouts = [];
+						}
+					}
 					return;
 				} else {
 					// INPUT AREAS NOT IN FOCUS
@@ -26378,11 +26399,19 @@ _jquery2.default.getJSON('/api/items', function (fetchedData) {
 						case 37:
 							// arrowLeft
 							e.preventDefault();
+							if (e.ctrlKey || e.metaKey) {
+								vm.keystroke('meta_arrowLeft');
+								break;
+							}
 							vm.keystroke('arrowLeft');
 							break;
 						case 39:
 							// arrowRight
 							e.preventDefault();
+							if (e.ctrlKey || e.metaKey) {
+								vm.keystroke('meta_arrowRight');
+								break;
+							}
 							vm.keystroke('arrowRight');
 							break;
 						case 38:
@@ -26447,6 +26476,7 @@ _jquery2.default.getJSON('/api/items', function (fetchedData) {
 								vm.keystroke('meta_delete');
 								break;
 							}
+							vm.keystroke('delete');
 							break;
 					} // end switch
 				} // END INPUT AREAS NOT IN FOCUS
@@ -26889,12 +26919,14 @@ exports.default = {
         popoutCall: function popoutCall(msg, popout) {
             this.$dispatch(msg, popout.item.id);
             this.removePopout(popout);
+        },
+        clearAll: function clearAll() {
+            vm.popouts = [];
         }
     }
-
 };
 if (module.exports.__esModule) module.exports = module.exports.default
-;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\n<div class=\"popouts\" v-if=\"popouts.length\">\n\t<div v-for=\"popout in popouts\" class=\"popout\">\n\t\t<div class=\"body bodybox\">{{ popout.title }}</div>\n\t\t<div class=\"nav\">\n\t\t\t<a href=\"#\" @click=\"popoutCall('confirm-cancel', popout)\">Cancel</a>\n\t\t\t<a href=\"#\" @click=\"popoutCall('confirm-ok', popout)\">OK</a>\n\t\t</div>\n\t</div>\n</div>\n"
+;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\n<div id=\"popouts-mask\" v-if=\"popouts.length\" @click=\"clearAll\">\n\t<div v-for=\"popout in popouts\" class=\"popout\">\n\t\t<div class=\"body bodybox\">{{ popout.title }}</div>\n\t\t<div class=\"nav\">\n\t\t\t<button class=\"btn-cancel\" @click=\"popoutCall('confirm-cancel', popout)\">Cancel</button>\n\t\t\t<button class=\"btn-ok\" @click=\"popoutCall('confirm-ok', popout)\">OK</button>\n\t\t</div>\n\t</div>\n</div>\n"
 if (module.hot) {(function () {  module.hot.accept()
   var hotAPI = require("vue-hot-reload-api")
   hotAPI.install(require("vue"), true)

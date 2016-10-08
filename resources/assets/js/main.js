@@ -368,6 +368,10 @@ window.vm = new Vue({
                 timeout: true,
                 time: 10,
             });
+			setTimeout(function() {
+				console.log($(".btn-ok"));
+				$(".btn-ok").focus();
+			}, 20);
 		},
 		addTimer(id){
 			id = (!id) ? selection.selectedId : id ;
@@ -446,21 +450,24 @@ window.vm = new Vue({
 		},
 		keystroke(k){
 			console.log(k);
-			if(k == 'arrowRight'){ this.showChildren(null, 'show')}
-			if(k == 'arrowLeft'){ this.showChildren(null, 'hide')}
 			if(k == 'arrowUp'){ this.selectItem('prev')}
 			if(k == 'arrowDown'){ this.selectItem('next')}
+			if(k == 'arrowRight'){ this.showChildren(null, 'show')}
+			if(k == 'arrowLeft'){ this.showChildren(null, 'hide')}
 			if(k == 'meta_arrowUp'){ this.moveItem('up')}
 			if(k == 'meta_arrowDown'){ this.moveItem('down')}
+			if(k == 'meta_arrowRight'){ this.indent()}
+			if(k == 'meta_arrowLeft'){ this.unindent()}
 			if(k == 'spaceBar'){ this.markDone() }
-			if(k == 'shift_tab'){ this.unindent()}
 			if(k == 'tab'){ this.indent()}
+			if(k == 'shift_tab'){ this.unindent()}
 			if(k == 'enter'){ this.showAddNewItem()}
 			if(k == 'shift_enter'){ this.showAddNewItem(null, 'child')}
 			if(k == 'meta_enter'){ this.$broadcast('startEdit')}
 			if(k == 't'){ this.setToday()}
 			if(k == 'meta_shift_d'){ this.duplicate()}
 			if(k == 'meta_delete'){ this.deleteItem()}
+			if(k == 'delete'){ this.deleteItem()}
 		},
 		test(id){
 			// id = (!id) ? selection.selectedId : id ;
@@ -486,17 +493,36 @@ window.vm = new Vue({
 	ready: function() {
       var vm = this;
       window.addEventListener('keydown', function(e) {
-        if ( $('input:focus').length > 0 ||  $('textarea:focus').length > 0 ) {
+        if ( $('input:focus').length > 0
+        	||  $('textarea:focus').length > 0
+        	|| $('button:focus').length > 0
+        	|| $('a:focus').length > 0
+        ) {
+    		let x = e.keyCode;
+    		if(x == 27) { // escape
+	        	if (vm.popouts.length){
+					e.preventDefault();
+					vm.popouts = [];
+				}
+			}
         	return;
 		} else { 
 		  // INPUT AREAS NOT IN FOCUS
           switch(e.keyCode) { 
 			case 37: // arrowLeft
 				e.preventDefault();
+				if (e.ctrlKey || e.metaKey){
+		  			vm.keystroke('meta_arrowLeft');
+		  			break;
+		  		}
 				vm.keystroke('arrowLeft');
 				break;
 			case 39: // arrowRight
 				e.preventDefault();
+				if (e.ctrlKey || e.metaKey){
+		  			vm.keystroke('meta_arrowRight');
+		  			break;
+		  		}
 				vm.keystroke('arrowRight');
 				break;
 			case 38: // arrowUp
@@ -553,6 +579,7 @@ window.vm = new Vue({
 					vm.keystroke('meta_delete');
 		  			break;
 		  		}
+				vm.keystroke('delete');
 				break;
           } // end switch
     	} // END INPUT AREAS NOT IN FOCUS

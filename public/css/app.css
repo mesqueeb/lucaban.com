@@ -5388,6 +5388,18 @@ body {
   background: #f5f5f5;
   margin: 0; }
 
+button {
+  font-family: 'Calibri', 'Lato';
+  color: #4d4d4d;
+  font-size: 14px;
+  font-weight: 300;
+  line-height: 1.4em;
+  -webkit-font-smoothing: antialiased;
+  -moz-font-smoothing: antialiased;
+  font-smoothing: antialiased;
+  resize: none;
+  color: #5dc2af; }
+
 form {
   margin-bottom: 0; }
 
@@ -5410,6 +5422,9 @@ input, textarea {
   resize: none;
   outline: none;
   border-style: none; }
+
+button:focus {
+  outline: -webkit-focus-ring-color auto 5px; }
 
 #loading-icon {
   position: fixed;
@@ -5477,9 +5492,6 @@ button {
   cursor: pointer;
   background: none;
   border: none; }
-
-button:focus {
-  outline: 0; }
 
 .navigation {
   display: -ms-flexbox;
@@ -5728,7 +5740,8 @@ button:focus {
     -ms-flex-positive: 1;
     flex-grow: 1; }
   .popup > button {
-    font-size: 2em; }
+    font-size: 2em;
+    color: black; }
   .popup input, .popup textarea {
     font-family: 'Calibri', 'Lato';
     color: #4d4d4d;
@@ -5768,13 +5781,11 @@ button:focus {
     justify-content: flex-end; }
   .popup .used-time button {
     margin-top: 0.2em;
-    padding: 0 0.3em;
-    border: 1px solid #929292;
-    border-radius: 0.3em; }
+    padding: 0 0.3em; }
   .popup .used-time input {
     width: 60px; }
 
-.popouts {
+#popouts-mask {
   display: -ms-flexbox;
   display: flex;
   -ms-flex-align: center;
@@ -5800,11 +5811,9 @@ button:focus {
   .popout > .nav {
     padding: 0.6em 1em;
     text-align: right; }
-  .popout a {
+  .popout button {
     padding: 0 0.4em;
-    margin: 0 0.3em;
-    text-decoration: none;
-    color: #5dc2af; }
+    margin: 0 0.3em; }
 
 .fix-timer #timer-area {
   background: #f5f5f5;
