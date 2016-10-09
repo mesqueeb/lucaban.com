@@ -23,7 +23,6 @@
 	
 ></Popouts>
 <div class="panel-body">
-	<Timer :timer-items="timerItems"></Timer>
 	<div class="navigation">
 		<div class="menu">
 			<a href="#"

@@ -6,7 +6,8 @@
 	window.jQuery = jQuery;
 
 // IMPORT Own jQuery replacement functions
-	import { hasClass } from './components/globalFunctions.js';
+	import { hasClass, btnEffect } from './components/globalFunctions.js';
+	window.btnEffect = btnEffect;
 	// Make hasClass(el) available as el.hasClass();
 	window.Element.prototype.hasClass = function(config){ return hasClass(this,config)};
 
@@ -89,6 +90,11 @@ $( document ).ready(function() {
 		setRowHeight();
 	}, 2000);
 });
+$('body').on('click', 'button', function(e){
+	console.log(e);
+	btnEffect(e);
+});
+
 
 
 
@@ -348,39 +354,49 @@ window.vm = new Vue({
 		popup(id, type){
 			id = (!id) ? selection.selectedId : id ;
 			let item = allItems.nodes[id];
-			this.popups.push({
-            	item,
-            	title: "Completed "+item.body,
-                text: "",
-                type: type,
-                timeout: true,
-                time: 10,
-            });
+			let popupExists = this.popups.filter(function (popup) { return popup.item.id === id; })[0];
+			if(!popupExists){
+				this.popups.push({
+	            	item,
+	                type: type,
+	                timeout: true, // not yet fully integrated
+	                time: 10, // not yet fully integrated
+	            });
+			}
+            if (type == 'afterDone') {
+				setTimeout(function() {
+		        	document.querySelector('#popups>div:first-child textarea').focus();
+				}, 20);
+            }
 		},
 		popout(id, type){
 			id = (!id) ? selection.selectedId : id ;
 			let item = allItems.nodes[id];
-			this.popouts.push({
-            	item,
-            	title: "Do you really want to delete ["+item.body+"] ?",
-                text: "",
-                type: type,
-                timeout: true,
-                time: 10,
-            });
-			setTimeout(function() {
-				console.log($(".btn-ok"));
-				$(".btn-ok").focus();
-			}, 20);
+			let popoutExists = this.popouts.filter(function (popout) { return popout.item.id === id; })[0];
+			if(!popoutExists){
+				this.popouts.push({
+	            	item,
+	                type: type,
+	            });
+			}
+			if(type=='timer'){
+				this.$children[1].playTimer(item);
+			} else {
+				setTimeout(function() {
+					document.querySelector('#popouts-mask>div:first-child .btn-ok').focus();
+				}, 20);
+			}
 		},
 		addTimer(id){
-			id = (!id) ? selection.selectedId : id ;
-			let item = allItems.nodes[id];
-			let timerExists = this.timerItems.filter(function (item) { return item.id === id; })[0];
-			if (!timerExists){
-				this.timerItems.push(item);
-				this.playTimer(item);
-			}
+			this.popout(id, 'timer');
+			return;
+			// id = (!id) ? selection.selectedId : id ;
+			// let item = allItems.nodes[id];
+			// let timerExists = this.timerItems.filter(function (item) { return item.id === id; })[0];
+			// if (!timerExists){
+			// 	this.timerItems.push(item);
+			// 	this.playTimer(item);
+			// }
 		},
 		fetchDone(){
 			this.loading = true;
@@ -493,18 +509,31 @@ window.vm = new Vue({
 	ready: function() {
       var vm = this;
       window.addEventListener('keydown', function(e) {
-        if ( $('input:focus').length > 0
+        let x = e.keyCode;
+    	if (vm.popouts.length){
+    		if(x == 27) { // escape
+				e.preventDefault();
+				vm.$children[1].clearAll();
+			}
+			if(x == 9){ // TAB
+				e.preventDefault();
+				if (e.shiftKey){
+					$(".btn-cancel").focus();
+				} else {
+					$(".btn-ok").focus();
+				}
+	  		}
+			if(x == 37){ // arrow left
+				$(".btn-cancel").focus();
+			}
+			if(x == 39){ // arrow right
+				$(".btn-ok").focus();
+			}
+		} else if ( $('input:focus').length > 0
         	||  $('textarea:focus').length > 0
         	|| $('button:focus').length > 0
-        	|| $('a:focus').length > 0
-        ) {
-    		let x = e.keyCode;
-    		if(x == 27) { // escape
-	        	if (vm.popouts.length){
-					e.preventDefault();
-					vm.popouts = [];
-				}
-			}
+        	|| $('a:focus').length > 0 )
+		{
         	return;
 		} else { 
 		  // INPUT AREAS NOT IN FOCUS

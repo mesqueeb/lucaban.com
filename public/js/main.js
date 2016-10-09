@@ -25763,13 +25763,31 @@ module.exports = Vue;
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
-    value: true
+	value: true
 });
 function hasClass(element, cls) {
-    return (' ' + element.className + ' ').indexOf(' ' + cls + ' ') > -1;
+	return (' ' + element.className + ' ').indexOf(' ' + cls + ' ') > -1;
+}
+
+function btnEffect(event) {
+	console.log(event);
+	var $el = void 0;
+	if (event.target.nodeName == 'I') {
+		$el = $(event.target.offsetParent);
+	} else {
+		$el = $(event.target);
+	}
+	$el.addClass("btn--click");
+	setTimeout(function () {
+		$el.removeClass("btn--click");
+	}, 400);
+	setTimeout(function () {
+		$el.blur();
+	}, 1000);
 }
 
 exports.hasClass = hasClass;
+exports.btnEffect = btnEffect;
 
 },{}],31:[function(require,module,exports){
 'use strict';
@@ -25851,6 +25869,7 @@ window.jQuery = _jquery2.default;
 
 // IMPORT Own jQuery replacement functions
 
+window.btnEffect = _globalFunctions.btnEffect;
 // Make hasClass(el) available as el.hasClass();
 window.Element.prototype.hasClass = function (config) {
 	return (0, _globalFunctions.hasClass)(this, config);
@@ -25924,6 +25943,10 @@ window.setRowHeight = function () {
 	setTimeout(function () {
 		setRowHeight();
 	}, 2000);
+});
+(0, _jquery2.default)('body').on('click', 'button', function (e) {
+	console.log(e);
+	(0, _globalFunctions.btnEffect)(e);
 });
 
 _jquery2.default.getJSON('/api/items', function (fetchedData) {
@@ -26199,41 +26222,52 @@ _jquery2.default.getJSON('/api/items', function (fetchedData) {
 			popup: function popup(id, type) {
 				id = !id ? selection.selectedId : id;
 				var item = allItems.nodes[id];
-				this.popups.push({
-					item: item,
-					title: "Completed " + item.body,
-					text: "",
-					type: type,
-					timeout: true,
-					time: 10
-				});
+				var popupExists = this.popups.filter(function (popup) {
+					return popup.item.id === id;
+				})[0];
+				if (!popupExists) {
+					this.popups.push({
+						item: item,
+						type: type,
+						timeout: true, // not yet fully integrated
+						time: 10 });
+				}
+				if (type == 'afterDone') {
+					setTimeout(function () {
+						document.querySelector('#popups>div:first-child textarea').focus();
+					}, 20);
+				}
 			},
 			popout: function popout(id, type) {
 				id = !id ? selection.selectedId : id;
 				var item = allItems.nodes[id];
-				this.popouts.push({
-					item: item,
-					title: "Do you really want to delete [" + item.body + "] ?",
-					text: "",
-					type: type,
-					timeout: true,
-					time: 10
-				});
-				setTimeout(function () {
-					console.log((0, _jquery2.default)(".btn-ok"));
-					(0, _jquery2.default)(".btn-ok").focus();
-				}, 20);
+				var popoutExists = this.popouts.filter(function (popout) {
+					return popout.item.id === id;
+				})[0];
+				if (!popoutExists) {
+					this.popouts.push({
+						item: item,
+						type: type
+					});
+				}
+				if (type == 'timer') {
+					this.$children[1].playTimer(item);
+				} else {
+					setTimeout(function () {
+						document.querySelector('#popouts-mask>div:first-child .btn-ok').focus();
+					}, 20);
+				}
 			},
 			addTimer: function addTimer(id) {
-				id = !id ? selection.selectedId : id;
-				var item = allItems.nodes[id];
-				var timerExists = this.timerItems.filter(function (item) {
-					return item.id === id;
-				})[0];
-				if (!timerExists) {
-					this.timerItems.push(item);
-					this.playTimer(item);
-				}
+				this.popout(id, 'timer');
+				return;
+				// id = (!id) ? selection.selectedId : id ;
+				// let item = allItems.nodes[id];
+				// let timerExists = this.timerItems.filter(function (item) { return item.id === id; })[0];
+				// if (!timerExists){
+				// 	this.timerItems.push(item);
+				// 	this.playTimer(item);
+				// }
 			},
 			fetchDone: function fetchDone() {
 				this.loading = true;
@@ -26383,15 +26417,31 @@ _jquery2.default.getJSON('/api/items', function (fetchedData) {
 		ready: function ready() {
 			var vm = this;
 			window.addEventListener('keydown', function (e) {
-				if ((0, _jquery2.default)('input:focus').length > 0 || (0, _jquery2.default)('textarea:focus').length > 0 || (0, _jquery2.default)('button:focus').length > 0 || (0, _jquery2.default)('a:focus').length > 0) {
-					var x = e.keyCode;
+				var x = e.keyCode;
+				if (vm.popouts.length) {
 					if (x == 27) {
 						// escape
-						if (vm.popouts.length) {
-							e.preventDefault();
-							vm.popouts = [];
+						e.preventDefault();
+						vm.$children[1].clearAll();
+					}
+					if (x == 9) {
+						// TAB
+						e.preventDefault();
+						if (e.shiftKey) {
+							(0, _jquery2.default)(".btn-cancel").focus();
+						} else {
+							(0, _jquery2.default)(".btn-ok").focus();
 						}
 					}
+					if (x == 37) {
+						// arrow left
+						(0, _jquery2.default)(".btn-cancel").focus();
+					}
+					if (x == 39) {
+						// arrow right
+						(0, _jquery2.default)(".btn-ok").focus();
+					}
+				} else if ((0, _jquery2.default)('input:focus').length > 0 || (0, _jquery2.default)('textarea:focus').length > 0 || (0, _jquery2.default)('button:focus').length > 0 || (0, _jquery2.default)('a:focus').length > 0) {
 					return;
 				} else {
 					// INPUT AREAS NOT IN FOCUS
@@ -26905,28 +26955,104 @@ exports.default = NotificationStore;
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
-    value: true
+	value: true
 });
 exports.default = {
-    name: 'Popouts',
-    template: '#popouts-template',
-    props: ['popouts'],
-    methods: {
-        removePopout: function removePopout(popout) {
-            clearTimeout(popout.timer);
-            this.$root.popouts.$remove(popout);
-        },
-        popoutCall: function popoutCall(msg, popout) {
-            this.$dispatch(msg, popout.item.id);
-            this.removePopout(popout);
-        },
-        clearAll: function clearAll() {
-            vm.popouts = [];
-        }
-    }
+	name: 'Popouts',
+	template: '#popouts-template',
+	props: ['popouts'],
+	methods: {
+		removePopout: function removePopout(popout) {
+			this.$root.popouts.$remove(popout);
+		},
+		popoutCall: function popoutCall(msg, popout) {
+			this.$dispatch(msg, popout.item.id);
+			this.removePopout(popout);
+		},
+		clearAll: function clearAll(event) {
+			if (!event || event.target.id == 'popouts-mask') {
+				vm.popouts.forEach(function (popout) {
+					console.log(popout.item);
+					this.pauseTimer(popout.item);
+				}.bind(this));
+				vm.popouts = [];
+			}
+		},
+		updateDone: function updateDone(item) {
+			this.pauseTimer(item);
+			allItems.prepareDonePatch(item.id);
+			$(".btn-ok").focus();
+		},
+		timerNav: function timerNav(button, popout) {
+			var item = popout.item;
+			if (button == 'play') {
+				this.playTimer(item);
+			}
+			if (button == 'pause') {
+				this.pauseTimer(item);
+			}
+			if (button == 'forward') {
+				this.forwardTimer(item);
+			}
+			if (button == 'reset') {
+				this.resetTimer(item);
+			}
+			if (button == 'close') {
+				this.closeTimer(popout);
+			}
+		},
+		playTimer: function playTimer(item) {
+			var update = function update() {
+				if (item.planned_time > 0) {
+					item.used_time = ++item.used_time;
+				} else {
+					item.used_time = ++item.used_time;
+				}
+			};
+			window.timers = !window.timers ? {} : timers;
+			if (timers[item.id]) {
+				return;
+			}
+			timers[item.id] = setInterval(update, 1000);
+		},
+		pauseTimer: function pauseTimer(item) {
+			if (!window.timers) {
+				return;
+			}
+			if (!window.timers[item.id]) {
+				return;
+			}
+			clearInterval(window.timers[item.id]);
+			delete window.timers[item.id];
+			vm.patch(item.id, 'used_time');
+			allItems.calculateTotalTime(item.id);
+		},
+		forwardTimer: function forwardTimer(item) {
+			item.used_time = item.used_time + 60;
+		},
+		resetTimer: function resetTimer(item) {
+			item.used_time = 0;
+			vm.patch(item.id, 'used_time');
+			allItems.calculateTotalTime(item.id);
+		},
+		closeTimer: function closeTimer(popout) {
+			var item = popout.item;
+			if (window.timers && window.timers[item.id]) {
+				clearInterval(window.timers[item.id]);
+				delete window.timers[item.id];
+			}
+			if (item.used_time < 5) {
+				item.used_time = 0;
+			} else {
+				vm.patch(item.id, 'used_time');
+				allItems.calculateTotalTime(item.id);
+			}
+			this.removePopout(popout);
+		}
+	}
 };
 if (module.exports.__esModule) module.exports = module.exports.default
-;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\n<div id=\"popouts-mask\" v-if=\"popouts.length\" @click=\"clearAll\">\n\t<div v-for=\"popout in popouts\" class=\"popout\">\n\t\t<div class=\"body bodybox\">{{ popout.title }}</div>\n\t\t<div class=\"nav\">\n\t\t\t<button class=\"btn-cancel\" @click=\"popoutCall('confirm-cancel', popout)\">Cancel</button>\n\t\t\t<button class=\"btn-ok\" @click=\"popoutCall('confirm-ok', popout)\">OK</button>\n\t\t</div>\n\t</div>\n</div>\n"
+;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\n<div id=\"popouts-mask\" v-if=\"popouts.length\" @click=\"clearAll($event)\">\n\t<div v-for=\"popout in popouts\" class=\"popout\">\n\t\t<div v-if=\"popout.type=='confirm-delete'\">\n\t\t\t<div class=\"body bodybox\">Do you really want to delete: {{ popout.item.body }} ?</div>\n\t\t\t<div class=\"nav\">\n\t\t\t\t<button class=\"btn-cancel\" @click=\"popoutCall('confirm-cancel', popout)\">Cancel</button>\n\t\t\t\t<button class=\"btn-ok\" @click=\"popoutCall('confirm-ok', popout)\">OK</button>\n\t\t\t</div>\n\t\t</div>\n\t\t\n\t\t<div v-if=\"popout.type=='timer'\" :class=\"{\n\t\t\t\tdone: popout.item.done,\n\t\t\t}\">\n\t\t\t<div class=\"body\">\n\t\t\t\t<div class=\"toggle-div\">\n\t\t\t\t\t<input class=\"toggle\" type=\"checkbox\" v-if=\"popout.item.children_order.length==0 || popout.item.done == true\" v-model=\"popout.item.done\" @change=\"updateDone(popout.item)\">\n\t\t\t\t</div>\n\t\t\t\t<div class=\"bodybox\">{{ popout.item.body }}</div>\n\t\t\t\t<div v-if=\"!popout.item.planned_time\" class=\"timer-time\">{{ popout.item.used_time | hhmmss }}</div>\n\t\t\t\t<div v-if=\"popout.item.planned_time\" class=\"timer-time countdown\">{{ popout.item.id | countdown }}</div>\n\t\t\t</div>\n\t\t\t<div class=\"nav\">\n\t\t\t\t<button class=\"play btn btn-dipclick\" @click=\"timerNav('play', popout)\"><i class=\"zmdi zmdi-play\"></i>\n\t\t\t\t</button>\n\t\t\t\t<button class=\"pause btn btn-dipclick\" @click=\"timerNav('pause', popout)\"><i class=\"zmdi zmdi-pause\"></i>\n\t\t\t\t</button>\n\t\t\t\t<button class=\"forward btn btn-dipclick\" @click=\"timerNav('forward', popout)\">+1 min\n\t\t\t\t</button>\n\t\t\t\t<button class=\"reset btn btn-dipclick\" @click=\"timerNav('reset', popout)\">Reset</button>\n\t\t\t\t<button class=\"btn-ok\" @click=\"timerNav('close', popout)\">OK</button>\n\t\t\t</div>\n\t\t</div>\n\t</div>\n</div>\n"
 if (module.hot) {(function () {  module.hot.accept()
   var hotAPI = require("vue-hot-reload-api")
   hotAPI.install(require("vue"), true)
@@ -26972,11 +27098,18 @@ exports.default = {
         },
         resetUsedTime: function resetUsedTime(item) {
             item.used_time = 0;
+        },
+        keydownInCompletionMemo: function keydownInCompletionMemo(popup, e) {
+            if (e.keyCode == 13 && (e.ctrlKey || e.metaKey) || e.keyCode == 27) {
+                setTimeout(function () {
+                    this.removePopup(popup);
+                }.bind(this), 200);
+            } else {}
         }
     }
 };
 if (module.exports.__esModule) module.exports = module.exports.default
-;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\n<div class=\"popups\">\n  <div v-for=\"popup in popups\" class=\"popup callout animated\" :class=\"popup.type ? popup.type : 'secondary'\" transition=\"fade\">\n      <div v-if=\"popup.title\" class=\"title\">{{popup.title}}</div>\n      <div v-if=\"popup.text\">{{popup.text}}</div>\n      <div v-if=\"popup.type=='afterDone'\" class=\"body\">\n          <div class=\"completion-memo\">\n            <label>Completion note</label>\n            <textarea name=\"completion_memo\" v-model=\"popup.item.completion_memo\" v-autosize=\"popup.item.completion_memo\">{{ popup.item.completion_memo }}</textarea>\n          </div>\n          <div class=\"used-time\">\n            <div>\n                <label>Used time</label>\n                <input v-model=\"popup.item.used_time\" type=\"number\">\n                <span>{{ popup.item.used_time | hhmmss }}</span>\n            </div>\n            <div>\n                <button class=\"forward\" @click=\"incrementUsedTime(popup.item, 60)\">+1 minute</button>\n                <button class=\"forward\" @click=\"incrementUsedTime(popup.item, 300)\">+5 minutes</button>\n                <button class=\"forward\" @click=\"incrementUsedTime(popup.item, 600)\">+10 minutes</button>\n                <button class=\"reset\" @click=\"resetUsedTime(popup.item)\">Reset</button>\n            </div>\n          </div>\n      </div>\n      <button @click=\"removePopup(popup)\" class=\"close-button\" aria-label=\"Close alert\" type=\"button\">\n          <span aria-hidden=\"true\">×</span>\n      </button>\n  </div>\n</div>\n"
+;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\n<div id=\"popups\">\n  <div v-for=\"popup in popups\" :class=\"popup.type ? popup.type : 'secondary'\" transition=\"fade\">\n    <div class=\"popup callout animated\" v-if=\"popup.type=='afterDone'\">\n      <div class=\"title\">Completed {{popup.item.body}}</div>\n      <div class=\"body\">\n          <div class=\"completion-memo\">\n            <label>Journal notes</label>\n            <textarea name=\"completion_memo\" v-model=\"popup.item.completion_memo\" v-autosize=\"popup.item.completion_memo\" @keydown=\"keydownInCompletionMemo(popup, $event)\">{{ popup.item.completion_memo }}</textarea>\n          </div>\n          <div class=\"used-time\">\n            <div>\n              <label class=\"\">Used time</label>\n              <!-- <input v-model=\"popup.item.used_time\" type=\"number\"/> -->\n              <span class=\"\">{{ popup.item.used_time | hhmmss }}</span>\n            </div>\n            <div class=\"buttons\">\n              <div>\n                <button class=\"forward\" @click=\"incrementUsedTime(popup.item, 60)\">+1 min</button>\n                <button class=\"forward\" @click=\"incrementUsedTime(popup.item, 300)\">+5 min</button>\n                <button class=\"forward\" @click=\"incrementUsedTime(popup.item, 600)\">+10 min</button>\n              </div><div>\n                <button class=\"forward\" @click=\"incrementUsedTime(popup.item, 1800)\">+30 min</button>\n                <!-- <button class=\"forward\"\n                  @click=\"incrementUsedTime(popup.item, 3600)\"\n                >+1 hour</button> -->\n                <button class=\"reset\" @click=\"resetUsedTime(popup.item)\">Reset</button>\n              </div>\n            </div>\n          </div>\n      </div>\n      <button @click=\"removePopup(popup)\" class=\"close-button\" aria-label=\"Close alert\" type=\"button\">\n          <span aria-hidden=\"true\">×</span>\n      </button>\n    </div>\n  </div>\n</div>\n"
 if (module.hot) {(function () {  module.hot.accept()
   var hotAPI = require("vue-hot-reload-api")
   hotAPI.install(require("vue"), true)

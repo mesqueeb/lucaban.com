@@ -37,7 +37,9 @@ input, textarea{
     border-style: none;
 }
 button:focus {
-    outline: -webkit-focus-ring-color auto 5px;
+    // outline: -webkit-focus-ring-color auto 5px;
+    outline: none;
+    border-bottom: 1px solid;
 }
 #loading-icon{
 	position: fixed;

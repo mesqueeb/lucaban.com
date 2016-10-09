@@ -5424,7 +5424,8 @@ input, textarea {
   border-style: none; }
 
 button:focus {
-  outline: -webkit-focus-ring-color auto 5px; }
+  outline: none;
+  border-bottom: 1px solid; }
 
 #loading-icon {
   position: fixed;
@@ -5711,7 +5712,7 @@ button {
 .done-card .body {
   margin-right: 1em; }
 
-.popups {
+#popups {
   top: 0;
   position: fixed;
   width: 100%;
@@ -5724,7 +5725,7 @@ button {
   box-shadow: 0 1px 0 rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.1); }
 
 .popup {
-  padding: 1em;
+  padding: 0.6em;
   width: 100%;
   display: -ms-flexbox;
   display: flex;
@@ -5732,6 +5733,7 @@ button {
   flex-wrap: wrap; }
   .popup .title {
     width: 100%;
+    margin-bottom: 0.2em;
     text-align: center;
     font-weight: 600; }
   .popup .body {
@@ -5739,9 +5741,6 @@ button {
     display: flex;
     -ms-flex-positive: 1;
     flex-grow: 1; }
-  .popup > button {
-    font-size: 2em;
-    color: black; }
   .popup input, .popup textarea {
     font-family: 'Calibri', 'Lato';
     color: #4d4d4d;
@@ -5767,23 +5766,30 @@ button {
   flex-grow: 2;
   margin-right: 0.3em; }
 
+.close-button {
+  padding-left: 0.5em;
+  font-size: 2em;
+  color: black; }
+
 .popup .used-time {
   display: -ms-flexbox;
   display: flex;
+  -ms-flex-direction: column;
+  flex-direction: column;
   -ms-flex-positive: 0;
   flex-grow: 0; }
-  .popup .used-time > div {
+  .popup .used-time span {
+    font-size: 1.4em;
+    margin-left: 1em; }
+  .popup .used-time > div > div {
     display: -ms-flexbox;
     display: flex;
-    -ms-flex-direction: column;
-    flex-direction: column;
-    -ms-flex-pack: end;
-    justify-content: flex-end; }
+    -ms-flex-wrap: wrap;
+    flex-wrap: wrap;
+    -ms-flex-direction: row;
+    flex-direction: row; }
   .popup .used-time button {
-    margin-top: 0.2em;
-    padding: 0 0.3em; }
-  .popup .used-time input {
-    width: 60px; }
+    padding: 0.3em 0.3em 0; }
 
 #popouts-mask {
   display: -ms-flexbox;
@@ -5804,11 +5810,19 @@ button {
 .popout {
   z-index: 5;
   background: white;
-  border-radius: 0.3em; }
-  .popout > .body {
+  border-radius: 0.3em;
+  margin: 1em; }
+  .popout .body {
     padding: 1em;
-    border-bottom: 1px solid #e3e3e3; }
-  .popout > .nav {
+    border-bottom: 1px solid #e3e3e3;
+    display: -ms-flexbox;
+    display: flex;
+    -ms-flex-align: center;
+    align-items: center; }
+  .popout .timer-time {
+    font-size: 1.4em;
+    margin: 0 auto; }
+  .popout .nav {
     padding: 0.6em 1em;
     text-align: right; }
   .popout button {
