@@ -5579,7 +5579,9 @@ button {
 .update-tags {
   font-size: 0.85em;
   display: -ms-flexbox;
-  display: flex; }
+  display: flex;
+  -ms-flex-align: baseline;
+  align-items: baseline; }
   .update-tags > div {
     margin: 0.3em; }
   .update-tags input {
@@ -5680,15 +5682,12 @@ button {
 .editing .selected {
   background: white; }
 
-.editing .bodybox {
-  display: none; }
-
 .editing .body-div {
-  border-bottom: none;
   -ms-flex-direction: column;
   flex-direction: column;
   -ms-flex-align: start;
-  align-items: flex-start; }
+  align-items: flex-start;
+  padding: 0.4em 0; }
 
 .done .bodybox {
   color: #d9d9d9;
@@ -5876,7 +5875,12 @@ button {
     margin: 0 auto; }
   .popout .nav {
     padding: 0.6em 1em;
-    text-align: right; }
+    display: -ms-flexbox;
+    display: flex;
+    -ms-flex-pack: end;
+    justify-content: flex-end;
+    -ms-flex-align: center;
+    align-items: center; }
   .popout button {
     font-size: 1.1em;
     padding: 0 0.4em;
@@ -5884,6 +5888,8 @@ button {
     margin-bottom: 1px; }
   .popout button:focus {
     margin-bottom: 0; }
+  .popout button.play, .popout button.pause {
+    font-size: 1.3em; }
 
 .fix-timer #timer-area {
   background: #f5f5f5;

@@ -35,7 +35,9 @@
     }
     .nav {
         padding: 0.6em 1em;
-        text-align: right;
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
     }
     button {
         font-size: 1.1em;
@@ -45,5 +47,8 @@
 	}
     button:focus {
         margin-bottom: 0;
+    }
+    button.play, button.pause {
+        font-size: 1.3em;
     }
 }

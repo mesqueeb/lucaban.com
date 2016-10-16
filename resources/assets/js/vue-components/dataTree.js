@@ -56,7 +56,7 @@ export default class Tree {
 	{
 		return this.nodes[id];
 	}
-	addItem(item, index, addNextItemAs)
+	addItem(item, index, addNextItemAs, addTags)
 	{
 		item.show_children = (!item.show_children) ? 1 : item.show_children;
 		item.children_order = (!item.children_order) ? [] : item.children_order.split(',').map(Number);
@@ -71,15 +71,17 @@ export default class Tree {
 		item.done_date = "0000-00-00 00:00:00";
 		item.done = false;
 		item.used_time = 0;
+		item.tagged = [];
 		//Actually ADD the item!
 		parent.children.splice(index, 0, item);
 		parent.children_order.splice(index, 0, item.id);
 		this.nodes[item.id] = item;
 
 		// Patches etc.
-		this.attachParentBody(item.id);
 	    selection.selectedId = item.id;
 	    vm.patch(item.parent_id, 'children_order');
+	    vm.patchTag(item.id, addTags);
+		this.attachParentBody(item.id);
 		this.autoCalculateDoneState(item.parent_id);
 	    if (item.used_time || item.planned_time){
 		    this.calculateTotalTime(item.id);
@@ -316,6 +318,11 @@ export default class Tree {
 	{
 		let item = allItems.nodes[id];
 		vm.patchTag(id, tags);
+	}
+	prepareTag(id, tags)
+	{
+		let item = allItems.nodes[id];
+
 	}
 	prepareDonePatch(id)
 	{

@@ -92,6 +92,7 @@ button{
 .update-tags{
     font-size: 0.85em;
     display: flex;
+    align-items: baseline;
     >div{
         margin: 0.3em;
     }
@@ -204,13 +205,10 @@ button{
     .selected{
         background: white;
     }
-    .bodybox{
-        display: none;
-    }
     .body-div{
-        border-bottom: none;
         flex-direction: column;
         align-items:flex-start;
+        padding: 0.4em 0;
     }
 }
 .done .bodybox{

@@ -9,7 +9,10 @@
 		<div v-if="popout.type=='confirm-delete'"
 			:class="popout.type"
 		>
-			<div class="body bodybox">Do you really want to delete: {{ popout.item.body }} ?</div>
+			<div class="body bodybox">Really delete
+				<i style="padding: 0 0.3em;">{{ popout.item.body }}</i>
+				<span v-if="popout.item.children.length"><strong style="padding-left:0 0.3em;"> and all children</strong></span>?
+			</div>
 			<div class="nav">
 				<button class="btn-cancel" 
 					@click="popoutCall('confirm-cancel', popout)"
@@ -45,10 +48,12 @@
 			</div>
 			<div class="nav">
 				<button class="play btn btn-dipclick"
+					v-show="!timerRunning"
 					@click="timerNav('play', popout)"
 				><i class="zmdi zmdi-play"></i>
 				</button>
 				<button class="pause btn btn-dipclick"
+					v-show="timerRunning"
 					@click="timerNav('pause', popout)"
 				><i class="zmdi zmdi-pause"></i>
 				</button>
@@ -72,9 +77,15 @@ export default {
     name: 'Popouts',
     template: '#popouts-template',
     props: ['popouts'],
+	data: function(){
+		return {
+			timerRunning: true,
+		};
+	},
     methods: {
         removePopout(popout) {
             this.$root.popouts.$remove(popout);
+            this.timerRunning = false;
         },
         popoutCall(msg, popout){
         	this.$dispatch(msg, popout.item.id);
@@ -105,6 +116,7 @@ export default {
 			if(button == 'close'){ this.closeTimer(popout); }
         },
         playTimer(item){
+        	this.timerRunning = true;
 			let update = function(){
 				if(item.planned_time>0){
 					item.used_time = ++item.used_time;
@@ -117,6 +129,7 @@ export default {
 			timers[item.id] = setInterval(update,1000);
 		},
 		pauseTimer(item){
+			this.timerRunning = false;
 			if (!window.timers) { return; }
 			if (!window.timers[item.id]) { return; }
 			clearInterval(window.timers[item.id]);

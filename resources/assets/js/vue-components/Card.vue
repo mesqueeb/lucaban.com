@@ -114,7 +114,7 @@
 									v-model="newTag"
 									@keyup.esc="cancelEdit(item)"
 									@keydown.tab="tabOnLastInput"
-									@keydown.enter.prevent="enterOnAddTag(item, newTag, $event)"
+									@keydown.enter.prevent="enterOnAddTag(item, 'editItem', $event)"
 								>
 							</label>
 							<div class="tag-suggestions" v-if="false">
@@ -225,15 +225,61 @@
 					autofocus 
 					rows="1"
 				></textarea>
-				<span>
-					<label for="planned_time">duration:</label>
+			</div>
+			<div class="update-tags">
+				<div class="update-planned-time">
+					Duration:
+					<button
+						:class="{ currentDuration: newItem.planned_time == 10 }"
+						@click.prevent="setPlannedTimeNewItem(item, 10, $event)"
+						@blur="blurOnAddNew(item)"
+					>10 min</button>
+					<button
+						:class="{ currentDuration: newItem.planned_time == 15 }"
+						@click.prevent="setPlannedTimeNewItem(item, 15, $event)"
+						@blur="blurOnAddNew(item)"
+					>15 min</button>
+					<button
+						:class="{ currentDuration: newItem.planned_time == 30 }"
+						@click.prevent="setPlannedTimeNewItem(item, 30, $event)"
+						@blur="blurOnAddNew(item)"
+					>30 min</button>
+					<button
+						:class="{ currentDuration: newItem.planned_time == 60 }"
+						@click.prevent="setPlannedTimeNewItem(item, 60, $event)"
+						@blur="blurOnAddNew(item)"
+					>1 hour</button>
 					<input name="planned_time"
 						type="number"
+						v-show="false"
 						v-model="newItem.planned_time"
 						@blur="blurOnAddNew(item)"
 						@keydown="keydownOnNew"
 					/>
-				</span>
+				</div>
+				<div class="update-custom-tags">
+					<label>
+						Add Tag: 
+						<input type="text"
+							class="prepare-tag"
+							@blur="blurOnAddNew(item)"
+							v-model="newTag"
+							@keydown.enter.prevent="enterOnAddTag(item, 'newItem', $event)"
+						>
+					</label>
+				</div>
+				<div class="item-tags prepared-tags">
+					<span v-if="newItem.preparedTags.length"
+						class="custom-tag"
+						v-for="tag in newItem.preparedTags"
+					>{{ tag }}
+						<button class="delete-tag"
+							@click.prevent="deletePreparedTag(tag, item)"
+						>
+							<i class="zmdi zmdi-close-circle"></i>
+						</button>
+					</span>
+				</div>
 			</div>
 		</form>
 
@@ -267,15 +313,61 @@
 					autofocus 
 					rows="1"
 				></textarea>
-				<span>
-					<label for="planned_time">duration:</label>
+			</div>
+			<div class="update-tags">
+				<div class="update-planned-time">
+					Duration:
+					<button
+						:class="{ currentDuration: newItem.planned_time == 10 }"
+						@click.prevent="setPlannedTimeNewItem(item, 10, $event)"
+						@blur="blurOnAddNew(item)"
+					>10 min</button>
+					<button
+						:class="{ currentDuration: newItem.planned_time == 15 }"
+						@click.prevent="setPlannedTimeNewItem(item, 15, $event)"
+						@blur="blurOnAddNew(item)"
+					>15 min</button>
+					<button
+						:class="{ currentDuration: newItem.planned_time == 30 }"
+						@click.prevent="setPlannedTimeNewItem(item, 30, $event)"
+						@blur="blurOnAddNew(item)"
+					>30 min</button>
+					<button
+						:class="{ currentDuration: newItem.planned_time == 60 }"
+						@click.prevent="setPlannedTimeNewItem(item, 60, $event)"
+						@blur="blurOnAddNew(item)"
+					>1 hour</button>
 					<input name="planned_time"
 						type="number"
+						v-show="false"
 						v-model="newItem.planned_time"
 						@blur="blurOnAddNew(item)"
 						@keydown="keydownOnNew"
 					/>
-				</span>
+				</div>
+				<div class="update-custom-tags">
+					<label>
+						Add Tag: 
+						<input type="text"
+							class="prepare-tag"
+							@blur="blurOnAddNew(item)"
+							v-model="newTag"
+							@keydown.enter.prevent="enterOnAddTag(item, 'newItem', $event)"
+						>
+					</label>
+				</div>
+				<div class="item-tags prepared-tags">
+					<span v-if="newItem.preparedTags.length"
+						class="custom-tag"
+						v-for="tag in newItem.preparedTags"
+					>{{ tag }}
+						<button class="delete-tag"
+							@click.prevent="deletePreparedTag(tag, item)"
+						>
+							<i class="zmdi zmdi-close-circle"></i>
+						</button>
+					</span>
+				</div>
 			</div>
 		</form>
 	</div>
@@ -300,6 +392,7 @@ export default {
 				planned_time:0,
 				parent_id: (this.item.parent_id) ? this.item.parent_id : allItems.root.id,
 				depth: (this.item.depth == 0) ? 1 : this.item.depth,
+				preparedTags: [],
 			},
 			newTag: null,
 		};
@@ -385,7 +478,7 @@ export default {
         	} else {
         	// If item has no children yet
 				this.$root.addingNewAsChild = true;
-        		$("#new-under-"+this.item.id+" textarea").focus();
+        		document.querySelector("#new-under-"+this.item.id+" textarea").focus();
         	}
 		},
 		keydownOnNew(e) {
@@ -481,12 +574,16 @@ export default {
 	    blurOnAddNew(item) {
 	    	let component = this;
 	    	setTimeout(function(){
-		    	if ( $('.addnewbox input:focus').length > 0 ||  $('.addnewbox textarea:focus').length > 0 ) {
+		    	if ( $('.addnewbox input:focus').length > 0
+		    		||  $('.addnewbox textarea:focus').length > 0
+		    		||  $('.addnewbox a:focus').length > 0
+		    		||  $('.addnewbox button:focus').length > 0
+		    	) {
 	        		return;
 				}　else {
 					component.cancelAddNew();
 				}
-	    	},20);
+	    	},50);
 	    },
 		updateDone(id){
 			allItems.prepareDonePatch(id);
@@ -554,13 +651,16 @@ export default {
 			console.log(newItem);
 			this.$http.post('/api/items',newItem) //SEND
 			.then(function(response){ //response
-				this.newItem.body = '';
-				this.newItem.planned_time = '';
-				let storedItem = response.data;
 				console.log('starting dom update...');
+				let storedItem = response.data;
 				let OlderSiblingIndex = this.siblingIndex;
 				let index = (!OlderSiblingIndex) ? 0 : OlderSiblingIndex+1;
-				allItems.addItem(storedItem, index, addNextItemAs);
+				let addTags = this.newItem.preparedTags;
+				allItems.addItem(storedItem, index, addNextItemAs, addTags);
+				// Reset stuff
+				this.newItem.body = '';
+				this.newItem.planned_time = '';
+				this.newItem.preparedTags = '';
 			});
 		},
 		cancelAddNew(lastSelectedId){
@@ -571,24 +671,48 @@ export default {
 			this.$root.addingNewAsChild = false;			
 			$(':focus').blur();
 		},
-		enterOnAddTag(item, tag, event){
+		enterOnAddTag(item, additionType, event){
 			console.log('enterOnAddTag');
-			if (!this.newTag || event.metaKey || event.ctrlKey){
-				this.doneEdit();
-			} else {
-				this.addTag(item, tag);
+			// additionType can be 'newItem' or 'editItem'
+			if(additionType == 'editItem'){
+				if (!this.newTag || event.metaKey || event.ctrlKey){
+					this.doneEdit();
+				} else {
+					this.addTag(item);
+				}
+			}
+			if(additionType == 'newItem'){
+				if (!this.newTag || event.metaKey || event.ctrlKey){
+					if(!this.newItem.body){ return; }
+				  	this.addNew();
+				} else {
+					this.prepareTag(item);
+				}
 			}
 		},
-		addTag(item, tag){
+		addTag(item){
 			let id = (item) ? item.id : selection.selectedId;
-			tag = (tag) ? tag : this.newTag;
+			let tag = this.newTag;
 			allItems.tagItem(id, tag);
+			this.newTag = null;
+		},
+		prepareTag(item){
+			let id = (item) ? item.id : selection.selectedId;
+			let tag = this.newTag;
+			this.newItem.preparedTags.push(tag);
 			this.newTag = null;
 		},
 		deleteTag(id, tagName, event){
 			let plsFocus = '#updatebox-'+id+' textarea';
-			$(plsFocus).focus();
+			document.querySelector(plsFocus).focus();
 			this.$root.patchTag(id, tagName, 'untag');
+		},
+		deletePreparedTag(tag, item){
+			let plsFocus;
+			if(this.showAddNewBox == true){ plsFocus = "#new-under-"+item.id+" .prepare-tag"; }
+			if(this.showAddNewBoxFirstChild == true){ plsFocus = "#new-firstchild-of-"+item.id+" .prepare-tag"; }
+			document.querySelector(plsFocus).focus();
+			this.newItem.preparedTags.$remove(tag);
 		},
 		setPlannedTime(item, time, event){
 			let plsFocus = '#updatebox-'+item.id+' .add-tag';
@@ -597,6 +721,16 @@ export default {
 				document.querySelector(plsFocus).focus();
 	    	},30);
 			item.planned_time = time;
+		},
+		setPlannedTimeNewItem(item, time, event){
+			let plsFocus;
+			if(this.showAddNewBox == true){ plsFocus = "#new-under-"+item.id+" .prepare-tag"; }
+			if(this.showAddNewBoxFirstChild == true){ plsFocus = "#new-firstchild-of-"+item.id+" .prepare-tag"; }
+			setTimeout(function(){
+				console.log('returning to : '+plsFocus);
+				document.querySelector(plsFocus).focus();
+	    	},30);
+			this.newItem.planned_time = time;
 		},
 	},
 	events: {
