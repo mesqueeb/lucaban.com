@@ -8,7 +8,16 @@
       class="popup callout animated"
       v-if="popup.type=='afterDone'"
     >
-      <div class="title">Completed {{popup.item.body}}</div>
+      <div class="top">
+          <div class="title">Completed {{popup.item.body}}
+          <label class="done-after-done">{{ popup.item.done_date | momentCalendar }}
+            <input class="flatpickr"
+              id="done-date-edit-{{ popup.item.id }}-popup"
+              v-model="popup.item.done_date"
+            >
+          </label></div>
+      </div>
+      
       <div class="body">
           <div class="completion-memo">
             <label>Journal notes</label>

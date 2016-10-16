@@ -7,8 +7,8 @@
 			<div class="item" 
 				v-for="item in day.items"
 			>
-				<div class="parent-string">{{ item.parents_bodies }}</div>
 				<span>・</span>
+				<div class="parent-string">{{ item.parents_bodies }}</div>
 				<span class="body bodybox">{{{ item.body }}}</span>
 				<div class="completion-notes bodybox">{{ item.completion_memo }}</div>
 				<div class="item-tags"

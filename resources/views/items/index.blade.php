@@ -55,7 +55,9 @@
 	<div class="items-wrapper"
 		v-show="selection.filter != 'done'"
 	>
-		<Card :item="allData"></Card>
+		<Card :item="allData"
+			:alltags="allTags"
+		></Card>
 	</div>
 	{{-- JOURNAL --}}
 	<div class="journal-wrapper"

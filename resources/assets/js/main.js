@@ -36,6 +36,50 @@
 	import flatpickr from 'flatpickr';
 	// Make flatpickr(el) available as el.flatpickr();
 	window.Element.prototype.flatpickr = function(config){ return flatpickr(this,config)};
+	window.Element.prototype.flatpickrify = function(config){ return flatpickr(this,{
+    	dateFormat: 'Y-m-d H:i:S',
+    	maxDate: 'today',
+    	enableTime: true,
+    	time_24hr: true,
+    	onOpen(dateObj, dateStr, instance){
+			if(!vm.$root.beforeEditCache_doneDate){
+				vm.$root.beforeEditCache_doneDate = {};
+			}
+			let el = instance.element.id;
+			let id = el.replace('done-date-edit-', '');
+			id = id.replace('-popup', '');
+			vm.$root.beforeEditCache_doneDate[id] = dateStr;
+    	},
+    	onChange: function(dateObj, dateStr, instance){
+			let el = instance.element.id;
+			document.getElementById(el).focus();
+			console.log('flatPicker on change');
+			console.log(el);
+		},
+		onClose: function(dateObj, dateStr, instance){
+			let el = instance.element.id;
+			let id = el.replace('done-date-edit-', '');
+			id = id.replace('-popup', '');
+			console.log('vm.$root.beforeEditCache_doneDate[id] = '+vm.$root.beforeEditCache_doneDate[id]);
+			// This doesn't even work...
+			if (vm.$root.beforeEditCache_doneDate[id] == dateStr){ return; }
+			console.log('patching: '+id)
+			vm.patch(id, 'done_date');
+			console.log('flatPicker on close');
+		},
+	})};
+	let documentClick = function documentClick(e) {
+		// Luca Patch
+		if(e.target.parentNode.nodeName == 'BODY') { 
+			console.log('aoe');
+			// See Patch inside Flatpickr File!!!
+			 }
+		// End Luca Patch
+
+	};
+	document.addEventListener("click", documentClick, true);
+
+
 
 // Vue Basics
 	import Vue from 'vue';
@@ -105,29 +149,7 @@ $.getJSON('/api/items',function(fetchedData){
 	setTimeout(function(){
 		let flatpickrInputs = document.getElementsByClassName("flatpickr");
 		for (var i = 0; i < flatpickrInputs.length; i++) {
-		    flatpickrInputs[i].flatpickr({
-		    	dateFormat: 'Y-m-d H:i:S',
-		    	maxDate: 'today',
-		    	enableTime: true,
-		    	time_24hr: true,
-		    	onOpen(dateObj, dateStr, instance){
-					vm.$root.beforeEditCache_doneDate = dateStr;
-		    	},
-		    	onChange: function(dateObj, dateStr, instance){
-					let el = instance.element.id;
-					document.getElementById(el).focus();
-					console.log('flatPicker on change');
-					console.log(el);
-				},
-				onClose: function(dateObj, dateStr, instance){
-					if (vm.$root.beforeEditCache_doneDate == dateStr){ return; }
-					let el = instance.element.id;
-					let id = el.replace('done-date-edit-', '');
-					vm.patch(id, 'done_date');
-					console.log('flatPicker on close');
-					console.log(id);
-				},
-	    	});
+		    flatpickrInputs[i].flatpickrify();
 		}
 	}, 1000);
 
@@ -165,8 +187,10 @@ window.vm = new Vue({
 			let item = allItems.nodes[id];
 			if (!item.children || !item.children.length){ return; }
 			if (show == 'show'){
+				if (item.show_children) { return; }
 				item.show_children = true;
 			} else if (show == 'hide') {
+				if (!item.show_children) { return; }
 				item.show_children = false;
 			} else {
 				item.show_children = !item.show_children;
@@ -282,15 +306,28 @@ window.vm = new Vue({
 				this.patching = false;
 			});
 		},
-		patchTag(id, tags, type){
+		patchTag(id, tags, requestType){
+			/* requestType can be:
+				'tag': tag item  (default if null)
+				'untag': untag item with certain tag
+				'retag': delete all tags and retag new ones
+			*/
 			this.patching = true;
 			let patchObj = {};
-			patchObj['request'] = tags;
-			patchObj['type'] = type;
+			patchObj['tags'] = tags;
+			patchObj['type'] = requestType;
 			this.$http.patch('/api/itemtags/' + id, patchObj, { method: 'PATCH'})
-			.then(function(response){
-				console.log('patched ['+allItems.nodes[id].body+'] TAGS: '+response+';');
-				console.log(response);
+			.then(function(tagResponse){
+				console.log('patched ['+allItems.nodes[id].body+'] TAGS: '+tagResponse.data.tags+';');
+				console.log(tagResponse);
+				// Re-Add tags of item
+				this.$http.get('/api/items/' + id, { method: 'GET'})
+				.then(function(response){
+					console.log('response');
+					console.log(response);
+					let newTags = response.data.tagged;
+					allItems.nodes[id].tagged = newTags;
+				});
 				this.patching = false;
 			});
 		},
@@ -355,17 +392,22 @@ window.vm = new Vue({
 			id = (!id) ? selection.selectedId : id ;
 			let item = allItems.nodes[id];
 			let popupExists = this.popups.filter(function (popup) { return popup.item.id === id; })[0];
-			if(!popupExists){
-				this.popups.push({
-	            	item,
-	                type: type,
-	                timeout: true, // not yet fully integrated
-	                time: 10, // not yet fully integrated
-	            });
-			}
+			if(popupExists){ return; }
+			this.popups.push({
+            	item,
+                type: type,
+                timeout: true, // not yet fully integrated
+                time: 10, // not yet fully integrated
+            });
             if (type == 'afterDone') {
 				setTimeout(function() {
 		        	document.querySelector('#popups>div:first-child textarea').focus();
+					let fpId = "#done-date-edit-"+id;
+					let fpEl = document.querySelector(fpId);
+					fpEl.flatpickrify();
+					let fpId_b = "#done-date-edit-"+id+"-popup";
+					let fpEl_b = document.querySelector(fpId_b);
+					fpEl_b.flatpickrify();
 				}, 20);
             }
 		},
@@ -405,12 +447,17 @@ window.vm = new Vue({
 				this.loading = false;
 			});
 		},
-		fetchTagged(tag, requestType){
+		fetchTagged(tags, requestType){
+			/* requestType can be:
+				'withAnyTag': fetch articles with any tag listed
+				'withAllTags': only fetch articles with all the tags
+				'tagNames': fetch all existing tags
+			*/
 			this.loading = true;
 			let request = {};
 			requestType = (!requestType) ? 'withAnyTag' : requestType;
+			request['tags'] = tags;
 			request['type'] = requestType;
-			request['request'] = tag;
 			console.log('request');
 			console.log(request);
 			this.$http.post('/api/itemtags/fetchTagged', request).then(function(response){
@@ -448,7 +495,8 @@ window.vm = new Vue({
 			this.patching = true;
 			id = (!id) ? selection.selectedId : id ;
 			let item = allItems.nodes[id];
-			item.children_order = allItems.arrayToString(item.children_order);			
+			// Prepare children_order for sending to DB.
+			item.children_order = allItems.arrayToString(item.children_order);		
 			console.log('dupe item.children_order = '+item.children_order);
 			let OlderSiblingIndex = allItems.siblingIndex(selection.selectedId);
 			let index = parseInt(OlderSiblingIndex)+1;
@@ -456,6 +504,9 @@ window.vm = new Vue({
 			.then(function(response){ //response
 				// Revert old item's children_order back to string.
 				item.children_order = (!item.children_order) ? [] : item.children_order.split(',').map(Number);
+				
+				// Copy all children as well!
+				// -> Not yet written!
 				
 				let storedItem = response.data;
 				console.log('starting dom update...');
@@ -524,9 +575,11 @@ window.vm = new Vue({
 				}
 	  		}
 			if(x == 37){ // arrow left
+				e.preventDefault();
 				$(".btn-cancel").focus();
 			}
 			if(x == 39){ // arrow right
+				e.preventDefault();
 				$(".btn-ok").focus();
 			}
 		} else if ( $('input:focus').length > 0
@@ -625,7 +678,7 @@ window.vm = new Vue({
 
 $.getJSON('/api/itemtags',function(tags){
 	console.log(tags);
-	window.tags = tags;
+	window.allTags = tags;
 	vm.allTags = tags;
 });
 

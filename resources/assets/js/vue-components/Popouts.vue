@@ -6,7 +6,9 @@
 	<div v-for="popout in popouts"
 		class="popout"
 	>
-		<div v-if="popout.type=='confirm-delete'">
+		<div v-if="popout.type=='confirm-delete'"
+			:class="popout.type"
+		>
 			<div class="body bodybox">Do you really want to delete: {{ popout.item.body }} ?</div>
 			<div class="nav">
 				<button class="btn-cancel" 
@@ -21,6 +23,7 @@
 		<div v-if="popout.type=='timer'"
 			:class="{
 				done: popout.item.done,
+				timer: popout.type=='timer',
 			}"
 		>
 			<div class="body">
@@ -80,10 +83,12 @@ export default {
         clearAll(event){
         	if(!event || event.target.id == 'popouts-mask'){
 	        	vm.popouts.forEach(function(popout) {
-	        		console.log(popout.item);
-	        		this.pauseTimer(popout.item);
+					if(popout.type == 'timer'){
+						this.closeTimer(popout);
+					} else {
+						this.removePopout(popout);
+					}
 	        	}.bind(this));
-	        	vm.popouts = [];
         	}
         },
         updateDone(item){

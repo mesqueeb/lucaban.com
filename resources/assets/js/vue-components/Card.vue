@@ -57,39 +57,81 @@
 				
 				<form action="update"
 					class="updatebox"
+					id="updatebox-{{ item.id }}"
 					v-show="item.id == this.$root.editingItem"
 					@submit.prevent="doneEdit(item)"
 				>
-					<textarea name="item_body"
-						rows="{{ item.rows }}"
-						v-model="item.body"
-						v-autosize="item.body"
-						v-item-focus="item.id == this.$root.editingItem"
-						@blur="blurOnEdit(item)"
-						@keyup.esc="cancelEdit(item)"
-						@keydown.tab="tabOnFirstInput"
-						@keydown="keydownOnEdit"
-					>{{ item.body }}</textarea>
-					<span>
-						<label for="planned_time">duration:</label>
-						<input name="planned_time"
-							type="number"
-							v-model="item.planned_time"
+					<div class="update-body">
+						<textarea name="item_body"
+							rows="{{ item.rows }}"
+							v-model="item.body"
+							v-autosize="item.body"
+							v-item-focus="item.id == this.$root.editingItem"
 							@blur="blurOnEdit(item)"
 							@keyup.esc="cancelEdit(item)"
-							@keydown.tab="tabOnLastInput"
+							@keydown.tab="tabOnFirstInput"
 							@keydown="keydownOnEdit"
-						/>
-					</span>
+						>{{ item.body }}</textarea>
+					</div>
+					<div class="update-tags">
+						<div class="update-planned-time">
+							Duration:
+							<button
+								:class="{ currentDuration: item.planned_time == 10 }"
+								@click.prevent="setPlannedTime(item, 10, $event)"
+								@blur="blurOnEdit(item)"
+							>10 min</button>
+							<button
+								:class="{ currentDuration: item.planned_time == 15 }"
+								@click.prevent="setPlannedTime(item, 15, $event)"
+								@blur="blurOnEdit(item)"
+							>15 min</button>
+							<button
+								:class="{ currentDuration: item.planned_time == 30 }"
+								@click.prevent="setPlannedTime(item, 30, $event)"
+								@blur="blurOnEdit(item)"
+							>30 min</button>
+							<button
+								:class="{ currentDuration: item.planned_time == 60 }"
+								@click.prevent="setPlannedTime(item, 60, $event)"
+								@blur="blurOnEdit(item)"
+							>1 hour</button>
+							<input name="planned_time"
+								type="number"
+								v-show="false"
+								v-model="item.planned_time"
+								@blur="blurOnEdit(item)"
+								@keyup.esc="cancelEdit(item)"
+								@keydown="keydownOnEdit"
+							/>
+						</div>
+						<div class="update-custom-tags">
+							<label>
+								Add Tag: 
+								<input type="text"
+									class="add-tag"
+									@blur="blurOnEdit(item)"
+									v-model="newTag"
+									@keyup.esc="cancelEdit(item)"
+									@keydown.tab="tabOnLastInput"
+									@keydown.enter.prevent="enterOnAddTag(item, newTag, $event)"
+								>
+							</label>
+							<div class="tag-suggestions" v-if="false">
+							<!-- UNDER CONSTRUCTION -->
+								<label v-for="tag in allTags_c"
+									:class="'tag'"
+									@click="this.$root.patchTag(item.id, tag)"
+								>{{ tag.name }}
+								</label>
+							</div>
+						</div>
+					</div>
 				</form>
-				<div class="item-tags"
-					v-show="this.$root.editingItem != item.id"
-				>
+				<div class="item-tags">
 					<label class="done"
 						v-if="item.done && item.id != this.$root.editingDoneDateItem"
-						
-					>
-						Done {{ item.done_date | momentCalendar }}
+					>Done {{ item.done_date | momentCalendar }}
 						<input class="flatpickr"
 							id="done-date-edit-{{ item.id }}"
 							v-model="item.done_date"
@@ -98,27 +140,39 @@
 					
 					<span v-if="(hasTotalUsedTime || hasTotalPlannedTime) && !item.done" class="total-duration">
 						<span>Total </span>
-						<span v-if="hasTotalUsedTime">used {{ item.totalUsedTime | hourminsec }}</span>
+						<span v-if="hasTotalUsedTime"> used {{ item.totalUsedTime | hourminsec }}</span>
 						<span v-if="(hasTotalUsedTime && hasTotalPlannedTime)">/</span>
-						<span v-if="hasTotalPlannedTime">
-							{{ item.totalPlannedTime | hourmin }}
-						</span>
+						<span v-if="hasTotalPlannedTime">{{ item.totalPlannedTime | hourmin }}</span>
  					</span>
 
-					<span v-if="(hasPlannedTime || hasUsedTime) && !item.done" class="duration">
+					<span v-if="
+						(item.id != this.$root.editingItem || hasUsedTime)
+						&& (hasPlannedTime || hasUsedTime)
+						&& !item.done" class="duration"
+					>
 						<span v-if="hasUsedTime">Used {{ item.used_time | hourminsec }}</span>
 						<span v-if="(hasPlannedTime && hasUsedTime)">/</span>
-						<span v-if="hasPlannedTime">
-							{{ item.planned_time | hourmin }}
-						</span>
+						<span v-if="hasPlannedTime">{{ item.planned_time | hourmin }}</span>
 					</span>
-						
-					<span v-if="hasDueDate && !item.done" class="duedate">
-						{{ item.due_date | momentCalendar }}
-					</span>
+					
+					<span v-if="hasDueDate && !item.done"
+						class="duedate"
+					>{{ item.due_date | momentCalendar }}</span>
 
-					<span v-if="item.dueDateParent && !item.done" class="duedate-parent">
-						{{ item.dueDateParent | momentCalendar }}
+					<span v-if="item.dueDateParent && !item.done"
+						class="duedate-parent"
+					>{{ item.dueDateParent | momentCalendar }}</span>
+
+					<span v-if="item.tagged.length && !item.done"
+						class="custom-tag"
+						v-for="tag in item.tagged"
+					>{{ tag.tag_name }}
+						<button class="delete-tag"
+							v-if="item.id == this.$root.editingItem"
+							@click.prevent="deleteTag(item.id, tag.tag_name, $event)"
+						>
+							<i class="zmdi zmdi-close-circle"></i>
+						</button>
 					</span>
 
 				</div>
@@ -158,27 +212,29 @@
 			v-if="showAddNewBoxFirstChild"
 			@submit.prevent
 		>
-			<textarea type="text"
-				class="add-item"
-				name="body"
-				v-model="newItem.body"
-				v-autosize="newItem.body"
-				@blur="blurOnAddNew(item)"
-				@keydown="keydownOnNew"
-				placeholder="..."
-				autocomplete="off"
-				autofocus 
-				rows="1"
-			></textarea>
-			<span>
-				<label for="planned_time">duration:</label>
-				<input name="planned_time"
-					type="number"
-					v-model="newItem.planned_time"
+			<div>
+				<textarea type="text"
+					class="add-item"
+					name="body"
+					v-model="newItem.body"
+					v-autosize="newItem.body"
 					@blur="blurOnAddNew(item)"
 					@keydown="keydownOnNew"
-				/>
-			</span>
+					placeholder="..."
+					autocomplete="off"
+					autofocus 
+					rows="1"
+				></textarea>
+				<span>
+					<label for="planned_time">duration:</label>
+					<input name="planned_time"
+						type="number"
+						v-model="newItem.planned_time"
+						@blur="blurOnAddNew(item)"
+						@keydown="keydownOnNew"
+					/>
+				</span>
+			</div>
 		</form>
 
 
@@ -188,6 +244,7 @@
 		>
 			<Card v-for="childCard in item.children"
 				:item="childCard"
+				:key="childCard.id"
 			></Card>
 		</div>
 
@@ -197,27 +254,29 @@
 			v-if="showAddNewBox"
 			@submit.prevent
 		>
-			<textarea type="text"
-				class="add-item"
-				name="body"
-				v-model="newItem.body"
-				v-autosize="newItem.body"
-				@blur="blurOnAddNew(item)"
-				@keydown="keydownOnNew"
-				placeholder="..."
-				autocomplete="off"
-				autofocus 
-				rows="1"
-			></textarea>
-			<span>
-				<label for="planned_time">duration:</label>
-				<input name="planned_time"
-					type="number"
-					v-model="newItem.planned_time"
+			<div>
+				<textarea type="text"
+					class="add-item"
+					name="body"
+					v-model="newItem.body"
+					v-autosize="newItem.body"
 					@blur="blurOnAddNew(item)"
 					@keydown="keydownOnNew"
-				/>
-			</span>
+					placeholder="..."
+					autocomplete="off"
+					autofocus 
+					rows="1"
+				></textarea>
+				<span>
+					<label for="planned_time">duration:</label>
+					<input name="planned_time"
+						type="number"
+						v-model="newItem.planned_time"
+						@blur="blurOnAddNew(item)"
+						@keydown="keydownOnNew"
+					/>
+				</span>
+			</div>
 		</form>
 	</div>
 </template>
@@ -233,7 +292,7 @@ export default {
 	},
 	ready(){
 	},
-	props: ['item'],
+	props: ['item', 'alltags'],
 	data: function(){
 		return {
 			newItem: {
@@ -242,6 +301,7 @@ export default {
 				parent_id: (this.item.parent_id) ? this.item.parent_id : allItems.root.id,
 				depth: (this.item.depth == 0) ? 1 : this.item.depth,
 			},
+			newTag: null,
 		};
 	},
 	computed: {
@@ -301,6 +361,9 @@ export default {
 		},
 		hasUsedTime(){
 		    return (this.item.used_time && this.item.used_time != '0');
+		},
+		allTags_c(){
+			return this.$root.allTags;
 		},
 	},
 	methods: {
@@ -402,12 +465,17 @@ export default {
 	    blurOnEdit(item) {
 	    	let component = this;
 	    	setTimeout(function(){
-		    	if ( $('.updatebox input:focus').length > 0 ||  $('.updatebox textarea:focus').length > 0 ) {
+		    	if ( $('.updatebox input:focus').length > 0
+		    		||  $('.updatebox textarea:focus').length > 0
+		    		||  $('.updatebox a:focus').length > 0
+		    		||  $('.updatebox button:focus').length > 0
+		    	) {
 	        		return;
 				}　else {
+			    	console.log('blurring on edit');
 					component.doneEdit(item);
 				}
-	    	},20);
+	    	},50);
 	    	// Codementor: is there any better way than this?
 	    },
 	    blurOnAddNew(item) {
@@ -446,10 +514,9 @@ export default {
 			if (!item.body) {
 				this.deleteItem(item);
 			}
-			let id = item.id;
-			let body = item.body;
-			let planned_time = item.planned_time;
-			this.$http.patch('/api/items/' + id, { body: body, planned_time: planned_time }, { method: 'PATCH'});
+			vm.patch(item.id, 'body');
+			vm.patch(item.id, 'planned_time');
+			allItems.copyParentBodyToAllChildren(item.id);
 			allItems.calculateTotalTime(item.id);
 		},
 		cancelEdit(item) {
@@ -503,6 +570,33 @@ export default {
 			// Reset newItem to sibling stance.
 			this.$root.addingNewAsChild = false;			
 			$(':focus').blur();
+		},
+		enterOnAddTag(item, tag, event){
+			console.log('enterOnAddTag');
+			if (!this.newTag || event.metaKey || event.ctrlKey){
+				this.doneEdit();
+			} else {
+				this.addTag(item, tag);
+			}
+		},
+		addTag(item, tag){
+			let id = (item) ? item.id : selection.selectedId;
+			tag = (tag) ? tag : this.newTag;
+			allItems.tagItem(id, tag);
+			this.newTag = null;
+		},
+		deleteTag(id, tagName, event){
+			let plsFocus = '#updatebox-'+id+' textarea';
+			$(plsFocus).focus();
+			this.$root.patchTag(id, tagName, 'untag');
+		},
+		setPlannedTime(item, time, event){
+			let plsFocus = '#updatebox-'+item.id+' .add-tag';
+			setTimeout(function(){
+				console.log('returning to editting: '+plsFocus);
+				document.querySelector(plsFocus).focus();
+	    	},30);
+			item.planned_time = time;
 		},
 	},
 	events: {

@@ -48,26 +48,24 @@ class ItemTagController extends Controller
      */
     public function show(Request $request, $id)
     {
-        if($request['type'] == 'tagNames'){
-            return Item::findOrFail($id)->tagNames();
+        $item = Item::findOrFail($id);
+        if($request['type'] == 'tagNames' || !$request['type']){
+            return $item->tagNames();
         }
-        if($request['type'] == 'withAnyTag'){
-            return Item::withAnyTag($request['request'])->get(); // fetch articles with any tag listed
+        if($request['type'] == 'tagged'){
+            return $item->tagged;
         }
-        if($request['type'] == 'withAllTags'){
-            return Item::withAllTags($request['request'])->get(); // only fetch articles with all the tags
+        if($request['type'] == 'tags'){
+            return $item->tags;
         }
     }
     public function fetchTagged(Request $request)
     {
         if($request['type'] == 'withAnyTag'){
-            return Item::withAnyTag($request['request'])->get(); // fetch articles with any tag listed
+            return Item::withAnyTag($request['tags'])->get(); // fetch articles with any tag listed
         }
         if($request['type'] == 'withAllTags'){
-            return Item::withAllTags($request['request'])->get(); // only fetch articles with all the tags
-        }
-        if($request['type'] == 'tagNames'){
-            return Item::findOrFail($id)->tagNames();
+            return Item::withAllTags($request['tags'])->get(); // only fetch articles with all the tags
         }
     }
 
@@ -91,14 +89,14 @@ class ItemTagController extends Controller
      */
     public function update(Request $request, $id)
     {
-        if ($request['type'] == 'tag'){
-            Item::findOrFail($id)->tag($request['request']); // attach the tag
+        if ($request['type'] == 'tag' || !$request['type']){
+            Item::findOrFail($id)->tag($request['tags']); // attach the tag
         }
         if ($request['type'] == 'untag'){
-            Item::findOrFail($id)->untag($request['request']); // attach the tag
+            Item::findOrFail($id)->untag($request['tags']); // untag tag
         }
         if ($request['type'] == 'retag'){
-            Item::findOrFail($id)->retag($request['request']); // attach the tag
+            Item::findOrFail($id)->retag($request['tags']); // Remove all tags and retag with request
         }
         return response()->json($request->all());
     }

@@ -70,9 +70,11 @@ button{
     margin-left: 1.5em;
 }
 .updatebox, .addnewbox {
-    display: flex;
-    align-items: center;
-    border: $selection-color solid thin;
+    >div:first-child{
+        display: flex;
+        align-items: center;
+        border: $selection-color solid thin;
+    }
     textarea, input{
         outline: 0px !important;
         padding: 0.5em;
@@ -81,21 +83,44 @@ button{
     textarea{
         width: 100%;
     }
+    .tag {
+        color: black;
+        background: #eaeaea;
+    }
+
+}
+.update-tags{
+    font-size: 0.85em;
+    display: flex;
+    >div{
+        margin: 0.3em;
+    }
     input{
-        border-radius: 0.3em;
-        background: $duration-color;
-        color: white;
         font-size: 1em;
-        width: 44px;
+        padding: 0.1em;
+        margin-right: 0.3em;
     }
-    span{
-        font-size: 0.85em;
-        margin-right: 0.5em;
-        display: inline-table;
+    .update-planned-time{
+        label:after {content: 'min';position: absolute;margin-left: -2em;}
+        input{
+            border-bottom: 1px solid $duration-color;
+            width: 4em;
+        }
+        button {
+            color: $duration-color;
+            font-size: 1em;
+            padding: 0 0.2em;
+        }
+        .currentDuration {
+            background: $duration-color;
+            padding: 0.1em 0.5em;
+            margin: 0.1em;
+            border-radius: 0.3em;
+            color: white;
+        }
     }
-    label{
-        margin: 0;
-        margin-right: 0.2em;
+    .update-custom-tags input {
+        border-bottom: 1px solid $theme-color;
     }
 }
 .addnewbox {
@@ -184,6 +209,8 @@ button{
     }
     .body-div{
         border-bottom: none;
+        flex-direction: column;
+        align-items:flex-start;
     }
 }
 .done .bodybox{
@@ -198,9 +225,11 @@ button{
     align-items: baseline;
     font-size: 0.7em;
     >span, >label {
+        align-items: center;
+        display: flex;
         position:relative;
         padding: 0.1em 0.5em;
-        margin-left: 0.2em;
+        margin: 0.1em;
         border-radius: 0.3em;
         color: white;
     }
@@ -214,7 +243,7 @@ button{
         position: absolute;
         left: 0;
     }
-    .duration {
+    .duration, .currentDuration {
         background: $duration-color;
     }
     .duedate{
@@ -227,6 +256,14 @@ button{
     }
     .total-duration{
         background:$duration-color-dark;
+    }
+    .custom-tag{
+        background: $theme-color;
+        button{
+            color: white;
+            margin-left: 0.5em;
+            padding: 0;
+        }
     }
 }
 .done-card {

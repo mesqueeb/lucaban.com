@@ -21,17 +21,29 @@
         border-bottom: 1px solid #e3e3e3;
         display: flex;
         align-items: center;
-	}
+    }
+    .bodybox {
+        font-size: 1.1em;
+        padding: 1em;
+    }
+    .confirm-delete .bodybox{
+        padding: 1em 2em;
+    }
     .timer-time{
         font-size: 1.4em;
         margin: 0 auto;
     }
-	.nav {
-	    padding: 0.6em 1em;
-	    text-align: right;
-	}
-	button {
+    .nav {
+        padding: 0.6em 1em;
+        text-align: right;
+    }
+    button {
+        font-size: 1.1em;
 	    padding: 0 0.4em;
 	    margin: 0 0.3em;
+        margin-bottom: 1px;
 	}
+    button:focus {
+        margin-bottom: 0;
+    }
 }

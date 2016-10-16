@@ -96,6 +96,18 @@ Vue.filter('momentCalendar', {
 		});
   	},
 });
+Vue.filter('momentDate', {
+	read: function(val) {
+	  	return moment(val).startOf('day').calendar(null, {
+		    sameDay: 'YYYY/MM/DD',
+		    nextDay: 'YYYY/MM/DD',
+		    nextWeek: 'YYYY/MM/DD',
+		    lastDay: 'YYYY/MM/DD',
+		    lastWeek: 'YYYY/MM/DD',
+		    sameElse: 'YYYY/MM/DD',
+		});
+  	},
+});
 
 Vue.filter('linkify', {
 	read: function(val) {

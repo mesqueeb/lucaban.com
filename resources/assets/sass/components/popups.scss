@@ -13,11 +13,15 @@
     width: 100%;
     display: flex;
     flex-wrap: wrap;
-    .title{
+	.top{
 	    width: 100%;
-	    margin-bottom: 0.2em;
-	    text-align: center;
+		display: flex;
+	    align-items: center;
+	    margin-bottom: 0.5em;
+	}
+    .title{
 	    font-weight: 600;
+        margin: 0 auto;
     }
     .body{
     	display: flex;
@@ -31,12 +35,20 @@
 	    border: 1px solid rgb(146, 146, 146);
 	    border-radius: 0.3em;
 	}
-}
-.popup .completion-memo{
-	display: flex;
-	flex-direction: column;
-	flex-grow: 2;
-	margin-right: 0.3em;
+	label.done-after-done {
+        cursor: pointer;
+	    font-weight: inherit;
+	    border-bottom: 1px solid;
+		input {
+		    border: none;
+		}
+	}
+	.completion-memo{
+		display: flex;
+		flex-direction: column;
+		flex-grow: 2;
+		margin-right: 0.3em;
+	}
 }
 .close-button {
     padding-left: 0.5em;
@@ -59,6 +71,7 @@
 	button{
 	    padding: 0.3em 0.3em 0;
 	}
+
 	// input{
 	// 	width: 60px;
 	// }

@@ -40,7 +40,7 @@ export default class Tree {
 			    let id = node.id;
 			    this.sortChildren(id);
 			    this.updateChildrenDueDate(id);
-				// this.copyParentBodyToChild(id);　//Maybe I should only do this when pressing DONE
+				// this.attachParentBody(id);　//Maybe I should only do this when pressing DONE
 			    if (!node.children.length && (node.used_time || node.planned_time)){
 				    this.calculateTotalTime(id);
 			    }
@@ -77,7 +77,7 @@ export default class Tree {
 		this.nodes[item.id] = item;
 
 		// Patches etc.
-		// this.copyParentBodyToChild(item.parent_id); 　//Maybe I should only do this when pressing DONE
+		this.attachParentBody(item.id);
 	    selection.selectedId = item.id;
 	    vm.patch(item.parent_id, 'children_order');
 		this.autoCalculateDoneState(item.parent_id);
@@ -233,7 +233,8 @@ export default class Tree {
 		// Fix bug where item would still show if it prevParent has an array of 0 and the moved child was originally the last child...
 		if(prevParent.children.length == 0){ prevParent.children = []; }
 
-		// this.copyParentBodyToChild(new_parent_id);　//Maybe I should only do this when pressing DONE
+		// Patches etc.
+		this.attachParentBody(id);
 		vm.patch(id, 'depth');
 		vm.patch(id, 'parent_id');
 		vm.patch(new_parent_id, 'children_order');
@@ -272,7 +273,7 @@ export default class Tree {
 			vm.patch(child.id, 'parents_bodies');
 		});
 	}
-	copyParentBodyToChild(id)
+	attachParentBody(id)
 	{
 		if (!id){ return; }
 		let item = this.nodes[id];
@@ -311,6 +312,11 @@ export default class Tree {
 	    this.calculateTotalTime(parent_id);
 	    selection.selectedId = newSelectedId;
 	}
+	tagItem(id, tags)
+	{
+		let item = allItems.nodes[id];
+		vm.patchTag(id, tags);
+	}
 	prepareDonePatch(id)
 	{
 		let item = this.nodes[id];
@@ -323,26 +329,14 @@ export default class Tree {
 		this.autoCalculateDoneState(item.parent_id);
 		if (item.done){ // IF DONE:
 			//Add parent's body
-			this.copyParentBodyToChild(id);
+			this.attachParentBody(id);
 			//Add Flatpickr
 			setTimeout(function(){
 				let fpId = "done-date-edit-"+id;
 				let fpEl = document.getElementById(fpId);
-				console.log(fpId);
-				console.log(fpEl);
-				fpEl.flatpickr({
-			    	dateFormat: 'Y-m-d H:i:S',
-			    	maxDate: 'today',
-			    	enableTime: true,
-			    	time_24hr: true,
-			    	onChange: function(dateObj, dateStr, instance){
-						let el = instance.element.id;
-						document.getElementById(el).focus();
-					},
-			    });
+				fpEl.flatpickrify();
 			},100);
-		} // end add Flatpickr
-
+		}
 	}
 	autoCalculateDoneState(id)
 	{

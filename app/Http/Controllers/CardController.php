@@ -23,8 +23,9 @@ class CardController extends Controller
         if(!$god){
             return Item::create(['body' => 'ALL', 'id' => '1', 'depth' => '0']);
         }
-        return Item::where('done',0)
-            ->orWhere('done_date', '>', Carbon::now()->subHour(12))
+        return Item::with('tagged')
+            ->where('done',0)
+            ->orWhere('done_date', '>', Carbon::now()->subHour(18))
             ->orderBy('depth', 'asc')
             ->get();
     }
@@ -64,9 +65,9 @@ class CardController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show(Request $request, $id)
     {
-        return Item::findOrFail($id);
+        return Item::with('tagged')->findOrFail($id);
     }
 
     /**
