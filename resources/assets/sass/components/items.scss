@@ -119,6 +119,9 @@ button{
             border-radius: 0.3em;
             color: white;
         }
+        .currentDuration:focus {
+            border-bottom:none;
+        }
     }
     .update-custom-tags input {
         border-bottom: 1px solid $theme-color;
@@ -257,11 +260,11 @@ button{
     }
     .custom-tag{
         background: $theme-color;
-        button{
-            color: white;
-            margin-left: 0.5em;
-            padding: 0;
-        }
+    }
+    button{
+        color: white;
+        margin-left: 0.5em;
+        padding: 0;
     }
 }
 .done-card {

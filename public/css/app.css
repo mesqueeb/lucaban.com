@@ -5605,6 +5605,8 @@ button {
     margin: 0.1em;
     border-radius: 0.3em;
     color: white; }
+  .update-tags .update-planned-time .currentDuration:focus {
+    border-bottom: none; }
   .update-tags .update-custom-tags input {
     border-bottom: 1px solid #5dc2af; }
 
@@ -5730,10 +5732,10 @@ button {
     background: #4679a7; }
   .item-tags .custom-tag {
     background: #5dc2af; }
-    .item-tags .custom-tag button {
-      color: white;
-      margin-left: 0.5em;
-      padding: 0; }
+  .item-tags button {
+    color: white;
+    margin-left: 0.5em;
+    padding: 0; }
 
 .done-card .item {
   display: -ms-flexbox;

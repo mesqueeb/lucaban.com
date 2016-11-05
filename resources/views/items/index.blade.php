@@ -51,6 +51,11 @@
 	<div class="panel-title">
 		@{{ selection.filter | capitalize }}
 	</div>
+	{{-- STATS --}}
+
+	<div class="stats">
+		<div>Total time: @{{ totalDuration }}</div>
+	</div>
 	{{-- DATA --}}
 	<div class="items-wrapper"
 		v-show="selection.filter != 'done'"

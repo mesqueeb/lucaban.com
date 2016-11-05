@@ -181,6 +181,17 @@ window.vm = new Vue({
 		Popups,
 		Popouts,
 	},
+	computed:{
+		totalListDuration(){
+			let x;
+			let y;
+			allItems.root.children.forEach(child => {
+				x = x + parseFloat(child.totalPlannedTime);
+				y = y + parseFloat(child.totalUsedTime);
+			});
+			return y + ' / '+x;
+		},
+	},
 	methods:{
 		showChildren(id, show){
 			id = (id) ? id : selection.selectedId;
@@ -271,8 +282,8 @@ window.vm = new Vue({
 			selection.selectedId = sel;
 			document.getElementById('card-'+sel).scrollIntoViewIfNeeded();
 		},
-		setToday(){
-			let id = selection.selectedId;
+		setToday(id){
+			id = (id) ? id : selection.selectedId;
 			allItems.setDueDate(id);
 		},
 		showAddNewItem(id, addAs){
@@ -312,6 +323,10 @@ window.vm = new Vue({
 				'untag': untag item with certain tag
 				'retag': delete all tags and retag new ones
 			*/
+			if(tags=='t' || tags=='T' || tags=='today' || tags=='Today'){
+				this.setToday(id);
+				return;
+			}
 			this.patching = true;
 			let patchObj = {};
 			patchObj['tags'] = tags;
@@ -430,6 +445,7 @@ window.vm = new Vue({
 			}
 		},
 		addTimer(id){
+			id = (!id) ? selection.selectedId : id ;
 			this.popout(id, 'timer');
 			return;
 			// id = (!id) ? selection.selectedId : id ;
@@ -525,13 +541,14 @@ window.vm = new Vue({
 			if(k == 'meta_arrowDown'){ this.moveItem('down')}
 			if(k == 'meta_arrowRight'){ this.indent()}
 			if(k == 'meta_arrowLeft'){ this.unindent()}
-			if(k == 'spaceBar'){ this.markDone() }
+			if(k == 'spaceBar'){ this.markDone()}
 			if(k == 'tab'){ this.indent()}
 			if(k == 'shift_tab'){ this.unindent()}
 			if(k == 'enter'){ this.showAddNewItem()}
 			if(k == 'shift_enter'){ this.showAddNewItem(null, 'child')}
 			if(k == 'meta_enter'){ this.$broadcast('startEdit')}
 			if(k == 't'){ this.setToday()}
+			if(k == 's'){ this.addTimer()}
 			if(k == 'meta_shift_d'){ this.duplicate()}
 			if(k == 'meta_delete'){ this.deleteItem()}
 			if(k == 'delete'){ this.deleteItem()}
@@ -647,6 +664,9 @@ window.vm = new Vue({
 				break;
 			case 84: // t
 				vm.keystroke('t');
+				break;
+			case 83: // s
+				vm.keystroke('s');
 				break;
 			case 68: // d
 				e.preventDefault();

@@ -270,8 +270,8 @@
 				</div>
 				<div class="item-tags prepared-tags">
 					<span v-if="newItem.preparedTags.length"
-						class="custom-tag"
 						v-for="tag in newItem.preparedTags"
+						:class="if(tag=='Today'){'duedate' } else{ 'custom-tag' }"
 					>{{ tag }}
 						<button class="delete-tag"
 							@click.prevent="deletePreparedTag(tag, item)"
@@ -358,8 +358,8 @@
 				</div>
 				<div class="item-tags prepared-tags">
 					<span v-if="newItem.preparedTags.length"
-						class="custom-tag"
 						v-for="tag in newItem.preparedTags"
+						:class="[(tag=='Today') ? 'duedate' : 'custom-tag']"
 					>{{ tag }}
 						<button class="delete-tag"
 							@click.prevent="deletePreparedTag(tag, item)"
@@ -648,6 +648,11 @@ export default {
 				newItem.depth++;
         		newItem.parent_id = this.item.id;
 			}
+			if (this.newItem.preparedTags.indexOf('Today') == -1){
+				this.newItem.preparedTags.$remove('Today');
+				let dd = (!duedate) ? moment().format() : duedate;
+				newItem.due_date = dd;
+			}
 			console.log(newItem);
 			this.$http.post('/api/items',newItem) //SEND
 			.then(function(response){ //response
@@ -699,6 +704,9 @@ export default {
 		prepareTag(item){
 			let id = (item) ? item.id : selection.selectedId;
 			let tag = this.newTag;
+			if(tag=='t' || tag=='T' || tag=='today' || tag=='Today'){
+				tag = 'Today';
+			}
 			this.newItem.preparedTags.push(tag);
 			this.newTag = null;
 		},

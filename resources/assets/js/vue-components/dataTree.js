@@ -64,14 +64,12 @@ export default class Tree {
 		let parent = allItems.nodes[item.parent_id];
 		// console.log('item.parent_id in additem');
 		// console.log(item.parent_id);
-		if (!parent.children_order){
-			parent.children_order = [];
-		}
-		item.due_date = "0000-00-00 00:00:00";
-		item.done_date = "0000-00-00 00:00:00";
-		item.done = false;
-		item.used_time = 0;
-		item.tagged = [];
+		if(!parent.children_order){ parent.children_order = []; 	 }
+		if(!item.due_date)	{ item.due_date = "0000-00-00 00:00:00"; }
+		if(!item.done_date)	{ item.done_date = "0000-00-00 00:00:00";}
+		if(!item.done)		{ item.done = false; 					 }
+		if(!item.used_time)	{ item.used_time = 0; 					 }
+		if(!item.tagged)	{ item.tagged = []; 					 }
 		//Actually ADD the item!
 		parent.children.splice(index, 0, item);
 		parent.children_order.splice(index, 0, item.id);
