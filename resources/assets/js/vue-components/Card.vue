@@ -109,6 +109,7 @@
 							<label>
 								Add Tag: 
 								<input type="text"
+									name="add_tag"
 									class="add-tag"
 									@blur="blurOnEdit(item)"
 									v-model="newTag"
@@ -262,6 +263,8 @@
 						Add Tag: 
 						<input type="text"
 							class="prepare-tag"
+							name="add_tag"
+							@keydown="keydownOnNew"
 							@blur="blurOnAddNew(item)"
 							v-model="newTag"
 							@keydown.enter.prevent="enterOnAddTag(item, 'newItem', $event)"
@@ -349,7 +352,9 @@
 					<label>
 						Add Tag: 
 						<input type="text"
+							name="add_tag"
 							class="prepare-tag"
+							@keydown="keydownOnNew"
 							@blur="blurOnAddNew(item)"
 							v-model="newTag"
 							@keydown.enter.prevent="enterOnAddTag(item, 'newItem', $event)"
@@ -393,7 +398,7 @@ export default {
 				parent_id: (this.item.parent_id) ? this.item.parent_id : allItems.root.id,
 				depth: (this.item.depth == 0) ? 1 : this.item.depth,
 				preparedTags: [],
-				due_date: null,
+				due_date: '0000-00-00 00:00:00',
 			},
 			newTag: null,
 		};
@@ -483,13 +488,14 @@ export default {
         	}
 		},
 		keydownOnNew(e) {
+			console.log(e.srcElement);
 			// SHIFT-TAB on body
 			if (e.srcElement.name == 'body' && e.keyCode === 9 && e.shiftKey) {
 	        	e.preventDefault();
 	        	vm.$root.showAddNewItem(this.item.parent_id);
 			}
 			// TAB on planned_time
-			if (e.srcElement.name == 'planned_time' && e.keyCode === 9 && !e.shiftKey) {
+			if (e.srcElement.name == 'add_tag' && e.keyCode === 9 && !e.shiftKey) {
 	        	e.preventDefault();
 	        	this.makeNewItemAChild();
 			}
@@ -651,8 +657,7 @@ export default {
 			}
 			if (this.newItem.preparedTags.indexOf('Today') != -1){
 				this.newItem.preparedTags.$remove('Today');
-				let dd = (!duedate) ? moment().format() : duedate;
-				newItem.due_date = dd;
+				newItem.due_date = moment().format();
 			}
 			console.log(newItem);
 			this.$http.post('/api/items',newItem) //SEND
@@ -665,7 +670,7 @@ export default {
 				allItems.addItem(storedItem, index, addNextItemAs, addTags);
 				// Reset stuff
 				this.newItem.body = '';
-				this.newItem.due_date = '';
+				this.newItem.due_date = '0000-00-00 00:00:00';
 				this.newItem.planned_time = '';
 				this.newItem.preparedTags = '';
 			});
