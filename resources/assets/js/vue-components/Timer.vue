@@ -2,7 +2,7 @@
 <div id="timer-area" class=""
 	v-show="timerItems.length"
 >
-	<div class="timer" id="timer-{{ item.id }}"
+	<div class="timer" :id="'timer-'+item.id"
 		v-for="item in timerItems"
 	>
 		<div class="toggle-div">

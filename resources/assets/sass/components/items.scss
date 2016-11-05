@@ -1,12 +1,6 @@
 label{
     font-weight: 300;
 }
-button{
-    cursor: pointer;
-    background: none;
-    border: none;
-}
-// button:focus {outline:0;}
 
 .navigation{
     display: flex;
@@ -118,9 +112,6 @@ button{
             margin: 0.1em;
             border-radius: 0.3em;
             color: white;
-        }
-        .currentDuration:focus {
-            border-bottom:none;
         }
     }
     .update-custom-tags input {

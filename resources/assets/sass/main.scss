@@ -18,10 +18,6 @@ body {
 	background: #f5f5f5;
 	margin: 0;
 }
-button{
-	@include text-settings();
-	color: $theme-color;
-}
 form {
     margin-bottom: 0;
 }
@@ -35,6 +31,14 @@ input, textarea{
 	@include text-settings();
 	outline: none;
     border-style: none;
+}
+button{
+	@include text-settings();
+    cursor: pointer;
+	color: $theme-color;
+    background: none;
+    border: none;
+	border-bottom: 1px solid transparent;
 }
 button:focus {
     // outline: -webkit-focus-ring-color auto 5px;

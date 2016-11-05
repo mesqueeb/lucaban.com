@@ -12,7 +12,7 @@
           <div class="title">Completed {{popup.item.body}}
           <label class="done-after-done">{{ popup.item.done_date | momentCalendar }}
             <input class="flatpickr"
-              id="done-date-edit-{{ popup.item.id }}-popup"
+              :id="'done-date-edit-'+popup.item.id+'-popup'"
               v-model="popup.item.done_date"
             >
           </label></div>

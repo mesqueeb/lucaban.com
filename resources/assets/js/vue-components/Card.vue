@@ -1,6 +1,6 @@
 <template id="items-card-template">
 	<div class="items-card"
-		id="card-{{ item.id }}"
+		:id="'card-'+item.id"
 	>
 		<div 
 			v-if="item.depth != 0"
@@ -20,12 +20,12 @@
 				>
 				<input type="checkbox"
 					class="styled-check"
-					id="show_children_{{item.id}}"
+					:id="'show_children_'+item.id"
 					v-model="item.show_children"
 					@change="updateShowChildren(item.id)"
 				>
 				<label class="arrow"
-					for="show_children_{{item.id}}"
+					:for="'show_children_'+item.id"
 					v-if="item.children_order.length>0"
 				></label>
 
@@ -57,13 +57,13 @@
 				
 				<form action="update"
 					class="updatebox"
-					id="updatebox-{{ item.id }}"
+					:id="'updatebox-'+item.id"
 					v-show="item.id == this.$root.editingItem"
 					@submit.prevent="doneEdit(item)"
 				>
 					<div class="update-body">
 						<textarea name="item_body"
-							rows="{{ item.rows }}"
+							:rows="item.rows"
 							v-model="item.body"
 							v-autosize="item.body"
 							v-item-focus="item.id == this.$root.editingItem"
@@ -209,7 +209,7 @@
 
 		<form 
 			:class="['addnewbox-firstchild', 'addnewbox', 'child']"
-			id="new-firstchild-of-{{ item.id }}"
+			:id="'new-firstchild-of-'+item.id"
 			v-if="showAddNewBoxFirstChild"
 			@submit.prevent
 		>
@@ -274,7 +274,7 @@
 				<div class="item-tags prepared-tags">
 					<span v-if="newItem.preparedTags.length"
 						v-for="tag in newItem.preparedTags"
-						:class="if(tag=='Today'){'duedate' } else{ 'custom-tag' }"
+						:class="(tag=='Today') ? 'duedate' : 'custom-tag'"
 					>{{ tag }}
 						<button class="delete-tag"
 							@click.prevent="deletePreparedTag(tag, item)"
@@ -299,7 +299,7 @@
 
 		<form 
 			:class="{addnewbox: true, child: this.$root.addingNewAsChild}"
-			id="new-under-{{ item.id }}"
+			:id="'new-under-'+ item.id "
 			v-if="showAddNewBox"
 			@submit.prevent
 		>
@@ -341,11 +341,11 @@
 						@blur="blurOnAddNew(item)"
 					>1 hour</button>
 					<input name="planned_time"
+						v-if="false"
 						type="number"
-						v-show="false"
 						v-model="newItem.planned_time"
-						@blur="blurOnAddNew(item)"
 						@keydown="keydownOnNew"
+						@blur="blurOnAddNew(item)"
 					/>
 				</div>
 				<div class="update-custom-tags">
@@ -364,7 +364,7 @@
 				<div class="item-tags prepared-tags">
 					<span v-if="newItem.preparedTags.length"
 						v-for="tag in newItem.preparedTags"
-						:class="[(tag=='Today') ? 'duedate' : 'custom-tag']"
+						:class="(tag=='Today') ? 'duedate' : 'custom-tag'"
 					>{{ tag }}
 						<button class="delete-tag"
 							@click.prevent="deletePreparedTag(tag, item)"
