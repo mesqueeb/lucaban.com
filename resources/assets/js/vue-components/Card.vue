@@ -393,6 +393,7 @@ export default {
 				parent_id: (this.item.parent_id) ? this.item.parent_id : allItems.root.id,
 				depth: (this.item.depth == 0) ? 1 : this.item.depth,
 				preparedTags: [],
+				due_date: null,
 			},
 			newTag: null,
 		};
@@ -648,7 +649,7 @@ export default {
 				newItem.depth++;
         		newItem.parent_id = this.item.id;
 			}
-			if (this.newItem.preparedTags.indexOf('Today') == -1){
+			if (this.newItem.preparedTags.indexOf('Today') != -1){
 				this.newItem.preparedTags.$remove('Today');
 				let dd = (!duedate) ? moment().format() : duedate;
 				newItem.due_date = dd;
@@ -664,6 +665,7 @@ export default {
 				allItems.addItem(storedItem, index, addNextItemAs, addTags);
 				// Reset stuff
 				this.newItem.body = '';
+				this.newItem.due_date = '';
 				this.newItem.planned_time = '';
 				this.newItem.preparedTags = '';
 			});
