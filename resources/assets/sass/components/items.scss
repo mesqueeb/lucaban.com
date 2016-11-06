@@ -86,6 +86,7 @@ label{
 .update-tags{
     font-size: 0.85em;
     display: flex;
+    flex-direction: column;
     align-items: baseline;
     >div{
         margin: 0.3em;
@@ -96,10 +97,14 @@ label{
         margin-right: 0.3em;
     }
     .update-planned-time{
+        display: flex;
+        align-items: baseline;
         label:after {content: 'min';position: absolute;margin-left: -2em;}
         input{
             border-bottom: 1px solid $duration-color;
-            width: 4em;
+            width: 2em;
+            text-align: center;
+            padding: 0;
         }
         button {
             color: $duration-color;

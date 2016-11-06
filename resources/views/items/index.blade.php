@@ -12,11 +12,14 @@
 <a href="{{route('home')}}">Go home</a>
 
 {{-- @include('elements.menu') --}}
-<img id="loading-icon"
-	src="/css/icons/loading_64x64.gif"
-	alt="Loading"
-	v-show="patching"
-/>
+<div id="loading-icon">
+	<img
+		src="/css/icons/loading_64x64.gif"
+		alt="Loading"
+		v-show="patching"
+	/>
+	<div class="patching-error" v-show="patching == 'error'">Error!</div>
+</div>
 
 <Popups :popups="popups"></Popups>
 <Popouts :popouts="popouts"

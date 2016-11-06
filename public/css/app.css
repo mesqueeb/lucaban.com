@@ -5434,9 +5434,13 @@ button:focus {
 #loading-icon {
   position: fixed;
   right: 1em;
-  top: 1em;
-  width: 30px;
-  height: 30px; }
+  top: 1em; }
+  #loading-icon img {
+    width: 30px;
+    height: 30px; }
+  #loading-icon .patching-error {
+    color: #e65e4d;
+    font-weight: 600; }
 
 .fade-out {
   opacity: 0;
@@ -5579,6 +5583,8 @@ label {
   font-size: 0.85em;
   display: -ms-flexbox;
   display: flex;
+  -ms-flex-direction: column;
+  flex-direction: column;
   -ms-flex-align: baseline;
   align-items: baseline; }
   .update-tags > div {
@@ -5587,23 +5593,30 @@ label {
     font-size: 1em;
     padding: 0.1em;
     margin-right: 0.3em; }
-  .update-tags .update-planned-time label:after {
-    content: 'min';
-    position: absolute;
-    margin-left: -2em; }
-  .update-tags .update-planned-time input {
-    border-bottom: 1px solid #5dacce;
-    width: 4em; }
-  .update-tags .update-planned-time button {
-    color: #5dacce;
-    font-size: 1em;
-    padding: 0 0.2em; }
-  .update-tags .update-planned-time .currentDuration {
-    background: #5dacce;
-    padding: 0.1em 0.5em;
-    margin: 0.1em;
-    border-radius: 0.3em;
-    color: white; }
+  .update-tags .update-planned-time {
+    display: -ms-flexbox;
+    display: flex;
+    -ms-flex-align: baseline;
+    align-items: baseline; }
+    .update-tags .update-planned-time label:after {
+      content: 'min';
+      position: absolute;
+      margin-left: -2em; }
+    .update-tags .update-planned-time input {
+      border-bottom: 1px solid #5dacce;
+      width: 2em;
+      text-align: center;
+      padding: 0; }
+    .update-tags .update-planned-time button {
+      color: #5dacce;
+      font-size: 1em;
+      padding: 0 0.2em; }
+    .update-tags .update-planned-time .currentDuration {
+      background: #5dacce;
+      padding: 0.1em 0.5em;
+      margin: 0.1em;
+      border-radius: 0.3em;
+      color: white; }
   .update-tags .update-custom-tags input {
     border-bottom: 1px solid #5dc2af; }
 

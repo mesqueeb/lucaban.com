@@ -96,14 +96,14 @@
 								@click.prevent="setPlannedTime(item, 60, $event)"
 								@blur="blurOnEdit(item)"
 							>1 hour</button>
-							<input name="planned_time"
+							<div><input name="planned_time"
 								type="number"
-								v-show="false"
-								v-model="item.planned_time"
+								v-show="true"
+								v-model="item.planned_time | min_to_hours"
 								@blur="blurOnEdit(item)"
 								@keyup.esc="cancelEdit(item)"
 								@keydown="keydownOnEdit"
-							/>
+							/>hours</div>
 						</div>
 						<div class="update-custom-tags">
 							<label>
@@ -140,7 +140,7 @@
 					</label>
 					
 					<span v-if="(hasTotalUsedTime || hasTotalPlannedTime) && !item.done" class="total-duration">
-						<span>Total </span>
+						<span style="padding-right:2px">Total </span>
 						<span v-if="hasTotalUsedTime"> used {{ item.totalUsedTime | hourminsec }}</span>
 						<span v-if="(hasTotalUsedTime && hasTotalPlannedTime)">/</span>
 						<span v-if="hasTotalPlannedTime">{{ item.totalPlannedTime | hourmin }}</span>
@@ -250,13 +250,13 @@
 						@click.prevent="setPlannedTimeNewItem(item, 60, $event)"
 						@blur="blurOnAddNew(item)"
 					>1 hour</button>
-					<input name="planned_time"
+					<div><input name="planned_time"
 						type="number"
-						v-show="false"
-						v-model="newItem.planned_time"
+						v-show="true"
+						v-model="newItem.planned_time | min_to_hours"
 						@blur="blurOnAddNew(item)"
 						@keydown="keydownOnNew"
-					/>
+					/>hours</div>
 				</div>
 				<div class="update-custom-tags">
 					<label>
@@ -340,13 +340,13 @@
 						@click.prevent="setPlannedTimeNewItem(item, 60, $event)"
 						@blur="blurOnAddNew(item)"
 					>1 hour</button>
-					<input name="planned_time"
-						v-if="false"
+					<div><input name="planned_time"
+						v-if="true"
 						type="number"
-						v-model="newItem.planned_time"
+						v-model="newItem.planned_time | min_to_hours"
 						@keydown="keydownOnNew"
 						@blur="blurOnAddNew(item)"
-					/>
+					/>hours</div>
 				</div>
 				<div class="update-custom-tags">
 					<label>
@@ -624,6 +624,7 @@ export default {
 			allItems.calculateTotalTime(item.id);
 		},
 		cancelEdit(item) {
+			item = (item) ? item : allItems.nodes[selection.selectedId];
 			this.$root.editingItem = null;
 			console.log("cancel edit. Reverting to:");
 			console.log(this.$root.beforeEditCache_body);
@@ -750,6 +751,8 @@ export default {
 	},
 	events: {
     	startEdit() { this.startEdit(); },
+    	escapeOnEditButtonFocus(){ this.cancelEdit(); },
+    	escapeOnNewButtonFocus(){ this.cancelAddNew(); },
 	},
 	directives: {
 		'item-focus': function (value) {

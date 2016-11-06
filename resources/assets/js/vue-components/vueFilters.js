@@ -13,6 +13,21 @@ Vue.filter('M/D', {
   //   return isNaN(number) ? 0 : parseFloat(number.toFixed(2))
   // }
 });
+Vue.filter('min_to_hours', {
+  // model -> view
+  // formats the value when updating the input element.
+  read: function(val) {
+  	let nr = val/60;
+  	if (val == 10){ nr = nr.toFixed(2); }
+    return nr;
+  },
+  // view -> model
+  // formats the value when writing to the data.
+  write: function(val, oldVal) {
+    let nr = parseFloat(val)*60;
+    return nr;
+  }
+});
 Vue.filter('countdown', {
 	read: function(val) {
 		let item = allItems.nodes[val];

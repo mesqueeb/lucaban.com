@@ -284,6 +284,7 @@ export default class Tree {
 	}
 	isProject(id)
 	{
+		if(!id){ return false; }
 		if (this.nodes[id].body.slice(-1) == ':'){
 			return true;
 		} else {

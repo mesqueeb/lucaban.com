@@ -315,6 +315,8 @@ window.vm = new Vue({
 			.then(function(response){
 				console.log('patched ['+allItems.nodes[id].body+'].'+arg+' = '+patchObj[arg]+';');
 				this.patching = false;
+			}, (response) => {
+				this.patching = 'error';
 			});
 		},
 		patchTag(id, tags, requestType){
@@ -575,7 +577,7 @@ window.vm = new Vue({
 	created(){
 	},
 	ready: function() {
-      var vm = this;
+      let vm = this;
       window.addEventListener('keydown', function(e) {
         let x = e.keyCode;
     	if (vm.popouts.length){
@@ -599,10 +601,21 @@ window.vm = new Vue({
 				e.preventDefault();
 				$(".btn-ok").focus();
 			}
+		} else if(vm.editingItem || vm.addingNewUnder){
+			if(!$('button:focus').length){
+				return;
+		    }
+			if(e.keyCode == 27){ // Escape
+				if(vm.editingItem){
+					vm.$broadcast('escapeOnEditButtonFocus');
+				} else if(vm.addingNewUnder){
+					vm.$broadcast('escapeOnNewButtonFocus');
+				}
+			}
 		} else if ( $('input:focus').length > 0
         	||  $('textarea:focus').length > 0
-        	|| $('button:focus').length > 0
-        	|| $('a:focus').length > 0 )
+        	|| $('a:focus').length > 0
+        	|| $('button:focus').length > 0)
 		{
         	return;
 		} else { 
