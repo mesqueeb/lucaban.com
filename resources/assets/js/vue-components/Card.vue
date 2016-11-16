@@ -69,8 +69,7 @@
 							v-item-focus="item.id == this.$root.editingItem"
 							@blur="blurOnEdit(item)"
 							@keyup.esc="cancelEdit(item)"
-							@keydown.tab="tabOnFirstInput"
-							@keydown="keydownOnEdit"
+							@keydown="keydownOnEdit(item, $event, 'body')"
 						>{{ item.body }}</textarea>
 					</div>
 					<div class="update-tags">
@@ -102,7 +101,7 @@
 								v-model="item.planned_time | min_to_hours"
 								@blur="blurOnEdit(item)"
 								@keyup.esc="cancelEdit(item)"
-								@keydown="keydownOnEdit"
+								@keydown="keydownOnEdit(item, $event)"
 							/>hours</div>
 						</div>
 						<div class="update-custom-tags">
@@ -114,8 +113,7 @@
 									@blur="blurOnEdit(item)"
 									v-model="newTag"
 									@keyup.esc="cancelEdit(item)"
-									@keydown.tab="tabOnLastInput"
-									@keydown.enter.prevent="enterOnAddTag(item, 'editItem', $event)"
+									@keydown="keydownOnEdit(item, $event, 'addTag')"
 								>
 							</label>
 							<div class="tag-suggestions" v-if="false">
@@ -220,7 +218,7 @@
 					v-model="newItem.body"
 					v-autosize="newItem.body"
 					@blur="blurOnAddNew(item)"
-					@keydown="keydownOnNew"
+					@keydown="keydownOnNew(item, $event, 'body')"
 					placeholder="..."
 					autocomplete="off"
 					autofocus 
@@ -255,7 +253,7 @@
 						v-show="true"
 						v-model="newItem.planned_time | min_to_hours"
 						@blur="blurOnAddNew(item)"
-						@keydown="keydownOnNew"
+						@keydown="keydownOnNew(item, $event)"
 					/>hours</div>
 				</div>
 				<div class="update-custom-tags">
@@ -264,10 +262,9 @@
 						<input type="text"
 							class="prepare-tag"
 							name="add_tag"
-							@keydown="keydownOnNew"
+							@keydown="keydownOnNew(item, $event, 'addTag')"
 							@blur="blurOnAddNew(item)"
 							v-model="newTag"
-							@keydown.enter.prevent="enterOnAddTag(item, 'newItem', $event)"
 						>
 					</label>
 				</div>
@@ -310,7 +307,7 @@
 					v-model="newItem.body"
 					v-autosize="newItem.body"
 					@blur="blurOnAddNew(item)"
-					@keydown="keydownOnNew"
+					@keydown="keydownOnNew(item, $event, 'body')"
 					placeholder="..."
 					autocomplete="off"
 					autofocus 
@@ -344,7 +341,7 @@
 						v-if="true"
 						type="number"
 						v-model="newItem.planned_time | min_to_hours"
-						@keydown="keydownOnNew"
+						@keydown="keydownOnNew(item, $event)"
 						@blur="blurOnAddNew(item)"
 					/>hours</div>
 				</div>
@@ -354,10 +351,9 @@
 						<input type="text"
 							name="add_tag"
 							class="prepare-tag"
-							@keydown="keydownOnNew"
+							@keydown="keydownOnNew(item, $event, 'addTag')"
 							@blur="blurOnAddNew(item)"
 							v-model="newTag"
-							@keydown.enter.prevent="enterOnAddTag(item, 'newItem', $event)"
 						>
 					</label>
 				</div>
@@ -406,7 +402,7 @@ export default {
 	computed: {
 		isProject(){
 			console.log('checking isProject');
-			return allItems.isProject(this.item.id);			
+			return allItems.isProject(this.item.id);	
 		},
 		siblingIndex(){ return allItems.siblingIndex(this.item.id); },
 		olderSiblingId(){ return allItems.olderSiblingId(this.item.id); },
@@ -473,9 +469,7 @@ export default {
 		selectItem(item){
 			selection.selectedId = item.id;
 		},
-		enterOnNew(e) {
-	    },
-		makeNewItemAChild(){
+		newItemIndent(){
 			let lastChild = allItems.getLastChildId(this.item.id);
         	if (lastChild){
         	// If item already has children
@@ -487,44 +481,63 @@ export default {
         		document.querySelector("#new-under-"+this.item.id+" textarea").focus();
         	}
 		},
-		keydownOnNew(e) {
-			console.log(e.srcElement);
-			// SHIFT-TAB on body
-			if (e.srcElement.name == 'body' && e.keyCode === 9 && e.shiftKey) {
-	        	e.preventDefault();
-	        	vm.$root.showAddNewItem(this.item.parent_id);
+		newItemUnindent(){
+			if(this.$root.addingNewAsChild){
+				this.$root.addingNewAsChild = false;
+				return;
 			}
-			// TAB on planned_time
-			if (e.srcElement.name == 'add_tag' && e.keyCode === 9 && !e.shiftKey) {
-	        	e.preventDefault();
-	        	this.makeNewItemAChild();
+			vm.$root.showAddNewItem(this.item.parent_id);
+		},
+		keydownOnNew(item, e, field) {
+			console.log('keydown on new: '+e.keyCode);
+			// SHIFT-TAB
+			if (e.keyCode === 9 && e.shiftKey) {
+	        	if(field == 'body'){
+	        		e.preventDefault();
+		        	this.newItemUnindent();
+		        	return;
+		        }
+			}
+			// TAB
+			if (e.keyCode === 9 && !e.shiftKey) {
+	        	if(field == 'addTag'){
+	        		e.preventDefault();
+		        	this.newItemIndent();
+		        	return;
+		        }
 			}
 			// ENTER
 			if (e.keyCode === 13 && !e.shiftKey && !e.altKey && !e.metaKey && !e.ctrlKey) {
-	        	e.preventDefault();
+				e.preventDefault();
+				if(field == 'newItemAddTag' && this.newTag){
+					this.prepareTag(item);
+					return;
+				}
 			  	if(!this.newItem.body){ return; }
 			  	this.addNew();
+			  	return;
 			} else if (e.keyCode === 13 && (e.metaKey || e.ctrlKey)) {
 			// Command ENTER
 	        	e.preventDefault();
 			  	if(!this.newItem.body){ return; }
 			  	let addNextItemAs = 'child';
 			  	this.addNew(addNextItemAs);
+			  	return;
 			}
 			// ArrowLeft
 			if (e.keyCode === 37){
 				// If in an EMPTY BODY
-				if (e.srcElement.name != 'body' || (e.srcElement.name == 'body' && !this.newItem.body)) {
+				if (field != 'body' || (field == 'body' && !this.newItem.body)) {
 					e.preventDefault();
-		        	vm.$root.showAddNewItem(this.item.parent_id);
+		        	this.newItemUnindent();
 				}
 			}
 			// ArrowRight
 			if (e.keyCode === 39){
 				// If in an EMPTY BODY
-				if (e.srcElement.name != 'body' || (e.srcElement.name == 'body' && !this.newItem.body)) {
+				if (field != 'body' || (field == 'body' && !this.newItem.body)) {
 					e.preventDefault();
-		        	this.makeNewItemAChild();
+		        	this.newItemIndent();
 				}
 			}
 			// ArrowUp or ArrowDown
@@ -541,25 +554,28 @@ export default {
 	        	this.cancelAddNew();
 			}
 	    },
-		keydownOnEdit(e) {
-			// Enter
+		keydownOnEdit(item, e, field) {
+			// SHIFT-TAB
+			if (e.keyCode === 9 && e.shiftKey) {
+	        	if(field == 'body'){
+	        		e.preventDefault(); return;
+		        }
+			}
+			// TAB
+			if (e.keyCode === 9 && !e.shiftKey) {
+	        	if(field == 'addTag'){
+	        		e.preventDefault(); return;
+		        }
+			}
+			// ENTER
 			if (e.keyCode === 13 && !e.shiftKey && !e.altKey) {
 	        	e.preventDefault();
+				if(field == 'addTag' && this.newTag){
+					this.addTag(item);
+					return;
+				}
 				this.doneEdit();
-			}
-	    },
-	    tabOnFirstInput(e){
-			// Tab
-			if (e.keyCode === 9 && e.shiftKey) {
-	        	e.preventDefault();
-	        	return;
-			}
-	    },
-	    tabOnLastInput(e){
-			// Tab
-			if (e.keyCode === 9 && !e.shiftKey) {
-	        	e.preventDefault();
-	        	return;
+				return;
 			}
 	    },
 	    blurOnEdit(item) {
@@ -666,7 +682,11 @@ export default {
 				console.log('starting dom update...');
 				let storedItem = response.data;
 				let OlderSiblingIndex = this.siblingIndex;
-				let index = (!OlderSiblingIndex) ? 0 : OlderSiblingIndex+1;
+				let index = (isNaN(OlderSiblingIndex)) ? 0 : OlderSiblingIndex+1;
+				console.log('siblingIndex: ');
+				console.log(this.siblingIndex);
+				console.log('Index: ');
+				console.log(index);
 				let addTags = this.newItem.preparedTags;
 				allItems.addItem(storedItem, index, addNextItemAs, addTags);
 				// Reset stuff
@@ -683,25 +703,6 @@ export default {
 			// Reset newItem to sibling stance.
 			this.$root.addingNewAsChild = false;			
 			$(':focus').blur();
-		},
-		enterOnAddTag(item, additionType, event){
-			console.log('enterOnAddTag');
-			// additionType can be 'newItem' or 'editItem'
-			if(additionType == 'editItem'){
-				if (!this.newTag || event.metaKey || event.ctrlKey){
-					this.doneEdit();
-				} else {
-					this.addTag(item);
-				}
-			}
-			if(additionType == 'newItem'){
-				if (!this.newTag || event.metaKey || event.ctrlKey){
-					if(!this.newItem.body){ return; }
-				  	this.addNew();
-				} else {
-					this.prepareTag(item);
-				}
-			}
 		},
 		addTag(item){
 			let id = (item) ? item.id : selection.selectedId;
