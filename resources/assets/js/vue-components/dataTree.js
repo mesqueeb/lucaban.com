@@ -56,38 +56,57 @@ export default class Tree {
 	{
 		return this.nodes[id];
 	}
-	addItem(item, index, addNextItemAs, addTags)
+	duplicate(id)
 	{
-		item.show_children = (!item.show_children) ? 1 : item.show_children;
+		let item = this.nodes[id];
+		let index = this.siblingIndex(id)+1;
+		let dupe = JSON.parse(JSON.stringify(item));
+		this.nodes[item.parent_id].children.splice(index, 0, dupe);
+
+		let addNextItemAs = null;
+		let addTags = dupe.tagged.map(tagObj => tagObj.tag_name);
+		let duplication = true;
+		vm.postNewItem(dupe, index, addNextItemAs, addTags, duplication);
+	}
+	addItem(item, index, addNextItemAs, addTags, duplication)
+	{
+		const parent = this.nodes[item.parent_id];
 		item.children_order = (!item.children_order) ? [] : item.children_order.split(',').map(Number);
-		item.children = (!item.children) ? [] : item.children;
-		let parent = allItems.nodes[item.parent_id];
-		// console.log('item.parent_id in additem');
-		// console.log(item.parent_id);
-		if(!parent.children_order){ parent.children_order = []; 	 }
-		if(!item.due_date)	{ item.due_date = "0000-00-00 00:00:00"; }
-		if(!item.done_date)	{ item.done_date = "0000-00-00 00:00:00";}
-		if(!item.done)		{ item.done = false; 					 }
-		if(!item.used_time)	{ item.used_time = 0; 					 }
-		if(!item.tagged)	{ item.tagged = []; 					 }
+		if(!parent.children_order)	{ parent.children_order = [] 	 }
+		if(!item.show_children)		{ item.show_children = 1 		 }
+		if(!item.children)	{ item.children = []					 }
+		if(!item.due_date)	{ item.due_date = "0000-00-00 00:00:00"	 }
+		if(!item.done_date)	{ item.done_date = "0000-00-00 00:00:00" }
+		if(!item.done)		{ item.done = false 					 }
+		if(!item.used_time)	{ item.used_time = 0 					 }
+		if(!item.tagged)	{ item.tagged = []	 					 }
 		//Actually ADD the item!
-		parent.children.splice(index, 0, item);
+		if(duplication){
+			console.log(parent.children[index]);
+			parent.children[index].id = item.id;
+		} else {
+			parent.children.splice(index, 0, item);
+		}
 		parent.children_order.splice(index, 0, item.id);
 		this.nodes[item.id] = item;
 
 		// Patches etc.
 	    selection.selectedId = item.id;
 	    vm.patch(item.parent_id, 'children_order');
-	    vm.patchTag(item.id, addTags);
+	    if(addTags.length){ vm.patchTag(item.id, addTags); }
 		this.attachParentBody(item.id);
 		this.autoCalculateDoneState(item.parent_id);
 	    if (item.used_time || item.planned_time){
 		    this.calculateTotalTime(item.id);
 	    }
 	    // Don't show adding a new task dialogue when Duplicating!
-	    let siblingId = this.olderSiblingId(item.id);
-	    let siblingBody = this.nodes[siblingId].body;
-	    if(siblingBody != item.body){
+	    if(duplication){
+		    // const originalItem = this.nodes[vm.duplicatedId];
+		    // if(item.depth == originalItem.depth+1){ console.log('abayo dupo');return; }
+		    // if(originalItem.children.length){
+			   //  originalItem.children.forEach(originalChild => vm.duplicate(originalChild.id, item.id));
+		    // }
+	    } else {
 		    vm.showAddNewItem(item.id, addNextItemAs);
 	    }
 	}
@@ -101,25 +120,25 @@ export default class Tree {
 	}
 	siblingIndex(id)
 	{
-		let parent_id = allItems.nodes[id].parent_id;
+		let parent_id = this.nodes[id].parent_id;
 		if(!parent_id){ return; }
-		let siblingsArr = allItems.nodes[parent_id].children_order;
+		let siblingsArr = this.nodes[parent_id].children_order;
 		return siblingsArr.indexOf(id);
 	}
 	olderSiblingId(id)
 	{
-		let parent_id = allItems.nodes[id].parent_id;
+		let parent_id = this.nodes[id].parent_id;
 		if(!parent_id){ return; }
-		let siblingsArr = allItems.nodes[parent_id].children_order;
-		if(siblingsArr.length <= 1 || allItems.siblingIndex(id) == 0){
+		let siblingsArr = this.nodes[parent_id].children_order;
+		if(siblingsArr.length <= 1 || this.siblingIndex(id) == 0){
 			return parent_id;
 		}
 		let siblingIndex = siblingsArr.indexOf(id);
-		return allItems.nodes[parent_id].children_order[siblingIndex-1];
+		return this.nodes[parent_id].children_order[siblingIndex-1];
 	}
 	nextItemId(id)
 	{
-		let item = allItems.nodes[id];
+		let item = this.nodes[id];
 		// first check if item has children, if so select the first child.
 		if (item.show_children && item.children.length > 0){
 			return item.children_order[0];
@@ -127,19 +146,19 @@ export default class Tree {
 		// if no children look at parent node's children order.
 		let parent_id = item.parent_id;
 		if(!parent_id){ return; }
-		let siblingsArr = allItems.nodes[parent_id].children_order;
+		let siblingsArr = this.nodes[parent_id].children_order;
 
-		if(allItems.siblingIndex(id)+1 == siblingsArr.length){
+		if(this.siblingIndex(id)+1 == siblingsArr.length){
 			// console.log('this was the last node');
 			return this.nextItemRecursion(id,parent_id);
 		}
 		let siblingIndex = siblingsArr.indexOf(id);
-		return allItems.nodes[parent_id].children_order[siblingIndex+1];
+		return this.nodes[parent_id].children_order[siblingIndex+1];
 	}
 	nextSiblingOrParentsSiblingId(id)
 	{
-		let parent_id = allItems.nodes[id].parent_id;
-		let children_order = allItems.nodes[parent_id].children_order;
+		let parent_id = this.nodes[id].parent_id;
+		let children_order = this.nodes[parent_id].children_order;
 		let nextIndex = this.siblingIndex(id)+1;
 		if (nextIndex == children_order.length){
 			return this.nextSiblingOrParentsSiblingId(parent_id);
@@ -149,25 +168,25 @@ export default class Tree {
 	}
 	prevItemId(id)
 	{
-		let parent_id = allItems.nodes[id].parent_id;
+		let parent_id = this.nodes[id].parent_id;
 		if(!parent_id){ return; }
-		let siblingsArr = allItems.nodes[parent_id].children_order;
-		if(allItems.siblingIndex(id) == 0){
+		let siblingsArr = this.nodes[parent_id].children_order;
+		if(this.siblingIndex(id) == 0){
 			return parent_id;
 		}
 		let siblingIndex = siblingsArr.indexOf(id);
-		let prevItemId = allItems.nodes[parent_id].children_order[siblingIndex-1];
+		let prevItemId = this.nodes[parent_id].children_order[siblingIndex-1];
 		// check if upper sibling item has children
 		prevItemId = this.prevItemRecursion(prevItemId);
 		return prevItemId;
 	}
 	prevItemRecursion(id)
 	{
-		let item = allItems.nodes[id];
+		let item = this.nodes[id];
 		let childrenLength = item.children.length;
 		// console.log('childrenLength: '+childrenLength+' // id: '+id);
 		if(item.show_children && childrenLength>0){
-			id = allItems.nodes[id].children[childrenLength-1].id;
+			id = this.nodes[id].children[childrenLength-1].id;
 			// console.log('childrenLength: '+childrenLength+' // id: '+id);
 			return this.prevItemRecursion(id);
 		} else {
@@ -176,12 +195,12 @@ export default class Tree {
 		}
 	}
 	nextItemRecursion(id,parent_id){
-		var nextIndex = allItems.siblingIndex(id)+1;
-		if(nextIndex != allItems.nodes[parent_id].children_order.length){
-			return allItems.nodes[parent_id].children_order[nextIndex];
+		var nextIndex = this.siblingIndex(id)+1;
+		if(nextIndex != this.nodes[parent_id].children_order.length){
+			return this.nodes[parent_id].children_order[nextIndex];
 		}
 		else {
-			return this.nextItemRecursion(parent_id,allItems.nodes[parent_id].parent_id);
+			return this.nextItemRecursion(parent_id,this.nodes[parent_id].parent_id);
 		}
 	}
 	sortChildren(id)
@@ -197,12 +216,12 @@ export default class Tree {
 	giveNewParent(id, new_parent_id, specificNewIndex)
 	{
 		console.log('giving new parent');
-		let parent_id = allItems.nodes[id].parent_id;
-		let targetItem = allItems.nodes[id];
-		let newParent = allItems.nodes[new_parent_id];
+		let parent_id = this.nodes[id].parent_id;
+		let targetItem = this.nodes[id];
+		let newParent = this.nodes[new_parent_id];
 			console.log('newParent ↓ ');
 			console.log(newParent);
-		let prevParent = allItems.nodes[parent_id];
+		let prevParent = this.nodes[parent_id];
 			console.log('prevParent ↓ ');
 			console.log(prevParent);
 		let siblingIndex = this.siblingIndex(id);
@@ -250,11 +269,11 @@ export default class Tree {
 	}
 	updateChildrenDepth(id)
 	{
-		let targetChildren = allItems.nodes[id].children;
+		let targetChildren = this.nodes[id].children;
 		if (!(targetChildren || targetChildren.length)){ return false; }
 		targetChildren.forEach(function(child){
 			console.log(child);
-			child.depth = allItems.nodes[child.parent_id].depth+1;
+			child.depth = this.nodes[child.parent_id].depth+1;
 			vm.patch(child.id, 'depth');
 			this.updateChildrenDepth(child.id);
 			return true;
@@ -293,8 +312,8 @@ export default class Tree {
 	}
 	deleteItem(id)
 	{
-		let item = allItems.nodes[id];
-		let newSelectedId = this.olderSiblingId(id);
+		let item = this.nodes[id];
+		let newSelectedId = this.nextItemId(id);
 		// Delete all children as well!
 		if (Array.isArray(item.children) && item.children.length) {
 			let allChildrenIds = this.getAllChildrenIds(id);
@@ -302,7 +321,7 @@ export default class Tree {
 		}
 		// Delete items attached to previous parent
 		let parent_id = item.parent_id;
-		let prevParent = allItems.nodes[parent_id];
+		let prevParent = this.nodes[parent_id];
 		let siblingIndex = this.siblingIndex(id);
 		prevParent.children.splice(siblingIndex,1);
 		prevParent.children_order.splice(siblingIndex,1);
@@ -315,12 +334,12 @@ export default class Tree {
 	}
 	tagItem(id, tags)
 	{
-		let item = allItems.nodes[id];
+		let item = this.nodes[id];
 		vm.patchTag(id, tags);
 	}
 	prepareTag(id, tags)
 	{
-		let item = allItems.nodes[id];
+		let item = this.nodes[id];
 
 	}
 	prepareDonePatch(id)
@@ -355,7 +374,7 @@ export default class Tree {
 	}
 	allChildrenDone(id)
 	{
-		let children = allItems.nodes[id].children;
+		let children = this.nodes[id].children;
 		if (!children.length){ return false; }
 		let doneAmount = children.reduce(function (prev, child){
 			let a = (child.done) ? 1 : 0 ;
@@ -380,7 +399,7 @@ export default class Tree {
 			return;
 		} else {
 			item.children_order.forEach(item => { allChildrenIds.push(item); });
-			item.children_order.forEach(item => { return this.getAllChildrenIdsRecursive(item, allChildrenIds) });
+			item.children_order.forEach(item => { return allItems.getAllChildrenIdsRecursive(item, allChildrenIds) });
 		}
 	}
 	calculateTotalTime(id)
@@ -417,15 +436,15 @@ export default class Tree {
 	}
 	checkValParentTree(id, val)
 	{
-		let pId = allItems.nodes[id].parent_id;
+		let pId = this.nodes[id].parent_id;
 		console.log('checkValParentTree pId: '+checkValParentTree);
 		if (!pId){ return false; }
-		let checkVal = allItems.nodes[pId].item[val];
+		let checkVal = this.nodes[pId].item[val];
 		console.log('checkValParentTree checkVal: '+checkVal);
 		if (checkVal){
 			return checkVal;
 		} else {
-			return allItems.checkValParentTree(pId, val);
+			return this.checkValParentTree(pId, val);
 		}
 	}
 	AplusB(a, b)
@@ -480,12 +499,12 @@ export default class Tree {
 	setDueDate(id, duedate)
 	{
 		let dd = (!duedate) ? moment().format() : duedate;
-		let oriDueDate = allItems.nodes[id].due_date;
+		let oriDueDate = this.nodes[id].due_date;
 		let diff = moment(oriDueDate).diff(dd, 'days');
 		if (diff == 0){ dd = '0000-00-00 00:00:00'; }
-		allItems.nodes[id].due_date = dd;
+		this.nodes[id].due_date = dd;
 		vm.patchDueDate(id, dd);
-		allItems.updateChildrenDueDate(id);
+		this.updateChildrenDueDate(id);
 	}
 	getParentsAsArray(id)
 	{
@@ -496,9 +515,9 @@ export default class Tree {
 	}
 	getParentsRecursive(id, pArr)
 	{
-		let pId = allItems.nodes[id].parent_id;
+		let pId = this.nodes[id].parent_id;
 		if (!pId){ return; }
-		pArr.push(allItems.nodes[pId].body);
+		pArr.push(this.nodes[pId].body);
 		this.getParentsRecursive(pId, pArr);
 	}
 	getLastChildId(id)
@@ -548,7 +567,7 @@ export default class Tree {
 		// 		}
 		//     });
 		// }
-		allItems.root.children = filteredItems;
+		this.root.children = filteredItems;
 	}
 	getFilteredFlat(keyword)
 	{

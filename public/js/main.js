@@ -26389,29 +26389,69 @@ _jquery2.default.getJSON('/api/items', function (fetchedData) {
 					this.fetchTagged(value, 'withAnyTag');
 				}
 			},
+
+			// duplicate(id){
+			// 	this.patching = true;
+			// 	id = (!id) ? selection.selectedId : id ;
+			// 	let item = allItems.nodes[id];
+			// 	console.log('dupe item.children_order = '+item.children_order);
+			// 	let OlderSiblingIndex = allItems.siblingIndex(selection.selectedId);
+			// 	let index = parseInt(OlderSiblingIndex)+1;
+			// 	this.$http.post('/api/items',item) //SEND
+			// 	.then(function(response){ //response
+
+			// 		// Copy all children as well!
+			// 		// -> Not yet written!
+
+			// 		let storedItem = response.data;
+			// 		console.log('starting dom update...');
+			// 		console.log('ind on duplicate: '+index);
+			// 		allItems.addItem(storedItem, index);
+			// 		this.patching = false;
+			// 	}, (response) => {
+			// 		this.patching = 'error';
+			// 	});
+			// },
 			duplicate: function duplicate(id) {
-				this.patching = true;
 				id = !id ? selection.selectedId : id;
-				var item = allItems.nodes[id];
+				allItems.duplicate(id);
+				// vm.duplicatedId = id;
+				// let newItem = allItems.nodes[id];
+				// newItem.children_order = '';
+				// if(copyInto){
+				// 	let copyIntoParent = allItems.nodes[copyInto];
+				// 	newItem.parent_id = copyInto;
+				// 	newItem.depth = copyIntoParent.depth+1;
+				// }
+				// let index = allItems.siblingIndex(id)+1;
+				// let addNextItemAs = null;
+				// let addTags = newItem.tagged.map(tagObj => tagObj.tag_name);
+				// let duplication = true;
+				// this.postNewItem(newItem, index, addNextItemAs, addTags, duplication);
+			},
+			postNewItem: function postNewItem(newItem, index, addNextItemAs, addTags, duplication) {
+				var _this3 = this;
+
+				this.patching = true;
 				// Prepare children_order for sending to DB.
-				item.children_order = allItems.arrayToString(item.children_order);
-				console.log('dupe item.children_order = ' + item.children_order);
-				var OlderSiblingIndex = allItems.siblingIndex(selection.selectedId);
-				var index = parseInt(OlderSiblingIndex) + 1;
-				this.$http.post('/api/items', item) //SEND
+				if (newItem.children_order) {
+					newItem.children_order = allItems.arrayToString(newItem.children_order);
+				}
+
+				this.$http.post('/api/items', newItem) //SEND
 				.then(function (response) {
 					//response
-					// Revert old item's children_order back to string.
-					item.children_order = !item.children_order ? [] : item.children_order.split(',').map(Number);
-
-					// Copy all children as well!
-					// -> Not yet written!
-
 					var storedItem = response.data;
+					// Revert old item's children_order back to string.
+					// storedItem.children_order = (!newItem.children_order) ? [] : newItem.children_order.split(',').map(Number);
+
 					console.log('starting dom update...');
-					console.log('ind on duplicate: ' + index);
-					allItems.addItem(storedItem, index);
+					console.log('Index: ');
+					console.log(index);
+					allItems.addItem(storedItem, index, addNextItemAs, addTags, duplication);
 					this.patching = false;
+				}, function (response) {
+					_this3.patching = 'error';
 				});
 			},
 			keystroke: function keystroke(k) {
@@ -26667,8 +26707,6 @@ exports.default = {
 			newItem: {
 				body: '',
 				planned_time: 0,
-				parent_id: this.item.parent_id ? this.item.parent_id : allItems.root.id,
-				depth: this.item.depth == 0 ? 1 : this.item.depth,
 				preparedTags: [],
 				due_date: '0000-00-00 00:00:00'
 			},
@@ -26944,34 +26982,33 @@ exports.default = {
 		addNew: function addNew(addNextItemAs) {
 			console.log('sending newItem:');
 			var newItem = this.newItem;
+			newItem.parent_id = this.item.parent_id ? this.item.parent_id : allItems.root.id;
+			newItem.depth = this.item.depth;
+
+			var OlderSiblingIndex = this.siblingIndex;
+			var index = isNaN(OlderSiblingIndex) ? 0 : OlderSiblingIndex + 1;
+
 			if (this.$root.addingNewAsChild) {
-				newItem.depth++;
+				newItem.depth = this.item.depth + 1;
 				newItem.parent_id = this.item.id;
+				index = 0;
 			}
+
 			if (this.newItem.preparedTags.indexOf('Today') != -1) {
 				this.newItem.preparedTags.$remove('Today');
 				newItem.due_date = moment().format();
 			}
+			var addTags = this.newItem.preparedTags;
+
 			console.log(newItem);
-			this.$http.post('/api/items', newItem) //SEND
-			.then(function (response) {
-				//response
-				console.log('starting dom update...');
-				var storedItem = response.data;
-				var OlderSiblingIndex = this.siblingIndex;
-				var index = isNaN(OlderSiblingIndex) ? 0 : OlderSiblingIndex + 1;
-				console.log('siblingIndex: ');
-				console.log(this.siblingIndex);
-				console.log('Index: ');
-				console.log(index);
-				var addTags = this.newItem.preparedTags;
-				allItems.addItem(storedItem, index, addNextItemAs, addTags);
-				// Reset stuff
-				this.newItem.body = '';
-				this.newItem.due_date = '0000-00-00 00:00:00';
-				this.newItem.planned_time = '';
-				this.newItem.preparedTags = '';
-			});
+			// Send to Root for Ajax call.
+			this.$root.postNewItem(newItem, index, addNextItemAs, addTags);
+
+			// Reset stuff
+			this.newItem.body = '';
+			this.newItem.due_date = '0000-00-00 00:00:00';
+			this.newItem.planned_time = '';
+			this.newItem.preparedTags = '';
 		},
 		cancelAddNew: function cancelAddNew(lastSelectedId) {
 			this.newItem.body = '';
@@ -27527,16 +27564,33 @@ var Tree = function () {
 			return this.nodes[id];
 		}
 	}, {
+		key: 'duplicate',
+		value: function duplicate(id) {
+			var item = this.nodes[id];
+			var index = this.siblingIndex(id) + 1;
+			var dupe = JSON.parse(JSON.stringify(item));
+			this.nodes[item.parent_id].children.splice(index, 0, dupe);
+
+			var addNextItemAs = null;
+			var addTags = dupe.tagged.map(function (tagObj) {
+				return tagObj.tag_name;
+			});
+			var duplication = true;
+			vm.postNewItem(dupe, index, addNextItemAs, addTags, duplication);
+		}
+	}, {
 		key: 'addItem',
-		value: function addItem(item, index, addNextItemAs, addTags) {
-			item.show_children = !item.show_children ? 1 : item.show_children;
+		value: function addItem(item, index, addNextItemAs, addTags, duplication) {
+			var parent = this.nodes[item.parent_id];
 			item.children_order = !item.children_order ? [] : item.children_order.split(',').map(Number);
-			item.children = !item.children ? [] : item.children;
-			var parent = allItems.nodes[item.parent_id];
-			// console.log('item.parent_id in additem');
-			// console.log(item.parent_id);
 			if (!parent.children_order) {
 				parent.children_order = [];
+			}
+			if (!item.show_children) {
+				item.show_children = 1;
+			}
+			if (!item.children) {
+				item.children = [];
 			}
 			if (!item.due_date) {
 				item.due_date = "0000-00-00 00:00:00";
@@ -27554,23 +27608,34 @@ var Tree = function () {
 				item.tagged = [];
 			}
 			//Actually ADD the item!
-			parent.children.splice(index, 0, item);
+			if (duplication) {
+				console.log(parent.children[index]);
+				parent.children[index].id = item.id;
+			} else {
+				parent.children.splice(index, 0, item);
+			}
 			parent.children_order.splice(index, 0, item.id);
 			this.nodes[item.id] = item;
 
 			// Patches etc.
 			selection.selectedId = item.id;
 			vm.patch(item.parent_id, 'children_order');
-			vm.patchTag(item.id, addTags);
+			if (addTags.length) {
+				vm.patchTag(item.id, addTags);
+			}
 			this.attachParentBody(item.id);
 			this.autoCalculateDoneState(item.parent_id);
 			if (item.used_time || item.planned_time) {
 				this.calculateTotalTime(item.id);
 			}
 			// Don't show adding a new task dialogue when Duplicating!
-			var siblingId = this.olderSiblingId(item.id);
-			var siblingBody = this.nodes[siblingId].body;
-			if (siblingBody != item.body) {
+			if (duplication) {
+				// const originalItem = this.nodes[vm.duplicatedId];
+				// if(item.depth == originalItem.depth+1){ console.log('abayo dupo');return; }
+				// if(originalItem.children.length){
+				//  originalItem.children.forEach(originalChild => vm.duplicate(originalChild.id, item.id));
+				// }
+			} else {
 				vm.showAddNewItem(item.id, addNextItemAs);
 			}
 		}
@@ -27586,31 +27651,31 @@ var Tree = function () {
 	}, {
 		key: 'siblingIndex',
 		value: function siblingIndex(id) {
-			var parent_id = allItems.nodes[id].parent_id;
+			var parent_id = this.nodes[id].parent_id;
 			if (!parent_id) {
 				return;
 			}
-			var siblingsArr = allItems.nodes[parent_id].children_order;
+			var siblingsArr = this.nodes[parent_id].children_order;
 			return siblingsArr.indexOf(id);
 		}
 	}, {
 		key: 'olderSiblingId',
 		value: function olderSiblingId(id) {
-			var parent_id = allItems.nodes[id].parent_id;
+			var parent_id = this.nodes[id].parent_id;
 			if (!parent_id) {
 				return;
 			}
-			var siblingsArr = allItems.nodes[parent_id].children_order;
-			if (siblingsArr.length <= 1 || allItems.siblingIndex(id) == 0) {
+			var siblingsArr = this.nodes[parent_id].children_order;
+			if (siblingsArr.length <= 1 || this.siblingIndex(id) == 0) {
 				return parent_id;
 			}
 			var siblingIndex = siblingsArr.indexOf(id);
-			return allItems.nodes[parent_id].children_order[siblingIndex - 1];
+			return this.nodes[parent_id].children_order[siblingIndex - 1];
 		}
 	}, {
 		key: 'nextItemId',
 		value: function nextItemId(id) {
-			var item = allItems.nodes[id];
+			var item = this.nodes[id];
 			// first check if item has children, if so select the first child.
 			if (item.show_children && item.children.length > 0) {
 				return item.children_order[0];
@@ -27620,20 +27685,20 @@ var Tree = function () {
 			if (!parent_id) {
 				return;
 			}
-			var siblingsArr = allItems.nodes[parent_id].children_order;
+			var siblingsArr = this.nodes[parent_id].children_order;
 
-			if (allItems.siblingIndex(id) + 1 == siblingsArr.length) {
+			if (this.siblingIndex(id) + 1 == siblingsArr.length) {
 				// console.log('this was the last node');
 				return this.nextItemRecursion(id, parent_id);
 			}
 			var siblingIndex = siblingsArr.indexOf(id);
-			return allItems.nodes[parent_id].children_order[siblingIndex + 1];
+			return this.nodes[parent_id].children_order[siblingIndex + 1];
 		}
 	}, {
 		key: 'nextSiblingOrParentsSiblingId',
 		value: function nextSiblingOrParentsSiblingId(id) {
-			var parent_id = allItems.nodes[id].parent_id;
-			var children_order = allItems.nodes[parent_id].children_order;
+			var parent_id = this.nodes[id].parent_id;
+			var children_order = this.nodes[parent_id].children_order;
 			var nextIndex = this.siblingIndex(id) + 1;
 			if (nextIndex == children_order.length) {
 				return this.nextSiblingOrParentsSiblingId(parent_id);
@@ -27644,16 +27709,16 @@ var Tree = function () {
 	}, {
 		key: 'prevItemId',
 		value: function prevItemId(id) {
-			var parent_id = allItems.nodes[id].parent_id;
+			var parent_id = this.nodes[id].parent_id;
 			if (!parent_id) {
 				return;
 			}
-			var siblingsArr = allItems.nodes[parent_id].children_order;
-			if (allItems.siblingIndex(id) == 0) {
+			var siblingsArr = this.nodes[parent_id].children_order;
+			if (this.siblingIndex(id) == 0) {
 				return parent_id;
 			}
 			var siblingIndex = siblingsArr.indexOf(id);
-			var prevItemId = allItems.nodes[parent_id].children_order[siblingIndex - 1];
+			var prevItemId = this.nodes[parent_id].children_order[siblingIndex - 1];
 			// check if upper sibling item has children
 			prevItemId = this.prevItemRecursion(prevItemId);
 			return prevItemId;
@@ -27661,11 +27726,11 @@ var Tree = function () {
 	}, {
 		key: 'prevItemRecursion',
 		value: function prevItemRecursion(id) {
-			var item = allItems.nodes[id];
+			var item = this.nodes[id];
 			var childrenLength = item.children.length;
 			// console.log('childrenLength: '+childrenLength+' // id: '+id);
 			if (item.show_children && childrenLength > 0) {
-				id = allItems.nodes[id].children[childrenLength - 1].id;
+				id = this.nodes[id].children[childrenLength - 1].id;
 				// console.log('childrenLength: '+childrenLength+' // id: '+id);
 				return this.prevItemRecursion(id);
 			} else {
@@ -27676,11 +27741,11 @@ var Tree = function () {
 	}, {
 		key: 'nextItemRecursion',
 		value: function nextItemRecursion(id, parent_id) {
-			var nextIndex = allItems.siblingIndex(id) + 1;
-			if (nextIndex != allItems.nodes[parent_id].children_order.length) {
-				return allItems.nodes[parent_id].children_order[nextIndex];
+			var nextIndex = this.siblingIndex(id) + 1;
+			if (nextIndex != this.nodes[parent_id].children_order.length) {
+				return this.nodes[parent_id].children_order[nextIndex];
 			} else {
-				return this.nextItemRecursion(parent_id, allItems.nodes[parent_id].parent_id);
+				return this.nextItemRecursion(parent_id, this.nodes[parent_id].parent_id);
 			}
 		}
 	}, {
@@ -27706,12 +27771,12 @@ var Tree = function () {
 		key: 'giveNewParent',
 		value: function giveNewParent(id, new_parent_id, specificNewIndex) {
 			console.log('giving new parent');
-			var parent_id = allItems.nodes[id].parent_id;
-			var targetItem = allItems.nodes[id];
-			var newParent = allItems.nodes[new_parent_id];
+			var parent_id = this.nodes[id].parent_id;
+			var targetItem = this.nodes[id];
+			var newParent = this.nodes[new_parent_id];
 			console.log('newParent ↓ ');
 			console.log(newParent);
-			var prevParent = allItems.nodes[parent_id];
+			var prevParent = this.nodes[parent_id];
 			console.log('prevParent ↓ ');
 			console.log(prevParent);
 			var siblingIndex = this.siblingIndex(id);
@@ -27762,13 +27827,13 @@ var Tree = function () {
 	}, {
 		key: 'updateChildrenDepth',
 		value: function updateChildrenDepth(id) {
-			var targetChildren = allItems.nodes[id].children;
+			var targetChildren = this.nodes[id].children;
 			if (!(targetChildren || targetChildren.length)) {
 				return false;
 			}
 			targetChildren.forEach(function (child) {
 				console.log(child);
-				child.depth = allItems.nodes[child.parent_id].depth + 1;
+				child.depth = this.nodes[child.parent_id].depth + 1;
 				vm.patch(child.id, 'depth');
 				this.updateChildrenDepth(child.id);
 				return true;
@@ -27825,8 +27890,8 @@ var Tree = function () {
 	}, {
 		key: 'deleteItem',
 		value: function deleteItem(id) {
-			var item = allItems.nodes[id];
-			var newSelectedId = this.olderSiblingId(id);
+			var item = this.nodes[id];
+			var newSelectedId = this.nextItemId(id);
 			// Delete all children as well!
 			if (Array.isArray(item.children) && item.children.length) {
 				var allChildrenIds = this.getAllChildrenIds(id);
@@ -27834,7 +27899,7 @@ var Tree = function () {
 			}
 			// Delete items attached to previous parent
 			var parent_id = item.parent_id;
-			var prevParent = allItems.nodes[parent_id];
+			var prevParent = this.nodes[parent_id];
 			var siblingIndex = this.siblingIndex(id);
 			prevParent.children.splice(siblingIndex, 1);
 			prevParent.children_order.splice(siblingIndex, 1);
@@ -27848,13 +27913,13 @@ var Tree = function () {
 	}, {
 		key: 'tagItem',
 		value: function tagItem(id, tags) {
-			var item = allItems.nodes[id];
+			var item = this.nodes[id];
 			vm.patchTag(id, tags);
 		}
 	}, {
 		key: 'prepareTag',
 		value: function prepareTag(id, tags) {
-			var item = allItems.nodes[id];
+			var item = this.nodes[id];
 		}
 	}, {
 		key: 'prepareDonePatch',
@@ -27894,7 +27959,7 @@ var Tree = function () {
 	}, {
 		key: 'allChildrenDone',
 		value: function allChildrenDone(id) {
-			var children = allItems.nodes[id].children;
+			var children = this.nodes[id].children;
 			if (!children.length) {
 				return false;
 			}
@@ -27918,8 +27983,6 @@ var Tree = function () {
 	}, {
 		key: 'getAllChildrenIdsRecursive',
 		value: function getAllChildrenIdsRecursive(id, allChildrenIds) {
-			var _this3 = this;
-
 			var item = this.nodes[id];
 			if (!(Array.isArray(item.children) && item.children.length)) {
 				return;
@@ -27928,7 +27991,7 @@ var Tree = function () {
 					allChildrenIds.push(item);
 				});
 				item.children_order.forEach(function (item) {
-					return _this3.getAllChildrenIdsRecursive(item, allChildrenIds);
+					return allItems.getAllChildrenIdsRecursive(item, allChildrenIds);
 				});
 			}
 		}
@@ -27978,17 +28041,17 @@ var Tree = function () {
 
 			return checkValParentTree;
 		}(function (id, val) {
-			var pId = allItems.nodes[id].parent_id;
+			var pId = this.nodes[id].parent_id;
 			console.log('checkValParentTree pId: ' + checkValParentTree);
 			if (!pId) {
 				return false;
 			}
-			var checkVal = allItems.nodes[pId].item[val];
+			var checkVal = this.nodes[pId].item[val];
 			console.log('checkValParentTree checkVal: ' + checkVal);
 			if (checkVal) {
 				return checkVal;
 			} else {
-				return allItems.checkValParentTree(pId, val);
+				return this.checkValParentTree(pId, val);
 			}
 		})
 	}, {
@@ -28039,13 +28102,13 @@ var Tree = function () {
 		key: 'flushDoneItems',
 		value: function flushDoneItems() // Do not use yet. Not sure how to best implement this...
 		{
-			var _this4 = this;
+			var _this3 = this;
 
 			var nodes = this.nodes;
 			var keys = Object.keys(nodes);
 			var doneItemsObject = keys.reduce(function (prev, id) {
 				if (nodes[id].done) {
-					_this4.deleteItem(id);
+					_this3.deleteItem(id);
 				}
 			});
 		}
@@ -28053,14 +28116,14 @@ var Tree = function () {
 		key: 'setDueDate',
 		value: function setDueDate(id, duedate) {
 			var dd = !duedate ? moment().format() : duedate;
-			var oriDueDate = allItems.nodes[id].due_date;
+			var oriDueDate = this.nodes[id].due_date;
 			var diff = moment(oriDueDate).diff(dd, 'days');
 			if (diff == 0) {
 				dd = '0000-00-00 00:00:00';
 			}
-			allItems.nodes[id].due_date = dd;
+			this.nodes[id].due_date = dd;
 			vm.patchDueDate(id, dd);
-			allItems.updateChildrenDueDate(id);
+			this.updateChildrenDueDate(id);
 		}
 	}, {
 		key: 'getParentsAsArray',
@@ -28073,11 +28136,11 @@ var Tree = function () {
 	}, {
 		key: 'getParentsRecursive',
 		value: function getParentsRecursive(id, pArr) {
-			var pId = allItems.nodes[id].parent_id;
+			var pId = this.nodes[id].parent_id;
 			if (!pId) {
 				return;
 			}
-			pArr.push(allItems.nodes[pId].body);
+			pArr.push(this.nodes[pId].body);
 			this.getParentsRecursive(pId, pArr);
 		}
 	}, {
@@ -28134,16 +28197,16 @@ var Tree = function () {
 			// 		}
 			//     });
 			// }
-			allItems.root.children = filteredItems;
+			this.root.children = filteredItems;
 		}
 	}, {
 		key: 'getFilteredFlat',
 		value: function getFilteredFlat(keyword) {
-			var _this5 = this;
+			var _this4 = this;
 
 			if (keyword == 'done') {
 				var _ret = function () {
-					var nodes = _this5.nodes;
+					var nodes = _this4.nodes;
 					var keys = Object.keys(nodes);
 					var doneItemsObject = keys.reduce(function (prev, item) {
 						if (nodes[item].done) {
@@ -28221,12 +28284,12 @@ var Tree = function () {
 	}, {
 		key: 'getFiltered',
 		value: function getFiltered(keyword) {
-			var _this6 = this;
+			var _this5 = this;
 
 			if (keyword == 'done') {
 				var _ret2 = function () {
-					var firstItem = _this6.root.children;
-					var doneItemsObject = _this6.getDoneTasksRecursively(firstItem);
+					var firstItem = _this5.root.children;
+					var doneItemsObject = _this5.getDoneTasksRecursively(firstItem);
 					console.log(doneItemsObject);
 					return {
 						v: Object.keys(doneItemsObject).map(function (k) {

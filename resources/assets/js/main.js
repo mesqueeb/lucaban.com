@@ -509,29 +509,67 @@ window.vm = new Vue({
 				this.fetchTagged(value, 'withAnyTag');
 			}
 		},
+		// duplicate(id){
+		// 	this.patching = true;
+		// 	id = (!id) ? selection.selectedId : id ;
+		// 	let item = allItems.nodes[id];
+		// 	console.log('dupe item.children_order = '+item.children_order);
+		// 	let OlderSiblingIndex = allItems.siblingIndex(selection.selectedId);
+		// 	let index = parseInt(OlderSiblingIndex)+1;
+		// 	this.$http.post('/api/items',item) //SEND
+		// 	.then(function(response){ //response
+				
+		// 		// Copy all children as well!
+		// 		// -> Not yet written!
+				
+		// 		let storedItem = response.data;
+		// 		console.log('starting dom update...');
+		// 		console.log('ind on duplicate: '+index);
+		// 		allItems.addItem(storedItem, index);
+		// 		this.patching = false;
+		// 	}, (response) => {
+		// 		this.patching = 'error';
+		// 	});
+		// },
 		duplicate(id){
-			this.patching = true;
 			id = (!id) ? selection.selectedId : id ;
-			let item = allItems.nodes[id];
+			allItems.duplicate(id);
+			// vm.duplicatedId = id;
+			// let newItem = allItems.nodes[id];
+			// newItem.children_order = '';
+			// if(copyInto){
+			// 	let copyIntoParent = allItems.nodes[copyInto];
+			// 	newItem.parent_id = copyInto;
+			// 	newItem.depth = copyIntoParent.depth+1;
+			// }
+			// let index = allItems.siblingIndex(id)+1;
+			// let addNextItemAs = null;
+			// let addTags = newItem.tagged.map(tagObj => tagObj.tag_name);
+			// let duplication = true;
+			// this.postNewItem(newItem, index, addNextItemAs, addTags, duplication);
+		},
+		postNewItem(newItem, index, addNextItemAs, addTags, duplication){
+			this.patching = true;
 			// Prepare children_order for sending to DB.
-			item.children_order = allItems.arrayToString(item.children_order);		
-			console.log('dupe item.children_order = '+item.children_order);
-			let OlderSiblingIndex = allItems.siblingIndex(selection.selectedId);
-			let index = parseInt(OlderSiblingIndex)+1;
-			this.$http.post('/api/items',item) //SEND
+			if(newItem.children_order){
+				newItem.children_order = allItems.arrayToString(newItem.children_order);
+			}
+			
+			this.$http.post('/api/items',newItem) //SEND
 			.then(function(response){ //response
-				// Revert old item's children_order back to string.
-				item.children_order = (!item.children_order) ? [] : item.children_order.split(',').map(Number);
-				
-				// Copy all children as well!
-				// -> Not yet written!
-				
 				let storedItem = response.data;
+				// Revert old item's children_order back to string.
+				// storedItem.children_order = (!newItem.children_order) ? [] : newItem.children_order.split(',').map(Number);
+				
 				console.log('starting dom update...');
-				console.log('ind on duplicate: '+index);
-				allItems.addItem(storedItem, index);
+				console.log('Index: ');
+				console.log(index);
+				allItems.addItem(storedItem, index, addNextItemAs, addTags, duplication);
 				this.patching = false;
-			})
+			}, (response) => {
+				this.patching = 'error';
+			});
+
 		},
 		keystroke(k){
 			console.log(k);

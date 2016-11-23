@@ -391,9 +391,7 @@ export default {
 			newItem: {
 				body: '',
 				planned_time:0,
-				parent_id: (this.item.parent_id) ? this.item.parent_id : allItems.root.id,
-				depth: (this.item.depth == 0) ? 1 : this.item.depth,
-				preparedTags: [],
+				preparedTags:[],
 				due_date: '0000-00-00 00:00:00',
 			},
 			newTag: null,
@@ -668,33 +666,33 @@ export default {
 		addNew(addNextItemAs){
 			console.log('sending newItem:');
 			let newItem = this.newItem;
+			newItem.parent_id = (this.item.parent_id) ? this.item.parent_id : allItems.root.id;
+			newItem.depth = this.item.depth;
+
+			let OlderSiblingIndex = this.siblingIndex;
+			let index = (isNaN(OlderSiblingIndex)) ? 0 : OlderSiblingIndex+1;
+			
 			if (this.$root.addingNewAsChild){
-				newItem.depth++;
+				newItem.depth = this.item.depth + 1;
         		newItem.parent_id = this.item.id;
+        		index = 0;
 			}
+			
 			if (this.newItem.preparedTags.indexOf('Today') != -1){
 				this.newItem.preparedTags.$remove('Today');
 				newItem.due_date = moment().format();
 			}
+			let addTags = this.newItem.preparedTags;
+			
 			console.log(newItem);
-			this.$http.post('/api/items',newItem) //SEND
-			.then(function(response){ //response
-				console.log('starting dom update...');
-				let storedItem = response.data;
-				let OlderSiblingIndex = this.siblingIndex;
-				let index = (isNaN(OlderSiblingIndex)) ? 0 : OlderSiblingIndex+1;
-				console.log('siblingIndex: ');
-				console.log(this.siblingIndex);
-				console.log('Index: ');
-				console.log(index);
-				let addTags = this.newItem.preparedTags;
-				allItems.addItem(storedItem, index, addNextItemAs, addTags);
-				// Reset stuff
-				this.newItem.body = '';
-				this.newItem.due_date = '0000-00-00 00:00:00';
-				this.newItem.planned_time = '';
-				this.newItem.preparedTags = '';
-			});
+			// Send to Root for Ajax call.
+			this.$root.postNewItem(newItem, index, addNextItemAs, addTags);
+
+			// Reset stuff
+			this.newItem.body = '';
+			this.newItem.due_date = '0000-00-00 00:00:00';
+			this.newItem.planned_time = '';
+			this.newItem.preparedTags = '';
 		},
 		cancelAddNew(lastSelectedId){
 			this.newItem.body = '';
