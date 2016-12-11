@@ -34,6 +34,10 @@
 
 // IMPORT FlatPickr
 	import flatpickr from 'flatpickr';
+	
+	(function(document){ // iife
+
+	let openFlatPickr = null;
 	// Make flatpickr(el) available as el.flatpickr();
 	window.Element.prototype.flatpickr = function(config){ return flatpickr(this,config)};
 	window.Element.prototype.flatpickrify = function(config){ return flatpickr(this,{
@@ -45,27 +49,30 @@
 			if(!vm.$root.beforeEditCache_doneDate){
 				vm.$root.beforeEditCache_doneDate = {};
 			}
-			let el = instance.element.id;
-			let id = el.replace('done-date-edit-', '');
+			let elId = instance.element.id;
+			let id = elId.replace('done-date-edit-', '');
+			console.log('opening for '+id);
 			id = id.replace('-popup', '');
 			vm.$root.beforeEditCache_doneDate[id] = dateStr;
+			openFlatPickr = instance;
     	},
     	onChange: function(dateObj, dateStr, instance){
 			let el = instance.element.id;
-			document.getElementById(el).focus();
+			instance.element.focus();
 			console.log('flatPicker on change');
-			console.log(el);
 		},
 		onClose: function(dateObj, dateStr, instance){
-			let el = instance.element.id;
-			let id = el.replace('done-date-edit-', '');
+			let elId = instance.element.id;
+			let id = elId.replace('done-date-edit-', '');
 			id = id.replace('-popup', '');
 			console.log('vm.$root.beforeEditCache_doneDate[id] = '+vm.$root.beforeEditCache_doneDate[id]);
 			// This doesn't even work...
 			if (vm.$root.beforeEditCache_doneDate[id] == dateStr){ return; }
 			console.log('patching: '+id)
 			vm.patch(id, 'done_date');
+			delete vm.$root.beforeEditCache_doneDate[id];
 			console.log('flatPicker on close');
+			openFlatPickr = null;
 		},
 	})};
 	let documentClick = function documentClick(e) {
@@ -73,12 +80,18 @@
 		if(e.target.parentNode.nodeName == 'BODY') { 
 			console.log('aoe');
 			// See Patch inside Flatpickr File!!!
-			 }
+			if(openFlatPickr && openFlatPickr.isOpen){
+				openFlatPickr.close();
+			}
+		}
 		// End Luca Patch
 
 	};
 	document.addEventListener("click", documentClick, true);
 
+	})(document);// end flatpickr
+
+	
 
 
 // Vue Basics
@@ -182,15 +195,8 @@ window.vm = new Vue({
 		Popouts,
 	},
 	computed:{
-		totalListDuration(){
-			let x;
-			let y;
-			allItems.root.children.forEach(child => {
-				x = x + parseFloat(child.totalPlannedTime);
-				y = y + parseFloat(child.totalUsedTime);
-			});
-			return y + ' / '+x;
-		},
+		totalUsedTimeTree(){},
+		totalPlannedTimeTree(){},
 	},
 	methods:{
 		showChildren(id, show){
@@ -439,7 +445,9 @@ window.vm = new Vue({
 	            });
 			}
 			if(type=='timer'){
-				this.$children[1].playTimer(item);
+				setTimeout(function() {
+					this.$broadcast('playTimer', item);
+				}.bind(this), 20);
 			} else {
 				setTimeout(function() {
 					document.querySelector('#popouts-mask>div:first-child .btn-ok').focus();
@@ -506,7 +514,8 @@ window.vm = new Vue({
 				allItems.filter('today');
 			}
 			if(type == 'tag'){
-				this.fetchTagged(value, 'withAnyTag');
+				allItems.filter('tag',value);
+				// this.fetchTagged(value, 'withAnyTag');
 			}
 		},
 		// duplicate(id){
@@ -554,13 +563,29 @@ window.vm = new Vue({
 			if(newItem.children_order){
 				newItem.children_order = allItems.arrayToString(newItem.children_order);
 			}
-			
-			this.$http.post('/api/items',newItem) //SEND
+			// let data = {
+			// 	newItemArray: [newItem, newItem]
+			// }
+			let data = newItem;
+			// newItem.id = 99999999;
+			// index = 0;
+			// allItems.addItem(newItem, index);
+			// return;
+		
+			// let data = newItem;
+			// data = JSON.stringify(data);
+			this.$http.post('/api/items',data) //SEND
+			// this.$http.post('/api/items',newItem) //SEND
 			.then(function(response){ //response
 				let storedItem = response.data;
 				// Revert old item's children_order back to string.
 				// storedItem.children_order = (!newItem.children_order) ? [] : newItem.children_order.split(',').map(Number);
-				
+				// if(storedItem.constructor === Array){
+				// 	console.log(storedItem);
+				// 	console.log('storedItem ARRAY');
+				// 	storedItem.forEach(item => allItems.addItem(item));
+				// 	return;
+				// }
 				console.log('starting dom update...');
 				console.log('Index: ');
 				console.log(index);
@@ -591,6 +616,7 @@ window.vm = new Vue({
 			if(k == 's'){ this.addTimer()}
 			if(k == 'meta_shift_d'){ this.duplicate()}
 			if(k == 'meta_delete'){ this.deleteItem()}
+			if(k == 'backspace'){ this.deleteItem()}
 			if(k == 'delete'){ this.deleteItem()}
 		},
 		test(id){
@@ -618,10 +644,18 @@ window.vm = new Vue({
       let vm = this;
       window.addEventListener('keydown', function(e) {
         let x = e.keyCode;
+       	if(document.activeElement.className == "flatpickr-days"){
+			if(x == 9){
+				console.log('hiya!');
+				e.preventDefault();
+				return;
+				// This stops the event listener when a flatpickr dialogue is open.
+			}
+		}
     	if (vm.popouts.length){
     		if(x == 27) { // escape
 				e.preventDefault();
-				vm.$children[1].clearAll();
+				vm.$broadcast('clearAll');
 			}
 			if(x == 9){ // TAB
 				e.preventDefault();
@@ -732,6 +766,10 @@ window.vm = new Vue({
 					vm.keystroke('meta_delete');
 		  			break;
 		  		}
+				vm.keystroke('backspace');
+				break;
+			case 46: // DELETE (real delete)
+				e.preventDefault();
 				vm.keystroke('delete');
 				break;
           } // end switch

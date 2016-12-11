@@ -5432,6 +5432,7 @@ button:focus {
   border-bottom: 1px solid; }
 
 #loading-icon {
+  z-index: 4;
   position: fixed;
   right: 1em;
   top: 1em; }
@@ -5686,7 +5687,8 @@ label {
 .bodybox {
   padding: 0.5em;
   display: inline-block;
-  white-space: pre-line; }
+  white-space: pre-line;
+  word-break: break-word; }
 
 .selected {
   background: rgba(245, 215, 110, 0.5); }
@@ -5870,14 +5872,11 @@ label {
   background: white;
   border-radius: 0.3em;
   margin: 1em; }
-  .popout .body {
+  .popout .bodybox {
     padding: 1em;
     border-bottom: 1px solid #e3e3e3;
-    display: -ms-flexbox;
-    display: flex;
     -ms-flex-align: center;
-    align-items: center; }
-  .popout .bodybox {
+    align-items: center;
     font-size: 1.1em;
     padding: 1em; }
   .popout .confirm-delete .bodybox {

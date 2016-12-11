@@ -51,6 +51,14 @@ export default {
 	name: 'Timer',
 	template:'#timer-template',
 	props: ['timer-items'],
+	events: {
+		'playTimer': function () {
+			console.log('pT playaaaaaah');
+			// console.log(item);
+			// this.playTimer(item);
+		},
+		'aa':function(){ console.log('aaaaa');},
+	},
 	methods: {
 		btnEffect(id, identifier){
 			let $el = $('#timer-'+id+' .'+identifier);

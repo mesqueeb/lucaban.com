@@ -4,9 +4,14 @@ export default class Tree {
 		this.source		= items;
 		this.nodes 		= {}; // →　"id":{ task obj };
 		this.orphans	= [];
-		this.filteredTagItems = null;
+		this.filteredItemRoot = {
+			children_order:[], children:[], body:"",
+			totalPlannedTime:0, totalUsedTime:0,
+			planned_time:0, used_time:0,
+		};
+		this.rootChildrenBackup = []; // replace with root later on
 		// process items
-		window.itemsProcessed = 0;
+		this.itemsProcessed = 0;
 		items.forEach(this.initialize.bind(this))
 	}
 	initialize(item, index) 
@@ -34,8 +39,8 @@ export default class Tree {
 		this.nodes[node.id] = node;
 
 		//Sort all nodes after making sure you got all of them.
-		itemsProcessed++;
-	    if(itemsProcessed === this.source.length) {
+		this.itemsProcessed++;
+	    if(this.itemsProcessed === this.source.length) {
 	    	$.each(this.nodes, function(index, node) {
 			    let id = node.id;
 			    this.sortChildren(id);
@@ -44,7 +49,7 @@ export default class Tree {
 			    if (!node.children.length && (node.used_time || node.planned_time)){
 				    this.calculateTotalTime(id);
 			    }
-			    window.allItemsBackup = this.root.children;
+			    this.rootChildrenBackup = this.root.children;
 			}.bind(this));
 	    }
 	}
@@ -61,18 +66,15 @@ export default class Tree {
 		let item = this.nodes[id];
 		let index = this.siblingIndex(id)+1;
 		let dupe = JSON.parse(JSON.stringify(item));
-		this.nodes[item.parent_id].children.splice(index, 0, dupe);
+		// this.nodes[item.parent_id].children.splice(index, 0, dupe);
 
 		let addNextItemAs = null;
 		let addTags = dupe.tagged.map(tagObj => tagObj.tag_name);
 		let duplication = true;
 		vm.postNewItem(dupe, index, addNextItemAs, addTags, duplication);
 	}
-	addItem(item, index, addNextItemAs, addTags, duplication)
+	setDefaultItemValues(item)
 	{
-		const parent = this.nodes[item.parent_id];
-		item.children_order = (!item.children_order) ? [] : item.children_order.split(',').map(Number);
-		if(!parent.children_order)	{ parent.children_order = [] 	 }
 		if(!item.show_children)		{ item.show_children = 1 		 }
 		if(!item.children)	{ item.children = []					 }
 		if(!item.due_date)	{ item.due_date = "0000-00-00 00:00:00"	 }
@@ -80,33 +82,41 @@ export default class Tree {
 		if(!item.done)		{ item.done = false 					 }
 		if(!item.used_time)	{ item.used_time = 0 					 }
 		if(!item.tagged)	{ item.tagged = []	 					 }
-		//Actually ADD the item!
-		if(duplication){
-			console.log(parent.children[index]);
-			parent.children[index].id = item.id;
-		} else {
-			parent.children.splice(index, 0, item);
+		if(!item.children_order){ item.children_order = [];			 }
+		else if (typeof item.children_order === 'string'){
+			item.children_order = item.children_order.split(',').map(Number);
 		}
-		parent.children_order.splice(index, 0, item.id);
+		return item;
+	}
+	addAndCleanNodesRecursively(item)
+	{
+		this.setDefaultItemValues(item);
 		this.nodes[item.id] = item;
+		if(item.children){
+			item.children.forEach(function(child) {
+				return allItems.addAndCleanNodesRecursively(child);
+			});
+		}
+	}
+	addItem(item, index, addNextItemAs, addTags, duplication)
+	{
+		this.addAndCleanNodesRecursively(item);
+		const parent = this.nodes[item.parent_id];
+		if(!parent.children_order)	{ parent.children_order = [] 	 }
+		//Actually ADD the item!
+		parent.children.splice(index, 0, item);
+		parent.children_order.splice(index, 0, item.id);
 
 		// Patches etc.
 	    selection.selectedId = item.id;
 	    vm.patch(item.parent_id, 'children_order');
-	    if(addTags.length){ vm.patchTag(item.id, addTags); }
+	    if(addTags){ vm.patchTag(item.id, addTags); }
 		this.attachParentBody(item.id);
 		this.autoCalculateDoneState(item.parent_id);
 	    if (item.used_time || item.planned_time){
 		    this.calculateTotalTime(item.id);
 	    }
-	    // Don't show adding a new task dialogue when Duplicating!
-	    if(duplication){
-		    // const originalItem = this.nodes[vm.duplicatedId];
-		    // if(item.depth == originalItem.depth+1){ console.log('abayo dupo');return; }
-		    // if(originalItem.children.length){
-			   //  originalItem.children.forEach(originalChild => vm.duplicate(originalChild.id, item.id));
-		    // }
-	    } else {
+	    if(!duplication){
 		    vm.showAddNewItem(item.id, addNextItemAs);
 	    }
 	}
@@ -138,6 +148,7 @@ export default class Tree {
 	}
 	nextItemId(id)
 	{
+		// debugger;
 		let item = this.nodes[id];
 		// first check if item has children, if so select the first child.
 		if (item.show_children && item.children.length > 0){
@@ -546,52 +557,40 @@ export default class Tree {
 	}
 	filter(keyword, value)
 	{
-    	window.filteredItems = [];
+		// debugger;
+		if (keyword == 'all'){
+			this.root.children = this.rootChildrenBackup;
+			//Why can't I do this?
+			// this.root = this.rootBackup;
+			return;
+		}
+		this.filteredItemRoot.children = [];
+		this.root.children = this.filteredItemRoot.children;
+    	//Why can't I do this?
+		// this.root = this.filteredItemRoot;
+
 		if (keyword == 'duedate'){
 			if (value == 'today'){
-		    	$.each(this.nodes, function(index, item) {
+				Object.keys(this.nodes).forEach(function (key) {
+					let item = this.nodes[key];
 		    		let diff = moment(item.due_date).diff(moment(), 'days');
 					if (diff <= 0){
-						filteredItems.push(item);
+						this.filteredItemRoot.children.push(item);
 					}
-			    });
+			    }.bind(this));
 			}
 		}
-		if (keyword == 'all'){
-			filteredItems = allItemsBackup;
+		if (keyword == 'tag'){
+	    	let filterTag = value;
+	    	Object.keys(this.nodes).forEach(function (key) {
+				let item = this.nodes[key];
+				let hasTag = item.tagged.find(actualTags => actualTags.tag_slug == filterTag);
+	    		if (hasTag){
+					this.filteredItemRoot.children.push(item);
+	    		}
+			}.bind(this));
 		}
-		// if (keyword == 'done'){
-	 //    	$.each(this.nodes, function(index, item) {
-		// 		if (item.done){
-		// 			filteredItems.push(item);
-		// 		}
-		//     });
-		// }
-		this.root.children = filteredItems;
-	}
-	getFilteredFlat(keyword)
-	{
-		if (keyword == 'done'){
-			let nodes = this.nodes;
-			let keys = Object.keys(nodes);
-			let doneItemsObject = keys.reduce((prev,item) => {
-				if(nodes[item].done){
-				  	let donePropName = moment(nodes[item].done_date).format('YYYY/MM/DD');
-				  	// if we don't have a slot for this date, make one
-				  	if(!prev.hasOwnProperty(donePropName)){
-				    	prev[donePropName] = [];
-				  	}
-					prev[donePropName].push(nodes[item]);
-				}
-        		return prev;
-			},{});
-			return Object.keys(doneItemsObject).map(function(k){ 
-			   let rObj = {};
-			   rObj['date'] = k;
-			   rObj['items'] = doneItemsObject[k];
-			   return rObj;
-			});
-	  	}
+		this.calculateTotalTime(this.root.id);
 	}
 	formatDone(doneArray)
 	{
@@ -615,42 +614,6 @@ export default class Tree {
 	    	}, 0);
 			return rObj;
 		});
-	}
-	getDoneTasksRecursively(childrenArray, prev)
-	{
-		if (!prev){ prev = {}; }
-		// let prev = (!prev) ? {} : prev;
-		return childrenArray.reduce(function (prev,item) {
-			// console.log('item in getDoneTasksRecursively:');
-			// console.log(item);
-			if(item.done){
-				console.log('item: '+item.body+' ; done = '+item.done);
-			  	let donePropName = moment(item.done_date).format('YYYY/MM/DD');
-			  	// if we don't have a slot for this date, make one
-			  	if(!prev.hasOwnProperty(donePropName)){
-			    	prev[donePropName] = [];
-			  	}
-				prev[donePropName].push(item);
-			} else {
-				// if (!prev){ return; }
-				this.getDoneTasksRecursively(item.children, prev); 
-			}
-    		return prev;
-		}.bind(this),prev);
-	}
-	getFiltered(keyword)
-	{
-		if (keyword == 'done'){
-			let firstItem = this.root.children;
-			let doneItemsObject = this.getDoneTasksRecursively(firstItem);
-			console.log(doneItemsObject);
-			return Object.keys(doneItemsObject).map(function(k){ 
-			   let rObj = {};
-			   rObj['date'] = k;
-			   rObj['items'] = doneItemsObject[k];
-			   return rObj;
-			});
-	  	}
 	}
 
 }

@@ -196,6 +196,7 @@ label{
     padding: 0.5em;
     display: inline-block;
     white-space: pre-line;
+    word-break: break-word;
 }
 .selected {
     background: $selection-color;

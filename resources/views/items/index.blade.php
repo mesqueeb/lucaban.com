@@ -57,7 +57,7 @@
 	{{-- STATS --}}
 
 	<div class="stats">
-		<div>Total time: @{{ totalDuration }}</div>
+		<div><span>Total time:</span>@{{ allData.totalPlannedTime | hourmin }} / @{{ allData.totalUsedTime | hourmin }}</div>
 	</div>
 	{{-- DATA --}}
 	<div class="items-wrapper"

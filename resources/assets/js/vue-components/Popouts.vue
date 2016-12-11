@@ -9,9 +9,7 @@
 		<div v-if="popout.type=='confirm-delete'"
 			:class="popout.type"
 		>
-			<div class="body bodybox">Really delete
-				<i style="padding: 0 0.3em;">{{ popout.item.body }}</i>
-				<span v-if="popout.item.children.length"><strong style="padding-left:0 0.3em;"> and all children</strong></span>?
+			<div class="bodybox">Really delete「{{ popout.item.body }}」<strong v-if="popout.item.children.length" style="padding-left:0 0.3em;"> and all children</strong>?
 			</div>
 			<div class="nav">
 				<button class="btn-cancel" 
@@ -81,6 +79,15 @@ export default {
 		return {
 			timerRunning: true,
 		};
+	},
+	events: {
+		'playTimer': function (item) {
+			console.log(item);
+			this.playTimer(item);
+		},
+		'clearAll'(){
+			this.clearAll();
+		},
 	},
     methods: {
         removePopout(popout) {

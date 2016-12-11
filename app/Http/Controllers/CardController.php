@@ -55,7 +55,22 @@ class CardController extends Controller
      */
     public function store(Request $request)
     {
-        return Item::create($request->all());
+        // return var_dump($request->all());
+        return Item::saveItemTree($request->all());
+        
+        // return Item::saveTaskTree($taskData);
+        if (is_array ($request->input('newItemArray'))){
+            $all = [];
+            foreach ($request->input('newItemArray') as $item)
+            {
+                $a = Item::create($item);
+                array_push($all,$a);
+            }
+            return $all;
+        }
+        $a = Item::create($request->all());
+        // print($a);
+        return $a["id"];
         // TODO:      moveToRightOf($otherNode)!!!
     }
 

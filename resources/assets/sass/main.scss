@@ -46,6 +46,7 @@ button:focus {
     border-bottom: 1px solid;
 }
 #loading-icon{
+	z-index: 4;
 	position: fixed;
     right: 1em;
     top: 1em;

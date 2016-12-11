@@ -10,10 +10,13 @@
     >
       <div class="top">
           <div class="title">Completed {{popup.item.body}}
-          <label class="done-after-done">{{ popup.item.done_date | momentCalendar }}
+          <label class="done-after-done"
+              @keydown="keydownInPopup(popup, $event, 'flatPicker')"
+          >{{ popup.item.done_date | momentCalendar }}
             <input class="flatpickr"
               :id="'done-date-edit-'+popup.item.id+'-popup'"
               v-model="popup.item.done_date"
+              @keydown="keydownInPopup(popup, $event, 'flatPicker')"
             >
           </label></div>
       </div>
@@ -58,7 +61,13 @@
             </div>
           </div>
       </div>
-      <button @click="removePopup(popup)" class="close-button" aria-label="Close alert" type="button">
+      <button
+        @click="removePopup(popup)"
+        @keydown="keydownInPopup(popup, $event, 'closeButton')"
+        class="close-button"
+        aria-label="Close alert"
+        type="button"
+      >
           <span aria-hidden="true">&times;</span>
       </button>
     </div>
@@ -97,15 +106,30 @@ export default {
             item.used_time = 0;
         },
         keydownInCompletionMemo(popup, e){
-            if (
+            if ( // ESCape
                 (e.keyCode == 13 && (e.ctrlKey || e.metaKey))
                 || e.keyCode == 27
             ){
+                this.removePopup(popup);
                 setTimeout(function(){
-                    this.removePopup(popup);
+                    if(vm.popups.length){
+                        document.querySelector('#popups>div:first-child textarea').focus();
+                    }
                 }.bind(this), 200);
             } else {
 
+            }
+        },
+        keydownInPopup(popup, e, field){
+            if(field == 'flatPickr'){
+                if(e.keyCode == '9' && e.shiftKey){
+                    e.preventDefault();
+                }
+            }
+            if(field == 'closeButton'){
+                if(e.keyCode == '9' && !e.shiftKey){
+                    e.preventDefault();
+                }
             }
         },
     },
