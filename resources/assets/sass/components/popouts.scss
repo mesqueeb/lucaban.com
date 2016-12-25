@@ -12,6 +12,15 @@
     transition: opacity .3s ease;	
 }
 .popout {
+    .body{
+        display: flex;
+        flex-direction: column;
+    }
+    .toggle-div{
+        width: 2em;
+        height: 1em;
+        margin-top: -4em;
+    }
     z-index: 5;
     background: white;
     border-radius: 0.3em;
@@ -19,6 +28,7 @@
     .bodybox {
         padding: 1em;
         border-bottom: 1px solid #e3e3e3;
+        display: flex;
         align-items: center;
         font-size: 1.1em;
         padding: 1em;
@@ -26,9 +36,10 @@
     .confirm-delete .bodybox{
         padding: 1em 2em;
     }
-    .timer-time{
-        font-size: 1.4em;
+    .timer-time {
+        font-size: 4em;
         margin: 0 auto;
+        padding: 0.8em;
     }
     .nav {
         padding: 0.6em 1em;

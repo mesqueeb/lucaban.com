@@ -5872,9 +5872,20 @@ label {
   background: white;
   border-radius: 0.3em;
   margin: 1em; }
+  .popout .body {
+    display: -ms-flexbox;
+    display: flex;
+    -ms-flex-direction: column;
+    flex-direction: column; }
+  .popout .toggle-div {
+    width: 2em;
+    height: 1em;
+    margin-top: -4em; }
   .popout .bodybox {
     padding: 1em;
     border-bottom: 1px solid #e3e3e3;
+    display: -ms-flexbox;
+    display: flex;
     -ms-flex-align: center;
     align-items: center;
     font-size: 1.1em;
@@ -5882,8 +5893,9 @@ label {
   .popout .confirm-delete .bodybox {
     padding: 1em 2em; }
   .popout .timer-time {
-    font-size: 1.4em;
-    margin: 0 auto; }
+    font-size: 4em;
+    margin: 0 auto;
+    padding: 0.8em; }
   .popout .nav {
     padding: 0.6em 1em;
     display: -ms-flexbox;

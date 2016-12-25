@@ -28,15 +28,16 @@
 			}"
 		>
 			<div class="body">
-				<div class="toggle-div">
-					<input class="toggle"
-						type="checkbox"
-						v-if="popout.item.children_order.length==0 || popout.item.done == true"
-						v-model="popout.item.done"
-						@change="updateDone(popout.item)"
-					>
+				<div class="bodybox">
+					<div class="toggle-div">
+						<input class="toggle"
+							type="checkbox"
+							v-if="popout.item.children_order.length==0 || popout.item.done == true"
+							v-model="popout.item.done"
+							@change="updateDone(popout.item)"
+						>
+					</div>{{ popout.item.body }}
 				</div>
-				<div class="bodybox">{{ popout.item.body }}</div>
 				<div v-if="!popout.item.planned_time"
 					class="timer-time" 
 				>{{ popout.item.used_time | hhmmss }}</div>
