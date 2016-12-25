@@ -128,43 +128,79 @@ export default class Tree {
 		});
 		return c_o.substring(1);
 	}
+	hasTag(id, tags)
+	{
+		let item = this.nodes[id];
+		if (!item.tagged.length){ return false; }
+		let hasTags;
+		if (tags instanceof Array){
+			tags.forEach(function (tag) {
+				let tagExists = item.tagged.find(itemTags => itemTags.tag_slug == tag);
+				if(tagExists){ hasTags = true; }
+			});
+		} else {
+			let tagExists = item.tagged.find(itemTags => itemTags.tag_slug == tags);
+			if(tagExists){ hasTags = true; }
+		}
+		return hasTags;
+	}
+	hasParentWithTag(id, tags)
+	{
+		let item = this.nodes[id];
+		let parent_id = this.nodes[id].parent_id;
+		if(!parent_id){ return false; }
+		
+		let parentHasTag = this.hasTag(parent_id, tags);
+		if (parentHasTag){
+			return true;
+		} else {
+			return this.hasParentWithTag(parent_id, tags);
+		}
+	}
+	parentIdWithTag(id, tags)
+	{
+		debugger;
+		let item = this.nodes[id];
+		console.log('id & body = '+item.id+" - "+item.body);
+		let parent_id = this.nodes[id].parent_id;
+		if(!parent_id){ return false; }
+		
+		let parentHasTag = this.hasTag(parent_id, tags);
+		console.log('parentHasTag');
+		console.log(parentHasTag);
+		if (parentHasTag){
+			return parent_id;
+		} else {
+			return this.parentIdWithTag(parent_id, tags);
+		}
+	}
 	siblingIndex(id)
 	{
 		let parent_id = this.nodes[id].parent_id;
 		if(!parent_id){ return; }
-		let siblingsArr = this.nodes[parent_id].children_order;
-		return siblingsArr.indexOf(id);
+		let siblingsArray = this.nodes[parent_id].children_order;
+		return siblingsArray.indexOf(id);
 	}
 	olderSiblingId(id)
 	{
 		let parent_id = this.nodes[id].parent_id;
 		if(!parent_id){ return; }
-		let siblingsArr = this.nodes[parent_id].children_order;
-		if(siblingsArr.length <= 1 || this.siblingIndex(id) == 0){
+		let siblingsArray = this.nodes[parent_id].children_order;
+		if(siblingsArray.length <= 1 || this.siblingIndex(id) == 0){
 			return parent_id;
 		}
-		let siblingIndex = siblingsArr.indexOf(id);
+		let siblingIndex = siblingsArray.indexOf(id);
 		return this.nodes[parent_id].children_order[siblingIndex-1];
 	}
 	nextItemId(id)
 	{
 		// debugger;
 		let item = this.nodes[id];
-		// first check if item has children, if so select the first child.
+		// 1) Select first child if any.
 		if (item.show_children && item.children.length > 0){
 			return item.children_order[0];
 		}
-		// if no children look at parent node's children order.
-		let parent_id = item.parent_id;
-		if(!parent_id){ return; }
-		let siblingsArr = this.nodes[parent_id].children_order;
-
-		if(this.siblingIndex(id)+1 == siblingsArr.length){
-			// console.log('this was the last node');
-			return this.nextItemRecursion(id,parent_id);
-		}
-		let siblingIndex = siblingsArr.indexOf(id);
-		return this.nodes[parent_id].children_order[siblingIndex+1];
+		return this.nextItemRecursion(id);
 	}
 	nextSiblingOrParentsSiblingId(id)
 	{
@@ -205,14 +241,47 @@ export default class Tree {
 			return id;
 		}
 	}
-	nextItemRecursion(id,parent_id){
-		var nextIndex = this.siblingIndex(id)+1;
-		if(nextIndex != this.nodes[parent_id].children_order.length){
-			return this.nodes[parent_id].children_order[nextIndex];
+	nextItemRecursion(id){
+		// debugger;
+		let nextIndex = this.siblingIndex(id)+1;
+		let parent_id = this.nodes[id].parent_id;
+		let itemIsLastSibling = (nextIndex == this.nodes[parent_id].children_order.length);
+		
+		// IF we have NO tags selected.
+		if(!selection.tags.length){ 
+			if(itemIsLastSibling){
+				return this.nextItemRecursion(parent_id);
+			}
+			let nextItemId = this.nodes[parent_id].children_order[nextIndex];
+			return nextItemId;
+		
+		// IF tag filter
+		} else {
+			let thisHasSelectedTag = this.hasTag(id, selection.tags);
+			if(thisHasSelectedTag){
+				return this.nextFilteredItemId(id);
+			}
+			
+			let parentHasSelectedTag = this.hasTag(parent_id, selection.tags);
+			if(itemIsLastSibling && parentHasSelectedTag){
+				console.log('this is the top lvl item with the filtered tag: ['+parent_id+'] '+this.nodes[parent_id].body);
+				return this.nextFilteredItemId(parent_id);
+			}
+			if(itemIsLastSibling && !parentHasSelectedTag){
+				return this.nextItemRecursion(parent_id);
+			}
+			return this.nodes[parent_id].children_order[nextIndex];					
 		}
-		else {
-			return this.nextItemRecursion(parent_id,this.nodes[parent_id].parent_id);
-		}
+	}
+	nextFilteredItemId(id)
+	{
+		let index = this.root.children_order.indexOf(id);
+		return this.root.children_order[index+1];
+	}
+	prevFilteredItemId(id)
+	{
+		let index = this.root.children_order.indexOf(id);
+		return this.root.children_order[index-1];
 	}
 	sortChildren(id)
 	{
@@ -223,6 +292,14 @@ export default class Tree {
 		if (order instanceof Array){
 			item.children = order.map(id => items.find(t => t.id === id));
 		}
+	}
+	resetChildrenOrder(id)
+	{
+		let item = this.nodes[id];
+		let resetChildrenOrder = item.children.map(function(child){
+		   return child.id;
+		});
+		this.nodes[id].children_order = resetChildrenOrder;
 	}
 	giveNewParent(id, new_parent_id, specificNewIndex)
 	{
@@ -555,20 +632,20 @@ export default class Tree {
 			}
 		}.bind(this))
 	}
-	filter(keyword, value)
+	filterItems(keyword, value, operator)
 	{
 		// debugger;
 		if (keyword == 'all'){
 			this.root.children = this.rootChildrenBackup;
 			//Why can't I do this?
 			// this.root = this.rootBackup;
-			return;
 		}
-		this.filteredItemRoot.children = [];
-		this.root.children = this.filteredItemRoot.children;
-    	//Why can't I do this?
-		// this.root = this.filteredItemRoot;
-
+		else {
+			this.filteredItemRoot.children = [];
+			this.root.children = this.filteredItemRoot.children;
+	    	//Why can't I do this?
+			// this.root = this.filteredItemRoot;
+		}
 		if (keyword == 'duedate'){
 			if (value == 'today'){
 				Object.keys(this.nodes).forEach(function (key) {
@@ -581,16 +658,17 @@ export default class Tree {
 			}
 		}
 		if (keyword == 'tag'){
-	    	let filterTag = value;
+	    	let filteredTag = value;
 	    	Object.keys(this.nodes).forEach(function (key) {
 				let item = this.nodes[key];
-				let hasTag = item.tagged.find(actualTags => actualTags.tag_slug == filterTag);
+				let hasTag = item.tagged.find(actualTags => actualTags.tag_slug == filteredTag);
 	    		if (hasTag){
 					this.filteredItemRoot.children.push(item);
 	    		}
 			}.bind(this));
 		}
 		this.calculateTotalTime(this.root.id);
+		this.resetChildrenOrder(this.root.id);
 	}
 	formatDone(doneArray)
 	{

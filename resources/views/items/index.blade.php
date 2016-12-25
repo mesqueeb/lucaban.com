@@ -30,11 +30,11 @@
 		<div class="menu">
 			<a href="#"
 				:class="{active: selection.filter == 'all'}"
-				@click="filter('all')"
+				@click="filterItems('all')"
 			>All</a>
 			<a href="#"
 				:class="{active: selection.filter == 'today'}"
-				@click="filter('today')"
+				@click="filterItems('today')"
 			>Today</a>
 			<a href="#"
 				:class="{active: selection.filter == 'done'}"
@@ -45,10 +45,10 @@
 
 			<a v-for="tag in allTags"
 				href="#"
-				:class=""
-				@click="filter('tag', tag.slug)"
+				:class="{active: selection.tags.includes(tag.slug)}"
+				@click="filterItems('tag', tag.slug)"
 			>@{{ tag.name }}</a>
-
+			
 		</div>
 	</div>
 	<div class="panel-title">

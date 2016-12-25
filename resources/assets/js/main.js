@@ -273,7 +273,7 @@ window.vm = new Vue({
 				if(!id || id == allItems.root.id){
 					sel = allItems.root.children_order[0];
 				} else {
-					sel = allItems.nextItemId(id)
+					sel = allItems.nextItemId(id);
 				}
 			} else if (direction == 'prev'){
 				let olderSiblingId = allItems.olderSiblingId(id);
@@ -500,21 +500,25 @@ window.vm = new Vue({
 				this.loading = false;
 			});
 		},
-		filter(type, value){
-			if(type == 'all'){
+		filterItems(keyword, value, operator){
+			selection.filter = keyword;
+			if(!operator){ selection.tags = []; }
+
+			if(keyword == 'all'){
 				selection.filter = 'all';
-				allItems.filter('all');
+				allItems.filterItems('all');
 			}
-			if(type == 'today'){
+			if(keyword == 'today'){
 				selection.filter = 'today';
-				allItems.filter('duedate','today');
+				allItems.filterItems('duedate','today');
 			}
-			if(type == 'done'){
+			if(keyword == 'done'){
 				selection.filter = 'done';
-				allItems.filter('today');
+				allItems.filterItems('today');
 			}
-			if(type == 'tag'){
-				allItems.filter('tag',value);
+			if(keyword == 'tag'){
+				selection.tags.push(value);
+				allItems.filterItems('tag',value);
 				// this.fetchTagged(value, 'withAnyTag');
 			}
 		},
