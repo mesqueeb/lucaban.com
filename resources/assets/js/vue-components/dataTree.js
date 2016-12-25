@@ -194,12 +194,11 @@ export default class Tree {
 	}
 	nextItemId(id)
 	{
-		// debugger;
 		let item = this.nodes[id];
-		// 1) Select first child if any.
+		// Select first child if any.
 		if (item.show_children && item.children.length > 0){
 			return item.children_order[0];
-		}
+	 	}
 		return this.nextItemRecursion(id);
 	}
 	nextSiblingOrParentsSiblingId(id)
@@ -215,62 +214,76 @@ export default class Tree {
 	}
 	prevItemId(id)
 	{
-		let parent_id = this.nodes[id].parent_id;
-		if(!parent_id){ return; }
-		let siblingsArr = this.nodes[parent_id].children_order;
-		if(this.siblingIndex(id) == 0){
-			return parent_id;
+		let item = this.nodes[id];
+		let parent_id = item.parent_id;
+		let index = this.siblingIndex(id);
+		let tagsSelected = selection.tags.length;
+		let prevItemId;
+		if (index == 0){
+			prevItemId = parent_id;
+		} else {
+			prevItemId = this.nodes[parent_id].children_order[index-1];
+			prevItemId = this.getDeepestLastChildId(prevItemId);
 		}
-		let siblingIndex = siblingsArr.indexOf(id);
-		let prevItemId = this.nodes[parent_id].children_order[siblingIndex-1];
-		// check if upper sibling item has children
-		prevItemId = this.prevItemRecursion(prevItemId);
+		let prevItem = this.nodes[prevItemId];
+		console.log('prevItem: ['+prevItemId+'] '+prevItem.body);
+		let prevItemChildrenCount = prevItem.children.length;
+
+		// if(tagsSelected){ 
+		// 	if(this.isTopLvlItemInFilteredRoot(id)){
+		// 		let prevFilteredItemId = this.prevFilteredItemId(id);
+		// 		return this.getDeepestLastChildId(prevFilteredItemId);				
+		// 	}
+		// 	let prevItemHasParentWithSelectedTag = this.hasParentWithTag(prevItemId, selection.tags);
+		// 	console.log('prevItem has Parent With Selected Tag = '+prevItemHasParentWithSelectedTag);
+		// 	if(prevItemHasParentWithSelectedTag){
+		// 		return prevItemId;
+		// 	}
+		// }
 		return prevItemId;
 	}
-	prevItemRecursion(id)
+	nextItemRecursion(id)
 	{
-		let item = this.nodes[id];
-		let childrenLength = item.children.length;
-		// console.log('childrenLength: '+childrenLength+' // id: '+id);
-		if(item.show_children && childrenLength>0){
-			id = this.nodes[id].children[childrenLength-1].id;
-			// console.log('childrenLength: '+childrenLength+' // id: '+id);
-			return this.prevItemRecursion(id);
-		} else {
-			// console.log('last cycle id: '+id);//THIS VALUE LOOKS FINE
-			return id;
-		}
-	}
-	nextItemRecursion(id){
 		// debugger;
 		let nextIndex = this.siblingIndex(id)+1;
-		let parent_id = this.nodes[id].parent_id;
+		let item = this.nodes[id];
+		let parent_id = item.parent_id;
 		let itemIsLastSibling = (nextIndex == this.nodes[parent_id].children_order.length);
+		let tagsSelected = selection.tags.length;
 		
-		// IF we have NO tags selected.
-		if(!selection.tags.length){ 
+		// if(!tagsSelected){ 
+			console.log('itemIsLastSibling '+itemIsLastSibling);
 			if(itemIsLastSibling){
 				return this.nextItemRecursion(parent_id);
 			}
 			let nextItemId = this.nodes[parent_id].children_order[nextIndex];
 			return nextItemId;
 		
-		// IF tag filter
+		// }
+		// else if (tagsSelected) {
+		// 	let itemHasSelectedTag = this.hasTag(id, selection.tags);
+		// 	if(itemHasSelectedTag){
+		// 		return this.nextFilteredItemId(id);
+		// 	}
+
+		// 	let parentHasSelectedTag = this.hasTag(parent_id, selection.tags);
+		// 	if(itemIsLastSibling && parentHasSelectedTag){
+		// 		console.log('this is the top lvl item with the filtered tag: ['+parent_id+'] '+this.nodes[parent_id].body);
+		// 		return this.nextFilteredItemId(parent_id);
+		// 	}
+		// 	if(itemIsLastSibling && !parentHasSelectedTag){
+		// 		return this.nextItemRecursion(parent_id);
+		// 	}
+		// 	return this.nodes[parent_id].children_order[nextIndex];					
+		// }
+	}
+	isTopLvlItemInFilteredRoot(id)
+	{
+		if(selection.filter == 'all'){ return false; }
+		if (this.root.children_order.includes(id)){
+			return true;
 		} else {
-			let thisHasSelectedTag = this.hasTag(id, selection.tags);
-			if(thisHasSelectedTag){
-				return this.nextFilteredItemId(id);
-			}
-			
-			let parentHasSelectedTag = this.hasTag(parent_id, selection.tags);
-			if(itemIsLastSibling && parentHasSelectedTag){
-				console.log('this is the top lvl item with the filtered tag: ['+parent_id+'] '+this.nodes[parent_id].body);
-				return this.nextFilteredItemId(parent_id);
-			}
-			if(itemIsLastSibling && !parentHasSelectedTag){
-				return this.nextItemRecursion(parent_id);
-			}
-			return this.nodes[parent_id].children_order[nextIndex];					
+			return false;
 		}
 	}
 	nextFilteredItemId(id)
@@ -541,6 +554,7 @@ export default class Tree {
 	}
 	moveItem(id, direction)
 	{
+		if(this.isTopLvlItemInFilteredRoot(id)){ return; }
 		clearTimeout(window.patchDelay);
 		let pId = this.nodes[id].parent_id;
 		let parent = this.nodes[pId];
@@ -610,10 +624,23 @@ export default class Tree {
 	}
 	getLastChildId(id)
 	{
-		let l = this.nodes[id].children.length;
-		if(!l){ return false; }
-		let n = this.nodes[id].children[l-1];
-		return n.id;
+		let item = this.nodes[id];
+		let childrenCount = item.children.length;
+		if(childrenCount && item.show_children){
+			let lastChild = item.children[childrenCount-1];
+			return lastChild.id;
+		}
+		return id;
+	}
+	getDeepestLastChildId(id)
+	{
+		// debugger;
+		let lastChildId = this.getLastChildId(id);
+		let item = this.nodes[lastChildId];
+		if(item.children.length && item.show_children){
+			return this.getDeepestLastChildId(lastChildId);
+		}
+		return lastChildId;
 	}
 	updateChildrenDueDate(id)
 	{
@@ -669,6 +696,14 @@ export default class Tree {
 		}
 		this.calculateTotalTime(this.root.id);
 		this.resetChildrenOrder(this.root.id);
+		this.rebindParentIds();
+	}
+	rebindParentIds()
+	{
+		this.root.children_order.forEach(function(id){
+			this.nodes[id].parent_id_backup = this.nodes[id].parent_id;
+			this.nodes[id].parent_id = this.root.id;
+		}.bind(this));
 	}
 	formatDone(doneArray)
 	{

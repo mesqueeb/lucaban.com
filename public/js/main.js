@@ -27901,9 +27901,8 @@ var Tree = function () {
 	}, {
 		key: 'nextItemId',
 		value: function nextItemId(id) {
-			// debugger;
 			var item = this.nodes[id];
-			// 1) Select first child if any.
+			// Select first child if any.
 			if (item.show_children && item.children.length > 0) {
 				return item.children_order[0];
 			}
@@ -27924,67 +27923,80 @@ var Tree = function () {
 	}, {
 		key: 'prevItemId',
 		value: function prevItemId(id) {
-			var parent_id = this.nodes[id].parent_id;
-			if (!parent_id) {
-				return;
-			}
-			var siblingsArr = this.nodes[parent_id].children_order;
-			if (this.siblingIndex(id) == 0) {
-				return parent_id;
-			}
-			var siblingIndex = siblingsArr.indexOf(id);
-			var prevItemId = this.nodes[parent_id].children_order[siblingIndex - 1];
-			// check if upper sibling item has children
-			prevItemId = this.prevItemRecursion(prevItemId);
-			return prevItemId;
-		}
-	}, {
-		key: 'prevItemRecursion',
-		value: function prevItemRecursion(id) {
 			var item = this.nodes[id];
-			var childrenLength = item.children.length;
-			// console.log('childrenLength: '+childrenLength+' // id: '+id);
-			if (item.show_children && childrenLength > 0) {
-				id = this.nodes[id].children[childrenLength - 1].id;
-				// console.log('childrenLength: '+childrenLength+' // id: '+id);
-				return this.prevItemRecursion(id);
+			var parent_id = item.parent_id;
+			var index = this.siblingIndex(id);
+			var tagsSelected = selection.tags.length;
+			var prevItemId = void 0;
+			if (index == 0) {
+				prevItemId = parent_id;
 			} else {
-				// console.log('last cycle id: '+id);//THIS VALUE LOOKS FINE
-				return id;
+				prevItemId = this.nodes[parent_id].children_order[index - 1];
+				prevItemId = this.getDeepestLastChildId(prevItemId);
 			}
+			var prevItem = this.nodes[prevItemId];
+			console.log('prevItem: [' + prevItemId + '] ' + prevItem.body);
+			var prevItemChildrenCount = prevItem.children.length;
+
+			// if(tagsSelected){ 
+			// 	if(this.isTopLvlItemInFilteredRoot(id)){
+			// 		let prevFilteredItemId = this.prevFilteredItemId(id);
+			// 		return this.getDeepestLastChildId(prevFilteredItemId);				
+			// 	}
+			// 	let prevItemHasParentWithSelectedTag = this.hasParentWithTag(prevItemId, selection.tags);
+			// 	console.log('prevItem has Parent With Selected Tag = '+prevItemHasParentWithSelectedTag);
+			// 	if(prevItemHasParentWithSelectedTag){
+			// 		return prevItemId;
+			// 	}
+			// }
+			return prevItemId;
 		}
 	}, {
 		key: 'nextItemRecursion',
 		value: function nextItemRecursion(id) {
 			// debugger;
 			var nextIndex = this.siblingIndex(id) + 1;
-			var parent_id = this.nodes[id].parent_id;
+			var item = this.nodes[id];
+			var parent_id = item.parent_id;
 			var itemIsLastSibling = nextIndex == this.nodes[parent_id].children_order.length;
+			var tagsSelected = selection.tags.length;
 
-			// IF we have NO tags selected.
-			if (!selection.tags.length) {
-				if (itemIsLastSibling) {
-					return this.nextItemRecursion(parent_id);
-				}
-				var nextItemId = this.nodes[parent_id].children_order[nextIndex];
-				return nextItemId;
+			// if(!tagsSelected){ 
+			console.log('itemIsLastSibling ' + itemIsLastSibling);
+			if (itemIsLastSibling) {
+				return this.nextItemRecursion(parent_id);
+			}
+			var nextItemId = this.nodes[parent_id].children_order[nextIndex];
+			return nextItemId;
 
-				// IF tag filter
+			// }
+			// else if (tagsSelected) {
+			// 	let itemHasSelectedTag = this.hasTag(id, selection.tags);
+			// 	if(itemHasSelectedTag){
+			// 		return this.nextFilteredItemId(id);
+			// 	}
+
+			// 	let parentHasSelectedTag = this.hasTag(parent_id, selection.tags);
+			// 	if(itemIsLastSibling && parentHasSelectedTag){
+			// 		console.log('this is the top lvl item with the filtered tag: ['+parent_id+'] '+this.nodes[parent_id].body);
+			// 		return this.nextFilteredItemId(parent_id);
+			// 	}
+			// 	if(itemIsLastSibling && !parentHasSelectedTag){
+			// 		return this.nextItemRecursion(parent_id);
+			// 	}
+			// 	return this.nodes[parent_id].children_order[nextIndex];					
+			// }
+		}
+	}, {
+		key: 'isTopLvlItemInFilteredRoot',
+		value: function isTopLvlItemInFilteredRoot(id) {
+			if (selection.filter == 'all') {
+				return false;
+			}
+			if (this.root.children_order.includes(id)) {
+				return true;
 			} else {
-				var thisHasSelectedTag = this.hasTag(id, selection.tags);
-				if (thisHasSelectedTag) {
-					return this.nextFilteredItemId(id);
-				}
-
-				var parentHasSelectedTag = this.hasTag(parent_id, selection.tags);
-				if (itemIsLastSibling && parentHasSelectedTag) {
-					console.log('this is the top lvl item with the filtered tag: [' + parent_id + '] ' + this.nodes[parent_id].body);
-					return this.nextFilteredItemId(parent_id);
-				}
-				if (itemIsLastSibling && !parentHasSelectedTag) {
-					return this.nextItemRecursion(parent_id);
-				}
-				return this.nodes[parent_id].children_order[nextIndex];
+				return false;
 			}
 		}
 	}, {
@@ -28322,6 +28334,9 @@ var Tree = function () {
 	}, {
 		key: 'moveItem',
 		value: function moveItem(id, direction) {
+			if (this.isTopLvlItemInFilteredRoot(id)) {
+				return;
+			}
 			clearTimeout(window.patchDelay);
 			var pId = this.nodes[id].parent_id;
 			var parent = this.nodes[pId];
@@ -28406,12 +28421,24 @@ var Tree = function () {
 	}, {
 		key: 'getLastChildId',
 		value: function getLastChildId(id) {
-			var l = this.nodes[id].children.length;
-			if (!l) {
-				return false;
+			var item = this.nodes[id];
+			var childrenCount = item.children.length;
+			if (childrenCount && item.show_children) {
+				var lastChild = item.children[childrenCount - 1];
+				return lastChild.id;
 			}
-			var n = this.nodes[id].children[l - 1];
-			return n.id;
+			return id;
+		}
+	}, {
+		key: 'getDeepestLastChildId',
+		value: function getDeepestLastChildId(id) {
+			// debugger;
+			var lastChildId = this.getLastChildId(id);
+			var item = this.nodes[lastChildId];
+			if (item.children.length && item.show_children) {
+				return this.getDeepestLastChildId(lastChildId);
+			}
+			return lastChildId;
 		}
 	}, {
 		key: 'updateChildrenDueDate',
@@ -28476,6 +28503,15 @@ var Tree = function () {
 			}
 			this.calculateTotalTime(this.root.id);
 			this.resetChildrenOrder(this.root.id);
+			this.rebindParentIds();
+		}
+	}, {
+		key: 'rebindParentIds',
+		value: function rebindParentIds() {
+			this.root.children_order.forEach(function (id) {
+				this.nodes[id].parent_id_backup = this.nodes[id].parent_id;
+				this.nodes[id].parent_id = this.root.id;
+			}.bind(this));
 		}
 	}, {
 		key: 'formatDone',
