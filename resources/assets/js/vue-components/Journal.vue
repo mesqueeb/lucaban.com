@@ -9,12 +9,12 @@
 			>
 				<span>・</span>
 				<div class="parent-string">{{ item.parents_bodies }}</div>
-				<span class="body bodybox">{{{ item.body }}}</span>
+				<div class="body bodybox">{{{ item.body }}}</div>
 				<div class="completion-notes bodybox">{{ item.completion_memo }}</div>
 				<div class="item-tags"
 				>
-					<span v-if="item.planned_time" class="duration">
-						{{ item.planned_time }} min
+					<span v-if="item.used_time" class="duration">
+						{{ item.used_time }} min
 					</span>
 				</div>
 			</div>

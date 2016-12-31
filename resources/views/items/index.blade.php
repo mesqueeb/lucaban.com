@@ -29,16 +29,16 @@
 	<div class="navigation">
 		<div class="menu">
 			<a href="#"
-				:class="{active: selection.filter == 'all'}"
+				:class="{active: (selection.filter.length == 0 && selection.tags.length == 0)}"
 				@click="filterItems('all')"
 			>All</a>
 			<a href="#"
-				:class="{active: selection.filter == 'today'}"
-				@click="filterItems('today')"
+				:class="{active: selection.filter.includes('today')}"
+				@click="filterItems('duedate','today')"
 			>Today</a>
 			<a href="#"
-				:class="{active: selection.filter == 'done'}"
-				@click="clickDone()"
+				:class="{active: selection.filter.includes('done')}"
+				@click="filterItems('done')"
 			>Done</a>
 		</div>
 		<div class="tag-menu">
@@ -51,13 +51,20 @@
 			
 		</div>
 	</div>
-	<div class="panel-title">
+	<div class="line"></div>
+	<div class="panel-title"
+	>
 		@{{ selection.filter | capitalize }}
+		@{{ selection.tags | capitalize }}
 	</div>
 	{{-- STATS --}}
-
-	<div class="stats">
-		<div><span>Total time:</span>@{{ allData.totalPlannedTime | hourmin }} / @{{ allData.totalUsedTime | hourmin }}</div>
+	<div class="stats"
+		v-show="selection.filter != 'done'"
+	>
+		<div>Used time <div class="used-time">@{{ allData.totalUsedTime | hourmin }}</div></div>
+		<div>Time left <div class="time-left">@{{ allData.totalPlannedTime*60-allData.totalUsedTime | hourmin }}</div></div>
+		<div>Items <div class="children-amount">@{{ childrenAmount }}</div></div>
+		<div>Done <div class="done-children-amount">@{{ doneChildrenAmount }}</div></div>
 	</div>
 	{{-- DATA --}}
 	<div class="items-wrapper"

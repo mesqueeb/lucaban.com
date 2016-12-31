@@ -2,8 +2,10 @@ label{
     font-weight: 300;
 }
 
+
 .navigation{
     display: flex;
+    margin-bottom: 0.2em;
     a {
         text-decoration: none;
         color: #4d4d4d;
@@ -12,16 +14,70 @@ label{
     .active{
         color: $theme-color;
     }
+    .menu {
+        display: flex;
+    }
     .tag-menu{
         margin-left: auto;
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        justify-content: flex-end;
     }
 }
 .card{
     margin: 0.5em;
 }
+.line{
+    width: 100%;
+    height: 1px;
+    border-top: 1px #ededed solid;
+}
+.stats{
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    border-bottom: 1px #ededed solid;
+    padding: 0.4em;
+    >div{
+        margin: 0.2em;
+    }
+    >div>div{
+        position: relative;
+        padding: 0.2em 0.5em;
+        border-radius: 0.3em;
+        color: white;
+        font-size: 0.9em;
+    }
+    .used-time{
+        background: $used-time-color;
+    }
+    .time-left{
+        background: $duration-color-dark;
+    }
+    .children-amount{
+        background: $theme-color;
+    }
+    .done-children-amount{
+        background: $done-color;
+    }
+}
+.scrolled-down .stats{
+    margin-top: 32px;
+}
 .panel-title{
     text-align: center;
     font-size: 1.2em;
+    padding: 6px 0;
+}
+.scrolled-down .panel-title{
+    position: fixed;
+    top: 0;
+    left: 0;
+    background: rgba(255, 255, 255, 0.9);
+    width: 100vw;
+    align-content: inherit;
+    z-index: 4;
 }
 .item-nav{
     margin-left: auto;
@@ -257,6 +313,7 @@ label{
     }
     .custom-tag{
         background: $theme-color;
+        cursor: pointer;
     }
     button{
         color: white;

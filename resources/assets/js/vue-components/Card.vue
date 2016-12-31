@@ -142,21 +142,28 @@
 						>
 					</label>
 					
-					<span v-if="(hasTotalUsedTime || hasTotalPlannedTime) && !item.done" class="total-duration">
-						<span style="padding-right:2px">Total </span>
+					<span v-if="
+						totalTimeLeft > 0
+						&& totalTimeLeft > timeLeft
+						&& totalTimeDifferentFromParent
+						&& !item.done" class="total-duration">
+						{{ totalTimeLeft | hourminsec }}
+						<!-- <span style="padding-right:2px">Total </span>
 						<span v-if="hasTotalUsedTime"> used {{ item.totalUsedTime | hourminsec }}</span>
 						<span v-if="(hasTotalUsedTime && hasTotalPlannedTime)">/</span>
-						<span v-if="hasTotalPlannedTime">{{ item.totalPlannedTime | hourmin }}</span>
+						<span v-if="hasTotalPlannedTime">{{ item.totalPlannedTime | hourmin }}</span> -->
  					</span>
 
 					<span v-if="
-						(item.id != this.$root.editingItem || hasUsedTime)
-						&& (hasPlannedTime || hasUsedTime)
+						item.id != this.$root.editingItem
+						&& timeLeft > 0
+						
 						&& !item.done" class="duration"
 					>
-						<span v-if="hasUsedTime">Used {{ item.used_time | hourminsec }}</span>
+						{{ timeLeft | hourminsec }}
+						<!-- <span v-if="hasUsedTime">Used {{ item.used_time | hourminsec }}</span>
 						<span v-if="(hasPlannedTime && hasUsedTime)">/</span>
-						<span v-if="hasPlannedTime">{{ item.planned_time | hourmin }}</span>
+						<span v-if="hasPlannedTime">{{ item.planned_time | hourmin }}</span> -->
 					</span>
 					
 					<span v-if="hasDueDate && !item.done"
@@ -170,6 +177,7 @@
 					<span v-if="item.tagged.length && !item.done"
 						class="custom-tag"
 						v-for="tag in item.tagged"
+						@click.prevent="this.$root.filterItems('tag', tag.tag_slug)"
 					>{{ tag.tag_name }}
 						<button class="delete-tag"
 							v-if="item.id == this.$root.editingItem"
@@ -471,6 +479,17 @@ export default {
 		allTags_c(){
 			return this.$root.allTags;
 		},
+		totalTimeLeft(){
+			let x = this.item.totalPlannedTime*60-this.item.totalUsedTime;
+			return x;
+		},
+		timeLeft(){
+			let x = this.item.planned_time*60-this.item.used_time;
+			return x;
+		},
+		totalTimeDifferentFromParent(){
+			return this.item.totalPlannedTime != allItems.nodes[this.item.parent_id].totalPlannedTime;
+		},
 	},
 	methods: {
 		addTimer(item){
@@ -522,6 +541,14 @@ export default {
 			// ENTER
 			if (e.keyCode === 13 && !e.shiftKey && !e.altKey && !e.metaKey && !e.ctrlKey) {
 				if(field == 'planned-time'){
+					if(e.srcElement.nodeName == 'INPUT'){
+						e.preventDefault();
+						let plsFocus = '.addnewbox .prepare-tag';
+						document.querySelector(plsFocus).focus();
+						if(!this.item.planned_time){
+							this.item.planned_time = 0;
+						}
+					}
 					return;
 				}
 				e.preventDefault();
@@ -623,6 +650,14 @@ export default {
 			// ENTER
 			if (e.keyCode === 13 && !e.shiftKey && !e.altKey) {
 				if(field == 'planned-time'){
+					if(e.srcElement.nodeName == 'INPUT'){
+						e.preventDefault();
+						let plsFocus = '#updatebox-'+item.id+' .add-tag';
+						document.querySelector(plsFocus).focus();
+						if(!this.item.planned_time){
+							this.item.planned_time = 0;
+						}		
+					}
 					return;
 				}
 	        	e.preventDefault();
@@ -806,6 +841,10 @@ export default {
 			let tag = this.newTag;
 			if(tag=='t' || tag=='T' || tag=='today' || tag=='Today'){
 				tag = 'Today';
+			}
+			if(allItems.hasParentWithTag(id, tag)){
+				console.log('NG! has a parent with the tag');
+				return;
 			}
 			this.newItem.preparedTags.push(tag);
 			this.newTag = null;

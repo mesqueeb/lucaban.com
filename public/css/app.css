@@ -5500,22 +5500,79 @@ label {
 
 .navigation {
   display: -ms-flexbox;
-  display: flex; }
+  display: flex;
+  margin-bottom: 0.2em; }
   .navigation a {
     text-decoration: none;
     color: #4d4d4d;
     margin: 0em 0.5em; }
   .navigation .active {
     color: #5dc2af; }
+  .navigation .menu {
+    display: -ms-flexbox;
+    display: flex; }
   .navigation .tag-menu {
-    margin-left: auto; }
+    margin-left: auto;
+    display: -ms-flexbox;
+    display: flex;
+    -ms-flex-align: center;
+    align-items: center;
+    -ms-flex-wrap: wrap;
+    flex-wrap: wrap;
+    -ms-flex-pack: end;
+    justify-content: flex-end; }
 
 .card {
   margin: 0.5em; }
 
+.line {
+  width: 100%;
+  height: 1px;
+  border-top: 1px #ededed solid; }
+
+.stats {
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-wrap: wrap;
+  flex-wrap: wrap;
+  -ms-flex-pack: center;
+  justify-content: center;
+  border-bottom: 1px #ededed solid;
+  padding: 0.4em; }
+  .stats > div {
+    margin: 0.2em; }
+  .stats > div > div {
+    position: relative;
+    padding: 0.2em 0.5em;
+    border-radius: 0.3em;
+    color: white;
+    font-size: 0.9em; }
+  .stats .used-time {
+    background: #5d67b3; }
+  .stats .time-left {
+    background: #4679a7; }
+  .stats .children-amount {
+    background: #5dc2af; }
+  .stats .done-children-amount {
+    background: #1E824C; }
+
+.scrolled-down .stats {
+  margin-top: 32px; }
+
 .panel-title {
   text-align: center;
-  font-size: 1.2em; }
+  font-size: 1.2em;
+  padding: 6px 0; }
+
+.scrolled-down .panel-title {
+  position: fixed;
+  top: 0;
+  left: 0;
+  background: rgba(255, 255, 255, 0.9);
+  width: 100vw;
+  -ms-flex-line-pack: inherit;
+  align-content: inherit;
+  z-index: 4; }
 
 .item-nav {
   margin-left: auto;
@@ -5743,7 +5800,8 @@ label {
   .item-tags .total-duration {
     background: #4679a7; }
   .item-tags .custom-tag {
-    background: #5dc2af; }
+    background: #5dc2af;
+    cursor: pointer; }
   .item-tags button {
     color: white;
     margin-left: 0.5em;
@@ -5766,7 +5824,7 @@ label {
   top: 0;
   position: fixed;
   width: 100%;
-  z-index: 3;
+  z-index: 5;
   display: -ms-flexbox;
   display: flex;
   -ms-flex-direction: column;

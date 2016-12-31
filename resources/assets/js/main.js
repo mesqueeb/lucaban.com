@@ -6,7 +6,7 @@
 	window.jQuery = jQuery;
 
 // IMPORT Own jQuery replacement functions
-	import { hasClass, btnEffect } from './components/globalFunctions.js';
+	import { hasClass, btnEffect, isElementInViewport } from './components/globalFunctions.js';
 	window.btnEffect = btnEffect;
 	// Make hasClass(el) available as el.hasClass();
 	window.Element.prototype.hasClass = function(config){ return hasClass(this,config)};
@@ -119,12 +119,23 @@
 	import Selection from './vue-components/Selection.js';
 	import NotificationStoreClass from './vue-components/NotificationStore.js';
 
+// $(window).on("scroll", function(e) {
+// 	// console.log($(this).scrollTop());
+// 	if ($(this).scrollTop() > 33 && vm.timerItems.length) {
+// 		$("body").addClass("fix-timer");
+// 	} else {
+// 		$("body").removeClass("fix-timer");
+// 	}
+// });
 $(window).on("scroll", function(e) {
-  if ($(this).scrollTop() > 33 && vm.timerItems.length) {
-    $("body").addClass("fix-timer");
-  } else {
-    $("body").removeClass("fix-timer");
-  }
+	if(!selection.filter.length && !selection.tags.length){ return; }
+	let el = document.getElementsByClassName('line');
+	// let el = $('.navigation');
+	if (!isElementInViewport(el[0])) {
+    	$("body").addClass("scrolled-down");
+	} else {
+    	$("body").removeClass("scrolled-down");
+	}
 });
 
 // set row height each time resize window
@@ -195,10 +206,39 @@ window.vm = new Vue({
 		Popouts,
 	},
 	computed:{
-		totalUsedTimeTree(){},
-		totalPlannedTimeTree(){},
+		childrenAmount(){
+			return this.countChildren(this.allData);
+		},
+		doneChildrenAmount(){
+			return this.countDoneChildren(this.allData);
+		},
 	},
 	methods:{
+		countChildren(item){
+			let x;
+			if (!item.children){ return 0; }
+			x = item.children.length;
+			item.children.forEach(function(child){
+				x = x+this.countChildren(child);
+			}.bind(this));
+			return x;
+		},
+		countDoneChildren(item){
+			let x;
+			if (!item.children){ return 0; }
+			x = this.returnDoneChildrenAmount(item);
+			item.children.forEach(function(child){
+				x = x+this.countDoneChildren(child);
+			}.bind(this));
+			return x;
+		},
+		returnDoneChildrenAmount(item){
+			let x = item.children.reduce(function(prevChild, currChild) {
+				let y = (currChild.done) ? 1 : 0;
+				return prevChild + y;
+			}, 0);
+			return x;
+		},
 		showChildren(id, show){
 			id = (id) ? id : selection.selectedId;
 			let item = allItems.nodes[id];
@@ -237,15 +277,23 @@ window.vm = new Vue({
 			if(!id){ return; }
 			allItems.moveItem(id, direction);
 		},
-		indent(){
-			let id = selection.selectedId;
+		indent(id){
+			id = (id) ? id : selection.selectedId;
+			// if(!allItems.isTopLvlItemInFilteredRoot(id)){ 
+			// 	console.log("can't indent a topLvlItem in filtered list");
+			// 	return;
+			// }
 			let new_parent_id = allItems.olderSiblingId(id);
 			if(new_parent_id == allItems.nodes[id].parent_id){ console.log('bump! ceiling!'); return; }
 			console.log('new_parent_id / olderSiblingId: '+new_parent_id);
 			allItems.giveNewParent(id,new_parent_id);
 		},
-		unindent(){
-			let id = selection.selectedId;
+		unindent(id){
+			id = (id) ? id : selection.selectedId;
+			// if(!allItems.isTopLvlItemInFilteredRoot(id)){ 
+			// 	console.log("can't unindent a topLvlItem in filtered list");
+			// 	return;
+			// }
 			let depth = allItems.nodes[id].depth;
 			let olderSiblingId = allItems.olderSiblingId(id);
 			let olderSiblingDepth = allItems.nodes[olderSiblingId].depth;
@@ -310,6 +358,13 @@ window.vm = new Vue({
 			}
 		},
 		patch(id, arg){
+			if((selection.filter.length > 0 || selection.tags.length > 0)
+				&& allItems.isTopLvlItemInFilteredRoot(id)){ 
+				if(arg == 'children_order' || arg == 'parent_id'){
+					console.log('trying to move toplvlItem on filtered');
+					return;
+				}
+			}
 			this.patching = true;
 			let patchObj = {};
 			let patchVal = allItems.nodes[id][arg];
@@ -407,10 +462,6 @@ window.vm = new Vue({
 				});
 			}
 		},
-		clickDone(){
-			this.fetchDone();
-			selection.filter = 'done';
-		},
 		popup(id, type){
 			id = (!id) ? selection.selectedId : id ;
 			let item = allItems.nodes[id];
@@ -501,26 +552,31 @@ window.vm = new Vue({
 			});
 		},
 		filterItems(keyword, value, operator){
-			selection.filter = keyword;
-			if(!operator){ selection.tags = []; }
+			if(!operator){
+				selection.tags = [];
+				selection.filter = [];
+			}
 
-			if(keyword == 'all'){
-				selection.filter = 'all';
-				allItems.filterItems('all');
-			}
-			if(keyword == 'today'){
-				selection.filter = 'today';
-				allItems.filterItems('duedate','today');
-			}
 			if(keyword == 'done'){
-				selection.filter = 'done';
-				allItems.filterItems('today');
+				if(selection.filter.includes('done')){ return; }
+				selection.filter.push('done');
+				this.fetchDone();
+				return;
 			}
+
 			if(keyword == 'tag'){
+				if(selection.tags.includes(value)){ return; }
 				selection.tags.push(value);
-				allItems.filterItems('tag',value);
-				// this.fetchTagged(value, 'withAnyTag');
+			} else {
+				if(selection.filter.includes(value)){ return; }
+				if(keyword == 'all'){
+					selection.filter = [];
+					allItems.filterItems('all');
+					return;
+				}
+				selection.filter.push(value);
 			}
+			allItems.filterItems(keyword,value);
 		},
 		// duplicate(id){
 		// 	this.patching = true;
@@ -622,6 +678,7 @@ window.vm = new Vue({
 			if(k == 'meta_delete'){ this.deleteItem()}
 			if(k == 'backspace'){ this.deleteItem()}
 			if(k == 'delete'){ this.deleteItem()}
+			if(k == 'ctrl_u'){ this.$broadcast('startEdit')}
 		},
 		test(id){
 			// id = (!id) ? selection.selectedId : id ;
@@ -751,13 +808,20 @@ window.vm = new Vue({
 					vm.keystroke('enter');
 		  		}
 				break;
-			case 84: // t
+			case 84: // key t
 				vm.keystroke('t');
 				break;
-			case 83: // s
+			case 83: // key s
 				vm.keystroke('s');
 				break;
-			case 68: // d
+			case 85: // key u
+				if (e.ctrlKey){
+					vm.keystroke('ctrl_u');
+		  			break;
+		  		}
+				vm.keystroke('u');
+				break;
+			case 68: // key d
 				e.preventDefault();
 				if ((e.ctrlKey || e.metaKey) && e.shiftKey){
 					vm.keystroke('meta_shift_d');

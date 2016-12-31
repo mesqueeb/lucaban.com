@@ -135,10 +135,12 @@ export default class Tree {
 		let hasTags;
 		if (tags instanceof Array){
 			tags.forEach(function (tag) {
+				tag = tag.toLowerCase();
 				let tagExists = item.tagged.find(itemTags => itemTags.tag_slug == tag);
 				if(tagExists){ hasTags = true; }
 			});
 		} else {
+			tags = tags.toLowerCase();
 			let tagExists = item.tagged.find(itemTags => itemTags.tag_slug == tags);
 			if(tagExists){ hasTags = true; }
 		}
@@ -279,8 +281,11 @@ export default class Tree {
 	}
 	isTopLvlItemInFilteredRoot(id)
 	{
-		if(selection.filter == 'all'){ return false; }
+		// debugger;
+		if(selection.filter.length == 0 && selection.tags.length == 0){ return false; }
 		if (this.root.children_order.includes(id)){
+			return true;
+		} else if (id == this.root.id) {
 			return true;
 		} else {
 			return false;
@@ -313,9 +318,14 @@ export default class Tree {
 		   return child.id;
 		});
 		this.nodes[id].children_order = resetChildrenOrder;
+		this.rebindParentIds();
 	}
 	giveNewParent(id, new_parent_id, specificNewIndex)
-	{
+	{	
+		if(this.isTopLvlItemInFilteredRoot(id)){ 
+			console.log("can't give new parent to topLvlItem in filtered list");
+			return;
+		}
 		console.log('giving new parent');
 		let parent_id = this.nodes[id].parent_id;
 		let targetItem = this.nodes[id];
@@ -436,6 +446,10 @@ export default class Tree {
 	tagItem(id, tags)
 	{
 		let item = this.nodes[id];
+		if(this.hasParentWithTag(id, tags)){
+			console.log('NG! has a parent with the tag');
+			return;
+		}
 		vm.patchTag(id, tags);
 	}
 	prepareTag(id, tags)
@@ -554,7 +568,10 @@ export default class Tree {
 	}
 	moveItem(id, direction)
 	{
-		if(this.isTopLvlItemInFilteredRoot(id)){ return; }
+		if(this.isTopLvlItemInFilteredRoot(id)){ 
+			console.log("can't move a TopLvlItemInFilteredRoot");
+			return; 
+		}
 		clearTimeout(window.patchDelay);
 		let pId = this.nodes[id].parent_id;
 		let parent = this.nodes[pId];
@@ -690,13 +707,13 @@ export default class Tree {
 				let item = this.nodes[key];
 				let hasTag = item.tagged.find(actualTags => actualTags.tag_slug == filteredTag);
 	    		if (hasTag){
+					item.show_children = 1;
 					this.filteredItemRoot.children.push(item);
 	    		}
 			}.bind(this));
 		}
 		this.calculateTotalTime(this.root.id);
 		this.resetChildrenOrder(this.root.id);
-		this.rebindParentIds();
 	}
 	rebindParentIds()
 	{
