@@ -91,7 +91,13 @@
 
 	})(document);// end flatpickr
 
-	
+	window.flatpickrifyAllInputs = function(){
+		let flatpickrInputs = document.getElementsByClassName("flatpickr");
+		for (var i = 0; i < flatpickrInputs.length; i++) {
+		    flatpickrInputs[i].flatpickrify();
+		}
+	};
+
 
 
 // Vue Basics
@@ -170,12 +176,11 @@ $('body').on('click', 'button', function(e){
 $.getJSON('/api/items',function(fetchedData){
 
 	//response
+	// Codementor: How do I make the following function wait until DOM is loaded?
 	setTimeout(function(){
-		let flatpickrInputs = document.getElementsByClassName("flatpickr");
-		for (var i = 0; i < flatpickrInputs.length; i++) {
-		    flatpickrInputs[i].flatpickrify();
-		}
+		flatpickrifyAllInputs();
 	}, 1000);
+
 
 window.allItems = new Tree(fetchedData);
 window.selection = new Selection();
@@ -184,7 +189,7 @@ window.vm = new Vue({
 	el:'#body',
 	data: {
 		allData: allItems.root,
-		doneData: null,
+		doneData: allItems.doneitems,
 		selection: selection,
 		addingNewUnder: null,
 		addingNewAsChild: false,
@@ -517,13 +522,36 @@ window.vm = new Vue({
 			// 	this.playTimer(item);
 			// }
 		},
-		fetchDone(){
+		fetchDone(tags){
 			this.loading = true;
 			this.$http.get('/api/items/fetchdone').then(function(response){
-				this.doneData = allItems.formatDone(response.json());
+				// debugger;
+				let data = response.json();
+				data.forEach(item => allItems.setDefaultItemValues(item));
+				this.loading = false;
+				allItems.doneitems = data;
+			});
+		},
+		fetchDoneVersion2(tags){
+			this.loading = true;
+			this.$http.get('/api/items/fetchdone').then(function(response){
+				// debugger;
+				let data = response.json();
+				console.log(data);
+				if(tags){
+					data = allItems.arrayFilterTag(data, tags);
+				}
+				data.forEach(function(item){
+					allItems.nodes[item.id] = item;
+					allItems.setDefaultItemValues(item);
+				});
+				// allItems.root.children = allItems.formatDone(data);
+				// allItems.doneitems = allItems.formatDone(data);
+				this.doneData = allItems.formatDone(data);
 				this.loading = false;
 			});
 		},
+
 		fetchTagged(tags, requestType){
 			/* requestType can be:
 				'withAnyTag': fetch articles with any tag listed
@@ -557,10 +585,10 @@ window.vm = new Vue({
 				selection.filter = [];
 			}
 
-			if(keyword == 'done'){
-				if(selection.filter.includes('done')){ return; }
-				selection.filter.push('done');
-				this.fetchDone();
+			if(keyword == 'done2'){
+				if(selection.filter.includes('done2')){ return; }
+				selection.filter.push('done2');
+				this.fetchDoneVersion2();
 				return;
 			}
 
@@ -574,10 +602,18 @@ window.vm = new Vue({
 					allItems.filterItems('all');
 					return;
 				}
-				selection.filter.push(value);
+				if (keyword == 'done' && !this.doneData.length){
+					this.fetchDone();
+				}
+				if(value){
+					selection.filter.push(value);
+				} else {
+					selection.filter.push(keyword);
+				}
 			}
 			allItems.filterItems(keyword,value);
 		},
+
 		// duplicate(id){
 		// 	this.patching = true;
 		// 	id = (!id) ? selection.selectedId : id ;

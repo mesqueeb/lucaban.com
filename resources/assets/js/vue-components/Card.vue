@@ -1,17 +1,34 @@
 <template id="items-card-template">
-	<div class="items-card"
+
+
+	<div :class="{
+			'items-card': true,
+			'journal-wrapper': $root.selection.filter.includes('done')
+		}"
 		:id="'card-'+item.id"
 	>
+ 		<div class="title"
+			v-if="journalDate"
+ 		>
+ 			<span>{{ journalDate | momentCalendar }}</span>
+ 			<span class="journal-date-small">{{ journalDate }}</span>
+ 		</div>
+ 		<div class="parent-string"
+			v-if="this.$root.selection.filter.includes('done') && this.item.depth != 0"
+			@click="selectItem(item)"
+ 		>{{ item.parents_bodies }}:</div>
 		<div 
 			v-if="item.depth != 0"
-			class="item-card"
 			:class="{
+				'item-card': true,
 				done: item.done,
 				show_children: item.show_children,
 				editing: item.id == this.$root.editingItem,
 			}"
 		>
-			<div class="toggle-div">
+			<div class="toggle-div"
+				v-if="!this.$root.selection.filter.includes('done')"
+			>
 				<input class="toggle"
 					type="checkbox"
 					v-if="item.children_order.length==0 || item.done == true"
@@ -41,6 +58,9 @@
 					//// This label is not yet used!
 				</label> -->
 			</div>
+			<div class=""
+				v-if="this.$root.selection.filter.includes('done')"
+			>・</div>
 			<div class="body-div textarea-wrap"
 				:class="{ selected: item.id == this.$root.selection.selectedId, project: isProject}"
 				@dblclick="startEdit(item, $event)"
@@ -49,7 +69,13 @@
 			>
 				<div class="bodybox"
 					v-show="item.id != this.$root.editingItem"
-				>{{{ item.body | linkify }}}</div>
+				>
+					<div>{{{ item.body | linkify }}}</div>
+					<div class="completion-notes bodybox"
+						v-if="item.completion_memo"
+						@click="selectItem(item)"
+					>{{ item.completion_memo }}</div>
+				</div>
 				<!-- <div class="hidden-sizer">{{item.body + "|"}}</div> -->
 				
 				<!-- For debugging: -->
@@ -174,7 +200,7 @@
 						class="duedate-parent"
 					>{{ item.dueDateParent | momentCalendar }}</span>
 
-					<span v-if="item.tagged.length && !item.done"
+					<span v-if="item.tagged.length"
 						class="custom-tag"
 						v-for="tag in item.tagged"
 						@click.prevent="this.$root.filterItems('tag', tag.tag_slug)"
@@ -215,6 +241,7 @@
 					><i class="zmdi zmdi-delete"></i>
 					</button>
 				</div>
+				
 			</div>
 		</div>
 
@@ -419,6 +446,20 @@ export default {
 		};
 	},
 	computed: {
+		journalDate(){
+			console.log('run on '+this.item.id+' - '+this.item.body);
+			if(this.$root.selection.filter.includes('done')){
+				if(this.item.depth == 0){ return; }
+				let prevId = allItems.prevItemId(this.item.id);
+				let prevDoneDate = allItems.nodes[prevId].done_date;
+				prevDoneDate = moment(prevDoneDate).format('YYYY/MM/DD');
+				let thisDoneDate = moment(this.item.done_date).format('YYYY/MM/DD');
+				if (thisDoneDate != prevDoneDate){
+					return thisDoneDate;
+				}
+			}
+			return false;
+		},
 		isProject(){
 			// console.log('checking isProject');
 			return allItems.isProject(this.item.id);	

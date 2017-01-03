@@ -32,9 +32,19 @@ class CardController extends Controller
 
     public function getDone()
     {
-        return Item::where('done',1)
+        // return $tags;
+        // if($tags){
+        //     $doneItems = Item::withAnyTag($tags)
+        //                 ->with('tagged')
+        //                 ->where('done',1)
+        //                 ->orderBy('done_date', 'desc')
+        //                 ->get();
+        // }
+        $doneItems = Item::with('tagged')
+                        ->where('done',1)
                         ->orderBy('done_date', 'desc')
                         ->get();
+        return $doneItems;
     }
 
     /**

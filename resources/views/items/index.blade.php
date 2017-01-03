@@ -40,7 +40,11 @@
 				:class="{active: selection.filter.includes('done')}"
 				@click="filterItems('done')"
 			>Done</a>
-		</div>
+{{-- 			<a href="#"
+				:class="{active: selection.filter.includes('done')}"
+				@click="filterItems('done2')"
+			>Done v.2</a>
+ --}}		</div>
 		<div class="tag-menu">
 
 			<a v-for="tag in allTags"
@@ -68,7 +72,7 @@
 	</div>
 	{{-- DATA --}}
 	<div class="items-wrapper"
-		v-show="selection.filter != 'done'"
+		v-show="!selection.filter.includes('done2')"
 	>
 		<Card :item="allData"
 			:alltags="allTags"
@@ -76,7 +80,7 @@
 	</div>
 	{{-- JOURNAL --}}
 	<div class="journal-wrapper"
-		v-show="selection.filter == 'done'"
+		v-show="selection.filter.includes('done2')"
 	>
 		<Journal :records-per-date="doneData"></Journal>
 	</div>

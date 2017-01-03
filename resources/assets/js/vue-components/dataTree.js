@@ -4,12 +4,14 @@ export default class Tree {
 		this.source		= items;
 		this.nodes 		= {}; // →　"id":{ task obj };
 		this.orphans	= [];
+		this.doneitems	= [];
 		this.filteredItemRoot = {
 			children_order:[], children:[], body:"",
 			totalPlannedTime:0, totalUsedTime:0,
 			planned_time:0, used_time:0,
 		};
-		this.rootChildrenBackup = []; // replace with root later on
+		this.backups = {};
+		this.backups.root = []; // replace with root later on
 		// process items
 		this.itemsProcessed = 0;
 		items.forEach(this.initialize.bind(this))
@@ -49,7 +51,7 @@ export default class Tree {
 			    if (!node.children.length && (node.used_time || node.planned_time)){
 				    this.calculateTotalTime(id);
 			    }
-			    this.rootChildrenBackup = this.root.children;
+			    this.backups.root = this.root.children;
 			}.bind(this));
 	    }
 	}
@@ -131,7 +133,8 @@ export default class Tree {
 	hasTag(id, tags)
 	{
 		let item = this.nodes[id];
-		if (!item.tagged.length){ return false; }
+		if(!item){ console.log("what is this shit."+id); return;}
+		if (!item.tagged || !item.tagged.length){ return false; }
 		let hasTags;
 		if (tags instanceof Array){
 			tags.forEach(function (tag) {
@@ -216,7 +219,9 @@ export default class Tree {
 	}
 	prevItemId(id)
 	{
+		if(!id){ return false; }
 		let item = this.nodes[id];
+		if(item.depth == 0){ return false; }
 		let parent_id = item.parent_id;
 		let index = this.siblingIndex(id);
 		let tagsSelected = selection.tags.length;
@@ -228,8 +233,8 @@ export default class Tree {
 			prevItemId = this.getDeepestLastChildId(prevItemId);
 		}
 		let prevItem = this.nodes[prevItemId];
-		console.log('prevItem: ['+prevItemId+'] '+prevItem.body);
-		let prevItemChildrenCount = prevItem.children.length;
+		// console.log('prevItem: ['+prevItemId+'] '+prevItem.body);
+		// let prevItemChildrenCount = prevItem.children.length;
 
 		// if(tagsSelected){ 
 		// 	if(this.isTopLvlItemInFilteredRoot(id)){
@@ -254,7 +259,7 @@ export default class Tree {
 		let tagsSelected = selection.tags.length;
 		
 		// if(!tagsSelected){ 
-			console.log('itemIsLastSibling '+itemIsLastSibling);
+			// console.log('itemIsLastSibling '+itemIsLastSibling);
 			if(itemIsLastSibling){
 				return this.nextItemRecursion(parent_id);
 			}
@@ -680,7 +685,7 @@ export default class Tree {
 	{
 		// debugger;
 		if (keyword == 'all'){
-			this.root.children = this.rootChildrenBackup;
+			this.root.children = this.backups.root;
 			//Why can't I do this?
 			// this.root = this.rootBackup;
 		}
@@ -690,10 +695,29 @@ export default class Tree {
 	    	//Why can't I do this?
 			// this.root = this.filteredItemRoot;
 		}
+		if (keyword == 'done'){
+			if(!this.doneitems.length){
+				setTimeout(function(){
+					this.filterItems(keyword, value, operator);
+				}.bind(this), 300);
+				return;
+			}
+			// Codementor: How do I know the following function will start after the fetch is over?
+	    	this.doneitems.forEach(function (item) {
+				if(item.done){
+					this.nodes[item.id] = item;
+					item.show_children = 1;
+					this.filteredItemRoot.children.push(item);
+				}
+			}.bind(this));
+			setTimeout(function(){
+				flatpickrifyAllInputs();
+			}, 1000);
+		}
 		if (keyword == 'duedate'){
 			if (value == 'today'){
-				Object.keys(this.nodes).forEach(function (key) {
-					let item = this.nodes[key];
+				Object.keys(this.nodes).forEach(function (id) {
+					let item = this.nodes[id];
 		    		let diff = moment(item.due_date).diff(moment(), 'days');
 					if (diff <= 0){
 						this.filteredItemRoot.children.push(item);
@@ -703,10 +727,9 @@ export default class Tree {
 		}
 		if (keyword == 'tag'){
 	    	let filteredTag = value;
-	    	Object.keys(this.nodes).forEach(function (key) {
-				let item = this.nodes[key];
-				let hasTag = item.tagged.find(actualTags => actualTags.tag_slug == filteredTag);
-	    		if (hasTag){
+	    	Object.keys(this.nodes).forEach(function (id) {
+				let item = this.nodes[id];
+	    		if (this.hasTag(id, filteredTag)){
 					item.show_children = 1;
 					this.filteredItemRoot.children.push(item);
 	    		}
@@ -714,6 +737,17 @@ export default class Tree {
 		}
 		this.calculateTotalTime(this.root.id);
 		this.resetChildrenOrder(this.root.id);
+	}
+	arrayFilterTag(array, tags){
+		let filteredArray = [];
+    	array.forEach(function (item) {
+			let id = item.id;
+    		if (this.hasTag(id, tags)){
+				item.show_children = 1;
+				filteredArray.push(item);
+    		}
+		}.bind(this));
+		return filteredArray;
 	}
 	rebindParentIds()
 	{
@@ -739,8 +773,8 @@ export default class Tree {
 			let rObj = {};
 			rObj['date'] = k;
 			rObj['items'] = doneItemsObject[k];
-			rObj['totalTime'] = rObj['items'].reduce((prev, next) => {
-				return allItems.AplusB(prev, next.planned_time);
+			rObj['totalUsedTime'] = rObj['items'].reduce((prev, next) => {
+				return allItems.AplusB(prev, next.used_time);
 	    	}, 0);
 			return rObj;
 		});

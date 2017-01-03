@@ -1,0 +1,35 @@
+.journal-wrapper {
+    // .done-card {
+    //     margin: 0.5em 0;
+    //     border-bottom: 1px #ededed solid;
+    //     padding-bottom: 0.6em;
+    // }
+    .title {
+        color: #46c5b6;
+        font-size: 1.2em;
+        text-align: left;
+    }
+    .journal-date-small {
+        color: #dadada;
+        font-size: 0.8em;
+    }
+
+    // .item {
+    //     display: flex;
+    //     flex-direction: column;
+    //     align-items: flex-start;
+    // }
+
+    // .main {
+    //     display: flex;
+    //     align-items: center;
+    // }
+
+    .completion-notes {
+        color: #a2999a;
+        padding: 2px 0 0 2em;
+    }
+    // .item-tags {
+    //     margin-left: 1em;
+    // }
+}

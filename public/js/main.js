@@ -25973,6 +25973,13 @@ window.hashtag = _hashtag2.default;
 	document.addEventListener("click", documentClick, true);
 })(document); // end flatpickr
 
+window.flatpickrifyAllInputs = function () {
+	var flatpickrInputs = document.getElementsByClassName("flatpickr");
+	for (var i = 0; i < flatpickrInputs.length; i++) {
+		flatpickrInputs[i].flatpickrify();
+	}
+};
+
 // Vue Basics
 
 window.Vue = _vue2.default;
@@ -26037,11 +26044,9 @@ window.setRowHeight = function () {
 _jquery2.default.getJSON('/api/items', function (fetchedData) {
 
 	//response
+	// Codementor: How do I make the following function wait until DOM is loaded?
 	setTimeout(function () {
-		var flatpickrInputs = document.getElementsByClassName("flatpickr");
-		for (var i = 0; i < flatpickrInputs.length; i++) {
-			flatpickrInputs[i].flatpickrify();
-		}
+		flatpickrifyAllInputs();
 	}, 1000);
 
 	window.allItems = new _dataTree2.default(fetchedData);
@@ -26051,7 +26056,7 @@ _jquery2.default.getJSON('/api/items', function (fetchedData) {
 		el: '#body',
 		data: {
 			allData: allItems.root,
-			doneData: null,
+			doneData: allItems.doneitems,
 			selection: selection,
 			addingNewUnder: null,
 			addingNewAsChild: false,
@@ -26412,10 +26417,34 @@ _jquery2.default.getJSON('/api/items', function (fetchedData) {
 				// 	this.playTimer(item);
 				// }
 			},
-			fetchDone: function fetchDone() {
+			fetchDone: function fetchDone(tags) {
 				this.loading = true;
 				this.$http.get('/api/items/fetchdone').then(function (response) {
-					this.doneData = allItems.formatDone(response.json());
+					// debugger;
+					var data = response.json();
+					data.forEach(function (item) {
+						return allItems.setDefaultItemValues(item);
+					});
+					this.loading = false;
+					allItems.doneitems = data;
+				});
+			},
+			fetchDoneVersion2: function fetchDoneVersion2(tags) {
+				this.loading = true;
+				this.$http.get('/api/items/fetchdone').then(function (response) {
+					// debugger;
+					var data = response.json();
+					console.log(data);
+					if (tags) {
+						data = allItems.arrayFilterTag(data, tags);
+					}
+					data.forEach(function (item) {
+						allItems.nodes[item.id] = item;
+						allItems.setDefaultItemValues(item);
+					});
+					// allItems.root.children = allItems.formatDone(data);
+					// allItems.doneitems = allItems.formatDone(data);
+					this.doneData = allItems.formatDone(data);
 					this.loading = false;
 				});
 			},
@@ -26452,12 +26481,12 @@ _jquery2.default.getJSON('/api/items', function (fetchedData) {
 					selection.filter = [];
 				}
 
-				if (keyword == 'done') {
-					if (selection.filter.includes('done')) {
+				if (keyword == 'done2') {
+					if (selection.filter.includes('done2')) {
 						return;
 					}
-					selection.filter.push('done');
-					this.fetchDone();
+					selection.filter.push('done2');
+					this.fetchDoneVersion2();
 					return;
 				}
 
@@ -26475,10 +26504,18 @@ _jquery2.default.getJSON('/api/items', function (fetchedData) {
 						allItems.filterItems('all');
 						return;
 					}
-					selection.filter.push(value);
+					if (keyword == 'done' && !this.doneData.length) {
+						this.fetchDone();
+					}
+					if (value) {
+						selection.filter.push(value);
+					} else {
+						selection.filter.push(keyword);
+					}
 				}
 				allItems.filterItems(keyword, value);
 			},
+
 
 			// duplicate(id){
 			// 	this.patching = true;
@@ -26848,6 +26885,22 @@ exports.default = {
 		};
 	},
 	computed: {
+		journalDate: function journalDate() {
+			console.log('run on ' + this.item.id + ' - ' + this.item.body);
+			if (this.$root.selection.filter.includes('done')) {
+				if (this.item.depth == 0) {
+					return;
+				}
+				var prevId = allItems.prevItemId(this.item.id);
+				var prevDoneDate = allItems.nodes[prevId].done_date;
+				prevDoneDate = moment(prevDoneDate).format('YYYY/MM/DD');
+				var thisDoneDate = moment(this.item.done_date).format('YYYY/MM/DD');
+				if (thisDoneDate != prevDoneDate) {
+					return thisDoneDate;
+				}
+			}
+			return false;
+		},
 		isProject: function isProject() {
 			// console.log('checking isProject');
 			return allItems.isProject(this.item.id);
@@ -27341,7 +27394,7 @@ exports.default = {
 	}
 };
 if (module.exports.__esModule) module.exports = module.exports.default
-;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\n\t<div class=\"items-card\" :id=\"'card-'+item.id\">\n\t\t<div v-if=\"item.depth != 0\" class=\"item-card\" :class=\"{\n\t\t\t\tdone: item.done,\n\t\t\t\tshow_children: item.show_children,\n\t\t\t\tediting: item.id == this.$root.editingItem,\n\t\t\t}\">\n\t\t\t<div class=\"toggle-div\">\n\t\t\t\t<input class=\"toggle\" type=\"checkbox\" v-if=\"item.children_order.length==0 || item.done == true\" v-model=\"item.done\" @change=\"updateDone(item.id)\">\n\t\t\t\t<input type=\"checkbox\" class=\"styled-check\" :id=\"'show_children_'+item.id\" v-model=\"item.show_children\" @change=\"updateShowChildren(item.id)\">\n\t\t\t\t<label class=\"arrow\" :for=\"'show_children_'+item.id\" v-if=\"item.children_order.length>0\"></label>\n\n\t\t\t\t<!-- <input class=\"show_children_toggle\"\n\t\t\t\t\tid=\"show_children_{{item.id}}\"\n\t\t\t\t\ttype=\"checkbox\"\n\t\t\t\t\tv-if=\"item.children_order.length>0\"\n\t\t\t\t\tv-model=\"item.show_children\"\n\t\t\t\t\t@change=\"updateShowChildren(item.id)\"\n\t\t\t\t>\n\t\t\t\t<label class=\"show_children_svg\" \n\t\t\t\t\tfor=\"show_children_{{item.id}}\">\n\t\t\t\t\t//// This label is not yet used!\n\t\t\t\t</label> -->\n\t\t\t</div>\n\t\t\t<div class=\"body-div textarea-wrap\" :class=\"{ selected: item.id == this.$root.selection.selectedId, project: isProject}\" @dblclick=\"startEdit(item, $event)\" @click=\"selectItem(item)\" @enter=\"console.log('yarrr')\">\n\t\t\t\t<div class=\"bodybox\" v-show=\"item.id != this.$root.editingItem\">{{{ item.body | linkify }}}</div>\n\t\t\t\t<!-- <div class=\"hidden-sizer\">{{item.body + \"|\"}}</div> -->\n\t\t\t\t\n\t\t\t\t<!-- For debugging: -->\n\t\t\t\t<span v-show=\"false\"> ({{item.id}}) D-{{item.depth}}) [{{item.children_order}}]</span>\n\t\t\t\t\n\t\t\t\t<form action=\"update\" class=\"updatebox\" :id=\"'updatebox-'+item.id\" v-show=\"item.id == this.$root.editingItem\" @submit.prevent=\"doneEdit(item)\">\n\t\t\t\t\t<div class=\"update-body\">\n\t\t\t\t\t\t<textarea class=\"edititem-body\" :rows=\"item.rows\" v-model=\"item.body\" v-autosize=\"item.body\" v-item-focus=\"item.id == this.$root.editingItem\" @blur=\"blurOnEdit(item)\" @keyup.esc=\"cancelEdit(item)\" @keydown=\"keydownOnEdit(item, $event, 'body')\">{{ item.body }}</textarea>\n\t\t\t\t\t</div>\n\t\t\t\t\t<div class=\"update-tags\">\n\t\t\t\t\t\t<div class=\"update-planned-time\">\n\t\t\t\t\t\t\tDuration:\n\t\t\t\t\t\t\t<button :class=\"{ currentDuration: item.planned_time == 10, 'planned-time': true }\" @click.prevent=\"setPlannedTime(item, 10, $event)\" @keydown=\"keydownOnEdit(item, $event, 'planned-time')\" @blur=\"blurOnEdit(item)\">10 min</button>\n\t\t\t\t\t\t\t<button :class=\"{ currentDuration: item.planned_time == 15, 'planned-time': true }\" @click.prevent=\"setPlannedTime(item, 15, $event)\" @keydown=\"keydownOnEdit(item, $event, 'planned-time')\" @blur=\"blurOnEdit(item)\">15 min</button>\n\t\t\t\t\t\t\t<button :class=\"{ currentDuration: item.planned_time == 30, 'planned-time': true }\" @click.prevent=\"setPlannedTime(item, 30, $event)\" @keydown=\"keydownOnEdit(item, $event, 'planned-time')\" @blur=\"blurOnEdit(item)\">30 min</button>\n\t\t\t\t\t\t\t<button :class=\"{ currentDuration: item.planned_time == 60, 'planned-time': true }\" @click.prevent=\"setPlannedTime(item, 60, $event)\" @keydown=\"keydownOnEdit(item, $event, 'planned-time')\" @blur=\"blurOnEdit(item)\">1 hour</button>\n\t\t\t\t\t\t\t<div><input class=\"planned-time\" type=\"number\" v-show=\"true\" v-model=\"item.planned_time | min_to_hours\" @blur=\"blurOnEdit(item)\" @keyup.esc=\"cancelEdit(item)\" @keydown=\"keydownOnEdit(item, $event, 'planned-time')\">hours</div>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t\t<div class=\"update-custom-tags\">\n\t\t\t\t\t\t\t<label>\n\t\t\t\t\t\t\t\tAdd Tag: \n\t\t\t\t\t\t\t\t<input type=\"text\" class=\"add-tag\" @blur=\"blurOnEdit(item)\" v-model=\"newTag\" @keyup.esc=\"cancelEdit(item)\" @keydown=\"keydownOnEdit(item, $event, 'addTag')\">\n\t\t\t\t\t\t\t</label>\n\t\t\t\t\t\t\t<div class=\"tag-suggestions\" v-if=\"false\">\n\t\t\t\t\t\t\t<!-- UNDER CONSTRUCTION -->\n\t\t\t\t\t\t\t\t<label v-for=\"tag in allTags_c\" :class=\"'tag'\" @click=\"this.$root.patchTag(item.id, tag)\">{{ tag.name }}\n\t\t\t\t\t\t\t\t</label>\n\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t</div>\n\t\t\t\t</form>\n\t\t\t\t<div class=\"item-tags\">\n\t\t\t\t\t<label class=\"done\" v-if=\"item.done &amp;&amp; item.id != this.$root.editingDoneDateItem\">Done {{ item.done_date | momentCalendar }}\n\t\t\t\t\t\t<input class=\"flatpickr\" id=\"done-date-edit-{{ item.id }}\" v-model=\"item.done_date\">\n\t\t\t\t\t</label>\n\t\t\t\t\t\n\t\t\t\t\t<span v-if=\"\n\t\t\t\t\t\ttotalTimeLeft > 0\n\t\t\t\t\t\t&amp;&amp; totalTimeLeft > timeLeft\n\t\t\t\t\t\t&amp;&amp; totalTimeDifferentFromParent\n\t\t\t\t\t\t&amp;&amp; !item.done\" class=\"total-duration\">\n\t\t\t\t\t\t{{ totalTimeLeft | hourminsec }}\n\t\t\t\t\t\t<!-- <span style=\"padding-right:2px\">Total </span>\n\t\t\t\t\t\t<span v-if=\"hasTotalUsedTime\"> used {{ item.totalUsedTime | hourminsec }}</span>\n\t\t\t\t\t\t<span v-if=\"(hasTotalUsedTime && hasTotalPlannedTime)\">/</span>\n\t\t\t\t\t\t<span v-if=\"hasTotalPlannedTime\">{{ item.totalPlannedTime | hourmin }}</span> -->\n \t\t\t\t\t</span>\n\n\t\t\t\t\t<span v-if=\"\n\t\t\t\t\t\titem.id != this.$root.editingItem\n\t\t\t\t\t\t&amp;&amp; timeLeft > 0\n\t\t\t\t\t\t\n\t\t\t\t\t\t&amp;&amp; !item.done\" class=\"duration\">\n\t\t\t\t\t\t{{ timeLeft | hourminsec }}\n\t\t\t\t\t\t<!-- <span v-if=\"hasUsedTime\">Used {{ item.used_time | hourminsec }}</span>\n\t\t\t\t\t\t<span v-if=\"(hasPlannedTime && hasUsedTime)\">/</span>\n\t\t\t\t\t\t<span v-if=\"hasPlannedTime\">{{ item.planned_time | hourmin }}</span> -->\n\t\t\t\t\t</span>\n\t\t\t\t\t\n\t\t\t\t\t<span v-if=\"hasDueDate &amp;&amp; !item.done\" class=\"duedate\">{{ item.due_date | momentCalendar }}</span>\n\n\t\t\t\t\t<span v-if=\"item.dueDateParent &amp;&amp; !item.done\" class=\"duedate-parent\">{{ item.dueDateParent | momentCalendar }}</span>\n\n\t\t\t\t\t<span v-if=\"item.tagged.length &amp;&amp; !item.done\" class=\"custom-tag\" v-for=\"tag in item.tagged\" @click.prevent=\"this.$root.filterItems('tag', tag.tag_slug)\">{{ tag.tag_name }}\n\t\t\t\t\t\t<button class=\"delete-tag\" v-if=\"item.id == this.$root.editingItem\" @click.prevent=\"deleteTag(item.id, tag.tag_name, $event)\">\n\t\t\t\t\t\t\t<i class=\"zmdi zmdi-close-circle\"></i>\n\t\t\t\t\t\t</button>\n\t\t\t\t\t</span>\n\n\t\t\t\t</div>\n\t\t\t\t<div class=\"item-nav\" v-if=\"this.$root.editingItem != item.id &amp;&amp; this.$root.selection.selectedId == item.id\">\n\t\t\t\t\t\n\t\t\t\t\t<button v-if=\"!item.done\" class=\"timer\" @click=\"addTimer(item)\"><i class=\"zmdi zmdi-timer\"></i>\n\t\t\t\t\t</button>\n\t\t\t\t\t<button v-if=\"item.done\" class=\"more\" @click=\"this.$root.popup(item.id, 'afterDone')\"><i class=\"zmdi zmdi-more\"></i>\n\t\t\t\t\t</button>\n\t\t\t\t\t<!--\n\t\t\t\t\t- font icon / woff format [font awesome]\n\t\t\t\t\t  material design iconic fonts\n\t\t\t\t\t- add svg as background to button\n\t\t\t\t\t- or image tag inside button\n\t\t\t\t\t- svg tag -> add as pattern\n\t\t\t\t\t-->\n\t\t\t\t\t<button class=\"delete\" v-if=\"item.children_order.length==0\" @click=\"deleteItem(item)\"><i class=\"zmdi zmdi-delete\"></i>\n\t\t\t\t\t</button>\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t</div>\n\n\t\t<form :class=\"['addnewbox-firstchild', 'addnewbox', 'child']\" :id=\"'new-firstchild-of-'+item.id\" v-if=\"showAddNewBoxFirstChild\" @submit.prevent=\"\">\n\t\t\t<div>\n\t\t\t\t<textarea type=\"text\" class=\"newitem-body\" v-model=\"newItem.body\" v-autosize=\"newItem.body\" @blur=\"blurOnAddNew(item)\" @keydown=\"keydownOnNew(item, $event, 'body')\" placeholder=\"...\" autocomplete=\"off\" autofocus=\"\" rows=\"1\"></textarea>\n\t\t\t</div>\n\t\t\t<div class=\"update-tags\">\n\t\t\t\t<div class=\"update-planned-time\">\n\t\t\t\t\tDuration:\n\t\t\t\t\t<button :class=\"{ currentDuration: newItem.planned_time == 10, 'planned-time': true }\" @click.prevent=\"setPlannedTimeNewItem(item, 10, $event)\" @keydown=\"keydownOnNew(item, $event, 'planned-time')\" @blur=\"blurOnAddNew(item)\">10 min</button>\n\t\t\t\t\t<button :class=\"{ currentDuration: newItem.planned_time == 15, 'planned-time': true }\" @click.prevent=\"setPlannedTimeNewItem(item, 15, $event)\" @keydown=\"keydownOnNew(item, $event, 'planned-time')\" @blur=\"blurOnAddNew(item)\">15 min</button>\n\t\t\t\t\t<button :class=\"{ currentDuration: newItem.planned_time == 30, 'planned-time': true }\" @click.prevent=\"setPlannedTimeNewItem(item, 30, $event)\" @keydown=\"keydownOnNew(item, $event, 'planned-time')\" @blur=\"blurOnAddNew(item)\">30 min</button>\n\t\t\t\t\t<button :class=\"{ currentDuration: newItem.planned_time == 60, 'planned-time': true }\" @click.prevent=\"setPlannedTimeNewItem(item, 60, $event)\" @keydown=\"keydownOnNew(item, $event, 'planned-time')\" @blur=\"blurOnAddNew(item)\">1 hour</button>\n\t\t\t\t\t<div><input class=\"planned-time\" type=\"number\" v-show=\"true\" v-model=\"newItem.planned_time | min_to_hours\" @blur=\"blurOnAddNew(item)\" @keydown=\"keydownOnNew(item, $event, 'planned-time')\">hours</div>\n\t\t\t\t</div>\n\t\t\t\t<div class=\"update-custom-tags\">\n\t\t\t\t\t<label>\n\t\t\t\t\t\tAdd Tag: \n\t\t\t\t\t\t<input type=\"text\" class=\"prepare-tag\" @keydown=\"keydownOnNew(item, $event, 'addTag')\" @blur=\"blurOnAddNew(item)\" v-model=\"newTag\">\n\t\t\t\t\t</label>\n\t\t\t\t</div>\n\t\t\t\t<div class=\"item-tags prepared-tags\">\n\t\t\t\t\t<span v-if=\"newItem.preparedTags.length\" v-for=\"tag in newItem.preparedTags\" :class=\"(tag=='Today') ? 'duedate' : 'custom-tag'\">{{ tag }}\n\t\t\t\t\t\t<button class=\"delete-tag\" @click.prevent=\"deletePreparedTag(tag, item)\">\n\t\t\t\t\t\t\t<i class=\"zmdi zmdi-close-circle\"></i>\n\t\t\t\t\t\t</button>\n\t\t\t\t\t</span>\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t</form>\n\n\n\t\t<div class=\"children\" v-if=\"item.children\" v-show=\"item.show_children\">\n\t\t\t<card v-for=\"childCard in item.children\" :item=\"childCard\" :key=\"childCard.id\"></card>\n\t\t</div>\n\n\t\t<form :class=\"['addnewbox']\" :id=\"'new-under-'+ item.id \" v-if=\"showAddNewBox\" @submit.prevent=\"\">\n\t\t\t<div>\n\t\t\t\t<textarea type=\"text\" class=\"newitem-body\" v-model=\"newItem.body\" v-autosize=\"newItem.body\" @blur=\"blurOnAddNew(item)\" @keydown=\"keydownOnNew(item, $event, 'body')\" placeholder=\"...\" autocomplete=\"off\" autofocus=\"\" rows=\"1\"></textarea>\n\t\t\t</div>\n\t\t\t<div class=\"update-tags\">\n\t\t\t\t<div class=\"update-planned-time\">\n\t\t\t\t\tDuration:\n\t\t\t\t\t<button :class=\"{ currentDuration: newItem.planned_time == 10, 'planned-time': true }\" @click.prevent=\"setPlannedTimeNewItem(item, 10, $event)\" @keydown=\"keydownOnNew(item, $event, 'planned-time')\" @blur=\"blurOnAddNew(item)\">10 min</button>\n\t\t\t\t\t<button :class=\"{ currentDuration: newItem.planned_time == 15, 'planned-time': true }\" @click.prevent=\"setPlannedTimeNewItem(item, 15, $event)\" @keydown=\"keydownOnNew(item, $event, 'planned-time')\" @blur=\"blurOnAddNew(item)\">15 min</button>\n\t\t\t\t\t<button :class=\"{ currentDuration: newItem.planned_time == 30, 'planned-time': true }\" @click.prevent=\"setPlannedTimeNewItem(item, 30, $event)\" @keydown=\"keydownOnNew(item, $event, 'planned-time')\" @blur=\"blurOnAddNew(item)\">30 min</button>\n\t\t\t\t\t<button :class=\"{ currentDuration: newItem.planned_time == 60, 'planned-time': true }\" @click.prevent=\"setPlannedTimeNewItem(item, 60, $event)\" @keydown=\"keydownOnNew(item, $event, 'planned-time')\" @blur=\"blurOnAddNew(item)\">1 hour</button>\n\t\t\t\t\t<div><input class=\"planned-time\" v-if=\"true\" type=\"number\" v-model=\"newItem.planned_time | min_to_hours\" @keydown=\"keydownOnNew(item, $event)\" @blur=\"blurOnAddNew(item)\">hours</div>\n\t\t\t\t</div>\n\t\t\t\t<div class=\"update-custom-tags\">\n\t\t\t\t\t<label>\n\t\t\t\t\t\tAdd Tag: \n\t\t\t\t\t\t<input type=\"text\" class=\"prepare-tag\" @keydown=\"keydownOnNew(item, $event, 'addTag')\" @blur=\"blurOnAddNew(item)\" v-model=\"newTag\">\n\t\t\t\t\t</label>\n\t\t\t\t</div>\n\t\t\t\t<div class=\"item-tags prepared-tags\">\n\t\t\t\t\t<span v-if=\"newItem.preparedTags.length\" v-for=\"tag in newItem.preparedTags\" :class=\"(tag=='Today') ? 'duedate' : 'custom-tag'\">{{ tag }}\n\t\t\t\t\t\t<button class=\"delete-tag\" @click.prevent=\"deletePreparedTag(tag, item)\">\n\t\t\t\t\t\t\t<i class=\"zmdi zmdi-close-circle\"></i>\n\t\t\t\t\t\t</button>\n\t\t\t\t\t</span>\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t</form>\n\t</div>\n"
+;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\n\n\n\t<div :class=\"{\n\t\t\t'items-card': true,\n\t\t\t'journal-wrapper': $root.selection.filter.includes('done')\n\t\t}\" :id=\"'card-'+item.id\">\n \t\t<div class=\"title\" v-if=\"journalDate\">\n \t\t\t<span>{{ journalDate | momentCalendar }}</span>\n \t\t\t<span class=\"journal-date-small\">{{ journalDate }}</span>\n \t\t</div>\n \t\t<div class=\"parent-string\" v-if=\"this.$root.selection.filter.includes('done') &amp;&amp; this.item.depth != 0\" @click=\"selectItem(item)\">{{ item.parents_bodies }}:</div>\n\t\t<div v-if=\"item.depth != 0\" :class=\"{\n\t\t\t\t'item-card': true,\n\t\t\t\tdone: item.done,\n\t\t\t\tshow_children: item.show_children,\n\t\t\t\tediting: item.id == this.$root.editingItem,\n\t\t\t}\">\n\t\t\t<div class=\"toggle-div\" v-if=\"!this.$root.selection.filter.includes('done')\">\n\t\t\t\t<input class=\"toggle\" type=\"checkbox\" v-if=\"item.children_order.length==0 || item.done == true\" v-model=\"item.done\" @change=\"updateDone(item.id)\">\n\t\t\t\t<input type=\"checkbox\" class=\"styled-check\" :id=\"'show_children_'+item.id\" v-model=\"item.show_children\" @change=\"updateShowChildren(item.id)\">\n\t\t\t\t<label class=\"arrow\" :for=\"'show_children_'+item.id\" v-if=\"item.children_order.length>0\"></label>\n\n\t\t\t\t<!-- <input class=\"show_children_toggle\"\n\t\t\t\t\tid=\"show_children_{{item.id}}\"\n\t\t\t\t\ttype=\"checkbox\"\n\t\t\t\t\tv-if=\"item.children_order.length>0\"\n\t\t\t\t\tv-model=\"item.show_children\"\n\t\t\t\t\t@change=\"updateShowChildren(item.id)\"\n\t\t\t\t>\n\t\t\t\t<label class=\"show_children_svg\" \n\t\t\t\t\tfor=\"show_children_{{item.id}}\">\n\t\t\t\t\t//// This label is not yet used!\n\t\t\t\t</label> -->\n\t\t\t</div>\n\t\t\t<div class=\"\" v-if=\"this.$root.selection.filter.includes('done')\">・</div>\n\t\t\t<div class=\"body-div textarea-wrap\" :class=\"{ selected: item.id == this.$root.selection.selectedId, project: isProject}\" @dblclick=\"startEdit(item, $event)\" @click=\"selectItem(item)\" @enter=\"console.log('yarrr')\">\n\t\t\t\t<div class=\"bodybox\" v-show=\"item.id != this.$root.editingItem\">\n\t\t\t\t\t<div>{{{ item.body | linkify }}}</div>\n\t\t\t\t\t<div class=\"completion-notes bodybox\" v-if=\"item.completion_memo\" @click=\"selectItem(item)\">{{ item.completion_memo }}</div>\n\t\t\t\t</div>\n\t\t\t\t<!-- <div class=\"hidden-sizer\">{{item.body + \"|\"}}</div> -->\n\t\t\t\t\n\t\t\t\t<!-- For debugging: -->\n\t\t\t\t<span v-show=\"false\"> ({{item.id}}) D-{{item.depth}}) [{{item.children_order}}]</span>\n\t\t\t\t\n\t\t\t\t<form action=\"update\" class=\"updatebox\" :id=\"'updatebox-'+item.id\" v-show=\"item.id == this.$root.editingItem\" @submit.prevent=\"doneEdit(item)\">\n\t\t\t\t\t<div class=\"update-body\">\n\t\t\t\t\t\t<textarea class=\"edititem-body\" :rows=\"item.rows\" v-model=\"item.body\" v-autosize=\"item.body\" v-item-focus=\"item.id == this.$root.editingItem\" @blur=\"blurOnEdit(item)\" @keyup.esc=\"cancelEdit(item)\" @keydown=\"keydownOnEdit(item, $event, 'body')\">{{ item.body }}</textarea>\n\t\t\t\t\t</div>\n\t\t\t\t\t<div class=\"update-tags\">\n\t\t\t\t\t\t<div class=\"update-planned-time\">\n\t\t\t\t\t\t\tDuration:\n\t\t\t\t\t\t\t<button :class=\"{ currentDuration: item.planned_time == 10, 'planned-time': true }\" @click.prevent=\"setPlannedTime(item, 10, $event)\" @keydown=\"keydownOnEdit(item, $event, 'planned-time')\" @blur=\"blurOnEdit(item)\">10 min</button>\n\t\t\t\t\t\t\t<button :class=\"{ currentDuration: item.planned_time == 15, 'planned-time': true }\" @click.prevent=\"setPlannedTime(item, 15, $event)\" @keydown=\"keydownOnEdit(item, $event, 'planned-time')\" @blur=\"blurOnEdit(item)\">15 min</button>\n\t\t\t\t\t\t\t<button :class=\"{ currentDuration: item.planned_time == 30, 'planned-time': true }\" @click.prevent=\"setPlannedTime(item, 30, $event)\" @keydown=\"keydownOnEdit(item, $event, 'planned-time')\" @blur=\"blurOnEdit(item)\">30 min</button>\n\t\t\t\t\t\t\t<button :class=\"{ currentDuration: item.planned_time == 60, 'planned-time': true }\" @click.prevent=\"setPlannedTime(item, 60, $event)\" @keydown=\"keydownOnEdit(item, $event, 'planned-time')\" @blur=\"blurOnEdit(item)\">1 hour</button>\n\t\t\t\t\t\t\t<div><input class=\"planned-time\" type=\"number\" v-show=\"true\" v-model=\"item.planned_time | min_to_hours\" @blur=\"blurOnEdit(item)\" @keyup.esc=\"cancelEdit(item)\" @keydown=\"keydownOnEdit(item, $event, 'planned-time')\">hours</div>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t\t<div class=\"update-custom-tags\">\n\t\t\t\t\t\t\t<label>\n\t\t\t\t\t\t\t\tAdd Tag: \n\t\t\t\t\t\t\t\t<input type=\"text\" class=\"add-tag\" @blur=\"blurOnEdit(item)\" v-model=\"newTag\" @keyup.esc=\"cancelEdit(item)\" @keydown=\"keydownOnEdit(item, $event, 'addTag')\">\n\t\t\t\t\t\t\t</label>\n\t\t\t\t\t\t\t<div class=\"tag-suggestions\" v-if=\"false\">\n\t\t\t\t\t\t\t<!-- UNDER CONSTRUCTION -->\n\t\t\t\t\t\t\t\t<label v-for=\"tag in allTags_c\" :class=\"'tag'\" @click=\"this.$root.patchTag(item.id, tag)\">{{ tag.name }}\n\t\t\t\t\t\t\t\t</label>\n\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t</div>\n\t\t\t\t</form>\n\t\t\t\t<div class=\"item-tags\">\n\t\t\t\t\t<label class=\"done\" v-if=\"item.done &amp;&amp; item.id != this.$root.editingDoneDateItem\">Done {{ item.done_date | momentCalendar }}\n\t\t\t\t\t\t<input class=\"flatpickr\" id=\"done-date-edit-{{ item.id }}\" v-model=\"item.done_date\">\n\t\t\t\t\t</label>\n\t\t\t\t\t\n\t\t\t\t\t<span v-if=\"\n\t\t\t\t\t\ttotalTimeLeft > 0\n\t\t\t\t\t\t&amp;&amp; totalTimeLeft > timeLeft\n\t\t\t\t\t\t&amp;&amp; totalTimeDifferentFromParent\n\t\t\t\t\t\t&amp;&amp; !item.done\" class=\"total-duration\">\n\t\t\t\t\t\t{{ totalTimeLeft | hourminsec }}\n\t\t\t\t\t\t<!-- <span style=\"padding-right:2px\">Total </span>\n\t\t\t\t\t\t<span v-if=\"hasTotalUsedTime\"> used {{ item.totalUsedTime | hourminsec }}</span>\n\t\t\t\t\t\t<span v-if=\"(hasTotalUsedTime && hasTotalPlannedTime)\">/</span>\n\t\t\t\t\t\t<span v-if=\"hasTotalPlannedTime\">{{ item.totalPlannedTime | hourmin }}</span> -->\n \t\t\t\t\t</span>\n\n\t\t\t\t\t<span v-if=\"\n\t\t\t\t\t\titem.id != this.$root.editingItem\n\t\t\t\t\t\t&amp;&amp; timeLeft > 0\n\t\t\t\t\t\t\n\t\t\t\t\t\t&amp;&amp; !item.done\" class=\"duration\">\n\t\t\t\t\t\t{{ timeLeft | hourminsec }}\n\t\t\t\t\t\t<!-- <span v-if=\"hasUsedTime\">Used {{ item.used_time | hourminsec }}</span>\n\t\t\t\t\t\t<span v-if=\"(hasPlannedTime && hasUsedTime)\">/</span>\n\t\t\t\t\t\t<span v-if=\"hasPlannedTime\">{{ item.planned_time | hourmin }}</span> -->\n\t\t\t\t\t</span>\n\t\t\t\t\t\n\t\t\t\t\t<span v-if=\"hasDueDate &amp;&amp; !item.done\" class=\"duedate\">{{ item.due_date | momentCalendar }}</span>\n\n\t\t\t\t\t<span v-if=\"item.dueDateParent &amp;&amp; !item.done\" class=\"duedate-parent\">{{ item.dueDateParent | momentCalendar }}</span>\n\n\t\t\t\t\t<span v-if=\"item.tagged.length\" class=\"custom-tag\" v-for=\"tag in item.tagged\" @click.prevent=\"this.$root.filterItems('tag', tag.tag_slug)\">{{ tag.tag_name }}\n\t\t\t\t\t\t<button class=\"delete-tag\" v-if=\"item.id == this.$root.editingItem\" @click.prevent=\"deleteTag(item.id, tag.tag_name, $event)\">\n\t\t\t\t\t\t\t<i class=\"zmdi zmdi-close-circle\"></i>\n\t\t\t\t\t\t</button>\n\t\t\t\t\t</span>\n\n\t\t\t\t</div>\n\t\t\t\t<div class=\"item-nav\" v-if=\"this.$root.editingItem != item.id &amp;&amp; this.$root.selection.selectedId == item.id\">\n\t\t\t\t\t\n\t\t\t\t\t<button v-if=\"!item.done\" class=\"timer\" @click=\"addTimer(item)\"><i class=\"zmdi zmdi-timer\"></i>\n\t\t\t\t\t</button>\n\t\t\t\t\t<button v-if=\"item.done\" class=\"more\" @click=\"this.$root.popup(item.id, 'afterDone')\"><i class=\"zmdi zmdi-more\"></i>\n\t\t\t\t\t</button>\n\t\t\t\t\t<!--\n\t\t\t\t\t- font icon / woff format [font awesome]\n\t\t\t\t\t  material design iconic fonts\n\t\t\t\t\t- add svg as background to button\n\t\t\t\t\t- or image tag inside button\n\t\t\t\t\t- svg tag -> add as pattern\n\t\t\t\t\t-->\n\t\t\t\t\t<button class=\"delete\" v-if=\"item.children_order.length==0\" @click=\"deleteItem(item)\"><i class=\"zmdi zmdi-delete\"></i>\n\t\t\t\t\t</button>\n\t\t\t\t</div>\n\t\t\t\t\n\t\t\t</div>\n\t\t</div>\n\n\t\t<form :class=\"['addnewbox-firstchild', 'addnewbox', 'child']\" :id=\"'new-firstchild-of-'+item.id\" v-if=\"showAddNewBoxFirstChild\" @submit.prevent=\"\">\n\t\t\t<div>\n\t\t\t\t<textarea type=\"text\" class=\"newitem-body\" v-model=\"newItem.body\" v-autosize=\"newItem.body\" @blur=\"blurOnAddNew(item)\" @keydown=\"keydownOnNew(item, $event, 'body')\" placeholder=\"...\" autocomplete=\"off\" autofocus=\"\" rows=\"1\"></textarea>\n\t\t\t</div>\n\t\t\t<div class=\"update-tags\">\n\t\t\t\t<div class=\"update-planned-time\">\n\t\t\t\t\tDuration:\n\t\t\t\t\t<button :class=\"{ currentDuration: newItem.planned_time == 10, 'planned-time': true }\" @click.prevent=\"setPlannedTimeNewItem(item, 10, $event)\" @keydown=\"keydownOnNew(item, $event, 'planned-time')\" @blur=\"blurOnAddNew(item)\">10 min</button>\n\t\t\t\t\t<button :class=\"{ currentDuration: newItem.planned_time == 15, 'planned-time': true }\" @click.prevent=\"setPlannedTimeNewItem(item, 15, $event)\" @keydown=\"keydownOnNew(item, $event, 'planned-time')\" @blur=\"blurOnAddNew(item)\">15 min</button>\n\t\t\t\t\t<button :class=\"{ currentDuration: newItem.planned_time == 30, 'planned-time': true }\" @click.prevent=\"setPlannedTimeNewItem(item, 30, $event)\" @keydown=\"keydownOnNew(item, $event, 'planned-time')\" @blur=\"blurOnAddNew(item)\">30 min</button>\n\t\t\t\t\t<button :class=\"{ currentDuration: newItem.planned_time == 60, 'planned-time': true }\" @click.prevent=\"setPlannedTimeNewItem(item, 60, $event)\" @keydown=\"keydownOnNew(item, $event, 'planned-time')\" @blur=\"blurOnAddNew(item)\">1 hour</button>\n\t\t\t\t\t<div><input class=\"planned-time\" type=\"number\" v-show=\"true\" v-model=\"newItem.planned_time | min_to_hours\" @blur=\"blurOnAddNew(item)\" @keydown=\"keydownOnNew(item, $event, 'planned-time')\">hours</div>\n\t\t\t\t</div>\n\t\t\t\t<div class=\"update-custom-tags\">\n\t\t\t\t\t<label>\n\t\t\t\t\t\tAdd Tag: \n\t\t\t\t\t\t<input type=\"text\" class=\"prepare-tag\" @keydown=\"keydownOnNew(item, $event, 'addTag')\" @blur=\"blurOnAddNew(item)\" v-model=\"newTag\">\n\t\t\t\t\t</label>\n\t\t\t\t</div>\n\t\t\t\t<div class=\"item-tags prepared-tags\">\n\t\t\t\t\t<span v-if=\"newItem.preparedTags.length\" v-for=\"tag in newItem.preparedTags\" :class=\"(tag=='Today') ? 'duedate' : 'custom-tag'\">{{ tag }}\n\t\t\t\t\t\t<button class=\"delete-tag\" @click.prevent=\"deletePreparedTag(tag, item)\">\n\t\t\t\t\t\t\t<i class=\"zmdi zmdi-close-circle\"></i>\n\t\t\t\t\t\t</button>\n\t\t\t\t\t</span>\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t</form>\n\n\n\t\t<div class=\"children\" v-if=\"item.children\" v-show=\"item.show_children\">\n\t\t\t<card v-for=\"childCard in item.children\" :item=\"childCard\" :key=\"childCard.id\"></card>\n\t\t</div>\n\n\t\t<form :class=\"['addnewbox']\" :id=\"'new-under-'+ item.id \" v-if=\"showAddNewBox\" @submit.prevent=\"\">\n\t\t\t<div>\n\t\t\t\t<textarea type=\"text\" class=\"newitem-body\" v-model=\"newItem.body\" v-autosize=\"newItem.body\" @blur=\"blurOnAddNew(item)\" @keydown=\"keydownOnNew(item, $event, 'body')\" placeholder=\"...\" autocomplete=\"off\" autofocus=\"\" rows=\"1\"></textarea>\n\t\t\t</div>\n\t\t\t<div class=\"update-tags\">\n\t\t\t\t<div class=\"update-planned-time\">\n\t\t\t\t\tDuration:\n\t\t\t\t\t<button :class=\"{ currentDuration: newItem.planned_time == 10, 'planned-time': true }\" @click.prevent=\"setPlannedTimeNewItem(item, 10, $event)\" @keydown=\"keydownOnNew(item, $event, 'planned-time')\" @blur=\"blurOnAddNew(item)\">10 min</button>\n\t\t\t\t\t<button :class=\"{ currentDuration: newItem.planned_time == 15, 'planned-time': true }\" @click.prevent=\"setPlannedTimeNewItem(item, 15, $event)\" @keydown=\"keydownOnNew(item, $event, 'planned-time')\" @blur=\"blurOnAddNew(item)\">15 min</button>\n\t\t\t\t\t<button :class=\"{ currentDuration: newItem.planned_time == 30, 'planned-time': true }\" @click.prevent=\"setPlannedTimeNewItem(item, 30, $event)\" @keydown=\"keydownOnNew(item, $event, 'planned-time')\" @blur=\"blurOnAddNew(item)\">30 min</button>\n\t\t\t\t\t<button :class=\"{ currentDuration: newItem.planned_time == 60, 'planned-time': true }\" @click.prevent=\"setPlannedTimeNewItem(item, 60, $event)\" @keydown=\"keydownOnNew(item, $event, 'planned-time')\" @blur=\"blurOnAddNew(item)\">1 hour</button>\n\t\t\t\t\t<div><input class=\"planned-time\" v-if=\"true\" type=\"number\" v-model=\"newItem.planned_time | min_to_hours\" @keydown=\"keydownOnNew(item, $event)\" @blur=\"blurOnAddNew(item)\">hours</div>\n\t\t\t\t</div>\n\t\t\t\t<div class=\"update-custom-tags\">\n\t\t\t\t\t<label>\n\t\t\t\t\t\tAdd Tag: \n\t\t\t\t\t\t<input type=\"text\" class=\"prepare-tag\" @keydown=\"keydownOnNew(item, $event, 'addTag')\" @blur=\"blurOnAddNew(item)\" v-model=\"newTag\">\n\t\t\t\t\t</label>\n\t\t\t\t</div>\n\t\t\t\t<div class=\"item-tags prepared-tags\">\n\t\t\t\t\t<span v-if=\"newItem.preparedTags.length\" v-for=\"tag in newItem.preparedTags\" :class=\"(tag=='Today') ? 'duedate' : 'custom-tag'\">{{ tag }}\n\t\t\t\t\t\t<button class=\"delete-tag\" @click.prevent=\"deletePreparedTag(tag, item)\">\n\t\t\t\t\t\t\t<i class=\"zmdi zmdi-close-circle\"></i>\n\t\t\t\t\t\t</button>\n\t\t\t\t\t</span>\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t</form>\n\t</div>\n"
 if (module.hot) {(function () {  module.hot.accept()
   var hotAPI = require("vue-hot-reload-api")
   hotAPI.install(require("vue"), true)
@@ -27365,8 +27418,8 @@ exports.default = {
 	ready: function ready() {},
 
 	computed: {
-		hasPlannedTime: function hasPlannedTime() {
-			return this.item.planned_time && this.item.planned_time != '0';
+		hasUsedTime: function hasUsedTime() {
+			return;
 		}
 	},
 	methods: {},
@@ -27379,7 +27432,7 @@ exports.default = {
 	}
 };
 if (module.exports.__esModule) module.exports = module.exports.default
-;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\n \t<div class=\"done-card\" v-for=\"day in recordsPerDate\">\n \t\t<div class=\"title\">{{ day.date }}</div>\n \t\t<div class=\"item-wrapper\">\n\t\t\t<div class=\"item\" v-for=\"item in day.items\">\n\t\t\t\t<span>・</span>\n\t\t\t\t<div class=\"parent-string\">{{ item.parents_bodies }}</div>\n\t\t\t\t<div class=\"body bodybox\">{{{ item.body }}}</div>\n\t\t\t\t<div class=\"completion-notes bodybox\">{{ item.completion_memo }}</div>\n\t\t\t\t<div class=\"item-tags\">\n\t\t\t\t\t<span v-if=\"item.used_time\" class=\"duration\">\n\t\t\t\t\t\t{{ item.used_time }} min\n\t\t\t\t\t</span>\n\t\t\t\t</div>\n\t\t\t</div>\n<!--    <div \n\t\t\tclass=\"item-card\"\n\t\t\tv-if=\"item.depth != 0\"\n\t\t\t:class=\"{\n\t\t\t\tdone: item.done,\n\t\t\t\tediting: item.id == this.$root.editingItem,\n\t\t\t}\"\n\t\t>\n\t\t\t<div class=\"toggle-div\">\n\t\t\t\t<input class=\"toggle\"\n\t\t\t\t\ttype=\"checkbox\"\n\t\t\t\t\tv-if=\"item.children_order.length==0 || item.done == true\"\n\t\t\t\t\tv-model=\"item.done\"\n\t\t\t\t\t@change=\"markDone(item.id)\"\n\t\t\t\t>\n\t\t\t</div>\n\t\t\t<div class=\"body-div\"\n\t\t\t\t:class=\"{ selected: item.id == this.$root.selection.selectedId, }\"\n\t\t\t\t@dblclick=\"startEdit(item)\"\n\t\t\t\t@click=\"select(item)\"\n\t\t\t\t@enter=\"console.log('yarrr')\"\n\t\t\t>\n\t\t\t\t<span class=\"bodybox\"\n\t\t\t\t\tv-show=\"item.id != this.$root.editingItem\"\n\t\t\t\t>{{ item.body }}</span>\n\t\t\t\t\n\t\t\t\t<span v-show=\"false\"> ({{item.id}}) D-{{item.depth}}) [{{item.children_order}}]</span>\n\t\t\t\t\n\t\t\t\t<form action=\"update\"\n\t\t\t\t\tclass=\"updatebox\"\n\t\t\t\t\tv-show=\"item.id == this.$root.editingItem\"\n\t\t\t\t\t@submit.prevent=\"doneEdit(item)\"\n\t\t\t\t>\n\t\t\t\t\t<textarea name=\"item_body\"\n\t\t\t\t\t\trows=\"{{ item.rows }}\"\n\t\t\t\t\t\tv-model=\"item.body\"\n\t\t\t\t\t\tv-autosize=\"item.body\"\n\t\t\t\t\t\tv-item-focus=\"item.id == this.$root.editingItem\"\n\t\t\t\t\t\t@blur=\"blurOnEdit(item)\"\n\t\t\t\t\t\t@keyup.esc=\"cancelEdit(item)\"\n\t\t\t\t\t\t@keydown.enter=\"enterOnEdit\"\n\t\t\t\t\t>{{ item.body }}</textarea>\n\t\t\t\t\t<span>\n\t\t\t\t\t\t<label for=\"planned_time\">duration:</label>\n\t\t\t\t\t\t<input name=\"planned_time\"\n\t\t\t\t\t\t\ttype=\"number\"\n\t\t\t\t\t\t\tv-model=\"item.planned_time\"\n\t\t\t\t\t\t\t@blur=\"blurOnEdit(item)\"\n\t\t\t\t\t\t\t@keyup.esc=\"cancelEdit(item)\"\n\t\t\t\t\t\t\t@keydown.enter=\"doneEdit(item)\"\n\t\t\t\t\t\t/>\n\t\t\t\t\t</span>\n\t\t\t\t</form>\n\t\t\t\t<div class=\"item-tags\"\n\t\t\t\t\tv-show=\"this.$root.editingItem != item.id\"\n\t\t\t\t>\n\t\t\t\t\t<span v-if=\"item.done\" class=\"done\">\n\t\t\t\t\t\tdone {{ item.done_date | momentRelative }}\n\t\t\t\t\t</span>\n\t\t\t\t\t\n\t\t\t\t\t<span v-if=\"hasTotalTime\" class=\"total-duration\">\n\t\t\t\t\t\ttotal {{ calcTotalTime }} min\n\t\t\t\t\t</span>\n\n\t\t\t\t\t<span v-if=\"hasPlannedTime\" class=\"duration\">\n\t\t\t\t\t\t{{ item.planned_time }} min\n\t\t\t\t\t</span>\n\n\t\t\t\t\t<span v-if=\"hasDueDate\" class=\"duedate\">\n\t\t\t\t\t\t{{ item.due_date | momentCalendar }}\n\t\t\t\t\t</span>\n\n\t\t\t\t\t<span v-if=\"item.dueDateParent\" class=\"duedate-parent\">\n\t\t\t\t\t\t{{ item.dueDateParent | momentCalendar }}\n\t\t\t\t\t</span>\n\n\t\t\t\t</div>\n\t\t\t\t<div class=\"item-nav\"\n\t\t\t\t\tv-show=\"this.$root.editingItem != item.id\"\n\t\t\t\t>\n\t\t\t\t\t<button \n\t\t\t\t\t\tv-if=\"item.children_order.length==0\"\n\t\t\t\t\t\t@click=\"deleteItem(item)\"\n\t\t\t\t\t>✗</button>\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t</div> \n-->\n\n<!--\n \t\t<form class=\"addnewbox\" \n\t\t\tid=\"new-under-{{ item.id }}\"\n\t\t\tv-if=\"showAddNewBox\"\n\t\t\t@submit.prevent\n\t\t>\n\t\t\t<textarea type=\"text\"\n\t\t\t\tclass=\"add-item\"\n\t\t\t\tname=\"body\"\n\t\t\t\tv-model=\"newItem.body\"\n\t\t\t\tv-autosize=\"newItem.body\"\n\t\t\t\t@blur=\"blurOnAddNew(item)\"\n\t\t\t\t@keyup.esc=\"cancelAddNew\"\n\t\t\t\t@keydown=\"keydownOnNew\"\n\t\t\t\tplaceholder=\"...\"\n\t\t\t\tautocomplete=\"off\"\n\t\t\t\tautofocus \n\t\t\t\trows=\"1\"\n\t\t\t></textarea>\n\t\t\t<span>\n\t\t\t\t<label for=\"planned_time\">duration:</label>\n\t\t\t\t<input name=\"planned_time\"\n\t\t\t\t\ttype=\"number\"\n\t\t\t\t\tv-model=\"newItem.planned_time\"\n\t\t\t\t\t@blur=\"blurOnAddNew(item)\"\n\t\t\t\t\t@keyup.esc=\"cancelAddNew\"\n\t\t\t\t\t@keydown=\"keydownOnNew\"\n\t\t\t\t/>\n\t\t\t</span>\n\t\t</form> -->\n\t\t</div><!-- End item-wrapper -->\n\t\t<div class=\"total time\">Total time: {{ day.totalTime }}</div>\n\t\t<hr>\n\t</div>\n"
+;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\n \t<div class=\"done-card\" v-for=\"day in recordsPerDate\">\n \t\t<div class=\"title\">\n \t\t\t<span>{{ day.date | momentCalendar }}</span>\n \t\t\t<span class=\"journal-date-small\">{{ day.date }}</span>\n \t\t</div>\n \t\t<div class=\"item-wrapper\">\n\t\t\t<div class=\"item\" v-for=\"item in day.items\">\n\t\t\t\t<div class=\"parent-string\">{{ item.parents_bodies }}</div>\n\t\t\t\t<div class=\"main\">\n\t\t\t\t\t<span>・</span>\n\t\t\t\t\t<div class=\"\">{{{ item.body }}}</div>\n\t\t\t\t\t<div class=\"item-tags\">\n\t\t\t\t\t\t<span v-if=\"item.used_time\" class=\"duration\">\n\t\t\t\t\t\t\t{{ item.used_time | hourminsec }}\n\t\t\t\t\t\t</span>\n\t\t\t\t\t\t<span v-if=\"item.tagged.length\" class=\"custom-tag\" v-for=\"tag in item.tagged\" @click.prevent=\"this.$root.filterItems('tag', tag.tag_slug)\">{{ tag.tag_name }}\n\t\t\t\t\t\t\t<button class=\"delete-tag\" v-if=\"item.id == this.$root.editingItem\" @click.prevent=\"deleteTag(item.id, tag.tag_name, $event)\">\n\t\t\t\t\t\t\t\t<i class=\"zmdi zmdi-close-circle\"></i>\n\t\t\t\t\t\t\t</button>\n\t\t\t\t\t\t</span>\n\t\t\t\t\t\t<label class=\"done\" v-if=\"item.done &amp;&amp; item.id != this.$root.editingDoneDateItem\">change done date\n\t\t\t\t\t\t\t<input class=\"flatpickr\" id=\"done-date-edit-{{ item.id }}\" v-model=\"item.done_date\">\n\t\t\t\t\t\t</label>\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t\t\t<div class=\"completion-notes bodybox\">{{ item.completion_memo }}</div>\n\t\t\t</div>\n\t\t</div><!-- End item-wrapper -->\n\t\t<div class=\"total time\" v-if=\"day.totalUsedTime\">used: {{ day.totalUsedTime | hourminsec }}</div>\n\t</div>\n"
 if (module.hot) {(function () {  module.hot.accept()
   var hotAPI = require("vue-hot-reload-api")
   hotAPI.install(require("vue"), true)
@@ -27775,12 +27828,14 @@ var Tree = function () {
 		this.source = items;
 		this.nodes = {}; // →　"id":{ task obj };
 		this.orphans = [];
+		this.doneitems = [];
 		this.filteredItemRoot = {
 			children_order: [], children: [], body: "",
 			totalPlannedTime: 0, totalUsedTime: 0,
 			planned_time: 0, used_time: 0
 		};
-		this.rootChildrenBackup = []; // replace with root later on
+		this.backups = {};
+		this.backups.root = []; // replace with root later on
 		// process items
 		this.itemsProcessed = 0;
 		items.forEach(this.initialize.bind(this));
@@ -27826,7 +27881,7 @@ var Tree = function () {
 					if (!node.children.length && (node.used_time || node.planned_time)) {
 						this.calculateTotalTime(id);
 					}
-					this.rootChildrenBackup = this.root.children;
+					this.backups.root = this.root.children;
 				}.bind(this));
 			}
 		}
@@ -27937,7 +27992,10 @@ var Tree = function () {
 		key: 'hasTag',
 		value: function hasTag(id, tags) {
 			var item = this.nodes[id];
-			if (!item.tagged.length) {
+			if (!item) {
+				console.log("what is this shit." + id);return;
+			}
+			if (!item.tagged || !item.tagged.length) {
 				return false;
 			}
 			var hasTags = void 0;
@@ -28047,7 +28105,13 @@ var Tree = function () {
 	}, {
 		key: 'prevItemId',
 		value: function prevItemId(id) {
+			if (!id) {
+				return false;
+			}
 			var item = this.nodes[id];
+			if (item.depth == 0) {
+				return false;
+			}
 			var parent_id = item.parent_id;
 			var index = this.siblingIndex(id);
 			var tagsSelected = selection.tags.length;
@@ -28059,8 +28123,8 @@ var Tree = function () {
 				prevItemId = this.getDeepestLastChildId(prevItemId);
 			}
 			var prevItem = this.nodes[prevItemId];
-			console.log('prevItem: [' + prevItemId + '] ' + prevItem.body);
-			var prevItemChildrenCount = prevItem.children.length;
+			// console.log('prevItem: ['+prevItemId+'] '+prevItem.body);
+			// let prevItemChildrenCount = prevItem.children.length;
 
 			// if(tagsSelected){ 
 			// 	if(this.isTopLvlItemInFilteredRoot(id)){
@@ -28086,7 +28150,7 @@ var Tree = function () {
 			var tagsSelected = selection.tags.length;
 
 			// if(!tagsSelected){ 
-			console.log('itemIsLastSibling ' + itemIsLastSibling);
+			// console.log('itemIsLastSibling '+itemIsLastSibling);
 			if (itemIsLastSibling) {
 				return this.nextItemRecursion(parent_id);
 			}
@@ -28604,7 +28668,7 @@ var Tree = function () {
 
 			// debugger;
 			if (keyword == 'all') {
-				this.root.children = this.rootChildrenBackup;
+				this.root.children = this.backups.root;
 				//Why can't I do this?
 				// this.root = this.rootBackup;
 			} else {
@@ -28613,10 +28677,29 @@ var Tree = function () {
 				//Why can't I do this?
 				// this.root = this.filteredItemRoot;
 			}
+			if (keyword == 'done') {
+				if (!this.doneitems.length) {
+					setTimeout(function () {
+						this.filterItems(keyword, value, operator);
+					}.bind(this), 300);
+					return;
+				}
+				// Codementor: How do I know the following function will start after the fetch is over?
+				this.doneitems.forEach(function (item) {
+					if (item.done) {
+						this.nodes[item.id] = item;
+						item.show_children = 1;
+						this.filteredItemRoot.children.push(item);
+					}
+				}.bind(this));
+				setTimeout(function () {
+					flatpickrifyAllInputs();
+				}, 1000);
+			}
 			if (keyword == 'duedate') {
 				if (value == 'today') {
-					Object.keys(this.nodes).forEach(function (key) {
-						var item = this.nodes[key];
+					Object.keys(this.nodes).forEach(function (id) {
+						var item = this.nodes[id];
 						var diff = moment(item.due_date).diff(moment(), 'days');
 						if (diff <= 0) {
 							this.filteredItemRoot.children.push(item);
@@ -28627,12 +28710,9 @@ var Tree = function () {
 			if (keyword == 'tag') {
 				(function () {
 					var filteredTag = value;
-					Object.keys(_this4.nodes).forEach(function (key) {
-						var item = this.nodes[key];
-						var hasTag = item.tagged.find(function (actualTags) {
-							return actualTags.tag_slug == filteredTag;
-						});
-						if (hasTag) {
+					Object.keys(_this4.nodes).forEach(function (id) {
+						var item = this.nodes[id];
+						if (this.hasTag(id, filteredTag)) {
 							item.show_children = 1;
 							this.filteredItemRoot.children.push(item);
 						}
@@ -28641,6 +28721,19 @@ var Tree = function () {
 			}
 			this.calculateTotalTime(this.root.id);
 			this.resetChildrenOrder(this.root.id);
+		}
+	}, {
+		key: 'arrayFilterTag',
+		value: function arrayFilterTag(array, tags) {
+			var filteredArray = [];
+			array.forEach(function (item) {
+				var id = item.id;
+				if (this.hasTag(id, tags)) {
+					item.show_children = 1;
+					filteredArray.push(item);
+				}
+			}.bind(this));
+			return filteredArray;
 		}
 	}, {
 		key: 'rebindParentIds',
@@ -28668,8 +28761,8 @@ var Tree = function () {
 				var rObj = {};
 				rObj['date'] = k;
 				rObj['items'] = doneItemsObject[k];
-				rObj['totalTime'] = rObj['items'].reduce(function (prev, next) {
-					return allItems.AplusB(prev, next.planned_time);
+				rObj['totalUsedTime'] = rObj['items'].reduce(function (prev, next) {
+					return allItems.AplusB(prev, next.used_time);
 				}, 0);
 				return rObj;
 			});

@@ -9,6 +9,10 @@ $duedate-parent-color: rgba(230, 94, 77, 0.5);
 $done-color: #1E824C;
 $used-time-color: #5d67b3;
 
+$sepia-background:#f5f2eb;
+$sepia-brown:#a59174;
+$sepia-grey:#c0b2b4;
+
 @import 'node_modules/material-design-iconic-font/scss/material-design-iconic-font.scss';
 @import 'node_modules/flatpickr/dist/flatpickr.min';
 @import 'main.scss';
@@ -19,3 +23,4 @@ $used-time-color: #5d67b3;
 @import 'components/popouts.scss';
 @import 'components/timer.scss';
 @import 'components/flatpickr.scss';
+@import 'components/journal.scss';
