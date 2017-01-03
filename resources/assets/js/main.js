@@ -182,8 +182,8 @@ $.getJSON('/api/items',function(fetchedData){
 	}, 1000);
 
 
-window.allItems = new Tree(fetchedData);
 window.selection = new Selection();
+window.allItems = new Tree(fetchedData);
 // import VueRoot from './vue-components/VueRoot.js';
 window.vm = new Vue({
 	el:'#body',
@@ -579,12 +579,15 @@ window.vm = new Vue({
 				this.loading = false;
 			});
 		},
-		filterItems(keyword, value, operator){
-			if(!operator){
+		filterItems(keyword, value, event){
+			// debugger;
+			let operator = null;
+			if (event && (event.ctrlKey || event.metaKey)){
+				operator = 'AND';
+			} else {
 				selection.tags = [];
 				selection.filter = [];
 			}
-
 			if(keyword == 'done2'){
 				if(selection.filter.includes('done2')){ return; }
 				selection.filter.push('done2');
@@ -611,7 +614,7 @@ window.vm = new Vue({
 					selection.filter.push(keyword);
 				}
 			}
-			allItems.filterItems(keyword,value);
+			allItems.filterItems(keyword,value,operator);
 		},
 
 		// duplicate(id){

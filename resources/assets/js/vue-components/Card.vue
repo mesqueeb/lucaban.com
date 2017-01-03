@@ -200,9 +200,11 @@
 						class="duedate-parent"
 					>{{ item.dueDateParent | momentCalendar }}</span>
 
-					<span v-if="item.tagged.length"
+					<span v-for="tag in item.tagged"
+						v-if="item.tagged.length"
+						v-show="!hasParentWithTag(item.id, tag.tag_slug)
+							|| item.id == this.$root.editingItem"
 						class="custom-tag"
-						v-for="tag in item.tagged"
 						@click.prevent="this.$root.filterItems('tag', tag.tag_slug)"
 					>{{ tag.tag_name }}
 						<button class="delete-tag"
@@ -447,7 +449,7 @@ export default {
 	},
 	computed: {
 		journalDate(){
-			console.log('run on '+this.item.id+' - '+this.item.body);
+			// console.log('run on '+this.item.id+' - '+this.item.body);
 			if(this.$root.selection.filter.includes('done')){
 				if(this.item.depth == 0){ return; }
 				let prevId = allItems.prevItemId(this.item.id);
@@ -529,10 +531,14 @@ export default {
 			return x;
 		},
 		totalTimeDifferentFromParent(){
+			if(!this.item.parent_id){ return true; }
 			return this.item.totalPlannedTime != allItems.nodes[this.item.parent_id].totalPlannedTime;
 		},
 	},
 	methods: {
+		hasParentWithTag(id, tags){
+			return allItems.hasParentWithTag(id, tags);
+		},
 		addTimer(item){
 			//Codementor
 			this.$root.addTimer(item.id);

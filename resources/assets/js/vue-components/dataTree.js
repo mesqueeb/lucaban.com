@@ -11,7 +11,7 @@ export default class Tree {
 			planned_time:0, used_time:0,
 		};
 		this.backups = {};
-		this.backups.root = []; // replace with root later on
+		this.backups.rootChildren = []; // replace with root later on
 		// process items
 		this.itemsProcessed = 0;
 		items.forEach(this.initialize.bind(this))
@@ -51,7 +51,7 @@ export default class Tree {
 			    if (!node.children.length && (node.used_time || node.planned_time)){
 				    this.calculateTotalTime(id);
 			    }
-			    this.backups.root = this.root.children;
+			    this.backups.rootChildren = this.root.children;
 			}.bind(this));
 	    }
 	}
@@ -324,6 +324,8 @@ export default class Tree {
 		});
 		this.nodes[id].children_order = resetChildrenOrder;
 		this.rebindParentIds();
+		this.root['totalUsedTime'] = this.calTotalUsedTime(this.root.id);
+		this.root['totalPlannedTime'] = this.calTotalPlannedTime(this.root.id);
 	}
 	giveNewParent(id, new_parent_id, specificNewIndex)
 	{	
@@ -451,11 +453,18 @@ export default class Tree {
 	tagItem(id, tags)
 	{
 		let item = this.nodes[id];
-		if(this.hasParentWithTag(id, tags)){
-			console.log('NG! has a parent with the tag');
+		if(this.hasTag(id, tags)){
+			console.log('NG! Has the tag already!!');
 			return;
 		}
+		// if (this.hasParentWithTag(id, tags)){}
+			// console.log('NG! has a parent with the tag');
 		vm.patchTag(id, tags);
+		if(item.children.length){
+			item.children_order.forEach(function(childId){
+				this.tagItem(childId, tags);
+			}.bind(this));
+		}
 	}
 	prepareTag(id, tags)
 	{
@@ -525,34 +534,44 @@ export default class Tree {
 	calculateTotalTime(id)
 	{
 		let item = this.nodes[id];
-		// console.log('item in calculateTotalTime ↓ ['+item.id+']'+item.body);
-		// console.log(id);
-		// console.log(item);
-		let totalPlannedTime;
-		let totalUsedTime;
-	    if (!(Array.isArray(item.children) && item.children.length)) {
-	    	// if we don't have children, do nothing, leave the time as-is
-			totalPlannedTime = (!item.done) ? parseFloat(item.planned_time) : 0 ;
-			totalUsedTime = (!item.done) ? parseFloat(item.used_time) : 0 ;
-	    } else {
-			// add up all the times of our direct children
-		    totalPlannedTime = item.children.reduce((prev, next) => {
-		        // return this.AplusB(prev, next.totalPlannedTime);
-		        return prev+parseFloat(next.totalPlannedTime);
-		    }, (!item.done) ? parseFloat(item.planned_time) : 0 );
-		    totalUsedTime = item.children.reduce((prev, next) => {
-		        // return this.AplusB(prev, next.totalUsedTime);
-		        return prev+parseFloat(next.totalUsedTime);
-		    }, (!item.done) ? parseFloat(item.used_time) : 0 );
-	    }
-	    // console.log('totalPlannedTime = '+parseFloat(totalPlannedTime));
-	    item['totalPlannedTime'] = parseFloat(totalPlannedTime);
-		// console.log('totalUsedTime = '+parseFloat(totalUsedTime));
-	    item['totalUsedTime'] = parseFloat(totalUsedTime);
+	    item['totalPlannedTime'] = this.calTotalPlannedTime(id);
+	    item['totalUsedTime'] = this.calTotalUsedTime(id);
 	    //call this on PARENT -> climb up the parent tree
 	    if (item.parent_id){
 		    this.calculateTotalTime(item.parent_id);
 	    }
+	}
+	calTotalPlannedTime(id)
+	{
+		let item = this.nodes[id];
+		let totalPlannedTime;
+	    if (!(Array.isArray(item.children) && item.children.length)) {
+	    	// if we don't have children, do nothing, leave the time as-is
+			totalPlannedTime = (!item.done || selection.filter.includes('done')) ? parseFloat(item.planned_time) : 0 ;
+	    } else {
+			// add up all the times of our direct children
+		    totalPlannedTime = item.children.reduce((prev, next) => {
+		        let x = (next.totalPlannedTime) ? next.totalPlannedTime : next.planned_time ;
+		        return prev+parseFloat(x);
+		    }, (!item.done || selection.filter.includes('done')) ? parseFloat(item.planned_time) : 0 );
+	    }
+	    return parseFloat(totalPlannedTime);
+	}
+	calTotalUsedTime(id)
+	{
+		let item = this.nodes[id];
+		let totalUsedTime;
+	    if (!(Array.isArray(item.children) && item.children.length)) {
+	    	// if we don't have children, do nothing, leave the time as-is
+			totalUsedTime = (!item.done || selection.filter.includes('done')) ? parseFloat(item.used_time) : 0 ;
+	    } else {
+			// add up all the times of our direct children
+		    totalUsedTime = item.children.reduce((prev, next) => {
+		        let x = (next.totalUsedTime) ? next.totalUsedTime : next.used_time ;
+		        return prev+parseFloat(x);
+		    }, (!item.done || selection.filter.includes('done')) ? parseFloat(item.used_time) : 0 );
+	    }
+	    return parseFloat(totalUsedTime);
 	}
 	checkValParentTree(id, val)
 	{
@@ -684,16 +703,15 @@ export default class Tree {
 	filterItems(keyword, value, operator)
 	{
 		// debugger;
-		if (keyword == 'all'){
-			this.root.children = this.backups.root;
-			//Why can't I do this?
-			// this.root = this.rootBackup;
+		let arrayToFilter;
+		if(operator == 'AND'){
+			arrayToFilter = this.flattenTree(this.root.children);
+		} else {
+			arrayToFilter = this.flattenTree(this.backups.rootChildren);
 		}
-		else {
-			this.filteredItemRoot.children = [];
-			this.root.children = this.filteredItemRoot.children;
-	    	//Why can't I do this?
-			// this.root = this.filteredItemRoot;
+		let filteredArray = [];
+		if (keyword == 'all'){
+			filteredArray = this.backups.rootChildren;
 		}
 		if (keyword == 'done'){
 			if(!this.doneitems.length){
@@ -707,7 +725,7 @@ export default class Tree {
 				if(item.done){
 					this.nodes[item.id] = item;
 					item.show_children = 1;
-					this.filteredItemRoot.children.push(item);
+					filteredArray.push(item);
 				}
 			}.bind(this));
 			setTimeout(function(){
@@ -715,39 +733,52 @@ export default class Tree {
 			}, 1000);
 		}
 		if (keyword == 'duedate'){
-			if (value == 'today'){
-				Object.keys(this.nodes).forEach(function (id) {
-					let item = this.nodes[id];
-		    		let diff = moment(item.due_date).diff(moment(), 'days');
-					if (diff <= 0){
-						this.filteredItemRoot.children.push(item);
-					}
-			    }.bind(this));
-			}
+			Array.prototype.push.apply(filteredArray, this.arrayFilterDate(arrayToFilter, value));
 		}
 		if (keyword == 'tag'){
-	    	let filteredTag = value;
-	    	Object.keys(this.nodes).forEach(function (id) {
-				let item = this.nodes[id];
-	    		if (this.hasTag(id, filteredTag)){
-					item.show_children = 1;
-					this.filteredItemRoot.children.push(item);
-	    		}
-			}.bind(this));
+			Array.prototype.push.apply(filteredArray, this.arrayFilterTag(arrayToFilter, value));
 		}
-		this.calculateTotalTime(this.root.id);
+		this.root.children = filteredArray;
+		// filteredArray.forEach(function (item) {
+		// 	this.calculateTotalTime(item.id);
+		// }.bind(this));
 		this.resetChildrenOrder(this.root.id);
 	}
 	arrayFilterTag(array, tags){
 		let filteredArray = [];
     	array.forEach(function (item) {
 			let id = item.id;
-    		if (this.hasTag(id, tags)){
+    		if (this.hasTag(id, tags)
+    			&& !this.hasParentWithTag(id, tags))
+    		{
 				item.show_children = 1;
 				filteredArray.push(item);
     		}
 		}.bind(this));
 		return filteredArray;
+	}
+	arrayFilterDate(array, date){
+		let filteredArray = [];
+		if(date == 'today'){
+			array.forEach(function (item) {
+				let diff = moment(item.due_date).diff(moment(), 'days');
+				if (diff <= 0){
+					filteredArray.push(item);
+				}
+			}.bind(this));
+		}
+		return filteredArray;
+	}
+	flattenTree(array)
+	{
+		let flattenedTree = [];
+		array.forEach(function(item){
+			flattenedTree.push(item);
+			if(item.children.length){
+				Array.prototype.push.apply(flattenedTree, this.flattenTree(item.children));
+			}
+		}.bind(this));
+		return flattenedTree;
 	}
 	rebindParentIds()
 	{

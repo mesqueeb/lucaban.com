@@ -50,7 +50,7 @@
 			<a v-for="tag in allTags"
 				href="#"
 				:class="{active: selection.tags.includes(tag.slug)}"
-				@click="filterItems('tag', tag.slug)"
+				@click="filterItems('tag', tag.slug, $event)"
 			>@{{ tag.name }}</a>
 			
 		</div>
@@ -63,10 +63,12 @@
 	</div>
 	{{-- STATS --}}
 	<div class="stats"
-		v-show="selection.filter != 'done'"
+		v-show="true"
 	>
 		<div>Used time <div class="used-time">@{{ allData.totalUsedTime | hourmin }}</div></div>
-		<div>Time left <div class="time-left">@{{ allData.totalPlannedTime*60-allData.totalUsedTime | hourmin }}</div></div>
+		<div
+			v-show="!selection.filter.includes('done')"
+		>Time left <div class="time-left">@{{ allData.totalPlannedTime*60-allData.totalUsedTime | hourmin }}</div></div>
 		<div>Items <div class="children-amount">@{{ childrenAmount }}</div></div>
 		<div>Done <div class="done-children-amount">@{{ doneChildrenAmount }}</div></div>
 	</div>
