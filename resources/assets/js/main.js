@@ -181,9 +181,9 @@ $.getJSON('/api/items',function(fetchedData){
 		flatpickrifyAllInputs();
 	}, 1000);
 
-
 window.selection = new Selection();
 window.allItems = new Tree(fetchedData);
+console.log('servertest: allItems.root.children.length: '+allItems.root.children.length);
 // import VueRoot from './vue-components/VueRoot.js';
 window.vm = new Vue({
 	el:'#body',

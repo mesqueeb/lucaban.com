@@ -26051,6 +26051,7 @@ _jquery2.default.getJSON('/api/items', function (fetchedData) {
 
 	window.selection = new _Selection2.default();
 	window.allItems = new _dataTree2.default(fetchedData);
+	console.log('servertest: allItems.root.children.length: ' + allItems.root.children.length);
 	// import VueRoot from './vue-components/VueRoot.js';
 	window.vm = new _vue2.default({
 		el: '#body',
