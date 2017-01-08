@@ -11,7 +11,11 @@
 <div id="body">
 <a href="{{route('home')}}">Go home</a>
 
+{{-- <Vuelistmaster></Vuelistmaster> --}}
 {{-- @include('elements.menu') --}}
+
+{{-- <script src="https://unpkg.com/vue@2.0.1/dist/vue.js"></script> --}}
+
 <div id="loading-icon">
 	<img
 		src="/css/icons/loading_64x64.gif"
@@ -40,14 +44,11 @@
 				:class="{active: selection.filter.includes('done')}"
 				@click="filterItems('done')"
 			>Done</a>
-{{-- 			<a href="#"
-				:class="{active: selection.filter.includes('done')}"
-				@click="filterItems('done2')"
-			>Done v.2</a>
- --}}		</div>
+		</div>
 		<div class="tag-menu">
 
 			<a v-for="tag in allTags"
+				v-if="tag.count"
 				href="#"
 				:class="{active: selection.tags.includes(tag.slug)}"
 				@click="filterItems('tag', tag.slug, $event)"
@@ -72,7 +73,7 @@
 		<div>Items <div class="children-amount">@{{ childrenAmount }}</div></div>
 		<div>Done <div class="done-children-amount">@{{ doneChildrenAmount }}</div></div>
 	</div>
-	{{-- DATA --}}
+	<!-- DATA -->
 	<div class="items-wrapper"
 		v-show="!selection.filter.includes('done2')"
 	>
@@ -80,7 +81,7 @@
 			:alltags="allTags"
 		></Card>
 	</div>
-	{{-- JOURNAL --}}
+	<!-- JOURNAL -->
 	<div class="journal-wrapper"
 		v-show="selection.filter.includes('done2')"
 	>
@@ -88,7 +89,7 @@
 	</div>
 </div>
 
-{{-- <script src="https://unpkg.com/vue@2.0.1/dist/vue.js"></script> --}}
+
 <script src="js/vendor.js"></script>
 <script src="js/main.js"></script>
 </div>

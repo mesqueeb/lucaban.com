@@ -14,9 +14,66 @@ export default class Tree {
 		this.backups.rootChildren = []; // replace with root later on
 		// process items
 		this.itemsProcessed = 0;
-		items.forEach(this.initialize.bind(this))
+//		this.source.forEach(this.initialize.bind(this))
+		this.firstInitialization();
+	}
+
+	firstInitialization()
+	{
+		console.log('run first initialization at source-length: '+this.source.length);
+		this.source.forEach(function(item){
+			this.initialize(item);
+			console.log('this.itemsProcessed = '+this.itemsProcessed);
+			//Sort all nodes after making sure you got all of them.
+		    if(this.itemsProcessed === this.source.length) {
+		    	this.organizeAfterInitialization();
+		    }
+		}.bind(this));
 	}
 	initialize(item, index) 
+	{
+		// console.log('run node initialization');
+		// variables
+		let node 	= this.makeNode(item);
+		let parent 	= this.getNode(node.parent_id);
+		// assign extra item values
+		if(node.children_order){
+			node.children_order = node.children_order.split(',').map(Number);
+		} else {
+			node.children_order = [];
+		}
+		node.children = [];
+		node.totalPlannedTime = (!item.done && node.planned_time) ? parseFloat(item.planned_time) : 0 ;
+		node.totalUsedTime = (!item.done && node.used_time) ? parseFloat(item.used_time) : 0 ;
+		node.parent_id_backup = node.parent_id;
+		// Register and organize nodes:
+		if(node.depth === 0) { this.root = node; }
+		else if (parent) { parent.children.push(node); }
+		else { this.orphans.push(node); }
+		this.nodes[node.id] = node;
+		this.itemsProcessed++;
+	}
+	organizeAfterInitialization()
+	{
+		console.log('run organizeAfterInitialization');
+		Object.keys(this.nodes).forEach(function (id) {
+		    this.sortChildren(id);
+		    this.updateChildrenDueDate(id);
+		    let item = this.nodes[id];
+			// this.attachParentBody(id);　//Maybe I should only do this when pressing DONE
+		    if (!item.children.length && (item.used_time || item.planned_time)){
+			    // Calculate total time from bottom up.
+			    this.calculateTotalTime(id);
+		    }
+		}.bind(this));
+		this.backups.rootChildren = this.root.children;
+		vm.$data.allData = this.root;
+		vm.$data.doneData = this.doneitems;
+		vm.$data.selection = selection;
+	}
+
+
+	OLDinitialize(item, index) 
 	{
 		// variables
 		let node 	= this.makeNode(item);
@@ -112,7 +169,7 @@ export default class Tree {
 		// Patches etc.
 	    selection.selectedId = item.id;
 	    vm.patch(item.parent_id, 'children_order');
-	    if(addTags){ vm.patchTag(item.id, addTags); }
+	    if(addTags){ this.tagItem(item.id, addTags); }
 		this.attachParentBody(item.id);
 		this.autoCalculateDoneState(item.parent_id);
 	    if (item.used_time || item.planned_time){
@@ -323,9 +380,8 @@ export default class Tree {
 		   return child.id;
 		});
 		this.nodes[id].children_order = resetChildrenOrder;
-		this.rebindParentIds();
-		this.root['totalUsedTime'] = this.calTotalUsedTime(this.root.id);
-		this.root['totalPlannedTime'] = this.calTotalPlannedTime(this.root.id);
+		this.root['totalUsedTime'] = this.calTotalUsedTime(id);
+		this.root['totalPlannedTime'] = this.calTotalPlannedTime(id);
 	}
 	giveNewParent(id, new_parent_id, specificNewIndex)
 	{	
@@ -457,8 +513,6 @@ export default class Tree {
 			console.log('NG! Has the tag already!!');
 			return;
 		}
-		// if (this.hasParentWithTag(id, tags)){}
-			// console.log('NG! has a parent with the tag');
 		vm.patchTag(id, tags);
 		if(item.children.length){
 			item.children_order.forEach(function(childId){
@@ -703,6 +757,10 @@ export default class Tree {
 	filterItems(keyword, value, operator)
 	{
 		// debugger;
+		// Start by resetting the parent id's to their original state
+		this.root.children.forEach(function(item){
+			item.parent_id = item.parent_id_backup;
+		});
 		let arrayToFilter;
 		if(operator == 'AND'){
 			arrayToFilter = this.flattenTree(this.root.children);
@@ -738,11 +796,16 @@ export default class Tree {
 		if (keyword == 'tag'){
 			Array.prototype.push.apply(filteredArray, this.arrayFilterTag(arrayToFilter, value));
 		}
+		filteredArray.forEach(function(item){
+			item.parent_id = this.root.id;
+		}.bind(this));
 		this.root.children = filteredArray;
-		// filteredArray.forEach(function (item) {
-		// 	this.calculateTotalTime(item.id);
-		// }.bind(this));
 		this.resetChildrenOrder(this.root.id);
+		// if (keyword == 'all'){
+		// 	this.rebindArrayParentIds(filteredArray, 'backup');
+		// } else {
+		// 	this.rebindArrayParentIds(filteredArray, this.root.id);
+		// }
 	}
 	arrayFilterTag(array, tags){
 		let filteredArray = [];
@@ -780,12 +843,17 @@ export default class Tree {
 		}.bind(this));
 		return flattenedTree;
 	}
-	rebindParentIds()
+	rebindArrayParentIds(array, newParentId)
 	{
-		this.root.children_order.forEach(function(id){
-			this.nodes[id].parent_id_backup = this.nodes[id].parent_id;
-			this.nodes[id].parent_id = this.root.id;
-		}.bind(this));
+		if(newParentId == 'backup'){
+			array.forEach(function(item){
+				item.parent_id = item.parent_id_backup;
+			});
+		} else {
+			array.forEach(function(item){
+				item.parent_id = newParentId;
+			});
+		}
 	}
 	formatDone(doneArray)
 	{

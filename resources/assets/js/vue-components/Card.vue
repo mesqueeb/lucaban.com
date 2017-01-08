@@ -1,431 +1,431 @@
 <template id="items-card-template">
 
 
-	<div :class="{
-			'items-card': true,
-			'journal-wrapper': $root.selection.filter.includes('done')
-		}"
-		:id="'card-'+item.id"
-	>
- 		<div class="title"
-			v-if="journalDate"
- 		>
- 			<span>{{ journalDate | momentCalendar }}</span>
- 			<span class="journal-date-small">{{ journalDate }}</span>
- 		</div>
- 		<div class="parent-string"
-			v-if="this.$root.selection.filter.includes('done') && this.item.depth != 0"
-			@click="selectItem(item)"
- 		>{{ item.parents_bodies }}:</div>
-		<div 
-			v-if="item.depth != 0"
-			:class="{
-				'item-card': true,
-				done: item.done,
-				show_children: item.show_children,
-				editing: item.id == this.$root.editingItem,
-			}"
+<div :class="{
+		'items-card': true,
+		'journal-wrapper': $root.selection.filter.includes('done')
+	}"
+	:id="'card-'+item.id"
+>
+		<div class="title"
+		v-if="journalDate"
 		>
-			<div class="toggle-div"
-				v-if="!this.$root.selection.filter.includes('done')"
+			<span>{{ journalDate | momentCalendar }}</span>
+			<span class="journal-date-small">{{ journalDate }}</span>
+		</div>
+		<div class="parent-string"
+		v-if="this.$root.selection.filter.includes('done') && this.item.depth != 0"
+		@click="selectItem(item)"
+		>{{ item.parents_bodies }}:</div>
+	<div 
+		v-if="item.depth != 0"
+		:class="{
+			'item-card': true,
+			done: item.done,
+			show_children: item.show_children,
+			editing: item.id == this.$root.editingItem,
+		}"
+	>
+		<div class="toggle-div"
+			v-if="!this.$root.selection.filter.includes('done')"
+		>
+			<input class="toggle"
+				type="checkbox"
+				v-if="item.children_order.length==0 || item.done == true"
+				v-model="item.done"
+				@change="updateDone(item.id)"
 			>
-				<input class="toggle"
-					type="checkbox"
-					v-if="item.children_order.length==0 || item.done == true"
-					v-model="item.done"
-					@change="updateDone(item.id)"
-				>
-				<input type="checkbox"
-					class="styled-check"
-					:id="'show_children_'+item.id"
-					v-model="item.show_children"
-					@change="updateShowChildren(item.id)"
-				>
-				<label class="arrow"
-					:for="'show_children_'+item.id"
-					v-if="item.children_order.length>0"
-				></label>
+			<input type="checkbox"
+				class="styled-check"
+				:id="'show_children_'+item.id"
+				v-model="item.show_children"
+				@change="updateShowChildren(item.id)"
+			>
+			<label class="arrow"
+				:for="'show_children_'+item.id"
+				v-if="item.children_order.length>0"
+			></label>
 
-				<!-- <input class="show_children_toggle"
-					id="show_children_{{item.id}}"
-					type="checkbox"
-					v-if="item.children_order.length>0"
-					v-model="item.show_children"
-					@change="updateShowChildren(item.id)"
-				>
-				<label class="show_children_svg" 
-					for="show_children_{{item.id}}">
-					//// This label is not yet used!
-				</label> -->
-			</div>
-			<div class=""
-				v-if="this.$root.selection.filter.includes('done')"
-			>・</div>
-			<div class="body-div textarea-wrap"
-				:class="{ selected: item.id == this.$root.selection.selectedId, project: isProject}"
-				@dblclick="startEdit(item, $event)"
-				@click="selectItem(item)"
-				@enter="console.log('yarrr')"
+			<!-- <input class="show_children_toggle"
+				id="show_children_{{item.id}}"
+				type="checkbox"
+				v-if="item.children_order.length>0"
+				v-model="item.show_children"
+				@change="updateShowChildren(item.id)"
 			>
-				<div class="bodybox"
-					v-show="item.id != this.$root.editingItem"
-				>
-					<div>{{{ item.body | linkify }}}</div>
-					<div class="completion-notes bodybox"
-						v-if="item.completion_memo"
-						@click="selectItem(item)"
-					>{{ item.completion_memo }}</div>
+			<label class="show_children_svg" 
+				for="show_children_{{item.id}}">
+				//// This label is not yet used!
+			</label> -->
+		</div>
+		<div class=""
+			v-if="this.$root.selection.filter.includes('done')"
+		>・</div>
+		<div class="body-div textarea-wrap"
+			:class="{ selected: item.id == this.$root.selection.selectedId, project: isProject}"
+			@dblclick="startEdit(item, $event)"
+			@click="selectItem(item)"
+			@enter="console.log('yarrr')"
+		>
+			<div class="bodybox"
+				v-show="item.id != this.$root.editingItem"
+			>
+				<div>{{{ item.body | linkify }}}</div>
+				<div class="completion-notes bodybox"
+					v-if="item.completion_memo"
+					@click="selectItem(item)"
+				>{{ item.completion_memo }}</div>
+			</div>
+			<!-- <div class="hidden-sizer">{{item.body + "|"}}</div> -->
+			
+			<!-- For debugging: -->
+			<span v-show="false"> ({{item.id}}) D-{{item.depth}}) [{{item.children_order}}]</span>
+			
+			<form action="update"
+				class="updatebox"
+				:id="'updatebox-'+item.id"
+				v-show="item.id == this.$root.editingItem"
+				@submit.prevent="doneEdit(item)"
+			>
+				<div class="update-body">
+					<textarea
+						class="edititem-body"
+						:rows="item.rows"
+						v-model="item.body"
+						v-autosize="item.body"
+						v-item-focus="item.id == this.$root.editingItem"
+						@blur="blurOnEdit(item)"
+						@keyup.esc="cancelEdit(item)"
+						@keydown="keydownOnEdit(item, $event, 'body')"
+					>{{ item.body }}</textarea>
 				</div>
-				<!-- <div class="hidden-sizer">{{item.body + "|"}}</div> -->
-				
-				<!-- For debugging: -->
-				<span v-show="false"> ({{item.id}}) D-{{item.depth}}) [{{item.children_order}}]</span>
-				
-				<form action="update"
-					class="updatebox"
-					:id="'updatebox-'+item.id"
-					v-show="item.id == this.$root.editingItem"
-					@submit.prevent="doneEdit(item)"
-				>
-					<div class="update-body">
-						<textarea
-							class="edititem-body"
-							:rows="item.rows"
-							v-model="item.body"
-							v-autosize="item.body"
-							v-item-focus="item.id == this.$root.editingItem"
+				<div class="update-tags">
+					<div class="update-planned-time">
+						Duration:
+						<button
+							:class="{ currentDuration: item.planned_time == 10, 'planned-time': true }"
+							@click.prevent="setPlannedTime(item, 10, $event)"
+							@keydown="keydownOnEdit(item, $event, 'planned-time')"
+							@blur="blurOnEdit(item)"
+						>10 min</button>
+						<button
+							:class="{ currentDuration: item.planned_time == 15, 'planned-time': true }"
+							@click.prevent="setPlannedTime(item, 15, $event)"
+							@keydown="keydownOnEdit(item, $event, 'planned-time')"
+							@blur="blurOnEdit(item)"
+						>15 min</button>
+						<button
+							:class="{ currentDuration: item.planned_time == 30, 'planned-time': true }"
+							@click.prevent="setPlannedTime(item, 30, $event)"
+							@keydown="keydownOnEdit(item, $event, 'planned-time')"
+							@blur="blurOnEdit(item)"
+						>30 min</button>
+						<button
+							:class="{ currentDuration: item.planned_time == 60, 'planned-time': true }"
+							@click.prevent="setPlannedTime(item, 60, $event)"
+							@keydown="keydownOnEdit(item, $event, 'planned-time')"
+							@blur="blurOnEdit(item)"
+						>1 hour</button>
+						<div><input
+							class="planned-time" 
+							type="number"
+							v-show="true"
+							v-model="item.planned_time | min_to_hours"
 							@blur="blurOnEdit(item)"
 							@keyup.esc="cancelEdit(item)"
-							@keydown="keydownOnEdit(item, $event, 'body')"
-						>{{ item.body }}</textarea>
+							@keydown="keydownOnEdit(item, $event, 'planned-time')"
+						/>hours</div>
 					</div>
-					<div class="update-tags">
-						<div class="update-planned-time">
-							Duration:
-							<button
-								:class="{ currentDuration: item.planned_time == 10, 'planned-time': true }"
-								@click.prevent="setPlannedTime(item, 10, $event)"
-								@keydown="keydownOnEdit(item, $event, 'planned-time')"
+					<div class="update-custom-tags">
+						<label>
+							Add Tag: 
+							<input type="text"
+								class="add-tag"
 								@blur="blurOnEdit(item)"
-							>10 min</button>
-							<button
-								:class="{ currentDuration: item.planned_time == 15, 'planned-time': true }"
-								@click.prevent="setPlannedTime(item, 15, $event)"
-								@keydown="keydownOnEdit(item, $event, 'planned-time')"
-								@blur="blurOnEdit(item)"
-							>15 min</button>
-							<button
-								:class="{ currentDuration: item.planned_time == 30, 'planned-time': true }"
-								@click.prevent="setPlannedTime(item, 30, $event)"
-								@keydown="keydownOnEdit(item, $event, 'planned-time')"
-								@blur="blurOnEdit(item)"
-							>30 min</button>
-							<button
-								:class="{ currentDuration: item.planned_time == 60, 'planned-time': true }"
-								@click.prevent="setPlannedTime(item, 60, $event)"
-								@keydown="keydownOnEdit(item, $event, 'planned-time')"
-								@blur="blurOnEdit(item)"
-							>1 hour</button>
-							<div><input
-								class="planned-time" 
-								type="number"
-								v-show="true"
-								v-model="item.planned_time | min_to_hours"
-								@blur="blurOnEdit(item)"
+								v-model="newTag"
 								@keyup.esc="cancelEdit(item)"
-								@keydown="keydownOnEdit(item, $event, 'planned-time')"
-							/>hours</div>
-						</div>
-						<div class="update-custom-tags">
-							<label>
-								Add Tag: 
-								<input type="text"
-									class="add-tag"
-									@blur="blurOnEdit(item)"
-									v-model="newTag"
-									@keyup.esc="cancelEdit(item)"
-									@keydown="keydownOnEdit(item, $event, 'addTag')"
-								>
+								@keydown="keydownOnEdit(item, $event, 'addTag')"
+							>
+						</label>
+						<div class="tag-suggestions" v-if="false">
+						<!-- UNDER CONSTRUCTION -->
+							<label v-for="tag in allTags_c"
+								:class="'tag'"
+								@click="this.$root.patchTag(item.id, tag)"
+							>{{ tag.name }}
 							</label>
-							<div class="tag-suggestions" v-if="false">
-							<!-- UNDER CONSTRUCTION -->
-								<label v-for="tag in allTags_c"
-									:class="'tag'"
-									@click="this.$root.patchTag(item.id, tag)"
-								>{{ tag.name }}
-								</label>
-							</div>
 						</div>
 					</div>
-				</form>
-				<div class="item-tags">
-					<label class="done"
-						v-if="item.done && item.id != this.$root.editingDoneDateItem"
-					>Done {{ item.done_date | momentCalendar }}
-						<input class="flatpickr"
-							id="done-date-edit-{{ item.id }}"
-							v-model="item.done_date"
-						>
-					</label>
-					
-					<span v-if="
-						totalTimeLeft > 0
-						&& totalTimeLeft > timeLeft
-						&& totalTimeDifferentFromParent
-						&& !item.done" class="total-duration">
-						{{ totalTimeLeft | hourminsec }}
-						<!-- <span style="padding-right:2px">Total </span>
-						<span v-if="hasTotalUsedTime"> used {{ item.totalUsedTime | hourminsec }}</span>
-						<span v-if="(hasTotalUsedTime && hasTotalPlannedTime)">/</span>
-						<span v-if="hasTotalPlannedTime">{{ item.totalPlannedTime | hourmin }}</span> -->
- 					</span>
-
-					<span v-if="
-						item.id != this.$root.editingItem
-						&& timeLeft > 0
-						
-						&& !item.done" class="duration"
+				</div>
+			</form>
+			<div class="item-tags">
+				<label class="done"
+					v-if="item.done && item.id != this.$root.editingDoneDateItem"
+				>Done {{ item.done_date | momentCalendar }}
+					<input class="flatpickr"
+						id="done-date-edit-{{ item.id }}"
+						v-model="item.done_date"
 					>
-						{{ timeLeft | hourminsec }}
-						<!-- <span v-if="hasUsedTime">Used {{ item.used_time | hourminsec }}</span>
-						<span v-if="(hasPlannedTime && hasUsedTime)">/</span>
-						<span v-if="hasPlannedTime">{{ item.planned_time | hourmin }}</span> -->
-					</span>
-					
-					<span v-if="hasDueDate && !item.done"
-						class="duedate"
-					>{{ item.due_date | momentCalendar }}</span>
-
-					<span v-if="item.dueDateParent && !item.done"
-						class="duedate-parent"
-					>{{ item.dueDateParent | momentCalendar }}</span>
-
-					<span v-for="tag in item.tagged"
-						v-if="item.tagged.length"
-						v-show="!hasParentWithTag(item.id, tag.tag_slug)
-							|| item.id == this.$root.editingItem"
-						class="custom-tag"
-						@click.prevent="this.$root.filterItems('tag', tag.tag_slug)"
-					>{{ tag.tag_name }}
-						<button class="delete-tag"
-							v-if="item.id == this.$root.editingItem"
-							@click.prevent="deleteTag(item.id, tag.tag_name, $event)"
-						>
-							<i class="zmdi zmdi-close-circle"></i>
-						</button>
-					</span>
-
-				</div>
-				<div class="item-nav"
-					v-if="this.$root.editingItem != item.id && this.$root.selection.selectedId == item.id"
-				>
-					
-					<button v-if="!item.done"
-						class="timer"
-						@click="addTimer(item)"
-					><i class="zmdi zmdi-timer"></i>
-					</button>
-					<button v-if="item.done"
-						class="more"
-						@click="this.$root.popup(item.id, 'afterDone')"
-					><i class="zmdi zmdi-more"></i>
-					</button>
-					<!--
-					- font icon / woff format [font awesome]
-					  material design iconic fonts
-					- add svg as background to button
-					- or image tag inside button
-					- svg tag -> add as pattern
-					-->
-					<button class="delete" 
-						v-if="item.children_order.length==0"
-						@click="deleteItem(item)"
-					><i class="zmdi zmdi-delete"></i>
-					</button>
-				</div>
+				</label>
 				
-			</div>
-		</div>
-
-		<form 
-			:class="['addnewbox-firstchild', 'addnewbox', 'child']"
-			:id="'new-firstchild-of-'+item.id"
-			v-if="showAddNewBoxFirstChild"
-			@submit.prevent
-		>
-			<div>
-				<textarea type="text"
-					class="newitem-body"
-					v-model="newItem.body"
-					v-autosize="newItem.body"
-					@blur="blurOnAddNew(item)"
-					@keydown="keydownOnNew(item, $event, 'body')"
-					placeholder="..."
-					autocomplete="off"
-					autofocus 
-					rows="1"
-				></textarea>
-			</div>
-			<div class="update-tags">
-				<div class="update-planned-time">
-					Duration:
-					<button
-						:class="{ currentDuration: newItem.planned_time == 10, 'planned-time': true }"
-						@click.prevent="setPlannedTimeNewItem(item, 10, $event)"
-						@keydown="keydownOnNew(item, $event, 'planned-time')"
-						@blur="blurOnAddNew(item)"
-					>10 min</button>
-					<button
-						:class="{ currentDuration: newItem.planned_time == 15, 'planned-time': true }"
-						@click.prevent="setPlannedTimeNewItem(item, 15, $event)"
-						@keydown="keydownOnNew(item, $event, 'planned-time')"
-						@blur="blurOnAddNew(item)"
-					>15 min</button>
-					<button
-						:class="{ currentDuration: newItem.planned_time == 30, 'planned-time': true }"
-						@click.prevent="setPlannedTimeNewItem(item, 30, $event)"
-						@keydown="keydownOnNew(item, $event, 'planned-time')"
-						@blur="blurOnAddNew(item)"
-					>30 min</button>
-					<button
-						:class="{ currentDuration: newItem.planned_time == 60, 'planned-time': true }"
-						@click.prevent="setPlannedTimeNewItem(item, 60, $event)"
-						@keydown="keydownOnNew(item, $event, 'planned-time')"
-						@blur="blurOnAddNew(item)"
-					>1 hour</button>
-					<div><input
-						class="planned-time" 
-						type="number"
-						v-show="true"
-						v-model="newItem.planned_time | min_to_hours"
-						@blur="blurOnAddNew(item)"
-						@keydown="keydownOnNew(item, $event, 'planned-time')"
-					/>hours</div>
-				</div>
-				<div class="update-custom-tags">
-					<label>
-						Add Tag: 
-						<input type="text"
-							class="prepare-tag"
-							@keydown="keydownOnNew(item, $event, 'addTag')"
-							@blur="blurOnAddNew(item)"
-							v-model="newTag"
-						>
-					</label>
-				</div>
-				<div class="item-tags prepared-tags">
-					<span v-if="newItem.preparedTags.length"
-						v-for="tag in newItem.preparedTags"
-						:class="(tag=='Today') ? 'duedate' : 'custom-tag'"
-					>{{ tag }}
-						<button class="delete-tag"
-							@click.prevent="deletePreparedTag(tag, item)"
-						>
-							<i class="zmdi zmdi-close-circle"></i>
-						</button>
+				<span v-if="
+					totalTimeLeft > 0
+					&& totalTimeLeft > timeLeft
+					&& totalTimeDifferentFromParent
+					&& !item.done" class="total-duration">
+					{{ totalTimeLeft | hourminsec }}
+					<!-- <span style="padding-right:2px">Total </span>
+					<span v-if="hasTotalUsedTime"> used {{ item.totalUsedTime | hourminsec }}</span>
+					<span v-if="(hasTotalUsedTime && hasTotalPlannedTime)">/</span>
+					<span v-if="hasTotalPlannedTime">{{ item.totalPlannedTime | hourmin }}</span> -->
 					</span>
-				</div>
+
+				<span v-if="
+					item.id != this.$root.editingItem
+					&& timeLeft > 0
+					
+					&& !item.done" class="duration"
+				>
+					{{ timeLeft | hourminsec }}
+					<!-- <span v-if="hasUsedTime">Used {{ item.used_time | hourminsec }}</span>
+					<span v-if="(hasPlannedTime && hasUsedTime)">/</span>
+					<span v-if="hasPlannedTime">{{ item.planned_time | hourmin }}</span> -->
+				</span>
+				
+				<span v-if="hasDueDate && !item.done"
+					class="duedate"
+				>{{ item.due_date | momentCalendar }}</span>
+
+				<span v-if="item.dueDateParent && !item.done"
+					class="duedate-parent"
+				>{{ item.dueDateParent | momentCalendar }}</span>
+
+				<span v-for="tag in item.tagged"
+					v-if="item.tagged.length"
+					v-show="!parentTags.includes(tag.tag_name)
+						|| item.id == this.$root.editingItem"
+					class="custom-tag"
+					@dblclick.prevent="this.$root.filterItems('tag', tag.tag_slug)"
+				>{{ tag.tag_name }}
+					<button class="delete-tag"
+						v-if="item.id == this.$root.editingItem
+						&& !parentTags.includes(tag.tag_name)"
+						@click.prevent="deleteTag(item.id, tag.tag_name, $event)"
+					>
+						<i class="zmdi zmdi-close-circle"></i>
+					</button>
+				</span>
+
 			</div>
-		</form>
-
-
-		<div class="children"
-			v-if="item.children"
-			v-show="item.show_children"
-		>
-			<Card v-for="childCard in item.children"
-				:item="childCard"
-				:key="childCard.id"
-			></Card>
+			<div class="item-nav"
+				v-if="this.$root.editingItem != item.id && this.$root.selection.selectedId == item.id"
+			>
+				
+				<button v-if="!item.done"
+					class="timer"
+					@click="addTimer(item)"
+				><i class="zmdi zmdi-timer"></i>
+				</button>
+				<button v-if="item.done"
+					class="more"
+					@click="this.$root.popup(item.id, 'afterDone')"
+				><i class="zmdi zmdi-more"></i>
+				</button>
+				<!--
+				- font icon / woff format [font awesome]
+				  material design iconic fonts
+				- add svg as background to button
+				- or image tag inside button
+				- svg tag -> add as pattern
+				-->
+				<button class="delete" 
+					v-if="item.children_order.length==0"
+					@click="deleteItem(item)"
+				><i class="zmdi zmdi-delete"></i>
+				</button>
+			</div>
+			
 		</div>
-
-		<form 
-			:class="['addnewbox']"
-			:id="'new-under-'+ item.id "
-			v-if="showAddNewBox"
-			@submit.prevent
-		>
-			<div>
-				<textarea type="text"
-					class="newitem-body"
-					v-model="newItem.body"
-					v-autosize="newItem.body"
-					@blur="blurOnAddNew(item)"
-					@keydown="keydownOnNew(item, $event, 'body')"
-					placeholder="..."
-					autocomplete="off"
-					autofocus 
-					rows="1"
-				></textarea>
-			</div>
-			<div class="update-tags">
-				<div class="update-planned-time">
-					Duration:
-					<button
-						:class="{ currentDuration: newItem.planned_time == 10, 'planned-time': true }"
-						@click.prevent="setPlannedTimeNewItem(item, 10, $event)"
-						@keydown="keydownOnNew(item, $event, 'planned-time')"
-						@blur="blurOnAddNew(item)"
-					>10 min</button>
-					<button
-						:class="{ currentDuration: newItem.planned_time == 15, 'planned-time': true }"
-						@click.prevent="setPlannedTimeNewItem(item, 15, $event)"
-						@keydown="keydownOnNew(item, $event, 'planned-time')"
-						@blur="blurOnAddNew(item)"
-					>15 min</button>
-					<button
-						:class="{ currentDuration: newItem.planned_time == 30, 'planned-time': true }"
-						@click.prevent="setPlannedTimeNewItem(item, 30, $event)"
-						@keydown="keydownOnNew(item, $event, 'planned-time')"
-						@blur="blurOnAddNew(item)"
-					>30 min</button>
-					<button
-						:class="{ currentDuration: newItem.planned_time == 60, 'planned-time': true }"
-						@click.prevent="setPlannedTimeNewItem(item, 60, $event)"
-						@keydown="keydownOnNew(item, $event, 'planned-time')"
-						@blur="blurOnAddNew(item)"
-					>1 hour</button>
-					<div><input
-						class="planned-time"
-						v-if="true"
-						type="number"
-						v-model="newItem.planned_time | min_to_hours"
-						@keydown="keydownOnNew(item, $event)"
-						@keydown="keydownOnNew(item, $event, 'planned-time')"
-						@blur="blurOnAddNew(item)"
-					/>hours</div>
-				</div>
-				<div class="update-custom-tags">
-					<label>
-						Add Tag: 
-						<input type="text"
-							class="prepare-tag"
-							@keydown="keydownOnNew(item, $event, 'addTag')"
-							@blur="blurOnAddNew(item)"
-							v-model="newTag"
-						>
-					</label>
-				</div>
-				<div class="item-tags prepared-tags">
-					<span v-if="newItem.preparedTags.length"
-						v-for="tag in newItem.preparedTags"
-						:class="(tag=='Today') ? 'duedate' : 'custom-tag'"
-					>{{ tag }}
-						<button class="delete-tag"
-							@click.prevent="deletePreparedTag(tag, item)"
-						>
-							<i class="zmdi zmdi-close-circle"></i>
-						</button>
-					</span>
-				</div>
-			</div>
-		</form>
 	</div>
+
+	<form 
+		:class="['addnewbox-firstchild', 'addnewbox', 'child']"
+		:id="'new-firstchild-of-'+item.id"
+		v-if="showAddNewBoxFirstChild"
+		@submit.prevent
+	>
+		<div>
+			<textarea type="text"
+				class="newitem-body"
+				v-model="newItem.body"
+				v-autosize="newItem.body"
+				@blur="blurOnAddNew(item)"
+				@keydown="keydownOnNew(item, $event, 'body')"
+				placeholder="..."
+				autocomplete="off"
+				autofocus 
+				rows="1"
+			></textarea>
+		</div>
+		<div class="update-tags">
+			<div class="update-planned-time">
+				Duration:
+				<button
+					:class="{ currentDuration: newItem.planned_time == 10, 'planned-time': true }"
+					@click.prevent="setPlannedTimeNewItem(item, 10, $event)"
+					@keydown="keydownOnNew(item, $event, 'planned-time')"
+					@blur="blurOnAddNew(item)"
+				>10 min</button>
+				<button
+					:class="{ currentDuration: newItem.planned_time == 15, 'planned-time': true }"
+					@click.prevent="setPlannedTimeNewItem(item, 15, $event)"
+					@keydown="keydownOnNew(item, $event, 'planned-time')"
+					@blur="blurOnAddNew(item)"
+				>15 min</button>
+				<button
+					:class="{ currentDuration: newItem.planned_time == 30, 'planned-time': true }"
+					@click.prevent="setPlannedTimeNewItem(item, 30, $event)"
+					@keydown="keydownOnNew(item, $event, 'planned-time')"
+					@blur="blurOnAddNew(item)"
+				>30 min</button>
+				<button
+					:class="{ currentDuration: newItem.planned_time == 60, 'planned-time': true }"
+					@click.prevent="setPlannedTimeNewItem(item, 60, $event)"
+					@keydown="keydownOnNew(item, $event, 'planned-time')"
+					@blur="blurOnAddNew(item)"
+				>1 hour</button>
+				<div><input
+					class="planned-time" 
+					type="number"
+					v-show="true"
+					v-model="newItem.planned_time | min_to_hours"
+					@blur="blurOnAddNew(item)"
+					@keydown="keydownOnNew(item, $event, 'planned-time')"
+				/>hours</div>
+			</div>
+			<div class="update-custom-tags">
+				<label>
+					Add Tag: 
+					<input type="text"
+						class="prepare-tag"
+						@keydown="keydownOnNew(item, $event, 'addTag')"
+						@blur="blurOnAddNew(item)"
+						v-model="newTag"
+					>
+				</label>
+			</div>
+			<div class="item-tags prepared-tags">
+				<span v-if="newItem.preparedTags.length"
+					v-for="tag in newItem.preparedTags"
+					:class="(tag=='Today') ? 'duedate' : 'custom-tag'"
+				>{{ tag }}
+					<button class="delete-tag"
+						v-if="!parentTags.includes(tag)"
+						@click.prevent="deletePreparedTag(tag, item)"
+					>
+						<i class="zmdi zmdi-close-circle"></i>
+					</button>
+				</span>
+			</div>
+		</div>
+	</form>
+
+
+	<div class="children"
+		v-if="item.children"
+		v-show="item.show_children"
+	>
+		<Card v-for="childCard in item.children"
+			:item="childCard"
+			:key="childCard.id"
+		></Card>
+	</div>
+
+	<form 
+		:class="['addnewbox']"
+		:id="'new-under-'+ item.id "
+		v-if="showAddNewBox"
+		@submit.prevent
+	>
+		<div>
+			<textarea type="text"
+				class="newitem-body"
+				v-model="newItem.body"
+				v-autosize="newItem.body"
+				@blur="blurOnAddNew(item)"
+				@keydown="keydownOnNew(item, $event, 'body')"
+				placeholder="..."
+				autocomplete="off"
+				autofocus 
+				rows="1"
+			></textarea>
+		</div>
+		<div class="update-tags">
+			<div class="update-planned-time">
+				Duration:
+				<button
+					:class="{ currentDuration: newItem.planned_time == 10, 'planned-time': true }"
+					@click.prevent="setPlannedTimeNewItem(item, 10, $event)"
+					@keydown="keydownOnNew(item, $event, 'planned-time')"
+					@blur="blurOnAddNew(item)"
+				>10 min</button>
+				<button
+					:class="{ currentDuration: newItem.planned_time == 15, 'planned-time': true }"
+					@click.prevent="setPlannedTimeNewItem(item, 15, $event)"
+					@keydown="keydownOnNew(item, $event, 'planned-time')"
+					@blur="blurOnAddNew(item)"
+				>15 min</button>
+				<button
+					:class="{ currentDuration: newItem.planned_time == 30, 'planned-time': true }"
+					@click.prevent="setPlannedTimeNewItem(item, 30, $event)"
+					@keydown="keydownOnNew(item, $event, 'planned-time')"
+					@blur="blurOnAddNew(item)"
+				>30 min</button>
+				<button
+					:class="{ currentDuration: newItem.planned_time == 60, 'planned-time': true }"
+					@click.prevent="setPlannedTimeNewItem(item, 60, $event)"
+					@keydown="keydownOnNew(item, $event, 'planned-time')"
+					@blur="blurOnAddNew(item)"
+				>1 hour</button>
+				<div><input
+					class="planned-time"
+					v-if="true"
+					type="number"
+					v-model="newItem.planned_time | min_to_hours"
+					@keydown="keydownOnNew(item, $event)"
+					@keydown="keydownOnNew(item, $event, 'planned-time')"
+					@blur="blurOnAddNew(item)"
+				/>hours</div>
+			</div>
+			<div class="update-custom-tags">
+				<label>
+					Add Tag: 
+					<input type="text"
+						class="prepare-tag"
+						@keydown="keydownOnNew(item, $event, 'addTag')"
+						@blur="blurOnAddNew(item)"
+						v-model="newTag"
+					>
+				</label>
+			</div>
+			<div class="item-tags prepared-tags">
+				<span v-if="newItem.preparedTags.length"
+					v-for="tag in newItem.preparedTags"
+					:class="(tag=='Today') ? 'duedate' : 'custom-tag'"
+				>{{ tag }}
+					<button class="delete-tag"
+						v-if="!parentTags.includes(tag)"
+						@click.prevent="deletePreparedTag(tag, item)"
+					>
+						<i class="zmdi zmdi-close-circle"></i>
+					</button>
+				</span>
+			</div>
+		</div>
+	</form>
+</div>
 </template>
-
-
 <script>
-
 
 export default {
 	name: 'Card',
@@ -433,6 +433,7 @@ export default {
 	created(){
 	},
 	ready(){
+		this.newItem.preparedTags = this.parentTags;
 	},
 	props: ['item', 'alltags'],
 	data: function(){
@@ -534,11 +535,11 @@ export default {
 			if(!this.item.parent_id){ return true; }
 			return this.item.totalPlannedTime != allItems.nodes[this.item.parent_id].totalPlannedTime;
 		},
+		parentTags(){
+			return allItems.nodes[this.item.parent_id].tagged.map(obj => obj.tag_name);
+		},
 	},
 	methods: {
-		hasParentWithTag(id, tags){
-			return allItems.hasParentWithTag(id, tags);
-		},
 		addTimer(item){
 			//Codementor
 			this.$root.addTimer(item.id);
@@ -788,7 +789,9 @@ export default {
 			this.$root.patch(id,'show_children');
 		},
 		startEdit(item, event){
-			if (event && event.srcElement.hasClass('done')){
+			if (event &&
+				(event.srcElement.hasClass('done')
+				|| event.srcElement.hasClass('custom-tag'))){
 				return;
 			}
 			console.log('startEdit');
@@ -867,7 +870,7 @@ export default {
 			this.newItem.body = '';
 			this.newItem.due_date = '0000-00-00 00:00:00';
 			this.newItem.planned_time = '';
-			this.newItem.preparedTags = '';
+			this.newItem.preparedTags = this.parentTags;
 		},
 		cancelAddNew(lastSelectedId){
 			this.newItem.body = '';
@@ -888,10 +891,6 @@ export default {
 			let tag = this.newTag;
 			if(tag=='t' || tag=='T' || tag=='today' || tag=='Today'){
 				tag = 'Today';
-			}
-			if(allItems.hasParentWithTag(id, tag)){
-				console.log('NG! has a parent with the tag');
-				return;
 			}
 			this.newItem.preparedTags.push(tag);
 			this.newTag = null;

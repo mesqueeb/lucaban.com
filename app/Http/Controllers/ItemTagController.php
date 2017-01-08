@@ -48,19 +48,24 @@ class ItemTagController extends Controller
      */
     public function show(Request $request, $id)
     {
+        // var_dump($request->all());
+
         $item = Item::findOrFail($id);
-        if($request['type'] == 'tagNames' || !$request['type']){
+        if($request['type'] == 'tagNames'){
             return $item->tagNames();
         }
-        if($request['type'] == 'tagged'){
+        if($request['type'] == 'tagged' || !$request['type']){
             return $item->tagged;
         }
         if($request['type'] == 'tags'){
             return $item->tags;
         }
+        return 'no tags found...';
     }
     public function fetchTagged(Request $request)
     {
+        // var_dump($request['type']);
+
         if($request['type'] == 'withAnyTag'){
             return Item::withAnyTag($request['tags'])->get(); // fetch articles with any tag listed
         }
@@ -89,6 +94,8 @@ class ItemTagController extends Controller
      */
     public function update(Request $request, $id)
     {
+        // var_dump($request->input);
+
         if ($request['type'] == 'tag' || !$request['type']){
             Item::findOrFail($id)->tag($request['tags']); // attach the tag
         }
