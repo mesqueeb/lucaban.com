@@ -25781,7 +25781,7 @@ function btnEffect(event) {
 		$el.removeClass("btn--click");
 	}, 400);
 	setTimeout(function () {
-		$el.blur();
+		// $el.blur();
 	}, 1000);
 }
 
@@ -27233,9 +27233,9 @@ exports.default = {
 		patch: function patch(id, arg) {
 			var _this = this;
 
-			if ((selection.filter.length > 0 || selection.tags.length > 0) && allItems.isTopLvlItemInFilteredRoot(id)) {
+			if (allItems.isTopLvlItemInFilteredRoot(id)) {
 				if (arg == 'children_order' || arg == 'parent_id') {
-					console.log('trying to move toplvlItem on filtered');
+					console.log("you can't sync a toplvlItem when filtering");
 					return;
 				}
 			}
@@ -27480,8 +27480,13 @@ exports.default = {
 		filterItems: function filterItems(keyword, value, event) {
 			// debugger;
 			var operator = null;
-			if (event && (event.ctrlKey || event.metaKey)) {
-				operator = 'AND';
+			if (event) {
+				event.preventDefault();
+				if (event.ctrlKey || event.metaKey) {
+					operator = 'AND';
+				} else if (event.altKey) {
+					operator = 'NOT';
+				}
 			} else {
 				selection.tags = [];
 				selection.filter = [];
@@ -28285,12 +28290,12 @@ var Tree = function () {
 		key: 'isTopLvlItemInFilteredRoot',
 		value: function isTopLvlItemInFilteredRoot(id) {
 			// debugger;
-			if (selection.filter.length == 0 && selection.tags.length == 0) {
+			if (selection.filter.length + selection.tags.length == 0) {
 				return false;
 			}
-			if (this.root.children_order.includes(id)) {
+			if (id == this.root.id) {
 				return true;
-			} else if (id == this.root.id) {
+			} else if (this.root.children_order.includes(id)) {
 				return true;
 			} else {
 				return false;
@@ -28794,7 +28799,9 @@ var Tree = function () {
 				item.parent_id = item.parent_id_backup;
 			});
 			var arrayToFilter = void 0;
-			if (operator == 'AND') {
+			if (operator == 'NOT') {
+				arrayToFilter = this.root.children;
+			} else if (operator == 'AND') {
 				arrayToFilter = this.flattenTree(this.root.children);
 			} else {
 				arrayToFilter = this.flattenTree(this.backups.rootChildren);
@@ -28826,7 +28833,7 @@ var Tree = function () {
 				Array.prototype.push.apply(filteredArray, this.arrayFilterDate(arrayToFilter, value));
 			}
 			if (keyword == 'tag') {
-				Array.prototype.push.apply(filteredArray, this.arrayFilterTag(arrayToFilter, value));
+				Array.prototype.push.apply(filteredArray, this.arrayFilterTag(arrayToFilter, value, operator));
 			}
 			filteredArray.forEach(function (item) {
 				item.parent_id = this.root.id;
@@ -28841,8 +28848,20 @@ var Tree = function () {
 		}
 	}, {
 		key: 'arrayFilterTag',
-		value: function arrayFilterTag(array, tags) {
+		value: function arrayFilterTag(array, tags, operator) {
 			var filteredArray = [];
+			if (operator == 'NOT') {
+				filteredArray = array.filter(function (item) {
+					return !this.hasTag(item.id, tags);
+				}.bind(this));
+				filteredArray.forEach(function (item) {
+					if (item.children.length) {
+						item.children = this.arrayFilterTag(item.children, tags, operator);
+					}
+				}.bind(this));
+				return filteredArray;
+			}
+
 			array.forEach(function (item) {
 				var id = item.id;
 				if (this.hasTag(id, tags) && !this.hasParentWithTag(id, tags)) {

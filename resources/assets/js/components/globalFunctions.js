@@ -15,7 +15,7 @@ function btnEffect(event){
 		$el.removeClass("btn--click");
 	}, 400);
 	setTimeout(function(){
-		$el.blur();
+		// $el.blur();
 	}, 1000);
 }
 

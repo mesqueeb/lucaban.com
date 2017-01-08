@@ -344,10 +344,10 @@ export default class Tree {
 	isTopLvlItemInFilteredRoot(id)
 	{
 		// debugger;
-		if(selection.filter.length == 0 && selection.tags.length == 0){ return false; }
-		if (this.root.children_order.includes(id)){
+		if((selection.filter.length+selection.tags.length) == 0){ return false; }
+		if (id == this.root.id) {
 			return true;
-		} else if (id == this.root.id) {
+		} else if (this.root.children_order.includes(id)){
 			return true;
 		} else {
 			return false;
@@ -762,7 +762,9 @@ export default class Tree {
 			item.parent_id = item.parent_id_backup;
 		});
 		let arrayToFilter;
-		if(operator == 'AND'){
+		if(operator == 'NOT'){
+			arrayToFilter = this.root.children;
+		} else if(operator == 'AND'){
 			arrayToFilter = this.flattenTree(this.root.children);
 		} else {
 			arrayToFilter = this.flattenTree(this.backups.rootChildren);
@@ -794,7 +796,7 @@ export default class Tree {
 			Array.prototype.push.apply(filteredArray, this.arrayFilterDate(arrayToFilter, value));
 		}
 		if (keyword == 'tag'){
-			Array.prototype.push.apply(filteredArray, this.arrayFilterTag(arrayToFilter, value));
+			Array.prototype.push.apply(filteredArray, this.arrayFilterTag(arrayToFilter, value, operator));
 		}
 		filteredArray.forEach(function(item){
 			item.parent_id = this.root.id;
@@ -807,8 +809,20 @@ export default class Tree {
 		// 	this.rebindArrayParentIds(filteredArray, this.root.id);
 		// }
 	}
-	arrayFilterTag(array, tags){
+	arrayFilterTag(array, tags, operator){
 		let filteredArray = [];
+		if(operator == 'NOT'){
+			filteredArray = array.filter(function(item) {
+				return !this.hasTag(item.id, tags);
+			}.bind(this));
+			filteredArray.forEach(function(item) {
+				if(item.children.length){
+					item.children = this.arrayFilterTag(item.children, tags, operator);
+				}
+			}.bind(this));
+			return filteredArray;
+		}
+
     	array.forEach(function (item) {
 			let id = item.id;
     		if (this.hasTag(id, tags)

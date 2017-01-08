@@ -5485,16 +5485,6 @@ button:focus {
     opacity: 0;
     transform: scale3d(1.2, 1.2, 1); } }
 
-.alert {
-  background: #ddd;
-  padding: 1em; }
-
-.alert-success {
-  background: lime; }
-
-.alert-error {
-  background: salmon; }
-
 label {
   font-weight: 300; }
 
@@ -5843,6 +5833,16 @@ label {
   color: #dadada;
   font-size: 0.8em; }
 
+.alert {
+  background: #ddd;
+  padding: 1em; }
+
+.alert-success {
+  background: lime; }
+
+.alert-error {
+  background: salmon; }
+
 #popups {
   top: 0;
   position: fixed;
@@ -5967,6 +5967,8 @@ label {
     border-bottom: 1px solid #e3e3e3;
     display: -ms-flexbox;
     display: flex;
+    -ms-flex-direction: row;
+    flex-direction: row;
     -ms-flex-align: center;
     align-items: center;
     font-size: 1.1em;

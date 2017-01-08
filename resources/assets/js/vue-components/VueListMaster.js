@@ -187,10 +187,9 @@ export default {
 			}
 		},
 		patch(id, arg){
-			if((selection.filter.length > 0 || selection.tags.length > 0)
-				&& allItems.isTopLvlItemInFilteredRoot(id)){ 
+			if(allItems.isTopLvlItemInFilteredRoot(id)){ 
 				if(arg == 'children_order' || arg == 'parent_id'){
-					console.log('trying to move toplvlItem on filtered');
+					console.log("you can't sync a toplvlItem when filtering");
 					return;
 				}
 			}
@@ -428,8 +427,13 @@ export default {
 		filterItems(keyword, value, event){
 			// debugger;
 			let operator = null;
-			if (event && (event.ctrlKey || event.metaKey)){
-				operator = 'AND';
+			if(event){
+				event.preventDefault();
+				if (event.ctrlKey || event.metaKey){
+					operator = 'AND';
+				} else if (event.altKey){
+					operator = 'NOT';
+				}				
 			} else {
 				selection.tags = [];
 				selection.filter = [];
