@@ -38,16 +38,15 @@ export default {
 			if(!items.length){ return []; }
 			items.forEach(function(child) {
 				child.tagged.forEach(function(taggedObj){
-					console.log('logging taggedObj in allTagsComputed');
-					console.log(taggedObj);
-					let tagPresent = childrensTags.find(function(tagAlready){
-						return tagAlready.name == taggedObj.tag.name;
-					}.bind(taggedObj));
-					if(tagPresent){
-						// console.log(taggedObj.tag.name+' present already!');
-					} else {
-						// console.log(taggedObj.tag.name+' needs adding');
-						childrensTags.push(taggedObj.tag);
+					// console.log('logging taggedObj in allTagsComputed');
+					// console.log(taggedObj);
+					if(taggedObj.tag.name){ // solve bug when tagname is empty
+						let tagPresent = childrensTags.find(function(tagAlready){
+							return tagAlready.name == taggedObj.tag.name;
+						}.bind(taggedObj));
+						if(!tagPresent){
+							childrensTags.push(taggedObj.tag);
+						}
 					}
 				}.bind(childrensTags));
 			}.bind(childrensTags));

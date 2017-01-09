@@ -25770,12 +25770,6 @@ function hasClass(element, cls) {
 
 function sortObjectArrayByProperty(array, propertyName) {
 	return array.sort(function (a, b) {
-		console.log('a[propertyName]');
-		console.log(a[propertyName]);
-		console.log(a);
-		console.log('b[propertyName]');
-		console.log(b[propertyName]);
-		console.log(b);
 		var textA = a[propertyName].toUpperCase();
 		var textB = b[propertyName].toUpperCase();
 		return textA < textB ? -1 : textA > textB ? 1 : 0;
@@ -27092,16 +27086,16 @@ exports.default = {
 			}
 			items.forEach(function (child) {
 				child.tagged.forEach(function (taggedObj) {
-					console.log('logging taggedObj in allTagsComputed');
-					console.log(taggedObj);
-					var tagPresent = childrensTags.find(function (tagAlready) {
-						return tagAlready.name == taggedObj.tag.name;
-					}.bind(taggedObj));
-					if (tagPresent) {
-						// console.log(taggedObj.tag.name+' present already!');
-					} else {
-						// console.log(taggedObj.tag.name+' needs adding');
-						childrensTags.push(taggedObj.tag);
+					// console.log('logging taggedObj in allTagsComputed');
+					// console.log(taggedObj);
+					if (taggedObj.tag.name) {
+						// solve bug when tagname is empty
+						var tagPresent = childrensTags.find(function (tagAlready) {
+							return tagAlready.name == taggedObj.tag.name;
+						}.bind(taggedObj));
+						if (!tagPresent) {
+							childrensTags.push(taggedObj.tag);
+						}
 					}
 				}.bind(childrensTags));
 			}.bind(childrensTags));

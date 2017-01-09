@@ -4,12 +4,6 @@ function hasClass(element, cls) {
 
 function sortObjectArrayByProperty(array, propertyName){
 	return array.sort(function(a, b){
-		console.log('a[propertyName]');
-		console.log(a[propertyName]);
-		console.log(a);
-		console.log('b[propertyName]');
-		console.log(b[propertyName]);
-		console.log(b);
 	    let textA = a[propertyName].toUpperCase();
 	    let textB = b[propertyName].toUpperCase();
 	    return (textA < textB) ? -1 : (textA > textB) ? 1 : 0;
