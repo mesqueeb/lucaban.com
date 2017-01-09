@@ -51,6 +51,7 @@ export default {
 					}
 				}.bind(childrensTags));
 			}.bind(childrensTags));
+			console.log('before sorting tags');
 			childrensTags = sortObjectArrayByProperty(childrensTags, 'name');
 			return childrensTags;
 		},

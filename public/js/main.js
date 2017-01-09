@@ -25770,6 +25770,12 @@ function hasClass(element, cls) {
 
 function sortObjectArrayByProperty(array, propertyName) {
 	return array.sort(function (a, b) {
+		console.log('a[propertyName]');
+		console.log(a[propertyName]);
+		console.log(a);
+		console.log('b[propertyName]');
+		console.log(b[propertyName]);
+		console.log(b);
 		var textA = a[propertyName].toUpperCase();
 		var textB = b[propertyName].toUpperCase();
 		return textA < textB ? -1 : textA > textB ? 1 : 0;
@@ -27099,6 +27105,7 @@ exports.default = {
 					}
 				}.bind(childrensTags));
 			}.bind(childrensTags));
+			console.log('before sorting tags');
 			childrensTags = (0, _globalFunctions.sortObjectArrayByProperty)(childrensTags, 'name');
 			return childrensTags;
 		},
