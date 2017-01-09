@@ -4,6 +4,8 @@ export default class Selection {
 		this.lastSelectedId = null;
 		this.filter = [];
 		this.tags = [];
+		this.hiddenTags = [];
+		this.hiddenItems = [];
 	}
 	
 

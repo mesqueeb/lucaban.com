@@ -1,12 +1,12 @@
 <template id="items-card-template">
 
-
 <div :class="{
 		'items-card': true,
 		'journal-wrapper': $root.selection.filter.includes('done')
 	}"
 	:id="'card-'+item.id"
 >
+<div v-if="!isHidden">
 		<div class="title"
 		v-if="journalDate"
 		>
@@ -424,6 +424,7 @@
 		</div>
 	</form>
 </div>
+</div>
 </template>
 <script>
 
@@ -536,7 +537,17 @@ export default {
 			return this.item.totalPlannedTime != allItems.nodes[this.item.parent_id].totalPlannedTime;
 		},
 		parentTags(){
-			return allItems.nodes[this.item.parent_id].tagged.map(obj => obj.tag_name);
+			return allItems.returnTagsAsArray(this.item.parent_id);
+		},
+		// childrensTags(){
+		// 	let childrensTags = [];
+		// 	allItems.nodes[this.item.id].children_order.forEach(function(childId) {
+		// 		Array.prototype.push.apply(childrensTags, allItems.returnTagsAsArray(childId));
+		// 	});
+		// 	return childrensTags;
+		// },
+		isHidden(){
+			return this.$root.selection.hiddenItems.includes(this.item.id)
 		},
 	},
 	methods: {

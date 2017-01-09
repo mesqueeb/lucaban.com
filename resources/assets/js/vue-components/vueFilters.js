@@ -131,5 +131,4 @@ Vue.filter('linkify', {
 		});
   	},
 });
-
 } // export default function(Vue)

@@ -164,11 +164,11 @@ $.getJSON('/api/items',function(fetchedData){
 	window.selection = new Selection();
 	window.allItems = new Tree(fetchedData);
 
-	$.getJSON('/api/itemtags',function(tags){
-		console.log(tags);
-		window.allTags = tags;
-		vm.allTags = tags;
-	});
+	// $.getJSON('/api/itemtags',function(tags){
+	// 	console.log(tags);
+	// 	window.allTags = tags;
+	// 	vm.allTags = tags;
+	// });
 	// Codementor: How do I make the following function wait until DOM/Vue/etc. is loaded?
 	setTimeout(function(){
 		flatpickrifyAllInputs();

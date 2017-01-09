@@ -47,10 +47,10 @@
 		</div>
 		<div class="tag-menu">
 
-			<a v-for="tag in allTags"
-				v-if="tag.count"
+			<a v-for="tag in allTagsComputed"
 				href="#"
-				:class="{active: selection.tags.includes(tag.slug)}"
+				:class="{active: selection.tags.includes(tag.slug), 
+					hidden: selection.hiddenTags.includes(tag.slug)}"
 				@click="filterItems('tag', tag.slug, $event)"
 			>@{{ tag.name }}</a>
 			
@@ -59,8 +59,13 @@
 	<div class="line"></div>
 	<div class="panel-title"
 	>
-		@{{ selection.filter | capitalize }}
-		@{{ selection.tags | capitalize }}
+		<div>
+			@{{ selection.filter | capitalize }}
+			@{{ selection.tags | capitalize }}
+		</div>
+		<div class="hidden-tags">
+			@{{ selection.hiddenTags | capitalize }}
+		</div>
 	</div>
 	{{-- STATS --}}
 	<div class="stats"

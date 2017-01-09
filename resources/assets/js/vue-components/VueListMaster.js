@@ -5,27 +5,22 @@ import Popups from './Popups.vue';
 import Popouts from './Popouts.vue';
 
 export default {
-	// name: 'Vuelistmaster',
-    // template: '#vuelist-template',
 	el:'#body',
 	data: {
-	// data: function(){
-		// return {
-			allData: null,
-			doneData: null,
-			selection: null,
-			addingNewUnder: null,
-			addingNewAsChild: false,
-			addingNewAsFirstChild: false,
-			editingItem: null,
-			editingDoneDateItem: null,
-			loading: true,
-			patching: true,
-			popups: [],
-			popouts: [],
-			timerItems: [],
-			allTags: [],
-		// }
+		doneData: null,
+		allData: null,
+		selection: null,
+		addingNewUnder: null,
+		addingNewAsChild: false,
+		addingNewAsFirstChild: false,
+		editingItem: null,
+		editingDoneDateItem: null,
+		loading: true,
+		patching: true,
+		popups: [],
+		popouts: [],
+		timerItems: [],
+		// allTags: [],
 	},
 	components: {
 		Card,
@@ -35,10 +30,35 @@ export default {
 		Popouts,
 	},
 	computed:{
+		allTagsComputed(){
+			if(!this.allData){ return []; }
+			console.log('run allTagsComputed()...');
+			let childrensTags = [];
+			let items = allItems.flattenTree(allItems.root.children);
+			items.forEach(function(child) {
+				child.tagged.forEach(function(taggedObj){
+					let tagPresent = childrensTags.find(function(tagAlready){
+						return tagAlready.name == taggedObj.tag.name;
+					}.bind(taggedObj));
+					if(tagPresent){
+						// console.log(taggedObj.tag.name+' present already!');
+					} else {
+						// console.log(taggedObj.tag.name+' needs adding');
+						childrensTags.push(taggedObj.tag);
+					}
+				}.bind(childrensTags));
+			}.bind(childrensTags));
+			// childrensTags = [ ...new Set(childrensTags) ]; // [1, 2, 3]
+			console.log('childrensTags');
+			console.log(childrensTags);
+			return childrensTags.sort();
+		},
 		childrenAmount(){
+			if(!this.allData){ return 0; }
 			return this.countChildren(this.allData);
 		},
 		doneChildrenAmount(){
+			if(!this.allData){ return 0; }
 			return this.countDoneChildren(this.allData);
 		},
 	},
@@ -359,13 +379,6 @@ export default {
 			id = (!id) ? selection.selectedId : id ;
 			this.popout(id, 'timer');
 			return;
-			// id = (!id) ? selection.selectedId : id ;
-			// let item = allItems.nodes[id];
-			// let timerExists = this.timerItems.filter(function (item) { return item.id === id; })[0];
-			// if (!timerExists){
-			// 	this.timerItems.push(item);
-			// 	this.playTimer(item);
-			// }
 		},
 		fetchDone(tags){
 			this.loading = true;
@@ -433,78 +446,47 @@ export default {
 					operator = 'AND';
 				} else if (event.altKey){
 					operator = 'NOT';
-				}				
-			} else {
+				}
+			}
+			if(!operator){
 				selection.tags = [];
 				selection.filter = [];
+				selection.hiddenItems = [];
+				selection.hiddenTags = [];
 			}
-			if(keyword == 'done2'){
-				if(selection.filter.includes('done2')){ return; }
-				selection.filter.push('done2');
-				this.fetchDoneVersion2();
+
+			if(keyword == 'all'){
+				allItems.filterItems('all');
 				return;
 			}
 
 			if(keyword == 'tag'){
-				if(selection.tags.includes(value)){ return; }
-				selection.tags.push(value);
-			} else {
-				if(selection.filter.includes(value)){ return; }
-				if(keyword == 'all'){
-					selection.filter = [];
-					allItems.filterItems('all');
+				if(operator == 'NOT'){
+					if(selection.hiddenTags.includes(value)){ return; }
+					selection.hiddenTags.push(value);
+					allItems.hideTaggedNodes(value);
 					return;
+				} else {
+					if(selection.tags.includes(value)){ return; }
+					selection.tags.push(value);
 				}
-				if (keyword == 'done' && !this.doneData.length){
-					this.fetchDone();
-				}
+			} else {
 				if(value){
+					if(selection.filter.includes(value)){ return; }
 					selection.filter.push(value);
 				} else {
+					if(selection.filter.includes(keyword)){ return; }
 					selection.filter.push(keyword);
 				}
 			}
+			if (keyword == 'done' && !this.doneData.length){
+				this.fetchDone();
+			}
 			allItems.filterItems(keyword,value,operator);
 		},
-
-		// duplicate(id){
-		// 	this.patching = true;
-		// 	id = (!id) ? selection.selectedId : id ;
-		// 	let item = allItems.nodes[id];
-		// 	console.log('dupe item.children_order = '+item.children_order);
-		// 	let OlderSiblingIndex = allItems.siblingIndex(selection.selectedId);
-		// 	let index = parseInt(OlderSiblingIndex)+1;
-		// 	this.$http.post('/api/items',item) //SEND
-		// 	.then(function(response){ //response
-				
-		// 		// Copy all children as well!
-		// 		// -> Not yet written!
-				
-		// 		let storedItem = response.data;
-		// 		console.log('starting dom update...');
-		// 		console.log('ind on duplicate: '+index);
-		// 		allItems.addItem(storedItem, index);
-		// 		this.patching = false;
-		// 	}, (response) => {
-		// 		this.patching = 'error';
-		// 	});
-		// },
 		duplicate(id){
 			id = (!id) ? selection.selectedId : id ;
 			allItems.duplicate(id);
-			// vm.duplicatedId = id;
-			// let newItem = allItems.nodes[id];
-			// newItem.children_order = '';
-			// if(copyInto){
-			// 	let copyIntoParent = allItems.nodes[copyInto];
-			// 	newItem.parent_id = copyInto;
-			// 	newItem.depth = copyIntoParent.depth+1;
-			// }
-			// let index = allItems.siblingIndex(id)+1;
-			// let addNextItemAs = null;
-			// let addTags = newItem.tagged.map(tagObj => tagObj.tag_name);
-			// let duplication = true;
-			// this.postNewItem(newItem, index, addNextItemAs, addTags, duplication);
 		},
 		postNewItem(newItem, index, addNextItemAs, addTags, duplication){
 			this.patching = true;

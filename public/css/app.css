@@ -5498,6 +5498,9 @@ label {
     margin: 0em 0.5em; }
   .navigation .active {
     color: #5dc2af; }
+  .navigation .hidden {
+    text-decoration: line-through;
+    color: #e65e4d; }
   .navigation .menu {
     display: -ms-flexbox;
     display: flex; }
@@ -5554,6 +5557,9 @@ label {
   font-size: 1.2em;
   padding: 6px 0 0; }
 
+.hidden-tags {
+  text-decoration: line-through; }
+
 .scrolled-down .panel-title {
   position: fixed;
   top: 0;
@@ -5584,7 +5590,7 @@ label {
   background: white;
   padding: 1em; }
 
-.items-wrapper > .items-card > .children .children {
+.children .children {
   margin-left: 2em; }
 
 .item-card {

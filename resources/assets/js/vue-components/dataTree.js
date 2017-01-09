@@ -23,7 +23,7 @@ export default class Tree {
 		console.log('run first initialization at source-length: '+this.source.length);
 		this.source.forEach(function(item){
 			this.initialize(item);
-			console.log('this.itemsProcessed = '+this.itemsProcessed);
+			// console.log('this.itemsProcessed = '+this.itemsProcessed);
 			//Sort all nodes after making sure you got all of them.
 		    if(this.itemsProcessed === this.source.length) {
 		    	this.organizeAfterInitialization();
@@ -67,9 +67,10 @@ export default class Tree {
 		    }
 		}.bind(this));
 		this.backups.rootChildren = this.root.children;
-		vm.$data.allData = this.root;
-		vm.$data.doneData = this.doneitems;
-		vm.$data.selection = selection;
+		vm.allData = this.root;
+		vm.doneData = this.doneitems;
+		vm.selection = selection;
+		// vm.allTags = vm.allTagsComputed;
 	}
 
 
@@ -195,12 +196,12 @@ export default class Tree {
 		let hasTags;
 		if (tags instanceof Array){
 			tags.forEach(function (tag) {
-				tag = tag.toLowerCase();
+				tag = tag.replace(/\s+/g, '-').toLowerCase();
 				let tagExists = item.tagged.find(itemTags => itemTags.tag_slug == tag);
 				if(tagExists){ hasTags = true; }
 			});
 		} else {
-			tags = tags.toLowerCase();
+			tags = tags.replace(/\s+/g, '-').toLowerCase();
 			let tagExists = item.tagged.find(itemTags => itemTags.tag_slug == tags);
 			if(tagExists){ hasTags = true; }
 		}
@@ -236,6 +237,21 @@ export default class Tree {
 			return this.parentIdWithTag(parent_id, tags);
 		}
 	}
+	returnTagsAsArray(id)
+	{
+		return this.nodes[id].tagged.map(obj => obj.tag_name);
+	}
+	hideTaggedNodes(tag)
+	{
+		Object.keys(this.nodes).forEach(function(id) {
+			id = parseFloat(id);
+			if(this.hasTag(id, tag)){
+				if(!selection.hiddenItems.includes(id)){
+					selection.hiddenItems.push(id);
+				}
+			}
+		}.bind(this));
+	}
 	siblingIndex(id)
 	{
 		let parent_id = this.nodes[id].parent_id;
@@ -257,11 +273,18 @@ export default class Tree {
 	nextItemId(id)
 	{
 		let item = this.nodes[id];
+		let nextItemId;
 		// Select first child if any.
 		if (item.show_children && item.children.length > 0){
-			return item.children_order[0];
+			nextItemId = item.children_order[0];
+	 	} else {
+			nextItemId = this.nextItemRecursion(id);
 	 	}
-		return this.nextItemRecursion(id);
+	 	if(selection.hiddenItems.includes(nextItemId)){
+		 	return this.nextItemId(nextItemId);
+	 	} else {
+		 	return nextItemId;
+	 	}
 	}
 	nextSiblingOrParentsSiblingId(id)
 	{
@@ -289,22 +312,11 @@ export default class Tree {
 			prevItemId = this.nodes[parent_id].children_order[index-1];
 			prevItemId = this.getDeepestLastChildId(prevItemId);
 		}
-		let prevItem = this.nodes[prevItemId];
-		// console.log('prevItem: ['+prevItemId+'] '+prevItem.body);
-		// let prevItemChildrenCount = prevItem.children.length;
-
-		// if(tagsSelected){ 
-		// 	if(this.isTopLvlItemInFilteredRoot(id)){
-		// 		let prevFilteredItemId = this.prevFilteredItemId(id);
-		// 		return this.getDeepestLastChildId(prevFilteredItemId);				
-		// 	}
-		// 	let prevItemHasParentWithSelectedTag = this.hasParentWithTag(prevItemId, selection.tags);
-		// 	console.log('prevItem has Parent With Selected Tag = '+prevItemHasParentWithSelectedTag);
-		// 	if(prevItemHasParentWithSelectedTag){
-		// 		return prevItemId;
-		// 	}
-		// }
-		return prevItemId;
+	 	if(selection.hiddenItems.includes(prevItemId)){
+		 	return this.prevItemId(prevItemId);
+	 	} else {
+		 	return prevItemId;
+	 	}
 	}
 	nextItemRecursion(id)
 	{
@@ -803,26 +815,21 @@ export default class Tree {
 		}.bind(this));
 		this.root.children = filteredArray;
 		this.resetChildrenOrder(this.root.id);
-		// if (keyword == 'all'){
-		// 	this.rebindArrayParentIds(filteredArray, 'backup');
-		// } else {
-		// 	this.rebindArrayParentIds(filteredArray, this.root.id);
-		// }
 	}
 	arrayFilterTag(array, tags, operator){
+		// if(operator == 'NOT'){
+		// 	array.forEach(function(item) {
+		// 		if(this.hasTag(item.id, tags)){
+		// 			this.hideItem(item.id);
+		// 		} else {
+		// 			if(item.children.length){
+		// 				item.children = this.arrayFilterTag(item.children, tags, operator);
+		// 			}
+		// 		}
+		// 	}.bind(this));
+		// 	return array;
+		// }
 		let filteredArray = [];
-		if(operator == 'NOT'){
-			filteredArray = array.filter(function(item) {
-				return !this.hasTag(item.id, tags);
-			}.bind(this));
-			filteredArray.forEach(function(item) {
-				if(item.children.length){
-					item.children = this.arrayFilterTag(item.children, tags, operator);
-				}
-			}.bind(this));
-			return filteredArray;
-		}
-
     	array.forEach(function (item) {
 			let id = item.id;
     		if (this.hasTag(id, tags)
@@ -845,6 +852,15 @@ export default class Tree {
 			}.bind(this));
 		}
 		return filteredArray;
+	}
+	hideItem(id)
+	{
+		if(!selection.hiddenItems.includes(id)){
+			selection.hiddenItems.push(id);
+		}
+		this.nodes[id].children.forEach(function(child) {
+			this.hideItem(child.id)
+		}.bind(this));
 	}
 	flattenTree(array)
 	{
