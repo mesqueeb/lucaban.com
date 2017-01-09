@@ -25768,6 +25768,16 @@ function hasClass(element, cls) {
 	return (' ' + element.className + ' ').indexOf(' ' + cls + ' ') > -1;
 }
 
+function removeEmptyValuesFromArray(array) {
+	var cleanArray = [];
+	array.forEach(function (val) {
+		if (val.replace(/\s/g, "").length) {
+			cleanArray.push(val);
+		}
+	}.bind(cleanArray));
+	return cleanArray;
+}
+
 function sortObjectArrayByProperty(array, propertyName) {
 	return array.sort(function (a, b) {
 		var textA = a[propertyName].toUpperCase();
@@ -25811,6 +25821,7 @@ exports.hasClass = hasClass;
 exports.btnEffect = btnEffect;
 exports.isElementInViewport = isElementInViewport;
 exports.sortObjectArrayByProperty = sortObjectArrayByProperty;
+exports.removeEmptyValuesFromArray = removeEmptyValuesFromArray;
 
 },{}],31:[function(require,module,exports){
 'use strict';
@@ -27325,8 +27336,18 @@ exports.default = {
    	'untag': untag item with certain tag
    	'retag': delete all tags and retag new ones
    */
-			if (!tags || !tags.replace(/\s/g, "").length) {
+			if (!tags) {
 				return;
+			}
+			if (Array.isArray(tags)) {
+				tags = (0, _globalFunctions.removeEmptyValuesFromArray)(tags);
+				if (!tags.length) {
+					return;
+				}
+			} else {
+				if (!tags.replace(/\s/g, "").length) {
+					return;
+				}
 			}
 			if (tags == 't' || tags == 'T' || tags == 'today' || tags == 'Today') {
 				this.setToday(id);
@@ -27876,6 +27897,8 @@ Object.defineProperty(exports, "__esModule", {
 });
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _globalFunctions = require('../components/globalFunctions.js');
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -28518,8 +28541,19 @@ var Tree = function () {
 	}, {
 		key: 'tagItem',
 		value: function tagItem(id, tags) {
-			if (!tags || !tags.replace(/\s/g, "").length) {
+			console.log(tags);
+			if (!tags) {
 				return;
+			}
+			if (Array.isArray(tags)) {
+				tags = (0, _globalFunctions.removeEmptyValuesFromArray)(tags);
+				if (!tags.length) {
+					return;
+				}
+			} else {
+				if (!tags.replace(/\s/g, "").length) {
+					return;
+				}
 			}
 			var item = this.nodes[id];
 			if (this.hasTag(id, tags)) {
@@ -28974,7 +29008,7 @@ var Tree = function () {
 
 exports.default = Tree;
 
-},{}],41:[function(require,module,exports){
+},{"../components/globalFunctions.js":30}],41:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {

@@ -2,6 +2,16 @@ function hasClass(element, cls) {
     return (' ' + element.className + ' ').indexOf(' ' + cls + ' ') > -1;
 }
 
+function removeEmptyValuesFromArray(array){
+	let cleanArray = [];
+	array.forEach(function(val){
+		if(val.replace(/\s/g, "").length){
+			cleanArray.push(val);
+		}
+	}.bind(cleanArray));
+	return cleanArray;
+}
+
 function sortObjectArrayByProperty(array, propertyName){
 	return array.sort(function(a, b){
 	    let textA = a[propertyName].toUpperCase();
@@ -44,4 +54,4 @@ function isElementInViewport (el) {
     );
 }
 
-export { hasClass, btnEffect, isElementInViewport, sortObjectArrayByProperty }
+export { hasClass, btnEffect, isElementInViewport, sortObjectArrayByProperty, removeEmptyValuesFromArray }

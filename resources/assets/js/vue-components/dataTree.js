@@ -1,3 +1,4 @@
+import {removeEmptyValuesFromArray} from '../components/globalFunctions.js';
 export default class Tree {
 	constructor(items){
 		// properties
@@ -520,7 +521,14 @@ export default class Tree {
 	}
 	tagItem(id, tags)
 	{
-		if(!tags || !tags.replace(/\s/g, "").length){ return; }
+		console.log(tags);
+		if(!tags){ return; }
+		if(Array.isArray(tags)){
+			tags = removeEmptyValuesFromArray(tags);
+			if(!tags.length){ return; }
+		} else {
+			if(!tags.replace(/\s/g, "").length){ return; }
+		}
 		let item = this.nodes[id];
 		if(this.hasTag(id, tags)){
 			console.log('NG! Has the tag already!!');

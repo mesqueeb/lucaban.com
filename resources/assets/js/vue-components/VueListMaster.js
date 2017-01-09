@@ -3,7 +3,7 @@ import Journal from './Journal.vue';
 import Timer from './Timer.vue';
 import Popups from './Popups.vue';
 import Popouts from './Popouts.vue';
-import { sortObjectArrayByProperty } from '../components/globalFunctions.js';
+import { sortObjectArrayByProperty, removeEmptyValuesFromArray } from '../components/globalFunctions.js';
 
 export default {
 	el:'#body',
@@ -242,7 +242,13 @@ export default {
 				'untag': untag item with certain tag
 				'retag': delete all tags and retag new ones
 			*/
-			if(!tags || !tags.replace(/\s/g, "").length){ return; }
+			if(!tags){ return; }
+			if(Array.isArray(tags)){
+				tags = removeEmptyValuesFromArray(tags);
+				if(!tags.length){ return; }
+			} else {
+				if(!tags.replace(/\s/g, "").length){ return; }
+			}
 			if(tags=='t' || tags=='T' || tags=='today' || tags=='Today'){
 				this.setToday(id);
 				return;
