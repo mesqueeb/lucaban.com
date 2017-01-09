@@ -35,8 +35,11 @@ export default {
 			if(!this.allData){ return []; }
 			let childrensTags = [];
 			let items = allItems.flattenTree(allItems.root.children);
+			if(!items.length){ return []; }
 			items.forEach(function(child) {
 				child.tagged.forEach(function(taggedObj){
+					console.log('logging taggedObj in allTagsComputed');
+					console.log(taggedObj);
 					let tagPresent = childrensTags.find(function(tagAlready){
 						return tagAlready.name == taggedObj.tag.name;
 					}.bind(taggedObj));
