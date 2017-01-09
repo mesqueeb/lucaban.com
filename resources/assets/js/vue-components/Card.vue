@@ -452,6 +452,7 @@ export default {
 	computed: {
 		journalDate(){
 			// console.log('run on '+this.item.id+' - '+this.item.body);
+			if(!this.$root.selection){ return false; }
 			if(this.$root.selection.filter.includes('done')){
 				if(this.item.depth == 0){ return; }
 				let prevId = allItems.prevItemId(this.item.id);

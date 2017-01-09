@@ -2,6 +2,14 @@ function hasClass(element, cls) {
     return (' ' + element.className + ' ').indexOf(' ' + cls + ' ') > -1;
 }
 
+function sortObjectArrayByProperty(array, propertyName){
+	return array.sort(function(a, b){
+	    let textA = a[propertyName].toUpperCase();
+	    let textB = b[propertyName].toUpperCase();
+	    return (textA < textB) ? -1 : (textA > textB) ? 1 : 0;
+	}.bind(propertyName));
+}
+
 function btnEffect(event){
 	console.log(event);
 	let $el;
@@ -36,4 +44,4 @@ function isElementInViewport (el) {
     );
 }
 
-export { hasClass, btnEffect, isElementInViewport }
+export { hasClass, btnEffect, isElementInViewport, sortObjectArrayByProperty }

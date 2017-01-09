@@ -25768,6 +25768,14 @@ function hasClass(element, cls) {
 	return (' ' + element.className + ' ').indexOf(' ' + cls + ' ') > -1;
 }
 
+function sortObjectArrayByProperty(array, propertyName) {
+	return array.sort(function (a, b) {
+		var textA = a[propertyName].toUpperCase();
+		var textB = b[propertyName].toUpperCase();
+		return textA < textB ? -1 : textA > textB ? 1 : 0;
+	}.bind(propertyName));
+}
+
 function btnEffect(event) {
 	console.log(event);
 	var $el = void 0;
@@ -25802,6 +25810,7 @@ function isElementInViewport(el) {
 exports.hasClass = hasClass;
 exports.btnEffect = btnEffect;
 exports.isElementInViewport = isElementInViewport;
+exports.sortObjectArrayByProperty = sortObjectArrayByProperty;
 
 },{}],31:[function(require,module,exports){
 'use strict';
@@ -26070,6 +26079,9 @@ exports.default = {
 	computed: {
 		journalDate: function journalDate() {
 			// console.log('run on '+this.item.id+' - '+this.item.body);
+			if (!this.$root.selection) {
+				return false;
+			}
 			if (this.$root.selection.filter.includes('done')) {
 				if (this.item.depth == 0) {
 					return;
@@ -27034,6 +27046,8 @@ var _Popouts = require('./Popouts.vue');
 
 var _Popouts2 = _interopRequireDefault(_Popouts);
 
+var _globalFunctions = require('../components/globalFunctions.js');
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 exports.default = {
@@ -27065,7 +27079,6 @@ exports.default = {
 			if (!this.allData) {
 				return [];
 			}
-			console.log('run allTagsComputed()...');
 			var childrensTags = [];
 			var items = allItems.flattenTree(allItems.root.children);
 			items.forEach(function (child) {
@@ -27081,10 +27094,8 @@ exports.default = {
 					}
 				}.bind(childrensTags));
 			}.bind(childrensTags));
-			// childrensTags = [ ...new Set(childrensTags) ]; // [1, 2, 3]
-			console.log('childrensTags');
-			console.log(childrensTags);
-			return childrensTags.sort();
+			childrensTags = (0, _globalFunctions.sortObjectArrayByProperty)(childrensTags, 'name');
+			return childrensTags;
 		},
 		childrenAmount: function childrenAmount() {
 			if (!this.allData) {
@@ -27859,7 +27870,7 @@ exports.default = {
 	}
 };
 
-},{"./Card.vue":32,"./Journal.vue":33,"./Popouts.vue":35,"./Popups.vue":36,"./Timer.vue":38}],40:[function(require,module,exports){
+},{"../components/globalFunctions.js":30,"./Card.vue":32,"./Journal.vue":33,"./Popouts.vue":35,"./Popups.vue":36,"./Timer.vue":38}],40:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {

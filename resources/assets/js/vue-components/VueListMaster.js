@@ -3,6 +3,7 @@ import Journal from './Journal.vue';
 import Timer from './Timer.vue';
 import Popups from './Popups.vue';
 import Popouts from './Popouts.vue';
+import { sortObjectArrayByProperty } from '../components/globalFunctions.js';
 
 export default {
 	el:'#body',
@@ -32,7 +33,6 @@ export default {
 	computed:{
 		allTagsComputed(){
 			if(!this.allData){ return []; }
-			console.log('run allTagsComputed()...');
 			let childrensTags = [];
 			let items = allItems.flattenTree(allItems.root.children);
 			items.forEach(function(child) {
@@ -48,10 +48,8 @@ export default {
 					}
 				}.bind(childrensTags));
 			}.bind(childrensTags));
-			// childrensTags = [ ...new Set(childrensTags) ]; // [1, 2, 3]
-			console.log('childrensTags');
-			console.log(childrensTags);
-			return childrensTags.sort();
+			childrensTags = sortObjectArrayByProperty(childrensTags, 'name');
+			return childrensTags;
 		},
 		childrenAmount(){
 			if(!this.allData){ return 0; }
