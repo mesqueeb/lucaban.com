@@ -520,6 +520,7 @@ export default class Tree {
 	}
 	tagItem(id, tags)
 	{
+		if(!tags || !tags.replace(/\s/g, "").length){ return; }
 		let item = this.nodes[id];
 		if(this.hasTag(id, tags)){
 			console.log('NG! Has the tag already!!');

@@ -27086,16 +27086,14 @@ exports.default = {
 			}
 			items.forEach(function (child) {
 				child.tagged.forEach(function (taggedObj) {
-					// console.log('logging taggedObj in allTagsComputed');
-					// console.log(taggedObj);
-					if (taggedObj.tag.name) {
-						// solve bug when tagname is empty
-						var tagPresent = childrensTags.find(function (tagAlready) {
-							return tagAlready.name == taggedObj.tag.name;
-						}.bind(taggedObj));
-						if (!tagPresent) {
-							childrensTags.push(taggedObj.tag);
-						}
+					if (!taggedObj.tag || !taggedObj.tag.name) {
+						return; // solves bugs with broken tags
+					}
+					var tagPresent = childrensTags.find(function (tagAlready) {
+						return tagAlready.name == taggedObj.tag.name;
+					}.bind(taggedObj));
+					if (!tagPresent) {
+						childrensTags.push(taggedObj.tag);
 					}
 				}.bind(childrensTags));
 			}.bind(childrensTags));
@@ -27284,6 +27282,20 @@ exports.default = {
 				}, 10);
 			}
 		},
+		stopPatching: function stopPatching() {
+			if (window.stopPatchingIcon) {
+				clearTimeout(window.stopPatchingIcon);
+			}
+			window.stopPatchingIcon = setTimeout(function () {
+				this.patching = false;
+			}.bind(this), 300);
+		},
+		startPatching: function startPatching() {
+			if (window.stopPatchingIcon) {
+				clearTimeout(window.stopPatchingIcon);
+			}
+			this.patching = true;
+		},
 		patch: function patch(id, arg) {
 			var _this = this;
 
@@ -27293,7 +27305,7 @@ exports.default = {
 					return;
 				}
 			}
-			this.patching = true;
+			this.startPatching();
 			var patchObj = {};
 			var patchVal = allItems.nodes[id][arg];
 			if (arg == 'children_order') {
@@ -27302,7 +27314,7 @@ exports.default = {
 			patchObj[arg] = patchVal;
 			this.$http.patch('/api/items/' + id, patchObj, { method: 'PATCH' }).then(function (response) {
 				console.log('patched [' + allItems.nodes[id].body + '].' + arg + ' = ' + patchObj[arg] + ';');
-				this.patching = false;
+				this.stopPatching();
 			}, function (response) {
 				_this.patching = 'error';
 			});
@@ -27313,11 +27325,14 @@ exports.default = {
    	'untag': untag item with certain tag
    	'retag': delete all tags and retag new ones
    */
+			if (!tags || !tags.replace(/\s/g, "").length) {
+				return;
+			}
 			if (tags == 't' || tags == 'T' || tags == 'today' || tags == 'Today') {
 				this.setToday(id);
 				return;
 			}
-			this.patching = true;
+			this.startPatching();
 			var patchObj = {};
 			patchObj['tags'] = tags;
 			patchObj['type'] = requestType;
@@ -27325,29 +27340,6 @@ exports.default = {
 				var syncedTags = tagResponse.data.tags;
 				console.log('patched [' + allItems.nodes[id].body + '] TAGS: ' + tagResponse.data.tags + ';');
 				console.log(tagResponse);
-
-				var tagObj = {};
-				var allTagsArray = this.allTags.map(function (obj) {
-					return obj.slug;
-				});
-				if (Array.isArray(syncedTags)) {
-					syncedTags.forEach(function (tag) {
-						tagObj.name = tag;
-						tagObj.slug = tag.replace(/\s+/g, '-').toLowerCase();
-						tagObj.count = 1;
-						if (!allTagsArray.includes(tagObj.slug)) {
-							this.allTags.push(tagObj);
-						}
-					}.bind(this));
-				} else {
-					tagObj.name = syncedTags;
-					tagObj.slug = syncedTags.replace(/\s+/g, '-').toLowerCase();
-					tagObj.count = 1;
-					if (!allTagsArray.includes(tagObj.slug)) {
-						this.allTags.push(tagObj);
-					}
-				}
-
 				// Re-Add tags of item
 				this.$http.get('/api/itemtags/' + id, { type: 'tags' })
 				// Codementor: Request type doesn't work......
@@ -27356,25 +27348,25 @@ exports.default = {
 					console.log(updatedTagList.data);
 					allItems.nodes[id].tagged = updatedTagList.data;
 				});
-				this.patching = false;
+				this.stopPatching();
 			});
 		},
 		patchDueDate: function patchDueDate(id, duedate) {
-			this.patching = true;
+			this.startPatching();
 			if (duedate == '0000-00-00 00:00:00') {
 				this.$http.patch('/api/items/' + id, { 'due_date': duedate }).then(function (response) {
-					this.patching = false;
+					this.stopPatching();
 				});
 				return;
 			}
 			duedate = moment(duedate).format();
 			console.log('PatchDueDate: ' + duedate);
 			this.$http.patch('/api/items/' + id, { 'due_date': duedate }).then(function (response) {
-				this.patching = false;
+				this.stopPatching();
 			});
 		},
 		patchDone: function patchDone(id) {
-			this.patching = true;
+			this.startPatching();
 			var done_date = void 0;
 			var doneValue = allItems.nodes[id].done;
 			if (doneValue) {
@@ -27383,7 +27375,7 @@ exports.default = {
 				done_date = '0000-00-00 00:00:00';
 			}
 			this.$http.patch('/api/items/' + id, { 'done': doneValue, 'done_date': done_date }).then(function (response) {
-				this.patching = false;
+				this.stopPatching();
 			});
 		},
 		deleteItem: function deleteItem(id) {
@@ -27396,7 +27388,7 @@ exports.default = {
 		deleteItemApi: function deleteItemApi(idOrArray) {
 			var _this2 = this;
 
-			this.patching = true;
+			this.startPatching();
 			if (Array.isArray(idOrArray) && idOrArray.length) {
 				var array = idOrArray; // It's an array!
 				array.forEach(function (id) {
@@ -27408,7 +27400,7 @@ exports.default = {
 					var item = allItems.nodes[id];
 					_this2.$http.delete('/api/items/' + id).then(function (response) {
 						console.log('deleted: [' + item.body + ']');
-						this.patching = false;
+						this.stopPatching();
 					});
 				})();
 			}
@@ -27586,7 +27578,7 @@ exports.default = {
 		postNewItem: function postNewItem(newItem, index, addNextItemAs, addTags, duplication) {
 			var _this3 = this;
 
-			this.patching = true;
+			this.startPatching();
 			// Prepare children_order for sending to DB.
 			if (newItem.children_order) {
 				newItem.children_order = allItems.arrayToString(newItem.children_order);
@@ -27619,7 +27611,7 @@ exports.default = {
 				console.log('Index: ');
 				console.log(index);
 				allItems.addItem(storedItem, index, addNextItemAs, addTags, duplication);
-				this.patching = false;
+				this.stopPatching();
 			}, function (response) {
 				_this3.patching = 'error';
 			});
@@ -28526,6 +28518,9 @@ var Tree = function () {
 	}, {
 		key: 'tagItem',
 		value: function tagItem(id, tags) {
+			if (!tags || !tags.replace(/\s/g, "").length) {
+				return;
+			}
 			var item = this.nodes[id];
 			if (this.hasTag(id, tags)) {
 				console.log('NG! Has the tag already!!');

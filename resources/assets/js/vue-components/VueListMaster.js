@@ -38,15 +38,14 @@ export default {
 			if(!items.length){ return []; }
 			items.forEach(function(child) {
 				child.tagged.forEach(function(taggedObj){
-					// console.log('logging taggedObj in allTagsComputed');
-					// console.log(taggedObj);
-					if(taggedObj.tag.name){ // solve bug when tagname is empty
-						let tagPresent = childrensTags.find(function(tagAlready){
-							return tagAlready.name == taggedObj.tag.name;
-						}.bind(taggedObj));
-						if(!tagPresent){
-							childrensTags.push(taggedObj.tag);
-						}
+					if(!taggedObj.tag || !taggedObj.tag.name){
+						return; // solves bugs with broken tags
+					}
+					let tagPresent = childrensTags.find(function(tagAlready){
+						return tagAlready.name == taggedObj.tag.name;
+					}.bind(taggedObj));
+					if(!tagPresent){
+						childrensTags.push(taggedObj.tag);
 					}
 				}.bind(childrensTags));
 			}.bind(childrensTags));
@@ -207,6 +206,14 @@ export default {
 				setTimeout(function(){$("#new-under-"+id+" textarea").focus();},10);
 			}
 		},
+		stopPatching(){
+			if(window.stopPatchingIcon){ clearTimeout(window.stopPatchingIcon); }
+		    window.stopPatchingIcon = setTimeout(function(){ this.patching = false; }.bind(this), 300);
+		},
+		startPatching(){
+		    if(window.stopPatchingIcon){ clearTimeout(window.stopPatchingIcon); }
+			this.patching = true;
+		},
 		patch(id, arg){
 			if(allItems.isTopLvlItemInFilteredRoot(id)){ 
 				if(arg == 'children_order' || arg == 'parent_id'){
@@ -214,7 +221,7 @@ export default {
 					return;
 				}
 			}
-			this.patching = true;
+			this.startPatching();
 			let patchObj = {};
 			let patchVal = allItems.nodes[id][arg];
 			if(arg == 'children_order'){
@@ -224,7 +231,7 @@ export default {
 			this.$http.patch('/api/items/' + id, patchObj, { method: 'PATCH'})
 			.then(function(response){
 				console.log('patched ['+allItems.nodes[id].body+'].'+arg+' = '+patchObj[arg]+';');
-				this.patching = false;
+				this.stopPatching();
 			}, (response) => {
 				this.patching = 'error';
 			});
@@ -235,11 +242,12 @@ export default {
 				'untag': untag item with certain tag
 				'retag': delete all tags and retag new ones
 			*/
+			if(!tags || !tags.replace(/\s/g, "").length){ return; }
 			if(tags=='t' || tags=='T' || tags=='today' || tags=='Today'){
 				this.setToday(id);
 				return;
 			}
-			this.patching = true;
+			this.startPatching();
 			let patchObj = {};
 			patchObj['tags'] = tags;
 			patchObj['type'] = requestType;
@@ -248,27 +256,6 @@ export default {
 				let syncedTags = tagResponse.data.tags;
 				console.log('patched ['+allItems.nodes[id].body+'] TAGS: '+tagResponse.data.tags+';');
 				console.log(tagResponse);
-
-				let tagObj = {};
-				let allTagsArray = this.allTags.map(obj => obj.slug);
-				if(Array.isArray(syncedTags)){
-					syncedTags.forEach(function(tag){
-						tagObj.name = tag;
-						tagObj.slug = tag.replace(/\s+/g, '-').toLowerCase();
-						tagObj.count = 1;
-						if(!allTagsArray.includes(tagObj.slug)){
-							this.allTags.push(tagObj);
-						}
-					}.bind(this));
-				} else {
-					tagObj.name = syncedTags;
-					tagObj.slug = syncedTags.replace(/\s+/g, '-').toLowerCase();
-					tagObj.count = 1;
-					if(!allTagsArray.includes(tagObj.slug)){
-						this.allTags.push(tagObj);
-					}
-				}
-
 				// Re-Add tags of item
 				this.$http.get('/api/itemtags/' + id, { type: 'tags'})
 				// Codementor: Request type doesn't work......
@@ -277,16 +264,16 @@ export default {
 					console.log(updatedTagList.data);
 					allItems.nodes[id].tagged = updatedTagList.data;
 				});
-				this.patching = false;
+				this.stopPatching();
 			});
 		},
 
 		patchDueDate(id, duedate){
-			this.patching = true;
+			this.startPatching();
 			if (duedate == '0000-00-00 00:00:00'){
 				this.$http.patch('/api/items/' + id, {'due_date':duedate})
 				.then(function(response){
-					this.patching = false;
+					this.stopPatching();
 				});
 				return;
 			}
@@ -294,11 +281,11 @@ export default {
 			console.log('PatchDueDate: '+duedate);
 			this.$http.patch('/api/items/' + id, {'due_date':duedate})
 			.then(function(response){
-				this.patching = false;
+				this.stopPatching();
 			});
 		},
 		patchDone(id){
-			this.patching = true;
+			this.startPatching();
 			let done_date;
 			let doneValue = allItems.nodes[id].done;
 			if (doneValue){
@@ -308,7 +295,7 @@ export default {
 			}
 			this.$http.patch('/api/items/' + id, {'done':doneValue, 'done_date':done_date})
 			.then(function(response){
-				this.patching = false;
+				this.stopPatching();
 			});
 		},
 		deleteItem(id){
@@ -319,7 +306,7 @@ export default {
 		 	this.popout(id, 'confirm-delete');
 		},
 		deleteItemApi(idOrArray){
-			this.patching = true;
+			this.startPatching();
 			if (Array.isArray(idOrArray) && idOrArray.length) {
 				let array = idOrArray; // It's an array!
 				array.forEach(id => { this.deleteItemApi(id); });
@@ -329,7 +316,7 @@ export default {
 				this.$http.delete('/api/items/' + id)
 				.then(function(response){
 					console.log('deleted: ['+item.body+']');
-					this.patching = false;
+					this.stopPatching();
 				});
 			}
 		},
@@ -490,7 +477,7 @@ export default {
 			allItems.duplicate(id);
 		},
 		postNewItem(newItem, index, addNextItemAs, addTags, duplication){
-			this.patching = true;
+			this.startPatching();
 			// Prepare children_order for sending to DB.
 			if(newItem.children_order){
 				newItem.children_order = allItems.arrayToString(newItem.children_order);
@@ -522,7 +509,7 @@ export default {
 				console.log('Index: ');
 				console.log(index);
 				allItems.addItem(storedItem, index, addNextItemAs, addTags, duplication);
-				this.patching = false;
+				this.stopPatching();
 			}, (response) => {
 				this.patching = 'error';
 			});
