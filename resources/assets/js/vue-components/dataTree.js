@@ -23,8 +23,8 @@ export default class Tree {
 		console.log('run first initialization at source-length: '+this.source.length);
 		this.source.forEach(function(item){
 			this.initialize(item);
-			// console.log('this.itemsProcessed = '+this.itemsProcessed);
 			//Sort all nodes after making sure you got all of them.
+			// console.log('this.itemsProcessed = '+this.itemsProcessed);
 		    if(this.itemsProcessed === this.source.length) {
 		    	this.organizeAfterInitialization();
 		    }
