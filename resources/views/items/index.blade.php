@@ -29,7 +29,7 @@
 <Popouts :popouts="popouts"
 	
 ></Popouts>
-<div class="panel-body">
+<div class="panel-body" v-cloak>
 	<div class="navigation">
 		<div class="menu">
 			<a href="#"
@@ -71,26 +71,19 @@
 	<div class="stats"
 		v-show="true"
 	>
-		<div>Used time <div class="used-time">@{{ allData.totalUsedTime | hourmin }}</div></div>
+		<div>Used time <div class="used-time">@{{ totalUsedSec | sec-to-hourmin }}</div></div>
 		<div
 			v-show="!selection.filter.includes('done')"
-		>Time left <div class="time-left">@{{ allData.totalPlannedTime*60-allData.totalUsedTime | hourmin }}</div></div>
+		>Time left <div class="time-left">@{{ totalSecLeft | sec-to-hourmin }}</div></div>
 		<div>Items <div class="children-amount">@{{ childrenAmount }}</div></div>
 		<div>Done <div class="done-children-amount">@{{ doneChildrenAmount }}</div></div>
 	</div>
 	<!-- DATA -->
 	<div class="items-wrapper"
-		v-show="!selection.filter.includes('done2')"
 	>
 		<Card :item="allData"
 			:alltags="allTags"
 		></Card>
-	</div>
-	<!-- JOURNAL -->
-	<div class="journal-wrapper"
-		v-show="selection.filter.includes('done2')"
-	>
-		<Journal :records-per-date="doneData"></Journal>
 	</div>
 </div>
 

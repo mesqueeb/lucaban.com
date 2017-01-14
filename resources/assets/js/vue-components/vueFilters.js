@@ -57,7 +57,7 @@ function calc_hhmmss(val){
 		return pad(minutes)+":"+pad(secs);
 	}
 }
-Vue.filter('hourminsec', {
+Vue.filter('sec-to-hourminsec', {
 	read: function(val) {
 		function pad(num, unit){
 		    if (num>0){
@@ -87,6 +87,25 @@ Vue.filter('hourmin', {
 		}
 		let minutes = val%60;
 		let hours = Math.floor(val/60)
+		if (hours>0){
+			return pad(hours,'hour ')+pad(minutes, 'min');
+		} else {
+			return pad(minutes,'min')
+		}
+	},
+});
+Vue.filter('sec-to-hourmin', {
+	read: function(val) {
+		function pad(num, unit){
+		    if (num>0){
+		    	return num+" "+unit;
+		    } return '';
+		}
+		let secs;
+		let minutes = Math.floor(val/60);
+		secs = val%60;
+		let hours = Math.floor(minutes/60)
+		minutes = minutes%60;
 		if (hours>0){
 			return pad(hours,'hour ')+pad(minutes, 'min');
 		} else {
@@ -126,9 +145,10 @@ Vue.filter('momentDate', {
 
 Vue.filter('linkify', {
 	read: function(val) {
-	  	return linkifyHtml(val, {
+	  	let a = linkifyHtml(val, {
 			defaultProtocol: 'https'
 		});
+		return a;
   	},
 });
 } // export default function(Vue)

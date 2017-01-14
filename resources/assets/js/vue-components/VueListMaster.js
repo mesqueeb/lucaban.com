@@ -61,6 +61,23 @@ export default {
 			if(!this.allData){ return 0; }
 			return this.countDoneChildren(this.allData);
 		},
+		totalSecLeft(){
+			console.log('run totalSecLeft');
+			if(!this.allData){ return 0; }
+			let card = this.$children.find(child => child.totalSecLeft);
+			return card.totalSecLeft;
+		},
+		totalUsedSec(){
+			console.log('run totalUsedSec');
+			if(!this.allData){ return 0; }
+			let card = this.$children.find(child => child.totalUsedSec);
+			return card.totalUsedSec;
+		},
+	},
+	watch:{
+		childrenAmount(){
+			this.bcFI();
+		},
 	},
 	methods:{
 		countChildren(item){
@@ -379,7 +396,14 @@ export default {
 			this.$http.get('/api/items/fetchdone').then(function(response){
 				// debugger;
 				let data = response.json();
-				data.forEach(item => allItems.setDefaultItemValues(item));
+				data.forEach(item => item = allItems.setDefaultItemValues(item));
+				data.forEach(item => {
+					if(!allItems.nodes[item.id]){ allItems.nodes[item.id] = item; }
+					// let parent = allItems.nodes[item.parent_id];
+					// if(parent && ){
+					// 	parent.children.push(item);
+					// }
+				});
 				this.loading = false;
 				allItems.doneitems = data;
 			});
@@ -430,6 +454,9 @@ export default {
 				this.allData = aaa;
 				this.loading = false;
 			});
+		},
+		bcFI(){
+			this.$broadcast('filterItems');
 		},
 		filterItems(keyword, value, event){
 			// debugger;
@@ -564,7 +591,8 @@ export default {
             return;
         },
     },
-	created(){
+	mounted(){
+
 	},
 	ready: function() {
       let vm = this;

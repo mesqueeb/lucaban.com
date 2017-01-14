@@ -5375,6 +5375,9 @@
 *, *:before, *:after {
   box-sizing: border-box; }
 
+[v-cloak] {
+  display: none; }
+
 body {
   font-family: 'Calibri', 'Lato';
   color: #4d4d4d;

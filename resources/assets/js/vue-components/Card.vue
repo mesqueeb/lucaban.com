@@ -6,17 +6,18 @@
 	}"
 	:id="'card-'+item.id"
 >
+
 <div v-if="!isHidden">
-		<div class="title"
-		v-if="journalDate"
-		>
-			<span>{{ journalDate | momentCalendar }}</span>
-			<span class="journal-date-small">{{ journalDate }}</span>
-		</div>
-		<div class="parent-string"
-		v-if="this.$root.selection.filter.includes('done') && this.item.depth != 0"
-		@click="selectItem(item)"
-		>{{ item.parents_bodies }}:</div>
+	<div class="title"
+	v-if="journalDate"
+	>
+		<span>{{ journalDate | momentCalendar }}</span>
+		<span class="journal-date-small">{{ journalDate }}</span>
+	</div>
+	<div class="parent-string"
+	v-if="this.$root.selection.filter.includes('done') && this.item.depth != 0"
+	@click="selectItem(item)"
+	>{{ item.parents_bodies }}:</div>
 	<div 
 		v-if="item.depth != 0"
 		:class="{
@@ -70,7 +71,7 @@
 			<div class="bodybox"
 				v-show="item.id != this.$root.editingItem"
 			>
-				<div>{{{ item.body | linkify }}}</div>
+				<div>{{ item.body | linkify }}</div>
 				<div class="completion-notes bodybox"
 					v-if="item.completion_memo"
 					@click="selectItem(item)"
@@ -167,27 +168,27 @@
 						v-model="item.done_date"
 					>
 				</label>
-				
+				<!-- <span class="total-duration">ttuc {{ totalUsedSec | sec-to-hourminsec }}</span> -->
 				<span v-if="
-					totalTimeLeft > 0
-					&& totalTimeLeft > timeLeft
+					totalSecLeft > 0
+					&& totalSecLeft > secLeft
 					&& totalTimeDifferentFromParent
 					&& !item.done" class="total-duration">
-					{{ totalTimeLeft | hourminsec }}
+					{{ totalSecLeft | sec-to-hourminsec }}
 					<!-- <span style="padding-right:2px">Total </span>
-					<span v-if="hasTotalUsedTime"> used {{ item.totalUsedTime | hourminsec }}</span>
-					<span v-if="(hasTotalUsedTime && hasTotalPlannedTime)">/</span>
-					<span v-if="hasTotalPlannedTime">{{ item.totalPlannedTime | hourmin }}</span> -->
+					<span v-if="hastotalUsedSec"> used {{ item.totalUsedSec | sec-to-hourminsec }}</span>
+					<span v-if="(hastotalUsedSec && hasTotalPlannedMin)">/</span>
+					<span v-if="hasTotalPlannedMin">{{ item.totalPlannedMin | hourmin }}</span> -->
 					</span>
 
 				<span v-if="
 					item.id != this.$root.editingItem
-					&& timeLeft > 0
+					&& secLeft > 0
 					
 					&& !item.done" class="duration"
 				>
-					{{ timeLeft | hourminsec }}
-					<!-- <span v-if="hasUsedTime">Used {{ item.used_time | hourminsec }}</span>
+					{{ secLeft | sec-to-hourminsec }}
+					<!-- <span v-if="hasUsedTime">Used {{ item.used_time | sec-to-hourminsec }}</span>
 					<span v-if="(hasPlannedTime && hasUsedTime)">/</span>
 					<span v-if="hasPlannedTime">{{ item.planned_time | hourmin }}</span> -->
 				</span>
@@ -205,7 +206,7 @@
 					v-show="!parentTags.includes(tag.tag_name)
 						|| item.id == this.$root.editingItem"
 					class="custom-tag"
-					@dblclick.prevent="this.$root.filterItems('tag', tag.tag_slug)"
+					@dblclick.prevent="this.$root.filterItems('tag', tag.tag_slug, $event)"
 				>{{ tag.tag_name }}
 					<button class="delete-tag"
 						v-if="item.id == this.$root.editingItem
@@ -431,10 +432,11 @@
 export default {
 	name: 'Card',
 	template:'#items-card-template',
-	created(){
-	},
 	ready(){
 		this.newItem.preparedTags = this.parentTags;
+		this.convertbodyURLtoHTML();
+		this.calculateTotalPlannedMin();
+		this.calculateTotalUsedSec();
 	},
 	props: ['item', 'alltags'],
 	data: function(){
@@ -447,7 +449,23 @@ export default {
 				children: '',
 			},
 			newTag: null,
+			totalPlannedMin: 0,
+			totalUsedSec: 0,
 		};
+	},
+	watch: {
+		item(){
+			this.calculateTotalPlannedMin();
+			this.calculateTotalUsedSec();
+		},
+		secLeft(){
+			this.calculateTotalPlannedMin();
+			this.calculateTotalUsedSec();
+			if(this.item.depth != 0){
+				this.$parent.calculateTotalPlannedMin();
+				this.$parent.calculateTotalUsedSec();
+			}
+		},
 	},
 	computed: {
 		journalDate(){
@@ -464,6 +482,15 @@ export default {
 				}
 			}
 			return false;
+		},
+		totalUsedMin(){
+			return this.totalUsedSec/60;
+		},
+		totalPlannedSec(){
+			return this.totalPlannedMin*60;
+		},
+		totalPlannedHour(){
+			return this.totalPlannedMin/60;
 		},
 		isProject(){
 			// console.log('checking isProject');
@@ -504,17 +531,17 @@ export default {
 		hasDoneDate(){
 		    return (this.item.done_date && this.item.done_date != '0000-00-00 00:00:00');
 		},
-		hasTotalUsedTime(){
+		hastotalUsedSec(){
 		    return (this.item.children_order.length
-		    	&& this.item.totalUsedTime
-		    	&& this.item.totalUsedTime != '0'
-		    	&& this.item.used_time != this.item.totalUsedTime);
+		    	&& this.item.totalUsedSec
+		    	&& this.item.totalUsedSec != '0'
+		    	&& this.item.used_time != this.item.totalUsedSec);
 		},
-		hasTotalPlannedTime(){
+		hasTotalPlannedMin(){
 		    return (this.item.children_order.length
-		    	&& this.item.totalPlannedTime
-		    	&& this.item.totalPlannedTime != '0'
-		    	&& this.item.planned_time != this.item.totalPlannedTime);
+		    	&& this.totalPlannedMin
+		    	&& this.totalPlannedMin != '0'
+		    	&& this.item.planned_time != this.totalPlannedMin);
 		},
 		hasPlannedTime(){
 		    return (this.item.planned_time && this.item.planned_time != '0');
@@ -525,17 +552,21 @@ export default {
 		allTags_c(){
 			return this.$root.allTags;
 		},
-		totalTimeLeft(){
-			let x = this.item.totalPlannedTime*60-this.item.totalUsedTime;
-			return x;
+		totalMinLeft(){
+			return this.totalPlannedMin-this.totalUsedMin;
 		},
-		timeLeft(){
-			let x = this.item.planned_time*60-this.item.used_time;
-			return x;
+		totalSecLeft(){
+			return this.totalPlannedSec-this.totalUsedSec;
+		},
+		secLeft(){
+			return this.item.planned_time*60-this.item.used_time;
+		},
+		minLeft(){
+			return this.secLeft/60;
 		},
 		totalTimeDifferentFromParent(){
 			if(!this.item.parent_id){ return true; }
-			return this.item.totalPlannedTime != allItems.nodes[this.item.parent_id].totalPlannedTime;
+			return this.totalPlannedSec != this.$parent.totalPlannedSec;
 		},
 		parentTags(){
 			return allItems.returnTagsAsArray(this.item.parent_id);
@@ -552,6 +583,48 @@ export default {
 		},
 	},
 	methods: {
+		convertbodyURLtoHTML(){
+			if(!this.item){ return; }
+			let bodyboxQS = "#card-"+this.item.id+" > div > .item-card > .body-div > .bodybox > div";
+			let a = document.querySelector(bodyboxQS);
+			if(!a){ return; }
+			a.innerHTML = a.innerHTML.replace("&lt;a href=", "<a href=").replace('target="_blank"&gt;','target="_blank">').replace("&lt;/a&gt;","</a>");
+		},
+		calculateTotalPlannedMin(){
+			if(!this.item){ return; }
+			// console.log("launching calculateTotalPlannedMin() for item ["+this.item.body+"] at depth: "+this.item.depth);
+			let totalPlannedMin;
+			let initialVal = (!this.item.done || this.$root.selection.filter.includes('done')) ? parseFloat(this.item.planned_time) : 0;
+		    if (!(Array.isArray(this.$children) && this.$children.length)) {
+		    	// if we don't have children, do nothing, leave the time as-is
+				totalPlannedMin = initialVal;
+		    } else {
+				// add up all the times of our direct children
+			    totalPlannedMin = this.$children.reduce((prev, next) => {
+			        let x = (next.totalPlannedMin) ? next.totalPlannedMin : next.item.planned_time ;
+			        return parseFloat(prev)+parseFloat(x);
+			    }, initialVal );
+		    }
+		    let x = parseFloat(totalPlannedMin);
+		    this.totalPlannedMin = x;
+		},
+		calculateTotalUsedSec(){
+			if(!this.item){ return; }
+			let totalUsedSec;
+			let initialVal = (!this.item.done || this.$root.selection.filter.includes('done')) ? parseFloat(this.item.used_time) : 0 ;
+		    if (!(Array.isArray(this.$children) && this.$children.length)) {
+		    	// if we don't have children, do nothing, leave the time as-is
+				totalUsedSec = initialVal ;
+		    } else {
+				// add up all the times of our direct children
+			    totalUsedSec = this.$children.reduce((prev, next) => {
+			        let x = (next.totalUsedSec) ? next.totalUsedSec : next.item.used_time 
+			        return parseFloat(prev)+parseFloat(x);
+			    }, initialVal );
+		    }
+		    let x = parseFloat(totalUsedSec);
+		    this.totalUsedSec = x;
+		},
 		addTimer(item){
 			//Codementor
 			this.$root.addTimer(item.id);
@@ -825,7 +898,6 @@ export default {
 			vm.patch(item.id, 'body');
 			vm.patch(item.id, 'planned_time');
 			allItems.copyParentBodyToAllChildren(item.id);
-			allItems.calculateTotalTime(item.id);
 		},
 		cancelEdit(item) {
 			item = (item) ? item : allItems.nodes[selection.selectedId];
@@ -944,6 +1016,14 @@ export default {
     	startEdit() { this.startEdit(); },
     	escapeOnEditButtonFocus(){ this.cancelEdit(); },
     	escapeOnNewButtonFocus(){ this.cancelAddNew(); },
+    	filterItems() { 
+    		if(!this.$children.length){
+	    		this.calculateTotalPlannedMin();
+	    		this.calculateTotalUsedSec();
+				this.$parent.calculateTotalPlannedMin();
+				this.$parent.calculateTotalUsedSec();    			
+    		} else { return true;}
+    	},
 	},
 	directives: {
 		'item-focus': function (value) {

@@ -8,7 +8,7 @@ export default class Tree {
 		this.doneitems	= [];
 		this.filteredItemRoot = {
 			children_order:[], children:[], body:"",
-			totalPlannedTime:0, totalUsedTime:0,
+			// totalPlannedTime:0, totalUsedTime:0,
 			planned_time:0, used_time:0,
 		};
 		this.backups = {};
@@ -35,17 +35,13 @@ export default class Tree {
 	{
 		// console.log('run node initialization');
 		// variables
-		let node 	= this.makeNode(item);
-		let parent 	= this.getNode(node.parent_id);
+		let node 	= JSON.parse(JSON.stringify(item));
+		let parent 	= this.nodes[node.parent_id];
+
 		// assign extra item values
-		if(node.children_order){
-			node.children_order = node.children_order.split(',').map(Number);
-		} else {
-			node.children_order = [];
-		}
-		node.children = [];
-		node.totalPlannedTime = (!item.done && node.planned_time) ? parseFloat(item.planned_time) : 0 ;
-		node.totalUsedTime = (!item.done && node.used_time) ? parseFloat(item.used_time) : 0 ;
+		node = this.setDefaultItemValues(node);
+		// node.totalPlannedTime = (!item.done && node.planned_time) ? parseFloat(item.planned_time) : 0 ;
+		// node.totalUsedTime = (!item.done && node.used_time) ? parseFloat(item.used_time) : 0 ;
 		node.parent_id_backup = node.parent_id;
 		// Register and organize nodes:
 		if(node.depth === 0) { this.root = node; }
@@ -62,10 +58,6 @@ export default class Tree {
 		    this.updateChildrenDueDate(id);
 		    let item = this.nodes[id];
 			// this.attachParentBody(id);　//Maybe I should only do this when pressing DONE
-		    if (!item.children.length && (item.used_time || item.planned_time)){
-			    // Calculate total time from bottom up.
-			    this.calculateTotalTime(id);
-		    }
 		}.bind(this));
 		this.backups.rootChildren = this.root.children;
 		vm.allData = this.root;
@@ -114,14 +106,6 @@ export default class Tree {
 			}.bind(this));
 	    }
 	}
-	makeNode(item)
-	{
-		return JSON.parse(JSON.stringify(item));
-	}
-	getNode(id)
-	{
-		return this.nodes[id];
-	}
 	duplicate(id)
 	{
 		let item = this.nodes[id];
@@ -136,6 +120,7 @@ export default class Tree {
 	}
 	setDefaultItemValues(item)
 	{
+		item.parent_id_backup = item.parent_id;
 		if(!item.show_children)		{ item.show_children = 1 		 }
 		if(!item.children)	{ item.children = []					 }
 		if(!item.due_date)	{ item.due_date = "0000-00-00 00:00:00"	 }
@@ -174,9 +159,6 @@ export default class Tree {
 	    if(addTags){ this.tagItem(item.id, addTags); }
 		this.attachParentBody(item.id);
 		this.autoCalculateDoneState(item.parent_id);
-	    if (item.used_time || item.planned_time){
-		    this.calculateTotalTime(item.id);
-	    }
 	    if(!duplication){
 		    vm.showAddNewItem(item.id, addNextItemAs);
 	    }
@@ -189,21 +171,31 @@ export default class Tree {
 		});
 		return c_o.substring(1);
 	}
+	tagNameToSlug(tag)
+	{
+		return tag.split(' ').join('-').toLowerCase();
+	}
+	tagSlugToName(tag)
+	{
+		tag = tag.replace(/-/g, ' ');
+		tag = tag.split(' ').map ( ([h, ...t]) => h.toUpperCase() + t.join('').toLowerCase() ).join(' ');
+		return tag;
+	}
 	hasTag(id, tags)
 	{
 		let item = this.nodes[id];
-		if(!item){ console.log("what is this shit."+id); return;}
+		if(!item){ console.log("[hasTag(id, tags)] what is this shit... id:"+id); return false;}
 		if (!item.tagged || !item.tagged.length){ return false; }
 		let hasTags;
 		if (tags instanceof Array){
 			tags.forEach(function (tag) {
-				tag = tag.replace(/\s+/g, '-').toLowerCase();
+				tag = this.tagNameToSlug(tag);
 				let tagExists = item.tagged.find(itemTags => itemTags.tag_slug == tag);
 				if(tagExists){ hasTags = true; }
-			});
+			}.bind(this));
 		} else {
-			tags = tags.replace(/\s+/g, '-').toLowerCase();
-			let tagExists = item.tagged.find(itemTags => itemTags.tag_slug == tags);
+			let tag = this.tagNameToSlug(tags);
+			let tagExists = item.tagged.find(itemTags => itemTags.tag_slug == tag);
 			if(tagExists){ hasTags = true; }
 		}
 		return hasTags;
@@ -223,7 +215,7 @@ export default class Tree {
 	}
 	parentIdWithTag(id, tags)
 	{
-		debugger;
+		// debugger;
 		let item = this.nodes[id];
 		console.log('id & body = '+item.id+" - "+item.body);
 		let parent_id = this.nodes[id].parent_id;
@@ -393,8 +385,6 @@ export default class Tree {
 		   return child.id;
 		});
 		this.nodes[id].children_order = resetChildrenOrder;
-		this.root['totalUsedTime'] = this.calTotalUsedTime(id);
-		this.root['totalPlannedTime'] = this.calTotalPlannedTime(id);
 	}
 	giveNewParent(id, new_parent_id, specificNewIndex)
 	{	
@@ -451,8 +441,6 @@ export default class Tree {
 		this.updateChildrenDueDate(parent_id);
 		this.autoCalculateDoneState(new_parent_id);
 		this.autoCalculateDoneState(parent_id);
-		this.calculateTotalTime(new_parent_id);
-		this.calculateTotalTime(parent_id);
 	}
 	updateChildrenDepth(id)
 	{
@@ -516,7 +504,6 @@ export default class Tree {
 		vm.patch(parent_id, 'children_order');
 	    vm.deleteItemApi(id);
 		this.autoCalculateDoneState(parent_id);
-	    this.calculateTotalTime(parent_id);
 	    selection.selectedId = newSelectedId;
 	}
 	tagItem(id, tags)
@@ -609,8 +596,6 @@ export default class Tree {
 	calculateTotalTime(id)
 	{
 		let item = this.nodes[id];
-	    item['totalPlannedTime'] = this.calTotalPlannedTime(id);
-	    item['totalUsedTime'] = this.calTotalUsedTime(id);
 	    //call this on PARENT -> climb up the parent tree
 	    if (item.parent_id){
 		    this.calculateTotalTime(item.parent_id);
@@ -804,8 +789,8 @@ export default class Tree {
 			// Codementor: How do I know the following function will start after the fetch is over?
 	    	this.doneitems.forEach(function (item) {
 				if(item.done){
-					this.nodes[item.id] = item;
 					item.show_children = 1;
+					// this.nodes[item.id] = item;
 					filteredArray.push(item);
 				}
 			}.bind(this));
@@ -826,24 +811,18 @@ export default class Tree {
 		this.resetChildrenOrder(this.root.id);
 	}
 	arrayFilterTag(array, tags, operator){
-		// if(operator == 'NOT'){
-		// 	array.forEach(function(item) {
-		// 		if(this.hasTag(item.id, tags)){
-		// 			this.hideItem(item.id);
-		// 		} else {
-		// 			if(item.children.length){
-		// 				item.children = this.arrayFilterTag(item.children, tags, operator);
-		// 			}
-		// 		}
-		// 	}.bind(this));
-		// 	return array;
-		// }
 		let filteredArray = [];
     	array.forEach(function (item) {
 			let id = item.id;
-    		if (this.hasTag(id, tags)
-    			&& !this.hasParentWithTag(id, tags))
-    		{
+			let hasTag = this.hasTag(id, tags);
+			let hasParentWithTag = this.hasParentWithTag(id, tags);
+			let isTopLvlItemInFilteredRoot = this.isTopLvlItemInFilteredRoot(id);
+    		// console.log(id+" - "+item.body+" →　hasTag["+tags+"]　=　"+hasTag);
+    		// console.log(id+" - "+item.body+" →　hasParentWithTag["+tags+"] =　"+hasParentWithTag);
+    		if(
+    			(isTopLvlItemInFilteredRoot && hasTag)
+    			|| (!isTopLvlItemInFilteredRoot && hasTag && !hasParentWithTag)
+    		){
 				item.show_children = 1;
 				filteredArray.push(item);
     		}
@@ -911,9 +890,9 @@ export default class Tree {
 			let rObj = {};
 			rObj['date'] = k;
 			rObj['items'] = doneItemsObject[k];
-			rObj['totalUsedTime'] = rObj['items'].reduce((prev, next) => {
-				return allItems.AplusB(prev, next.used_time);
-	    	}, 0);
+			// rObj['totalUsedTime'] = rObj['items'].reduce((prev, next) => {
+			// 	return allItems.AplusB(prev, next.used_time);
+	  //   	}, 0);
 			return rObj;
 		});
 	}

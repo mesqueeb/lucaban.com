@@ -26069,9 +26069,11 @@ Object.defineProperty(exports, "__esModule", {
 exports.default = {
 	name: 'Card',
 	template: '#items-card-template',
-	created: function created() {},
 	ready: function ready() {
 		this.newItem.preparedTags = this.parentTags;
+		this.convertbodyURLtoHTML();
+		this.calculateTotalPlannedMin();
+		this.calculateTotalUsedSec();
 	},
 
 	props: ['item', 'alltags'],
@@ -26084,8 +26086,24 @@ exports.default = {
 				due_date: '0000-00-00 00:00:00',
 				children: ''
 			},
-			newTag: null
+			newTag: null,
+			totalPlannedMin: 0,
+			totalUsedSec: 0
 		};
+	},
+	watch: {
+		item: function item() {
+			this.calculateTotalPlannedMin();
+			this.calculateTotalUsedSec();
+		},
+		secLeft: function secLeft() {
+			this.calculateTotalPlannedMin();
+			this.calculateTotalUsedSec();
+			if (this.item.depth != 0) {
+				this.$parent.calculateTotalPlannedMin();
+				this.$parent.calculateTotalUsedSec();
+			}
+		}
 	},
 	computed: {
 		journalDate: function journalDate() {
@@ -26106,6 +26124,15 @@ exports.default = {
 				}
 			}
 			return false;
+		},
+		totalUsedMin: function totalUsedMin() {
+			return this.totalUsedSec / 60;
+		},
+		totalPlannedSec: function totalPlannedSec() {
+			return this.totalPlannedMin * 60;
+		},
+		totalPlannedHour: function totalPlannedHour() {
+			return this.totalPlannedMin / 60;
 		},
 		isProject: function isProject() {
 			// console.log('checking isProject');
@@ -26156,11 +26183,11 @@ exports.default = {
 		hasDoneDate: function hasDoneDate() {
 			return this.item.done_date && this.item.done_date != '0000-00-00 00:00:00';
 		},
-		hasTotalUsedTime: function hasTotalUsedTime() {
-			return this.item.children_order.length && this.item.totalUsedTime && this.item.totalUsedTime != '0' && this.item.used_time != this.item.totalUsedTime;
+		hastotalUsedSec: function hastotalUsedSec() {
+			return this.item.children_order.length && this.item.totalUsedSec && this.item.totalUsedSec != '0' && this.item.used_time != this.item.totalUsedSec;
 		},
-		hasTotalPlannedTime: function hasTotalPlannedTime() {
-			return this.item.children_order.length && this.item.totalPlannedTime && this.item.totalPlannedTime != '0' && this.item.planned_time != this.item.totalPlannedTime;
+		hasTotalPlannedMin: function hasTotalPlannedMin() {
+			return this.item.children_order.length && this.totalPlannedMin && this.totalPlannedMin != '0' && this.item.planned_time != this.totalPlannedMin;
 		},
 		hasPlannedTime: function hasPlannedTime() {
 			return this.item.planned_time && this.item.planned_time != '0';
@@ -26171,19 +26198,23 @@ exports.default = {
 		allTags_c: function allTags_c() {
 			return this.$root.allTags;
 		},
-		totalTimeLeft: function totalTimeLeft() {
-			var x = this.item.totalPlannedTime * 60 - this.item.totalUsedTime;
-			return x;
+		totalMinLeft: function totalMinLeft() {
+			return this.totalPlannedMin - this.totalUsedMin;
 		},
-		timeLeft: function timeLeft() {
-			var x = this.item.planned_time * 60 - this.item.used_time;
-			return x;
+		totalSecLeft: function totalSecLeft() {
+			return this.totalPlannedSec - this.totalUsedSec;
+		},
+		secLeft: function secLeft() {
+			return this.item.planned_time * 60 - this.item.used_time;
+		},
+		minLeft: function minLeft() {
+			return this.secLeft / 60;
 		},
 		totalTimeDifferentFromParent: function totalTimeDifferentFromParent() {
 			if (!this.item.parent_id) {
 				return true;
 			}
-			return this.item.totalPlannedTime != allItems.nodes[this.item.parent_id].totalPlannedTime;
+			return this.totalPlannedSec != this.$parent.totalPlannedSec;
 		},
 		parentTags: function parentTags() {
 			return allItems.returnTagsAsArray(this.item.parent_id);
@@ -26201,6 +26232,56 @@ exports.default = {
 		}
 	},
 	methods: {
+		convertbodyURLtoHTML: function convertbodyURLtoHTML() {
+			if (!this.item) {
+				return;
+			}
+			var bodyboxQS = "#card-" + this.item.id + " > div > .item-card > .body-div > .bodybox > div";
+			var a = document.querySelector(bodyboxQS);
+			if (!a) {
+				return;
+			}
+			a.innerHTML = a.innerHTML.replace("&lt;a href=", "<a href=").replace('target="_blank"&gt;', 'target="_blank">').replace("&lt;/a&gt;", "</a>");
+		},
+		calculateTotalPlannedMin: function calculateTotalPlannedMin() {
+			if (!this.item) {
+				return;
+			}
+			// console.log("launching calculateTotalPlannedMin() for item ["+this.item.body+"] at depth: "+this.item.depth);
+			var totalPlannedMin = void 0;
+			var initialVal = !this.item.done || this.$root.selection.filter.includes('done') ? parseFloat(this.item.planned_time) : 0;
+			if (!(Array.isArray(this.$children) && this.$children.length)) {
+				// if we don't have children, do nothing, leave the time as-is
+				totalPlannedMin = initialVal;
+			} else {
+				// add up all the times of our direct children
+				totalPlannedMin = this.$children.reduce(function (prev, next) {
+					var x = next.totalPlannedMin ? next.totalPlannedMin : next.item.planned_time;
+					return parseFloat(prev) + parseFloat(x);
+				}, initialVal);
+			}
+			var x = parseFloat(totalPlannedMin);
+			this.totalPlannedMin = x;
+		},
+		calculateTotalUsedSec: function calculateTotalUsedSec() {
+			if (!this.item) {
+				return;
+			}
+			var totalUsedSec = void 0;
+			var initialVal = !this.item.done || this.$root.selection.filter.includes('done') ? parseFloat(this.item.used_time) : 0;
+			if (!(Array.isArray(this.$children) && this.$children.length)) {
+				// if we don't have children, do nothing, leave the time as-is
+				totalUsedSec = initialVal;
+			} else {
+				// add up all the times of our direct children
+				totalUsedSec = this.$children.reduce(function (prev, next) {
+					var x = next.totalUsedSec ? next.totalUsedSec : next.item.used_time;
+					return parseFloat(prev) + parseFloat(x);
+				}, initialVal);
+			}
+			var x = parseFloat(totalUsedSec);
+			this.totalUsedSec = x;
+		},
 		addTimer: function addTimer(item) {
 			//Codementor
 			this.$root.addTimer(item.id);
@@ -26468,7 +26549,6 @@ exports.default = {
 			vm.patch(item.id, 'body');
 			vm.patch(item.id, 'planned_time');
 			allItems.copyParentBodyToAllChildren(item.id);
-			allItems.calculateTotalTime(item.id);
 		},
 		cancelEdit: function cancelEdit(item) {
 			item = item ? item : allItems.nodes[selection.selectedId];
@@ -26592,6 +26672,16 @@ exports.default = {
 		},
 		escapeOnNewButtonFocus: function escapeOnNewButtonFocus() {
 			this.cancelAddNew();
+		},
+		filterItems: function filterItems() {
+			if (!this.$children.length) {
+				this.calculateTotalPlannedMin();
+				this.calculateTotalUsedSec();
+				this.$parent.calculateTotalPlannedMin();
+				this.$parent.calculateTotalUsedSec();
+			} else {
+				return true;
+			}
 		}
 	},
 	directives: {
@@ -26613,7 +26703,7 @@ exports.default = {
 	}
 };
 if (module.exports.__esModule) module.exports = module.exports.default
-;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\n\n<div :class=\"{\n\t\t'items-card': true,\n\t\t'journal-wrapper': $root.selection.filter.includes('done')\n\t}\" :id=\"'card-'+item.id\">\n<div v-if=\"!isHidden\">\n\t\t<div class=\"title\" v-if=\"journalDate\">\n\t\t\t<span>{{ journalDate | momentCalendar }}</span>\n\t\t\t<span class=\"journal-date-small\">{{ journalDate }}</span>\n\t\t</div>\n\t\t<div class=\"parent-string\" v-if=\"this.$root.selection.filter.includes('done') &amp;&amp; this.item.depth != 0\" @click=\"selectItem(item)\">{{ item.parents_bodies }}:</div>\n\t<div v-if=\"item.depth != 0\" :class=\"{\n\t\t\t'item-card': true,\n\t\t\tdone: item.done,\n\t\t\tshow_children: item.show_children,\n\t\t\tediting: item.id == this.$root.editingItem,\n\t\t}\">\n\t\t<div class=\"toggle-div\" v-if=\"!this.$root.selection.filter.includes('done')\">\n\t\t\t<input class=\"toggle\" type=\"checkbox\" v-if=\"item.children_order.length==0 || item.done == true\" v-model=\"item.done\" @change=\"updateDone(item.id)\">\n\t\t\t<input type=\"checkbox\" class=\"styled-check\" :id=\"'show_children_'+item.id\" v-model=\"item.show_children\" @change=\"updateShowChildren(item.id)\">\n\t\t\t<label class=\"arrow\" :for=\"'show_children_'+item.id\" v-if=\"item.children_order.length>0\"></label>\n\n\t\t\t<!-- <input class=\"show_children_toggle\"\n\t\t\t\tid=\"show_children_{{item.id}}\"\n\t\t\t\ttype=\"checkbox\"\n\t\t\t\tv-if=\"item.children_order.length>0\"\n\t\t\t\tv-model=\"item.show_children\"\n\t\t\t\t@change=\"updateShowChildren(item.id)\"\n\t\t\t>\n\t\t\t<label class=\"show_children_svg\" \n\t\t\t\tfor=\"show_children_{{item.id}}\">\n\t\t\t\t//// This label is not yet used!\n\t\t\t</label> -->\n\t\t</div>\n\t\t<div class=\"\" v-if=\"this.$root.selection.filter.includes('done')\">・</div>\n\t\t<div class=\"body-div textarea-wrap\" :class=\"{ selected: item.id == this.$root.selection.selectedId, project: isProject}\" @dblclick=\"startEdit(item, $event)\" @click=\"selectItem(item)\" @enter=\"console.log('yarrr')\">\n\t\t\t<div class=\"bodybox\" v-show=\"item.id != this.$root.editingItem\">\n\t\t\t\t<div>{{{ item.body | linkify }}}</div>\n\t\t\t\t<div class=\"completion-notes bodybox\" v-if=\"item.completion_memo\" @click=\"selectItem(item)\">{{ item.completion_memo }}</div>\n\t\t\t</div>\n\t\t\t<!-- <div class=\"hidden-sizer\">{{item.body + \"|\"}}</div> -->\n\t\t\t\n\t\t\t<!-- For debugging: -->\n\t\t\t<span v-show=\"false\"> ({{item.id}}) D-{{item.depth}}) [{{item.children_order}}]</span>\n\t\t\t\n\t\t\t<form action=\"update\" class=\"updatebox\" :id=\"'updatebox-'+item.id\" v-show=\"item.id == this.$root.editingItem\" @submit.prevent=\"doneEdit(item)\">\n\t\t\t\t<div class=\"update-body\">\n\t\t\t\t\t<textarea class=\"edititem-body\" :rows=\"item.rows\" v-model=\"item.body\" v-autosize=\"item.body\" v-item-focus=\"item.id == this.$root.editingItem\" @blur=\"blurOnEdit(item)\" @keyup.esc=\"cancelEdit(item)\" @keydown=\"keydownOnEdit(item, $event, 'body')\">{{ item.body }}</textarea>\n\t\t\t\t</div>\n\t\t\t\t<div class=\"update-tags\">\n\t\t\t\t\t<div class=\"update-planned-time\">\n\t\t\t\t\t\tDuration:\n\t\t\t\t\t\t<button :class=\"{ currentDuration: item.planned_time == 10, 'planned-time': true }\" @click.prevent=\"setPlannedTime(item, 10, $event)\" @keydown=\"keydownOnEdit(item, $event, 'planned-time')\" @blur=\"blurOnEdit(item)\">10 min</button>\n\t\t\t\t\t\t<button :class=\"{ currentDuration: item.planned_time == 15, 'planned-time': true }\" @click.prevent=\"setPlannedTime(item, 15, $event)\" @keydown=\"keydownOnEdit(item, $event, 'planned-time')\" @blur=\"blurOnEdit(item)\">15 min</button>\n\t\t\t\t\t\t<button :class=\"{ currentDuration: item.planned_time == 30, 'planned-time': true }\" @click.prevent=\"setPlannedTime(item, 30, $event)\" @keydown=\"keydownOnEdit(item, $event, 'planned-time')\" @blur=\"blurOnEdit(item)\">30 min</button>\n\t\t\t\t\t\t<button :class=\"{ currentDuration: item.planned_time == 60, 'planned-time': true }\" @click.prevent=\"setPlannedTime(item, 60, $event)\" @keydown=\"keydownOnEdit(item, $event, 'planned-time')\" @blur=\"blurOnEdit(item)\">1 hour</button>\n\t\t\t\t\t\t<div><input class=\"planned-time\" type=\"number\" v-show=\"true\" v-model=\"item.planned_time | min_to_hours\" @blur=\"blurOnEdit(item)\" @keyup.esc=\"cancelEdit(item)\" @keydown=\"keydownOnEdit(item, $event, 'planned-time')\">hours</div>\n\t\t\t\t\t</div>\n\t\t\t\t\t<div class=\"update-custom-tags\">\n\t\t\t\t\t\t<label>\n\t\t\t\t\t\t\tAdd Tag: \n\t\t\t\t\t\t\t<input type=\"text\" class=\"add-tag\" @blur=\"blurOnEdit(item)\" v-model=\"newTag\" @keyup.esc=\"cancelEdit(item)\" @keydown=\"keydownOnEdit(item, $event, 'addTag')\">\n\t\t\t\t\t\t</label>\n\t\t\t\t\t\t<div class=\"tag-suggestions\" v-if=\"false\">\n\t\t\t\t\t\t<!-- UNDER CONSTRUCTION -->\n\t\t\t\t\t\t\t<label v-for=\"tag in allTags_c\" :class=\"'tag'\" @click=\"this.$root.patchTag(item.id, tag)\">{{ tag.name }}\n\t\t\t\t\t\t\t</label>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t\t</form>\n\t\t\t<div class=\"item-tags\">\n\t\t\t\t<label class=\"done\" v-if=\"item.done &amp;&amp; item.id != this.$root.editingDoneDateItem\">Done {{ item.done_date | momentCalendar }}\n\t\t\t\t\t<input class=\"flatpickr\" id=\"done-date-edit-{{ item.id }}\" v-model=\"item.done_date\">\n\t\t\t\t</label>\n\t\t\t\t\n\t\t\t\t<span v-if=\"\n\t\t\t\t\ttotalTimeLeft > 0\n\t\t\t\t\t&amp;&amp; totalTimeLeft > timeLeft\n\t\t\t\t\t&amp;&amp; totalTimeDifferentFromParent\n\t\t\t\t\t&amp;&amp; !item.done\" class=\"total-duration\">\n\t\t\t\t\t{{ totalTimeLeft | hourminsec }}\n\t\t\t\t\t<!-- <span style=\"padding-right:2px\">Total </span>\n\t\t\t\t\t<span v-if=\"hasTotalUsedTime\"> used {{ item.totalUsedTime | hourminsec }}</span>\n\t\t\t\t\t<span v-if=\"(hasTotalUsedTime && hasTotalPlannedTime)\">/</span>\n\t\t\t\t\t<span v-if=\"hasTotalPlannedTime\">{{ item.totalPlannedTime | hourmin }}</span> -->\n\t\t\t\t\t</span>\n\n\t\t\t\t<span v-if=\"\n\t\t\t\t\titem.id != this.$root.editingItem\n\t\t\t\t\t&amp;&amp; timeLeft > 0\n\t\t\t\t\t\n\t\t\t\t\t&amp;&amp; !item.done\" class=\"duration\">\n\t\t\t\t\t{{ timeLeft | hourminsec }}\n\t\t\t\t\t<!-- <span v-if=\"hasUsedTime\">Used {{ item.used_time | hourminsec }}</span>\n\t\t\t\t\t<span v-if=\"(hasPlannedTime && hasUsedTime)\">/</span>\n\t\t\t\t\t<span v-if=\"hasPlannedTime\">{{ item.planned_time | hourmin }}</span> -->\n\t\t\t\t</span>\n\t\t\t\t\n\t\t\t\t<span v-if=\"hasDueDate &amp;&amp; !item.done\" class=\"duedate\">{{ item.due_date | momentCalendar }}</span>\n\n\t\t\t\t<span v-if=\"item.dueDateParent &amp;&amp; !item.done\" class=\"duedate-parent\">{{ item.dueDateParent | momentCalendar }}</span>\n\n\t\t\t\t<span v-for=\"tag in item.tagged\" v-if=\"item.tagged.length\" v-show=\"!parentTags.includes(tag.tag_name)\n\t\t\t\t\t\t|| item.id == this.$root.editingItem\" class=\"custom-tag\" @dblclick.prevent=\"this.$root.filterItems('tag', tag.tag_slug)\">{{ tag.tag_name }}\n\t\t\t\t\t<button class=\"delete-tag\" v-if=\"item.id == this.$root.editingItem\n\t\t\t\t\t\t&amp;&amp; !parentTags.includes(tag.tag_name)\" @click.prevent=\"deleteTag(item.id, tag.tag_name, $event)\">\n\t\t\t\t\t\t<i class=\"zmdi zmdi-close-circle\"></i>\n\t\t\t\t\t</button>\n\t\t\t\t</span>\n\n\t\t\t</div>\n\t\t\t<div class=\"item-nav\" v-if=\"this.$root.editingItem != item.id &amp;&amp; this.$root.selection.selectedId == item.id\">\n\t\t\t\t\n\t\t\t\t<button v-if=\"!item.done\" class=\"timer\" @click=\"addTimer(item)\"><i class=\"zmdi zmdi-timer\"></i>\n\t\t\t\t</button>\n\t\t\t\t<button v-if=\"item.done\" class=\"more\" @click=\"this.$root.popup(item.id, 'afterDone')\"><i class=\"zmdi zmdi-more\"></i>\n\t\t\t\t</button>\n\t\t\t\t<!--\n\t\t\t\t- font icon / woff format [font awesome]\n\t\t\t\t  material design iconic fonts\n\t\t\t\t- add svg as background to button\n\t\t\t\t- or image tag inside button\n\t\t\t\t- svg tag -> add as pattern\n\t\t\t\t-->\n\t\t\t\t<button class=\"delete\" v-if=\"item.children_order.length==0\" @click=\"deleteItem(item)\"><i class=\"zmdi zmdi-delete\"></i>\n\t\t\t\t</button>\n\t\t\t</div>\n\t\t\t\n\t\t</div>\n\t</div>\n\n\t<form :class=\"['addnewbox-firstchild', 'addnewbox', 'child']\" :id=\"'new-firstchild-of-'+item.id\" v-if=\"showAddNewBoxFirstChild\" @submit.prevent=\"\">\n\t\t<div>\n\t\t\t<textarea type=\"text\" class=\"newitem-body\" v-model=\"newItem.body\" v-autosize=\"newItem.body\" @blur=\"blurOnAddNew(item)\" @keydown=\"keydownOnNew(item, $event, 'body')\" placeholder=\"...\" autocomplete=\"off\" autofocus=\"\" rows=\"1\"></textarea>\n\t\t</div>\n\t\t<div class=\"update-tags\">\n\t\t\t<div class=\"update-planned-time\">\n\t\t\t\tDuration:\n\t\t\t\t<button :class=\"{ currentDuration: newItem.planned_time == 10, 'planned-time': true }\" @click.prevent=\"setPlannedTimeNewItem(item, 10, $event)\" @keydown=\"keydownOnNew(item, $event, 'planned-time')\" @blur=\"blurOnAddNew(item)\">10 min</button>\n\t\t\t\t<button :class=\"{ currentDuration: newItem.planned_time == 15, 'planned-time': true }\" @click.prevent=\"setPlannedTimeNewItem(item, 15, $event)\" @keydown=\"keydownOnNew(item, $event, 'planned-time')\" @blur=\"blurOnAddNew(item)\">15 min</button>\n\t\t\t\t<button :class=\"{ currentDuration: newItem.planned_time == 30, 'planned-time': true }\" @click.prevent=\"setPlannedTimeNewItem(item, 30, $event)\" @keydown=\"keydownOnNew(item, $event, 'planned-time')\" @blur=\"blurOnAddNew(item)\">30 min</button>\n\t\t\t\t<button :class=\"{ currentDuration: newItem.planned_time == 60, 'planned-time': true }\" @click.prevent=\"setPlannedTimeNewItem(item, 60, $event)\" @keydown=\"keydownOnNew(item, $event, 'planned-time')\" @blur=\"blurOnAddNew(item)\">1 hour</button>\n\t\t\t\t<div><input class=\"planned-time\" type=\"number\" v-show=\"true\" v-model=\"newItem.planned_time | min_to_hours\" @blur=\"blurOnAddNew(item)\" @keydown=\"keydownOnNew(item, $event, 'planned-time')\">hours</div>\n\t\t\t</div>\n\t\t\t<div class=\"update-custom-tags\">\n\t\t\t\t<label>\n\t\t\t\t\tAdd Tag: \n\t\t\t\t\t<input type=\"text\" class=\"prepare-tag\" @keydown=\"keydownOnNew(item, $event, 'addTag')\" @blur=\"blurOnAddNew(item)\" v-model=\"newTag\">\n\t\t\t\t</label>\n\t\t\t</div>\n\t\t\t<div class=\"item-tags prepared-tags\">\n\t\t\t\t<span v-if=\"newItem.preparedTags.length\" v-for=\"tag in newItem.preparedTags\" :class=\"(tag=='Today') ? 'duedate' : 'custom-tag'\">{{ tag }}\n\t\t\t\t\t<button class=\"delete-tag\" v-if=\"!parentTags.includes(tag)\" @click.prevent=\"deletePreparedTag(tag, item)\">\n\t\t\t\t\t\t<i class=\"zmdi zmdi-close-circle\"></i>\n\t\t\t\t\t</button>\n\t\t\t\t</span>\n\t\t\t</div>\n\t\t</div>\n\t</form>\n\n\n\t<div class=\"children\" v-if=\"item.children\" v-show=\"item.show_children\">\n\t\t<card v-for=\"childCard in item.children\" :item=\"childCard\" :key=\"childCard.id\"></card>\n\t</div>\n\n\t<form :class=\"['addnewbox']\" :id=\"'new-under-'+ item.id \" v-if=\"showAddNewBox\" @submit.prevent=\"\">\n\t\t<div>\n\t\t\t<textarea type=\"text\" class=\"newitem-body\" v-model=\"newItem.body\" v-autosize=\"newItem.body\" @blur=\"blurOnAddNew(item)\" @keydown=\"keydownOnNew(item, $event, 'body')\" placeholder=\"...\" autocomplete=\"off\" autofocus=\"\" rows=\"1\"></textarea>\n\t\t</div>\n\t\t<div class=\"update-tags\">\n\t\t\t<div class=\"update-planned-time\">\n\t\t\t\tDuration:\n\t\t\t\t<button :class=\"{ currentDuration: newItem.planned_time == 10, 'planned-time': true }\" @click.prevent=\"setPlannedTimeNewItem(item, 10, $event)\" @keydown=\"keydownOnNew(item, $event, 'planned-time')\" @blur=\"blurOnAddNew(item)\">10 min</button>\n\t\t\t\t<button :class=\"{ currentDuration: newItem.planned_time == 15, 'planned-time': true }\" @click.prevent=\"setPlannedTimeNewItem(item, 15, $event)\" @keydown=\"keydownOnNew(item, $event, 'planned-time')\" @blur=\"blurOnAddNew(item)\">15 min</button>\n\t\t\t\t<button :class=\"{ currentDuration: newItem.planned_time == 30, 'planned-time': true }\" @click.prevent=\"setPlannedTimeNewItem(item, 30, $event)\" @keydown=\"keydownOnNew(item, $event, 'planned-time')\" @blur=\"blurOnAddNew(item)\">30 min</button>\n\t\t\t\t<button :class=\"{ currentDuration: newItem.planned_time == 60, 'planned-time': true }\" @click.prevent=\"setPlannedTimeNewItem(item, 60, $event)\" @keydown=\"keydownOnNew(item, $event, 'planned-time')\" @blur=\"blurOnAddNew(item)\">1 hour</button>\n\t\t\t\t<div><input class=\"planned-time\" v-if=\"true\" type=\"number\" v-model=\"newItem.planned_time | min_to_hours\" @keydown=\"keydownOnNew(item, $event)\" @blur=\"blurOnAddNew(item)\">hours</div>\n\t\t\t</div>\n\t\t\t<div class=\"update-custom-tags\">\n\t\t\t\t<label>\n\t\t\t\t\tAdd Tag: \n\t\t\t\t\t<input type=\"text\" class=\"prepare-tag\" @keydown=\"keydownOnNew(item, $event, 'addTag')\" @blur=\"blurOnAddNew(item)\" v-model=\"newTag\">\n\t\t\t\t</label>\n\t\t\t</div>\n\t\t\t<div class=\"item-tags prepared-tags\">\n\t\t\t\t<span v-if=\"newItem.preparedTags.length\" v-for=\"tag in newItem.preparedTags\" :class=\"(tag=='Today') ? 'duedate' : 'custom-tag'\">{{ tag }}\n\t\t\t\t\t<button class=\"delete-tag\" v-if=\"!parentTags.includes(tag)\" @click.prevent=\"deletePreparedTag(tag, item)\">\n\t\t\t\t\t\t<i class=\"zmdi zmdi-close-circle\"></i>\n\t\t\t\t\t</button>\n\t\t\t\t</span>\n\t\t\t</div>\n\t\t</div>\n\t</form>\n</div>\n</div>\n"
+;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\n\n<div :class=\"{\n\t\t'items-card': true,\n\t\t'journal-wrapper': $root.selection.filter.includes('done')\n\t}\" :id=\"'card-'+item.id\">\n\n<div v-if=\"!isHidden\">\n\t<div class=\"title\" v-if=\"journalDate\">\n\t\t<span>{{ journalDate | momentCalendar }}</span>\n\t\t<span class=\"journal-date-small\">{{ journalDate }}</span>\n\t</div>\n\t<div class=\"parent-string\" v-if=\"this.$root.selection.filter.includes('done') &amp;&amp; this.item.depth != 0\" @click=\"selectItem(item)\">{{ item.parents_bodies }}:</div>\n\t<div v-if=\"item.depth != 0\" :class=\"{\n\t\t\t'item-card': true,\n\t\t\tdone: item.done,\n\t\t\tshow_children: item.show_children,\n\t\t\tediting: item.id == this.$root.editingItem,\n\t\t}\">\n\t\t<div class=\"toggle-div\" v-if=\"!this.$root.selection.filter.includes('done')\">\n\t\t\t<input class=\"toggle\" type=\"checkbox\" v-if=\"item.children_order.length==0 || item.done == true\" v-model=\"item.done\" @change=\"updateDone(item.id)\">\n\t\t\t<input type=\"checkbox\" class=\"styled-check\" :id=\"'show_children_'+item.id\" v-model=\"item.show_children\" @change=\"updateShowChildren(item.id)\">\n\t\t\t<label class=\"arrow\" :for=\"'show_children_'+item.id\" v-if=\"item.children_order.length>0\"></label>\n\n\t\t\t<!-- <input class=\"show_children_toggle\"\n\t\t\t\tid=\"show_children_{{item.id}}\"\n\t\t\t\ttype=\"checkbox\"\n\t\t\t\tv-if=\"item.children_order.length>0\"\n\t\t\t\tv-model=\"item.show_children\"\n\t\t\t\t@change=\"updateShowChildren(item.id)\"\n\t\t\t>\n\t\t\t<label class=\"show_children_svg\" \n\t\t\t\tfor=\"show_children_{{item.id}}\">\n\t\t\t\t//// This label is not yet used!\n\t\t\t</label> -->\n\t\t</div>\n\t\t<div class=\"\" v-if=\"this.$root.selection.filter.includes('done')\">・</div>\n\t\t<div class=\"body-div textarea-wrap\" :class=\"{ selected: item.id == this.$root.selection.selectedId, project: isProject}\" @dblclick=\"startEdit(item, $event)\" @click=\"selectItem(item)\" @enter=\"console.log('yarrr')\">\n\t\t\t<div class=\"bodybox\" v-show=\"item.id != this.$root.editingItem\">\n\t\t\t\t<div>{{ item.body | linkify }}</div>\n\t\t\t\t<div class=\"completion-notes bodybox\" v-if=\"item.completion_memo\" @click=\"selectItem(item)\">{{ item.completion_memo }}</div>\n\t\t\t</div>\n\t\t\t<!-- <div class=\"hidden-sizer\">{{item.body + \"|\"}}</div> -->\n\t\t\t\n\t\t\t<!-- For debugging: -->\n\t\t\t<span v-show=\"false\"> ({{item.id}}) D-{{item.depth}}) [{{item.children_order}}]</span>\n\t\t\t\n\t\t\t<form action=\"update\" class=\"updatebox\" :id=\"'updatebox-'+item.id\" v-show=\"item.id == this.$root.editingItem\" @submit.prevent=\"doneEdit(item)\">\n\t\t\t\t<div class=\"update-body\">\n\t\t\t\t\t<textarea class=\"edititem-body\" :rows=\"item.rows\" v-model=\"item.body\" v-autosize=\"item.body\" v-item-focus=\"item.id == this.$root.editingItem\" @blur=\"blurOnEdit(item)\" @keyup.esc=\"cancelEdit(item)\" @keydown=\"keydownOnEdit(item, $event, 'body')\">{{ item.body }}</textarea>\n\t\t\t\t</div>\n\t\t\t\t<div class=\"update-tags\">\n\t\t\t\t\t<div class=\"update-planned-time\">\n\t\t\t\t\t\tDuration:\n\t\t\t\t\t\t<button :class=\"{ currentDuration: item.planned_time == 10, 'planned-time': true }\" @click.prevent=\"setPlannedTime(item, 10, $event)\" @keydown=\"keydownOnEdit(item, $event, 'planned-time')\" @blur=\"blurOnEdit(item)\">10 min</button>\n\t\t\t\t\t\t<button :class=\"{ currentDuration: item.planned_time == 15, 'planned-time': true }\" @click.prevent=\"setPlannedTime(item, 15, $event)\" @keydown=\"keydownOnEdit(item, $event, 'planned-time')\" @blur=\"blurOnEdit(item)\">15 min</button>\n\t\t\t\t\t\t<button :class=\"{ currentDuration: item.planned_time == 30, 'planned-time': true }\" @click.prevent=\"setPlannedTime(item, 30, $event)\" @keydown=\"keydownOnEdit(item, $event, 'planned-time')\" @blur=\"blurOnEdit(item)\">30 min</button>\n\t\t\t\t\t\t<button :class=\"{ currentDuration: item.planned_time == 60, 'planned-time': true }\" @click.prevent=\"setPlannedTime(item, 60, $event)\" @keydown=\"keydownOnEdit(item, $event, 'planned-time')\" @blur=\"blurOnEdit(item)\">1 hour</button>\n\t\t\t\t\t\t<div><input class=\"planned-time\" type=\"number\" v-show=\"true\" v-model=\"item.planned_time | min_to_hours\" @blur=\"blurOnEdit(item)\" @keyup.esc=\"cancelEdit(item)\" @keydown=\"keydownOnEdit(item, $event, 'planned-time')\">hours</div>\n\t\t\t\t\t</div>\n\t\t\t\t\t<div class=\"update-custom-tags\">\n\t\t\t\t\t\t<label>\n\t\t\t\t\t\t\tAdd Tag: \n\t\t\t\t\t\t\t<input type=\"text\" class=\"add-tag\" @blur=\"blurOnEdit(item)\" v-model=\"newTag\" @keyup.esc=\"cancelEdit(item)\" @keydown=\"keydownOnEdit(item, $event, 'addTag')\">\n\t\t\t\t\t\t</label>\n\t\t\t\t\t\t<div class=\"tag-suggestions\" v-if=\"false\">\n\t\t\t\t\t\t<!-- UNDER CONSTRUCTION -->\n\t\t\t\t\t\t\t<label v-for=\"tag in allTags_c\" :class=\"'tag'\" @click=\"this.$root.patchTag(item.id, tag)\">{{ tag.name }}\n\t\t\t\t\t\t\t</label>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t\t</form>\n\t\t\t<div class=\"item-tags\">\n\t\t\t\t<label class=\"done\" v-if=\"item.done &amp;&amp; item.id != this.$root.editingDoneDateItem\">Done {{ item.done_date | momentCalendar }}\n\t\t\t\t\t<input class=\"flatpickr\" id=\"done-date-edit-{{ item.id }}\" v-model=\"item.done_date\">\n\t\t\t\t</label>\n\t\t\t\t<!-- <span class=\"total-duration\">ttuc {{ totalUsedSec | sec-to-hourminsec }}</span> -->\n\t\t\t\t<span v-if=\"\n\t\t\t\t\ttotalSecLeft > 0\n\t\t\t\t\t&amp;&amp; totalSecLeft > secLeft\n\t\t\t\t\t&amp;&amp; totalTimeDifferentFromParent\n\t\t\t\t\t&amp;&amp; !item.done\" class=\"total-duration\">\n\t\t\t\t\t{{ totalSecLeft | sec-to-hourminsec }}\n\t\t\t\t\t<!-- <span style=\"padding-right:2px\">Total </span>\n\t\t\t\t\t<span v-if=\"hastotalUsedSec\"> used {{ item.totalUsedSec | sec-to-hourminsec }}</span>\n\t\t\t\t\t<span v-if=\"(hastotalUsedSec && hasTotalPlannedMin)\">/</span>\n\t\t\t\t\t<span v-if=\"hasTotalPlannedMin\">{{ item.totalPlannedMin | hourmin }}</span> -->\n\t\t\t\t\t</span>\n\n\t\t\t\t<span v-if=\"\n\t\t\t\t\titem.id != this.$root.editingItem\n\t\t\t\t\t&amp;&amp; secLeft > 0\n\t\t\t\t\t\n\t\t\t\t\t&amp;&amp; !item.done\" class=\"duration\">\n\t\t\t\t\t{{ secLeft | sec-to-hourminsec }}\n\t\t\t\t\t<!-- <span v-if=\"hasUsedTime\">Used {{ item.used_time | sec-to-hourminsec }}</span>\n\t\t\t\t\t<span v-if=\"(hasPlannedTime && hasUsedTime)\">/</span>\n\t\t\t\t\t<span v-if=\"hasPlannedTime\">{{ item.planned_time | hourmin }}</span> -->\n\t\t\t\t</span>\n\t\t\t\t\n\t\t\t\t<span v-if=\"hasDueDate &amp;&amp; !item.done\" class=\"duedate\">{{ item.due_date | momentCalendar }}</span>\n\n\t\t\t\t<span v-if=\"item.dueDateParent &amp;&amp; !item.done\" class=\"duedate-parent\">{{ item.dueDateParent | momentCalendar }}</span>\n\n\t\t\t\t<span v-for=\"tag in item.tagged\" v-if=\"item.tagged.length\" v-show=\"!parentTags.includes(tag.tag_name)\n\t\t\t\t\t\t|| item.id == this.$root.editingItem\" class=\"custom-tag\" @dblclick.prevent=\"this.$root.filterItems('tag', tag.tag_slug, $event)\">{{ tag.tag_name }}\n\t\t\t\t\t<button class=\"delete-tag\" v-if=\"item.id == this.$root.editingItem\n\t\t\t\t\t\t&amp;&amp; !parentTags.includes(tag.tag_name)\" @click.prevent=\"deleteTag(item.id, tag.tag_name, $event)\">\n\t\t\t\t\t\t<i class=\"zmdi zmdi-close-circle\"></i>\n\t\t\t\t\t</button>\n\t\t\t\t</span>\n\n\t\t\t</div>\n\t\t\t<div class=\"item-nav\" v-if=\"this.$root.editingItem != item.id &amp;&amp; this.$root.selection.selectedId == item.id\">\n\t\t\t\t\n\t\t\t\t<button v-if=\"!item.done\" class=\"timer\" @click=\"addTimer(item)\"><i class=\"zmdi zmdi-timer\"></i>\n\t\t\t\t</button>\n\t\t\t\t<button v-if=\"item.done\" class=\"more\" @click=\"this.$root.popup(item.id, 'afterDone')\"><i class=\"zmdi zmdi-more\"></i>\n\t\t\t\t</button>\n\t\t\t\t<!--\n\t\t\t\t- font icon / woff format [font awesome]\n\t\t\t\t  material design iconic fonts\n\t\t\t\t- add svg as background to button\n\t\t\t\t- or image tag inside button\n\t\t\t\t- svg tag -> add as pattern\n\t\t\t\t-->\n\t\t\t\t<button class=\"delete\" v-if=\"item.children_order.length==0\" @click=\"deleteItem(item)\"><i class=\"zmdi zmdi-delete\"></i>\n\t\t\t\t</button>\n\t\t\t</div>\n\t\t\t\n\t\t</div>\n\t</div>\n\n\t<form :class=\"['addnewbox-firstchild', 'addnewbox', 'child']\" :id=\"'new-firstchild-of-'+item.id\" v-if=\"showAddNewBoxFirstChild\" @submit.prevent=\"\">\n\t\t<div>\n\t\t\t<textarea type=\"text\" class=\"newitem-body\" v-model=\"newItem.body\" v-autosize=\"newItem.body\" @blur=\"blurOnAddNew(item)\" @keydown=\"keydownOnNew(item, $event, 'body')\" placeholder=\"...\" autocomplete=\"off\" autofocus=\"\" rows=\"1\"></textarea>\n\t\t</div>\n\t\t<div class=\"update-tags\">\n\t\t\t<div class=\"update-planned-time\">\n\t\t\t\tDuration:\n\t\t\t\t<button :class=\"{ currentDuration: newItem.planned_time == 10, 'planned-time': true }\" @click.prevent=\"setPlannedTimeNewItem(item, 10, $event)\" @keydown=\"keydownOnNew(item, $event, 'planned-time')\" @blur=\"blurOnAddNew(item)\">10 min</button>\n\t\t\t\t<button :class=\"{ currentDuration: newItem.planned_time == 15, 'planned-time': true }\" @click.prevent=\"setPlannedTimeNewItem(item, 15, $event)\" @keydown=\"keydownOnNew(item, $event, 'planned-time')\" @blur=\"blurOnAddNew(item)\">15 min</button>\n\t\t\t\t<button :class=\"{ currentDuration: newItem.planned_time == 30, 'planned-time': true }\" @click.prevent=\"setPlannedTimeNewItem(item, 30, $event)\" @keydown=\"keydownOnNew(item, $event, 'planned-time')\" @blur=\"blurOnAddNew(item)\">30 min</button>\n\t\t\t\t<button :class=\"{ currentDuration: newItem.planned_time == 60, 'planned-time': true }\" @click.prevent=\"setPlannedTimeNewItem(item, 60, $event)\" @keydown=\"keydownOnNew(item, $event, 'planned-time')\" @blur=\"blurOnAddNew(item)\">1 hour</button>\n\t\t\t\t<div><input class=\"planned-time\" type=\"number\" v-show=\"true\" v-model=\"newItem.planned_time | min_to_hours\" @blur=\"blurOnAddNew(item)\" @keydown=\"keydownOnNew(item, $event, 'planned-time')\">hours</div>\n\t\t\t</div>\n\t\t\t<div class=\"update-custom-tags\">\n\t\t\t\t<label>\n\t\t\t\t\tAdd Tag: \n\t\t\t\t\t<input type=\"text\" class=\"prepare-tag\" @keydown=\"keydownOnNew(item, $event, 'addTag')\" @blur=\"blurOnAddNew(item)\" v-model=\"newTag\">\n\t\t\t\t</label>\n\t\t\t</div>\n\t\t\t<div class=\"item-tags prepared-tags\">\n\t\t\t\t<span v-if=\"newItem.preparedTags.length\" v-for=\"tag in newItem.preparedTags\" :class=\"(tag=='Today') ? 'duedate' : 'custom-tag'\">{{ tag }}\n\t\t\t\t\t<button class=\"delete-tag\" v-if=\"!parentTags.includes(tag)\" @click.prevent=\"deletePreparedTag(tag, item)\">\n\t\t\t\t\t\t<i class=\"zmdi zmdi-close-circle\"></i>\n\t\t\t\t\t</button>\n\t\t\t\t</span>\n\t\t\t</div>\n\t\t</div>\n\t</form>\n\n\n\t<div class=\"children\" v-if=\"item.children\" v-show=\"item.show_children\">\n\t\t<card v-for=\"childCard in item.children\" :item=\"childCard\" :key=\"childCard.id\"></card>\n\t</div>\n\n\t<form :class=\"['addnewbox']\" :id=\"'new-under-'+ item.id \" v-if=\"showAddNewBox\" @submit.prevent=\"\">\n\t\t<div>\n\t\t\t<textarea type=\"text\" class=\"newitem-body\" v-model=\"newItem.body\" v-autosize=\"newItem.body\" @blur=\"blurOnAddNew(item)\" @keydown=\"keydownOnNew(item, $event, 'body')\" placeholder=\"...\" autocomplete=\"off\" autofocus=\"\" rows=\"1\"></textarea>\n\t\t</div>\n\t\t<div class=\"update-tags\">\n\t\t\t<div class=\"update-planned-time\">\n\t\t\t\tDuration:\n\t\t\t\t<button :class=\"{ currentDuration: newItem.planned_time == 10, 'planned-time': true }\" @click.prevent=\"setPlannedTimeNewItem(item, 10, $event)\" @keydown=\"keydownOnNew(item, $event, 'planned-time')\" @blur=\"blurOnAddNew(item)\">10 min</button>\n\t\t\t\t<button :class=\"{ currentDuration: newItem.planned_time == 15, 'planned-time': true }\" @click.prevent=\"setPlannedTimeNewItem(item, 15, $event)\" @keydown=\"keydownOnNew(item, $event, 'planned-time')\" @blur=\"blurOnAddNew(item)\">15 min</button>\n\t\t\t\t<button :class=\"{ currentDuration: newItem.planned_time == 30, 'planned-time': true }\" @click.prevent=\"setPlannedTimeNewItem(item, 30, $event)\" @keydown=\"keydownOnNew(item, $event, 'planned-time')\" @blur=\"blurOnAddNew(item)\">30 min</button>\n\t\t\t\t<button :class=\"{ currentDuration: newItem.planned_time == 60, 'planned-time': true }\" @click.prevent=\"setPlannedTimeNewItem(item, 60, $event)\" @keydown=\"keydownOnNew(item, $event, 'planned-time')\" @blur=\"blurOnAddNew(item)\">1 hour</button>\n\t\t\t\t<div><input class=\"planned-time\" v-if=\"true\" type=\"number\" v-model=\"newItem.planned_time | min_to_hours\" @keydown=\"keydownOnNew(item, $event)\" @blur=\"blurOnAddNew(item)\">hours</div>\n\t\t\t</div>\n\t\t\t<div class=\"update-custom-tags\">\n\t\t\t\t<label>\n\t\t\t\t\tAdd Tag: \n\t\t\t\t\t<input type=\"text\" class=\"prepare-tag\" @keydown=\"keydownOnNew(item, $event, 'addTag')\" @blur=\"blurOnAddNew(item)\" v-model=\"newTag\">\n\t\t\t\t</label>\n\t\t\t</div>\n\t\t\t<div class=\"item-tags prepared-tags\">\n\t\t\t\t<span v-if=\"newItem.preparedTags.length\" v-for=\"tag in newItem.preparedTags\" :class=\"(tag=='Today') ? 'duedate' : 'custom-tag'\">{{ tag }}\n\t\t\t\t\t<button class=\"delete-tag\" v-if=\"!parentTags.includes(tag)\" @click.prevent=\"deletePreparedTag(tag, item)\">\n\t\t\t\t\t\t<i class=\"zmdi zmdi-close-circle\"></i>\n\t\t\t\t\t</button>\n\t\t\t\t</span>\n\t\t\t</div>\n\t\t</div>\n\t</form>\n</div>\n</div>\n"
 if (module.hot) {(function () {  module.hot.accept()
   var hotAPI = require("vue-hot-reload-api")
   hotAPI.install(require("vue"), true)
@@ -27123,6 +27213,31 @@ exports.default = {
 				return 0;
 			}
 			return this.countDoneChildren(this.allData);
+		},
+		totalSecLeft: function totalSecLeft() {
+			console.log('run totalSecLeft');
+			if (!this.allData) {
+				return 0;
+			}
+			var card = this.$children.find(function (child) {
+				return child.totalSecLeft;
+			});
+			return card.totalSecLeft;
+		},
+		totalUsedSec: function totalUsedSec() {
+			console.log('run totalUsedSec');
+			if (!this.allData) {
+				return 0;
+			}
+			var card = this.$children.find(function (child) {
+				return child.totalUsedSec;
+			});
+			return card.totalUsedSec;
+		}
+	},
+	watch: {
+		childrenAmount: function childrenAmount() {
+			this.bcFI();
 		}
 	},
 	methods: {
@@ -27485,7 +27600,16 @@ exports.default = {
 				// debugger;
 				var data = response.json();
 				data.forEach(function (item) {
-					return allItems.setDefaultItemValues(item);
+					return item = allItems.setDefaultItemValues(item);
+				});
+				data.forEach(function (item) {
+					if (!allItems.nodes[item.id]) {
+						allItems.nodes[item.id] = item;
+					}
+					// let parent = allItems.nodes[item.parent_id];
+					// if(parent && ){
+					// 	parent.children.push(item);
+					// }
 				});
 				this.loading = false;
 				allItems.doneitems = data;
@@ -27536,6 +27660,9 @@ exports.default = {
 				this.allData = aaa;
 				this.loading = false;
 			});
+		},
+		bcFI: function bcFI() {
+			this.$broadcast('filterItems');
 		},
 		filterItems: function filterItems(keyword, value, event) {
 			// debugger;
@@ -27722,7 +27849,7 @@ exports.default = {
 			return;
 		}
 	},
-	created: function created() {},
+	mounted: function mounted() {},
 
 	ready: function ready() {
 		var vm = this;
@@ -27900,6 +28027,8 @@ var _createClass = function () { function defineProperties(target, props) { for 
 
 var _globalFunctions = require('../components/globalFunctions.js');
 
+function _toArray(arr) { return Array.isArray(arr) ? arr : Array.from(arr); }
+
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var Tree = function () {
@@ -27913,7 +28042,7 @@ var Tree = function () {
 		this.doneitems = [];
 		this.filteredItemRoot = {
 			children_order: [], children: [], body: "",
-			totalPlannedTime: 0, totalUsedTime: 0,
+			// totalPlannedTime:0, totalUsedTime:0,
 			planned_time: 0, used_time: 0
 		};
 		this.backups = {};
@@ -27942,17 +28071,13 @@ var Tree = function () {
 		value: function initialize(item, index) {
 			// console.log('run node initialization');
 			// variables
-			var node = this.makeNode(item);
-			var parent = this.getNode(node.parent_id);
+			var node = JSON.parse(JSON.stringify(item));
+			var parent = this.nodes[node.parent_id];
+
 			// assign extra item values
-			if (node.children_order) {
-				node.children_order = node.children_order.split(',').map(Number);
-			} else {
-				node.children_order = [];
-			}
-			node.children = [];
-			node.totalPlannedTime = !item.done && node.planned_time ? parseFloat(item.planned_time) : 0;
-			node.totalUsedTime = !item.done && node.used_time ? parseFloat(item.used_time) : 0;
+			node = this.setDefaultItemValues(node);
+			// node.totalPlannedTime = (!item.done && node.planned_time) ? parseFloat(item.planned_time) : 0 ;
+			// node.totalUsedTime = (!item.done && node.used_time) ? parseFloat(item.used_time) : 0 ;
 			node.parent_id_backup = node.parent_id;
 			// Register and organize nodes:
 			if (node.depth === 0) {
@@ -27974,10 +28099,6 @@ var Tree = function () {
 				this.updateChildrenDueDate(id);
 				var item = this.nodes[id];
 				// this.attachParentBody(id);　//Maybe I should only do this when pressing DONE
-				if (!item.children.length && (item.used_time || item.planned_time)) {
-					// Calculate total time from bottom up.
-					this.calculateTotalTime(id);
-				}
 			}.bind(this));
 			this.backups.rootChildren = this.root.children;
 			vm.allData = this.root;
@@ -28030,16 +28151,6 @@ var Tree = function () {
 			}
 		}
 	}, {
-		key: 'makeNode',
-		value: function makeNode(item) {
-			return JSON.parse(JSON.stringify(item));
-		}
-	}, {
-		key: 'getNode',
-		value: function getNode(id) {
-			return this.nodes[id];
-		}
-	}, {
 		key: 'duplicate',
 		value: function duplicate(id) {
 			var item = this.nodes[id];
@@ -28057,6 +28168,7 @@ var Tree = function () {
 	}, {
 		key: 'setDefaultItemValues',
 		value: function setDefaultItemValues(item) {
+			item.parent_id_backup = item.parent_id;
 			if (!item.show_children) {
 				item.show_children = 1;
 			}
@@ -28116,9 +28228,6 @@ var Tree = function () {
 			}
 			this.attachParentBody(item.id);
 			this.autoCalculateDoneState(item.parent_id);
-			if (item.used_time || item.planned_time) {
-				this.calculateTotalTime(item.id);
-			}
 			if (!duplication) {
 				vm.showAddNewItem(item.id, addNextItemAs);
 			}
@@ -28133,11 +28242,33 @@ var Tree = function () {
 			return c_o.substring(1);
 		}
 	}, {
+		key: 'tagNameToSlug',
+		value: function tagNameToSlug(tag) {
+			return tag.split(' ').join('-').toLowerCase();
+		}
+	}, {
+		key: 'tagSlugToName',
+		value: function tagSlugToName(tag) {
+			tag = tag.replace(/-/g, ' ');
+			tag = tag.split(' ').map(function (_ref) {
+				var _ref2 = _toArray(_ref);
+
+				var h = _ref2[0];
+
+				var t = _ref2.slice(1);
+
+				return h.toUpperCase() + t.join('').toLowerCase();
+			}).join(' ');
+			return tag;
+		}
+	}, {
 		key: 'hasTag',
 		value: function hasTag(id, tags) {
+			var _this = this;
+
 			var item = this.nodes[id];
 			if (!item) {
-				console.log("what is this shit." + id);return;
+				console.log("[hasTag(id, tags)] what is this shit... id:" + id);return false;
 			}
 			if (!item.tagged || !item.tagged.length) {
 				return false;
@@ -28145,22 +28276,24 @@ var Tree = function () {
 			var hasTags = void 0;
 			if (tags instanceof Array) {
 				tags.forEach(function (tag) {
-					tag = tag.replace(/\s+/g, '-').toLowerCase();
+					tag = this.tagNameToSlug(tag);
 					var tagExists = item.tagged.find(function (itemTags) {
 						return itemTags.tag_slug == tag;
 					});
 					if (tagExists) {
 						hasTags = true;
 					}
-				});
+				}.bind(this));
 			} else {
-				tags = tags.replace(/\s+/g, '-').toLowerCase();
-				var tagExists = item.tagged.find(function (itemTags) {
-					return itemTags.tag_slug == tags;
-				});
-				if (tagExists) {
-					hasTags = true;
-				}
+				(function () {
+					var tag = _this.tagNameToSlug(tags);
+					var tagExists = item.tagged.find(function (itemTags) {
+						return itemTags.tag_slug == tag;
+					});
+					if (tagExists) {
+						hasTags = true;
+					}
+				})();
 			}
 			return hasTags;
 		}
@@ -28183,7 +28316,7 @@ var Tree = function () {
 	}, {
 		key: 'parentIdWithTag',
 		value: function parentIdWithTag(id, tags) {
-			debugger;
+			// debugger;
 			var item = this.nodes[id];
 			console.log('id & body = ' + item.id + " - " + item.body);
 			var parent_id = this.nodes[id].parent_id;
@@ -28364,11 +28497,11 @@ var Tree = function () {
 	}, {
 		key: 'sortChildren',
 		value: function sortChildren(id) {
-			var _this = this;
+			var _this2 = this;
 
 			var item = this.nodes[id];
 			item.children_order = item.children_order.filter(function (id) {
-				return ~item.children.indexOf(_this.nodes[id]);
+				return ~item.children.indexOf(_this2.nodes[id]);
 			});
 			var order = item.children_order;
 			var items = item.children;
@@ -28388,8 +28521,6 @@ var Tree = function () {
 				return child.id;
 			});
 			this.nodes[id].children_order = resetChildrenOrder;
-			this.root['totalUsedTime'] = this.calTotalUsedTime(id);
-			this.root['totalPlannedTime'] = this.calTotalPlannedTime(id);
 		}
 	}, {
 		key: 'giveNewParent',
@@ -28449,8 +28580,6 @@ var Tree = function () {
 			this.updateChildrenDueDate(parent_id);
 			this.autoCalculateDoneState(new_parent_id);
 			this.autoCalculateDoneState(parent_id);
-			this.calculateTotalTime(new_parent_id);
-			this.calculateTotalTime(parent_id);
 		}
 	}, {
 		key: 'updateChildrenDepth',
@@ -28470,7 +28599,7 @@ var Tree = function () {
 	}, {
 		key: 'copyParentBodyToAllChildren',
 		value: function copyParentBodyToAllChildren(parent_id) {
-			var _this2 = this;
+			var _this3 = this;
 
 			if (!parent_id) {
 				return;
@@ -28481,7 +28610,7 @@ var Tree = function () {
 			}
 			var b = item.body;
 			item.children_order.forEach(function (childId) {
-				var child = _this2.nodes[childId];
+				var child = _this3.nodes[childId];
 				child.parents_bodies = b;
 				if (!vm) {
 					return;
@@ -28535,7 +28664,6 @@ var Tree = function () {
 			vm.patch(parent_id, 'children_order');
 			vm.deleteItemApi(id);
 			this.autoCalculateDoneState(parent_id);
-			this.calculateTotalTime(parent_id);
 			selection.selectedId = newSelectedId;
 		}
 	}, {
@@ -28650,8 +28778,6 @@ var Tree = function () {
 		key: 'calculateTotalTime',
 		value: function calculateTotalTime(id) {
 			var item = this.nodes[id];
-			item['totalPlannedTime'] = this.calTotalPlannedTime(id);
-			item['totalUsedTime'] = this.calTotalUsedTime(id);
 			//call this on PARENT -> climb up the parent tree
 			if (item.parent_id) {
 				this.calculateTotalTime(item.parent_id);
@@ -28769,13 +28895,13 @@ var Tree = function () {
 		key: 'flushDoneItems',
 		value: function flushDoneItems() // Do not use yet. Not sure how to best implement this...
 		{
-			var _this3 = this;
+			var _this4 = this;
 
 			var nodes = this.nodes;
 			var keys = Object.keys(nodes);
 			var doneItemsObject = keys.reduce(function (prev, id) {
 				if (nodes[id].done) {
-					_this3.deleteItem(id);
+					_this4.deleteItem(id);
 				}
 			});
 		}
@@ -28882,8 +29008,8 @@ var Tree = function () {
 				// Codementor: How do I know the following function will start after the fetch is over?
 				this.doneitems.forEach(function (item) {
 					if (item.done) {
-						this.nodes[item.id] = item;
 						item.show_children = 1;
+						// this.nodes[item.id] = item;
 						filteredArray.push(item);
 					}
 				}.bind(this));
@@ -28906,22 +29032,15 @@ var Tree = function () {
 	}, {
 		key: 'arrayFilterTag',
 		value: function arrayFilterTag(array, tags, operator) {
-			// if(operator == 'NOT'){
-			// 	array.forEach(function(item) {
-			// 		if(this.hasTag(item.id, tags)){
-			// 			this.hideItem(item.id);
-			// 		} else {
-			// 			if(item.children.length){
-			// 				item.children = this.arrayFilterTag(item.children, tags, operator);
-			// 			}
-			// 		}
-			// 	}.bind(this));
-			// 	return array;
-			// }
 			var filteredArray = [];
 			array.forEach(function (item) {
 				var id = item.id;
-				if (this.hasTag(id, tags) && !this.hasParentWithTag(id, tags)) {
+				var hasTag = this.hasTag(id, tags);
+				var hasParentWithTag = this.hasParentWithTag(id, tags);
+				var isTopLvlItemInFilteredRoot = this.isTopLvlItemInFilteredRoot(id);
+				// console.log(id+" - "+item.body+" →　hasTag["+tags+"]　=　"+hasTag);
+				// console.log(id+" - "+item.body+" →　hasParentWithTag["+tags+"] =　"+hasParentWithTag);
+				if (isTopLvlItemInFilteredRoot && hasTag || !isTopLvlItemInFilteredRoot && hasTag && !hasParentWithTag) {
 					item.show_children = 1;
 					filteredArray.push(item);
 				}
@@ -28995,9 +29114,9 @@ var Tree = function () {
 				var rObj = {};
 				rObj['date'] = k;
 				rObj['items'] = doneItemsObject[k];
-				rObj['totalUsedTime'] = rObj['items'].reduce(function (prev, next) {
-					return allItems.AplusB(prev, next.used_time);
-				}, 0);
+				// rObj['totalUsedTime'] = rObj['items'].reduce((prev, next) => {
+				// 	return allItems.AplusB(prev, next.used_time);
+				//   	}, 0);
 				return rObj;
 			});
 		}
@@ -29070,7 +29189,7 @@ exports.default = function (Vue) {
 			return pad(minutes) + ":" + pad(secs);
 		}
 	}
-	Vue.filter('hourminsec', {
+	Vue.filter('sec-to-hourminsec', {
 		read: function read(val) {
 			function pad(num, unit) {
 				if (num > 0) {
@@ -29100,6 +29219,25 @@ exports.default = function (Vue) {
 			}
 			var minutes = val % 60;
 			var hours = Math.floor(val / 60);
+			if (hours > 0) {
+				return pad(hours, 'hour ') + pad(minutes, 'min');
+			} else {
+				return pad(minutes, 'min');
+			}
+		}
+	});
+	Vue.filter('sec-to-hourmin', {
+		read: function read(val) {
+			function pad(num, unit) {
+				if (num > 0) {
+					return num + " " + unit;
+				}return '';
+			}
+			var secs = void 0;
+			var minutes = Math.floor(val / 60);
+			secs = val % 60;
+			var hours = Math.floor(minutes / 60);
+			minutes = minutes % 60;
 			if (hours > 0) {
 				return pad(hours, 'hour ') + pad(minutes, 'min');
 			} else {
@@ -29139,9 +29277,10 @@ exports.default = function (Vue) {
 
 	Vue.filter('linkify', {
 		read: function read(val) {
-			return linkifyHtml(val, {
+			var a = linkifyHtml(val, {
 				defaultProtocol: 'https'
 			});
+			return a;
 		}
 	});
 };
