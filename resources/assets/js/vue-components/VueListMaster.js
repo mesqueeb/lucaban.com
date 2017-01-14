@@ -55,7 +55,8 @@ export default {
 		},
 		childrenAmount(){
 			if(!this.allData){ return 0; }
-			return this.countChildren(this.allData);
+			let x = this.countChildren(this.allData);
+			return x;
 		},
 		doneChildrenAmount(){
 			if(!this.allData){ return 0; }
@@ -81,30 +82,25 @@ export default {
 	},
 	methods:{
 		countChildren(item){
-			let x;
 			if (!item.children){ return 0; }
-			x = item.children.length;
-			item.children.forEach(function(child){
-				x = x+this.countChildren(child);
-			}.bind(this));
+			let children = allItems.flattenTree(item.children);
+			let x = children.length;
 			return x;
 		},
 		countDoneChildren(item){
-			let x;
 			if (!item.children){ return 0; }
-			x = this.returnDoneChildrenAmount(item);
-			item.children.forEach(function(child){
-				x = x+this.countDoneChildren(child);
-			}.bind(this));
+			let children = allItems.flattenTree(item.children);
+			let doneChildren = children.filter(child => child.done);
+			let x = doneChildren.length;
 			return x;
 		},
-		returnDoneChildrenAmount(item){
-			let x = item.children.reduce(function(prevChild, currChild) {
-				let y = (currChild.done) ? 1 : 0;
-				return prevChild + y;
-			}, 0);
-			return x;
-		},
+		// returnDoneChildrenAmount(item){
+		// 	let x = item.children.reduce(function(prevChild, currChild) {
+		// 		let y = (currChild.done) ? 1 : 0;
+		// 		return prevChild + y;
+		// 	}, 0);
+		// 	return x;
+		// },
 		showChildren(id, show){
 			id = (id) ? id : selection.selectedId;
 			let item = allItems.nodes[id];

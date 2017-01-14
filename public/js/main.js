@@ -26072,8 +26072,6 @@ exports.default = {
 	ready: function ready() {
 		this.newItem.preparedTags = this.parentTags;
 		this.convertbodyURLtoHTML();
-		this.calculateTotalPlannedMin();
-		this.calculateTotalUsedSec();
 	},
 
 	props: ['item', 'alltags'],
@@ -26086,26 +26084,25 @@ exports.default = {
 				due_date: '0000-00-00 00:00:00',
 				children: ''
 			},
-			newTag: null,
-			totalPlannedMin: 0,
-			totalUsedSec: 0
+			newTag: null
 		};
 	},
-	watch: {
-		item: function item() {
-			this.calculateTotalPlannedMin();
-			this.calculateTotalUsedSec();
-		},
-		secLeft: function secLeft() {
-			this.calculateTotalPlannedMin();
-			this.calculateTotalUsedSec();
-			if (this.item.depth != 0) {
-				this.$parent.calculateTotalPlannedMin();
-				this.$parent.calculateTotalUsedSec();
-			}
-		}
-	},
+	watch: {},
 	computed: {
+		totalPlannedMin: function totalPlannedMin() {
+			var childrenArray = allItems.flattenTree(this.item.children);
+			var x = childrenArray.reduce(function (prevVal, child) {
+				return prevVal + child.planned_time;
+			}, this.item.planned_time);
+			return x;
+		},
+		totalUsedSec: function totalUsedSec() {
+			var childrenArray = allItems.flattenTree(this.item.children);
+			var x = childrenArray.reduce(function (prevVal, child) {
+				return prevVal + child.used_time;
+			}, this.item.used_time);
+			return x;
+		},
 		journalDate: function journalDate() {
 			// console.log('run on '+this.item.id+' - '+this.item.body);
 			if (!this.$root.selection) {
@@ -26165,18 +26162,6 @@ exports.default = {
 				return false;
 			}
 		},
-		calcTotalTime: function calcTotalTime() {
-			// let a = allItems.calculateDuration(this.item);
-			// return a.totalTime;
-			// console.log("runCalc");
-			// if(this.$children.length === 0){
-			// 	return this.item.planned_time ? this.item.planned_time : 0;
-			// } else {
-			// 	return this.$children.reduce(function(prev,curr){
-			// 		return prev+ curr.calcTotalTime
-			// 	},0)
-			// }
-		},
 		hasDueDate: function hasDueDate() {
 			return this.item.due_date && this.item.due_date != '0000-00-00 00:00:00';
 		},
@@ -26219,14 +26204,6 @@ exports.default = {
 		parentTags: function parentTags() {
 			return allItems.returnTagsAsArray(this.item.parent_id);
 		},
-
-		// childrensTags(){
-		// 	let childrensTags = [];
-		// 	allItems.nodes[this.item.id].children_order.forEach(function(childId) {
-		// 		Array.prototype.push.apply(childrensTags, allItems.returnTagsAsArray(childId));
-		// 	});
-		// 	return childrensTags;
-		// },
 		isHidden: function isHidden() {
 			return this.$root.selection.hiddenItems.includes(this.item.id);
 		}
@@ -26242,45 +26219,6 @@ exports.default = {
 				return;
 			}
 			a.innerHTML = a.innerHTML.replace("&lt;a href=", "<a href=").replace('target="_blank"&gt;', 'target="_blank">').replace("&lt;/a&gt;", "</a>");
-		},
-		calculateTotalPlannedMin: function calculateTotalPlannedMin() {
-			if (!this.item) {
-				return;
-			}
-			// console.log("launching calculateTotalPlannedMin() for item ["+this.item.body+"] at depth: "+this.item.depth);
-			var totalPlannedMin = void 0;
-			var initialVal = !this.item.done || this.$root.selection.filter.includes('done') ? parseFloat(this.item.planned_time) : 0;
-			if (!(Array.isArray(this.$children) && this.$children.length)) {
-				// if we don't have children, do nothing, leave the time as-is
-				totalPlannedMin = initialVal;
-			} else {
-				// add up all the times of our direct children
-				totalPlannedMin = this.$children.reduce(function (prev, next) {
-					var x = next.totalPlannedMin ? next.totalPlannedMin : next.item.planned_time;
-					return parseFloat(prev) + parseFloat(x);
-				}, initialVal);
-			}
-			var x = parseFloat(totalPlannedMin);
-			this.totalPlannedMin = x;
-		},
-		calculateTotalUsedSec: function calculateTotalUsedSec() {
-			if (!this.item) {
-				return;
-			}
-			var totalUsedSec = void 0;
-			var initialVal = !this.item.done || this.$root.selection.filter.includes('done') ? parseFloat(this.item.used_time) : 0;
-			if (!(Array.isArray(this.$children) && this.$children.length)) {
-				// if we don't have children, do nothing, leave the time as-is
-				totalUsedSec = initialVal;
-			} else {
-				// add up all the times of our direct children
-				totalUsedSec = this.$children.reduce(function (prev, next) {
-					var x = next.totalUsedSec ? next.totalUsedSec : next.item.used_time;
-					return parseFloat(prev) + parseFloat(x);
-				}, initialVal);
-			}
-			var x = parseFloat(totalUsedSec);
-			this.totalUsedSec = x;
 		},
 		addTimer: function addTimer(item) {
 			//Codementor
@@ -26571,9 +26509,6 @@ exports.default = {
 		},
 		deleteItem: function deleteItem(item) {
 			var id = item.id;
-			// if (confirm("Do you really want to delete: "+item.body+"?") == false) {
-			//        return;
-			//    }
 			this.$root.deleteItem(id);
 		},
 		addNew: function addNew(addNextItemAs) {
@@ -26672,16 +26607,6 @@ exports.default = {
 		},
 		escapeOnNewButtonFocus: function escapeOnNewButtonFocus() {
 			this.cancelAddNew();
-		},
-		filterItems: function filterItems() {
-			if (!this.$children.length) {
-				this.calculateTotalPlannedMin();
-				this.calculateTotalUsedSec();
-				this.$parent.calculateTotalPlannedMin();
-				this.$parent.calculateTotalUsedSec();
-			} else {
-				return true;
-			}
 		}
 	},
 	directives: {
@@ -27206,7 +27131,8 @@ exports.default = {
 			if (!this.allData) {
 				return 0;
 			}
-			return this.countChildren(this.allData);
+			var x = this.countChildren(this.allData);
+			return x;
 		},
 		doneChildrenAmount: function doneChildrenAmount() {
 			if (!this.allData) {
@@ -27242,34 +27168,32 @@ exports.default = {
 	},
 	methods: {
 		countChildren: function countChildren(item) {
-			var x = void 0;
 			if (!item.children) {
 				return 0;
 			}
-			x = item.children.length;
-			item.children.forEach(function (child) {
-				x = x + this.countChildren(child);
-			}.bind(this));
+			var children = allItems.flattenTree(item.children);
+			var x = children.length;
 			return x;
 		},
 		countDoneChildren: function countDoneChildren(item) {
-			var x = void 0;
 			if (!item.children) {
 				return 0;
 			}
-			x = this.returnDoneChildrenAmount(item);
-			item.children.forEach(function (child) {
-				x = x + this.countDoneChildren(child);
-			}.bind(this));
+			var children = allItems.flattenTree(item.children);
+			var doneChildren = children.filter(function (child) {
+				return child.done;
+			});
+			var x = doneChildren.length;
 			return x;
 		},
-		returnDoneChildrenAmount: function returnDoneChildrenAmount(item) {
-			var x = item.children.reduce(function (prevChild, currChild) {
-				var y = currChild.done ? 1 : 0;
-				return prevChild + y;
-			}, 0);
-			return x;
-		},
+
+		// returnDoneChildrenAmount(item){
+		// 	let x = item.children.reduce(function(prevChild, currChild) {
+		// 		let y = (currChild.done) ? 1 : 0;
+		// 		return prevChild + y;
+		// 	}, 0);
+		// 	return x;
+		// },
 		showChildren: function showChildren(id, show) {
 			id = id ? id : selection.selectedId;
 			var item = allItems.nodes[id];
