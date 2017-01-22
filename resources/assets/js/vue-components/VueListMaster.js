@@ -1,32 +1,33 @@
 import Card from './Card.vue';
-import Journal from './Journal.vue';
-import Timer from './Timer.vue';
 import Popups from './Popups.vue';
 import Popouts from './Popouts.vue';
-import { sortObjectArrayByProperty, removeEmptyValuesFromArray } from '../components/globalFunctions.js';
+import { sec_to_hourmin, sortObjectArrayByProperty, removeEmptyValuesFromArray } from '../components/globalFunctions.js';
+import Selection from './Selection.js';
+import Tree from './dataTree.js';
+
+window.selection = new Selection();
 
 export default {
-	el:'#body',
+	el:'#items-app',
 	data: {
 		doneData: null,
 		allData: null,
-		selection: null,
+		selection,
 		addingNewUnder: null,
 		addingNewAsChild: false,
 		addingNewAsFirstChild: false,
 		editingItem: null,
+		editingItemTags: null,
 		editingDoneDateItem: null,
 		loading: true,
 		patching: true,
 		popups: [],
-		popouts: [],
+		popouts: {'delete':[], 'timer':[]},
 		timerItems: [],
 		// allTags: [],
 	},
 	components: {
 		Card,
-		Journal,
-		Timer,
 		Popups,
 		Popouts,
 	},
@@ -63,24 +64,26 @@ export default {
 			return this.countDoneChildren(this.allData);
 		},
 		totalSecLeft(){
+			if(!this.allData || !this.$children.length){ return 0; }
 			console.log('run totalSecLeft');
-			if(!this.allData){ return 0; }
-			let card = this.$children.find(child => child.totalSecLeft);
+			let card = this.$children.find(child => (child.totalSecLeft || child.totalSecLeft == 0));
 			return card.totalSecLeft;
 		},
 		totalUsedSec(){
+			if(!this.allData || !this.$children.length){ return 0; }
 			console.log('run totalUsedSec');
-			if(!this.allData){ return 0; }
-			let card = this.$children.find(child => child.totalUsedSec);
+			let card = this.$children.find(child => (child.totalUsedSec || child.totalUsedSec == 0));
 			return card.totalUsedSec;
 		},
-	},
-	watch:{
-		childrenAmount(){
-			this.bcFI();
+		totalUsedHourMin(){
+			return sec_to_hourmin(this.totalUsedSec);
+		},
+		totalHourMinLeft(){
+			return sec_to_hourmin(this.totalSecLeft);
 		},
 	},
 	methods:{
+
 		countChildren(item){
 			if (!item.children){ return 0; }
 			let children = allItems.flattenTree(item.children);
@@ -101,14 +104,14 @@ export default {
 		// 	}, 0);
 		// 	return x;
 		// },
-		showChildren(id, show){
+		showChildren(id, show_or_hide){
 			id = (id) ? id : selection.selectedId;
 			let item = allItems.nodes[id];
 			if (!item.children || !item.children.length){ return; }
-			if (show == 'show'){
+			if (show_or_hide == 'show'){
 				if (item.show_children) { return; }
 				item.show_children = true;
-			} else if (show == 'hide') {
+			} else if (show_or_hide == 'hide') {
 				if (!item.show_children) { return; }
 				item.show_children = false;
 			} else {
@@ -218,6 +221,14 @@ export default {
 				this.addingNewAsChild = false;
 				setTimeout(function(){$("#new-under-"+id+" textarea").focus();},10);
 			}
+		},
+		startEditTags(id){
+			id = (id) ? id : selection.selectedId;
+			if(!id){ return; }
+			this.editingItemTags = id;
+			setTimeout(function(){
+				document.querySelector('#updatebox-'+id+' > .update-tags > .update-custom-tags input').focus();
+			},10);
 		},
 		stopPatching(){
 			if(window.stopPatchingIcon){ clearTimeout(window.stopPatchingIcon); }
@@ -365,22 +376,22 @@ export default {
 		popout(id, type){
 			id = (!id) ? selection.selectedId : id ;
 			let item = allItems.nodes[id];
-			let popoutExists = this.popouts.filter(function (popout) { return popout.item.id === id; })[0];
-			if(!popoutExists){
-				this.popouts.push({
-	            	item,
-	                type: type,
-	            });
-			}
-			if(type=='timer'){
-				setTimeout(function() {
-					this.$broadcast('playTimer', item);
-				}.bind(this), 20);
-			} else {
-				setTimeout(function() {
-					document.querySelector('#popouts-mask>div:first-child .btn-ok').focus();
-				}, 20);
-			}
+			// let popoutExists = this.popouts.filter(function (popout) { return popout.item.id === id; })[0];
+			// if(!popoutExists){
+				console.log("poppy doesn't exist");
+				if(type=='timer'){
+					this.popouts.timer.push(item);
+					Vue.nextTick(function () {
+						eventHub.$emit('playTimer', item);
+					});
+				}
+				if(type=='confirm-delete'){
+					this.popouts.delete.push(item);
+					Vue.nextTick(function () {
+						document.querySelector('#popouts-mask>div:first-child .btn-ok').focus();
+					});
+				}
+			// }
 		},
 		addTimer(id){
 			id = (!id) ? selection.selectedId : id ;
@@ -392,16 +403,14 @@ export default {
 			this.$http.get('/api/items/fetchdone').then(function(response){
 				// debugger;
 				let data = response.json();
+				console.log(data);
 				data.forEach(item => item = allItems.setDefaultItemValues(item));
 				data.forEach(item => {
 					if(!allItems.nodes[item.id]){ allItems.nodes[item.id] = item; }
-					// let parent = allItems.nodes[item.parent_id];
-					// if(parent && ){
-					// 	parent.children.push(item);
-					// }
+					else { data.push(allItems.nodes[item.id]); }
 				});
-				this.loading = false;
 				allItems.doneitems = data;
+				this.loading = false;
 			});
 		},
 		fetchDoneVersion2(tags){
@@ -451,9 +460,6 @@ export default {
 				this.loading = false;
 			});
 		},
-		bcFI(){
-			this.$broadcast('filterItems');
-		},
 		filterItems(keyword, value, event){
 			// debugger;
 			let operator = null;
@@ -470,10 +476,12 @@ export default {
 				selection.filter = [];
 				selection.hiddenItems = [];
 				selection.hiddenTags = [];
+				selection.hiddenBookmarks = [];
 			}
 
 			if(keyword == 'all'){
 				allItems.filterItems('all');
+				selection.view = 'tree';
 				return;
 			}
 
@@ -488,15 +496,25 @@ export default {
 					selection.tags.push(value);
 				}
 			} else {
-				if(value){
+				if(operator == 'NOT' && keyword == 'journal'){
+					selection.hiddenBookmarks.push(keyword);
+					allItems.hideDoneNodes();
+					return;
+				}
+				if(keyword == 'journal'){
+					if(selection.view.includes('journal')){ return; }
+					selection.view = 'journal';
+				} else if(value){
+					selection.view = 'tree';
 					if(selection.filter.includes(value)){ return; }
 					selection.filter.push(value);
 				} else {
+					selection.view = 'tree';
 					if(selection.filter.includes(keyword)){ return; }
 					selection.filter.push(keyword);
 				}
 			}
-			if (keyword == 'done' && !this.doneData.length){
+			if (keyword == 'journal' && !this.doneData.length){
 				this.fetchDone();
 			}
 			allItems.filterItems(keyword,value,operator);
@@ -545,28 +563,43 @@ export default {
 
 		},
 		keystroke(k){
+			if(selection.view == 'journal' && (
+				// Disable keystrokes when in the journal.
+				k == 'arrowRight' ||
+				k == 'arrowLeft' ||
+				k == 'meta_arrowUp' ||
+				k == 'meta_arrowDown' ||
+				k == 'meta_arrowRight' ||
+				k == 'meta_arrowLeft' ||
+				k == 'spaceBar' ||
+				k == 'tab' ||
+				k == 'shift_tab' ||
+				k == 't' ||
+				k == 's'
+			)){ console.log('cannot use '+k+' in journal mode'); return; }
 			console.log(k);
-			if(k == 'arrowUp'){ this.selectItem('prev')}
-			if(k == 'arrowDown'){ this.selectItem('next')}
-			if(k == 'arrowRight'){ this.showChildren(null, 'show')}
-			if(k == 'arrowLeft'){ this.showChildren(null, 'hide')}
-			if(k == 'meta_arrowUp'){ this.moveItem('up')}
-			if(k == 'meta_arrowDown'){ this.moveItem('down')}
-			if(k == 'meta_arrowRight'){ this.indent()}
-			if(k == 'meta_arrowLeft'){ this.unindent()}
-			if(k == 'spaceBar'){ this.markDone()}
-			if(k == 'tab'){ this.indent()}
-			if(k == 'shift_tab'){ this.unindent()}
-			if(k == 'enter'){ this.showAddNewItem()}
-			if(k == 'shift_enter'){ this.showAddNewItem(null, 'child')}
-			if(k == 'meta_enter'){ this.$broadcast('startEdit')}
-			if(k == 't'){ this.setToday()}
-			if(k == 's'){ this.addTimer()}
-			if(k == 'meta_shift_d'){ this.duplicate()}
-			if(k == 'meta_delete'){ this.deleteItem()}
-			if(k == 'backspace'){ this.deleteItem()}
+			if(k == 'arrowUp'){ this.selectItem('prev')} else
+			if(k == 'arrowDown'){ this.selectItem('next')} else
+			if(k == 'arrowRight'){ this.showChildren(null, 'show')} else
+			if(k == 'arrowLeft'){ this.showChildren(null, 'hide')} else
+			if(k == 'meta_arrowUp'){ this.moveItem('up')} else
+			if(k == 'meta_arrowDown'){ this.moveItem('down')} else
+			if(k == 'meta_arrowRight'){ this.indent()} else
+			if(k == 'meta_arrowLeft'){ this.unindent()} else
+			if(k == 'spaceBar'){ this.markDone()} else
+			if(k == 'tab'){ this.indent()} else
+			if(k == 'shift_tab'){ this.unindent()} else
+			if(k == 'enter'){ this.showAddNewItem()} else
+			if(k == 'shift_enter'){ this.showAddNewItem(null, 'child')} else
+			if(k == 'meta_enter'){ eventHub.$emit('startEdit')} else
+			if(k == 'ctrl_u'){ eventHub.$emit('startEdit')} else
+			if(k == 't'){ this.setToday()} else
+			if(k == 'meta_t'){ this.startEditTags()} else
+			if(k == 's'){ this.addTimer()} else
+			if(k == 'meta_shift_d'){ this.duplicate()} else
+			if(k == 'meta_delete'){ this.deleteItem()} else
+			if(k == 'backspace'){ this.deleteItem()} else
 			if(k == 'delete'){ this.deleteItem()}
-			if(k == 'ctrl_u'){ this.$broadcast('startEdit')}
 		},
 		test(id){
 			// id = (!id) ? selection.selectedId : id ;
@@ -575,22 +608,17 @@ export default {
 			this.patchTag(id, 'bloem', 'tag');
 		},
 	},
-	events: {
-        'confirm-ok': function (id) {
+	mounted() {
+        eventHub.$on('confirm-ok', function(id) {
             console.log('computer says "ok"...');
             console.log(id);
             allItems.deleteItem(id);
-        },
-        'confirm-cancel': function (id) {
+        });
+        eventHub.$on('confirm-cancel', function(id) {
             console.log('computer says "no"...');
             console.log(id);
             return;
-        },
-    },
-	mounted(){
-
-	},
-	ready: function() {
+        });
       let vm = this;
       window.addEventListener('keydown', function(e) {
         let x = e.keyCode;
@@ -605,7 +633,7 @@ export default {
     	if (vm.popouts.length){
     		if(x == 27) { // escape
 				e.preventDefault();
-				vm.$broadcast('clearAll');
+				eventHub.$emit('clearAll');
 			}
 			if(x == 9){ // TAB
 				e.preventDefault();
@@ -629,9 +657,9 @@ export default {
 		    }
 			if(e.keyCode == 27){ // Escape
 				if(vm.editingItem){
-					vm.$broadcast('escapeOnEditButtonFocus');
+					eventHub.$emit('escapeOnEditButtonFocus');
 				} else if(vm.addingNewUnder){
-					vm.$broadcast('escapeOnNewButtonFocus');
+					eventHub.$emit('escapeOnNewButtonFocus');
 				}
 			}
 		} else if ( $('input:focus').length > 0
@@ -698,7 +726,12 @@ export default {
 		  		}
 				break;
 			case 84: // key t
-				vm.keystroke('t');
+				e.preventDefault();
+				if (e.ctrlKey || e.metaKey || e.shiftKey){
+		  			vm.keystroke('meta_t');
+		  		} else {
+					vm.keystroke('t');
+		  		}
 				break;
 			case 83: // key s
 				vm.keystroke('s');
@@ -734,7 +767,9 @@ export default {
       });
     },
 	http: {
-		root: '/root',
+		// root: '/root',
+	// 	// base: '/base',
+		// route: 'route',
 		headers: {
 			'X-CSRF-TOKEN': document.querySelector('#token').getAttribute('value'),
 		},

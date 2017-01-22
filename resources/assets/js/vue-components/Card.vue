@@ -1,21 +1,24 @@
 <template id="items-card-template">
 
-<div :class="{
-		'items-card': true,
-		'journal-wrapper': $root.selection.filter.includes('done')
-	}"
+<div
+	v-if="item"
 	:id="'card-'+item.id"
+	:class="{
+		'items-card': true,
+		'journal-wrapper': journalView
+	}"
 >
 
 <div v-if="!isHidden">
 	<div class="title"
 	v-if="journalDate"
 	>
-		<span>{{ journalDate | momentCalendar }}</span>
+		<!-- <span>{{ journalDate | momentCalendar }}</span> -->
+		<span>{{ journalDate }}</span>
 		<span class="journal-date-small">{{ journalDate }}</span>
 	</div>
 	<div class="parent-string"
-	v-if="this.$root.selection.filter.includes('done') && this.item.depth != 0"
+	v-if="journalView && item.depth != 0"
 	@click="selectItem(item)"
 	>{{ item.parents_bodies }}:</div>
 	<div 
@@ -24,11 +27,11 @@
 			'item-card': true,
 			done: item.done,
 			show_children: item.show_children,
-			editing: item.id == this.$root.editingItem,
+			editing: item.id == basis.editingItem,
 		}"
 	>
 		<div class="toggle-div"
-			v-if="!this.$root.selection.filter.includes('done')"
+			v-if="!journalView"
 		>
 			<input class="toggle"
 				type="checkbox"
@@ -48,30 +51,33 @@
 			></label>
 
 			<!-- <input class="show_children_toggle"
-				id="show_children_{{item.id}}"
+				:id="'show_children_' + item.id"
 				type="checkbox"
 				v-if="item.children_order.length>0"
 				v-model="item.show_children"
 				@change="updateShowChildren(item.id)"
 			>
 			<label class="show_children_svg" 
-				for="show_children_{{item.id}}">
+				:for="'show_children_' + item.id">
 				//// This label is not yet used!
 			</label> -->
 		</div>
 		<div class=""
-			v-if="this.$root.selection.filter.includes('done')"
+			v-if="journalView"
 		>・</div>
 		<div class="body-div textarea-wrap"
-			:class="{ selected: item.id == this.$root.selection.selectedId, project: isProject}"
+			:class="{ selected: item.id == this.$root.selection.selectedId,
+				project: isProject,
+				'updating-tags': item.id == basis.editingItemTags}"
 			@dblclick="startEdit(item, $event)"
 			@click="selectItem(item)"
 			@enter="console.log('yarrr')"
 		>
 			<div class="bodybox"
-				v-show="item.id != this.$root.editingItem"
+				v-show="item.id != basis.editingItem"
 			>
-				<div>{{ item.body | linkify }}</div>
+				<!-- <div>{{ item.body | linkify }}</div> -->
+				<div>{{ item.body }}</div>
 				<div class="completion-notes bodybox"
 					v-if="item.completion_memo"
 					@click="selectItem(item)"
@@ -80,28 +86,26 @@
 			<!-- <div class="hidden-sizer">{{item.body + "|"}}</div> -->
 			
 			<!-- For debugging: -->
-			<span v-show="false"> ({{item.id}}) D-{{item.depth}}) [{{item.children_order}}]</span>
+			<span v-if="false"> ({{item.id}}) D-{{item.depth}}) [{{item.children_order}}]</span>
 			
 			<form action="update"
 				class="updatebox"
 				:id="'updatebox-'+item.id"
-				v-show="item.id == this.$root.editingItem"
+				v-show="item.id == basis.editingItem || item.id == basis.editingItemTags"
 				@submit.prevent="doneEdit(item)"
 			>
-				<div class="update-body">
+				<div class="update-body" v-show="item.id != basis.editingItemTags">
 					<textarea
+						v-focus
 						class="edititem-body"
 						:rows="item.rows"
 						v-model="item.body"
-						v-autosize="item.body"
-						v-item-focus="item.id == this.$root.editingItem"
 						@blur="blurOnEdit(item)"
-						@keyup.esc="cancelEdit(item)"
 						@keydown="keydownOnEdit(item, $event, 'body')"
-					>{{ item.body }}</textarea>
+					></textarea>
 				</div>
 				<div class="update-tags">
-					<div class="update-planned-time">
+					<div class="update-planned-time" v-show="item.id != basis.editingItemTags">
 						Duration:
 						<button
 							:class="{ currentDuration: item.planned_time == 10, 'planned-time': true }"
@@ -131,11 +135,10 @@
 							class="planned-time" 
 							type="number"
 							v-show="true"
-							v-model="item.planned_time | min_to_hours"
+							v-model="item.planned_time"
 							@blur="blurOnEdit(item)"
-							@keyup.esc="cancelEdit(item)"
 							@keydown="keydownOnEdit(item, $event, 'planned-time')"
-						/>hours</div>
+						/>min</div>
 					</div>
 					<div class="update-custom-tags">
 						<label>
@@ -144,7 +147,6 @@
 								class="add-tag"
 								@blur="blurOnEdit(item)"
 								v-model="newTag"
-								@keyup.esc="cancelEdit(item)"
 								@keydown="keydownOnEdit(item, $event, 'addTag')"
 							>
 						</label>
@@ -161,10 +163,12 @@
 			</form>
 			<div class="item-tags">
 				<label class="done"
-					v-if="item.done && item.id != this.$root.editingDoneDateItem"
-				>Done {{ item.done_date | momentCalendar }}
+					v-if="item.done && item.id != basis.editingDoneDateItem && !journalView"
+				>
+				<!-- Done {{ item.done_date | momentCalendar }} -->
+				Done {{ item.done_date }}
 					<input class="flatpickr"
-						id="done-date-edit-{{ item.id }}"
+						:id="'done-date-edit-' + item.id"
 						v-model="item.done_date"
 					>
 				</label>
@@ -174,42 +178,41 @@
 					&& totalSecLeft > secLeft
 					&& totalTimeDifferentFromParent
 					&& !item.done" class="total-duration">
-					{{ totalSecLeft | sec-to-hourminsec }}
-					<!-- <span style="padding-right:2px">Total </span>
-					<span v-if="hastotalUsedSec"> used {{ item.totalUsedSec | sec-to-hourminsec }}</span>
-					<span v-if="(hastotalUsedSec && hasTotalPlannedMin)">/</span>
-					<span v-if="hasTotalPlannedMin">{{ item.totalPlannedMin | hourmin }}</span> -->
+					<!-- {{ totalSecLeft | sec-to-hourminsec }} -->
+					{{ totalSecLeft }}
 					</span>
 
 				<span v-if="
-					item.id != this.$root.editingItem
+					item.id != basis.editingItem
 					&& secLeft > 0
 					
 					&& !item.done" class="duration"
 				>
-					{{ secLeft | sec-to-hourminsec }}
-					<!-- <span v-if="hasUsedTime">Used {{ item.used_time | sec-to-hourminsec }}</span>
-					<span v-if="(hasPlannedTime && hasUsedTime)">/</span>
-					<span v-if="hasPlannedTime">{{ item.planned_time | hourmin }}</span> -->
+					<!-- {{ secLeft | sec-to-hourminsec }} -->
+					{{ secLeft }}
 				</span>
 				
 				<span v-if="hasDueDate && !item.done"
 					class="duedate"
-				>{{ item.due_date | momentCalendar }}</span>
+				>
+				<!-- {{ item.due_date | momentCalendar }}</span> -->
+				{{ item.due_date }}</span>
 
 				<span v-if="item.dueDateParent && !item.done"
 					class="duedate-parent"
-				>{{ item.dueDateParent | momentCalendar }}</span>
+				>
+				<!-- {{ item.dueDateParent | momentCalendar }}</span> -->
+				{{ item.dueDateParent }}</span>
 
 				<span v-for="tag in item.tagged"
 					v-if="item.tagged.length"
 					v-show="!parentTags.includes(tag.tag_name)
-						|| item.id == this.$root.editingItem"
+						|| item.id == basis.editingItem"
 					class="custom-tag"
 					@dblclick.prevent="this.$root.filterItems('tag', tag.tag_slug, $event)"
 				>{{ tag.tag_name }}
 					<button class="delete-tag"
-						v-if="item.id == this.$root.editingItem
+						v-if="item.id == basis.editingItem
 						&& !parentTags.includes(tag.tag_name)"
 						@click.prevent="deleteTag(item.id, tag.tag_name, $event)"
 					>
@@ -219,7 +222,7 @@
 
 			</div>
 			<div class="item-nav"
-				v-if="this.$root.editingItem != item.id && this.$root.selection.selectedId == item.id"
+				v-if="basis.editingItem != item.id && this.$root.selection.selectedId == item.id"
 			>
 				
 				<button v-if="!item.done"
@@ -257,9 +260,9 @@
 	>
 		<div>
 			<textarea type="text"
+				v-focus
 				class="newitem-body"
 				v-model="newItem.body"
-				v-autosize="newItem.body"
 				@blur="blurOnAddNew(item)"
 				@keydown="keydownOnNew(item, $event, 'body')"
 				placeholder="..."
@@ -299,10 +302,10 @@
 					class="planned-time" 
 					type="number"
 					v-show="true"
-					v-model="newItem.planned_time | min_to_hours"
+					v-model="newItem.planned_time"
 					@blur="blurOnAddNew(item)"
 					@keydown="keydownOnNew(item, $event, 'planned-time')"
-				/>hours</div>
+				/>min</div>
 			</div>
 			<div class="update-custom-tags">
 				<label>
@@ -350,9 +353,9 @@
 	>
 		<div>
 			<textarea type="text"
+				v-focus
 				class="newitem-body"
 				v-model="newItem.body"
-				v-autosize="newItem.body"
 				@blur="blurOnAddNew(item)"
 				@keydown="keydownOnNew(item, $event, 'body')"
 				placeholder="..."
@@ -392,11 +395,11 @@
 					class="planned-time"
 					v-if="true"
 					type="number"
-					v-model="newItem.planned_time | min_to_hours"
+					v-model="newItem.planned_time"
 					@keydown="keydownOnNew(item, $event)"
 					@keydown="keydownOnNew(item, $event, 'planned-time')"
 					@blur="blurOnAddNew(item)"
-				/>hours</div>
+				/>min</div>
 			</div>
 			<div class="update-custom-tags">
 				<label>
@@ -432,12 +435,15 @@
 export default {
 	name: 'Card',
 	template:'#items-card-template',
-	ready(){
+	mounted(){
 		this.newItem.preparedTags = this.parentTags;
 		this.convertbodyURLtoHTML();
+    	eventHub.$on('startEdit', this.startEdit);
+    	eventHub.$on('escapeOnEditButtonFocus', this.cancelEdit);
+    	eventHub.$on('escapeOnNewButtonFocus', this.cancelAddNew);
 	},
-	props: ['item', 'alltags'],
-	data: function(){
+	props: ['item'],
+	data(){
 		return {
 			newItem: {
 				body: '',
@@ -452,20 +458,32 @@ export default {
 	watch: {
 	},
 	computed: {
-		totalPlannedMin(){
+		basis(){
+			return this.$root;
+		},
+		totalPlannedMin(){ if(!this.item || !allItems){ return 0; }
+			// console.log('trying at totalPlannedMin');
+			if(!this.item.children.length){ return (this.item.planned_time) ? this.item.planned_time : 0 ; }
 			let childrenArray = allItems.flattenTree(this.item.children);
 			let x = childrenArray.reduce((prevVal, child) => prevVal + child.planned_time, this.item.planned_time);
-		    return x;
+		    return (x) ? x : 0;
 		},
-		totalUsedSec(){
+		totalUsedSec(){ if(!this.item || !allItems){ return 0; }
+			// console.log('trying at totalUsedSec');
+			if(!this.item.children.length){ return (this.item.used_time) ? this.item.used_time : 0 ; }
 			let childrenArray = allItems.flattenTree(this.item.children);
 			let x = childrenArray.reduce((prevVal, child) => prevVal + child.used_time, this.item.used_time);
-		    return x;
+		    return (x) ? x : 0;
 		},
-		journalDate(){
+		journalView(){ if(!this.item || !allItems){ return; }
+			if(this.$root.selection.view == 'journal'){
+				return true;
+			} else { return false; }
+		},
+		journalDate(){ if(!this.item || !allItems){ return; }
 			// console.log('run on '+this.item.id+' - '+this.item.body);
-			if(!this.$root.selection){ return false; }
-			if(this.$root.selection.filter.includes('done')){
+			if(this.$root.selection.view != 'journal'){ return false; }
+			if(this.journalView){
 				if(this.item.depth == 0){ return; }
 				let prevId = allItems.prevItemId(this.item.id);
 				let prevDoneDate = allItems.nodes[prevId].done_date;
@@ -477,83 +495,87 @@ export default {
 			}
 			return false;
 		},
-		totalUsedMin(){
+		totalUsedMin(){ if(!this.item || !allItems){ return 0; }
 			return this.totalUsedSec/60;
 		},
-		totalPlannedSec(){
+		totalPlannedSec(){ if(!this.item || !allItems){ return 0; }
 			return this.totalPlannedMin*60;
 		},
-		totalPlannedHour(){
+		totalPlannedHour(){ if(!this.item || !allItems){ return 0; }
 			return this.totalPlannedMin/60;
 		},
-		isProject(){
+		isProject(){ if(!this.item || !allItems){ return; }
 			// console.log('checking isProject');
 			return allItems.isProject(this.item.id);	
 		},
-		siblingIndex(){ return allItems.siblingIndex(this.item.id); },
-		olderSiblingId(){ return allItems.olderSiblingId(this.item.id); },
-		parentsChildren_order(){
+		siblingIndex(){ if(!this.item || !allItems){ return; }
+			return allItems.siblingIndex(this.item.id);
+		},
+		olderSiblingId(){ if(!this.item || !allItems){ return; }
+			return allItems.olderSiblingId(this.item.id); 
+		},
+		parentsChildren_order(){ if(!this.item || !allItems){ return; }
 			let pId = this.item.parent_id;
 			if(this.item.depth == 0){ return allItems.nodes[this.item.id].children_order; }
 			return allItems.nodes[pId].children_order;
 		},
-		showAddNewBox(){
+		showAddNewBox(){ if(!this.item || !allItems){ return; }
 			if((this.$root.addingNewUnder == this.item.id && !this.$root.addingNewAsFirstChild) || (this.item.depth == 0 && allItems.root.children_order.length == 0)){
 				return true;
 			} else { return false; }
 		},
-		showAddNewBoxFirstChild(){
+		showAddNewBoxFirstChild(){ if(!this.item || !allItems){ return; }
 			if(this.$root.addingNewUnder == this.item.id && this.$root.addingNewAsFirstChild){
 				return true;
 			} else { return false; }
 		},
-		hasDueDate(){
+		hasDueDate(){ if(!this.item || !allItems){ return; }
 		    return (this.item.due_date && this.item.due_date != '0000-00-00 00:00:00');
 		},
-		hasDoneDate(){
+		hasDoneDate(){ if(!this.item || !allItems){ return; }
 		    return (this.item.done_date && this.item.done_date != '0000-00-00 00:00:00');
 		},
-		hastotalUsedSec(){
+		hastotalUsedSec(){ if(!this.item || !allItems){ return; }
 		    return (this.item.children_order.length
 		    	&& this.item.totalUsedSec
 		    	&& this.item.totalUsedSec != '0'
 		    	&& this.item.used_time != this.item.totalUsedSec);
 		},
-		hasTotalPlannedMin(){
+		hasTotalPlannedMin(){ if(!this.item || !allItems){ return; }
 		    return (this.item.children_order.length
 		    	&& this.totalPlannedMin
 		    	&& this.totalPlannedMin != '0'
 		    	&& this.item.planned_time != this.totalPlannedMin);
 		},
-		hasPlannedTime(){
+		hasPlannedTime(){ if(!this.item || !allItems){ return; }
 		    return (this.item.planned_time && this.item.planned_time != '0');
 		},
-		hasUsedTime(){
+		hasUsedTime(){ if(!this.item || !allItems){ return; }
 		    return (this.item.used_time && this.item.used_time != '0');
 		},
-		allTags_c(){
+		allTags_c(){ if(!this.item || !allItems){ return; }
 			return this.$root.allTags;
 		},
-		totalMinLeft(){
+		totalMinLeft(){ if(!this.item || !allItems){ return 0; }
 			return this.totalPlannedMin-this.totalUsedMin;
 		},
-		totalSecLeft(){
+		totalSecLeft(){ if(!this.item || !allItems){ return 0; }
 			return this.totalPlannedSec-this.totalUsedSec;
 		},
-		secLeft(){
+		secLeft(){ if(!this.item || !allItems){ return 0; }
 			return this.item.planned_time*60-this.item.used_time;
 		},
-		minLeft(){
+		minLeft(){ if(!this.item || !allItems){ return 0; }
 			return this.secLeft/60;
 		},
-		totalTimeDifferentFromParent(){
+		totalTimeDifferentFromParent(){ if(!this.item || !allItems){ return 0; }
 			if(!this.item.parent_id){ return true; }
 			return this.totalPlannedSec != this.$parent.totalPlannedSec;
 		},
-		parentTags(){
+		parentTags(){ if(!this.item || !allItems){ return []; }
 			return allItems.returnTagsAsArray(this.item.parent_id);
 		},
-		isHidden(){
+		isHidden(){ if(!this.item || !allItems){ return true; }
 			return this.$root.selection.hiddenItems.includes(this.item.id)
 		},
 	},
@@ -776,6 +798,9 @@ export default {
 		        	return;
 				}
 			}
+			if (e.keyCode === 27) {
+				this.cancelEdit(item);
+			}
 	    },
 	    blurOnEdit(item) {
 	    	let component = this;
@@ -824,28 +849,36 @@ export default {
 			this.$root.beforeEditCache_body = item.body;
 			this.$root.beforeEditCache_planned_time = item.planned_time;
 			this.$root.editingItem = item.id;
+			Vue.nextTick(function () {
+				let plsFocus = '#updatebox-'+item.id+' > .update-body > textarea';
+				document.querySelector(plsFocus).focus();
+			});
 		},
 		doneEdit(item) {
 			item = (item) ? item : allItems.nodes[selection.selectedId];
-			if (!this.$root.editingItem) {
-				return;
-			}
+			// if (!this.$root.editingItem) {
+			// 	return;
+			// }
 			this.$root.editingItem = null;
-			item.body = item.body.trim();
+			this.$root.editingItemTags = null;
 			if (!item.body) {
-				this.deleteItem(item);
+				this.item.body = this.$root.beforeEditCache_body;
 			}
+			item.body = item.body.trim();
 			vm.patch(item.id, 'body');
 			vm.patch(item.id, 'planned_time');
 			allItems.copyParentBodyToAllChildren(item.id);
 		},
 		cancelEdit(item) {
 			item = (item) ? item : allItems.nodes[selection.selectedId];
+			if(this.$root.editingItem){
+				console.log("cancel edit. Reverting to:");
+				console.log(this.$root.beforeEditCache_body);
+				item.body = this.$root.beforeEditCache_body;
+				item.planned_time = this.$root.beforeEditCache_planned_time;
+			}
 			this.$root.editingItem = null;
-			console.log("cancel edit. Reverting to:");
-			console.log(this.$root.beforeEditCache_body);
-			item.body = this.$root.beforeEditCache_body;
-			item.planned_time = this.$root.beforeEditCache_planned_time;
+			this.$root.editingItemTags = null;
 		},
 		startEditDoneDate(item, event){
 			console.log('startEditDoneDate');
@@ -876,9 +909,9 @@ export default {
         		newItem.parent_id = this.item.id;
         		index = 0;
 			}
-			
-			if (this.newItem.preparedTags.indexOf('Today') != -1){
-				this.newItem.preparedTags.$remove('Today');
+			let todayTagIndex = this.newItem.preparedTags.indexOf('Today');
+			if (todayTagIndex != -1){
+				this.newItem.preparedTags.splice(todayTagIndex, 1);
 				newItem.due_date = moment().format();
 			}
 			let addTags = this.newItem.preparedTags;
@@ -927,7 +960,8 @@ export default {
 			// if(this.showAddNewBox == true){ plsFocus = "#new-under-"+item.id+" .prepare-tag"; }
 			// if(this.showAddNewBoxFirstChild == true){ plsFocus = "#new-firstchild-of-"+item.id+" .prepare-tag"; }
 			document.querySelector(plsFocus).focus();
-			this.newItem.preparedTags.$remove(tag);
+			let tagIndex = this.newItem.preparedTags.indexOf(tagIndex);
+			this.newItem.preparedTags.splice(tagIndex, 1)
 		},
 		setPlannedTime(item, time, event){
 			let plsFocus = '#updatebox-'+item.id+' .add-tag';
@@ -939,9 +973,6 @@ export default {
 		},
 		setPlannedTimeNewItem(item, time, event){
 			let plsFocus = ".addnewbox .prepare-tag";
-			// let plsFocus;
-			// if(this.showAddNewBox == true){ plsFocus = "#new-under-"+item.id+" .prepare-tag"; }
-			// if(this.showAddNewBoxFirstChild == true){ plsFocus = "#new-firstchild-of-"+item.id+" .prepare-tag"; }
 			setTimeout(function(){
 				console.log('returning to : '+plsFocus);
 				document.querySelector(plsFocus).focus();
@@ -949,27 +980,30 @@ export default {
 			this.newItem.planned_time = time;
 		},
 	},
-	events: {
-    	startEdit() { this.startEdit(); },
-    	escapeOnEditButtonFocus(){ this.cancelEdit(); },
-    	escapeOnNewButtonFocus(){ this.cancelAddNew(); },
-	},
 	directives: {
-		'item-focus': function (value) {
-			if (!value) {
-				return;
+		// My old directive:
+		// 'item-focus': function (value) {
+		// 	if (!value) {
+		// 		return;
+		// 	}
+		// 	let el = this.el;
+		// 	Vue.nextTick(function () {
+		// 		el.focus();
+		// 	});
+		// }
+		focus: {
+			inserted(el) {
+				Vue.nextTick(function () {
+					el.focus();
+				});
 			}
-			let el = this.el;
-			Vue.nextTick(function () {
-				el.focus();
-			});
-		}
-	},
-	http: {
-		root: '/root',
-		headers: {
-			'X-CSRF-TOKEN': document.querySelector('#token').getAttribute('value'),
 		},
-    },
+	},
+	// http: {
+	// 	// base: '/base',
+	// 	headers: {
+	// 		'X-CSRF-TOKEN': document.querySelector('#token').getAttribute('value'),
+	// 	},
+ //    },
 }
 </script>

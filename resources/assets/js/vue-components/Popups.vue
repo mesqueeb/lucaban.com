@@ -28,7 +28,7 @@
               v-model="popup.item.completion_memo"
               v-autosize="popup.item.completion_memo"
               @keydown="keydownInCompletionMemo(popup, $event)"
-            >{{ popup.item.completion_memo }}</textarea>
+            ></textarea>
           </div>
           <div class="used-time">
             <div>
@@ -93,7 +93,8 @@ export default {
                     this.$root.patch(popup.item.id, 'completion_memo');
                 }
             }
-            this.$root.popups.$remove(popup);
+            let index = root.popups.indexOf(popup);
+            this.$root.popups.splice(index, 1);
         },
         incrementUsedTime(item, amount) {
             if (!item.used_time){ 

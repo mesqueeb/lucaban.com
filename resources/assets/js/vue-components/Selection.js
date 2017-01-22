@@ -6,6 +6,8 @@ export default class Selection {
 		this.tags = [];
 		this.hiddenTags = [];
 		this.hiddenItems = [];
+		this.hiddenBookmarks = [];
+		this.view = 'tree';
 	}
 	
 

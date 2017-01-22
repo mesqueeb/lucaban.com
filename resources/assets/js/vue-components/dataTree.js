@@ -2,6 +2,7 @@ import {removeEmptyValuesFromArray} from '../components/globalFunctions.js';
 export default class Tree {
 	constructor(items){
 		// properties
+		if (!items){ return; }
 		this.source		= items;
 		this.nodes 		= {}; // →　"id":{ task obj };
 		this.orphans	= [];
@@ -60,9 +61,6 @@ export default class Tree {
 			// this.attachParentBody(id);　//Maybe I should only do this when pressing DONE
 		}.bind(this));
 		this.backups.rootChildren = this.root.children;
-		vm.allData = this.root;
-		vm.doneData = this.doneitems;
-		vm.selection = selection;
 		// vm.allTags = vm.allTagsComputed;
 	}
 
@@ -121,7 +119,7 @@ export default class Tree {
 	setDefaultItemValues(item)
 	{
 		item.parent_id_backup = item.parent_id;
-		if(!item.show_children)		{ item.show_children = 1 		 }
+		if(item.show_children == null){ item.show_children = 1 		 }
 		if(!item.children)	{ item.children = []					 }
 		if(!item.due_date)	{ item.due_date = "0000-00-00 00:00:00"	 }
 		if(!item.done_date)	{ item.done_date = "0000-00-00 00:00:00" }
@@ -239,6 +237,17 @@ export default class Tree {
 		Object.keys(this.nodes).forEach(function(id) {
 			id = parseFloat(id);
 			if(this.hasTag(id, tag)){
+				if(!selection.hiddenItems.includes(id)){
+					selection.hiddenItems.push(id);
+				}
+			}
+		}.bind(this));
+	}
+	hideDoneNodes()
+	{
+		Object.keys(this.nodes).forEach(function(id) {
+			id = parseFloat(id);
+			if(this.nodes[id].done){
 				if(!selection.hiddenItems.includes(id)){
 					selection.hiddenItems.push(id);
 				}
@@ -607,13 +616,13 @@ export default class Tree {
 		let totalPlannedTime;
 	    if (!(Array.isArray(item.children) && item.children.length)) {
 	    	// if we don't have children, do nothing, leave the time as-is
-			totalPlannedTime = (!item.done || selection.filter.includes('done')) ? parseFloat(item.planned_time) : 0 ;
+			totalPlannedTime = (!item.done || selection.view == 'journal') ? parseFloat(item.planned_time) : 0 ;
 	    } else {
 			// add up all the times of our direct children
 		    totalPlannedTime = item.children.reduce((prev, next) => {
 		        let x = (next.totalPlannedTime) ? next.totalPlannedTime : next.planned_time ;
 		        return prev+parseFloat(x);
-		    }, (!item.done || selection.filter.includes('done')) ? parseFloat(item.planned_time) : 0 );
+		    }, (!item.done || selection.view == 'journal') ? parseFloat(item.planned_time) : 0 );
 	    }
 	    return parseFloat(totalPlannedTime);
 	}
@@ -623,13 +632,13 @@ export default class Tree {
 		let totalUsedTime;
 	    if (!(Array.isArray(item.children) && item.children.length)) {
 	    	// if we don't have children, do nothing, leave the time as-is
-			totalUsedTime = (!item.done || selection.filter.includes('done')) ? parseFloat(item.used_time) : 0 ;
+			totalUsedTime = (!item.done || selection.view == 'journal') ? parseFloat(item.used_time) : 0 ;
 	    } else {
 			// add up all the times of our direct children
 		    totalUsedTime = item.children.reduce((prev, next) => {
 		        let x = (next.totalUsedTime) ? next.totalUsedTime : next.used_time ;
 		        return prev+parseFloat(x);
-		    }, (!item.done || selection.filter.includes('done')) ? parseFloat(item.used_time) : 0 );
+		    }, (!item.done || selection.view == 'journal') ? parseFloat(item.used_time) : 0 );
 	    }
 	    return parseFloat(totalUsedTime);
 	}
@@ -779,30 +788,33 @@ export default class Tree {
 		if (keyword == 'all'){
 			filteredArray = this.backups.rootChildren;
 		}
-		if (keyword == 'done'){
+		if (keyword == 'journal'){
+			// if(operator != 'NOT'){
+			// currently if operator is 'NOT' the this function won't even been launched.
 			if(!this.doneitems.length){
+				console.log('waiting for done items...');
 				setTimeout(function(){
 					this.filterItems(keyword, value, operator);
-				}.bind(this), 300);
+				}.bind(this), 200);
 				return;
 			}
+			arrayToFilter = this.doneitems;
+			// }
 			// Codementor: How do I know the following function will start after the fetch is over?
-	    	this.doneitems.forEach(function (item) {
-				if(item.done){
-					item.show_children = 1;
-					// this.nodes[item.id] = item;
-					filteredArray.push(item);
-				}
-			}.bind(this));
+			let doneFilterResults = this.arrayFilterDone(arrayToFilter, operator);
+			Array.prototype.push.apply(filteredArray, doneFilterResults);			
+
 			setTimeout(function(){
 				flatpickrifyAllInputs();
 			}, 1000);
 		}
 		if (keyword == 'duedate'){
-			Array.prototype.push.apply(filteredArray, this.arrayFilterDate(arrayToFilter, value));
+			let dueDateFilterResults = this.arrayFilterDate(arrayToFilter, value, operator);
+			Array.prototype.push.apply(filteredArray, dueDateFilterResults);
 		}
 		if (keyword == 'tag'){
-			Array.prototype.push.apply(filteredArray, this.arrayFilterTag(arrayToFilter, value, operator));
+			let tagFilterResults = this.arrayFilterTag(arrayToFilter, value, operator);
+			Array.prototype.push.apply(filteredArray, tagFilterResults);
 		}
 		filteredArray.forEach(function(item){
 			item.parent_id = this.root.id;
@@ -829,7 +841,17 @@ export default class Tree {
 		}.bind(this));
 		return filteredArray;
 	}
-	arrayFilterDate(array, date){
+	arrayFilterDone(array, operator){
+		let filteredArray = [];
+    	array.forEach(function (item) {
+			if(item.done){
+				item.show_children = 1;
+				filteredArray.push(item);
+			}
+		}.bind(this));
+		return filteredArray;
+	}
+	arrayFilterDate(array, date, operator){
 		let filteredArray = [];
 		if(date == 'today'){
 			array.forEach(function (item) {

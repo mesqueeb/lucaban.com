@@ -14,7 +14,7 @@ label{
     .active{
         color: $theme-color;
     }
-    .hidden{
+    .filtered-out{
         text-decoration: line-through;
         color: $duedate-color;
     }
@@ -195,7 +195,15 @@ label{
 .updatebox{
     width: 100%;
 }
-
+.body-div.updating-tags {
+    flex-wrap: wrap;
+    .updatebox {
+        margin: 0 auto;
+        order: 10;
+        background: white;
+        border: 1px $selection-color solid;
+    }
+}
 .toggle-div{
     width: 2em;
     div, input{
@@ -300,11 +308,6 @@ label{
         cursor: pointer;
         color: #5a5a5a;
         background: #e6e6e6;
-    }
-    .flatpickr {
-        z-index: -1;
-        position: absolute;
-        left: 0;
     }
     .duration, .currentDuration {
         background: $duration-color;

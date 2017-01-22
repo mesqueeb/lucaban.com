@@ -34,7 +34,8 @@
 
 // IMPORT FlatPickr
 	import flatpickr from 'flatpickr';
-	
+	// import flatPickConfig from './components/flatPickrOptions.js';
+
 (function(document){ // iife
 let openFlatPickr = null;
 // Make flatpickr(el) available as el.flatpickr();
@@ -77,7 +78,6 @@ window.Element.prototype.flatpickrify = function(config){ return flatpickr(this,
 let documentClick = function documentClick(e) {
 	// Luca Patch
 	if(e.target.parentNode.nodeName == 'BODY') { 
-		console.log('aoe');
 		// See Patch inside Flatpickr File!!!
 		if(openFlatPickr && openFlatPickr.isOpen){
 			openFlatPickr.close();
@@ -114,12 +114,10 @@ window.flatpickrifyAllInputs = function(){
 	// window.vm = VueListMaster;
 	// window.vm = new Vue(VueListMaster);
 	// import VueListMaster from '/vue-components/VueListMaster.js'
-	window.vm = new Vue(VueListMaster);
 
 // JS Classes
 	import Tree from './vue-components/dataTree.js';
-	import Selection from './vue-components/Selection.js';
-	import NotificationStoreClass from './vue-components/NotificationStore.js';
+
 
 
 window.onscroll = function() {
@@ -158,12 +156,18 @@ $('body').on('click', 'button', function(e){
 	btnEffect(e);
 });
 
+	console.log('fetching allItems');
 $.getJSON('/api/items',function(fetchedData){
-
+	console.log('fetched allItems');
+	
 	//response
-	window.selection = new Selection();
+	window.eventHub = new Vue();
 	window.allItems = new Tree(fetchedData);
+	window.vm = new Vue(VueListMaster);
+		vm.allData = allItems.root;
+		vm.doneData = allItems.doneitems;
 
+	console.log(allItems);
 	// $.getJSON('/api/itemtags',function(tags){
 	// 	console.log(tags);
 	// 	window.allTags = tags;
