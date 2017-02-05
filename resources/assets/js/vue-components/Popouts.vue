@@ -54,12 +54,18 @@
 					class="timer-time" 
 				>
 				<!-- {{ item.used_time | hhmmss }}</div> -->
-				{{ item.used_time }}</div>
+				{{ sec_to_hhmmss(item.used_time) }}</div>
 				<div v-if="item.planned_time"
-					class="timer-time countdown"
+					:class="{
+						'timer-time':true,
+						'countdown':true,
+						'overtime':item.used_time>item.planned_time*60,
+					}"
 				>
-				<!-- {{ popout.id | countdown }}</div> -->
-				{{ item.id }}</div>
+					<div v-if="item.used_time>item.planned_time*60" class="overtime-notice">overtime</div>
+					<div>{{ countdownTimer(item.used_time,item.planned_time) }}</div>
+				</div>
+				<!-- {{ item.used_time }}</div> -->
 			</div>
 			<div class="nav">
 				<button class="play btn btn-dipclick"
@@ -88,25 +94,35 @@
 </div>
 </template>
 <script>
-import PopoutConfirmation from './PopoutConfirmation.vue';
+// import PopoutConfirmation from './PopoutConfirmation.vue';
+import { sec_to_hhmmss, momentCalendar } from '../components/valueMorphers2.js'
+
 export default {
     name: 'Popouts',
     template: '#popouts-template',
     props: ['popouts'],
-    components: {
-    	PopoutConfirmation
-    },
+    // components: {
+    // 	PopoutConfirmation
+    // },
 	data(){
 		return {
 			timerRunning: true,
 		};
 	},
-	mouted(){
-		// eventHub.$on('playTimer', this.playTimer);
-		eventHub.$on('playTimer', console.log('hi'));
+	mounted(){
+		eventHub.$on('playTimer', this.playTimer);
 		eventHub.$on('clearAll', this.clearAll);
 	},
     methods: {
+    	sec_to_hhmmss, momentCalendar,
+    	countdownTimer(used_time, planned_time){
+    		let secondsLeft = planned_time*60-used_time;
+    		if(secondsLeft>0){
+	    		return this.sec_to_hhmmss(secondsLeft);
+    		} else {
+	    		return this.sec_to_hhmmss(used_time);
+    		}
+    	},
         removePopout(item) {
             this.timerRunning = false;
         	let index = this.$root.popouts.timer.indexOf(item);
@@ -187,7 +203,6 @@ export default {
 				item.used_time = 0;
 			} else {
 				vm.patch(item.id, 'used_time');
-				allItems.calculateTotalTime(item.id);
 			}
 			this.removePopout(item);
 		},

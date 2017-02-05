@@ -1,3 +1,15 @@
+function arrayToString(arr)
+{
+	if(!Array.isArray(arr) || !arr.length){
+		return '';
+	}
+	let c_o = '';
+	arr.forEach(function(entry) {
+	    c_o = c_o+','+entry;
+	});
+	return c_o.substring(1);
+}
+
 function sec_to_hourmin(val){
 	function pad(num, unit){
 	    if (num>0){
@@ -69,4 +81,4 @@ function isElementInViewport (el) {
     );
 }
 
-export { sec_to_hourmin, hasClass, btnEffect, isElementInViewport, sortObjectArrayByProperty, removeEmptyValuesFromArray }
+export { arrayToString, sec_to_hourmin, hasClass, btnEffect, isElementInViewport, sortObjectArrayByProperty, removeEmptyValuesFromArray }

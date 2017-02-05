@@ -6,7 +6,7 @@
 	window.jQuery = jQuery;
 
 // IMPORT Own jQuery replacement functions
-	import { hasClass, btnEffect, isElementInViewport } from './components/globalFunctions.js';
+	import { arrayToString, hasClass, btnEffect, isElementInViewport } from './components/globalFunctions.js';
 	window.btnEffect = btnEffect;
 	// Make hasClass(el) available as el.hasClass();
 	window.Element.prototype.hasClass = function(config){ return hasClass(this,config)};
@@ -26,7 +26,8 @@
 			// moment/min/moment-with-locales.min.js
 			// moment-countdown/dist/moment-countdown.min.js
 	// var moment = require('moment');
-	// import moment from 'moment';
+	import moment from 'moment';
+	window.moment = moment;
 	// moment().format();
 	// import countdown from 'countdown';
 	// require('moment-countdown');
@@ -58,7 +59,7 @@ window.Element.prototype.flatpickrify = function(config){ return flatpickr(this,
 	},
 	onChange: function(dateObj, dateStr, instance){
 		let el = instance.element.id;
-		instance.element.focus();
+		// instance.element.focus();
 		console.log('flatPicker on change');
 	},
 	onClose: function(dateObj, dateStr, instance){
@@ -104,8 +105,10 @@ window.flatpickrifyAllInputs = function(){
 	window.Vue = Vue;
 	import VueResource from 'vue-resource';
 	Vue.use(VueResource);
-	var VueAutosize = require('vue-autosize');
-	Vue.use(VueAutosize);
+	// var VueAutosize = require('vue-autosize');
+	// Vue.use(VueAutosize);
+	// import VueFlatpickr from 'vue-flatpickr';
+	// Vue.use(VueFlatpickr);
 
 	import VueFilters from './vue-components/vueFilters.js';
 	VueFilters(Vue);

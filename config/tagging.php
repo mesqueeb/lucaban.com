@@ -1,7 +1,6 @@
 <?php
 
-return array(
-	
+return [
 	// Datatype for primary keys of your models.
 	// used in migrations only
 	'primary_keys_type' => 'integer', // 'string' or 'integer'
@@ -23,4 +22,10 @@ return array(
 
 	// Model to use to store the tags in the database
 	'tag_model'=>'\Conner\Tagging\Model\Tag',
-);
+
+	// Delimiter used within tags
+	'delimiter' => '-',
+	
+	// Model to use for the relation between tags and tagged records
+	'tagged_model' => '\Conner\Tagging\Model\Tagged',
+];

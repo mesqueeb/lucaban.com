@@ -12,7 +12,7 @@
           <div class="title">Completed {{popup.item.body}}
           <label class="done-after-done"
               @keydown="keydownInPopup(popup, $event, 'flatPicker')"
-          >{{ popup.item.done_date | momentCalendar }}
+          >{{ momentCalendar(popup.item.done_date) }}
             <input class="flatpickr"
               :id="'done-date-edit-'+popup.item.id+'-popup'"
               v-model="popup.item.done_date"
@@ -34,7 +34,7 @@
             <div>
               <label class="">Used time</label>
               <!-- <input v-model="popup.item.used_time" type="number"/> -->
-              <span class="">{{ popup.item.used_time | hhmmss }}</span>
+              <span class="">{{ sec_to_hhmmss(popup.item.used_time) }}</span>
             </div>
             <div class="buttons">
               <div>
@@ -75,11 +75,14 @@
 </div>
 </template>
 <script>
+import { sec_to_hhmmss, momentCalendar } from '../components/valueMorphers2.js'
+
 export default {
     name: 'Popups',
     template: '#popups-template',
     props: ['popups'],
     methods: {
+        sec_to_hhmmss, momentCalendar,
         addPopup(popup) {
             this.$root.popups.push(popup)
         },
@@ -93,7 +96,7 @@ export default {
                     this.$root.patch(popup.item.id, 'completion_memo');
                 }
             }
-            let index = root.popups.indexOf(popup);
+            let index = this.$root.popups.indexOf(popup);
             this.$root.popups.splice(index, 1);
         },
         incrementUsedTime(item, amount) {

@@ -1,7 +1,7 @@
 import Card from './Card.vue';
 import Popups from './Popups.vue';
 import Popouts from './Popouts.vue';
-import { sec_to_hourmin, sortObjectArrayByProperty, removeEmptyValuesFromArray } from '../components/globalFunctions.js';
+import { arrayToString, sec_to_hourmin, sortObjectArrayByProperty, removeEmptyValuesFromArray } from '../components/globalFunctions.js';
 import Selection from './Selection.js';
 import Tree from './dataTree.js';
 
@@ -24,6 +24,8 @@ export default {
 		popups: [],
 		popouts: {'delete':[], 'timer':[]},
 		timerItems: [],
+		beforeEditCache_body: null,
+		beforeEditCache_planned_time: null,
 		// allTags: [],
 	},
 	components: {
@@ -226,9 +228,11 @@ export default {
 			id = (id) ? id : selection.selectedId;
 			if(!id){ return; }
 			this.editingItemTags = id;
-			setTimeout(function(){
+			Vue.nextTick(function () {
+			// setTimeout(function(){
 				document.querySelector('#updatebox-'+id+' > .update-tags > .update-custom-tags input').focus();
-			},10);
+			// },10);
+			});
 		},
 		stopPatching(){
 			if(window.stopPatchingIcon){ clearTimeout(window.stopPatchingIcon); }
@@ -249,7 +253,7 @@ export default {
 			let patchObj = {};
 			let patchVal = allItems.nodes[id][arg];
 			if(arg == 'children_order'){
-				patchVal = allItems.arrayToString(patchVal);
+				patchVal = arrayToString(patchVal);
 			}
 			patchObj[arg] = patchVal;
 			this.$http.patch('/api/items/' + id, patchObj, { method: 'PATCH'})
@@ -383,6 +387,7 @@ export default {
 					this.popouts.timer.push(item);
 					Vue.nextTick(function () {
 						eventHub.$emit('playTimer', item);
+						console.log('emitted playTimer');
 					});
 				}
 				if(type=='confirm-delete'){
@@ -527,7 +532,7 @@ export default {
 			this.startPatching();
 			// Prepare children_order for sending to DB.
 			if(newItem.children_order){
-				newItem.children_order = allItems.arrayToString(newItem.children_order);
+				newItem.children_order = arrayToString(newItem.children_order);
 			}
 			// let data = {
 			// 	newItemArray: [newItem, newItem]
@@ -594,7 +599,7 @@ export default {
 			if(k == 'meta_enter'){ eventHub.$emit('startEdit')} else
 			if(k == 'ctrl_u'){ eventHub.$emit('startEdit')} else
 			if(k == 't'){ this.setToday()} else
-			if(k == 'meta_t'){ this.startEditTags()} else
+			if(k == 'shift_t'){ this.startEditTags()} else
 			if(k == 's'){ this.addTimer()} else
 			if(k == 'meta_shift_d'){ this.duplicate()} else
 			if(k == 'meta_delete'){ this.deleteItem()} else
@@ -630,10 +635,11 @@ export default {
 				// This stops the event listener when a flatpickr dialogue is open.
 			}
 		}
-    	if (vm.popouts.length){
+    	if (vm.popouts.delete.length || vm.popouts.timer.length){
     		if(x == 27) { // escape
 				e.preventDefault();
 				eventHub.$emit('clearAll');
+				console.log('Escape');
 			}
 			if(x == 9){ // TAB
 				e.preventDefault();
@@ -728,7 +734,7 @@ export default {
 			case 84: // key t
 				e.preventDefault();
 				if (e.ctrlKey || e.metaKey || e.shiftKey){
-		  			vm.keystroke('meta_t');
+		  			vm.keystroke('shift_t');
 		  		} else {
 					vm.keystroke('t');
 		  		}

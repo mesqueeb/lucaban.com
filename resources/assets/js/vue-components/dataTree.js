@@ -65,45 +65,45 @@ export default class Tree {
 	}
 
 
-	OLDinitialize(item, index) 
-	{
-		// variables
-		let node 	= this.makeNode(item);
-		let parent 	= this.getNode(node.parent_id);
-		// assign extra item values
-		if(node.children_order){
-			node.children_order = node.children_order.split(',').map(Number);
-		} else {
-			node.children_order = [];
-		}
-		node.children = [];
-			// assign total Time to nodes with no children:
-		if (!node.children.length){
-	    	node['totalPlannedTime'] = (!item.done && node.planned_time) ? parseFloat(item.planned_time) : 0 ;
-			node['totalUsedTime'] = (!item.done && node.used_time) ? parseFloat(item.used_time) : 0 ;
-		}
+	// OLDinitialize(item, index) 
+	// {
+	// 	// variables
+	// 	let node 	= this.makeNode(item);
+	// 	let parent 	= this.getNode(node.parent_id);
+	// 	// assign extra item values
+	// 	if(node.children_order){
+	// 		node.children_order = node.children_order.split(',').map(Number);
+	// 	} else {
+	// 		node.children_order = [];
+	// 	}
+	// 	node.children = [];
+	// 		// assign total Time to nodes with no children:
+	// 	if (!node.children.length){
+	//     	node['totalPlannedTime'] = (!item.done && node.planned_time) ? parseFloat(item.planned_time) : 0 ;
+	// 		node['totalUsedTime'] = (!item.done && node.used_time) ? parseFloat(item.used_time) : 0 ;
+	// 	}
 
-		// Register and organize nodes:
-		if(index === 0) { this.root = node; }
-		else if (parent) { parent.children.push(node); }
-		else { this.orphans.push(node); }
-		this.nodes[node.id] = node;
+	// 	// Register and organize nodes:
+	// 	if(index === 0) { this.root = node; }
+	// 	else if (parent) { parent.children.push(node); }
+	// 	else { this.orphans.push(node); }
+	// 	this.nodes[node.id] = node;
 
-		//Sort all nodes after making sure you got all of them.
-		this.itemsProcessed++;
-	    if(this.itemsProcessed === this.source.length) {
-	    	$.each(this.nodes, function(index, node) {
-			    let id = node.id;
-			    this.sortChildren(id);
-			    this.updateChildrenDueDate(id);
-				// this.attachParentBody(id);　//Maybe I should only do this when pressing DONE
-			    if (!node.children.length && (node.used_time || node.planned_time)){
-				    this.calculateTotalTime(id);
-			    }
-			    this.backups.rootChildren = this.root.children;
-			}.bind(this));
-	    }
-	}
+	// 	//Sort all nodes after making sure you got all of them.
+	// 	this.itemsProcessed++;
+	//     if(this.itemsProcessed === this.source.length) {
+	//     	$.each(this.nodes, function(index, node) {
+	// 		    let id = node.id;
+	// 		    this.sortChildren(id);
+	// 		    this.updateChildrenDueDate(id);
+	// 			// this.attachParentBody(id);　//Maybe I should only do this when pressing DONE
+	// 		    if (!node.children.length && (node.used_time || node.planned_time)){
+	// 			    this.calculateTotalTime(id);
+	// 		    }
+	// 		    this.backups.rootChildren = this.root.children;
+	// 		}.bind(this));
+	//     }
+	// }
 	duplicate(id)
 	{
 		let item = this.nodes[id];
@@ -160,14 +160,6 @@ export default class Tree {
 	    if(!duplication){
 		    vm.showAddNewItem(item.id, addNextItemAs);
 	    }
-	}
-	arrayToString(arr)
-	{
-		let c_o = '';
-		arr.forEach(function(entry) {
-		    c_o = c_o+','+entry;
-		});
-		return c_o.substring(1);
 	}
 	tagNameToSlug(tag)
 	{
@@ -602,14 +594,14 @@ export default class Tree {
 			item.children_order.forEach(item => { return allItems.getAllChildrenIdsRecursive(item, allChildrenIds) });
 		}
 	}
-	calculateTotalTime(id)
-	{
-		let item = this.nodes[id];
-	    //call this on PARENT -> climb up the parent tree
-	    if (item.parent_id){
-		    this.calculateTotalTime(item.parent_id);
-	    }
-	}
+	// calculateTotalTime(id)
+	// {
+	// 	let item = this.nodes[id];
+	//     //call this on PARENT -> climb up the parent tree
+	//     if (item.parent_id){
+	// 	    this.calculateTotalTime(item.parent_id);
+	//     }
+	// }
 	calTotalPlannedTime(id)
 	{
 		let item = this.nodes[id];

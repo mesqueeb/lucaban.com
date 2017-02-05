@@ -12,6 +12,14 @@
     transition: opacity .3s ease;	
 }
 .popout {
+    .overtime-notice{
+        color: $duedate-color;
+        font-size: 0.3em;
+        width: 100%;
+    }
+    .overtime{
+        color: $duedate-color;
+    }
     .body{
         display: flex;
         flex-direction: column;
@@ -40,7 +48,8 @@
     .timer-time {
         font-size: 4em;
         margin: 0 auto;
-        padding: 0.8em;
+        padding: 0.3em 0.8em 0;
+        line-height: normal;
     }
     .nav {
         padding: 0.6em 1em;

@@ -10,6 +10,16 @@ use App\Item;
 class ItemTagController extends Controller
 {
     /**
+     * Create a new controller instance.
+     *
+     * @return void
+     */
+    public function __construct()
+    {
+        $this->middleware('auth');
+    }
+
+    /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
@@ -67,10 +77,10 @@ class ItemTagController extends Controller
         // var_dump($request['type']);
 
         if($request['type'] == 'withAnyTag'){
-            return Item::withAnyTag($request['tags'])->get(); // fetch articles with any tag listed
+            return Item::withAnyTag($request['tags'])->get()->all(); // fetch articles with any tag listed
         }
         if($request['type'] == 'withAllTags'){
-            return Item::withAllTags($request['tags'])->get(); // only fetch articles with all the tags
+            return Item::withAllTags($request['tags'])->get()->all(); // only fetch articles with all the tags
         }
     }
 

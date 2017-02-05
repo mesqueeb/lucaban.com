@@ -1,47 +1,26 @@
 {
   "private": true,
   "scripts": {
-    "prod": "gulp --production",
-    "dev": "gulp watch"
+    "dev": "node node_modules/cross-env/bin/cross-env.js NODE_ENV=development node_modules/webpack/bin/webpack.js --progress --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js",
+    "watch": "node node_modules/cross-env/bin/cross-env.js NODE_ENV=development node_modules/webpack/bin/webpack.js --watch --progress --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js",
+    "hot": "node node_modules/cross-env/bin/cross-env.js NODE_ENV=development node_modules/webpack-dev-server/bin/webpack-dev-server.js --inline --hot --config=node_modules/laravel-mix/setup/webpack.config.js",
+    "production": "node node_modules/cross-env/bin/cross-env.js NODE_ENV=production node_modules/webpack/bin/webpack.js --progress --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js"
   },
   "devDependencies": {
-    "bootstrap-sass": "^3.3.0",
-    "gulp": "^3.9.1",
-    "laravel-elixir": "^6.0.0-15",
-    "laravel-elixir-browserify-official": "^0.1.3"
-  },
-  "name": "lucaban",
-  "description": "[![Build Status](https://travis-ci.org/laravel/framework.svg)](https://travis-ci.org/laravel/framework) [![Total Downloads](https://poser.pugx.org/laravel/framework/d/total.svg)](https://packagist.org/packages/laravel/framework) [![Latest Stable Version](https://poser.pugx.org/laravel/framework/v/stable.svg)](https://packagist.org/packages/laravel/framework) [![Latest Unstable Version](https://poser.pugx.org/laravel/framework/v/unstable.svg)](https://packagist.org/packages/laravel/framework) [![License](https://poser.pugx.org/laravel/framework/license.svg)](https://packagist.org/packages/laravel/framework)",
-  "version": "1.0.0",
-  "main": "gulpfile.js",
-  "directories": {
-    "test": "tests"
+    "axios": "^0.15.2",
+    "bootstrap-sass": "^3.3.7",
+    "jquery": "^3.1.0",
+    "laravel-mix": "^0.6.0",
+    "lodash": "^4.16.2",
+    "vue": "^2.0.1"
   },
   "dependencies": {
+    "bootstrap-sass": "^3.3.7",
     "countdown": "^2.6.0",
-    "flatpickr": "^1.9.1",
-    "jquery": "^3.1.0",
-    "laravel-elixir-vueify": "^2",
-    "linkifyjs": "^2.1.1",
+    "flatpickr": "^2.3.5",
+    "linkifyjs": "^2.1.4",
     "material-design-iconic-font": "^2.2.0",
-    "moment-countdown": "0.0.3",
-    "vue": "^2",
-    "vue-autosize": "^0",
-    "vue-flatpickr": "^2",
-    "vue-resource": "^1",
-    "vue-textarea": "^1"
-  },
-  "browser": {
-    "vue": "vue/dist/vue.common"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/mesqueeb/lucaban.git"
-  },
-  "author": "",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/mesqueeb/lucaban/issues"
-  },
-  "homepage": "https://github.com/mesqueeb/lucaban#readme"
+    "moment": "^2.17.1",
+    "vue-resource": "^1.1.2"
+  }
 }

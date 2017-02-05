@@ -9,11 +9,16 @@ class Item extends Model
 {
 	use Taggable;
 	protected $table = 'items';
-	protected $fillable = ['done','done_date','body','children_order','parent_id','depth','planned_time','used_time','due_date', 'children', 'show_children', 'completion_memo', 'parents_bodies', 'memo'];
+	// protected $fillable = ['done','done_date','body','children_order','parent_id','depth','planned_time','used_time','due_date', 'children', 'show_children', 'completion_memo', 'parents_bodies', 'memo'];
+	protected $guarded = ['id', 'created_at', 'updated_at', 'created_by'];
 
-
-	public function childItems() {
-		return $this->hasMany(Item::class);
+	public function users()
+	{
+		return $this->belongsToMany('App\User');
+	}
+	public function childItems()
+	{
+		return $this->hasMany(Item::class, 'parent_id');
 	}
 	// Class - Instruction Manual/Description of an OBject
 	// Instance - Actual thing, based on a class

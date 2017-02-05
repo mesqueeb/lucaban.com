@@ -14,7 +14,7 @@
 	v-if="journalDate"
 	>
 		<!-- <span>{{ journalDate | momentCalendar }}</span> -->
-		<span>{{ journalDate }}</span>
+		<span>{{ momentCalendar(journalDate) }}</span>
 		<span class="journal-date-small">{{ journalDate }}</span>
 	</div>
 	<div class="parent-string"
@@ -77,7 +77,7 @@
 				v-show="item.id != basis.editingItem"
 			>
 				<!-- <div>{{ item.body | linkify }}</div> -->
-				<div>{{ item.body }}</div>
+				<div>{{ linkify(item.body) }}</div>
 				<div class="completion-notes bodybox"
 					v-if="item.completion_memo"
 					@click="selectItem(item)"
@@ -166,7 +166,7 @@
 					v-if="item.done && item.id != basis.editingDoneDateItem && !journalView"
 				>
 				<!-- Done {{ item.done_date | momentCalendar }} -->
-				Done {{ item.done_date }}
+				Done {{ momentCalendar(item.done_date) }}
 					<input class="flatpickr"
 						:id="'done-date-edit-' + item.id"
 						v-model="item.done_date"
@@ -179,7 +179,7 @@
 					&& totalTimeDifferentFromParent
 					&& !item.done" class="total-duration">
 					<!-- {{ totalSecLeft | sec-to-hourminsec }} -->
-					{{ totalSecLeft }}
+					{{ sec_to_hourminsec(totalSecLeft) }}
 					</span>
 
 				<span v-if="
@@ -189,20 +189,20 @@
 					&& !item.done" class="duration"
 				>
 					<!-- {{ secLeft | sec-to-hourminsec }} -->
-					{{ secLeft }}
+					{{ sec_to_hourminsec(secLeft) }}
 				</span>
 				
 				<span v-if="hasDueDate && !item.done"
 					class="duedate"
 				>
 				<!-- {{ item.due_date | momentCalendar }}</span> -->
-				{{ item.due_date }}</span>
+				{{ momentCalendar(item.due_date) }}</span>
 
 				<span v-if="item.dueDateParent && !item.done"
 					class="duedate-parent"
 				>
 				<!-- {{ item.dueDateParent | momentCalendar }}</span> -->
-				{{ item.dueDateParent }}</span>
+				{{ momentCalendar(item.dueDateParent) }}</span>
 
 				<span v-for="tag in item.tagged"
 					v-if="item.tagged.length"
@@ -396,7 +396,6 @@
 					v-if="true"
 					type="number"
 					v-model="newItem.planned_time"
-					@keydown="keydownOnNew(item, $event)"
 					@keydown="keydownOnNew(item, $event, 'planned-time')"
 					@blur="blurOnAddNew(item)"
 				/>min</div>
@@ -427,10 +426,14 @@
 			</div>
 		</div>
 	</form>
+	<!-- <Flatpickr /> -->
 </div>
 </div>
 </template>
 <script>
+// import Morph from '../components/valueMorphers.js'
+// window.Morph = new Morph();
+import { linkify, momentCalendar, sec_to_hourminsec } from '../components/valueMorphers2.js';
 
 export default {
 	name: 'Card',
@@ -455,8 +458,9 @@ export default {
 			newTag: null,
 		};
 	},
-	watch: {
-	},
+	// components: { 
+	// Flatpickr: Flatpickr,
+	// },
 	computed: {
 		basis(){
 			return this.$root;
@@ -572,7 +576,7 @@ export default {
 			if(!this.item.parent_id){ return true; }
 			return this.totalPlannedSec != this.$parent.totalPlannedSec;
 		},
-		parentTags(){ if(!this.item || !allItems){ return []; }
+		parentTags(){ if(!this.item || !allItems || !this.item.parent_id){ return []; }
 			return allItems.returnTagsAsArray(this.item.parent_id);
 		},
 		isHidden(){ if(!this.item || !allItems){ return true; }
@@ -580,6 +584,9 @@ export default {
 		},
 	},
 	methods: {
+		linkify,
+		momentCalendar,
+		sec_to_hourminsec,
 		convertbodyURLtoHTML(){
 			if(!this.item){ return; }
 			let bodyboxQS = "#card-"+this.item.id+" > div > .item-card > .body-div > .bodybox > div";
@@ -860,14 +867,24 @@ export default {
 			// 	return;
 			// }
 			this.$root.editingItem = null;
-			this.$root.editingItemTags = null;
+			if(this.$root.editingItemTags){
+				this.$root.editingItemTags = null;
+				return;
+			}
 			if (!item.body) {
-				this.item.body = this.$root.beforeEditCache_body;
+				item.body = this.$root.beforeEditCache_body;
 			}
 			item.body = item.body.trim();
-			vm.patch(item.id, 'body');
-			vm.patch(item.id, 'planned_time');
-			allItems.copyParentBodyToAllChildren(item.id);
+
+			if (item.planned_time != this.$root.beforeEditCache_planned_time){
+				vm.patch(item.id, 'planned_time');
+			}
+			if (item.body != this.$root.beforeEditCache_body){
+				vm.patch(item.id, 'body');
+				allItems.copyParentBodyToAllChildren(item.id);
+			}
+			this.$root.beforeEditCache_body = null;
+			this.$root.beforeEditCache_planned_time = null;
 		},
 		cancelEdit(item) {
 			item = (item) ? item : allItems.nodes[selection.selectedId];

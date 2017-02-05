@@ -1,8 +1,10 @@
 @charset "UTF-8";
+
 /*!
  *  Material Design Iconic Font by Sergey Kupletsky ($zavoloklom) - http://zavoloklom.github.io/material-design-iconic-font/
  *  License - http://zavoloklom.github.io/material-design-iconic-font/license (Font: SIL OFL 1.1, CSS: MIT License)
  */
+
 @font-face {
   font-family: "Material-Design-Iconic-Font";
   src: url("/css/fonts/Material-Design-Iconic-Font.woff2?v=2.2.0") format("woff2"), url("/css/fonts/Material-Design-Iconic-Font.woff?v=2.2.0") format("woff"), url("/css/fonts/Material-Design-Iconic-Font.ttf?v=2.2.0") format("truetype");
@@ -20,7 +22,7 @@
 }
 
 .zmdi-hc-lg {
-  font-size: 1.3333333333em;
+  font-size: 1.33333333em;
   line-height: 0.75em;
   vertical-align: -15%;
 }
@@ -42,13 +44,13 @@
 }
 
 .zmdi-hc-fw {
-  width: 1.2857142857em;
+  width: 1.28571429em;
   text-align: center;
 }
 
 .zmdi-hc-ul {
   padding-left: 0;
-  margin-left: 2.1428571429em;
+  margin-left: 2.14285714em;
   list-style-type: none;
 }
 
@@ -58,14 +60,14 @@
 
 .zmdi-hc-li {
   position: absolute;
-  left: -2.1428571429em;
-  width: 2.1428571429em;
-  top: 0.1428571429em;
+  left: -2.14285714em;
+  width: 2.14285714em;
+  top: 0.14285714em;
   text-align: center;
 }
 
 .zmdi-hc-li.zmdi-hc-lg {
-  left: -1.8571428571em;
+  left: -1.85714286em;
 }
 
 .zmdi-hc-border {
@@ -92,81 +94,85 @@
 
 .zmdi-hc-spin {
   -webkit-animation: zmdi-spin 1.5s infinite linear;
-  animation: zmdi-spin 1.5s infinite linear;
+          animation: zmdi-spin 1.5s infinite linear;
 }
 
 .zmdi-hc-spin-reverse {
   -webkit-animation: zmdi-spin-reverse 1.5s infinite linear;
-  animation: zmdi-spin-reverse 1.5s infinite linear;
+          animation: zmdi-spin-reverse 1.5s infinite linear;
 }
 
 @-webkit-keyframes zmdi-spin {
   0% {
     -webkit-transform: rotate(0deg);
-    transform: rotate(0deg);
+            transform: rotate(0deg);
   }
+
   100% {
     -webkit-transform: rotate(359deg);
-    transform: rotate(359deg);
+            transform: rotate(359deg);
   }
 }
 
 @keyframes zmdi-spin {
   0% {
     -webkit-transform: rotate(0deg);
-    transform: rotate(0deg);
+            transform: rotate(0deg);
   }
+
   100% {
     -webkit-transform: rotate(359deg);
-    transform: rotate(359deg);
+            transform: rotate(359deg);
   }
 }
 
 @-webkit-keyframes zmdi-spin-reverse {
   0% {
     -webkit-transform: rotate(0deg);
-    transform: rotate(0deg);
+            transform: rotate(0deg);
   }
+
   100% {
     -webkit-transform: rotate(-359deg);
-    transform: rotate(-359deg);
+            transform: rotate(-359deg);
   }
 }
 
 @keyframes zmdi-spin-reverse {
   0% {
     -webkit-transform: rotate(0deg);
-    transform: rotate(0deg);
+            transform: rotate(0deg);
   }
+
   100% {
     -webkit-transform: rotate(-359deg);
-    transform: rotate(-359deg);
+            transform: rotate(-359deg);
   }
 }
 
 .zmdi-hc-rotate-90 {
   -webkit-transform: rotate(90deg);
-  transform: rotate(90deg);
+          transform: rotate(90deg);
 }
 
 .zmdi-hc-rotate-180 {
   -webkit-transform: rotate(180deg);
-  transform: rotate(180deg);
+          transform: rotate(180deg);
 }
 
 .zmdi-hc-rotate-270 {
   -webkit-transform: rotate(270deg);
-  transform: rotate(270deg);
+          transform: rotate(270deg);
 }
 
 .zmdi-hc-flip-horizontal {
   -webkit-transform: scale(-1, 1);
-  transform: scale(-1, 1);
+          transform: scale(-1, 1);
 }
 
 .zmdi-hc-flip-vertical {
   -webkit-transform: scale(1, -1);
-  transform: scale(1, -1);
+          transform: scale(1, -1);
 }
 
 .zmdi-hc-stack {
@@ -178,7 +184,8 @@
   vertical-align: middle;
 }
 
-.zmdi-hc-stack-1x, .zmdi-hc-stack-2x {
+.zmdi-hc-stack-1x,
+.zmdi-hc-stack-2x {
   position: absolute;
   left: 0;
   width: 100%;
@@ -199,6718 +206,6746 @@
 
 /* Material Design Iconic Font uses the Unicode Private Use Area (PUA) to ensure screen
    readers do not read off random characters that represent icons */
+
 .zmdi-3d-rotation:before {
-  content: "";
+  content: "\F101";
 }
 
 .zmdi-airplane-off:before {
-  content: "";
+  content: "\F102";
 }
 
 .zmdi-airplane:before {
-  content: "";
+  content: "\F103";
 }
 
 .zmdi-album:before {
-  content: "";
+  content: "\F104";
 }
 
 .zmdi-archive:before {
-  content: "";
+  content: "\F105";
 }
 
 .zmdi-assignment-account:before {
-  content: "";
+  content: "\F106";
 }
 
 .zmdi-assignment-alert:before {
-  content: "";
+  content: "\F107";
 }
 
 .zmdi-assignment-check:before {
-  content: "";
+  content: "\F108";
 }
 
 .zmdi-assignment-o:before {
-  content: "";
+  content: "\F109";
 }
 
 .zmdi-assignment-return:before {
-  content: "";
+  content: "\F10A";
 }
 
 .zmdi-assignment-returned:before {
-  content: "";
+  content: "\F10B";
 }
 
 .zmdi-assignment:before {
-  content: "";
+  content: "\F10C";
 }
 
 .zmdi-attachment-alt:before {
-  content: "";
+  content: "\F10D";
 }
 
 .zmdi-attachment:before {
-  content: "";
+  content: "\F10E";
 }
 
 .zmdi-audio:before {
-  content: "";
+  content: "\F10F";
 }
 
 .zmdi-badge-check:before {
-  content: "";
+  content: "\F110";
 }
 
 .zmdi-balance-wallet:before {
-  content: "";
+  content: "\F111";
 }
 
 .zmdi-balance:before {
-  content: "";
+  content: "\F112";
 }
 
 .zmdi-battery-alert:before {
-  content: "";
+  content: "\F113";
 }
 
 .zmdi-battery-flash:before {
-  content: "";
+  content: "\F114";
 }
 
 .zmdi-battery-unknown:before {
-  content: "";
+  content: "\F115";
 }
 
 .zmdi-battery:before {
-  content: "";
+  content: "\F116";
 }
 
 .zmdi-bike:before {
-  content: "";
+  content: "\F117";
 }
 
 .zmdi-block-alt:before {
-  content: "";
+  content: "\F118";
 }
 
 .zmdi-block:before {
-  content: "";
+  content: "\F119";
 }
 
 .zmdi-boat:before {
-  content: "";
+  content: "\F11A";
 }
 
 .zmdi-book-image:before {
-  content: "";
+  content: "\F11B";
 }
 
 .zmdi-book:before {
-  content: "";
+  content: "\F11C";
 }
 
 .zmdi-bookmark-outline:before {
-  content: "";
+  content: "\F11D";
 }
 
 .zmdi-bookmark:before {
-  content: "";
+  content: "\F11E";
 }
 
 .zmdi-brush:before {
-  content: "";
+  content: "\F11F";
 }
 
 .zmdi-bug:before {
-  content: "";
+  content: "\F120";
 }
 
 .zmdi-bus:before {
-  content: "";
+  content: "\F121";
 }
 
 .zmdi-cake:before {
-  content: "";
+  content: "\F122";
 }
 
 .zmdi-car-taxi:before {
-  content: "";
+  content: "\F123";
 }
 
 .zmdi-car-wash:before {
-  content: "";
+  content: "\F124";
 }
 
 .zmdi-car:before {
-  content: "";
+  content: "\F125";
 }
 
 .zmdi-card-giftcard:before {
-  content: "";
+  content: "\F126";
 }
 
 .zmdi-card-membership:before {
-  content: "";
+  content: "\F127";
 }
 
 .zmdi-card-travel:before {
-  content: "";
+  content: "\F128";
 }
 
 .zmdi-card:before {
-  content: "";
+  content: "\F129";
 }
 
 .zmdi-case-check:before {
-  content: "";
+  content: "\F12A";
 }
 
 .zmdi-case-download:before {
-  content: "";
+  content: "\F12B";
 }
 
 .zmdi-case-play:before {
-  content: "";
+  content: "\F12C";
 }
 
 .zmdi-case:before {
-  content: "";
+  content: "\F12D";
 }
 
 .zmdi-cast-connected:before {
-  content: "";
+  content: "\F12E";
 }
 
 .zmdi-cast:before {
-  content: "";
+  content: "\F12F";
 }
 
 .zmdi-chart-donut:before {
-  content: "";
+  content: "\F130";
 }
 
 .zmdi-chart:before {
-  content: "";
+  content: "\F131";
 }
 
 .zmdi-city-alt:before {
-  content: "";
+  content: "\F132";
 }
 
 .zmdi-city:before {
-  content: "";
+  content: "\F133";
 }
 
 .zmdi-close-circle-o:before {
-  content: "";
+  content: "\F134";
 }
 
 .zmdi-close-circle:before {
-  content: "";
+  content: "\F135";
 }
 
 .zmdi-close:before {
-  content: "";
+  content: "\F136";
 }
 
 .zmdi-cocktail:before {
-  content: "";
+  content: "\F137";
 }
 
 .zmdi-code-setting:before {
-  content: "";
+  content: "\F138";
 }
 
 .zmdi-code-smartphone:before {
-  content: "";
+  content: "\F139";
 }
 
 .zmdi-code:before {
-  content: "";
+  content: "\F13A";
 }
 
 .zmdi-coffee:before {
-  content: "";
+  content: "\F13B";
 }
 
 .zmdi-collection-bookmark:before {
-  content: "";
+  content: "\F13C";
 }
 
 .zmdi-collection-case-play:before {
-  content: "";
+  content: "\F13D";
 }
 
 .zmdi-collection-folder-image:before {
-  content: "";
+  content: "\F13E";
 }
 
 .zmdi-collection-image-o:before {
-  content: "";
+  content: "\F13F";
 }
 
 .zmdi-collection-image:before {
-  content: "";
+  content: "\F140";
 }
 
 .zmdi-collection-item-1:before {
-  content: "";
+  content: "\F141";
 }
 
 .zmdi-collection-item-2:before {
-  content: "";
+  content: "\F142";
 }
 
 .zmdi-collection-item-3:before {
-  content: "";
+  content: "\F143";
 }
 
 .zmdi-collection-item-4:before {
-  content: "";
+  content: "\F144";
 }
 
 .zmdi-collection-item-5:before {
-  content: "";
+  content: "\F145";
 }
 
 .zmdi-collection-item-6:before {
-  content: "";
+  content: "\F146";
 }
 
 .zmdi-collection-item-7:before {
-  content: "";
+  content: "\F147";
 }
 
 .zmdi-collection-item-8:before {
-  content: "";
+  content: "\F148";
 }
 
 .zmdi-collection-item-9-plus:before {
-  content: "";
+  content: "\F149";
 }
 
 .zmdi-collection-item-9:before {
-  content: "";
+  content: "\F14A";
 }
 
 .zmdi-collection-item:before {
-  content: "";
+  content: "\F14B";
 }
 
 .zmdi-collection-music:before {
-  content: "";
+  content: "\F14C";
 }
 
 .zmdi-collection-pdf:before {
-  content: "";
+  content: "\F14D";
 }
 
 .zmdi-collection-plus:before {
-  content: "";
+  content: "\F14E";
 }
 
 .zmdi-collection-speaker:before {
-  content: "";
+  content: "\F14F";
 }
 
 .zmdi-collection-text:before {
-  content: "";
+  content: "\F150";
 }
 
 .zmdi-collection-video:before {
-  content: "";
+  content: "\F151";
 }
 
 .zmdi-compass:before {
-  content: "";
+  content: "\F152";
 }
 
 .zmdi-cutlery:before {
-  content: "";
+  content: "\F153";
 }
 
 .zmdi-delete:before {
-  content: "";
+  content: "\F154";
 }
 
 .zmdi-dialpad:before {
-  content: "";
+  content: "\F155";
 }
 
 .zmdi-dns:before {
-  content: "";
+  content: "\F156";
 }
 
 .zmdi-drink:before {
-  content: "";
+  content: "\F157";
 }
 
 .zmdi-edit:before {
-  content: "";
+  content: "\F158";
 }
 
 .zmdi-email-open:before {
-  content: "";
+  content: "\F159";
 }
 
 .zmdi-email:before {
-  content: "";
+  content: "\F15A";
 }
 
 .zmdi-eye-off:before {
-  content: "";
+  content: "\F15B";
 }
 
 .zmdi-eye:before {
-  content: "";
+  content: "\F15C";
 }
 
 .zmdi-eyedropper:before {
-  content: "";
+  content: "\F15D";
 }
 
 .zmdi-favorite-outline:before {
-  content: "";
+  content: "\F15E";
 }
 
 .zmdi-favorite:before {
-  content: "";
+  content: "\F15F";
 }
 
 .zmdi-filter-list:before {
-  content: "";
+  content: "\F160";
 }
 
 .zmdi-fire:before {
-  content: "";
+  content: "\F161";
 }
 
 .zmdi-flag:before {
-  content: "";
+  content: "\F162";
 }
 
 .zmdi-flare:before {
-  content: "";
+  content: "\F163";
 }
 
 .zmdi-flash-auto:before {
-  content: "";
+  content: "\F164";
 }
 
 .zmdi-flash-off:before {
-  content: "";
+  content: "\F165";
 }
 
 .zmdi-flash:before {
-  content: "";
+  content: "\F166";
 }
 
 .zmdi-flip:before {
-  content: "";
+  content: "\F167";
 }
 
 .zmdi-flower-alt:before {
-  content: "";
+  content: "\F168";
 }
 
 .zmdi-flower:before {
-  content: "";
+  content: "\F169";
 }
 
 .zmdi-font:before {
-  content: "";
+  content: "\F16A";
 }
 
 .zmdi-fullscreen-alt:before {
-  content: "";
+  content: "\F16B";
 }
 
 .zmdi-fullscreen-exit:before {
-  content: "";
+  content: "\F16C";
 }
 
 .zmdi-fullscreen:before {
-  content: "";
+  content: "\F16D";
 }
 
 .zmdi-functions:before {
-  content: "";
+  content: "\F16E";
 }
 
 .zmdi-gas-station:before {
-  content: "";
+  content: "\F16F";
 }
 
 .zmdi-gesture:before {
-  content: "";
+  content: "\F170";
 }
 
 .zmdi-globe-alt:before {
-  content: "";
+  content: "\F171";
 }
 
 .zmdi-globe-lock:before {
-  content: "";
+  content: "\F172";
 }
 
 .zmdi-globe:before {
-  content: "";
+  content: "\F173";
 }
 
 .zmdi-graduation-cap:before {
-  content: "";
+  content: "\F174";
 }
 
 .zmdi-home:before {
-  content: "";
+  content: "\F175";
 }
 
 .zmdi-hospital-alt:before {
-  content: "";
+  content: "\F176";
 }
 
 .zmdi-hospital:before {
-  content: "";
+  content: "\F177";
 }
 
 .zmdi-hotel:before {
-  content: "";
+  content: "\F178";
 }
 
 .zmdi-hourglass-alt:before {
-  content: "";
+  content: "\F179";
 }
 
 .zmdi-hourglass-outline:before {
-  content: "";
+  content: "\F17A";
 }
 
 .zmdi-hourglass:before {
-  content: "";
+  content: "\F17B";
 }
 
 .zmdi-http:before {
-  content: "";
+  content: "\F17C";
 }
 
 .zmdi-image-alt:before {
-  content: "";
+  content: "\F17D";
 }
 
 .zmdi-image-o:before {
-  content: "";
+  content: "\F17E";
 }
 
 .zmdi-image:before {
-  content: "";
+  content: "\F17F";
 }
 
 .zmdi-inbox:before {
-  content: "";
+  content: "\F180";
 }
 
 .zmdi-invert-colors-off:before {
-  content: "";
+  content: "\F181";
 }
 
 .zmdi-invert-colors:before {
-  content: "";
+  content: "\F182";
 }
 
 .zmdi-key:before {
-  content: "";
+  content: "\F183";
 }
 
 .zmdi-label-alt-outline:before {
-  content: "";
+  content: "\F184";
 }
 
 .zmdi-label-alt:before {
-  content: "";
+  content: "\F185";
 }
 
 .zmdi-label-heart:before {
-  content: "";
+  content: "\F186";
 }
 
 .zmdi-label:before {
-  content: "";
+  content: "\F187";
 }
 
 .zmdi-labels:before {
-  content: "";
+  content: "\F188";
 }
 
 .zmdi-lamp:before {
-  content: "";
+  content: "\F189";
 }
 
 .zmdi-landscape:before {
-  content: "";
+  content: "\F18A";
 }
 
 .zmdi-layers-off:before {
-  content: "";
+  content: "\F18B";
 }
 
 .zmdi-layers:before {
-  content: "";
+  content: "\F18C";
 }
 
 .zmdi-library:before {
-  content: "";
+  content: "\F18D";
 }
 
 .zmdi-link:before {
-  content: "";
+  content: "\F18E";
 }
 
 .zmdi-lock-open:before {
-  content: "";
+  content: "\F18F";
 }
 
 .zmdi-lock-outline:before {
-  content: "";
+  content: "\F190";
 }
 
 .zmdi-lock:before {
-  content: "";
+  content: "\F191";
 }
 
 .zmdi-mail-reply-all:before {
-  content: "";
+  content: "\F192";
 }
 
 .zmdi-mail-reply:before {
-  content: "";
+  content: "\F193";
 }
 
 .zmdi-mail-send:before {
-  content: "";
+  content: "\F194";
 }
 
 .zmdi-mall:before {
-  content: "";
+  content: "\F195";
 }
 
 .zmdi-map:before {
-  content: "";
+  content: "\F196";
 }
 
 .zmdi-menu:before {
-  content: "";
+  content: "\F197";
 }
 
 .zmdi-money-box:before {
-  content: "";
+  content: "\F198";
 }
 
 .zmdi-money-off:before {
-  content: "";
+  content: "\F199";
 }
 
 .zmdi-money:before {
-  content: "";
+  content: "\F19A";
 }
 
 .zmdi-more-vert:before {
-  content: "";
+  content: "\F19B";
 }
 
 .zmdi-more:before {
-  content: "";
+  content: "\F19C";
 }
 
 .zmdi-movie-alt:before {
-  content: "";
+  content: "\F19D";
 }
 
 .zmdi-movie:before {
-  content: "";
+  content: "\F19E";
 }
 
 .zmdi-nature-people:before {
-  content: "";
+  content: "\F19F";
 }
 
 .zmdi-nature:before {
-  content: "";
+  content: "\F1A0";
 }
 
 .zmdi-navigation:before {
-  content: "";
+  content: "\F1A1";
 }
 
 .zmdi-open-in-browser:before {
-  content: "";
+  content: "\F1A2";
 }
 
 .zmdi-open-in-new:before {
-  content: "";
+  content: "\F1A3";
 }
 
 .zmdi-palette:before {
-  content: "";
+  content: "\F1A4";
 }
 
 .zmdi-parking:before {
-  content: "";
+  content: "\F1A5";
 }
 
 .zmdi-pin-account:before {
-  content: "";
+  content: "\F1A6";
 }
 
 .zmdi-pin-assistant:before {
-  content: "";
+  content: "\F1A7";
 }
 
 .zmdi-pin-drop:before {
-  content: "";
+  content: "\F1A8";
 }
 
 .zmdi-pin-help:before {
-  content: "";
+  content: "\F1A9";
 }
 
 .zmdi-pin-off:before {
-  content: "";
+  content: "\F1AA";
 }
 
 .zmdi-pin:before {
-  content: "";
+  content: "\F1AB";
 }
 
 .zmdi-pizza:before {
-  content: "";
+  content: "\F1AC";
 }
 
 .zmdi-plaster:before {
-  content: "";
+  content: "\F1AD";
 }
 
 .zmdi-power-setting:before {
-  content: "";
+  content: "\F1AE";
 }
 
 .zmdi-power:before {
-  content: "";
+  content: "\F1AF";
 }
 
 .zmdi-print:before {
-  content: "";
+  content: "\F1B0";
 }
 
 .zmdi-puzzle-piece:before {
-  content: "";
+  content: "\F1B1";
 }
 
 .zmdi-quote:before {
-  content: "";
+  content: "\F1B2";
 }
 
 .zmdi-railway:before {
-  content: "";
+  content: "\F1B3";
 }
 
 .zmdi-receipt:before {
-  content: "";
+  content: "\F1B4";
 }
 
 .zmdi-refresh-alt:before {
-  content: "";
+  content: "\F1B5";
 }
 
 .zmdi-refresh-sync-alert:before {
-  content: "";
+  content: "\F1B6";
 }
 
 .zmdi-refresh-sync-off:before {
-  content: "";
+  content: "\F1B7";
 }
 
 .zmdi-refresh-sync:before {
-  content: "";
+  content: "\F1B8";
 }
 
 .zmdi-refresh:before {
-  content: "";
+  content: "\F1B9";
 }
 
 .zmdi-roller:before {
-  content: "";
+  content: "\F1BA";
 }
 
 .zmdi-ruler:before {
-  content: "";
+  content: "\F1BB";
 }
 
 .zmdi-scissors:before {
-  content: "";
+  content: "\F1BC";
 }
 
 .zmdi-screen-rotation-lock:before {
-  content: "";
+  content: "\F1BD";
 }
 
 .zmdi-screen-rotation:before {
-  content: "";
+  content: "\F1BE";
 }
 
 .zmdi-search-for:before {
-  content: "";
+  content: "\F1BF";
 }
 
 .zmdi-search-in-file:before {
-  content: "";
+  content: "\F1C0";
 }
 
 .zmdi-search-in-page:before {
-  content: "";
+  content: "\F1C1";
 }
 
 .zmdi-search-replace:before {
-  content: "";
+  content: "\F1C2";
 }
 
 .zmdi-search:before {
-  content: "";
+  content: "\F1C3";
 }
 
 .zmdi-seat:before {
-  content: "";
+  content: "\F1C4";
 }
 
 .zmdi-settings-square:before {
-  content: "";
+  content: "\F1C5";
 }
 
 .zmdi-settings:before {
-  content: "";
+  content: "\F1C6";
 }
 
 .zmdi-shield-check:before {
-  content: "";
+  content: "\F1C7";
 }
 
 .zmdi-shield-security:before {
-  content: "";
+  content: "\F1C8";
 }
 
 .zmdi-shopping-basket:before {
-  content: "";
+  content: "\F1C9";
 }
 
 .zmdi-shopping-cart-plus:before {
-  content: "";
+  content: "\F1CA";
 }
 
 .zmdi-shopping-cart:before {
-  content: "";
+  content: "\F1CB";
 }
 
 .zmdi-sign-in:before {
-  content: "";
+  content: "\F1CC";
 }
 
 .zmdi-sort-amount-asc:before {
-  content: "";
+  content: "\F1CD";
 }
 
 .zmdi-sort-amount-desc:before {
-  content: "";
+  content: "\F1CE";
 }
 
 .zmdi-sort-asc:before {
-  content: "";
+  content: "\F1CF";
 }
 
 .zmdi-sort-desc:before {
-  content: "";
+  content: "\F1D0";
 }
 
 .zmdi-spellcheck:before {
-  content: "";
+  content: "\F1D1";
 }
 
 .zmdi-storage:before {
-  content: "";
+  content: "\F1D2";
 }
 
 .zmdi-store-24:before {
-  content: "";
+  content: "\F1D3";
 }
 
 .zmdi-store:before {
-  content: "";
+  content: "\F1D4";
 }
 
 .zmdi-subway:before {
-  content: "";
+  content: "\F1D5";
 }
 
 .zmdi-sun:before {
-  content: "";
+  content: "\F1D6";
 }
 
 .zmdi-tab-unselected:before {
-  content: "";
+  content: "\F1D7";
 }
 
 .zmdi-tab:before {
-  content: "";
+  content: "\F1D8";
 }
 
 .zmdi-tag-close:before {
-  content: "";
+  content: "\F1D9";
 }
 
 .zmdi-tag-more:before {
-  content: "";
+  content: "\F1DA";
 }
 
 .zmdi-tag:before {
-  content: "";
+  content: "\F1DB";
 }
 
 .zmdi-thumb-down:before {
-  content: "";
+  content: "\F1DC";
 }
 
 .zmdi-thumb-up-down:before {
-  content: "";
+  content: "\F1DD";
 }
 
 .zmdi-thumb-up:before {
-  content: "";
+  content: "\F1DE";
 }
 
 .zmdi-ticket-star:before {
-  content: "";
+  content: "\F1DF";
 }
 
 .zmdi-toll:before {
-  content: "";
+  content: "\F1E0";
 }
 
 .zmdi-toys:before {
-  content: "";
+  content: "\F1E1";
 }
 
 .zmdi-traffic:before {
-  content: "";
+  content: "\F1E2";
 }
 
 .zmdi-translate:before {
-  content: "";
+  content: "\F1E3";
 }
 
 .zmdi-triangle-down:before {
-  content: "";
+  content: "\F1E4";
 }
 
 .zmdi-triangle-up:before {
-  content: "";
+  content: "\F1E5";
 }
 
 .zmdi-truck:before {
-  content: "";
+  content: "\F1E6";
 }
 
 .zmdi-turning-sign:before {
-  content: "";
+  content: "\F1E7";
 }
 
 .zmdi-wallpaper:before {
-  content: "";
+  content: "\F1E8";
 }
 
 .zmdi-washing-machine:before {
-  content: "";
+  content: "\F1E9";
 }
 
 .zmdi-window-maximize:before {
-  content: "";
+  content: "\F1EA";
 }
 
 .zmdi-window-minimize:before {
-  content: "";
+  content: "\F1EB";
 }
 
 .zmdi-window-restore:before {
-  content: "";
+  content: "\F1EC";
 }
 
 .zmdi-wrench:before {
-  content: "";
+  content: "\F1ED";
 }
 
 .zmdi-zoom-in:before {
-  content: "";
+  content: "\F1EE";
 }
 
 .zmdi-zoom-out:before {
-  content: "";
+  content: "\F1EF";
 }
 
 .zmdi-alert-circle-o:before {
-  content: "";
+  content: "\F1F0";
 }
 
 .zmdi-alert-circle:before {
-  content: "";
+  content: "\F1F1";
 }
 
 .zmdi-alert-octagon:before {
-  content: "";
+  content: "\F1F2";
 }
 
 .zmdi-alert-polygon:before {
-  content: "";
+  content: "\F1F3";
 }
 
 .zmdi-alert-triangle:before {
-  content: "";
+  content: "\F1F4";
 }
 
 .zmdi-help-outline:before {
-  content: "";
+  content: "\F1F5";
 }
 
 .zmdi-help:before {
-  content: "";
+  content: "\F1F6";
 }
 
 .zmdi-info-outline:before {
-  content: "";
+  content: "\F1F7";
 }
 
 .zmdi-info:before {
-  content: "";
+  content: "\F1F8";
 }
 
 .zmdi-notifications-active:before {
-  content: "";
+  content: "\F1F9";
 }
 
 .zmdi-notifications-add:before {
-  content: "";
+  content: "\F1FA";
 }
 
 .zmdi-notifications-none:before {
-  content: "";
+  content: "\F1FB";
 }
 
 .zmdi-notifications-off:before {
-  content: "";
+  content: "\F1FC";
 }
 
 .zmdi-notifications-paused:before {
-  content: "";
+  content: "\F1FD";
 }
 
 .zmdi-notifications:before {
-  content: "";
+  content: "\F1FE";
 }
 
 .zmdi-account-add:before {
-  content: "";
+  content: "\F1FF";
 }
 
 .zmdi-account-box-mail:before {
-  content: "";
+  content: "\F200";
 }
 
 .zmdi-account-box-o:before {
-  content: "";
+  content: "\F201";
 }
 
 .zmdi-account-box-phone:before {
-  content: "";
+  content: "\F202";
 }
 
 .zmdi-account-box:before {
-  content: "";
+  content: "\F203";
 }
 
 .zmdi-account-calendar:before {
-  content: "";
+  content: "\F204";
 }
 
 .zmdi-account-circle:before {
-  content: "";
+  content: "\F205";
 }
 
 .zmdi-account-o:before {
-  content: "";
+  content: "\F206";
 }
 
 .zmdi-account:before {
-  content: "";
+  content: "\F207";
 }
 
 .zmdi-accounts-add:before {
-  content: "";
+  content: "\F208";
 }
 
 .zmdi-accounts-alt:before {
-  content: "";
+  content: "\F209";
 }
 
 .zmdi-accounts-list-alt:before {
-  content: "";
+  content: "\F20A";
 }
 
 .zmdi-accounts-list:before {
-  content: "";
+  content: "\F20B";
 }
 
 .zmdi-accounts-outline:before {
-  content: "";
+  content: "\F20C";
 }
 
 .zmdi-accounts:before {
-  content: "";
+  content: "\F20D";
 }
 
 .zmdi-face:before {
-  content: "";
+  content: "\F20E";
 }
 
 .zmdi-female:before {
-  content: "";
+  content: "\F20F";
 }
 
 .zmdi-male-alt:before {
-  content: "";
+  content: "\F210";
 }
 
 .zmdi-male-female:before {
-  content: "";
+  content: "\F211";
 }
 
 .zmdi-male:before {
-  content: "";
+  content: "\F212";
 }
 
 .zmdi-mood-bad:before {
-  content: "";
+  content: "\F213";
 }
 
 .zmdi-mood:before {
-  content: "";
+  content: "\F214";
 }
 
 .zmdi-run:before {
-  content: "";
+  content: "\F215";
 }
 
 .zmdi-walk:before {
-  content: "";
+  content: "\F216";
 }
 
 .zmdi-cloud-box:before {
-  content: "";
+  content: "\F217";
 }
 
 .zmdi-cloud-circle:before {
-  content: "";
+  content: "\F218";
 }
 
 .zmdi-cloud-done:before {
-  content: "";
+  content: "\F219";
 }
 
 .zmdi-cloud-download:before {
-  content: "";
+  content: "\F21A";
 }
 
 .zmdi-cloud-off:before {
-  content: "";
+  content: "\F21B";
 }
 
 .zmdi-cloud-outline-alt:before {
-  content: "";
+  content: "\F21C";
 }
 
 .zmdi-cloud-outline:before {
-  content: "";
+  content: "\F21D";
 }
 
 .zmdi-cloud-upload:before {
-  content: "";
+  content: "\F21E";
 }
 
 .zmdi-cloud:before {
-  content: "";
+  content: "\F21F";
 }
 
 .zmdi-download:before {
-  content: "";
+  content: "\F220";
 }
 
 .zmdi-file-plus:before {
-  content: "";
+  content: "\F221";
 }
 
 .zmdi-file-text:before {
-  content: "";
+  content: "\F222";
 }
 
 .zmdi-file:before {
-  content: "";
+  content: "\F223";
 }
 
 .zmdi-folder-outline:before {
-  content: "";
+  content: "\F224";
 }
 
 .zmdi-folder-person:before {
-  content: "";
+  content: "\F225";
 }
 
 .zmdi-folder-star-alt:before {
-  content: "";
+  content: "\F226";
 }
 
 .zmdi-folder-star:before {
-  content: "";
+  content: "\F227";
 }
 
 .zmdi-folder:before {
-  content: "";
+  content: "\F228";
 }
 
 .zmdi-gif:before {
-  content: "";
+  content: "\F229";
 }
 
 .zmdi-upload:before {
-  content: "";
+  content: "\F22A";
 }
 
 .zmdi-border-all:before {
-  content: "";
+  content: "\F22B";
 }
 
 .zmdi-border-bottom:before {
-  content: "";
+  content: "\F22C";
 }
 
 .zmdi-border-clear:before {
-  content: "";
+  content: "\F22D";
 }
 
 .zmdi-border-color:before {
-  content: "";
+  content: "\F22E";
 }
 
 .zmdi-border-horizontal:before {
-  content: "";
+  content: "\F22F";
 }
 
 .zmdi-border-inner:before {
-  content: "";
+  content: "\F230";
 }
 
 .zmdi-border-left:before {
-  content: "";
+  content: "\F231";
 }
 
 .zmdi-border-outer:before {
-  content: "";
+  content: "\F232";
 }
 
 .zmdi-border-right:before {
-  content: "";
+  content: "\F233";
 }
 
 .zmdi-border-style:before {
-  content: "";
+  content: "\F234";
 }
 
 .zmdi-border-top:before {
-  content: "";
+  content: "\F235";
 }
 
 .zmdi-border-vertical:before {
-  content: "";
+  content: "\F236";
 }
 
 .zmdi-copy:before {
-  content: "";
+  content: "\F237";
 }
 
 .zmdi-crop:before {
-  content: "";
+  content: "\F238";
 }
 
 .zmdi-format-align-center:before {
-  content: "";
+  content: "\F239";
 }
 
 .zmdi-format-align-justify:before {
-  content: "";
+  content: "\F23A";
 }
 
 .zmdi-format-align-left:before {
-  content: "";
+  content: "\F23B";
 }
 
 .zmdi-format-align-right:before {
-  content: "";
+  content: "\F23C";
 }
 
 .zmdi-format-bold:before {
-  content: "";
+  content: "\F23D";
 }
 
 .zmdi-format-clear-all:before {
-  content: "";
+  content: "\F23E";
 }
 
 .zmdi-format-clear:before {
-  content: "";
+  content: "\F23F";
 }
 
 .zmdi-format-color-fill:before {
-  content: "";
+  content: "\F240";
 }
 
 .zmdi-format-color-reset:before {
-  content: "";
+  content: "\F241";
 }
 
 .zmdi-format-color-text:before {
-  content: "";
+  content: "\F242";
 }
 
 .zmdi-format-indent-decrease:before {
-  content: "";
+  content: "\F243";
 }
 
 .zmdi-format-indent-increase:before {
-  content: "";
+  content: "\F244";
 }
 
 .zmdi-format-italic:before {
-  content: "";
+  content: "\F245";
 }
 
 .zmdi-format-line-spacing:before {
-  content: "";
+  content: "\F246";
 }
 
 .zmdi-format-list-bulleted:before {
-  content: "";
+  content: "\F247";
 }
 
 .zmdi-format-list-numbered:before {
-  content: "";
+  content: "\F248";
 }
 
 .zmdi-format-ltr:before {
-  content: "";
+  content: "\F249";
 }
 
 .zmdi-format-rtl:before {
-  content: "";
+  content: "\F24A";
 }
 
 .zmdi-format-size:before {
-  content: "";
+  content: "\F24B";
 }
 
 .zmdi-format-strikethrough-s:before {
-  content: "";
+  content: "\F24C";
 }
 
 .zmdi-format-strikethrough:before {
-  content: "";
+  content: "\F24D";
 }
 
 .zmdi-format-subject:before {
-  content: "";
+  content: "\F24E";
 }
 
 .zmdi-format-underlined:before {
-  content: "";
+  content: "\F24F";
 }
 
 .zmdi-format-valign-bottom:before {
-  content: "";
+  content: "\F250";
 }
 
 .zmdi-format-valign-center:before {
-  content: "";
+  content: "\F251";
 }
 
 .zmdi-format-valign-top:before {
-  content: "";
+  content: "\F252";
 }
 
 .zmdi-redo:before {
-  content: "";
+  content: "\F253";
 }
 
 .zmdi-select-all:before {
-  content: "";
+  content: "\F254";
 }
 
 .zmdi-space-bar:before {
-  content: "";
+  content: "\F255";
 }
 
 .zmdi-text-format:before {
-  content: "";
+  content: "\F256";
 }
 
 .zmdi-transform:before {
-  content: "";
+  content: "\F257";
 }
 
 .zmdi-undo:before {
-  content: "";
+  content: "\F258";
 }
 
 .zmdi-wrap-text:before {
-  content: "";
+  content: "\F259";
 }
 
 .zmdi-comment-alert:before {
-  content: "";
+  content: "\F25A";
 }
 
 .zmdi-comment-alt-text:before {
-  content: "";
+  content: "\F25B";
 }
 
 .zmdi-comment-alt:before {
-  content: "";
+  content: "\F25C";
 }
 
 .zmdi-comment-edit:before {
-  content: "";
+  content: "\F25D";
 }
 
 .zmdi-comment-image:before {
-  content: "";
+  content: "\F25E";
 }
 
 .zmdi-comment-list:before {
-  content: "";
+  content: "\F25F";
 }
 
 .zmdi-comment-more:before {
-  content: "";
+  content: "\F260";
 }
 
 .zmdi-comment-outline:before {
-  content: "";
+  content: "\F261";
 }
 
 .zmdi-comment-text-alt:before {
-  content: "";
+  content: "\F262";
 }
 
 .zmdi-comment-text:before {
-  content: "";
+  content: "\F263";
 }
 
 .zmdi-comment-video:before {
-  content: "";
+  content: "\F264";
 }
 
 .zmdi-comment:before {
-  content: "";
+  content: "\F265";
 }
 
 .zmdi-comments:before {
-  content: "";
+  content: "\F266";
 }
 
 .zmdi-check-all:before {
-  content: "";
+  content: "\F267";
 }
 
 .zmdi-check-circle-u:before {
-  content: "";
+  content: "\F268";
 }
 
 .zmdi-check-circle:before {
-  content: "";
+  content: "\F269";
 }
 
 .zmdi-check-square:before {
-  content: "";
+  content: "\F26A";
 }
 
 .zmdi-check:before {
-  content: "";
+  content: "\F26B";
 }
 
 .zmdi-circle-o:before {
-  content: "";
+  content: "\F26C";
 }
 
 .zmdi-circle:before {
-  content: "";
+  content: "\F26D";
 }
 
 .zmdi-dot-circle-alt:before {
-  content: "";
+  content: "\F26E";
 }
 
 .zmdi-dot-circle:before {
-  content: "";
+  content: "\F26F";
 }
 
 .zmdi-minus-circle-outline:before {
-  content: "";
+  content: "\F270";
 }
 
 .zmdi-minus-circle:before {
-  content: "";
+  content: "\F271";
 }
 
 .zmdi-minus-square:before {
-  content: "";
+  content: "\F272";
 }
 
 .zmdi-minus:before {
-  content: "";
+  content: "\F273";
 }
 
 .zmdi-plus-circle-o-duplicate:before {
-  content: "";
+  content: "\F274";
 }
 
 .zmdi-plus-circle-o:before {
-  content: "";
+  content: "\F275";
 }
 
 .zmdi-plus-circle:before {
-  content: "";
+  content: "\F276";
 }
 
 .zmdi-plus-square:before {
-  content: "";
+  content: "\F277";
 }
 
 .zmdi-plus:before {
-  content: "";
+  content: "\F278";
 }
 
 .zmdi-square-o:before {
-  content: "";
+  content: "\F279";
 }
 
 .zmdi-star-circle:before {
-  content: "";
+  content: "\F27A";
 }
 
 .zmdi-star-half:before {
-  content: "";
+  content: "\F27B";
 }
 
 .zmdi-star-outline:before {
-  content: "";
+  content: "\F27C";
 }
 
 .zmdi-star:before {
-  content: "";
+  content: "\F27D";
 }
 
 .zmdi-bluetooth-connected:before {
-  content: "";
+  content: "\F27E";
 }
 
 .zmdi-bluetooth-off:before {
-  content: "";
+  content: "\F27F";
 }
 
 .zmdi-bluetooth-search:before {
-  content: "";
+  content: "\F280";
 }
 
 .zmdi-bluetooth-setting:before {
-  content: "";
+  content: "\F281";
 }
 
 .zmdi-bluetooth:before {
-  content: "";
+  content: "\F282";
 }
 
 .zmdi-camera-add:before {
-  content: "";
+  content: "\F283";
 }
 
 .zmdi-camera-alt:before {
-  content: "";
+  content: "\F284";
 }
 
 .zmdi-camera-bw:before {
-  content: "";
+  content: "\F285";
 }
 
 .zmdi-camera-front:before {
-  content: "";
+  content: "\F286";
 }
 
 .zmdi-camera-mic:before {
-  content: "";
+  content: "\F287";
 }
 
 .zmdi-camera-party-mode:before {
-  content: "";
+  content: "\F288";
 }
 
 .zmdi-camera-rear:before {
-  content: "";
+  content: "\F289";
 }
 
 .zmdi-camera-roll:before {
-  content: "";
+  content: "\F28A";
 }
 
 .zmdi-camera-switch:before {
-  content: "";
+  content: "\F28B";
 }
 
 .zmdi-camera:before {
-  content: "";
+  content: "\F28C";
 }
 
 .zmdi-card-alert:before {
-  content: "";
+  content: "\F28D";
 }
 
 .zmdi-card-off:before {
-  content: "";
+  content: "\F28E";
 }
 
 .zmdi-card-sd:before {
-  content: "";
+  content: "\F28F";
 }
 
 .zmdi-card-sim:before {
-  content: "";
+  content: "\F290";
 }
 
 .zmdi-desktop-mac:before {
-  content: "";
+  content: "\F291";
 }
 
 .zmdi-desktop-windows:before {
-  content: "";
+  content: "\F292";
 }
 
 .zmdi-device-hub:before {
-  content: "";
+  content: "\F293";
 }
 
 .zmdi-devices-off:before {
-  content: "";
+  content: "\F294";
 }
 
 .zmdi-devices:before {
-  content: "";
+  content: "\F295";
 }
 
 .zmdi-dock:before {
-  content: "";
+  content: "\F296";
 }
 
 .zmdi-floppy:before {
-  content: "";
+  content: "\F297";
 }
 
 .zmdi-gamepad:before {
-  content: "";
+  content: "\F298";
 }
 
 .zmdi-gps-dot:before {
-  content: "";
+  content: "\F299";
 }
 
 .zmdi-gps-off:before {
-  content: "";
+  content: "\F29A";
 }
 
 .zmdi-gps:before {
-  content: "";
+  content: "\F29B";
 }
 
 .zmdi-headset-mic:before {
-  content: "";
+  content: "\F29C";
 }
 
 .zmdi-headset:before {
-  content: "";
+  content: "\F29D";
 }
 
 .zmdi-input-antenna:before {
-  content: "";
+  content: "\F29E";
 }
 
 .zmdi-input-composite:before {
-  content: "";
+  content: "\F29F";
 }
 
 .zmdi-input-hdmi:before {
-  content: "";
+  content: "\F2A0";
 }
 
 .zmdi-input-power:before {
-  content: "";
+  content: "\F2A1";
 }
 
 .zmdi-input-svideo:before {
-  content: "";
+  content: "\F2A2";
 }
 
 .zmdi-keyboard-hide:before {
-  content: "";
+  content: "\F2A3";
 }
 
 .zmdi-keyboard:before {
-  content: "";
+  content: "\F2A4";
 }
 
 .zmdi-laptop-chromebook:before {
-  content: "";
+  content: "\F2A5";
 }
 
 .zmdi-laptop-mac:before {
-  content: "";
+  content: "\F2A6";
 }
 
 .zmdi-laptop:before {
-  content: "";
+  content: "\F2A7";
 }
 
 .zmdi-mic-off:before {
-  content: "";
+  content: "\F2A8";
 }
 
 .zmdi-mic-outline:before {
-  content: "";
+  content: "\F2A9";
 }
 
 .zmdi-mic-setting:before {
-  content: "";
+  content: "\F2AA";
 }
 
 .zmdi-mic:before {
-  content: "";
+  content: "\F2AB";
 }
 
 .zmdi-mouse:before {
-  content: "";
+  content: "\F2AC";
 }
 
 .zmdi-network-alert:before {
-  content: "";
+  content: "\F2AD";
 }
 
 .zmdi-network-locked:before {
-  content: "";
+  content: "\F2AE";
 }
 
 .zmdi-network-off:before {
-  content: "";
+  content: "\F2AF";
 }
 
 .zmdi-network-outline:before {
-  content: "";
+  content: "\F2B0";
 }
 
 .zmdi-network-setting:before {
-  content: "";
+  content: "\F2B1";
 }
 
 .zmdi-network:before {
-  content: "";
+  content: "\F2B2";
 }
 
 .zmdi-phone-bluetooth:before {
-  content: "";
+  content: "\F2B3";
 }
 
 .zmdi-phone-end:before {
-  content: "";
+  content: "\F2B4";
 }
 
 .zmdi-phone-forwarded:before {
-  content: "";
+  content: "\F2B5";
 }
 
 .zmdi-phone-in-talk:before {
-  content: "";
+  content: "\F2B6";
 }
 
 .zmdi-phone-locked:before {
-  content: "";
+  content: "\F2B7";
 }
 
 .zmdi-phone-missed:before {
-  content: "";
+  content: "\F2B8";
 }
 
 .zmdi-phone-msg:before {
-  content: "";
+  content: "\F2B9";
 }
 
 .zmdi-phone-paused:before {
-  content: "";
+  content: "\F2BA";
 }
 
 .zmdi-phone-ring:before {
-  content: "";
+  content: "\F2BB";
 }
 
 .zmdi-phone-setting:before {
-  content: "";
+  content: "\F2BC";
 }
 
 .zmdi-phone-sip:before {
-  content: "";
+  content: "\F2BD";
 }
 
 .zmdi-phone:before {
-  content: "";
+  content: "\F2BE";
 }
 
 .zmdi-portable-wifi-changes:before {
-  content: "";
+  content: "\F2BF";
 }
 
 .zmdi-portable-wifi-off:before {
-  content: "";
+  content: "\F2C0";
 }
 
 .zmdi-portable-wifi:before {
-  content: "";
+  content: "\F2C1";
 }
 
 .zmdi-radio:before {
-  content: "";
+  content: "\F2C2";
 }
 
 .zmdi-reader:before {
-  content: "";
+  content: "\F2C3";
 }
 
 .zmdi-remote-control-alt:before {
-  content: "";
+  content: "\F2C4";
 }
 
 .zmdi-remote-control:before {
-  content: "";
+  content: "\F2C5";
 }
 
 .zmdi-router:before {
-  content: "";
+  content: "\F2C6";
 }
 
 .zmdi-scanner:before {
-  content: "";
+  content: "\F2C7";
 }
 
 .zmdi-smartphone-android:before {
-  content: "";
+  content: "\F2C8";
 }
 
 .zmdi-smartphone-download:before {
-  content: "";
+  content: "\F2C9";
 }
 
 .zmdi-smartphone-erase:before {
-  content: "";
+  content: "\F2CA";
 }
 
 .zmdi-smartphone-info:before {
-  content: "";
+  content: "\F2CB";
 }
 
 .zmdi-smartphone-iphone:before {
-  content: "";
+  content: "\F2CC";
 }
 
 .zmdi-smartphone-landscape-lock:before {
-  content: "";
+  content: "\F2CD";
 }
 
 .zmdi-smartphone-landscape:before {
-  content: "";
+  content: "\F2CE";
 }
 
 .zmdi-smartphone-lock:before {
-  content: "";
+  content: "\F2CF";
 }
 
 .zmdi-smartphone-portrait-lock:before {
-  content: "";
+  content: "\F2D0";
 }
 
 .zmdi-smartphone-ring:before {
-  content: "";
+  content: "\F2D1";
 }
 
 .zmdi-smartphone-setting:before {
-  content: "";
+  content: "\F2D2";
 }
 
 .zmdi-smartphone-setup:before {
-  content: "";
+  content: "\F2D3";
 }
 
 .zmdi-smartphone:before {
-  content: "";
+  content: "\F2D4";
 }
 
 .zmdi-speaker:before {
-  content: "";
+  content: "\F2D5";
 }
 
 .zmdi-tablet-android:before {
-  content: "";
+  content: "\F2D6";
 }
 
 .zmdi-tablet-mac:before {
-  content: "";
+  content: "\F2D7";
 }
 
 .zmdi-tablet:before {
-  content: "";
+  content: "\F2D8";
 }
 
 .zmdi-tv-alt-play:before {
-  content: "";
+  content: "\F2D9";
 }
 
 .zmdi-tv-list:before {
-  content: "";
+  content: "\F2DA";
 }
 
 .zmdi-tv-play:before {
-  content: "";
+  content: "\F2DB";
 }
 
 .zmdi-tv:before {
-  content: "";
+  content: "\F2DC";
 }
 
 .zmdi-usb:before {
-  content: "";
+  content: "\F2DD";
 }
 
 .zmdi-videocam-off:before {
-  content: "";
+  content: "\F2DE";
 }
 
 .zmdi-videocam-switch:before {
-  content: "";
+  content: "\F2DF";
 }
 
 .zmdi-videocam:before {
-  content: "";
+  content: "\F2E0";
 }
 
 .zmdi-watch:before {
-  content: "";
+  content: "\F2E1";
 }
 
 .zmdi-wifi-alt-2:before {
-  content: "";
+  content: "\F2E2";
 }
 
 .zmdi-wifi-alt:before {
-  content: "";
+  content: "\F2E3";
 }
 
 .zmdi-wifi-info:before {
-  content: "";
+  content: "\F2E4";
 }
 
 .zmdi-wifi-lock:before {
-  content: "";
+  content: "\F2E5";
 }
 
 .zmdi-wifi-off:before {
-  content: "";
+  content: "\F2E6";
 }
 
 .zmdi-wifi-outline:before {
-  content: "";
+  content: "\F2E7";
 }
 
 .zmdi-wifi:before {
-  content: "";
+  content: "\F2E8";
 }
 
 .zmdi-arrow-left-bottom:before {
-  content: "";
+  content: "\F2E9";
 }
 
 .zmdi-arrow-left:before {
-  content: "";
+  content: "\F2EA";
 }
 
 .zmdi-arrow-merge:before {
-  content: "";
+  content: "\F2EB";
 }
 
 .zmdi-arrow-missed:before {
-  content: "";
+  content: "\F2EC";
 }
 
 .zmdi-arrow-right-top:before {
-  content: "";
+  content: "\F2ED";
 }
 
 .zmdi-arrow-right:before {
-  content: "";
+  content: "\F2EE";
 }
 
 .zmdi-arrow-split:before {
-  content: "";
+  content: "\F2EF";
 }
 
 .zmdi-arrows:before {
-  content: "";
+  content: "\F2F0";
 }
 
 .zmdi-caret-down-circle:before {
-  content: "";
+  content: "\F2F1";
 }
 
 .zmdi-caret-down:before {
-  content: "";
+  content: "\F2F2";
 }
 
 .zmdi-caret-left-circle:before {
-  content: "";
+  content: "\F2F3";
 }
 
 .zmdi-caret-left:before {
-  content: "";
+  content: "\F2F4";
 }
 
 .zmdi-caret-right-circle:before {
-  content: "";
+  content: "\F2F5";
 }
 
 .zmdi-caret-right:before {
-  content: "";
+  content: "\F2F6";
 }
 
 .zmdi-caret-up-circle:before {
-  content: "";
+  content: "\F2F7";
 }
 
 .zmdi-caret-up:before {
-  content: "";
+  content: "\F2F8";
 }
 
 .zmdi-chevron-down:before {
-  content: "";
+  content: "\F2F9";
 }
 
 .zmdi-chevron-left:before {
-  content: "";
+  content: "\F2FA";
 }
 
 .zmdi-chevron-right:before {
-  content: "";
+  content: "\F2FB";
 }
 
 .zmdi-chevron-up:before {
-  content: "";
+  content: "\F2FC";
 }
 
 .zmdi-forward:before {
-  content: "";
+  content: "\F2FD";
 }
 
 .zmdi-long-arrow-down:before {
-  content: "";
+  content: "\F2FE";
 }
 
 .zmdi-long-arrow-left:before {
-  content: "";
+  content: "\F2FF";
 }
 
 .zmdi-long-arrow-return:before {
-  content: "";
+  content: "\F300";
 }
 
 .zmdi-long-arrow-right:before {
-  content: "";
+  content: "\F301";
 }
 
 .zmdi-long-arrow-tab:before {
-  content: "";
+  content: "\F302";
 }
 
 .zmdi-long-arrow-up:before {
-  content: "";
+  content: "\F303";
 }
 
 .zmdi-rotate-ccw:before {
-  content: "";
+  content: "\F304";
 }
 
 .zmdi-rotate-cw:before {
-  content: "";
+  content: "\F305";
 }
 
 .zmdi-rotate-left:before {
-  content: "";
+  content: "\F306";
 }
 
 .zmdi-rotate-right:before {
-  content: "";
+  content: "\F307";
 }
 
 .zmdi-square-down:before {
-  content: "";
+  content: "\F308";
 }
 
 .zmdi-square-right:before {
-  content: "";
+  content: "\F309";
 }
 
 .zmdi-swap-alt:before {
-  content: "";
+  content: "\F30A";
 }
 
 .zmdi-swap-vertical-circle:before {
-  content: "";
+  content: "\F30B";
 }
 
 .zmdi-swap-vertical:before {
-  content: "";
+  content: "\F30C";
 }
 
 .zmdi-swap:before {
-  content: "";
+  content: "\F30D";
 }
 
 .zmdi-trending-down:before {
-  content: "";
+  content: "\F30E";
 }
 
 .zmdi-trending-flat:before {
-  content: "";
+  content: "\F30F";
 }
 
 .zmdi-trending-up:before {
-  content: "";
+  content: "\F310";
 }
 
 .zmdi-unfold-less:before {
-  content: "";
+  content: "\F311";
 }
 
 .zmdi-unfold-more:before {
-  content: "";
+  content: "\F312";
 }
 
 .zmdi-apps:before {
-  content: "";
+  content: "\F313";
 }
 
 .zmdi-grid-off:before {
-  content: "";
+  content: "\F314";
 }
 
 .zmdi-grid:before {
-  content: "";
+  content: "\F315";
 }
 
 .zmdi-view-agenda:before {
-  content: "";
+  content: "\F316";
 }
 
 .zmdi-view-array:before {
-  content: "";
+  content: "\F317";
 }
 
 .zmdi-view-carousel:before {
-  content: "";
+  content: "\F318";
 }
 
 .zmdi-view-column:before {
-  content: "";
+  content: "\F319";
 }
 
 .zmdi-view-comfy:before {
-  content: "";
+  content: "\F31A";
 }
 
 .zmdi-view-compact:before {
-  content: "";
+  content: "\F31B";
 }
 
 .zmdi-view-dashboard:before {
-  content: "";
+  content: "\F31C";
 }
 
 .zmdi-view-day:before {
-  content: "";
+  content: "\F31D";
 }
 
 .zmdi-view-headline:before {
-  content: "";
+  content: "\F31E";
 }
 
 .zmdi-view-list-alt:before {
-  content: "";
+  content: "\F31F";
 }
 
 .zmdi-view-list:before {
-  content: "";
+  content: "\F320";
 }
 
 .zmdi-view-module:before {
-  content: "";
+  content: "\F321";
 }
 
 .zmdi-view-quilt:before {
-  content: "";
+  content: "\F322";
 }
 
 .zmdi-view-stream:before {
-  content: "";
+  content: "\F323";
 }
 
 .zmdi-view-subtitles:before {
-  content: "";
+  content: "\F324";
 }
 
 .zmdi-view-toc:before {
-  content: "";
+  content: "\F325";
 }
 
 .zmdi-view-web:before {
-  content: "";
+  content: "\F326";
 }
 
 .zmdi-view-week:before {
-  content: "";
+  content: "\F327";
 }
 
 .zmdi-widgets:before {
-  content: "";
+  content: "\F328";
 }
 
 .zmdi-alarm-check:before {
-  content: "";
+  content: "\F329";
 }
 
 .zmdi-alarm-off:before {
-  content: "";
+  content: "\F32A";
 }
 
 .zmdi-alarm-plus:before {
-  content: "";
+  content: "\F32B";
 }
 
 .zmdi-alarm-snooze:before {
-  content: "";
+  content: "\F32C";
 }
 
 .zmdi-alarm:before {
-  content: "";
+  content: "\F32D";
 }
 
 .zmdi-calendar-alt:before {
-  content: "";
+  content: "\F32E";
 }
 
 .zmdi-calendar-check:before {
-  content: "";
+  content: "\F32F";
 }
 
 .zmdi-calendar-close:before {
-  content: "";
+  content: "\F330";
 }
 
 .zmdi-calendar-note:before {
-  content: "";
+  content: "\F331";
 }
 
 .zmdi-calendar:before {
-  content: "";
+  content: "\F332";
 }
 
 .zmdi-time-countdown:before {
-  content: "";
+  content: "\F333";
 }
 
 .zmdi-time-interval:before {
-  content: "";
+  content: "\F334";
 }
 
 .zmdi-time-restore-setting:before {
-  content: "";
+  content: "\F335";
 }
 
 .zmdi-time-restore:before {
-  content: "";
+  content: "\F336";
 }
 
 .zmdi-time:before {
-  content: "";
+  content: "\F337";
 }
 
 .zmdi-timer-off:before {
-  content: "";
+  content: "\F338";
 }
 
 .zmdi-timer:before {
-  content: "";
+  content: "\F339";
 }
 
 .zmdi-android-alt:before {
-  content: "";
+  content: "\F33A";
 }
 
 .zmdi-android:before {
-  content: "";
+  content: "\F33B";
 }
 
 .zmdi-apple:before {
-  content: "";
+  content: "\F33C";
 }
 
 .zmdi-behance:before {
-  content: "";
+  content: "\F33D";
 }
 
 .zmdi-codepen:before {
-  content: "";
+  content: "\F33E";
 }
 
 .zmdi-dribbble:before {
-  content: "";
+  content: "\F33F";
 }
 
 .zmdi-dropbox:before {
-  content: "";
+  content: "\F340";
 }
 
 .zmdi-evernote:before {
-  content: "";
+  content: "\F341";
 }
 
 .zmdi-facebook-box:before {
-  content: "";
+  content: "\F342";
 }
 
 .zmdi-facebook:before {
-  content: "";
+  content: "\F343";
 }
 
 .zmdi-github-box:before {
-  content: "";
+  content: "\F344";
 }
 
 .zmdi-github:before {
-  content: "";
+  content: "\F345";
 }
 
 .zmdi-google-drive:before {
-  content: "";
+  content: "\F346";
 }
 
 .zmdi-google-earth:before {
-  content: "";
+  content: "\F347";
 }
 
 .zmdi-google-glass:before {
-  content: "";
+  content: "\F348";
 }
 
 .zmdi-google-maps:before {
-  content: "";
+  content: "\F349";
 }
 
 .zmdi-google-pages:before {
-  content: "";
+  content: "\F34A";
 }
 
 .zmdi-google-play:before {
-  content: "";
+  content: "\F34B";
 }
 
 .zmdi-google-plus-box:before {
-  content: "";
+  content: "\F34C";
 }
 
 .zmdi-google-plus:before {
-  content: "";
+  content: "\F34D";
 }
 
 .zmdi-google:before {
-  content: "";
+  content: "\F34E";
 }
 
 .zmdi-instagram:before {
-  content: "";
+  content: "\F34F";
 }
 
 .zmdi-language-css3:before {
-  content: "";
+  content: "\F350";
 }
 
 .zmdi-language-html5:before {
-  content: "";
+  content: "\F351";
 }
 
 .zmdi-language-javascript:before {
-  content: "";
+  content: "\F352";
 }
 
 .zmdi-language-python-alt:before {
-  content: "";
+  content: "\F353";
 }
 
 .zmdi-language-python:before {
-  content: "";
+  content: "\F354";
 }
 
 .zmdi-lastfm:before {
-  content: "";
+  content: "\F355";
 }
 
 .zmdi-linkedin-box:before {
-  content: "";
+  content: "\F356";
 }
 
 .zmdi-paypal:before {
-  content: "";
+  content: "\F357";
 }
 
 .zmdi-pinterest-box:before {
-  content: "";
+  content: "\F358";
 }
 
 .zmdi-pocket:before {
-  content: "";
+  content: "\F359";
 }
 
 .zmdi-polymer:before {
-  content: "";
+  content: "\F35A";
 }
 
 .zmdi-share:before {
-  content: "";
+  content: "\F35B";
 }
 
 .zmdi-stackoverflow:before {
-  content: "";
+  content: "\F35C";
 }
 
 .zmdi-steam-square:before {
-  content: "";
+  content: "\F35D";
 }
 
 .zmdi-steam:before {
-  content: "";
+  content: "\F35E";
 }
 
 .zmdi-twitter-box:before {
-  content: "";
+  content: "\F35F";
 }
 
 .zmdi-twitter:before {
-  content: "";
+  content: "\F360";
 }
 
 .zmdi-vk:before {
-  content: "";
+  content: "\F361";
 }
 
 .zmdi-wikipedia:before {
-  content: "";
+  content: "\F362";
 }
 
 .zmdi-windows:before {
-  content: "";
+  content: "\F363";
 }
 
 .zmdi-aspect-ratio-alt:before {
-  content: "";
+  content: "\F364";
 }
 
 .zmdi-aspect-ratio:before {
-  content: "";
+  content: "\F365";
 }
 
 .zmdi-blur-circular:before {
-  content: "";
+  content: "\F366";
 }
 
 .zmdi-blur-linear:before {
-  content: "";
+  content: "\F367";
 }
 
 .zmdi-blur-off:before {
-  content: "";
+  content: "\F368";
 }
 
 .zmdi-blur:before {
-  content: "";
+  content: "\F369";
 }
 
 .zmdi-brightness-2:before {
-  content: "";
+  content: "\F36A";
 }
 
 .zmdi-brightness-3:before {
-  content: "";
+  content: "\F36B";
 }
 
 .zmdi-brightness-4:before {
-  content: "";
+  content: "\F36C";
 }
 
 .zmdi-brightness-5:before {
-  content: "";
+  content: "\F36D";
 }
 
 .zmdi-brightness-6:before {
-  content: "";
+  content: "\F36E";
 }
 
 .zmdi-brightness-7:before {
-  content: "";
+  content: "\F36F";
 }
 
 .zmdi-brightness-auto:before {
-  content: "";
+  content: "\F370";
 }
 
 .zmdi-brightness-setting:before {
-  content: "";
+  content: "\F371";
 }
 
 .zmdi-broken-image:before {
-  content: "";
+  content: "\F372";
 }
 
 .zmdi-center-focus-strong:before {
-  content: "";
+  content: "\F373";
 }
 
 .zmdi-center-focus-weak:before {
-  content: "";
+  content: "\F374";
 }
 
 .zmdi-compare:before {
-  content: "";
+  content: "\F375";
 }
 
 .zmdi-crop-16-9:before {
-  content: "";
+  content: "\F376";
 }
 
 .zmdi-crop-3-2:before {
-  content: "";
+  content: "\F377";
 }
 
 .zmdi-crop-5-4:before {
-  content: "";
+  content: "\F378";
 }
 
 .zmdi-crop-7-5:before {
-  content: "";
+  content: "\F379";
 }
 
 .zmdi-crop-din:before {
-  content: "";
+  content: "\F37A";
 }
 
 .zmdi-crop-free:before {
-  content: "";
+  content: "\F37B";
 }
 
 .zmdi-crop-landscape:before {
-  content: "";
+  content: "\F37C";
 }
 
 .zmdi-crop-portrait:before {
-  content: "";
+  content: "\F37D";
 }
 
 .zmdi-crop-square:before {
-  content: "";
+  content: "\F37E";
 }
 
 .zmdi-exposure-alt:before {
-  content: "";
+  content: "\F37F";
 }
 
 .zmdi-exposure:before {
-  content: "";
+  content: "\F380";
 }
 
 .zmdi-filter-b-and-w:before {
-  content: "";
+  content: "\F381";
 }
 
 .zmdi-filter-center-focus:before {
-  content: "";
+  content: "\F382";
 }
 
 .zmdi-filter-frames:before {
-  content: "";
+  content: "\F383";
 }
 
 .zmdi-filter-tilt-shift:before {
-  content: "";
+  content: "\F384";
 }
 
 .zmdi-gradient:before {
-  content: "";
+  content: "\F385";
 }
 
 .zmdi-grain:before {
-  content: "";
+  content: "\F386";
 }
 
 .zmdi-graphic-eq:before {
-  content: "";
+  content: "\F387";
 }
 
 .zmdi-hdr-off:before {
-  content: "";
+  content: "\F388";
 }
 
 .zmdi-hdr-strong:before {
-  content: "";
+  content: "\F389";
 }
 
 .zmdi-hdr-weak:before {
-  content: "";
+  content: "\F38A";
 }
 
 .zmdi-hdr:before {
-  content: "";
+  content: "\F38B";
 }
 
 .zmdi-iridescent:before {
-  content: "";
+  content: "\F38C";
 }
 
 .zmdi-leak-off:before {
-  content: "";
+  content: "\F38D";
 }
 
 .zmdi-leak:before {
-  content: "";
+  content: "\F38E";
 }
 
 .zmdi-looks:before {
-  content: "";
+  content: "\F38F";
 }
 
 .zmdi-loupe:before {
-  content: "";
+  content: "\F390";
 }
 
 .zmdi-panorama-horizontal:before {
-  content: "";
+  content: "\F391";
 }
 
 .zmdi-panorama-vertical:before {
-  content: "";
+  content: "\F392";
 }
 
 .zmdi-panorama-wide-angle:before {
-  content: "";
+  content: "\F393";
 }
 
 .zmdi-photo-size-select-large:before {
-  content: "";
+  content: "\F394";
 }
 
 .zmdi-photo-size-select-small:before {
-  content: "";
+  content: "\F395";
 }
 
 .zmdi-picture-in-picture:before {
-  content: "";
+  content: "\F396";
 }
 
 .zmdi-slideshow:before {
-  content: "";
+  content: "\F397";
 }
 
 .zmdi-texture:before {
-  content: "";
+  content: "\F398";
 }
 
 .zmdi-tonality:before {
-  content: "";
+  content: "\F399";
 }
 
 .zmdi-vignette:before {
-  content: "";
+  content: "\F39A";
 }
 
 .zmdi-wb-auto:before {
-  content: "";
+  content: "\F39B";
 }
 
 .zmdi-eject-alt:before {
-  content: "";
+  content: "\F39C";
 }
 
 .zmdi-eject:before {
-  content: "";
+  content: "\F39D";
 }
 
 .zmdi-equalizer:before {
-  content: "";
+  content: "\F39E";
 }
 
 .zmdi-fast-forward:before {
-  content: "";
+  content: "\F39F";
 }
 
 .zmdi-fast-rewind:before {
-  content: "";
+  content: "\F3A0";
 }
 
 .zmdi-forward-10:before {
-  content: "";
+  content: "\F3A1";
 }
 
 .zmdi-forward-30:before {
-  content: "";
+  content: "\F3A2";
 }
 
 .zmdi-forward-5:before {
-  content: "";
+  content: "\F3A3";
 }
 
 .zmdi-hearing:before {
-  content: "";
+  content: "\F3A4";
 }
 
 .zmdi-pause-circle-outline:before {
-  content: "";
+  content: "\F3A5";
 }
 
 .zmdi-pause-circle:before {
-  content: "";
+  content: "\F3A6";
 }
 
 .zmdi-pause:before {
-  content: "";
+  content: "\F3A7";
 }
 
 .zmdi-play-circle-outline:before {
-  content: "";
+  content: "\F3A8";
 }
 
 .zmdi-play-circle:before {
-  content: "";
+  content: "\F3A9";
 }
 
 .zmdi-play:before {
-  content: "";
+  content: "\F3AA";
 }
 
 .zmdi-playlist-audio:before {
-  content: "";
+  content: "\F3AB";
 }
 
 .zmdi-playlist-plus:before {
-  content: "";
+  content: "\F3AC";
 }
 
 .zmdi-repeat-one:before {
-  content: "";
+  content: "\F3AD";
 }
 
 .zmdi-repeat:before {
-  content: "";
+  content: "\F3AE";
 }
 
 .zmdi-replay-10:before {
-  content: "";
+  content: "\F3AF";
 }
 
 .zmdi-replay-30:before {
-  content: "";
+  content: "\F3B0";
 }
 
 .zmdi-replay-5:before {
-  content: "";
+  content: "\F3B1";
 }
 
 .zmdi-replay:before {
-  content: "";
+  content: "\F3B2";
 }
 
 .zmdi-shuffle:before {
-  content: "";
+  content: "\F3B3";
 }
 
 .zmdi-skip-next:before {
-  content: "";
+  content: "\F3B4";
 }
 
 .zmdi-skip-previous:before {
-  content: "";
+  content: "\F3B5";
 }
 
 .zmdi-stop:before {
-  content: "";
+  content: "\F3B6";
 }
 
 .zmdi-surround-sound:before {
-  content: "";
+  content: "\F3B7";
 }
 
 .zmdi-tune:before {
-  content: "";
+  content: "\F3B8";
 }
 
 .zmdi-volume-down:before {
-  content: "";
+  content: "\F3B9";
 }
 
 .zmdi-volume-mute:before {
-  content: "";
+  content: "\F3BA";
 }
 
 .zmdi-volume-off:before {
-  content: "";
+  content: "\F3BB";
 }
 
 .zmdi-volume-up:before {
-  content: "";
+  content: "\F3BC";
 }
 
 .zmdi-n-1-square:before {
-  content: "";
+  content: "\F3BD";
 }
 
 .zmdi-n-2-square:before {
-  content: "";
+  content: "\F3BE";
 }
 
 .zmdi-n-3-square:before {
-  content: "";
+  content: "\F3BF";
 }
 
 .zmdi-n-4-square:before {
-  content: "";
+  content: "\F3C0";
 }
 
 .zmdi-n-5-square:before {
-  content: "";
+  content: "\F3C1";
 }
 
 .zmdi-n-6-square:before {
-  content: "";
+  content: "\F3C2";
 }
 
 .zmdi-neg-1:before {
-  content: "";
+  content: "\F3C3";
 }
 
 .zmdi-neg-2:before {
-  content: "";
+  content: "\F3C4";
 }
 
 .zmdi-plus-1:before {
-  content: "";
+  content: "\F3C5";
 }
 
 .zmdi-plus-2:before {
-  content: "";
+  content: "\F3C6";
 }
 
 .zmdi-sec-10:before {
-  content: "";
+  content: "\F3C7";
 }
 
 .zmdi-sec-3:before {
-  content: "";
+  content: "\F3C8";
 }
 
 .zmdi-zero:before {
-  content: "";
+  content: "\F3C9";
 }
 
 .zmdi-airline-seat-flat-angled:before {
-  content: "";
+  content: "\F3CA";
 }
 
 .zmdi-airline-seat-flat:before {
-  content: "";
+  content: "\F3CB";
 }
 
 .zmdi-airline-seat-individual-suite:before {
-  content: "";
+  content: "\F3CC";
 }
 
 .zmdi-airline-seat-legroom-extra:before {
-  content: "";
+  content: "\F3CD";
 }
 
 .zmdi-airline-seat-legroom-normal:before {
-  content: "";
+  content: "\F3CE";
 }
 
 .zmdi-airline-seat-legroom-reduced:before {
-  content: "";
+  content: "\F3CF";
 }
 
 .zmdi-airline-seat-recline-extra:before {
-  content: "";
+  content: "\F3D0";
 }
 
 .zmdi-airline-seat-recline-normal:before {
-  content: "";
+  content: "\F3D1";
 }
 
 .zmdi-airplay:before {
-  content: "";
+  content: "\F3D2";
 }
 
 .zmdi-closed-caption:before {
-  content: "";
+  content: "\F3D3";
 }
 
 .zmdi-confirmation-number:before {
-  content: "";
+  content: "\F3D4";
 }
 
 .zmdi-developer-board:before {
-  content: "";
+  content: "\F3D5";
 }
 
 .zmdi-disc-full:before {
-  content: "";
+  content: "\F3D6";
 }
 
 .zmdi-explicit:before {
-  content: "";
+  content: "\F3D7";
 }
 
 .zmdi-flight-land:before {
-  content: "";
+  content: "\F3D8";
 }
 
 .zmdi-flight-takeoff:before {
-  content: "";
+  content: "\F3D9";
 }
 
 .zmdi-flip-to-back:before {
-  content: "";
+  content: "\F3DA";
 }
 
 .zmdi-flip-to-front:before {
-  content: "";
+  content: "\F3DB";
 }
 
 .zmdi-group-work:before {
-  content: "";
+  content: "\F3DC";
 }
 
 .zmdi-hd:before {
-  content: "";
+  content: "\F3DD";
 }
 
 .zmdi-hq:before {
-  content: "";
+  content: "\F3DE";
 }
 
 .zmdi-markunread-mailbox:before {
-  content: "";
+  content: "\F3DF";
 }
 
 .zmdi-memory:before {
-  content: "";
+  content: "\F3E0";
 }
 
 .zmdi-nfc:before {
-  content: "";
+  content: "\F3E1";
 }
 
 .zmdi-play-for-work:before {
-  content: "";
+  content: "\F3E2";
 }
 
 .zmdi-power-input:before {
-  content: "";
+  content: "\F3E3";
 }
 
 .zmdi-present-to-all:before {
-  content: "";
+  content: "\F3E4";
 }
 
 .zmdi-satellite:before {
-  content: "";
+  content: "\F3E5";
 }
 
 .zmdi-tap-and-play:before {
-  content: "";
+  content: "\F3E6";
 }
 
 .zmdi-vibration:before {
-  content: "";
+  content: "\F3E7";
 }
 
 .zmdi-voicemail:before {
-  content: "";
+  content: "\F3E8";
 }
 
 .zmdi-group:before {
-  content: "";
+  content: "\F3E9";
 }
 
 .zmdi-rss:before {
-  content: "";
+  content: "\F3EA";
 }
 
 .zmdi-shape:before {
-  content: "";
+  content: "\F3EB";
 }
 
 .zmdi-spinner:before {
-  content: "";
+  content: "\F3EC";
 }
 
 .zmdi-ungroup:before {
-  content: "";
+  content: "\F3ED";
 }
 
 .zmdi-500px:before {
-  content: "";
+  content: "\F3EE";
 }
 
 .zmdi-8tracks:before {
-  content: "";
+  content: "\F3EF";
 }
 
 .zmdi-amazon:before {
-  content: "";
+  content: "\F3F0";
 }
 
 .zmdi-blogger:before {
-  content: "";
+  content: "\F3F1";
 }
 
 .zmdi-delicious:before {
-  content: "";
+  content: "\F3F2";
 }
 
 .zmdi-disqus:before {
-  content: "";
+  content: "\F3F3";
 }
 
 .zmdi-flattr:before {
-  content: "";
+  content: "\F3F4";
 }
 
 .zmdi-flickr:before {
-  content: "";
+  content: "\F3F5";
 }
 
 .zmdi-github-alt:before {
-  content: "";
+  content: "\F3F6";
 }
 
 .zmdi-google-old:before {
-  content: "";
+  content: "\F3F7";
 }
 
 .zmdi-linkedin:before {
-  content: "";
+  content: "\F3F8";
 }
 
 .zmdi-odnoklassniki:before {
-  content: "";
+  content: "\F3F9";
 }
 
 .zmdi-outlook:before {
-  content: "";
+  content: "\F3FA";
 }
 
 .zmdi-paypal-alt:before {
-  content: "";
+  content: "\F3FB";
 }
 
 .zmdi-pinterest:before {
-  content: "";
+  content: "\F3FC";
 }
 
 .zmdi-playstation:before {
-  content: "";
+  content: "\F3FD";
 }
 
 .zmdi-reddit:before {
-  content: "";
+  content: "\F3FE";
 }
 
 .zmdi-skype:before {
-  content: "";
+  content: "\F3FF";
 }
 
 .zmdi-slideshare:before {
-  content: "";
+  content: "\F400";
 }
 
 .zmdi-soundcloud:before {
-  content: "";
+  content: "\F401";
 }
 
 .zmdi-tumblr:before {
-  content: "";
+  content: "\F402";
 }
 
 .zmdi-twitch:before {
-  content: "";
+  content: "\F403";
 }
 
 .zmdi-vimeo:before {
-  content: "";
+  content: "\F404";
 }
 
 .zmdi-whatsapp:before {
-  content: "";
+  content: "\F405";
 }
 
 .zmdi-xbox:before {
-  content: "";
+  content: "\F406";
 }
 
 .zmdi-yahoo:before {
-  content: "";
+  content: "\F407";
 }
 
 .zmdi-youtube-play:before {
-  content: "";
+  content: "\F408";
 }
 
 .zmdi-youtube:before {
-  content: "";
+  content: "\F409";
 }
 
 .zmdi-3d-rotation:before {
-  content: "";
+  content: "\F101";
 }
 
 .zmdi-airplane-off:before {
-  content: "";
+  content: "\F102";
 }
 
 .zmdi-airplane:before {
-  content: "";
+  content: "\F103";
 }
 
 .zmdi-album:before {
-  content: "";
+  content: "\F104";
 }
 
 .zmdi-archive:before {
-  content: "";
+  content: "\F105";
 }
 
 .zmdi-assignment-account:before {
-  content: "";
+  content: "\F106";
 }
 
 .zmdi-assignment-alert:before {
-  content: "";
+  content: "\F107";
 }
 
 .zmdi-assignment-check:before {
-  content: "";
+  content: "\F108";
 }
 
 .zmdi-assignment-o:before {
-  content: "";
+  content: "\F109";
 }
 
 .zmdi-assignment-return:before {
-  content: "";
+  content: "\F10A";
 }
 
 .zmdi-assignment-returned:before {
-  content: "";
+  content: "\F10B";
 }
 
 .zmdi-assignment:before {
-  content: "";
+  content: "\F10C";
 }
 
 .zmdi-attachment-alt:before {
-  content: "";
+  content: "\F10D";
 }
 
 .zmdi-attachment:before {
-  content: "";
+  content: "\F10E";
 }
 
 .zmdi-audio:before {
-  content: "";
+  content: "\F10F";
 }
 
 .zmdi-badge-check:before {
-  content: "";
+  content: "\F110";
 }
 
 .zmdi-balance-wallet:before {
-  content: "";
+  content: "\F111";
 }
 
 .zmdi-balance:before {
-  content: "";
+  content: "\F112";
 }
 
 .zmdi-battery-alert:before {
-  content: "";
+  content: "\F113";
 }
 
 .zmdi-battery-flash:before {
-  content: "";
+  content: "\F114";
 }
 
 .zmdi-battery-unknown:before {
-  content: "";
+  content: "\F115";
 }
 
 .zmdi-battery:before {
-  content: "";
+  content: "\F116";
 }
 
 .zmdi-bike:before {
-  content: "";
+  content: "\F117";
 }
 
 .zmdi-block-alt:before {
-  content: "";
+  content: "\F118";
 }
 
 .zmdi-block:before {
-  content: "";
+  content: "\F119";
 }
 
 .zmdi-boat:before {
-  content: "";
+  content: "\F11A";
 }
 
 .zmdi-book-image:before {
-  content: "";
+  content: "\F11B";
 }
 
 .zmdi-book:before {
-  content: "";
+  content: "\F11C";
 }
 
 .zmdi-bookmark-outline:before {
-  content: "";
+  content: "\F11D";
 }
 
 .zmdi-bookmark:before {
-  content: "";
+  content: "\F11E";
 }
 
 .zmdi-brush:before {
-  content: "";
+  content: "\F11F";
 }
 
 .zmdi-bug:before {
-  content: "";
+  content: "\F120";
 }
 
 .zmdi-bus:before {
-  content: "";
+  content: "\F121";
 }
 
 .zmdi-cake:before {
-  content: "";
+  content: "\F122";
 }
 
 .zmdi-car-taxi:before {
-  content: "";
+  content: "\F123";
 }
 
 .zmdi-car-wash:before {
-  content: "";
+  content: "\F124";
 }
 
 .zmdi-car:before {
-  content: "";
+  content: "\F125";
 }
 
 .zmdi-card-giftcard:before {
-  content: "";
+  content: "\F126";
 }
 
 .zmdi-card-membership:before {
-  content: "";
+  content: "\F127";
 }
 
 .zmdi-card-travel:before {
-  content: "";
+  content: "\F128";
 }
 
 .zmdi-card:before {
-  content: "";
+  content: "\F129";
 }
 
 .zmdi-case-check:before {
-  content: "";
+  content: "\F12A";
 }
 
 .zmdi-case-download:before {
-  content: "";
+  content: "\F12B";
 }
 
 .zmdi-case-play:before {
-  content: "";
+  content: "\F12C";
 }
 
 .zmdi-case:before {
-  content: "";
+  content: "\F12D";
 }
 
 .zmdi-cast-connected:before {
-  content: "";
+  content: "\F12E";
 }
 
 .zmdi-cast:before {
-  content: "";
+  content: "\F12F";
 }
 
 .zmdi-chart-donut:before {
-  content: "";
+  content: "\F130";
 }
 
 .zmdi-chart:before {
-  content: "";
+  content: "\F131";
 }
 
 .zmdi-city-alt:before {
-  content: "";
+  content: "\F132";
 }
 
 .zmdi-city:before {
-  content: "";
+  content: "\F133";
 }
 
 .zmdi-close-circle-o:before {
-  content: "";
+  content: "\F134";
 }
 
 .zmdi-close-circle:before {
-  content: "";
+  content: "\F135";
 }
 
 .zmdi-close:before {
-  content: "";
+  content: "\F136";
 }
 
 .zmdi-cocktail:before {
-  content: "";
+  content: "\F137";
 }
 
 .zmdi-code-setting:before {
-  content: "";
+  content: "\F138";
 }
 
 .zmdi-code-smartphone:before {
-  content: "";
+  content: "\F139";
 }
 
 .zmdi-code:before {
-  content: "";
+  content: "\F13A";
 }
 
 .zmdi-coffee:before {
-  content: "";
+  content: "\F13B";
 }
 
 .zmdi-collection-bookmark:before {
-  content: "";
+  content: "\F13C";
 }
 
 .zmdi-collection-case-play:before {
-  content: "";
+  content: "\F13D";
 }
 
 .zmdi-collection-folder-image:before {
-  content: "";
+  content: "\F13E";
 }
 
 .zmdi-collection-image-o:before {
-  content: "";
+  content: "\F13F";
 }
 
 .zmdi-collection-image:before {
-  content: "";
+  content: "\F140";
 }
 
 .zmdi-collection-item-1:before {
-  content: "";
+  content: "\F141";
 }
 
 .zmdi-collection-item-2:before {
-  content: "";
+  content: "\F142";
 }
 
 .zmdi-collection-item-3:before {
-  content: "";
+  content: "\F143";
 }
 
 .zmdi-collection-item-4:before {
-  content: "";
+  content: "\F144";
 }
 
 .zmdi-collection-item-5:before {
-  content: "";
+  content: "\F145";
 }
 
 .zmdi-collection-item-6:before {
-  content: "";
+  content: "\F146";
 }
 
 .zmdi-collection-item-7:before {
-  content: "";
+  content: "\F147";
 }
 
 .zmdi-collection-item-8:before {
-  content: "";
+  content: "\F148";
 }
 
 .zmdi-collection-item-9-plus:before {
-  content: "";
+  content: "\F149";
 }
 
 .zmdi-collection-item-9:before {
-  content: "";
+  content: "\F14A";
 }
 
 .zmdi-collection-item:before {
-  content: "";
+  content: "\F14B";
 }
 
 .zmdi-collection-music:before {
-  content: "";
+  content: "\F14C";
 }
 
 .zmdi-collection-pdf:before {
-  content: "";
+  content: "\F14D";
 }
 
 .zmdi-collection-plus:before {
-  content: "";
+  content: "\F14E";
 }
 
 .zmdi-collection-speaker:before {
-  content: "";
+  content: "\F14F";
 }
 
 .zmdi-collection-text:before {
-  content: "";
+  content: "\F150";
 }
 
 .zmdi-collection-video:before {
-  content: "";
+  content: "\F151";
 }
 
 .zmdi-compass:before {
-  content: "";
+  content: "\F152";
 }
 
 .zmdi-cutlery:before {
-  content: "";
+  content: "\F153";
 }
 
 .zmdi-delete:before {
-  content: "";
+  content: "\F154";
 }
 
 .zmdi-dialpad:before {
-  content: "";
+  content: "\F155";
 }
 
 .zmdi-dns:before {
-  content: "";
+  content: "\F156";
 }
 
 .zmdi-drink:before {
-  content: "";
+  content: "\F157";
 }
 
 .zmdi-edit:before {
-  content: "";
+  content: "\F158";
 }
 
 .zmdi-email-open:before {
-  content: "";
+  content: "\F159";
 }
 
 .zmdi-email:before {
-  content: "";
+  content: "\F15A";
 }
 
 .zmdi-eye-off:before {
-  content: "";
+  content: "\F15B";
 }
 
 .zmdi-eye:before {
-  content: "";
+  content: "\F15C";
 }
 
 .zmdi-eyedropper:before {
-  content: "";
+  content: "\F15D";
 }
 
 .zmdi-favorite-outline:before {
-  content: "";
+  content: "\F15E";
 }
 
 .zmdi-favorite:before {
-  content: "";
+  content: "\F15F";
 }
 
 .zmdi-filter-list:before {
-  content: "";
+  content: "\F160";
 }
 
 .zmdi-fire:before {
-  content: "";
+  content: "\F161";
 }
 
 .zmdi-flag:before {
-  content: "";
+  content: "\F162";
 }
 
 .zmdi-flare:before {
-  content: "";
+  content: "\F163";
 }
 
 .zmdi-flash-auto:before {
-  content: "";
+  content: "\F164";
 }
 
 .zmdi-flash-off:before {
-  content: "";
+  content: "\F165";
 }
 
 .zmdi-flash:before {
-  content: "";
+  content: "\F166";
 }
 
 .zmdi-flip:before {
-  content: "";
+  content: "\F167";
 }
 
 .zmdi-flower-alt:before {
-  content: "";
+  content: "\F168";
 }
 
 .zmdi-flower:before {
-  content: "";
+  content: "\F169";
 }
 
 .zmdi-font:before {
-  content: "";
+  content: "\F16A";
 }
 
 .zmdi-fullscreen-alt:before {
-  content: "";
+  content: "\F16B";
 }
 
 .zmdi-fullscreen-exit:before {
-  content: "";
+  content: "\F16C";
 }
 
 .zmdi-fullscreen:before {
-  content: "";
+  content: "\F16D";
 }
 
 .zmdi-functions:before {
-  content: "";
+  content: "\F16E";
 }
 
 .zmdi-gas-station:before {
-  content: "";
+  content: "\F16F";
 }
 
 .zmdi-gesture:before {
-  content: "";
+  content: "\F170";
 }
 
 .zmdi-globe-alt:before {
-  content: "";
+  content: "\F171";
 }
 
 .zmdi-globe-lock:before {
-  content: "";
+  content: "\F172";
 }
 
 .zmdi-globe:before {
-  content: "";
+  content: "\F173";
 }
 
 .zmdi-graduation-cap:before {
-  content: "";
+  content: "\F174";
 }
 
 .zmdi-home:before {
-  content: "";
+  content: "\F175";
 }
 
 .zmdi-hospital-alt:before {
-  content: "";
+  content: "\F176";
 }
 
 .zmdi-hospital:before {
-  content: "";
+  content: "\F177";
 }
 
 .zmdi-hotel:before {
-  content: "";
+  content: "\F178";
 }
 
 .zmdi-hourglass-alt:before {
-  content: "";
+  content: "\F179";
 }
 
 .zmdi-hourglass-outline:before {
-  content: "";
+  content: "\F17A";
 }
 
 .zmdi-hourglass:before {
-  content: "";
+  content: "\F17B";
 }
 
 .zmdi-http:before {
-  content: "";
+  content: "\F17C";
 }
 
 .zmdi-image-alt:before {
-  content: "";
+  content: "\F17D";
 }
 
 .zmdi-image-o:before {
-  content: "";
+  content: "\F17E";
 }
 
 .zmdi-image:before {
-  content: "";
+  content: "\F17F";
 }
 
 .zmdi-inbox:before {
-  content: "";
+  content: "\F180";
 }
 
 .zmdi-invert-colors-off:before {
-  content: "";
+  content: "\F181";
 }
 
 .zmdi-invert-colors:before {
-  content: "";
+  content: "\F182";
 }
 
 .zmdi-key:before {
-  content: "";
+  content: "\F183";
 }
 
 .zmdi-label-alt-outline:before {
-  content: "";
+  content: "\F184";
 }
 
 .zmdi-label-alt:before {
-  content: "";
+  content: "\F185";
 }
 
 .zmdi-label-heart:before {
-  content: "";
+  content: "\F186";
 }
 
 .zmdi-label:before {
-  content: "";
+  content: "\F187";
 }
 
 .zmdi-labels:before {
-  content: "";
+  content: "\F188";
 }
 
 .zmdi-lamp:before {
-  content: "";
+  content: "\F189";
 }
 
 .zmdi-landscape:before {
-  content: "";
+  content: "\F18A";
 }
 
 .zmdi-layers-off:before {
-  content: "";
+  content: "\F18B";
 }
 
 .zmdi-layers:before {
-  content: "";
+  content: "\F18C";
 }
 
 .zmdi-library:before {
-  content: "";
+  content: "\F18D";
 }
 
 .zmdi-link:before {
-  content: "";
+  content: "\F18E";
 }
 
 .zmdi-lock-open:before {
-  content: "";
+  content: "\F18F";
 }
 
 .zmdi-lock-outline:before {
-  content: "";
+  content: "\F190";
 }
 
 .zmdi-lock:before {
-  content: "";
+  content: "\F191";
 }
 
 .zmdi-mail-reply-all:before {
-  content: "";
+  content: "\F192";
 }
 
 .zmdi-mail-reply:before {
-  content: "";
+  content: "\F193";
 }
 
 .zmdi-mail-send:before {
-  content: "";
+  content: "\F194";
 }
 
 .zmdi-mall:before {
-  content: "";
+  content: "\F195";
 }
 
 .zmdi-map:before {
-  content: "";
+  content: "\F196";
 }
 
 .zmdi-menu:before {
-  content: "";
+  content: "\F197";
 }
 
 .zmdi-money-box:before {
-  content: "";
+  content: "\F198";
 }
 
 .zmdi-money-off:before {
-  content: "";
+  content: "\F199";
 }
 
 .zmdi-money:before {
-  content: "";
+  content: "\F19A";
 }
 
 .zmdi-more-vert:before {
-  content: "";
+  content: "\F19B";
 }
 
 .zmdi-more:before {
-  content: "";
+  content: "\F19C";
 }
 
 .zmdi-movie-alt:before {
-  content: "";
+  content: "\F19D";
 }
 
 .zmdi-movie:before {
-  content: "";
+  content: "\F19E";
 }
 
 .zmdi-nature-people:before {
-  content: "";
+  content: "\F19F";
 }
 
 .zmdi-nature:before {
-  content: "";
+  content: "\F1A0";
 }
 
 .zmdi-navigation:before {
-  content: "";
+  content: "\F1A1";
 }
 
 .zmdi-open-in-browser:before {
-  content: "";
+  content: "\F1A2";
 }
 
 .zmdi-open-in-new:before {
-  content: "";
+  content: "\F1A3";
 }
 
 .zmdi-palette:before {
-  content: "";
+  content: "\F1A4";
 }
 
 .zmdi-parking:before {
-  content: "";
+  content: "\F1A5";
 }
 
 .zmdi-pin-account:before {
-  content: "";
+  content: "\F1A6";
 }
 
 .zmdi-pin-assistant:before {
-  content: "";
+  content: "\F1A7";
 }
 
 .zmdi-pin-drop:before {
-  content: "";
+  content: "\F1A8";
 }
 
 .zmdi-pin-help:before {
-  content: "";
+  content: "\F1A9";
 }
 
 .zmdi-pin-off:before {
-  content: "";
+  content: "\F1AA";
 }
 
 .zmdi-pin:before {
-  content: "";
+  content: "\F1AB";
 }
 
 .zmdi-pizza:before {
-  content: "";
+  content: "\F1AC";
 }
 
 .zmdi-plaster:before {
-  content: "";
+  content: "\F1AD";
 }
 
 .zmdi-power-setting:before {
-  content: "";
+  content: "\F1AE";
 }
 
 .zmdi-power:before {
-  content: "";
+  content: "\F1AF";
 }
 
 .zmdi-print:before {
-  content: "";
+  content: "\F1B0";
 }
 
 .zmdi-puzzle-piece:before {
-  content: "";
+  content: "\F1B1";
 }
 
 .zmdi-quote:before {
-  content: "";
+  content: "\F1B2";
 }
 
 .zmdi-railway:before {
-  content: "";
+  content: "\F1B3";
 }
 
 .zmdi-receipt:before {
-  content: "";
+  content: "\F1B4";
 }
 
 .zmdi-refresh-alt:before {
-  content: "";
+  content: "\F1B5";
 }
 
 .zmdi-refresh-sync-alert:before {
-  content: "";
+  content: "\F1B6";
 }
 
 .zmdi-refresh-sync-off:before {
-  content: "";
+  content: "\F1B7";
 }
 
 .zmdi-refresh-sync:before {
-  content: "";
+  content: "\F1B8";
 }
 
 .zmdi-refresh:before {
-  content: "";
+  content: "\F1B9";
 }
 
 .zmdi-roller:before {
-  content: "";
+  content: "\F1BA";
 }
 
 .zmdi-ruler:before {
-  content: "";
+  content: "\F1BB";
 }
 
 .zmdi-scissors:before {
-  content: "";
+  content: "\F1BC";
 }
 
 .zmdi-screen-rotation-lock:before {
-  content: "";
+  content: "\F1BD";
 }
 
 .zmdi-screen-rotation:before {
-  content: "";
+  content: "\F1BE";
 }
 
 .zmdi-search-for:before {
-  content: "";
+  content: "\F1BF";
 }
 
 .zmdi-search-in-file:before {
-  content: "";
+  content: "\F1C0";
 }
 
 .zmdi-search-in-page:before {
-  content: "";
+  content: "\F1C1";
 }
 
 .zmdi-search-replace:before {
-  content: "";
+  content: "\F1C2";
 }
 
 .zmdi-search:before {
-  content: "";
+  content: "\F1C3";
 }
 
 .zmdi-seat:before {
-  content: "";
+  content: "\F1C4";
 }
 
 .zmdi-settings-square:before {
-  content: "";
+  content: "\F1C5";
 }
 
 .zmdi-settings:before {
-  content: "";
+  content: "\F1C6";
 }
 
 .zmdi-shield-check:before {
-  content: "";
+  content: "\F1C7";
 }
 
 .zmdi-shield-security:before {
-  content: "";
+  content: "\F1C8";
 }
 
 .zmdi-shopping-basket:before {
-  content: "";
+  content: "\F1C9";
 }
 
 .zmdi-shopping-cart-plus:before {
-  content: "";
+  content: "\F1CA";
 }
 
 .zmdi-shopping-cart:before {
-  content: "";
+  content: "\F1CB";
 }
 
 .zmdi-sign-in:before {
-  content: "";
+  content: "\F1CC";
 }
 
 .zmdi-sort-amount-asc:before {
-  content: "";
+  content: "\F1CD";
 }
 
 .zmdi-sort-amount-desc:before {
-  content: "";
+  content: "\F1CE";
 }
 
 .zmdi-sort-asc:before {
-  content: "";
+  content: "\F1CF";
 }
 
 .zmdi-sort-desc:before {
-  content: "";
+  content: "\F1D0";
 }
 
 .zmdi-spellcheck:before {
-  content: "";
+  content: "\F1D1";
 }
 
 .zmdi-storage:before {
-  content: "";
+  content: "\F1D2";
 }
 
 .zmdi-store-24:before {
-  content: "";
+  content: "\F1D3";
 }
 
 .zmdi-store:before {
-  content: "";
+  content: "\F1D4";
 }
 
 .zmdi-subway:before {
-  content: "";
+  content: "\F1D5";
 }
 
 .zmdi-sun:before {
-  content: "";
+  content: "\F1D6";
 }
 
 .zmdi-tab-unselected:before {
-  content: "";
+  content: "\F1D7";
 }
 
 .zmdi-tab:before {
-  content: "";
+  content: "\F1D8";
 }
 
 .zmdi-tag-close:before {
-  content: "";
+  content: "\F1D9";
 }
 
 .zmdi-tag-more:before {
-  content: "";
+  content: "\F1DA";
 }
 
 .zmdi-tag:before {
-  content: "";
+  content: "\F1DB";
 }
 
 .zmdi-thumb-down:before {
-  content: "";
+  content: "\F1DC";
 }
 
 .zmdi-thumb-up-down:before {
-  content: "";
+  content: "\F1DD";
 }
 
 .zmdi-thumb-up:before {
-  content: "";
+  content: "\F1DE";
 }
 
 .zmdi-ticket-star:before {
-  content: "";
+  content: "\F1DF";
 }
 
 .zmdi-toll:before {
-  content: "";
+  content: "\F1E0";
 }
 
 .zmdi-toys:before {
-  content: "";
+  content: "\F1E1";
 }
 
 .zmdi-traffic:before {
-  content: "";
+  content: "\F1E2";
 }
 
 .zmdi-translate:before {
-  content: "";
+  content: "\F1E3";
 }
 
 .zmdi-triangle-down:before {
-  content: "";
+  content: "\F1E4";
 }
 
 .zmdi-triangle-up:before {
-  content: "";
+  content: "\F1E5";
 }
 
 .zmdi-truck:before {
-  content: "";
+  content: "\F1E6";
 }
 
 .zmdi-turning-sign:before {
-  content: "";
+  content: "\F1E7";
 }
 
 .zmdi-wallpaper:before {
-  content: "";
+  content: "\F1E8";
 }
 
 .zmdi-washing-machine:before {
-  content: "";
+  content: "\F1E9";
 }
 
 .zmdi-window-maximize:before {
-  content: "";
+  content: "\F1EA";
 }
 
 .zmdi-window-minimize:before {
-  content: "";
+  content: "\F1EB";
 }
 
 .zmdi-window-restore:before {
-  content: "";
+  content: "\F1EC";
 }
 
 .zmdi-wrench:before {
-  content: "";
+  content: "\F1ED";
 }
 
 .zmdi-zoom-in:before {
-  content: "";
+  content: "\F1EE";
 }
 
 .zmdi-zoom-out:before {
-  content: "";
+  content: "\F1EF";
 }
 
 .zmdi-alert-circle-o:before {
-  content: "";
+  content: "\F1F0";
 }
 
 .zmdi-alert-circle:before {
-  content: "";
+  content: "\F1F1";
 }
 
 .zmdi-alert-octagon:before {
-  content: "";
+  content: "\F1F2";
 }
 
 .zmdi-alert-polygon:before {
-  content: "";
+  content: "\F1F3";
 }
 
 .zmdi-alert-triangle:before {
-  content: "";
+  content: "\F1F4";
 }
 
 .zmdi-help-outline:before {
-  content: "";
+  content: "\F1F5";
 }
 
 .zmdi-help:before {
-  content: "";
+  content: "\F1F6";
 }
 
 .zmdi-info-outline:before {
-  content: "";
+  content: "\F1F7";
 }
 
 .zmdi-info:before {
-  content: "";
+  content: "\F1F8";
 }
 
 .zmdi-notifications-active:before {
-  content: "";
+  content: "\F1F9";
 }
 
 .zmdi-notifications-add:before {
-  content: "";
+  content: "\F1FA";
 }
 
 .zmdi-notifications-none:before {
-  content: "";
+  content: "\F1FB";
 }
 
 .zmdi-notifications-off:before {
-  content: "";
+  content: "\F1FC";
 }
 
 .zmdi-notifications-paused:before {
-  content: "";
+  content: "\F1FD";
 }
 
 .zmdi-notifications:before {
-  content: "";
+  content: "\F1FE";
 }
 
 .zmdi-account-add:before {
-  content: "";
+  content: "\F1FF";
 }
 
 .zmdi-account-box-mail:before {
-  content: "";
+  content: "\F200";
 }
 
 .zmdi-account-box-o:before {
-  content: "";
+  content: "\F201";
 }
 
 .zmdi-account-box-phone:before {
-  content: "";
+  content: "\F202";
 }
 
 .zmdi-account-box:before {
-  content: "";
+  content: "\F203";
 }
 
 .zmdi-account-calendar:before {
-  content: "";
+  content: "\F204";
 }
 
 .zmdi-account-circle:before {
-  content: "";
+  content: "\F205";
 }
 
 .zmdi-account-o:before {
-  content: "";
+  content: "\F206";
 }
 
 .zmdi-account:before {
-  content: "";
+  content: "\F207";
 }
 
 .zmdi-accounts-add:before {
-  content: "";
+  content: "\F208";
 }
 
 .zmdi-accounts-alt:before {
-  content: "";
+  content: "\F209";
 }
 
 .zmdi-accounts-list-alt:before {
-  content: "";
+  content: "\F20A";
 }
 
 .zmdi-accounts-list:before {
-  content: "";
+  content: "\F20B";
 }
 
 .zmdi-accounts-outline:before {
-  content: "";
+  content: "\F20C";
 }
 
 .zmdi-accounts:before {
-  content: "";
+  content: "\F20D";
 }
 
 .zmdi-face:before {
-  content: "";
+  content: "\F20E";
 }
 
 .zmdi-female:before {
-  content: "";
+  content: "\F20F";
 }
 
 .zmdi-male-alt:before {
-  content: "";
+  content: "\F210";
 }
 
 .zmdi-male-female:before {
-  content: "";
+  content: "\F211";
 }
 
 .zmdi-male:before {
-  content: "";
+  content: "\F212";
 }
 
 .zmdi-mood-bad:before {
-  content: "";
+  content: "\F213";
 }
 
 .zmdi-mood:before {
-  content: "";
+  content: "\F214";
 }
 
 .zmdi-run:before {
-  content: "";
+  content: "\F215";
 }
 
 .zmdi-walk:before {
-  content: "";
+  content: "\F216";
 }
 
 .zmdi-cloud-box:before {
-  content: "";
+  content: "\F217";
 }
 
 .zmdi-cloud-circle:before {
-  content: "";
+  content: "\F218";
 }
 
 .zmdi-cloud-done:before {
-  content: "";
+  content: "\F219";
 }
 
 .zmdi-cloud-download:before {
-  content: "";
+  content: "\F21A";
 }
 
 .zmdi-cloud-off:before {
-  content: "";
+  content: "\F21B";
 }
 
 .zmdi-cloud-outline-alt:before {
-  content: "";
+  content: "\F21C";
 }
 
 .zmdi-cloud-outline:before {
-  content: "";
+  content: "\F21D";
 }
 
 .zmdi-cloud-upload:before {
-  content: "";
+  content: "\F21E";
 }
 
 .zmdi-cloud:before {
-  content: "";
+  content: "\F21F";
 }
 
 .zmdi-download:before {
-  content: "";
+  content: "\F220";
 }
 
 .zmdi-file-plus:before {
-  content: "";
+  content: "\F221";
 }
 
 .zmdi-file-text:before {
-  content: "";
+  content: "\F222";
 }
 
 .zmdi-file:before {
-  content: "";
+  content: "\F223";
 }
 
 .zmdi-folder-outline:before {
-  content: "";
+  content: "\F224";
 }
 
 .zmdi-folder-person:before {
-  content: "";
+  content: "\F225";
 }
 
 .zmdi-folder-star-alt:before {
-  content: "";
+  content: "\F226";
 }
 
 .zmdi-folder-star:before {
-  content: "";
+  content: "\F227";
 }
 
 .zmdi-folder:before {
-  content: "";
+  content: "\F228";
 }
 
 .zmdi-gif:before {
-  content: "";
+  content: "\F229";
 }
 
 .zmdi-upload:before {
-  content: "";
+  content: "\F22A";
 }
 
 .zmdi-border-all:before {
-  content: "";
+  content: "\F22B";
 }
 
 .zmdi-border-bottom:before {
-  content: "";
+  content: "\F22C";
 }
 
 .zmdi-border-clear:before {
-  content: "";
+  content: "\F22D";
 }
 
 .zmdi-border-color:before {
-  content: "";
+  content: "\F22E";
 }
 
 .zmdi-border-horizontal:before {
-  content: "";
+  content: "\F22F";
 }
 
 .zmdi-border-inner:before {
-  content: "";
+  content: "\F230";
 }
 
 .zmdi-border-left:before {
-  content: "";
+  content: "\F231";
 }
 
 .zmdi-border-outer:before {
-  content: "";
+  content: "\F232";
 }
 
 .zmdi-border-right:before {
-  content: "";
+  content: "\F233";
 }
 
 .zmdi-border-style:before {
-  content: "";
+  content: "\F234";
 }
 
 .zmdi-border-top:before {
-  content: "";
+  content: "\F235";
 }
 
 .zmdi-border-vertical:before {
-  content: "";
+  content: "\F236";
 }
 
 .zmdi-copy:before {
-  content: "";
+  content: "\F237";
 }
 
 .zmdi-crop:before {
-  content: "";
+  content: "\F238";
 }
 
 .zmdi-format-align-center:before {
-  content: "";
+  content: "\F239";
 }
 
 .zmdi-format-align-justify:before {
-  content: "";
+  content: "\F23A";
 }
 
 .zmdi-format-align-left:before {
-  content: "";
+  content: "\F23B";
 }
 
 .zmdi-format-align-right:before {
-  content: "";
+  content: "\F23C";
 }
 
 .zmdi-format-bold:before {
-  content: "";
+  content: "\F23D";
 }
 
 .zmdi-format-clear-all:before {
-  content: "";
+  content: "\F23E";
 }
 
 .zmdi-format-clear:before {
-  content: "";
+  content: "\F23F";
 }
 
 .zmdi-format-color-fill:before {
-  content: "";
+  content: "\F240";
 }
 
 .zmdi-format-color-reset:before {
-  content: "";
+  content: "\F241";
 }
 
 .zmdi-format-color-text:before {
-  content: "";
+  content: "\F242";
 }
 
 .zmdi-format-indent-decrease:before {
-  content: "";
+  content: "\F243";
 }
 
 .zmdi-format-indent-increase:before {
-  content: "";
+  content: "\F244";
 }
 
 .zmdi-format-italic:before {
-  content: "";
+  content: "\F245";
 }
 
 .zmdi-format-line-spacing:before {
-  content: "";
+  content: "\F246";
 }
 
 .zmdi-format-list-bulleted:before {
-  content: "";
+  content: "\F247";
 }
 
 .zmdi-format-list-numbered:before {
-  content: "";
+  content: "\F248";
 }
 
 .zmdi-format-ltr:before {
-  content: "";
+  content: "\F249";
 }
 
 .zmdi-format-rtl:before {
-  content: "";
+  content: "\F24A";
 }
 
 .zmdi-format-size:before {
-  content: "";
+  content: "\F24B";
 }
 
 .zmdi-format-strikethrough-s:before {
-  content: "";
+  content: "\F24C";
 }
 
 .zmdi-format-strikethrough:before {
-  content: "";
+  content: "\F24D";
 }
 
 .zmdi-format-subject:before {
-  content: "";
+  content: "\F24E";
 }
 
 .zmdi-format-underlined:before {
-  content: "";
+  content: "\F24F";
 }
 
 .zmdi-format-valign-bottom:before {
-  content: "";
+  content: "\F250";
 }
 
 .zmdi-format-valign-center:before {
-  content: "";
+  content: "\F251";
 }
 
 .zmdi-format-valign-top:before {
-  content: "";
+  content: "\F252";
 }
 
 .zmdi-redo:before {
-  content: "";
+  content: "\F253";
 }
 
 .zmdi-select-all:before {
-  content: "";
+  content: "\F254";
 }
 
 .zmdi-space-bar:before {
-  content: "";
+  content: "\F255";
 }
 
 .zmdi-text-format:before {
-  content: "";
+  content: "\F256";
 }
 
 .zmdi-transform:before {
-  content: "";
+  content: "\F257";
 }
 
 .zmdi-undo:before {
-  content: "";
+  content: "\F258";
 }
 
 .zmdi-wrap-text:before {
-  content: "";
+  content: "\F259";
 }
 
 .zmdi-comment-alert:before {
-  content: "";
+  content: "\F25A";
 }
 
 .zmdi-comment-alt-text:before {
-  content: "";
+  content: "\F25B";
 }
 
 .zmdi-comment-alt:before {
-  content: "";
+  content: "\F25C";
 }
 
 .zmdi-comment-edit:before {
-  content: "";
+  content: "\F25D";
 }
 
 .zmdi-comment-image:before {
-  content: "";
+  content: "\F25E";
 }
 
 .zmdi-comment-list:before {
-  content: "";
+  content: "\F25F";
 }
 
 .zmdi-comment-more:before {
-  content: "";
+  content: "\F260";
 }
 
 .zmdi-comment-outline:before {
-  content: "";
+  content: "\F261";
 }
 
 .zmdi-comment-text-alt:before {
-  content: "";
+  content: "\F262";
 }
 
 .zmdi-comment-text:before {
-  content: "";
+  content: "\F263";
 }
 
 .zmdi-comment-video:before {
-  content: "";
+  content: "\F264";
 }
 
 .zmdi-comment:before {
-  content: "";
+  content: "\F265";
 }
 
 .zmdi-comments:before {
-  content: "";
+  content: "\F266";
 }
 
 .zmdi-check-all:before {
-  content: "";
+  content: "\F267";
 }
 
 .zmdi-check-circle-u:before {
-  content: "";
+  content: "\F268";
 }
 
 .zmdi-check-circle:before {
-  content: "";
+  content: "\F269";
 }
 
 .zmdi-check-square:before {
-  content: "";
+  content: "\F26A";
 }
 
 .zmdi-check:before {
-  content: "";
+  content: "\F26B";
 }
 
 .zmdi-circle-o:before {
-  content: "";
+  content: "\F26C";
 }
 
 .zmdi-circle:before {
-  content: "";
+  content: "\F26D";
 }
 
 .zmdi-dot-circle-alt:before {
-  content: "";
+  content: "\F26E";
 }
 
 .zmdi-dot-circle:before {
-  content: "";
+  content: "\F26F";
 }
 
 .zmdi-minus-circle-outline:before {
-  content: "";
+  content: "\F270";
 }
 
 .zmdi-minus-circle:before {
-  content: "";
+  content: "\F271";
 }
 
 .zmdi-minus-square:before {
-  content: "";
+  content: "\F272";
 }
 
 .zmdi-minus:before {
-  content: "";
+  content: "\F273";
 }
 
 .zmdi-plus-circle-o-duplicate:before {
-  content: "";
+  content: "\F274";
 }
 
 .zmdi-plus-circle-o:before {
-  content: "";
+  content: "\F275";
 }
 
 .zmdi-plus-circle:before {
-  content: "";
+  content: "\F276";
 }
 
 .zmdi-plus-square:before {
-  content: "";
+  content: "\F277";
 }
 
 .zmdi-plus:before {
-  content: "";
+  content: "\F278";
 }
 
 .zmdi-square-o:before {
-  content: "";
+  content: "\F279";
 }
 
 .zmdi-star-circle:before {
-  content: "";
+  content: "\F27A";
 }
 
 .zmdi-star-half:before {
-  content: "";
+  content: "\F27B";
 }
 
 .zmdi-star-outline:before {
-  content: "";
+  content: "\F27C";
 }
 
 .zmdi-star:before {
-  content: "";
+  content: "\F27D";
 }
 
 .zmdi-bluetooth-connected:before {
-  content: "";
+  content: "\F27E";
 }
 
 .zmdi-bluetooth-off:before {
-  content: "";
+  content: "\F27F";
 }
 
 .zmdi-bluetooth-search:before {
-  content: "";
+  content: "\F280";
 }
 
 .zmdi-bluetooth-setting:before {
-  content: "";
+  content: "\F281";
 }
 
 .zmdi-bluetooth:before {
-  content: "";
+  content: "\F282";
 }
 
 .zmdi-camera-add:before {
-  content: "";
+  content: "\F283";
 }
 
 .zmdi-camera-alt:before {
-  content: "";
+  content: "\F284";
 }
 
 .zmdi-camera-bw:before {
-  content: "";
+  content: "\F285";
 }
 
 .zmdi-camera-front:before {
-  content: "";
+  content: "\F286";
 }
 
 .zmdi-camera-mic:before {
-  content: "";
+  content: "\F287";
 }
 
 .zmdi-camera-party-mode:before {
-  content: "";
+  content: "\F288";
 }
 
 .zmdi-camera-rear:before {
-  content: "";
+  content: "\F289";
 }
 
 .zmdi-camera-roll:before {
-  content: "";
+  content: "\F28A";
 }
 
 .zmdi-camera-switch:before {
-  content: "";
+  content: "\F28B";
 }
 
 .zmdi-camera:before {
-  content: "";
+  content: "\F28C";
 }
 
 .zmdi-card-alert:before {
-  content: "";
+  content: "\F28D";
 }
 
 .zmdi-card-off:before {
-  content: "";
+  content: "\F28E";
 }
 
 .zmdi-card-sd:before {
-  content: "";
+  content: "\F28F";
 }
 
 .zmdi-card-sim:before {
-  content: "";
+  content: "\F290";
 }
 
 .zmdi-desktop-mac:before {
-  content: "";
+  content: "\F291";
 }
 
 .zmdi-desktop-windows:before {
-  content: "";
+  content: "\F292";
 }
 
 .zmdi-device-hub:before {
-  content: "";
+  content: "\F293";
 }
 
 .zmdi-devices-off:before {
-  content: "";
+  content: "\F294";
 }
 
 .zmdi-devices:before {
-  content: "";
+  content: "\F295";
 }
 
 .zmdi-dock:before {
-  content: "";
+  content: "\F296";
 }
 
 .zmdi-floppy:before {
-  content: "";
+  content: "\F297";
 }
 
 .zmdi-gamepad:before {
-  content: "";
+  content: "\F298";
 }
 
 .zmdi-gps-dot:before {
-  content: "";
+  content: "\F299";
 }
 
 .zmdi-gps-off:before {
-  content: "";
+  content: "\F29A";
 }
 
 .zmdi-gps:before {
-  content: "";
+  content: "\F29B";
 }
 
 .zmdi-headset-mic:before {
-  content: "";
+  content: "\F29C";
 }
 
 .zmdi-headset:before {
-  content: "";
+  content: "\F29D";
 }
 
 .zmdi-input-antenna:before {
-  content: "";
+  content: "\F29E";
 }
 
 .zmdi-input-composite:before {
-  content: "";
+  content: "\F29F";
 }
 
 .zmdi-input-hdmi:before {
-  content: "";
+  content: "\F2A0";
 }
 
 .zmdi-input-power:before {
-  content: "";
+  content: "\F2A1";
 }
 
 .zmdi-input-svideo:before {
-  content: "";
+  content: "\F2A2";
 }
 
 .zmdi-keyboard-hide:before {
-  content: "";
+  content: "\F2A3";
 }
 
 .zmdi-keyboard:before {
-  content: "";
+  content: "\F2A4";
 }
 
 .zmdi-laptop-chromebook:before {
-  content: "";
+  content: "\F2A5";
 }
 
 .zmdi-laptop-mac:before {
-  content: "";
+  content: "\F2A6";
 }
 
 .zmdi-laptop:before {
-  content: "";
+  content: "\F2A7";
 }
 
 .zmdi-mic-off:before {
-  content: "";
+  content: "\F2A8";
 }
 
 .zmdi-mic-outline:before {
-  content: "";
+  content: "\F2A9";
 }
 
 .zmdi-mic-setting:before {
-  content: "";
+  content: "\F2AA";
 }
 
 .zmdi-mic:before {
-  content: "";
+  content: "\F2AB";
 }
 
 .zmdi-mouse:before {
-  content: "";
+  content: "\F2AC";
 }
 
 .zmdi-network-alert:before {
-  content: "";
+  content: "\F2AD";
 }
 
 .zmdi-network-locked:before {
-  content: "";
+  content: "\F2AE";
 }
 
 .zmdi-network-off:before {
-  content: "";
+  content: "\F2AF";
 }
 
 .zmdi-network-outline:before {
-  content: "";
+  content: "\F2B0";
 }
 
 .zmdi-network-setting:before {
-  content: "";
+  content: "\F2B1";
 }
 
 .zmdi-network:before {
-  content: "";
+  content: "\F2B2";
 }
 
 .zmdi-phone-bluetooth:before {
-  content: "";
+  content: "\F2B3";
 }
 
 .zmdi-phone-end:before {
-  content: "";
+  content: "\F2B4";
 }
 
 .zmdi-phone-forwarded:before {
-  content: "";
+  content: "\F2B5";
 }
 
 .zmdi-phone-in-talk:before {
-  content: "";
+  content: "\F2B6";
 }
 
 .zmdi-phone-locked:before {
-  content: "";
+  content: "\F2B7";
 }
 
 .zmdi-phone-missed:before {
-  content: "";
+  content: "\F2B8";
 }
 
 .zmdi-phone-msg:before {
-  content: "";
+  content: "\F2B9";
 }
 
 .zmdi-phone-paused:before {
-  content: "";
+  content: "\F2BA";
 }
 
 .zmdi-phone-ring:before {
-  content: "";
+  content: "\F2BB";
 }
 
 .zmdi-phone-setting:before {
-  content: "";
+  content: "\F2BC";
 }
 
 .zmdi-phone-sip:before {
-  content: "";
+  content: "\F2BD";
 }
 
 .zmdi-phone:before {
-  content: "";
+  content: "\F2BE";
 }
 
 .zmdi-portable-wifi-changes:before {
-  content: "";
+  content: "\F2BF";
 }
 
 .zmdi-portable-wifi-off:before {
-  content: "";
+  content: "\F2C0";
 }
 
 .zmdi-portable-wifi:before {
-  content: "";
+  content: "\F2C1";
 }
 
 .zmdi-radio:before {
-  content: "";
+  content: "\F2C2";
 }
 
 .zmdi-reader:before {
-  content: "";
+  content: "\F2C3";
 }
 
 .zmdi-remote-control-alt:before {
-  content: "";
+  content: "\F2C4";
 }
 
 .zmdi-remote-control:before {
-  content: "";
+  content: "\F2C5";
 }
 
 .zmdi-router:before {
-  content: "";
+  content: "\F2C6";
 }
 
 .zmdi-scanner:before {
-  content: "";
+  content: "\F2C7";
 }
 
 .zmdi-smartphone-android:before {
-  content: "";
+  content: "\F2C8";
 }
 
 .zmdi-smartphone-download:before {
-  content: "";
+  content: "\F2C9";
 }
 
 .zmdi-smartphone-erase:before {
-  content: "";
+  content: "\F2CA";
 }
 
 .zmdi-smartphone-info:before {
-  content: "";
+  content: "\F2CB";
 }
 
 .zmdi-smartphone-iphone:before {
-  content: "";
+  content: "\F2CC";
 }
 
 .zmdi-smartphone-landscape-lock:before {
-  content: "";
+  content: "\F2CD";
 }
 
 .zmdi-smartphone-landscape:before {
-  content: "";
+  content: "\F2CE";
 }
 
 .zmdi-smartphone-lock:before {
-  content: "";
+  content: "\F2CF";
 }
 
 .zmdi-smartphone-portrait-lock:before {
-  content: "";
+  content: "\F2D0";
 }
 
 .zmdi-smartphone-ring:before {
-  content: "";
+  content: "\F2D1";
 }
 
 .zmdi-smartphone-setting:before {
-  content: "";
+  content: "\F2D2";
 }
 
 .zmdi-smartphone-setup:before {
-  content: "";
+  content: "\F2D3";
 }
 
 .zmdi-smartphone:before {
-  content: "";
+  content: "\F2D4";
 }
 
 .zmdi-speaker:before {
-  content: "";
+  content: "\F2D5";
 }
 
 .zmdi-tablet-android:before {
-  content: "";
+  content: "\F2D6";
 }
 
 .zmdi-tablet-mac:before {
-  content: "";
+  content: "\F2D7";
 }
 
 .zmdi-tablet:before {
-  content: "";
+  content: "\F2D8";
 }
 
 .zmdi-tv-alt-play:before {
-  content: "";
+  content: "\F2D9";
 }
 
 .zmdi-tv-list:before {
-  content: "";
+  content: "\F2DA";
 }
 
 .zmdi-tv-play:before {
-  content: "";
+  content: "\F2DB";
 }
 
 .zmdi-tv:before {
-  content: "";
+  content: "\F2DC";
 }
 
 .zmdi-usb:before {
-  content: "";
+  content: "\F2DD";
 }
 
 .zmdi-videocam-off:before {
-  content: "";
+  content: "\F2DE";
 }
 
 .zmdi-videocam-switch:before {
-  content: "";
+  content: "\F2DF";
 }
 
 .zmdi-videocam:before {
-  content: "";
+  content: "\F2E0";
 }
 
 .zmdi-watch:before {
-  content: "";
+  content: "\F2E1";
 }
 
 .zmdi-wifi-alt-2:before {
-  content: "";
+  content: "\F2E2";
 }
 
 .zmdi-wifi-alt:before {
-  content: "";
+  content: "\F2E3";
 }
 
 .zmdi-wifi-info:before {
-  content: "";
+  content: "\F2E4";
 }
 
 .zmdi-wifi-lock:before {
-  content: "";
+  content: "\F2E5";
 }
 
 .zmdi-wifi-off:before {
-  content: "";
+  content: "\F2E6";
 }
 
 .zmdi-wifi-outline:before {
-  content: "";
+  content: "\F2E7";
 }
 
 .zmdi-wifi:before {
-  content: "";
+  content: "\F2E8";
 }
 
 .zmdi-arrow-left-bottom:before {
-  content: "";
+  content: "\F2E9";
 }
 
 .zmdi-arrow-left:before {
-  content: "";
+  content: "\F2EA";
 }
 
 .zmdi-arrow-merge:before {
-  content: "";
+  content: "\F2EB";
 }
 
 .zmdi-arrow-missed:before {
-  content: "";
+  content: "\F2EC";
 }
 
 .zmdi-arrow-right-top:before {
-  content: "";
+  content: "\F2ED";
 }
 
 .zmdi-arrow-right:before {
-  content: "";
+  content: "\F2EE";
 }
 
 .zmdi-arrow-split:before {
-  content: "";
+  content: "\F2EF";
 }
 
 .zmdi-arrows:before {
-  content: "";
+  content: "\F2F0";
 }
 
 .zmdi-caret-down-circle:before {
-  content: "";
+  content: "\F2F1";
 }
 
 .zmdi-caret-down:before {
-  content: "";
+  content: "\F2F2";
 }
 
 .zmdi-caret-left-circle:before {
-  content: "";
+  content: "\F2F3";
 }
 
 .zmdi-caret-left:before {
-  content: "";
+  content: "\F2F4";
 }
 
 .zmdi-caret-right-circle:before {
-  content: "";
+  content: "\F2F5";
 }
 
 .zmdi-caret-right:before {
-  content: "";
+  content: "\F2F6";
 }
 
 .zmdi-caret-up-circle:before {
-  content: "";
+  content: "\F2F7";
 }
 
 .zmdi-caret-up:before {
-  content: "";
+  content: "\F2F8";
 }
 
 .zmdi-chevron-down:before {
-  content: "";
+  content: "\F2F9";
 }
 
 .zmdi-chevron-left:before {
-  content: "";
+  content: "\F2FA";
 }
 
 .zmdi-chevron-right:before {
-  content: "";
+  content: "\F2FB";
 }
 
 .zmdi-chevron-up:before {
-  content: "";
+  content: "\F2FC";
 }
 
 .zmdi-forward:before {
-  content: "";
+  content: "\F2FD";
 }
 
 .zmdi-long-arrow-down:before {
-  content: "";
+  content: "\F2FE";
 }
 
 .zmdi-long-arrow-left:before {
-  content: "";
+  content: "\F2FF";
 }
 
 .zmdi-long-arrow-return:before {
-  content: "";
+  content: "\F300";
 }
 
 .zmdi-long-arrow-right:before {
-  content: "";
+  content: "\F301";
 }
 
 .zmdi-long-arrow-tab:before {
-  content: "";
+  content: "\F302";
 }
 
 .zmdi-long-arrow-up:before {
-  content: "";
+  content: "\F303";
 }
 
 .zmdi-rotate-ccw:before {
-  content: "";
+  content: "\F304";
 }
 
 .zmdi-rotate-cw:before {
-  content: "";
+  content: "\F305";
 }
 
 .zmdi-rotate-left:before {
-  content: "";
+  content: "\F306";
 }
 
 .zmdi-rotate-right:before {
-  content: "";
+  content: "\F307";
 }
 
 .zmdi-square-down:before {
-  content: "";
+  content: "\F308";
 }
 
 .zmdi-square-right:before {
-  content: "";
+  content: "\F309";
 }
 
 .zmdi-swap-alt:before {
-  content: "";
+  content: "\F30A";
 }
 
 .zmdi-swap-vertical-circle:before {
-  content: "";
+  content: "\F30B";
 }
 
 .zmdi-swap-vertical:before {
-  content: "";
+  content: "\F30C";
 }
 
 .zmdi-swap:before {
-  content: "";
+  content: "\F30D";
 }
 
 .zmdi-trending-down:before {
-  content: "";
+  content: "\F30E";
 }
 
 .zmdi-trending-flat:before {
-  content: "";
+  content: "\F30F";
 }
 
 .zmdi-trending-up:before {
-  content: "";
+  content: "\F310";
 }
 
 .zmdi-unfold-less:before {
-  content: "";
+  content: "\F311";
 }
 
 .zmdi-unfold-more:before {
-  content: "";
+  content: "\F312";
 }
 
 .zmdi-apps:before {
-  content: "";
+  content: "\F313";
 }
 
 .zmdi-grid-off:before {
-  content: "";
+  content: "\F314";
 }
 
 .zmdi-grid:before {
-  content: "";
+  content: "\F315";
 }
 
 .zmdi-view-agenda:before {
-  content: "";
+  content: "\F316";
 }
 
 .zmdi-view-array:before {
-  content: "";
+  content: "\F317";
 }
 
 .zmdi-view-carousel:before {
-  content: "";
+  content: "\F318";
 }
 
 .zmdi-view-column:before {
-  content: "";
+  content: "\F319";
 }
 
 .zmdi-view-comfy:before {
-  content: "";
+  content: "\F31A";
 }
 
 .zmdi-view-compact:before {
-  content: "";
+  content: "\F31B";
 }
 
 .zmdi-view-dashboard:before {
-  content: "";
+  content: "\F31C";
 }
 
 .zmdi-view-day:before {
-  content: "";
+  content: "\F31D";
 }
 
 .zmdi-view-headline:before {
-  content: "";
+  content: "\F31E";
 }
 
 .zmdi-view-list-alt:before {
-  content: "";
+  content: "\F31F";
 }
 
 .zmdi-view-list:before {
-  content: "";
+  content: "\F320";
 }
 
 .zmdi-view-module:before {
-  content: "";
+  content: "\F321";
 }
 
 .zmdi-view-quilt:before {
-  content: "";
+  content: "\F322";
 }
 
 .zmdi-view-stream:before {
-  content: "";
+  content: "\F323";
 }
 
 .zmdi-view-subtitles:before {
-  content: "";
+  content: "\F324";
 }
 
 .zmdi-view-toc:before {
-  content: "";
+  content: "\F325";
 }
 
 .zmdi-view-web:before {
-  content: "";
+  content: "\F326";
 }
 
 .zmdi-view-week:before {
-  content: "";
+  content: "\F327";
 }
 
 .zmdi-widgets:before {
-  content: "";
+  content: "\F328";
 }
 
 .zmdi-alarm-check:before {
-  content: "";
+  content: "\F329";
 }
 
 .zmdi-alarm-off:before {
-  content: "";
+  content: "\F32A";
 }
 
 .zmdi-alarm-plus:before {
-  content: "";
+  content: "\F32B";
 }
 
 .zmdi-alarm-snooze:before {
-  content: "";
+  content: "\F32C";
 }
 
 .zmdi-alarm:before {
-  content: "";
+  content: "\F32D";
 }
 
 .zmdi-calendar-alt:before {
-  content: "";
+  content: "\F32E";
 }
 
 .zmdi-calendar-check:before {
-  content: "";
+  content: "\F32F";
 }
 
 .zmdi-calendar-close:before {
-  content: "";
+  content: "\F330";
 }
 
 .zmdi-calendar-note:before {
-  content: "";
+  content: "\F331";
 }
 
 .zmdi-calendar:before {
-  content: "";
+  content: "\F332";
 }
 
 .zmdi-time-countdown:before {
-  content: "";
+  content: "\F333";
 }
 
 .zmdi-time-interval:before {
-  content: "";
+  content: "\F334";
 }
 
 .zmdi-time-restore-setting:before {
-  content: "";
+  content: "\F335";
 }
 
 .zmdi-time-restore:before {
-  content: "";
+  content: "\F336";
 }
 
 .zmdi-time:before {
-  content: "";
+  content: "\F337";
 }
 
 .zmdi-timer-off:before {
-  content: "";
+  content: "\F338";
 }
 
 .zmdi-timer:before {
-  content: "";
+  content: "\F339";
 }
 
 .zmdi-android-alt:before {
-  content: "";
+  content: "\F33A";
 }
 
 .zmdi-android:before {
-  content: "";
+  content: "\F33B";
 }
 
 .zmdi-apple:before {
-  content: "";
+  content: "\F33C";
 }
 
 .zmdi-behance:before {
-  content: "";
+  content: "\F33D";
 }
 
 .zmdi-codepen:before {
-  content: "";
+  content: "\F33E";
 }
 
 .zmdi-dribbble:before {
-  content: "";
+  content: "\F33F";
 }
 
 .zmdi-dropbox:before {
-  content: "";
+  content: "\F340";
 }
 
 .zmdi-evernote:before {
-  content: "";
+  content: "\F341";
 }
 
 .zmdi-facebook-box:before {
-  content: "";
+  content: "\F342";
 }
 
 .zmdi-facebook:before {
-  content: "";
+  content: "\F343";
 }
 
 .zmdi-github-box:before {
-  content: "";
+  content: "\F344";
 }
 
 .zmdi-github:before {
-  content: "";
+  content: "\F345";
 }
 
 .zmdi-google-drive:before {
-  content: "";
+  content: "\F346";
 }
 
 .zmdi-google-earth:before {
-  content: "";
+  content: "\F347";
 }
 
 .zmdi-google-glass:before {
-  content: "";
+  content: "\F348";
 }
 
 .zmdi-google-maps:before {
-  content: "";
+  content: "\F349";
 }
 
 .zmdi-google-pages:before {
-  content: "";
+  content: "\F34A";
 }
 
 .zmdi-google-play:before {
-  content: "";
+  content: "\F34B";
 }
 
 .zmdi-google-plus-box:before {
-  content: "";
+  content: "\F34C";
 }
 
 .zmdi-google-plus:before {
-  content: "";
+  content: "\F34D";
 }
 
 .zmdi-google:before {
-  content: "";
+  content: "\F34E";
 }
 
 .zmdi-instagram:before {
-  content: "";
+  content: "\F34F";
 }
 
 .zmdi-language-css3:before {
-  content: "";
+  content: "\F350";
 }
 
 .zmdi-language-html5:before {
-  content: "";
+  content: "\F351";
 }
 
 .zmdi-language-javascript:before {
-  content: "";
+  content: "\F352";
 }
 
 .zmdi-language-python-alt:before {
-  content: "";
+  content: "\F353";
 }
 
 .zmdi-language-python:before {
-  content: "";
+  content: "\F354";
 }
 
 .zmdi-lastfm:before {
-  content: "";
+  content: "\F355";
 }
 
 .zmdi-linkedin-box:before {
-  content: "";
+  content: "\F356";
 }
 
 .zmdi-paypal:before {
-  content: "";
+  content: "\F357";
 }
 
 .zmdi-pinterest-box:before {
-  content: "";
+  content: "\F358";
 }
 
 .zmdi-pocket:before {
-  content: "";
+  content: "\F359";
 }
 
 .zmdi-polymer:before {
-  content: "";
+  content: "\F35A";
 }
 
 .zmdi-share:before {
-  content: "";
+  content: "\F35B";
 }
 
 .zmdi-stackoverflow:before {
-  content: "";
+  content: "\F35C";
 }
 
 .zmdi-steam-square:before {
-  content: "";
+  content: "\F35D";
 }
 
 .zmdi-steam:before {
-  content: "";
+  content: "\F35E";
 }
 
 .zmdi-twitter-box:before {
-  content: "";
+  content: "\F35F";
 }
 
 .zmdi-twitter:before {
-  content: "";
+  content: "\F360";
 }
 
 .zmdi-vk:before {
-  content: "";
+  content: "\F361";
 }
 
 .zmdi-wikipedia:before {
-  content: "";
+  content: "\F362";
 }
 
 .zmdi-windows:before {
-  content: "";
+  content: "\F363";
 }
 
 .zmdi-aspect-ratio-alt:before {
-  content: "";
+  content: "\F364";
 }
 
 .zmdi-aspect-ratio:before {
-  content: "";
+  content: "\F365";
 }
 
 .zmdi-blur-circular:before {
-  content: "";
+  content: "\F366";
 }
 
 .zmdi-blur-linear:before {
-  content: "";
+  content: "\F367";
 }
 
 .zmdi-blur-off:before {
-  content: "";
+  content: "\F368";
 }
 
 .zmdi-blur:before {
-  content: "";
+  content: "\F369";
 }
 
 .zmdi-brightness-2:before {
-  content: "";
+  content: "\F36A";
 }
 
 .zmdi-brightness-3:before {
-  content: "";
+  content: "\F36B";
 }
 
 .zmdi-brightness-4:before {
-  content: "";
+  content: "\F36C";
 }
 
 .zmdi-brightness-5:before {
-  content: "";
+  content: "\F36D";
 }
 
 .zmdi-brightness-6:before {
-  content: "";
+  content: "\F36E";
 }
 
 .zmdi-brightness-7:before {
-  content: "";
+  content: "\F36F";
 }
 
 .zmdi-brightness-auto:before {
-  content: "";
+  content: "\F370";
 }
 
 .zmdi-brightness-setting:before {
-  content: "";
+  content: "\F371";
 }
 
 .zmdi-broken-image:before {
-  content: "";
+  content: "\F372";
 }
 
 .zmdi-center-focus-strong:before {
-  content: "";
+  content: "\F373";
 }
 
 .zmdi-center-focus-weak:before {
-  content: "";
+  content: "\F374";
 }
 
 .zmdi-compare:before {
-  content: "";
+  content: "\F375";
 }
 
 .zmdi-crop-16-9:before {
-  content: "";
+  content: "\F376";
 }
 
 .zmdi-crop-3-2:before {
-  content: "";
+  content: "\F377";
 }
 
 .zmdi-crop-5-4:before {
-  content: "";
+  content: "\F378";
 }
 
 .zmdi-crop-7-5:before {
-  content: "";
+  content: "\F379";
 }
 
 .zmdi-crop-din:before {
-  content: "";
+  content: "\F37A";
 }
 
 .zmdi-crop-free:before {
-  content: "";
+  content: "\F37B";
 }
 
 .zmdi-crop-landscape:before {
-  content: "";
+  content: "\F37C";
 }
 
 .zmdi-crop-portrait:before {
-  content: "";
+  content: "\F37D";
 }
 
 .zmdi-crop-square:before {
-  content: "";
+  content: "\F37E";
 }
 
 .zmdi-exposure-alt:before {
-  content: "";
+  content: "\F37F";
 }
 
 .zmdi-exposure:before {
-  content: "";
+  content: "\F380";
 }
 
 .zmdi-filter-b-and-w:before {
-  content: "";
+  content: "\F381";
 }
 
 .zmdi-filter-center-focus:before {
-  content: "";
+  content: "\F382";
 }
 
 .zmdi-filter-frames:before {
-  content: "";
+  content: "\F383";
 }
 
 .zmdi-filter-tilt-shift:before {
-  content: "";
+  content: "\F384";
 }
 
 .zmdi-gradient:before {
-  content: "";
+  content: "\F385";
 }
 
 .zmdi-grain:before {
-  content: "";
+  content: "\F386";
 }
 
 .zmdi-graphic-eq:before {
-  content: "";
+  content: "\F387";
 }
 
 .zmdi-hdr-off:before {
-  content: "";
+  content: "\F388";
 }
 
 .zmdi-hdr-strong:before {
-  content: "";
+  content: "\F389";
 }
 
 .zmdi-hdr-weak:before {
-  content: "";
+  content: "\F38A";
 }
 
 .zmdi-hdr:before {
-  content: "";
+  content: "\F38B";
 }
 
 .zmdi-iridescent:before {
-  content: "";
+  content: "\F38C";
 }
 
 .zmdi-leak-off:before {
-  content: "";
+  content: "\F38D";
 }
 
 .zmdi-leak:before {
-  content: "";
+  content: "\F38E";
 }
 
 .zmdi-looks:before {
-  content: "";
+  content: "\F38F";
 }
 
 .zmdi-loupe:before {
-  content: "";
+  content: "\F390";
 }
 
 .zmdi-panorama-horizontal:before {
-  content: "";
+  content: "\F391";
 }
 
 .zmdi-panorama-vertical:before {
-  content: "";
+  content: "\F392";
 }
 
 .zmdi-panorama-wide-angle:before {
-  content: "";
+  content: "\F393";
 }
 
 .zmdi-photo-size-select-large:before {
-  content: "";
+  content: "\F394";
 }
 
 .zmdi-photo-size-select-small:before {
-  content: "";
+  content: "\F395";
 }
 
 .zmdi-picture-in-picture:before {
-  content: "";
+  content: "\F396";
 }
 
 .zmdi-slideshow:before {
-  content: "";
+  content: "\F397";
 }
 
 .zmdi-texture:before {
-  content: "";
+  content: "\F398";
 }
 
 .zmdi-tonality:before {
-  content: "";
+  content: "\F399";
 }
 
 .zmdi-vignette:before {
-  content: "";
+  content: "\F39A";
 }
 
 .zmdi-wb-auto:before {
-  content: "";
+  content: "\F39B";
 }
 
 .zmdi-eject-alt:before {
-  content: "";
+  content: "\F39C";
 }
 
 .zmdi-eject:before {
-  content: "";
+  content: "\F39D";
 }
 
 .zmdi-equalizer:before {
-  content: "";
+  content: "\F39E";
 }
 
 .zmdi-fast-forward:before {
-  content: "";
+  content: "\F39F";
 }
 
 .zmdi-fast-rewind:before {
-  content: "";
+  content: "\F3A0";
 }
 
 .zmdi-forward-10:before {
-  content: "";
+  content: "\F3A1";
 }
 
 .zmdi-forward-30:before {
-  content: "";
+  content: "\F3A2";
 }
 
 .zmdi-forward-5:before {
-  content: "";
+  content: "\F3A3";
 }
 
 .zmdi-hearing:before {
-  content: "";
+  content: "\F3A4";
 }
 
 .zmdi-pause-circle-outline:before {
-  content: "";
+  content: "\F3A5";
 }
 
 .zmdi-pause-circle:before {
-  content: "";
+  content: "\F3A6";
 }
 
 .zmdi-pause:before {
-  content: "";
+  content: "\F3A7";
 }
 
 .zmdi-play-circle-outline:before {
-  content: "";
+  content: "\F3A8";
 }
 
 .zmdi-play-circle:before {
-  content: "";
+  content: "\F3A9";
 }
 
 .zmdi-play:before {
-  content: "";
+  content: "\F3AA";
 }
 
 .zmdi-playlist-audio:before {
-  content: "";
+  content: "\F3AB";
 }
 
 .zmdi-playlist-plus:before {
-  content: "";
+  content: "\F3AC";
 }
 
 .zmdi-repeat-one:before {
-  content: "";
+  content: "\F3AD";
 }
 
 .zmdi-repeat:before {
-  content: "";
+  content: "\F3AE";
 }
 
 .zmdi-replay-10:before {
-  content: "";
+  content: "\F3AF";
 }
 
 .zmdi-replay-30:before {
-  content: "";
+  content: "\F3B0";
 }
 
 .zmdi-replay-5:before {
-  content: "";
+  content: "\F3B1";
 }
 
 .zmdi-replay:before {
-  content: "";
+  content: "\F3B2";
 }
 
 .zmdi-shuffle:before {
-  content: "";
+  content: "\F3B3";
 }
 
 .zmdi-skip-next:before {
-  content: "";
+  content: "\F3B4";
 }
 
 .zmdi-skip-previous:before {
-  content: "";
+  content: "\F3B5";
 }
 
 .zmdi-stop:before {
-  content: "";
+  content: "\F3B6";
 }
 
 .zmdi-surround-sound:before {
-  content: "";
+  content: "\F3B7";
 }
 
 .zmdi-tune:before {
-  content: "";
+  content: "\F3B8";
 }
 
 .zmdi-volume-down:before {
-  content: "";
+  content: "\F3B9";
 }
 
 .zmdi-volume-mute:before {
-  content: "";
+  content: "\F3BA";
 }
 
 .zmdi-volume-off:before {
-  content: "";
+  content: "\F3BB";
 }
 
 .zmdi-volume-up:before {
-  content: "";
+  content: "\F3BC";
 }
 
 .zmdi-n-1-square:before {
-  content: "";
+  content: "\F3BD";
 }
 
 .zmdi-n-2-square:before {
-  content: "";
+  content: "\F3BE";
 }
 
 .zmdi-n-3-square:before {
-  content: "";
+  content: "\F3BF";
 }
 
 .zmdi-n-4-square:before {
-  content: "";
+  content: "\F3C0";
 }
 
 .zmdi-n-5-square:before {
-  content: "";
+  content: "\F3C1";
 }
 
 .zmdi-n-6-square:before {
-  content: "";
+  content: "\F3C2";
 }
 
 .zmdi-neg-1:before {
-  content: "";
+  content: "\F3C3";
 }
 
 .zmdi-neg-2:before {
-  content: "";
+  content: "\F3C4";
 }
 
 .zmdi-plus-1:before {
-  content: "";
+  content: "\F3C5";
 }
 
 .zmdi-plus-2:before {
-  content: "";
+  content: "\F3C6";
 }
 
 .zmdi-sec-10:before {
-  content: "";
+  content: "\F3C7";
 }
 
 .zmdi-sec-3:before {
-  content: "";
+  content: "\F3C8";
 }
 
 .zmdi-zero:before {
-  content: "";
+  content: "\F3C9";
 }
 
 .zmdi-airline-seat-flat-angled:before {
-  content: "";
+  content: "\F3CA";
 }
 
 .zmdi-airline-seat-flat:before {
-  content: "";
+  content: "\F3CB";
 }
 
 .zmdi-airline-seat-individual-suite:before {
-  content: "";
+  content: "\F3CC";
 }
 
 .zmdi-airline-seat-legroom-extra:before {
-  content: "";
+  content: "\F3CD";
 }
 
 .zmdi-airline-seat-legroom-normal:before {
-  content: "";
+  content: "\F3CE";
 }
 
 .zmdi-airline-seat-legroom-reduced:before {
-  content: "";
+  content: "\F3CF";
 }
 
 .zmdi-airline-seat-recline-extra:before {
-  content: "";
+  content: "\F3D0";
 }
 
 .zmdi-airline-seat-recline-normal:before {
-  content: "";
+  content: "\F3D1";
 }
 
 .zmdi-airplay:before {
-  content: "";
+  content: "\F3D2";
 }
 
 .zmdi-closed-caption:before {
-  content: "";
+  content: "\F3D3";
 }
 
 .zmdi-confirmation-number:before {
-  content: "";
+  content: "\F3D4";
 }
 
 .zmdi-developer-board:before {
-  content: "";
+  content: "\F3D5";
 }
 
 .zmdi-disc-full:before {
-  content: "";
+  content: "\F3D6";
 }
 
 .zmdi-explicit:before {
-  content: "";
+  content: "\F3D7";
 }
 
 .zmdi-flight-land:before {
-  content: "";
+  content: "\F3D8";
 }
 
 .zmdi-flight-takeoff:before {
-  content: "";
+  content: "\F3D9";
 }
 
 .zmdi-flip-to-back:before {
-  content: "";
+  content: "\F3DA";
 }
 
 .zmdi-flip-to-front:before {
-  content: "";
+  content: "\F3DB";
 }
 
 .zmdi-group-work:before {
-  content: "";
+  content: "\F3DC";
 }
 
 .zmdi-hd:before {
-  content: "";
+  content: "\F3DD";
 }
 
 .zmdi-hq:before {
-  content: "";
+  content: "\F3DE";
 }
 
 .zmdi-markunread-mailbox:before {
-  content: "";
+  content: "\F3DF";
 }
 
 .zmdi-memory:before {
-  content: "";
+  content: "\F3E0";
 }
 
 .zmdi-nfc:before {
-  content: "";
+  content: "\F3E1";
 }
 
 .zmdi-play-for-work:before {
-  content: "";
+  content: "\F3E2";
 }
 
 .zmdi-power-input:before {
-  content: "";
+  content: "\F3E3";
 }
 
 .zmdi-present-to-all:before {
-  content: "";
+  content: "\F3E4";
 }
 
 .zmdi-satellite:before {
-  content: "";
+  content: "\F3E5";
 }
 
 .zmdi-tap-and-play:before {
-  content: "";
+  content: "\F3E6";
 }
 
 .zmdi-vibration:before {
-  content: "";
+  content: "\F3E7";
 }
 
 .zmdi-voicemail:before {
-  content: "";
+  content: "\F3E8";
 }
 
 .zmdi-group:before {
-  content: "";
+  content: "\F3E9";
 }
 
 .zmdi-rss:before {
-  content: "";
+  content: "\F3EA";
 }
 
 .zmdi-shape:before {
-  content: "";
+  content: "\F3EB";
 }
 
 .zmdi-spinner:before {
-  content: "";
+  content: "\F3EC";
 }
 
 .zmdi-ungroup:before {
-  content: "";
+  content: "\F3ED";
 }
 
 .zmdi-500px:before {
-  content: "";
+  content: "\F3EE";
 }
 
 .zmdi-8tracks:before {
-  content: "";
+  content: "\F3EF";
 }
 
 .zmdi-amazon:before {
-  content: "";
+  content: "\F3F0";
 }
 
 .zmdi-blogger:before {
-  content: "";
+  content: "\F3F1";
 }
 
 .zmdi-delicious:before {
-  content: "";
+  content: "\F3F2";
 }
 
 .zmdi-disqus:before {
-  content: "";
+  content: "\F3F3";
 }
 
 .zmdi-flattr:before {
-  content: "";
+  content: "\F3F4";
 }
 
 .zmdi-flickr:before {
-  content: "";
+  content: "\F3F5";
 }
 
 .zmdi-github-alt:before {
-  content: "";
+  content: "\F3F6";
 }
 
 .zmdi-google-old:before {
-  content: "";
+  content: "\F3F7";
 }
 
 .zmdi-linkedin:before {
-  content: "";
+  content: "\F3F8";
 }
 
 .zmdi-odnoklassniki:before {
-  content: "";
+  content: "\F3F9";
 }
 
 .zmdi-outlook:before {
-  content: "";
+  content: "\F3FA";
 }
 
 .zmdi-paypal-alt:before {
-  content: "";
+  content: "\F3FB";
 }
 
 .zmdi-pinterest:before {
-  content: "";
+  content: "\F3FC";
 }
 
 .zmdi-playstation:before {
-  content: "";
+  content: "\F3FD";
 }
 
 .zmdi-reddit:before {
-  content: "";
+  content: "\F3FE";
 }
 
 .zmdi-skype:before {
-  content: "";
+  content: "\F3FF";
 }
 
 .zmdi-slideshare:before {
-  content: "";
+  content: "\F400";
 }
 
 .zmdi-soundcloud:before {
-  content: "";
+  content: "\F401";
 }
 
 .zmdi-tumblr:before {
-  content: "";
+  content: "\F402";
 }
 
 .zmdi-twitch:before {
-  content: "";
+  content: "\F403";
 }
 
 .zmdi-vimeo:before {
-  content: "";
+  content: "\F404";
 }
 
 .zmdi-whatsapp:before {
-  content: "";
+  content: "\F405";
 }
 
 .zmdi-xbox:before {
-  content: "";
+  content: "\F406";
 }
 
 .zmdi-yahoo:before {
-  content: "";
+  content: "\F407";
 }
 
 .zmdi-youtube-play:before {
-  content: "";
+  content: "\F408";
 }
 
 .zmdi-youtube:before {
-  content: "";
+  content: "\F409";
 }
 
 .zmdi-import-export:before {
-  content: "";
+  content: "\F30C";
 }
 
 .zmdi-swap-vertical-:before {
-  content: "";
+  content: "\F30C";
 }
 
 .zmdi-airplanemode-inactive:before {
-  content: "";
+  content: "\F102";
 }
 
 .zmdi-airplanemode-active:before {
-  content: "";
+  content: "\F103";
 }
 
 .zmdi-rate-review:before {
-  content: "";
+  content: "\F103";
 }
 
 .zmdi-comment-sign:before {
-  content: "";
+  content: "\F25A";
 }
 
 .zmdi-network-warning:before {
-  content: "";
+  content: "\F2AD";
 }
 
 .zmdi-shopping-cart-add:before {
-  content: "";
+  content: "\F1CA";
 }
 
 .zmdi-file-add:before {
-  content: "";
+  content: "\F221";
 }
 
 .zmdi-network-wifi-scan:before {
-  content: "";
+  content: "\F2E4";
 }
 
 .zmdi-collection-add:before {
-  content: "";
+  content: "\F14E";
 }
 
 .zmdi-format-playlist-add:before {
-  content: "";
+  content: "\F3AC";
 }
 
 .zmdi-format-queue-music:before {
-  content: "";
+  content: "\F3AB";
 }
 
 .zmdi-plus-box:before {
-  content: "";
+  content: "\F277";
 }
 
 .zmdi-tag-backspace:before {
-  content: "";
+  content: "\F1D9";
 }
 
 .zmdi-alarm-add:before {
-  content: "";
+  content: "\F32B";
 }
 
 .zmdi-battery-charging:before {
-  content: "";
+  content: "\F114";
 }
 
 .zmdi-daydream-setting:before {
-  content: "";
+  content: "\F217";
 }
 
 .zmdi-more-horiz:before {
-  content: "";
+  content: "\F19C";
 }
 
 .zmdi-book-photo:before {
-  content: "";
+  content: "\F11B";
 }
 
 .zmdi-incandescent:before {
-  content: "";
+  content: "\F189";
 }
 
 .zmdi-wb-iridescent:before {
-  content: "";
+  content: "\F38C";
 }
 
 .zmdi-calendar-remove:before {
-  content: "";
+  content: "\F330";
 }
 
 .zmdi-refresh-sync-disabled:before {
-  content: "";
+  content: "\F1B7";
 }
 
 .zmdi-refresh-sync-problem:before {
-  content: "";
+  content: "\F1B6";
 }
 
 .zmdi-crop-original:before {
-  content: "";
+  content: "\F17E";
 }
 
 .zmdi-power-off:before {
-  content: "";
+  content: "\F1AF";
 }
 
 .zmdi-power-off-setting:before {
-  content: "";
+  content: "\F1AE";
 }
 
 .zmdi-leak-remove:before {
-  content: "";
+  content: "\F38D";
 }
 
 .zmdi-star-border:before {
-  content: "";
+  content: "\F27C";
 }
 
 .zmdi-brightness-low:before {
-  content: "";
+  content: "\F36D";
 }
 
 .zmdi-brightness-medium:before {
-  content: "";
+  content: "\F36E";
 }
 
 .zmdi-brightness-high:before {
-  content: "";
+  content: "\F36F";
 }
 
 .zmdi-smartphone-portrait:before {
-  content: "";
+  content: "\F2D4";
 }
 
 .zmdi-live-tv:before {
-  content: "";
+  content: "\F2D9";
 }
 
 .zmdi-format-textdirection-l-to-r:before {
-  content: "";
+  content: "\F249";
 }
 
 .zmdi-format-textdirection-r-to-l:before {
-  content: "";
+  content: "\F24A";
 }
 
 .zmdi-arrow-back:before {
-  content: "";
+  content: "\F2EA";
 }
 
 .zmdi-arrow-forward:before {
-  content: "";
+  content: "\F2EE";
 }
 
 .zmdi-arrow-in:before {
-  content: "";
+  content: "\F2E9";
 }
 
 .zmdi-arrow-out:before {
-  content: "";
+  content: "\F2ED";
 }
 
 .zmdi-rotate-90-degrees-ccw:before {
-  content: "";
+  content: "\F304";
 }
 
 .zmdi-adb:before {
-  content: "";
+  content: "\F33A";
 }
 
 .zmdi-network-wifi:before {
-  content: "";
+  content: "\F2E8";
 }
 
 .zmdi-network-wifi-alt:before {
-  content: "";
+  content: "\F2E3";
 }
 
 .zmdi-network-wifi-lock:before {
-  content: "";
+  content: "\F2E5";
 }
 
 .zmdi-network-wifi-off:before {
-  content: "";
+  content: "\F2E6";
 }
 
 .zmdi-network-wifi-outline:before {
-  content: "";
+  content: "\F2E7";
 }
 
 .zmdi-network-wifi-info:before {
-  content: "";
+  content: "\F2E4";
 }
 
 .zmdi-layers-clear:before {
-  content: "";
+  content: "\F18B";
 }
 
 .zmdi-colorize:before {
-  content: "";
+  content: "\F15D";
 }
 
 .zmdi-format-paint:before {
-  content: "";
+  content: "\F1BA";
 }
 
 .zmdi-format-quote:before {
-  content: "";
+  content: "\F1B2";
 }
 
 .zmdi-camera-monochrome-photos:before {
-  content: "";
+  content: "\F285";
 }
 
 .zmdi-sort-by-alpha:before {
-  content: "";
+  content: "\F1CF";
 }
 
 .zmdi-folder-shared:before {
-  content: "";
+  content: "\F225";
 }
 
 .zmdi-folder-special:before {
-  content: "";
+  content: "\F226";
 }
 
 .zmdi-comment-dots:before {
-  content: "";
+  content: "\F260";
 }
 
 .zmdi-reorder:before {
-  content: "";
+  content: "\F31E";
 }
 
 .zmdi-dehaze:before {
-  content: "";
+  content: "\F197";
 }
 
 .zmdi-sort:before {
-  content: "";
+  content: "\F1CE";
 }
 
 .zmdi-pages:before {
-  content: "";
+  content: "\F34A";
 }
 
 .zmdi-stack-overflow:before {
-  content: "";
+  content: "\F35C";
 }
 
 .zmdi-calendar-account:before {
-  content: "";
+  content: "\F204";
 }
 
 .zmdi-paste:before {
-  content: "";
+  content: "\F109";
 }
 
 .zmdi-cut:before {
-  content: "";
+  content: "\F1BC";
 }
 
 .zmdi-save:before {
-  content: "";
+  content: "\F297";
 }
 
 .zmdi-smartphone-code:before {
-  content: "";
+  content: "\F139";
 }
 
 .zmdi-directions-bike:before {
-  content: "";
+  content: "\F117";
 }
 
 .zmdi-directions-boat:before {
-  content: "";
+  content: "\F11A";
 }
 
 .zmdi-directions-bus:before {
-  content: "";
+  content: "\F121";
 }
 
 .zmdi-directions-car:before {
-  content: "";
+  content: "\F125";
 }
 
 .zmdi-directions-railway:before {
-  content: "";
+  content: "\F1B3";
 }
 
 .zmdi-directions-run:before {
-  content: "";
+  content: "\F215";
 }
 
 .zmdi-directions-subway:before {
-  content: "";
+  content: "\F1D5";
 }
 
 .zmdi-directions-walk:before {
-  content: "";
+  content: "\F216";
 }
 
 .zmdi-local-hotel:before {
-  content: "";
+  content: "\F178";
 }
 
 .zmdi-local-activity:before {
-  content: "";
+  content: "\F1DF";
 }
 
 .zmdi-local-play:before {
-  content: "";
+  content: "\F1DF";
 }
 
 .zmdi-local-airport:before {
-  content: "";
+  content: "\F103";
 }
 
 .zmdi-local-atm:before {
-  content: "";
+  content: "\F198";
 }
 
 .zmdi-local-bar:before {
-  content: "";
+  content: "\F137";
 }
 
 .zmdi-local-cafe:before {
-  content: "";
+  content: "\F13B";
 }
 
 .zmdi-local-car-wash:before {
-  content: "";
+  content: "\F124";
 }
 
 .zmdi-local-convenience-store:before {
-  content: "";
+  content: "\F1D3";
 }
 
 .zmdi-local-dining:before {
-  content: "";
+  content: "\F153";
 }
 
 .zmdi-local-drink:before {
-  content: "";
+  content: "\F157";
 }
 
 .zmdi-local-florist:before {
-  content: "";
+  content: "\F168";
 }
 
 .zmdi-local-gas-station:before {
-  content: "";
+  content: "\F16F";
 }
 
 .zmdi-local-grocery-store:before {
-  content: "";
+  content: "\F1CB";
 }
 
 .zmdi-local-hospital:before {
-  content: "";
+  content: "\F177";
 }
 
 .zmdi-local-laundry-service:before {
-  content: "";
+  content: "\F1E9";
 }
 
 .zmdi-local-library:before {
-  content: "";
+  content: "\F18D";
 }
 
 .zmdi-local-mall:before {
-  content: "";
+  content: "\F195";
 }
 
 .zmdi-local-movies:before {
-  content: "";
+  content: "\F19D";
 }
 
 .zmdi-local-offer:before {
-  content: "";
+  content: "\F187";
 }
 
 .zmdi-local-parking:before {
-  content: "";
+  content: "\F1A5";
 }
 
 .zmdi-local-parking:before {
-  content: "";
+  content: "\F1A5";
 }
 
 .zmdi-local-pharmacy:before {
-  content: "";
+  content: "\F176";
 }
 
 .zmdi-local-phone:before {
-  content: "";
+  content: "\F2BE";
 }
 
 .zmdi-local-pizza:before {
-  content: "";
+  content: "\F1AC";
 }
 
 .zmdi-local-post-office:before {
-  content: "";
+  content: "\F15A";
 }
 
 .zmdi-local-printshop:before {
-  content: "";
+  content: "\F1B0";
 }
 
 .zmdi-local-see:before {
-  content: "";
+  content: "\F28C";
 }
 
 .zmdi-local-shipping:before {
-  content: "";
+  content: "\F1E6";
 }
 
 .zmdi-local-store:before {
-  content: "";
+  content: "\F1D4";
 }
 
 .zmdi-local-taxi:before {
-  content: "";
+  content: "\F123";
 }
 
 .zmdi-local-wc:before {
-  content: "";
+  content: "\F211";
 }
 
 .zmdi-my-location:before {
-  content: "";
+  content: "\F299";
 }
 
 .zmdi-directions:before {
-  content: "";
-}
-
-.flatpickr-input, .flatpickr-wrapper input {
-  z-index: 1;
-  cursor: pointer;
-}
-
-.flatpickr-wrapper {
-  position: absolute;
-  display: none;
-}
-
-.flatpickr-wrapper.inline, .flatpickr-wrapper.inline .flatpickr-calendar, .flatpickr-wrapper.static {
-  position: relative;
-}
-
-.flatpickr-wrapper.static .flatpickr-calendar {
-  position: absolute;
-}
-
-.flatpickr-wrapper.inline, .flatpickr-wrapper.open {
-  display: inline-block;
-}
-
-.flatpickr-wrapper.inline .flatpickr-calendar, .flatpickr-wrapper.open .flatpickr-calendar {
-  z-index: 99999;
-  visibility: visible;
+  content: "\F1E7";
 }
 
 .flatpickr-calendar {
-  background: #fff;
-  border: 1px solid #ddd;
-  font-size: 90%;
-  border-radius: 3px;
-  position: absolute;
-  top: 100%;
-  left: 0;
+  background: transparent;
+  overflow: hidden;
+  max-height: 0;
+  opacity: 0;
   visibility: hidden;
-  width: 256px;
+  text-align: center;
+  padding: 0;
+  -webkit-animation: none;
+  animation: none;
+  direction: ltr;
+  border: 0;
+  font-size: 14px;
+  line-height: 24px;
+  border-radius: 5px;
+  position: absolute;
+  width: 315px;
+  box-sizing: border-box;
+  -webkit-transition: top 0.1s cubic-bezier(0, 1, 0.5, 1);
+  transition: top 0.1s cubic-bezier(0, 1, 0.5, 1);
+  z-index: 999;
+  background: #fff;
+  box-shadow: 1px 0 0 #e6e6e6, -1px 0 0 #e6e6e6, 0 1px 0 #e6e6e6, 0 -1px 0 #e6e6e6, 0 3px 13px rgba(0, 0, 0, 0.08);
+}
+
+.flatpickr-calendar.inline,
+.flatpickr-calendar.open {
+  opacity: 1;
+  visibility: visible;
+  overflow: visible;
+  max-height: 640px;
+}
+
+.flatpickr-calendar.open {
+  display: inline-block;
+  -webkit-animation: flatpickrFadeInDown 0.3s cubic-bezier(0, 1, 0.5, 1);
+  animation: flatpickrFadeInDown 0.3s cubic-bezier(0, 1, 0.5, 1);
+}
+
+.flatpickr-calendar.inline {
+  display: block;
+  position: relative;
+  top: 2px;
+}
+
+.flatpickr-calendar.static {
+  position: absolute;
+  top: calc(100% + 2px);
+}
+
+.flatpickr-calendar.static.open {
+  display: block;
 }
 
 .flatpickr-calendar.hasWeeks {
-  width: 288px;
+  width: auto;
 }
 
-.flatpickr-calendar.hasWeeks .flatpickr-weekdays span {
-  width: 12.5%;
+.flatpickr-calendar.dateIsPicked.hasTime .flatpickr-time {
+  height: 40px;
+  border-top: 1px solid #e6e6e6;
 }
 
-.flatpickr-calendar:after, .flatpickr-calendar:before {
+.flatpickr-calendar.noCalendar.hasTime .flatpickr-time {
+  height: auto;
+}
+
+.flatpickr-calendar:after,
+.flatpickr-calendar:before {
   position: absolute;
   display: block;
   pointer-events: none;
   border: solid transparent;
-  content: '';
+  content: "";
   height: 0;
   width: 0;
   left: 22px;
+}
+
+.flatpickr-calendar.rightMost:after,
+.flatpickr-calendar.rightMost:before {
+  left: auto;
+  right: 22px;
 }
 
 .flatpickr-calendar:before {
@@ -6923,239 +6958,596 @@
   margin: 0 -4px;
 }
 
-.flatpickr-calendar.arrowTop:after, .flatpickr-calendar.arrowTop:before {
+.flatpickr-calendar.arrowTop:after,
+.flatpickr-calendar.arrowTop:before {
   bottom: 100%;
 }
 
 .flatpickr-calendar.arrowTop:before {
-  border-bottom-color: #ddd;
+  border-bottom-color: #e6e6e6;
 }
 
 .flatpickr-calendar.arrowTop:after {
   border-bottom-color: #fff;
 }
 
-.flatpickr-calendar.arrowBottom:after, .flatpickr-calendar.arrowBottom:before {
+.flatpickr-calendar.arrowBottom:after,
+.flatpickr-calendar.arrowBottom:before {
   top: 100%;
 }
 
 .flatpickr-calendar.arrowBottom:before {
-  border-top-color: #ddd;
+  border-top-color: #e6e6e6;
 }
 
 .flatpickr-calendar.arrowBottom:after {
   border-top-color: #fff;
 }
 
-.flatpickr-month {
-  background: 0 0;
-  color: #000;
-  padding: 4px 5px 2px;
-  text-align: center;
+.flatpickr-wrapper {
   position: relative;
+  display: inline-block;
 }
 
-.flatpickr-next-month, .flatpickr-prev-month {
+.flatpickr-month {
+  background: transparent;
+  color: rgba(0, 0, 0, 0.9);
+  fill: rgba(0, 0, 0, 0.9);
+  height: 28px;
+  line-height: 24px;
+  text-align: center;
+  position: relative;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+.flatpickr-next-month,
+.flatpickr-prev-month {
   text-decoration: none;
   cursor: pointer;
   position: absolute;
-  top: .5rem;
+  top: 10px;
+  height: 16px;
+  line-height: 16px;
 }
 
-.flatpickr-next-month i, .flatpickr-prev-month i {
+.flatpickr-next-month i,
+.flatpickr-prev-month i {
   position: relative;
 }
 
-.flatpickr-next-month:hover, .flatpickr-prev-month:hover {
-  color: #f99595;
+.flatpickr-next-month.flatpickr-prev-month,
+.flatpickr-prev-month.flatpickr-prev-month {
+  left: calc(3.57% - 1.5px);
 }
 
-.flatpickr-prev-month {
-  float: left;
-  left: .5rem;
+.flatpickr-next-month.flatpickr-next-month,
+.flatpickr-prev-month.flatpickr-next-month {
+  right: calc(3.57% - 1.5px);
 }
 
-.flatpickr-next-month {
-  float: right;
-  right: .5rem;
+.flatpickr-next-month:hover,
+.flatpickr-prev-month:hover {
+  color: #959ea9;
+}
+
+.flatpickr-next-month:hover svg,
+.flatpickr-prev-month:hover svg {
+  fill: #f64747;
+}
+
+.flatpickr-next-month svg,
+.flatpickr-prev-month svg {
+  width: 14px;
+}
+
+.flatpickr-next-month svg path,
+.flatpickr-prev-month svg path {
+  -webkit-transition: fill .1s;
+  transition: fill .1s;
+  fill: inherit;
+}
+
+.numInputWrapper {
+  position: relative;
+  height: auto;
+}
+
+.numInputWrapper input,
+.numInputWrapper span {
+  display: inline-block;
+}
+
+.numInputWrapper input {
+  width: 100%;
+}
+
+.numInputWrapper span {
+  position: absolute;
+  right: 0;
+  width: 14px;
+  padding: 0 4px 0 2px;
+  height: 50%;
+  line-height: 50%;
+  opacity: 0;
+  cursor: pointer;
+  border: 1px solid rgba(57, 57, 57, 0.05);
+  box-sizing: border-box;
+}
+
+.numInputWrapper span:hover {
+  background: rgba(0, 0, 0, 0.1);
+}
+
+.numInputWrapper span:active {
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.numInputWrapper span:after {
+  display: block;
+  content: "";
+  position: absolute;
+  top: 33%;
+}
+
+.numInputWrapper span.arrowUp {
+  top: 0;
+  border-bottom: 0;
+}
+
+.numInputWrapper span.arrowUp:after {
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+  border-bottom: 4px solid rgba(57, 57, 57, 0.6);
+}
+
+.numInputWrapper span.arrowDown {
+  top: 50%;
+}
+
+.numInputWrapper span.arrowDown:after {
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+  border-top: 4px solid rgba(57, 57, 57, 0.6);
+}
+
+.numInputWrapper span svg {
+  width: inherit;
+  height: auto;
+}
+
+.numInputWrapper span svg path {
+  fill: rgba(0, 0, 0, 0.5);
+}
+
+.numInputWrapper:hover {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.numInputWrapper:hover span {
+  opacity: 1;
 }
 
 .flatpickr-current-month {
   font-size: 135%;
-  font-weight: 300;
-  color: rgba(0, 0, 0, 0.7);
-  display: inline-block;
-}
-
-.flatpickr-current-month .cur_month {
-  font-weight: 700;
-  color: #000;
-}
-
-.flatpickr-current-month .cur_year {
-  background: 0 0;
-  box-sizing: border-box;
-  color: inherit;
-  cursor: default;
-  padding: 0 0 0 2px;
-  margin: 0;
-  width: 3.15em;
-  display: inline;
-  font-size: inherit;
-  font-weight: 300;
   line-height: inherit;
-  height: initial;
-  border: 0;
+  font-weight: 300;
+  color: inherit;
+  position: absolute;
+  width: 75%;
+  left: 12.5%;
+  top: 5px;
+  display: inline-block;
+  text-align: center;
 }
 
-.flatpickr-current-month .cur_year:hover {
+.flatpickr-current-month span.cur-month {
+  font-family: inherit;
+  font-weight: 700;
+  color: inherit;
+  display: inline-block;
+  margin-left: 7px;
+  padding: 0;
+}
+
+.flatpickr-current-month span.cur-month:hover {
   background: rgba(0, 0, 0, 0.05);
 }
 
-.flatpickr-weekdays {
-  font-size: 90%;
-  background: 0 0;
-  padding: 2px 0 4px;
-  text-align: center;
-}
-
-.flatpickr-weekdays span {
-  opacity: .54;
-  text-align: center;
+.flatpickr-current-month .numInputWrapper {
+  width: 6ch;
+  width: 7ch\0;
   display: inline-block;
-  width: 14.28%;
-  font-weight: 700;
 }
 
-.flatpickr-weeks {
-  width: 32px;
-  float: left;
+.flatpickr-current-month .numInputWrapper span.arrowUp:after {
+  border-bottom-color: rgba(0, 0, 0, 0.9);
 }
 
-.flatpickr-days {
-  padding-top: 1px;
+.flatpickr-current-month .numInputWrapper span.arrowDown:after {
+  border-top-color: rgba(0, 0, 0, 0.9);
+}
+
+.flatpickr-current-month input.cur-year {
+  background: transparent;
+  box-sizing: border-box;
+  color: inherit;
+  cursor: default;
+  padding: 0 0 0 .5ch;
+  margin: 0;
+  display: inline;
+  font-size: inherit;
+  font-family: inherit;
+  font-weight: 300;
+  line-height: inherit;
+  height: auto;
+  border: 0;
+  border-radius: 0;
+  vertical-align: initial;
+}
+
+.flatpickr-current-month input.cur-year:focus {
   outline: 0;
 }
 
-.flatpickr-days span, .flatpickr-weeks span {
-  background: 0 0;
+.flatpickr-current-month input.cur-year[disabled],
+.flatpickr-current-month input.cur-year[disabled]:hover {
+  font-size: 100%;
+  color: rgba(0, 0, 0, 0.5);
+  background: transparent;
+  pointer-events: none;
+}
+
+.flatpickr-weekdays {
+  background: transparent;
+  text-align: center;
+  overflow: hidden;
+}
+
+.flatpickr-days,
+.flatpickr-weeks {
+  padding: 1px 0 0;
+}
+
+.flatpickr-days {
+  padding: 0;
+  outline: 0;
+  text-align: left;
+  width: 315px;
+  box-sizing: border-box;
+  display: inline-block;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-wrap: wrap;
+  flex-wrap: wrap;
+  -ms-flex-pack: distribute;
+  justify-content: space-around;
+}
+
+.flatpickr-day {
+  background: none;
   border: 1px solid transparent;
   border-radius: 150px;
   box-sizing: border-box;
   color: #393939;
   cursor: pointer;
+  font-weight: 400;
+  width: 14.2857143%;
+  -ms-flex-preferred-size: 14.2857143%;
+  flex-basis: 14.2857143%;
+  max-width: 40px;
+  height: 40px;
+  line-height: 40px;
+  margin: 0;
   display: inline-block;
-  font-weight: 300;
-  width: 34px;
-  height: 34px;
-  line-height: 33px;
-  margin: 0 1px 1px;
+  position: relative;
+  -webkit-box-pack: center;
+  -ms-flex-pack: center;
+  justify-content: center;
   text-align: center;
 }
 
-.flatpickr-days span.disabled, .flatpickr-days span.disabled:hover, .flatpickr-days span.nextMonthDay, .flatpickr-days span.prevMonthDay, .flatpickr-weeks span.disabled, .flatpickr-weeks span.disabled:hover, .flatpickr-weeks span.nextMonthDay, .flatpickr-weeks span.prevMonthDay {
-  color: rgba(57, 57, 57, 0.3);
-  background: 0 0;
-  border-color: transparent;
-  cursor: default;
-}
-
-.flatpickr-days span.nextMonthDay:focus, .flatpickr-days span.nextMonthDay:hover, .flatpickr-days span.prevMonthDay:focus, .flatpickr-days span.prevMonthDay:hover, .flatpickr-days span:focus, .flatpickr-days span:hover, .flatpickr-weeks span.nextMonthDay:focus, .flatpickr-weeks span.nextMonthDay:hover, .flatpickr-weeks span.prevMonthDay:focus, .flatpickr-weeks span.prevMonthDay:hover, .flatpickr-weeks span:focus, .flatpickr-weeks span:hover {
+.flatpickr-day.inRange,
+.flatpickr-day.nextMonthDay.inRange,
+.flatpickr-day.nextMonthDay.today.inRange,
+.flatpickr-day.nextMonthDay:focus,
+.flatpickr-day.nextMonthDay:hover,
+.flatpickr-day.prevMonthDay.inRange,
+.flatpickr-day.prevMonthDay.today.inRange,
+.flatpickr-day.prevMonthDay:focus,
+.flatpickr-day.prevMonthDay:hover,
+.flatpickr-day.today.inRange,
+.flatpickr-day:focus,
+.flatpickr-day:hover {
   cursor: pointer;
   outline: 0;
   background: #e6e6e6;
   border-color: #e6e6e6;
 }
 
-.flatpickr-days span.today, .flatpickr-weeks span.today {
-  border-color: #f99595;
+.flatpickr-day.today {
+  border-color: #959ea9;
 }
 
-.flatpickr-days span.today:focus, .flatpickr-days span.today:hover, .flatpickr-weeks span.today:focus, .flatpickr-weeks span.today:hover {
-  border-color: #f99595;
-  background: #f99595;
+.flatpickr-day.today:focus,
+.flatpickr-day.today:hover {
+  border-color: #959ea9;
+  background: #959ea9;
   color: #fff;
 }
 
-.flatpickr-days span.selected, .flatpickr-days span.selected:focus, .flatpickr-days span.selected:hover, .flatpickr-weeks span.selected, .flatpickr-weeks span.selected:focus, .flatpickr-weeks span.selected:hover {
-  background: #446cb3;
+.flatpickr-day.endRange,
+.flatpickr-day.endRange.nextMonthDay,
+.flatpickr-day.endRange.prevMonthDay,
+.flatpickr-day.endRange:focus,
+.flatpickr-day.endRange:hover,
+.flatpickr-day.selected,
+.flatpickr-day.selected.nextMonthDay,
+.flatpickr-day.selected.prevMonthDay,
+.flatpickr-day.selected:focus,
+.flatpickr-day.selected:hover,
+.flatpickr-day.startRange,
+.flatpickr-day.startRange.nextMonthDay,
+.flatpickr-day.startRange.prevMonthDay,
+.flatpickr-day.startRange:focus,
+.flatpickr-day.startRange:hover {
+  background: #569ff7;
   color: #fff;
-  border-color: #446cb3;
+  border-color: #569ff7;
 }
 
-.flatpickr-am-pm, .flatpickr-time input[type=number], .flatpickr-time-separator {
-  height: 38px;
+.flatpickr-day.endRange.startRange,
+.flatpickr-day.selected.startRange,
+.flatpickr-day.startRange.startRange {
+  border-radius: 50px 0 0 50px;
+}
+
+.flatpickr-day.endRange.endRange,
+.flatpickr-day.selected.endRange,
+.flatpickr-day.startRange.endRange {
+  border-radius: 0 50px 50px 0;
+}
+
+.flatpickr-day.inRange {
+  border-radius: 0;
+  box-shadow: -5px 0 0 #e6e6e6,5px 0 0 #e6e6e6;
+}
+
+.flatpickr-day.disabled,
+.flatpickr-day.disabled:hover {
+  pointer-events: none;
+}
+
+.flatpickr-day.disabled,
+.flatpickr-day.disabled:hover,
+.flatpickr-day.nextMonthDay,
+.flatpickr-day.notAllowed,
+.flatpickr-day.notAllowed.nextMonthDay,
+.flatpickr-day.notAllowed.prevMonthDay,
+.flatpickr-day.prevMonthDay {
+  color: rgba(57, 57, 57, 0.3);
+  background: transparent;
+  border-color: transparent;
+  cursor: default;
+}
+
+span.flatpickr-weekday {
+  cursor: default;
+  font-size: 90%;
+  color: rgba(0, 0, 0, 0.54);
+  height: 27.333333333333332px;
+  line-height: 24px;
+  background: transparent;
+  text-align: center;
+  display: block;
+  float: left;
+  width: 14.28%;
+  font-weight: 700;
+  margin: 0;
+  padding-top: 3.333333333333333px;
+}
+
+.rangeMode .flatpickr-day {
+  margin-top: 1px;
+}
+
+.flatpickr-weekwrapper {
   display: inline-block;
-  line-height: 38px;
-  color: #393939;
+  float: left;
+}
+
+.flatpickr-weekwrapper .flatpickr-weeks {
+  padding: 1px 12px 0;
+  box-shadow: 1px 0 0 #e6e6e6;
+}
+
+.flatpickr-weekwrapper .flatpickr-weekday {
+  float: none;
+  width: 100%;
+}
+
+.flatpickr-weekwrapper span.flatpickr-day {
+  display: block;
+  width: 100%;
+  max-width: none;
+}
+
+.flatpickr-innerContainer {
+  display: block;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.flatpickr-rContainer {
+  display: inline-block;
+  padding: 0;
+  box-sizing: border-box;
 }
 
 .flatpickr-time {
-  overflow: auto;
   text-align: center;
-  border-top: 0;
   outline: 0;
+  display: block;
+  height: 0;
+  line-height: 40px;
+  max-height: 40px;
+  box-sizing: border-box;
+  overflow: hidden;
+  -webkit-transition: height 0.33s cubic-bezier(0, 1, 0.5, 1);
+  transition: height 0.33s cubic-bezier(0, 1, 0.5, 1);
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
 }
 
-.flatpickr-time input[type=number] {
-  background: 0 0;
-  -webkit-appearance: none;
-  -moz-appearance: textfield;
+.flatpickr-time:after {
+  content: "";
+  display: table;
+  clear: both;
+}
+
+.flatpickr-time .numInputWrapper {
+  -webkit-box-flex: 1;
+  -ms-flex: 1;
+  flex: 1 1 0%;
+  width: 40%;
+  height: 40px;
+  float: left;
+}
+
+.flatpickr-time .numInputWrapper span.arrowUp:after {
+  border-bottom-color: #393939;
+}
+
+.flatpickr-time .numInputWrapper span.arrowDown:after {
+  border-top-color: #393939;
+}
+
+.flatpickr-time.hasSeconds .numInputWrapper {
+  width: 26%;
+}
+
+.flatpickr-time.time24hr .numInputWrapper {
+  width: 49%;
+}
+
+.flatpickr-time input {
+  background: transparent;
   box-shadow: none;
   border: 0;
   border-radius: 0;
-  width: 33%;
-  min-width: 33%;
   text-align: center;
   margin: 0;
   padding: 0;
+  height: inherit;
+  line-height: inherit;
   cursor: pointer;
+  color: #393939;
+  font-size: 14px;
+  position: relative;
+  box-sizing: border-box;
+}
+
+.flatpickr-time input.flatpickr-hour {
   font-weight: 700;
 }
 
-.flatpickr-am-pm:focus, .flatpickr-am-pm:hover, .flatpickr-time input[type=number]:focus, .flatpickr-time input[type=number]:hover {
-  background: #f0f0f0;
+.flatpickr-time input.flatpickr-minute,
+.flatpickr-time input.flatpickr-second {
+  font-weight: 400;
 }
 
-.flatpickr-time input[type=number].flatpickr-minute {
-  width: 26%;
-  font-weight: 300;
-}
-
-.flatpickr-time input[type=number].flatpickr-second {
-  font-weight: 300;
-}
-
-.flatpickr-time input[type=number]:focus {
+.flatpickr-time input:focus {
   outline: 0;
   border: 0;
 }
 
-.flatpickr-time.has-seconds input[type=number] {
-  width: 25%;
-  min-width: 25%;
+.flatpickr-time .flatpickr-am-pm,
+.flatpickr-time .flatpickr-time-separator {
+  height: inherit;
+  display: inline-block;
+  float: left;
+  line-height: inherit;
+  color: #393939;
+  font-weight: 700;
+  width: 2%;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 }
 
-.flatpickr-days + .flatpickr-time {
-  border-top: 1px solid #ddd;
-}
-
-.flatpickr-am-pm {
+.flatpickr-time .flatpickr-am-pm {
   outline: 0;
-  width: 21%;
-  padding: 0 2%;
+  width: 18%;
   cursor: pointer;
-  text-align: left;
-  font-weight: 300;
+  text-align: center;
+  font-weight: 400;
 }
 
-@media all and (-ms-high-contrast: none) {
+.flatpickr-time .flatpickr-am-pm:focus,
+.flatpickr-time .flatpickr-am-pm:hover {
+  background: #f0f0f0;
+}
+
+.hasTime .flatpickr-days,
+.hasWeeks .flatpickr-days {
+  border-bottom: 0;
+  border-bottom-right-radius: 0;
+  border-bottom-left-radius: 0;
+}
+
+.hasWeeks .flatpickr-days {
+  border-left: 0;
+}
+
+@media (-ms-high-contrast: none) {
   .flatpickr-month {
     padding: 0;
   }
+
+  .flatpickr-month svg {
+    top: 0 !important;
+  }
 }
 
-*, *:before, *:after {
+@-webkit-keyframes flatpickrFadeInDown {
+  0% {
+    opacity: 0;
+    -webkit-transform: translate3d(0, -20px, 0);
+    transform: translate3d(0, -20px, 0);
+  }
+
+  to {
+    opacity: 1;
+    -webkit-transform: none;
+    transform: none;
+  }
+}
+
+@keyframes flatpickrFadeInDown {
+  0% {
+    opacity: 0;
+    -webkit-transform: translate3d(0, -20px, 0);
+    transform: translate3d(0, -20px, 0);
+  }
+
+  to {
+    opacity: 1;
+    -webkit-transform: none;
+    transform: none;
+  }
+}
+
+*,
+*:before,
+*:after {
   box-sizing: border-box;
 }
 
@@ -7189,7 +7581,8 @@ input::-webkit-inner-spin-button {
   /* <-- Apparently some margin are still there even though it's hidden */
 }
 
-input, textarea {
+input,
+textarea {
   font-family: 'Calibri', 'Lato';
   color: #4d4d4d;
   font-size: 14px;
@@ -7275,42 +7668,47 @@ button:focus {
 }
 
 /* Effect Dipclick */
+
 .btn-dipclick::after {
   background: rgba(111, 148, 182, 0.1);
 }
 
 .btn-dipclick.btn--click::after {
   -webkit-animation: anim-effect-boris 0.3s forwards;
-  animation: anim-effect-boris 0.3s forwards;
+          animation: anim-effect-boris 0.3s forwards;
 }
 
 @-webkit-keyframes anim-effect-boris {
   0% {
     -webkit-transform: scale3d(0.3, 0.3, 1);
-    transform: scale3d(0.3, 0.3, 1);
+            transform: scale3d(0.3, 0.3, 1);
   }
+
   25%, 50% {
     opacity: 1;
   }
+
   100% {
     opacity: 0;
     -webkit-transform: scale3d(1.2, 1.2, 1);
-    transform: scale3d(1.2, 1.2, 1);
+            transform: scale3d(1.2, 1.2, 1);
   }
 }
 
 @keyframes anim-effect-boris {
   0% {
     -webkit-transform: scale3d(0.3, 0.3, 1);
-    transform: scale3d(0.3, 0.3, 1);
+            transform: scale3d(0.3, 0.3, 1);
   }
+
   25%, 50% {
     opacity: 1;
   }
+
   100% {
     opacity: 0;
     -webkit-transform: scale3d(1.2, 1.2, 1);
-    transform: scale3d(1.2, 1.2, 1);
+            transform: scale3d(1.2, 1.2, 1);
   }
 }
 
@@ -7320,6 +7718,7 @@ label {
 
 .navigation {
   display: -webkit-box;
+  display: -ms-flexbox;
   display: flex;
   margin-bottom: 0.2em;
 }
@@ -7341,18 +7740,23 @@ label {
 
 .navigation .menu {
   display: -webkit-box;
+  display: -ms-flexbox;
   display: flex;
 }
 
 .navigation .tag-menu {
   margin-left: auto;
   display: -webkit-box;
+  display: -ms-flexbox;
   display: flex;
   -webkit-box-align: center;
-  align-items: center;
-  flex-wrap: wrap;
+      -ms-flex-align: center;
+          align-items: center;
+  -ms-flex-wrap: wrap;
+      flex-wrap: wrap;
   -webkit-box-pack: end;
-  justify-content: flex-end;
+      -ms-flex-pack: end;
+          justify-content: flex-end;
 }
 
 .card {
@@ -7367,10 +7771,13 @@ label {
 
 .stats {
   display: -webkit-box;
+  display: -ms-flexbox;
   display: flex;
-  flex-wrap: wrap;
+  -ms-flex-wrap: wrap;
+      flex-wrap: wrap;
   -webkit-box-pack: center;
-  justify-content: center;
+      -ms-flex-pack: center;
+          justify-content: center;
   border-bottom: 1px #ededed solid;
   padding: 0.4em;
 }
@@ -7423,17 +7830,21 @@ label {
   left: 0;
   background: rgba(255, 255, 255, 0.9);
   width: 100vw;
-  align-content: inherit;
+  -ms-flex-line-pack: inherit;
+      align-content: inherit;
   z-index: 4;
 }
 
 .item-nav {
   margin-left: auto;
   display: -webkit-box;
+  display: -ms-flexbox;
   display: flex;
-  flex-wrap: wrap;
+  -ms-flex-wrap: wrap;
+      flex-wrap: wrap;
   -webkit-box-pack: center;
-  justify-content: center;
+      -ms-flex-pack: center;
+          justify-content: center;
 }
 
 .item-nav button {
@@ -7459,22 +7870,27 @@ label {
 .item-card {
   margin: 0 0 0 0;
   display: -webkit-box;
+  display: -ms-flexbox;
   display: flex;
   -webkit-box-align: center;
-  align-items: center;
+      -ms-flex-align: center;
+          align-items: center;
 }
 
 .body-div {
   border-bottom: 1px solid #ededed;
   width: 100%;
   display: -webkit-box;
+  display: -ms-flexbox;
   display: flex;
   -webkit-box-align: center;
-  align-items: center;
+      -ms-flex-align: center;
+          align-items: center;
 }
 
 .body-div > span {
   display: -webkit-inline-box;
+  display: -ms-inline-flexbox;
   display: inline-flex;
 }
 
@@ -7482,25 +7898,33 @@ label {
   margin-left: 1.5em;
 }
 
-.updatebox > div:first-child, .addnewbox > div:first-child {
+.updatebox > div:first-child,
+.addnewbox > div:first-child {
   display: -webkit-box;
+  display: -ms-flexbox;
   display: flex;
   -webkit-box-align: center;
-  align-items: center;
+      -ms-flex-align: center;
+          align-items: center;
   border: rgba(245, 215, 110, 0.5) solid thin;
 }
 
-.updatebox textarea, .updatebox input, .addnewbox textarea, .addnewbox input {
+.updatebox textarea,
+.updatebox input,
+.addnewbox textarea,
+.addnewbox input {
   outline: 0px !important;
   padding: 0.5em;
   resize: none;
 }
 
-.updatebox textarea, .addnewbox textarea {
+.updatebox textarea,
+.addnewbox textarea {
   width: 100%;
 }
 
-.updatebox .tag, .addnewbox .tag {
+.updatebox .tag,
+.addnewbox .tag {
   color: black;
   background: #eaeaea;
 }
@@ -7508,12 +7932,15 @@ label {
 .update-tags {
   font-size: 0.85em;
   display: -webkit-box;
+  display: -ms-flexbox;
   display: flex;
   -webkit-box-orient: vertical;
   -webkit-box-direction: normal;
-  flex-direction: column;
+      -ms-flex-direction: column;
+          flex-direction: column;
   -webkit-box-align: baseline;
-  align-items: baseline;
+      -ms-flex-align: baseline;
+          align-items: baseline;
 }
 
 .update-tags > div {
@@ -7528,9 +7955,11 @@ label {
 
 .update-tags .update-planned-time {
   display: -webkit-box;
+  display: -ms-flexbox;
   display: flex;
   -webkit-box-align: baseline;
-  align-items: baseline;
+      -ms-flex-align: baseline;
+          align-items: baseline;
 }
 
 .update-tags .update-planned-time label:after {
@@ -7577,13 +8006,15 @@ label {
 }
 
 .body-div.updating-tags {
-  flex-wrap: wrap;
+  -ms-flex-wrap: wrap;
+      flex-wrap: wrap;
 }
 
 .body-div.updating-tags .updatebox {
   margin: 0 auto;
   -webkit-box-ordinal-group: 11;
-  order: 10;
+      -ms-flex-order: 10;
+          order: 10;
   background: white;
   border: 1px rgba(245, 215, 110, 0.5) solid;
 }
@@ -7592,7 +8023,8 @@ label {
   width: 2em;
 }
 
-.toggle-div div, .toggle-div input {
+.toggle-div div,
+.toggle-div input {
   margin: 0;
 }
 
@@ -7608,7 +8040,7 @@ label {
 .toggle:after {
   content: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="-10 -18 100 135"><circle cx="50" cy="50" r="50" fill="none" stroke="#ededed" stroke-width="3"/></svg>');
   -webkit-transform: scale(0.7);
-  transform: scale(0.7);
+          transform: scale(0.7);
   display: block;
   margin: 0 0 0 -1em;
 }
@@ -7616,7 +8048,7 @@ label {
 .toggle:checked:after {
   content: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="-10 -18 100 135"><circle cx="50" cy="50" r="50" fill="none" stroke="#bddad5" stroke-width="3"/><path fill="#5dc2af" d="M72 25L42 71 27 56l-4 4 20 20 34-52z"/></svg>');
   -webkit-transform: scale(0.7);
-  transform: scale(0.7);
+          transform: scale(0.7);
   display: block;
   margin: 0 0 0 -1em;
 }
@@ -7635,7 +8067,7 @@ label {
   border-left: black 1px solid;
   border-bottom: black 1px solid;
   -webkit-transform: rotateZ(-135deg);
-  transform: rotateZ(-135deg);
+          transform: rotateZ(-135deg);
   width: 0.5em;
   height: 0.5em;
   -webkit-transition: -webkit-transform 0.3s ease-in-out;
@@ -7646,7 +8078,7 @@ label {
 
 .styled-check:checked + .arrow:before {
   -webkit-transform: rotateZ(-45deg);
-  transform: rotateZ(-45deg);
+          transform: rotateZ(-45deg);
 }
 
 .arrow {
@@ -7666,10 +8098,12 @@ label {
   white-space: pre-line;
   word-break: break-word;
   display: -webkit-box;
+  display: -ms-flexbox;
   display: flex;
   -webkit-box-orient: vertical;
   -webkit-box-direction: normal;
-  flex-direction: column;
+      -ms-flex-direction: column;
+          flex-direction: column;
 }
 
 .selected {
@@ -7683,10 +8117,11 @@ label {
 .editing .body-div {
   -webkit-box-orient: vertical;
   -webkit-box-direction: normal;
-  flex-direction: column;
+      -ms-flex-direction: column;
+          flex-direction: column;
   -webkit-box-align: start;
-  -ms-grid-row-align: flex-start;
-  align-items: flex-start;
+      -ms-flex-align: start;
+          align-items: flex-start;
   padding: 0.4em 0;
 }
 
@@ -7698,17 +8133,23 @@ label {
 .item-tags {
   white-space: nowrap;
   display: -webkit-box;
+  display: -ms-flexbox;
   display: flex;
-  flex-wrap: wrap;
+  -ms-flex-wrap: wrap;
+      flex-wrap: wrap;
   -webkit-box-align: baseline;
-  align-items: baseline;
+      -ms-flex-align: baseline;
+          align-items: baseline;
   font-size: 0.7em;
 }
 
-.item-tags > span, .item-tags > label {
+.item-tags > span,
+.item-tags > label {
   -webkit-box-align: center;
-  align-items: center;
+      -ms-flex-align: center;
+          align-items: center;
   display: -webkit-box;
+  display: -ms-flexbox;
   display: flex;
   position: relative;
   padding: 0.1em 0.5em;
@@ -7723,7 +8164,8 @@ label {
   background: #e6e6e6;
 }
 
-.item-tags .duration, .item-tags .currentDuration {
+.item-tags .duration,
+.item-tags .currentDuration {
   background: #5dacce;
 }
 
@@ -7772,8 +8214,8 @@ label {
 
 .journal-wrapper .item-card {
   -webkit-box-align: baseline;
-  -ms-grid-row-align: baseline;
-  align-items: baseline;
+      -ms-flex-align: baseline;
+          align-items: baseline;
 }
 
 .journal-wrapper .bodybox {
@@ -7809,10 +8251,12 @@ label {
   width: 100%;
   z-index: 5;
   display: -webkit-box;
+  display: -ms-flexbox;
   display: flex;
   -webkit-box-orient: vertical;
   -webkit-box-direction: normal;
-  flex-direction: column;
+      -ms-flex-direction: column;
+          flex-direction: column;
   background: rgba(248, 248, 248, 0.95);
   box-shadow: 0 1px 0 rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.1);
 }
@@ -7821,16 +8265,20 @@ label {
   padding: 0.6em;
   width: 100%;
   display: -webkit-box;
+  display: -ms-flexbox;
   display: flex;
-  flex-wrap: wrap;
+  -ms-flex-wrap: wrap;
+      flex-wrap: wrap;
 }
 
 .popup .top {
   width: 100%;
   display: -webkit-box;
+  display: -ms-flexbox;
   display: flex;
   -webkit-box-align: center;
-  align-items: center;
+      -ms-flex-align: center;
+          align-items: center;
   margin-bottom: 0.5em;
 }
 
@@ -7841,12 +8289,15 @@ label {
 
 .popup .body {
   display: -webkit-box;
+  display: -ms-flexbox;
   display: flex;
   -webkit-box-flex: 1;
-  flex-grow: 1;
+      -ms-flex-positive: 1;
+          flex-grow: 1;
 }
 
-.popup input, .popup textarea {
+.popup input,
+.popup textarea {
   font-family: 'Calibri', 'Lato';
   color: #4d4d4d;
   font-size: 14px;
@@ -7875,12 +8326,15 @@ label {
 
 .popup .completion-memo {
   display: -webkit-box;
+  display: -ms-flexbox;
   display: flex;
   -webkit-box-orient: vertical;
   -webkit-box-direction: normal;
-  flex-direction: column;
+      -ms-flex-direction: column;
+          flex-direction: column;
   -webkit-box-flex: 2;
-  flex-grow: 2;
+      -ms-flex-positive: 2;
+          flex-grow: 2;
   margin-right: 0.3em;
 }
 
@@ -7892,12 +8346,15 @@ label {
 
 .popup .used-time {
   display: -webkit-box;
+  display: -ms-flexbox;
   display: flex;
   -webkit-box-orient: vertical;
   -webkit-box-direction: normal;
-  flex-direction: column;
+      -ms-flex-direction: column;
+          flex-direction: column;
   -webkit-box-flex: 0;
-  flex-grow: 0;
+      -ms-flex-positive: 0;
+          flex-grow: 0;
 }
 
 .popup .used-time span {
@@ -7907,11 +8364,14 @@ label {
 
 .popup .used-time > div > div {
   display: -webkit-box;
+  display: -ms-flexbox;
   display: flex;
-  flex-wrap: wrap;
+  -ms-flex-wrap: wrap;
+      flex-wrap: wrap;
   -webkit-box-orient: horizontal;
   -webkit-box-direction: normal;
-  flex-direction: row;
+      -ms-flex-direction: row;
+          flex-direction: row;
 }
 
 .popup .used-time button {
@@ -7920,11 +8380,14 @@ label {
 
 #popouts-mask {
   display: -webkit-box;
+  display: -ms-flexbox;
   display: flex;
   -webkit-box-align: center;
-  align-items: center;
+      -ms-flex-align: center;
+          align-items: center;
   -webkit-box-pack: center;
-  justify-content: center;
+      -ms-flex-pack: center;
+          justify-content: center;
   z-index: 4;
   position: fixed;
   top: 0;
@@ -7943,12 +8406,24 @@ label {
   margin: 1em;
 }
 
+.popout .overtime-notice {
+  color: #e65e4d;
+  font-size: 0.3em;
+  width: 100%;
+}
+
+.popout .overtime {
+  color: #e65e4d;
+}
+
 .popout .body {
   display: -webkit-box;
+  display: -ms-flexbox;
   display: flex;
   -webkit-box-orient: vertical;
   -webkit-box-direction: normal;
-  flex-direction: column;
+      -ms-flex-direction: column;
+          flex-direction: column;
 }
 
 .popout .toggle-div {
@@ -7961,12 +8436,15 @@ label {
   padding: 1em;
   border-bottom: 1px solid #e3e3e3;
   display: -webkit-box;
+  display: -ms-flexbox;
   display: flex;
   -webkit-box-orient: horizontal;
   -webkit-box-direction: normal;
-  flex-direction: row;
+      -ms-flex-direction: row;
+          flex-direction: row;
   -webkit-box-align: center;
-  align-items: center;
+      -ms-flex-align: center;
+          align-items: center;
   font-size: 1.1em;
   padding: 1em;
 }
@@ -7978,17 +8456,21 @@ label {
 .popout .timer-time {
   font-size: 4em;
   margin: 0 auto;
-  padding: 0.8em;
+  padding: 0.3em 0.8em 0;
+  line-height: normal;
 }
 
 .popout .nav {
   padding: 0.6em 1em;
   display: -webkit-box;
+  display: -ms-flexbox;
   display: flex;
   -webkit-box-pack: end;
-  justify-content: flex-end;
+      -ms-flex-pack: end;
+          justify-content: flex-end;
   -webkit-box-align: center;
-  align-items: center;
+      -ms-flex-align: center;
+          align-items: center;
 }
 
 .popout button {
@@ -8002,7 +8484,8 @@ label {
   margin-bottom: 0;
 }
 
-.popout button.play, .popout button.pause {
+.popout button.play,
+.popout button.pause {
   font-size: 1.3em;
 }
 
@@ -8022,9 +8505,11 @@ label {
 
 #timer-area .timer {
   display: -webkit-box;
+  display: -ms-flexbox;
   display: flex;
   -webkit-box-align: baseline;
-  align-items: baseline;
+      -ms-flex-align: baseline;
+          align-items: baseline;
   font-size: 1.3em;
   padding-bottom: 0.5em;
 }
@@ -8067,7 +8552,8 @@ input.flatpickr {
   height: 300px !important;
 }
 
-.flatpickr-wrapper.open .arrowTop:after, .flatpickr-wrapper.open .arrowTop:before {
+.flatpickr-wrapper.open .arrowTop:after,
+.flatpickr-wrapper.open .arrowTop:before {
   display: none;
 }
 
@@ -8086,5 +8572,3 @@ input.flatpickr {
   color: #a2999a;
   padding: 2px 0 0 2em;
 }
-
-/*# sourceMappingURL=app.css.map */

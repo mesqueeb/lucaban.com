@@ -13,6 +13,16 @@ use Carbon\Carbon;
 class CardController extends Controller
 {
     /**
+     * Create a new controller instance.
+     *
+     * @return void
+     */
+    public function __construct()
+    {
+        $this->middleware('auth');
+    }
+
+    /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
@@ -27,7 +37,7 @@ class CardController extends Controller
             ->where('done',0)
             ->orWhere('done_date', '>', Carbon::now()->subHour(18))
             ->orderBy('depth', 'asc')
-            ->get();
+            ->get()->all();
     }
 
     public function getDone()
@@ -43,7 +53,7 @@ class CardController extends Controller
         $doneItems = Item::with('tagged')
                         ->where('done',1)
                         ->orderBy('done_date', 'desc')
-                        ->get();
+                        ->get()->all();
         return $doneItems;
     }
 
