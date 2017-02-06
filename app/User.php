@@ -12,6 +12,11 @@ class User extends Authenticatable
     {
         return $this->belongsToMany('App\Item');
     }
+    public function scopeUserItems($query)
+    {
+        $query->find(auth()->id())->items();
+    }
+    
     /**
      * The attributes that are mass assignable.
      *

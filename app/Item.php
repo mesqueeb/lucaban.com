@@ -10,7 +10,7 @@ class Item extends Model
 	use Taggable;
 	protected $table = 'items';
 	// protected $fillable = ['done','done_date','body','children_order','parent_id','depth','planned_time','used_time','due_date', 'children', 'show_children', 'completion_memo', 'parents_bodies', 'memo'];
-	protected $guarded = ['id', 'created_at', 'updated_at', 'created_by'];
+	protected $guarded = ['id', 'created_at', 'updated_at', 'tagged', 'parent_id_backup', 'dueDateParent', 'preparedTags'];
 
 	public function users()
 	{
@@ -20,14 +20,23 @@ class Item extends Model
 	{
 		return $this->hasMany(Item::class, 'parent_id');
 	}
-	// Class - Instruction Manual/Description of an OBject
+	public function scopeUserItems($query)
+    {
+        // Retrieve all posts with at least one comment containing words like foo%
+        $query->whereHas('users', function ($query) {
+        	$query->where('id', '=', auth()->id());
+        });
+    }
+	// Class - Instruction Manual/Description of an Object
 	// Instance - Actual thing, based on a class
 	// Methods - Done to the thing, described in the class
 	// Static Method - Is a thing that is to do with the class but doesn't need an instance of it
 	public static function saveItemTree($itemData,$parent_id = null){
+		$userid = auth()->id();
+		$itemData['created_by'] = $userid;
+		// dd($itemData);
 	    if(!is_null($parent_id)){
 	      $itemData['parent_id'] = $parent_id;
-	      $itemData['memo'] = 'blueblubelubeluble';
 	    }
 	    // $itemData['id'] = null; // possibly not necessary if you set fillables correctly
 	    $item = new Item($itemData);
@@ -44,6 +53,7 @@ class Item extends Model
 		    $item['children_order'] = $children_order;
 		}
 	   	$item->save();
+	   	$item->users()->attach($userid);
 	   	$item['children'] = $children;
 	    return $item;
 	}

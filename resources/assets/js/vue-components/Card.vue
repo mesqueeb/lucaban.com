@@ -1,15 +1,14 @@
 <template id="items-card-template">
 
 <div
-	v-if="item"
+	v-if="item || listIsEmpty"
 	:id="'card-'+item.id"
 	:class="{
 		'items-card': true,
 		'journal-wrapper': journalView
 	}"
 >
-
-<div v-if="!isHidden">
+<div v-if="!isHidden || listIsEmpty">
 	<div class="title"
 	v-if="journalDate"
 	>
@@ -66,7 +65,7 @@
 			v-if="journalView"
 		>・</div>
 		<div class="body-div textarea-wrap"
-			:class="{ selected: item.id == this.$root.selection.selectedId,
+			:class="{ selected: item.id == basis.selection.selectedId,
 				project: isProject,
 				'updating-tags': item.id == basis.editingItemTags}"
 			@dblclick="startEdit(item, $event)"
@@ -154,7 +153,7 @@
 						<!-- UNDER CONSTRUCTION -->
 							<label v-for="tag in allTags_c"
 								:class="'tag'"
-								@click="this.$root.patchTag(item.id, tag)"
+								@click="basis.patchTag(item.id, tag)"
 							>{{ tag.name }}
 							</label>
 						</div>
@@ -209,7 +208,7 @@
 					v-show="!parentTags.includes(tag.tag_name)
 						|| item.id == basis.editingItem"
 					class="custom-tag"
-					@dblclick.prevent="this.$root.filterItems('tag', tag.tag_slug, $event)"
+					@dblclick.prevent="basis.filterItems('tag', tag.tag_slug, $event)"
 				>{{ tag.tag_name }}
 					<button class="delete-tag"
 						v-if="item.id == basis.editingItem
@@ -222,7 +221,7 @@
 
 			</div>
 			<div class="item-nav"
-				v-if="basis.editingItem != item.id && this.$root.selection.selectedId == item.id"
+				v-if="basis.editingItem != item.id && basis.selection.selectedId == item.id"
 			>
 				
 				<button v-if="!item.done"
@@ -232,7 +231,7 @@
 				</button>
 				<button v-if="item.done"
 					class="more"
-					@click="this.$root.popup(item.id, 'afterDone')"
+					@click="basis.popup(item.id, 'afterDone')"
 				><i class="zmdi zmdi-more"></i>
 				</button>
 				<!--
@@ -336,7 +335,7 @@
 
 
 	<div class="children"
-		v-if="item.children"
+		v-if="item.children.length"
 		v-show="item.show_children"
 	>
 		<Card v-for="childCard in item.children"
@@ -348,7 +347,7 @@
 	<form 
 		:class="['addnewbox']"
 		:id="'new-under-'+ item.id "
-		v-if="showAddNewBox"
+		v-if="showAddNewBox || (listIsEmpty && basis.selection.view != 'journal')"
 		@submit.prevent
 	>
 		<div>
@@ -426,7 +425,6 @@
 			</div>
 		</div>
 	</form>
-	<!-- <Flatpickr /> -->
 </div>
 </div>
 </template>
@@ -462,6 +460,9 @@ export default {
 	// Flatpickr: Flatpickr,
 	// },
 	computed: {
+		listIsEmpty(){
+			return this.$root.noItems;
+		},
 		basis(){
 			return this.$root;
 		},
@@ -524,7 +525,7 @@ export default {
 			return allItems.nodes[pId].children_order;
 		},
 		showAddNewBox(){ if(!this.item || !allItems){ return; }
-			if((this.$root.addingNewUnder == this.item.id && !this.$root.addingNewAsFirstChild) || (this.item.depth == 0 && allItems.root.children_order.length == 0)){
+			if(this.$root.addingNewUnder == this.item.id && !this.$root.addingNewAsFirstChild){
 				return true;
 			} else { return false; }
 		},
@@ -921,15 +922,19 @@ export default {
 			let OlderSiblingIndex = this.siblingIndex;
 			let index = (isNaN(OlderSiblingIndex)) ? 0 : OlderSiblingIndex+1;
 			
-			if (this.$root.addingNewAsChild){
+			if (this.$root.addingNewAsChild || this.listIsEmpty){
 				newItem.depth = this.item.depth + 1;
         		newItem.parent_id = this.item.id;
         		index = 0;
 			}
-			let todayTagIndex = this.newItem.preparedTags.indexOf('Today');
-			if (todayTagIndex != -1){
-				this.newItem.preparedTags.splice(todayTagIndex, 1);
+			if(selection.view == "journal"){
+				newItem.done = 1;
+			}
+			if (this.newItem.preparedTags.includes('Today') || selection.filter.includes('today')){
 				newItem.due_date = moment().format();
+				this.newItem.preparedTags = this.newItem.preparedTags.filter(function(val){
+					return val != 'Today';
+				});
 			}
 			let addTags = this.newItem.preparedTags;
 			

@@ -8528,32 +8528,23 @@ label {
 }
 
 input.flatpickr {
-  z-index: -2;
-  position: absolute;
+  z-index: -4;
+  position: fixed;
+  top: -20px;
 }
 
-.flatpickr-wrapper.open {
-  background-color: rgba(0, 0, 0, 0.5);
-  z-index: 5;
-  position: fixed !important;
-  top: 0 !important;
-  left: 0 !important;
-  bottom: 0 !important;
-  right: 0 !important;
-}
-
-.flatpickr-wrapper.open .flatpickr-calendar {
+.flatpickr-calendar {
   position: fixed !important;
   top: 0 !important;
   left: 0 !important;
   bottom: 0 !important;
   right: 0 !important;
   margin: auto !important;
-  height: 300px !important;
+  height: 330px !important;
 }
 
-.flatpickr-wrapper.open .arrowTop:after,
-.flatpickr-wrapper.open .arrowTop:before {
+.arrowTop:after,
+.arrowTop:before {
   display: none;
 }
 

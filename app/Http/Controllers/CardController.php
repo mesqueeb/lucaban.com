@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Http\Requests;
 use App\Item;
+use App\User;
 use DB;
 use Illuminate\Http\Response;
 use Carbon\Carbon;
@@ -29,28 +30,38 @@ class CardController extends Controller
      */
     public function index()
     {
-        $god = Item::where('parent_id', null)->first();
+        $userId = auth()->id();
+        $god = User::find($userId)->items()
+            ->where('parent_id',NULL)
+            ->where('created_by',$userId)
+            ->where('depth',0)
+            ->first();
         if(!$god){
-            return Item::create(['body' => 'ALL', 'id' => '1', 'depth' => '0']);
+            $firstItem = Item::create(
+                ['body' => 'ALL',
+                'created_by' => $userId,
+                'depth' => 0]);
+            $firstItem->users()->attach($userId);
+            $firstItem['children'] = [];
+            return [$firstItem];
         }
-        return Item::with('tagged')
+        return Item::UserItems()
             ->where('done',0)
-            ->orWhere('done_date', '>', Carbon::now()->subHour(18))
+            ->orWhere(function($query)
+            {
+                $query->UserItems()
+                ->where('done_date', '>', Carbon::now()->subHour(16));
+            })
+            ->with('users')
+            ->with('tagged')
             ->orderBy('depth', 'asc')
             ->get()->all();
     }
 
     public function getDone()
     {
-        // return $tags;
-        // if($tags){
-        //     $doneItems = Item::withAnyTag($tags)
-        //                 ->with('tagged')
-        //                 ->where('done',1)
-        //                 ->orderBy('done_date', 'desc')
-        //                 ->get();
-        // }
-        $doneItems = Item::with('tagged')
+        $doneItems = Item::UserItems()
+                        ->with('tagged')
                         ->where('done',1)
                         ->orderBy('done_date', 'desc')
                         ->get()->all();
@@ -77,21 +88,6 @@ class CardController extends Controller
     {
         // return var_dump($request->all());
         return Item::saveItemTree($request->all());
-        
-        // return Item::saveTaskTree($taskData);
-        if (is_array ($request->input('newItemArray'))){
-            $all = [];
-            foreach ($request->input('newItemArray') as $item)
-            {
-                $a = Item::create($item);
-                array_push($all,$a);
-            }
-            return $all;
-        }
-        $a = Item::create($request->all());
-        // print($a);
-        return $a["id"];
-        // TODO:      moveToRightOf($otherNode)!!!
     }
 
     /**
@@ -137,6 +133,8 @@ class CardController extends Controller
      */
     public function destroy($id)
     {
-        Item::findOrFail($id)->delete();
+        $item = Item::findOrFail($id);
+        $item->users()->detach(auth()->id());
+        $item->delete();
     }
 }

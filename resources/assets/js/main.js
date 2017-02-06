@@ -34,14 +34,14 @@
 	// import moment-countdown from 'moment-countdown';
 
 // IMPORT FlatPickr
-	import flatpickr from 'flatpickr';
+	import Flatpickr from 'flatpickr';
 	// import flatPickConfig from './components/flatPickrOptions.js';
 
 (function(document){ // iife
 let openFlatPickr = null;
 // Make flatpickr(el) available as el.flatpickr();
-window.Element.prototype.flatpickr = function(config){ return flatpickr(this,config)};
-window.Element.prototype.flatpickrify = function(config){ return flatpickr(this,{
+window.Element.prototype.flatpickr = function(config){ return new Flatpickr(this,config)};
+window.Element.prototype.flatpickrify = function(config){ return new Flatpickr(this,{
 	dateFormat: 'Y-m-d H:i:S',
 	maxDate: 'today',
 	enableTime: true,
@@ -57,17 +57,11 @@ window.Element.prototype.flatpickrify = function(config){ return flatpickr(this,
 		vm.$root.beforeEditCache_doneDate[id] = dateStr;
 		openFlatPickr = instance;
 	},
-	onChange: function(dateObj, dateStr, instance){
-		let el = instance.element.id;
-		// instance.element.focus();
-		console.log('flatPicker on change');
-	},
 	onClose: function(dateObj, dateStr, instance){
 		let elId = instance.element.id;
 		let id = elId.replace('done-date-edit-', '');
 		id = id.replace('-popup', '');
 		console.log('vm.$root.beforeEditCache_doneDate[id] = '+vm.$root.beforeEditCache_doneDate[id]);
-		// This doesn't even work...
 		if (vm.$root.beforeEditCache_doneDate[id] == dateStr){ return; }
 		console.log('patching: '+id)
 		vm.patch(id, 'done_date');
@@ -107,16 +101,16 @@ window.flatpickrifyAllInputs = function(){
 	Vue.use(VueResource);
 	// var VueAutosize = require('vue-autosize');
 	// Vue.use(VueAutosize);
-	// import VueFlatpickr from 'vue-flatpickr';
-	// Vue.use(VueFlatpickr);
+
+	// import VueFlatpickr from 'vue-flatpickr'
+	// import 'vue-flatpickr/theme/airbnb.css'
+	// Vue.use(VueFlatpickr)
+
 
 	import VueFilters from './vue-components/vueFilters.js';
 	VueFilters(Vue);
 	// Vue Components
 	import VueListMaster from './vue-components/VueListMaster.js'
-	// window.vm = VueListMaster;
-	// window.vm = new Vue(VueListMaster);
-	// import VueListMaster from '/vue-components/VueListMaster.js'
 
 // JS Classes
 	import Tree from './vue-components/dataTree.js';
@@ -159,24 +153,22 @@ $('body').on('click', 'button', function(e){
 	btnEffect(e);
 });
 
-	console.log('fetching allItems');
+	console.log('fetching all items');
 $.getJSON('/api/items',function(fetchedData){
-	console.log('fetched allItems');
+	console.log('fetched all items');
 	
 	//response
 	window.eventHub = new Vue();
 	window.allItems = new Tree(fetchedData);
-	window.vm = new Vue(VueListMaster);
-		vm.allData = allItems.root;
-		vm.doneData = allItems.doneitems;
-
 	console.log(allItems);
-	// $.getJSON('/api/itemtags',function(tags){
-	// 	console.log(tags);
-	// 	window.allTags = tags;
-	// 	vm.allTags = tags;
-	// });
-	// Codementor: How do I make the following function wait until DOM/Vue/etc. is loaded?
+	
+	window.vm = new Vue(VueListMaster);
+
+	vm.allData = allItems.root;
+	vm.doneData = allItems.doneitems;
+
+	console.log('allItems ↓');
+	console.log(allItems);
 	setTimeout(function(){
 		flatpickrifyAllInputs();
 	}, 1000);

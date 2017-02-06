@@ -1,27 +1,18 @@
 input.flatpickr {
-	z-index: -2;
-    position: absolute;
+    z-index: -4;
+    position: fixed;
+    top: -20px;
 }
 
-.flatpickr-wrapper.open{
-	background-color: rgba(0, 0, 0, .5);
-    z-index: 5;
+.flatpickr-calendar {
     position: fixed !important;
     top: 0 !important;
     left: 0 !important;
     bottom: 0 !important;
     right: 0 !important;
-
-	.flatpickr-calendar {
-	    position: fixed !important;
-	    top: 0 !important;
-	    left: 0 !important;
-	    bottom: 0 !important;
-	    right: 0 !important;
-	    margin: auto !important;
-	    height: 300px !important;
-	}
-	.arrowTop:after, .arrowTop:before{
-		display: none;
-	}
+    margin: auto !important;
+    height: 330px !important;
+}
+.arrowTop:after, .arrowTop:before{
+	display: none;
 }

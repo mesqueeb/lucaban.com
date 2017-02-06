@@ -16,7 +16,6 @@ export default class Tree {
 		this.backups.rootChildren = []; // replace with root later on
 		// process items
 		this.itemsProcessed = 0;
-//		this.source.forEach(this.initialize.bind(this))
 		this.firstInitialization();
 	}
 
@@ -34,18 +33,16 @@ export default class Tree {
 	}
 	initialize(item, index) 
 	{
-		// console.log('run node initialization');
+		console.log('run node initialization');
 		// variables
 		let node 	= JSON.parse(JSON.stringify(item));
 		let parent 	= this.nodes[node.parent_id];
 
 		// assign extra item values
 		node = this.setDefaultItemValues(node);
-		// node.totalPlannedTime = (!item.done && node.planned_time) ? parseFloat(item.planned_time) : 0 ;
-		// node.totalUsedTime = (!item.done && node.used_time) ? parseFloat(item.used_time) : 0 ;
 		node.parent_id_backup = node.parent_id;
 		// Register and organize nodes:
-		if(node.depth === 0) { this.root = node; }
+		if(node.depth == 0) { this.root = node; console.log('mnode');}
 		else if (parent) { parent.children.push(node); }
 		else { this.orphans.push(node); }
 		this.nodes[node.id] = node;
@@ -60,50 +57,10 @@ export default class Tree {
 		    let item = this.nodes[id];
 			// this.attachParentBody(id);　//Maybe I should only do this when pressing DONE
 		}.bind(this));
-		this.backups.rootChildren = this.root.children;
-		// vm.allTags = vm.allTagsComputed;
+		if(this.root){
+			this.backups.rootChildren = this.root.children;
+		}
 	}
-
-
-	// OLDinitialize(item, index) 
-	// {
-	// 	// variables
-	// 	let node 	= this.makeNode(item);
-	// 	let parent 	= this.getNode(node.parent_id);
-	// 	// assign extra item values
-	// 	if(node.children_order){
-	// 		node.children_order = node.children_order.split(',').map(Number);
-	// 	} else {
-	// 		node.children_order = [];
-	// 	}
-	// 	node.children = [];
-	// 		// assign total Time to nodes with no children:
-	// 	if (!node.children.length){
-	//     	node['totalPlannedTime'] = (!item.done && node.planned_time) ? parseFloat(item.planned_time) : 0 ;
-	// 		node['totalUsedTime'] = (!item.done && node.used_time) ? parseFloat(item.used_time) : 0 ;
-	// 	}
-
-	// 	// Register and organize nodes:
-	// 	if(index === 0) { this.root = node; }
-	// 	else if (parent) { parent.children.push(node); }
-	// 	else { this.orphans.push(node); }
-	// 	this.nodes[node.id] = node;
-
-	// 	//Sort all nodes after making sure you got all of them.
-	// 	this.itemsProcessed++;
-	//     if(this.itemsProcessed === this.source.length) {
-	//     	$.each(this.nodes, function(index, node) {
-	// 		    let id = node.id;
-	// 		    this.sortChildren(id);
-	// 		    this.updateChildrenDueDate(id);
-	// 			// this.attachParentBody(id);　//Maybe I should only do this when pressing DONE
-	// 		    if (!node.children.length && (node.used_time || node.planned_time)){
-	// 			    this.calculateTotalTime(id);
-	// 		    }
-	// 		    this.backups.rootChildren = this.root.children;
-	// 		}.bind(this));
-	//     }
-	// }
 	duplicate(id)
 	{
 		let item = this.nodes[id];
@@ -119,6 +76,7 @@ export default class Tree {
 	setDefaultItemValues(item)
 	{
 		item.parent_id_backup = item.parent_id;
+		item.depth = Number(item.depth);
 		if(item.show_children == null){ item.show_children = 1 		 }
 		if(!item.children)	{ item.children = []					 }
 		if(!item.due_date)	{ item.due_date = "0000-00-00 00:00:00"	 }
@@ -144,6 +102,7 @@ export default class Tree {
 	}
 	addItem(item, index, addNextItemAs, addTags, duplication)
 	{
+		// debugger;
 		this.addAndCleanNodesRecursively(item);
 		const parent = this.nodes[item.parent_id];
 		if(!parent.children_order)	{ parent.children_order = [] 	 }
@@ -153,7 +112,12 @@ export default class Tree {
 
 		// Patches etc.
 	    selection.selectedId = item.id;
-	    vm.patch(item.parent_id, 'children_order');
+		if(this.isTopLvlItemInFilteredRoot(item.id) && item.parent_id == this.root.id){
+			this.backups.rootChildren.push(item);
+			vm.patchRootChildrenOrderWithFilter(item.id);
+		} else {
+		    vm.patch(item.parent_id, 'children_order');
+		}
 	    if(addTags){ this.tagItem(item.id, addTags); }
 		this.attachParentBody(item.id);
 		this.autoCalculateDoneState(item.parent_id);
@@ -318,34 +282,16 @@ export default class Tree {
 		let nextIndex = this.siblingIndex(id)+1;
 		let item = this.nodes[id];
 		let parent_id = item.parent_id;
-		let itemIsLastSibling = (nextIndex == this.nodes[parent_id].children_order.length);
+		let parentsChildrenOrder = this.nodes[parent_id].children_order;
+		let itemIsLastSibling = (nextIndex == parentsChildrenOrder.length);
 		let tagsSelected = selection.tags.length;
 		
-		// if(!tagsSelected){ 
-			// console.log('itemIsLastSibling '+itemIsLastSibling);
-			if(itemIsLastSibling){
-				return this.nextItemRecursion(parent_id);
-			}
-			let nextItemId = this.nodes[parent_id].children_order[nextIndex];
-			return nextItemId;
-		
-		// }
-		// else if (tagsSelected) {
-		// 	let itemHasSelectedTag = this.hasTag(id, selection.tags);
-		// 	if(itemHasSelectedTag){
-		// 		return this.nextFilteredItemId(id);
-		// 	}
-
-		// 	let parentHasSelectedTag = this.hasTag(parent_id, selection.tags);
-		// 	if(itemIsLastSibling && parentHasSelectedTag){
-		// 		console.log('this is the top lvl item with the filtered tag: ['+parent_id+'] '+this.nodes[parent_id].body);
-		// 		return this.nextFilteredItemId(parent_id);
-		// 	}
-		// 	if(itemIsLastSibling && !parentHasSelectedTag){
-		// 		return this.nextItemRecursion(parent_id);
-		// 	}
-		// 	return this.nodes[parent_id].children_order[nextIndex];					
-		// }
+		if(itemIsLastSibling){
+			if(parent_id == this.root.id){ return; }
+			return this.nextItemRecursion(parent_id);
+		}
+		let nextItemId = this.nodes[parent_id].children_order[nextIndex];
+		return nextItemId;
 	}
 	isTopLvlItemInFilteredRoot(id)
 	{
@@ -790,11 +736,13 @@ export default class Tree {
 				}.bind(this), 200);
 				return;
 			}
-			arrayToFilter = this.doneitems;
+			filteredArray = this.doneitems;
 			// }
 			// Codementor: How do I know the following function will start after the fetch is over?
-			let doneFilterResults = this.arrayFilterDone(arrayToFilter, operator);
-			Array.prototype.push.apply(filteredArray, doneFilterResults);			
+
+			// let doneFilterResults = this.arrayFilterDone(arrayToFilter, operator);
+			// -> This is useless...
+			// Array.prototype.push.apply(filteredArray, arrayToFilter);			
 
 			setTimeout(function(){
 				flatpickrifyAllInputs();

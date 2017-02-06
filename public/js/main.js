@@ -23986,7 +23986,6 @@ var Tree = function () {
 		this.backups.rootChildren = []; // replace with root later on
 		// process items
 		this.itemsProcessed = 0;
-		//		this.source.forEach(this.initialize.bind(this))
 		this.firstInitialization();
 	}
 
@@ -24006,19 +24005,17 @@ var Tree = function () {
 	}, {
 		key: 'initialize',
 		value: function initialize(item, index) {
-			// console.log('run node initialization');
+			console.log('run node initialization');
 			// variables
 			var node = JSON.parse(JSON.stringify(item));
 			var parent = this.nodes[node.parent_id];
 
 			// assign extra item values
 			node = this.setDefaultItemValues(node);
-			// node.totalPlannedTime = (!item.done && node.planned_time) ? parseFloat(item.planned_time) : 0 ;
-			// node.totalUsedTime = (!item.done && node.used_time) ? parseFloat(item.used_time) : 0 ;
 			node.parent_id_backup = node.parent_id;
 			// Register and organize nodes:
-			if (node.depth === 0) {
-				this.root = node;
+			if (node.depth == 0) {
+				this.root = node;console.log('mnode');
 			} else if (parent) {
 				parent.children.push(node);
 			} else {
@@ -24037,50 +24034,10 @@ var Tree = function () {
 				var item = this.nodes[id];
 				// this.attachParentBody(id);　//Maybe I should only do this when pressing DONE
 			}.bind(this));
-			this.backups.rootChildren = this.root.children;
-			// vm.allTags = vm.allTagsComputed;
+			if (this.root) {
+				this.backups.rootChildren = this.root.children;
+			}
 		}
-
-		// OLDinitialize(item, index) 
-		// {
-		// 	// variables
-		// 	let node 	= this.makeNode(item);
-		// 	let parent 	= this.getNode(node.parent_id);
-		// 	// assign extra item values
-		// 	if(node.children_order){
-		// 		node.children_order = node.children_order.split(',').map(Number);
-		// 	} else {
-		// 		node.children_order = [];
-		// 	}
-		// 	node.children = [];
-		// 		// assign total Time to nodes with no children:
-		// 	if (!node.children.length){
-		//     	node['totalPlannedTime'] = (!item.done && node.planned_time) ? parseFloat(item.planned_time) : 0 ;
-		// 		node['totalUsedTime'] = (!item.done && node.used_time) ? parseFloat(item.used_time) : 0 ;
-		// 	}
-
-		// 	// Register and organize nodes:
-		// 	if(index === 0) { this.root = node; }
-		// 	else if (parent) { parent.children.push(node); }
-		// 	else { this.orphans.push(node); }
-		// 	this.nodes[node.id] = node;
-
-		// 	//Sort all nodes after making sure you got all of them.
-		// 	this.itemsProcessed++;
-		//     if(this.itemsProcessed === this.source.length) {
-		//     	$.each(this.nodes, function(index, node) {
-		// 		    let id = node.id;
-		// 		    this.sortChildren(id);
-		// 		    this.updateChildrenDueDate(id);
-		// 			// this.attachParentBody(id);　//Maybe I should only do this when pressing DONE
-		// 		    if (!node.children.length && (node.used_time || node.planned_time)){
-		// 			    this.calculateTotalTime(id);
-		// 		    }
-		// 		    this.backups.rootChildren = this.root.children;
-		// 		}.bind(this));
-		//     }
-		// }
-
 	}, {
 		key: 'duplicate',
 		value: function duplicate(id) {
@@ -24100,6 +24057,7 @@ var Tree = function () {
 		key: 'setDefaultItemValues',
 		value: function setDefaultItemValues(item) {
 			item.parent_id_backup = item.parent_id;
+			item.depth = Number(item.depth);
 			if (item.show_children == null) {
 				item.show_children = 1;
 			}
@@ -24142,6 +24100,7 @@ var Tree = function () {
 	}, {
 		key: 'addItem',
 		value: function addItem(item, index, addNextItemAs, addTags, duplication) {
+			// debugger;
 			this.addAndCleanNodesRecursively(item);
 			var parent = this.nodes[item.parent_id];
 			if (!parent.children_order) {
@@ -24153,7 +24112,12 @@ var Tree = function () {
 
 			// Patches etc.
 			selection.selectedId = item.id;
-			vm.patch(item.parent_id, 'children_order');
+			if (this.isTopLvlItemInFilteredRoot(item.id) && item.parent_id == this.root.id) {
+				this.backups.rootChildren.push(item);
+				vm.patchRootChildrenOrderWithFilter(item.id);
+			} else {
+				vm.patch(item.parent_id, 'children_order');
+			}
 			if (addTags) {
 				this.tagItem(item.id, addTags);
 			}
@@ -24370,34 +24334,18 @@ var Tree = function () {
 			var nextIndex = this.siblingIndex(id) + 1;
 			var item = this.nodes[id];
 			var parent_id = item.parent_id;
-			var itemIsLastSibling = nextIndex == this.nodes[parent_id].children_order.length;
+			var parentsChildrenOrder = this.nodes[parent_id].children_order;
+			var itemIsLastSibling = nextIndex == parentsChildrenOrder.length;
 			var tagsSelected = selection.tags.length;
 
-			// if(!tagsSelected){ 
-			// console.log('itemIsLastSibling '+itemIsLastSibling);
 			if (itemIsLastSibling) {
+				if (parent_id == this.root.id) {
+					return;
+				}
 				return this.nextItemRecursion(parent_id);
 			}
 			var nextItemId = this.nodes[parent_id].children_order[nextIndex];
 			return nextItemId;
-
-			// }
-			// else if (tagsSelected) {
-			// 	let itemHasSelectedTag = this.hasTag(id, selection.tags);
-			// 	if(itemHasSelectedTag){
-			// 		return this.nextFilteredItemId(id);
-			// 	}
-
-			// 	let parentHasSelectedTag = this.hasTag(parent_id, selection.tags);
-			// 	if(itemIsLastSibling && parentHasSelectedTag){
-			// 		console.log('this is the top lvl item with the filtered tag: ['+parent_id+'] '+this.nodes[parent_id].body);
-			// 		return this.nextFilteredItemId(parent_id);
-			// 	}
-			// 	if(itemIsLastSibling && !parentHasSelectedTag){
-			// 		return this.nextItemRecursion(parent_id);
-			// 	}
-			// 	return this.nodes[parent_id].children_order[nextIndex];					
-			// }
 		}
 	}, {
 		key: 'isTopLvlItemInFilteredRoot',
@@ -24940,11 +24888,13 @@ var Tree = function () {
 					}.bind(this), 200);
 					return;
 				}
-				arrayToFilter = this.doneitems;
+				filteredArray = this.doneitems;
 				// }
 				// Codementor: How do I know the following function will start after the fetch is over?
-				var doneFilterResults = this.arrayFilterDone(arrayToFilter, operator);
-				Array.prototype.push.apply(filteredArray, doneFilterResults);
+
+				// let doneFilterResults = this.arrayFilterDone(arrayToFilter, operator);
+				// -> This is useless...
+				// Array.prototype.push.apply(filteredArray, arrayToFilter);			
 
 				setTimeout(function () {
 					flatpickrifyAllInputs();
@@ -36499,10 +36449,10 @@ window.moment = __WEBPACK_IMPORTED_MODULE_5_moment___default.a;
 	var openFlatPickr = null;
 	// Make flatpickr(el) available as el.flatpickr();
 	window.Element.prototype.flatpickr = function (config) {
-		return __WEBPACK_IMPORTED_MODULE_6_flatpickr___default()(this, config);
+		return new __WEBPACK_IMPORTED_MODULE_6_flatpickr___default.a(this, config);
 	};
 	window.Element.prototype.flatpickrify = function (config) {
-		return __WEBPACK_IMPORTED_MODULE_6_flatpickr___default()(this, {
+		return new __WEBPACK_IMPORTED_MODULE_6_flatpickr___default.a(this, {
 			dateFormat: 'Y-m-d H:i:S',
 			maxDate: 'today',
 			enableTime: true,
@@ -36519,17 +36469,11 @@ window.moment = __WEBPACK_IMPORTED_MODULE_5_moment___default.a;
 				openFlatPickr = instance;
 			},
 
-			onChange: function onChange(dateObj, dateStr, instance) {
-				var el = instance.element.id;
-				// instance.element.focus();
-				console.log('flatPicker on change');
-			},
 			onClose: function onClose(dateObj, dateStr, instance) {
 				var elId = instance.element.id;
 				var id = elId.replace('done-date-edit-', '');
 				id = id.replace('-popup', '');
 				console.log('vm.$root.beforeEditCache_doneDate[id] = ' + vm.$root.beforeEditCache_doneDate[id]);
-				// This doesn't even work...
 				if (vm.$root.beforeEditCache_doneDate[id] == dateStr) {
 					return;
 				}
@@ -36568,16 +36512,16 @@ window.Vue = __WEBPACK_IMPORTED_MODULE_7_vue___default.a;
 __WEBPACK_IMPORTED_MODULE_7_vue___default.a.use(__WEBPACK_IMPORTED_MODULE_8_vue_resource___default.a);
 // var VueAutosize = require('vue-autosize');
 // Vue.use(VueAutosize);
-// import VueFlatpickr from 'vue-flatpickr';
-// Vue.use(VueFlatpickr);
+
+// import VueFlatpickr from 'vue-flatpickr'
+// import 'vue-flatpickr/theme/airbnb.css'
+// Vue.use(VueFlatpickr)
+
 
 
 __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_9__vue_components_vueFilters_js__["a" /* default */])(__WEBPACK_IMPORTED_MODULE_7_vue___default.a);
 // Vue Components
 
-// window.vm = VueListMaster;
-// window.vm = new Vue(VueListMaster);
-// import VueListMaster from '/vue-components/VueListMaster.js'
 
 // JS Classes
 
@@ -36620,24 +36564,22 @@ __WEBPACK_IMPORTED_MODULE_0_jquery___default()('body').on('click', 'button', fun
 	__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__components_globalFunctions_js__["a" /* btnEffect */])(e);
 });
 
-console.log('fetching allItems');
+console.log('fetching all items');
 __WEBPACK_IMPORTED_MODULE_0_jquery___default.a.getJSON('/api/items', function (fetchedData) {
-	console.log('fetched allItems');
+	console.log('fetched all items');
 
 	//response
 	window.eventHub = new __WEBPACK_IMPORTED_MODULE_7_vue___default.a();
 	window.allItems = new __WEBPACK_IMPORTED_MODULE_11__vue_components_dataTree_js__["a" /* default */](fetchedData);
+	console.log(allItems);
+
 	window.vm = new __WEBPACK_IMPORTED_MODULE_7_vue___default.a(__WEBPACK_IMPORTED_MODULE_10__vue_components_VueListMaster_js__["a" /* default */]);
+
 	vm.allData = allItems.root;
 	vm.doneData = allItems.doneitems;
 
+	console.log('allItems ↓');
 	console.log(allItems);
-	// $.getJSON('/api/itemtags',function(tags){
-	// 	console.log(tags);
-	// 	window.allTags = tags;
-	// 	vm.allTags = tags;
-	// });
-	// Codementor: How do I make the following function wait until DOM/Vue/etc. is loaded?
 	setTimeout(function () {
 		flatpickrifyAllInputs();
 	}, 1000);
@@ -37115,8 +37057,6 @@ __WEBPACK_IMPORTED_MODULE_0_jquery___default.a.getJSON('/api/items', function (f
 //
 //
 //
-//
-//
 
 // import Morph from '../components/valueMorphers.js'
 // window.Morph = new Morph();
@@ -37151,6 +37091,9 @@ __WEBPACK_IMPORTED_MODULE_0_jquery___default.a.getJSON('/api/items', function (f
 	// Flatpickr: Flatpickr,
 	// },
 	computed: {
+		listIsEmpty: function listIsEmpty() {
+			return this.$root.noItems;
+		},
 		basis: function basis() {
 			return this.$root;
 		},
@@ -37265,7 +37208,7 @@ __WEBPACK_IMPORTED_MODULE_0_jquery___default.a.getJSON('/api/items', function (f
 			if (!this.item || !allItems) {
 				return;
 			}
-			if (this.$root.addingNewUnder == this.item.id && !this.$root.addingNewAsFirstChild || this.item.depth == 0 && allItems.root.children_order.length == 0) {
+			if (this.$root.addingNewUnder == this.item.id && !this.$root.addingNewAsFirstChild) {
 				return true;
 			} else {
 				return false;
@@ -37705,15 +37648,19 @@ __WEBPACK_IMPORTED_MODULE_0_jquery___default.a.getJSON('/api/items', function (f
 			var OlderSiblingIndex = this.siblingIndex;
 			var index = isNaN(OlderSiblingIndex) ? 0 : OlderSiblingIndex + 1;
 
-			if (this.$root.addingNewAsChild) {
+			if (this.$root.addingNewAsChild || this.listIsEmpty) {
 				newItem.depth = this.item.depth + 1;
 				newItem.parent_id = this.item.id;
 				index = 0;
 			}
-			var todayTagIndex = this.newItem.preparedTags.indexOf('Today');
-			if (todayTagIndex != -1) {
-				this.newItem.preparedTags.splice(todayTagIndex, 1);
+			if (selection.view == "journal") {
+				newItem.done = 1;
+			}
+			if (this.newItem.preparedTags.includes('Today') || selection.filter.includes('today')) {
 				newItem.due_date = moment().format();
+				this.newItem.preparedTags = this.newItem.preparedTags.filter(function (val) {
+					return val != 'Today';
+				});
 			}
 			var addTags = this.newItem.preparedTags;
 
@@ -38246,7 +38193,19 @@ window.selection = new __WEBPACK_IMPORTED_MODULE_4__Selection_js__["a" /* defaul
 	el: '#items-app',
 	data: {
 		doneData: null,
-		allData: null,
+		allData: {
+			"body": "ALL",
+			"children": [],
+			"children_order": [],
+			"depth": 0,
+			"done": false,
+			"done_date": "0000-00-00 00:00:00",
+			"due_date": "0000-00-00 00:00:00",
+			"id": "x",
+			"show_children": 1,
+			"tagged": [],
+			"used_time": 0
+		},
 		selection: selection,
 		addingNewUnder: null,
 		addingNewAsChild: false,
@@ -38268,6 +38227,11 @@ window.selection = new __WEBPACK_IMPORTED_MODULE_4__Selection_js__["a" /* defaul
 		Popouts: __WEBPACK_IMPORTED_MODULE_2__Popouts_vue___default.a
 	},
 	computed: {
+		noItems: function noItems() {
+			if (!this.allData || !allItems.root || !allItems.root.children.length) {
+				return true;
+			}return false;
+		},
 		allTagsComputed: function allTagsComputed() {
 			if (!this.allData) {
 				return [];
@@ -38526,6 +38490,16 @@ window.selection = new __WEBPACK_IMPORTED_MODULE_4__Selection_js__["a" /* defaul
 			}
 			this.patching = true;
 		},
+		patchRootChildrenOrderWithFilter: function patchRootChildrenOrderWithFilter(id) {
+			this.$http.get('api/items/' + allItems.root.id).then(function (response) {
+				var rootChildrenOrder = response.data.children_order;
+				rootChildrenOrder = rootChildrenOrder + ',' + id;
+				this.$http.patch('api/items/' + allItems.root.id, { 'children_order': rootChildrenOrder }).then(function (response) {
+					var newRootChildrenOrder = response.data.children_order;
+					console.log('newRootChildrenOrder = ' + newRootChildrenOrder);
+				});
+			});
+		},
 		patch: function patch(id, arg) {
 			var _this = this;
 
@@ -38697,42 +38671,29 @@ window.selection = new __WEBPACK_IMPORTED_MODULE_4__Selection_js__["a" /* defaul
 			this.popout(id, 'timer');
 			return;
 		},
-		fetchDone: function fetchDone(tags) {
+		fetchDone: function fetchDone(tags, operator) {
 			this.loading = true;
 			this.$http.get('/api/items/fetchdone').then(function (response) {
 				// debugger;
-				var data = response.json();
+				console.log('fetched Done');
+				var data = response.data;
 				console.log(data);
+				if (!data.length) {
+					console.log('no done items...');
+					this.loading = false;
+					return;
+				}
+				// clean up and add as nodes
 				data.forEach(function (item) {
-					return item = allItems.setDefaultItemValues(item);
-				});
-				data.forEach(function (item) {
+					item = allItems.setDefaultItemValues(item);
 					if (!allItems.nodes[item.id]) {
 						allItems.nodes[item.id] = item;
-					} else {
-						data.push(allItems.nodes[item.id]);
+					}
+					if (!allItems.doneitems.includes(item)) {
+						allItems.doneitems.push(item);
 					}
 				});
-				allItems.doneitems = data;
-				this.loading = false;
-			});
-		},
-		fetchDoneVersion2: function fetchDoneVersion2(tags) {
-			this.loading = true;
-			this.$http.get('/api/items/fetchdone').then(function (response) {
-				// debugger;
-				var data = response.json();
-				console.log(data);
-				if (tags) {
-					data = allItems.arrayFilterTag(data, tags);
-				}
-				data.forEach(function (item) {
-					allItems.nodes[item.id] = item;
-					allItems.setDefaultItemValues(item);
-				});
-				// allItems.root.children = allItems.formatDone(data);
-				// allItems.doneitems = allItems.formatDone(data);
-				this.doneData = allItems.formatDone(data);
+				allItems.filterItems('journal', null, operator);
 				this.loading = false;
 			});
 		},
@@ -38828,9 +38789,10 @@ window.selection = new __WEBPACK_IMPORTED_MODULE_4__Selection_js__["a" /* defaul
 				}
 			}
 			if (keyword == 'journal' && !this.doneData.length) {
-				this.fetchDone();
+				this.fetchDone(null, operator);
+			} else {
+				allItems.filterItems(keyword, value, operator);
 			}
-			allItems.filterItems(keyword, value, operator);
 		},
 		duplicate: function duplicate(id) {
 			id = !id ? selection.selectedId : id;
@@ -42772,7 +42734,7 @@ if (false) {
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
-  return (_vm.item) ? _c('div', {
+  return (_vm.item || _vm.listIsEmpty) ? _c('div', {
     class: {
       'items-card': true,
       'journal-wrapper': _vm.journalView
@@ -42780,7 +42742,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     attrs: {
       "id": 'card-' + _vm.item.id
     }
-  }, [(!_vm.isHidden) ? _c('div', [(_vm.journalDate) ? _c('div', {
+  }, [(!_vm.isHidden || _vm.listIsEmpty) ? _c('div', [(_vm.journalDate) ? _c('div', {
     staticClass: "title"
   }, [_c('span', [_vm._v(_vm._s(_vm.momentCalendar(_vm.journalDate)))]), _vm._v(" "), _c('span', {
     staticClass: "journal-date-small"
@@ -42879,7 +42841,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
   }) : _vm._e()]) : _vm._e(), _vm._v(" "), (_vm.journalView) ? _c('div', {}, [_vm._v("・")]) : _vm._e(), _vm._v(" "), _c('div', {
     staticClass: "body-div textarea-wrap",
     class: {
-      selected: _vm.item.id == this.$root.selection.selectedId,
+      selected: _vm.item.id == _vm.basis.selection.selectedId,
         project: _vm.isProject,
         'updating-tags': _vm.item.id == _vm.basis.editingItemTags
     },
@@ -43106,7 +43068,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
       class: 'tag',
       on: {
         "click": function($event) {
-          this.$root.patchTag(_vm.item.id, tag)
+          _vm.basis.patchTag(_vm.item.id, tag)
         }
       }
     }, [_vm._v(_vm._s(tag.name) + "\n\t\t\t\t\t\t\t")])
@@ -43164,7 +43126,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
       on: {
         "dblclick": function($event) {
           $event.preventDefault();
-          this.$root.filterItems('tag', tag.tag_slug, $event)
+          _vm.basis.filterItems('tag', tag.tag_slug, $event)
         }
       }
     }, [_vm._v(_vm._s(tag.tag_name) + "\n\t\t\t\t\t"), (_vm.item.id == _vm.basis.editingItem &&
@@ -43179,7 +43141,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     }, [_c('i', {
       staticClass: "zmdi zmdi-close-circle"
     })]) : _vm._e()]) : _vm._e()
-  })], 2), _vm._v(" "), (_vm.basis.editingItem != _vm.item.id && this.$root.selection.selectedId == _vm.item.id) ? _c('div', {
+  })], 2), _vm._v(" "), (_vm.basis.editingItem != _vm.item.id && _vm.basis.selection.selectedId == _vm.item.id) ? _c('div', {
     staticClass: "item-nav"
   }, [(!_vm.item.done) ? _c('button', {
     staticClass: "timer",
@@ -43194,7 +43156,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     staticClass: "more",
     on: {
       "click": function($event) {
-        this.$root.popup(_vm.item.id, 'afterDone')
+        _vm.basis.popup(_vm.item.id, 'afterDone')
       }
     }
   }, [_c('i', {
@@ -43396,7 +43358,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     }, [_c('i', {
       staticClass: "zmdi zmdi-close-circle"
     })]) : _vm._e()]) : _vm._e()
-  }))])]) : _vm._e(), _vm._v(" "), (_vm.item.children) ? _c('div', {
+  }))])]) : _vm._e(), _vm._v(" "), (_vm.item.children.length) ? _c('div', {
     directives: [{
       name: "show",
       rawName: "v-show",
@@ -43411,7 +43373,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
         "item": childCard
       }
     })
-  })) : _vm._e(), _vm._v(" "), (_vm.showAddNewBox) ? _c('form', {
+  })) : _vm._e(), _vm._v(" "), (_vm.showAddNewBox || (_vm.listIsEmpty && _vm.basis.selection.view != 'journal')) ? _c('form', {
     class: ['addnewbox'],
     attrs: {
       "id": 'new-under-' + _vm.item.id

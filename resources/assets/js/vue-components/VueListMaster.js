@@ -11,7 +11,19 @@ export default {
 	el:'#items-app',
 	data: {
 		doneData: null,
-		allData: null,
+		allData: {
+			"body":"ALL",
+			"children":[],
+			"children_order":[],
+			"depth":0,
+			"done":false,
+			"done_date":"0000-00-00 00:00:00",
+			"due_date":"0000-00-00 00:00:00",
+			"id":"x",
+			"show_children":1,
+			"tagged":[],
+			"used_time":0
+		},
 		selection,
 		addingNewUnder: null,
 		addingNewAsChild: false,
@@ -34,6 +46,11 @@ export default {
 		Popouts,
 	},
 	computed:{
+		noItems(){
+			if(!this.allData || !allItems.root || !allItems.root.children.length){
+				return true;
+			} return false;
+		},
 		allTagsComputed(){
 			if(!this.allData){ return []; }
 			let childrensTags = [];
@@ -242,6 +259,16 @@ export default {
 		    if(window.stopPatchingIcon){ clearTimeout(window.stopPatchingIcon); }
 			this.patching = true;
 		},
+		patchRootChildrenOrderWithFilter(id){
+			this.$http.get('api/items/'+allItems.root.id).then(function(response){
+				let rootChildrenOrder = response.data.children_order;
+				rootChildrenOrder = rootChildrenOrder+','+id;
+				this.$http.patch('api/items/'+allItems.root.id, {'children_order':rootChildrenOrder}).then(function(response){
+					let newRootChildrenOrder = response.data.children_order;
+					console.log('newRootChildrenOrder = '+newRootChildrenOrder);
+				});
+			});
+		},
 		patch(id, arg){
 			if(allItems.isTopLvlItemInFilteredRoot(id)){ 
 				if(arg == 'children_order' || arg == 'parent_id'){
@@ -403,37 +430,25 @@ export default {
 			this.popout(id, 'timer');
 			return;
 		},
-		fetchDone(tags){
+		fetchDone(tags, operator){
 			this.loading = true;
 			this.$http.get('/api/items/fetchdone').then(function(response){
 				// debugger;
-				let data = response.json();
+				console.log('fetched Done');
+				let data = response.data;
 				console.log(data);
-				data.forEach(item => item = allItems.setDefaultItemValues(item));
-				data.forEach(item => {
-					if(!allItems.nodes[item.id]){ allItems.nodes[item.id] = item; }
-					else { data.push(allItems.nodes[item.id]); }
-				});
-				allItems.doneitems = data;
-				this.loading = false;
-			});
-		},
-		fetchDoneVersion2(tags){
-			this.loading = true;
-			this.$http.get('/api/items/fetchdone').then(function(response){
-				// debugger;
-				let data = response.json();
-				console.log(data);
-				if(tags){
-					data = allItems.arrayFilterTag(data, tags);
+				if(!data.length){ 
+					console.log('no done items...');
+					this.loading = false;
+					return;
 				}
-				data.forEach(function(item){
-					allItems.nodes[item.id] = item;
-					allItems.setDefaultItemValues(item);
+				// clean up and add as nodes
+				data.forEach(item => {
+					item = allItems.setDefaultItemValues(item)
+					if(!allItems.nodes[item.id]){ allItems.nodes[item.id] = item; }
+					if(!allItems.doneitems.includes(item)){ allItems.doneitems.push(item); }
 				});
-				// allItems.root.children = allItems.formatDone(data);
-				// allItems.doneitems = allItems.formatDone(data);
-				this.doneData = allItems.formatDone(data);
+				allItems.filterItems('journal',null,operator);
 				this.loading = false;
 			});
 		},
@@ -520,9 +535,10 @@ export default {
 				}
 			}
 			if (keyword == 'journal' && !this.doneData.length){
-				this.fetchDone();
+				this.fetchDone(null,operator);
+			} else {
+				allItems.filterItems(keyword,value,operator);
 			}
-			allItems.filterItems(keyword,value,operator);
 		},
 		duplicate(id){
 			id = (!id) ? selection.selectedId : id ;
