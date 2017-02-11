@@ -28,8 +28,8 @@ class CreateItemsTable extends Migration
         $table->text('completion_memo');
         $table->boolean('show_children')->default(1);
         $table->softDeletes();
-        $table->morphs('taggable');
-        $table->integer('created_by')->unsigned()->index();     
+        // $table->morphs('taggable');
+        $table->integer('created_by')->unsigned()->index(); 
         // To assign things see table: link_things_u        
         $table->timestamps();
     });

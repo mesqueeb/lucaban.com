@@ -8,11 +8,11 @@
 		'journal-wrapper': journalView
 	}"
 >
-<div v-if="!isHidden || listIsEmpty">
+<div class="item-card-wrapper" v-if="!isHidden || listIsEmpty">
 	<div class="title"
 	v-if="journalDate"
 	>
-		<!-- <span>{{ journalDate | momentCalendar }}</span> -->
+		<!-- Codementor: Is this the correct way to format something like this? -->
 		<span>{{ momentCalendar(journalDate) }}</span>
 		<span class="journal-date-small">{{ journalDate }}</span>
 	</div>
@@ -48,18 +48,6 @@
 				:for="'show_children_'+item.id"
 				v-if="item.children_order.length>0"
 			></label>
-
-			<!-- <input class="show_children_toggle"
-				:id="'show_children_' + item.id"
-				type="checkbox"
-				v-if="item.children_order.length>0"
-				v-model="item.show_children"
-				@change="updateShowChildren(item.id)"
-			>
-			<label class="show_children_svg" 
-				:for="'show_children_' + item.id">
-				//// This label is not yet used!
-			</label> -->
 		</div>
 		<div class=""
 			v-if="journalView"
@@ -75,15 +63,12 @@
 			<div class="bodybox"
 				v-show="item.id != basis.editingItem"
 			>
-				<!-- <div>{{ item.body | linkify }}</div> -->
 				<div>{{ linkify(item.body) }}</div>
 				<div class="completion-notes bodybox"
 					v-if="item.completion_memo"
 					@click="selectItem(item)"
 				>{{ item.completion_memo }}</div>
 			</div>
-			<!-- <div class="hidden-sizer">{{item.body + "|"}}</div> -->
-			
 			<!-- For debugging: -->
 			<span v-if="false"> ({{item.id}}) D-{{item.depth}}) [{{item.children_order}}]</span>
 			
@@ -108,27 +93,31 @@
 						Duration:
 						<button
 							:class="{ currentDuration: item.planned_time == 10, 'planned-time': true }"
-							@click.prevent="setPlannedTime(item, 10, $event)"
+							@click.prevent="setPlannedTime(item, $event)"
 							@keydown="keydownOnEdit(item, $event, 'planned-time')"
 							@blur="blurOnEdit(item)"
+							value="10"
 						>10 min</button>
 						<button
 							:class="{ currentDuration: item.planned_time == 15, 'planned-time': true }"
-							@click.prevent="setPlannedTime(item, 15, $event)"
+							@click.prevent="setPlannedTime(item, $event)"
 							@keydown="keydownOnEdit(item, $event, 'planned-time')"
 							@blur="blurOnEdit(item)"
+							value="15"
 						>15 min</button>
 						<button
 							:class="{ currentDuration: item.planned_time == 30, 'planned-time': true }"
-							@click.prevent="setPlannedTime(item, 30, $event)"
+							@click.prevent="setPlannedTime(item, $event)"
 							@keydown="keydownOnEdit(item, $event, 'planned-time')"
 							@blur="blurOnEdit(item)"
+							value="30"
 						>30 min</button>
 						<button
 							:class="{ currentDuration: item.planned_time == 60, 'planned-time': true }"
-							@click.prevent="setPlannedTime(item, 60, $event)"
+							@click.prevent="setPlannedTime(item, $event)"
 							@keydown="keydownOnEdit(item, $event, 'planned-time')"
 							@blur="blurOnEdit(item)"
+							value="60"
 						>1 hour</button>
 						<div><input
 							class="planned-time" 
@@ -251,92 +240,10 @@
 		</div>
 	</div>
 
-	<form 
-		:class="['addnewbox-firstchild', 'addnewbox', 'child']"
-		:id="'new-firstchild-of-'+item.id"
-		v-if="showAddNewBoxFirstChild"
-		@submit.prevent
-	>
-		<div>
-			<textarea type="text"
-				v-focus
-				class="newitem-body"
-				v-model="newItem.body"
-				@blur="blurOnAddNew(item)"
-				@keydown="keydownOnNew(item, $event, 'body')"
-				placeholder="..."
-				autocomplete="off"
-				autofocus 
-				rows="1"
-			></textarea>
-		</div>
-		<div class="update-tags">
-			<div class="update-planned-time">
-				Duration:
-				<button
-					:class="{ currentDuration: newItem.planned_time == 10, 'planned-time': true }"
-					@click.prevent="setPlannedTimeNewItem(item, 10, $event)"
-					@keydown="keydownOnNew(item, $event, 'planned-time')"
-					@blur="blurOnAddNew(item)"
-				>10 min</button>
-				<button
-					:class="{ currentDuration: newItem.planned_time == 15, 'planned-time': true }"
-					@click.prevent="setPlannedTimeNewItem(item, 15, $event)"
-					@keydown="keydownOnNew(item, $event, 'planned-time')"
-					@blur="blurOnAddNew(item)"
-				>15 min</button>
-				<button
-					:class="{ currentDuration: newItem.planned_time == 30, 'planned-time': true }"
-					@click.prevent="setPlannedTimeNewItem(item, 30, $event)"
-					@keydown="keydownOnNew(item, $event, 'planned-time')"
-					@blur="blurOnAddNew(item)"
-				>30 min</button>
-				<button
-					:class="{ currentDuration: newItem.planned_time == 60, 'planned-time': true }"
-					@click.prevent="setPlannedTimeNewItem(item, 60, $event)"
-					@keydown="keydownOnNew(item, $event, 'planned-time')"
-					@blur="blurOnAddNew(item)"
-				>1 hour</button>
-				<div><input
-					class="planned-time" 
-					type="number"
-					v-show="true"
-					v-model="newItem.planned_time"
-					@blur="blurOnAddNew(item)"
-					@keydown="keydownOnNew(item, $event, 'planned-time')"
-				/>min</div>
-			</div>
-			<div class="update-custom-tags">
-				<label>
-					Add Tag: 
-					<input type="text"
-						class="prepare-tag"
-						@keydown="keydownOnNew(item, $event, 'addTag')"
-						@blur="blurOnAddNew(item)"
-						v-model="newTag"
-					>
-				</label>
-			</div>
-			<div class="item-tags prepared-tags">
-				<span v-if="newItem.preparedTags.length"
-					v-for="tag in newItem.preparedTags"
-					:class="(tag=='Today') ? 'duedate' : 'custom-tag'"
-				>{{ tag }}
-					<button class="delete-tag"
-						v-if="!parentTags.includes(tag)"
-						@click.prevent="deletePreparedTag(tag, item)"
-					>
-						<i class="zmdi zmdi-close-circle"></i>
-					</button>
-				</span>
-			</div>
-		</div>
-	</form>
-
-
 	<div class="children"
 		v-if="item.children.length"
 		v-show="item.show_children"
+		:style="(addingNewAsFirstChild)?'order:3;':''"
 	>
 		<Card v-for="childCard in item.children"
 			:item="childCard"
@@ -345,9 +252,11 @@
 	</div>
 
 	<form 
-		:class="['addnewbox']"
+		:class="{'addnewbox':true, 
+			'child':addingNewAsChild,
+			'first-child':addingNewAsFirstChild,}"
 		:id="'new-under-'+ item.id "
-		v-if="showAddNewBox || (listIsEmpty && basis.selection.view != 'journal')"
+		v-show="item.id == 383 || showAddNewBox || (listIsEmpty && basis.selection.view != 'journal')"
 		@submit.prevent
 	>
 		<div>
@@ -368,27 +277,31 @@
 				Duration:
 				<button
 					:class="{ currentDuration: newItem.planned_time == 10, 'planned-time': true }"
-					@click.prevent="setPlannedTimeNewItem(item, 10, $event)"
+					@click.prevent="setPlannedTimeNewItem(item, $event)"
 					@keydown="keydownOnNew(item, $event, 'planned-time')"
 					@blur="blurOnAddNew(item)"
+					value="10"
 				>10 min</button>
 				<button
 					:class="{ currentDuration: newItem.planned_time == 15, 'planned-time': true }"
-					@click.prevent="setPlannedTimeNewItem(item, 15, $event)"
+					@click.prevent="setPlannedTimeNewItem(item, $event)"
 					@keydown="keydownOnNew(item, $event, 'planned-time')"
 					@blur="blurOnAddNew(item)"
+					value="15"
 				>15 min</button>
 				<button
 					:class="{ currentDuration: newItem.planned_time == 30, 'planned-time': true }"
-					@click.prevent="setPlannedTimeNewItem(item, 30, $event)"
+					@click.prevent="setPlannedTimeNewItem(item, $event)"
 					@keydown="keydownOnNew(item, $event, 'planned-time')"
 					@blur="blurOnAddNew(item)"
+					value="30"
 				>30 min</button>
 				<button
 					:class="{ currentDuration: newItem.planned_time == 60, 'planned-time': true }"
-					@click.prevent="setPlannedTimeNewItem(item, 60, $event)"
+					@click.prevent="setPlannedTimeNewItem(item, $event)"
 					@keydown="keydownOnNew(item, $event, 'planned-time')"
 					@blur="blurOnAddNew(item)"
+					value="60"
 				>1 hour</button>
 				<div><input
 					class="planned-time"
@@ -471,6 +384,7 @@ export default {
 			if(!this.item.children.length){ return (this.item.planned_time) ? this.item.planned_time : 0 ; }
 			let childrenArray = allItems.flattenTree(this.item.children);
 			let x = childrenArray.reduce((prevVal, child) => prevVal + child.planned_time, this.item.planned_time);
+			x = x - this.$root.hiddenItemsTotalPlannedTime;
 		    return (x) ? x : 0;
 		},
 		totalUsedSec(){ if(!this.item || !allItems){ return 0; }
@@ -478,6 +392,7 @@ export default {
 			if(!this.item.children.length){ return (this.item.used_time) ? this.item.used_time : 0 ; }
 			let childrenArray = allItems.flattenTree(this.item.children);
 			let x = childrenArray.reduce((prevVal, child) => prevVal + child.used_time, this.item.used_time);
+		    x = x - this.$root.hiddenItemsTotalUsedTime;
 		    return (x) ? x : 0;
 		},
 		journalView(){ if(!this.item || !allItems){ return; }
@@ -525,14 +440,15 @@ export default {
 			return allItems.nodes[pId].children_order;
 		},
 		showAddNewBox(){ if(!this.item || !allItems){ return; }
-			if(this.$root.addingNewUnder == this.item.id && !this.$root.addingNewAsFirstChild){
-				return true;
-			} else { return false; }
+			if(this.$root.addingNewUnder == this.item.id)
+			{ return true; }
+			return false;
 		},
-		showAddNewBoxFirstChild(){ if(!this.item || !allItems){ return; }
-			if(this.$root.addingNewUnder == this.item.id && this.$root.addingNewAsFirstChild){
-				return true;
-			} else { return false; }
+		addingNewAsFirstChild(){ if(!this.item || !allItems){ return; }
+			return this.$root.addingNewAsFirstChild;
+		},
+		addingNewAsChild(){ if(!this.item || !allItems){ return; }
+			return this.$root.addingNewAsChild;
 		},
 		hasDueDate(){ if(!this.item || !allItems){ return; }
 		    return (this.item.due_date && this.item.due_date != '0000-00-00 00:00:00');
@@ -603,26 +519,24 @@ export default {
 			selection.selectedId = item.id;
 		},
 		newItemIndent(){
-			let lastChild = allItems.getLastChildId(this.item.id);
-        	if (lastChild){
-        	// If item already has children
-        		console.log("Adding instead under: ["+allItems.nodes[lastChild].body+']');
-        		vm.$root.showAddNewItem(lastChild);
-        	} else {
-        	// If item has no children yet
+			if(!this.item.children.length || !this.item.show_children){
+        	// If item has no children yet / no visible children
 				this.$root.addingNewAsChild = true;
-        		document.querySelector("#new-under-"+this.item.id+" textarea").focus();
-        	}
+				return;
+			}
+			let lastChildId = allItems.getLastChildId(this.item.id);
+    		vm.$root.showAddNewItem(lastChildId);
 		},
 		newItemUnindent(){
 			if(this.$root.addingNewAsChild){
 				this.$root.addingNewAsChild = false;
+				this.$root.addingNewAsFirstChild = false;
 				return;
 			}
 			vm.$root.showAddNewItem(this.item.parent_id);
 		},
 		keydownOnNew(item, e, field) {
-			console.log('keydown on new: '+e.keyCode);
+			console.log('keydown on new: '+e.keyCode+' - '+field);
 			console.log(e);
 
 			// SHIFT-TAB
@@ -643,18 +557,11 @@ export default {
 			}
 			// ENTER
 			if (e.keyCode === 13 && !e.shiftKey && !e.altKey && !e.metaKey && !e.ctrlKey) {
+				e.preventDefault();
 				if(field == 'planned-time'){
-					if(e.srcElement.nodeName == 'INPUT'){
-						e.preventDefault();
-						let plsFocus = '.addnewbox .prepare-tag';
-						document.querySelector(plsFocus).focus();
-						if(!this.item.planned_time){
-							this.item.planned_time = 0;
-						}
-					}
+					this.setPlannedTimeNewItem(item, event);
 					return;
 				}
-				e.preventDefault();
 				if(field == 'addTag' && this.newTag){
 					this.prepareTag(item);
 					return;
@@ -675,6 +582,7 @@ export default {
 				// If in an EMPTY BODY
 				if (field != 'body' || (field == 'body' && !this.newItem.body)) {
 					e.preventDefault();
+		        	// console.log('this.newItemUnindent();');
 		        	this.newItemUnindent();
 		        	return;
 				}
@@ -684,6 +592,7 @@ export default {
 				// If in an EMPTY BODY
 				if (field != 'body' || (field == 'body' && !this.newItem.body)) {
 					e.preventDefault();
+		        	// console.log('this.newItemIndent();');
 		        	this.newItemIndent();
 		        	return;
 				}
@@ -752,18 +661,11 @@ export default {
 			}
 			// ENTER
 			if (e.keyCode === 13 && !e.shiftKey && !e.altKey) {
+				e.preventDefault();
 				if(field == 'planned-time'){
-					if(e.srcElement.nodeName == 'INPUT'){
-						e.preventDefault();
-						let plsFocus = '#updatebox-'+item.id+' .add-tag';
-						document.querySelector(plsFocus).focus();
-						if(!this.item.planned_time){
-							this.item.planned_time = 0;
-						}		
-					}
+					this.setPlannedTime(item, event);
 					return;
 				}
-	        	e.preventDefault();
 				if(field == 'addTag' && this.newTag){
 					this.addTag(item);
 					return;
@@ -980,26 +882,25 @@ export default {
 			let plsFocus = ".addnewbox .prepare-tag";
 			// let plsFocus;
 			// if(this.showAddNewBox == true){ plsFocus = "#new-under-"+item.id+" .prepare-tag"; }
-			// if(this.showAddNewBoxFirstChild == true){ plsFocus = "#new-firstchild-of-"+item.id+" .prepare-tag"; }
 			document.querySelector(plsFocus).focus();
 			let tagIndex = this.newItem.preparedTags.indexOf(tagIndex);
 			this.newItem.preparedTags.splice(tagIndex, 1)
 		},
-		setPlannedTime(item, time, event){
+		setPlannedTime(item, event){
+			item.planned_time = (event.srcElement.value) ? parseFloat(event.srcElement.value) : 0 ;
 			let plsFocus = '#updatebox-'+item.id+' .add-tag';
-			setTimeout(function(){
+			Vue.nextTick(function () {
 				console.log('returning to editting: '+plsFocus);
 				document.querySelector(plsFocus).focus();
-	    	},30);
-			item.planned_time = time;
+			});
 		},
-		setPlannedTimeNewItem(item, time, event){
-			let plsFocus = ".addnewbox .prepare-tag";
-			setTimeout(function(){
+		setPlannedTimeNewItem(item, event){
+			this.newItem.planned_time = (event.srcElement.value) ? parseFloat(event.srcElement.value) : 0 ;
+			let plsFocus = "#new-under-"+item.id+" .prepare-tag";
+			Vue.nextTick(function () {
 				console.log('returning to : '+plsFocus);
 				document.querySelector(plsFocus).focus();
-	    	},30);
-			this.newItem.planned_time = time;
+	    	});
 		},
 	},
 	directives: {

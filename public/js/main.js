@@ -14919,6 +14919,22 @@ function sec_to_hourmin(val) {
 			return num + " " + unit;
 		}return '';
 	}
+	var seconds = val % 60;
+	var minutes = Math.floor(val / 60);
+	var hours = Math.floor(minutes / 60);
+	minutes = minutes % 60;
+	if (hours > 0) {
+		return pad(hours, 'hour ') + pad(minutes, 'min');
+	} else {
+		return pad(minutes, 'min');
+	}
+}
+function min_to_hourmin(val) {
+	function pad(num, unit) {
+		if (num > 0) {
+			return num + " " + unit;
+		}return '';
+	}
 	var minutes = val % 60;
 	var hours = Math.floor(val / 60);
 	if (hours > 0) {
@@ -24866,21 +24882,28 @@ var Tree = function () {
 			this.root.children.forEach(function (item) {
 				item.parent_id = item.parent_id_backup;
 			});
+			if (operator == 'NOT' && keyword == 'journal') {
+				this.hideDoneNodes();
+				selection.addKeywords(keyword, value, operator);
+				return;
+			} else if (operator == 'NOT' && keyword == 'tag') {
+				this.hideTaggedNodes(value);
+				selection.addKeywords(keyword, value, operator);
+				return;
+			}
 			var arrayToFilter = void 0;
-			if (operator == 'NOT') {
-				arrayToFilter = this.root.children;
-			} else if (operator == 'AND') {
+			if (operator == 'AND') {
 				arrayToFilter = this.flattenTree(this.root.children);
 			} else {
+				selection.clear();
 				arrayToFilter = this.flattenTree(this.backups.rootChildren);
 			}
+
 			var filteredArray = [];
 			if (keyword == 'all') {
 				filteredArray = this.backups.rootChildren;
 			}
 			if (keyword == 'journal') {
-				// if(operator != 'NOT'){
-				// currently if operator is 'NOT' the this function won't even been launched.
 				if (!this.doneitems.length) {
 					console.log('waiting for done items...');
 					setTimeout(function () {
@@ -24889,13 +24912,7 @@ var Tree = function () {
 					return;
 				}
 				filteredArray = this.doneitems;
-				// }
 				// Codementor: How do I know the following function will start after the fetch is over?
-
-				// let doneFilterResults = this.arrayFilterDone(arrayToFilter, operator);
-				// -> This is useless...
-				// Array.prototype.push.apply(filteredArray, arrayToFilter);			
-
 				setTimeout(function () {
 					flatpickrifyAllInputs();
 				}, 1000);
@@ -24913,6 +24930,7 @@ var Tree = function () {
 			}.bind(this));
 			this.root.children = filteredArray;
 			this.resetChildrenOrder(this.root.id);
+			selection.addKeywords(keyword, value, operator);
 		}
 	}, {
 		key: 'arrayFilterTag',
@@ -36970,93 +36988,6 @@ __WEBPACK_IMPORTED_MODULE_0_jquery___default.a.getJSON('/api/items', function (f
 //
 //
 //
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
 
 // import Morph from '../components/valueMorphers.js'
 // window.Morph = new Morph();
@@ -37109,6 +37040,7 @@ __WEBPACK_IMPORTED_MODULE_0_jquery___default.a.getJSON('/api/items', function (f
 			var x = childrenArray.reduce(function (prevVal, child) {
 				return prevVal + child.planned_time;
 			}, this.item.planned_time);
+			x = x - this.$root.hiddenItemsTotalPlannedTime;
 			return x ? x : 0;
 		},
 		totalUsedSec: function totalUsedSec() {
@@ -37123,6 +37055,7 @@ __WEBPACK_IMPORTED_MODULE_0_jquery___default.a.getJSON('/api/items', function (f
 			var x = childrenArray.reduce(function (prevVal, child) {
 				return prevVal + child.used_time;
 			}, this.item.used_time);
+			x = x - this.$root.hiddenItemsTotalUsedTime;
 			return x ? x : 0;
 		},
 		journalView: function journalView() {
@@ -37208,21 +37141,22 @@ __WEBPACK_IMPORTED_MODULE_0_jquery___default.a.getJSON('/api/items', function (f
 			if (!this.item || !allItems) {
 				return;
 			}
-			if (this.$root.addingNewUnder == this.item.id && !this.$root.addingNewAsFirstChild) {
+			if (this.$root.addingNewUnder == this.item.id) {
 				return true;
-			} else {
-				return false;
 			}
+			return false;
 		},
-		showAddNewBoxFirstChild: function showAddNewBoxFirstChild() {
+		addingNewAsFirstChild: function addingNewAsFirstChild() {
 			if (!this.item || !allItems) {
 				return;
 			}
-			if (this.$root.addingNewUnder == this.item.id && this.$root.addingNewAsFirstChild) {
-				return true;
-			} else {
-				return false;
+			return this.$root.addingNewAsFirstChild;
+		},
+		addingNewAsChild: function addingNewAsChild() {
+			if (!this.item || !allItems) {
+				return;
 			}
+			return this.$root.addingNewAsChild;
 		},
 		hasDueDate: function hasDueDate() {
 			if (!this.item || !allItems) {
@@ -37335,26 +37269,24 @@ __WEBPACK_IMPORTED_MODULE_0_jquery___default.a.getJSON('/api/items', function (f
 			selection.selectedId = item.id;
 		},
 		newItemIndent: function newItemIndent() {
-			var lastChild = allItems.getLastChildId(this.item.id);
-			if (lastChild) {
-				// If item already has children
-				console.log("Adding instead under: [" + allItems.nodes[lastChild].body + ']');
-				vm.$root.showAddNewItem(lastChild);
-			} else {
-				// If item has no children yet
+			if (!this.item.children.length || !this.item.show_children) {
+				// If item has no children yet / no visible children
 				this.$root.addingNewAsChild = true;
-				document.querySelector("#new-under-" + this.item.id + " textarea").focus();
+				return;
 			}
+			var lastChildId = allItems.getLastChildId(this.item.id);
+			vm.$root.showAddNewItem(lastChildId);
 		},
 		newItemUnindent: function newItemUnindent() {
 			if (this.$root.addingNewAsChild) {
 				this.$root.addingNewAsChild = false;
+				this.$root.addingNewAsFirstChild = false;
 				return;
 			}
 			vm.$root.showAddNewItem(this.item.parent_id);
 		},
 		keydownOnNew: function keydownOnNew(item, e, field) {
-			console.log('keydown on new: ' + e.keyCode);
+			console.log('keydown on new: ' + e.keyCode + ' - ' + field);
 			console.log(e);
 
 			// SHIFT-TAB
@@ -37375,18 +37307,11 @@ __WEBPACK_IMPORTED_MODULE_0_jquery___default.a.getJSON('/api/items', function (f
 			}
 			// ENTER
 			if (e.keyCode === 13 && !e.shiftKey && !e.altKey && !e.metaKey && !e.ctrlKey) {
+				e.preventDefault();
 				if (field == 'planned-time') {
-					if (e.srcElement.nodeName == 'INPUT') {
-						e.preventDefault();
-						var plsFocus = '.addnewbox .prepare-tag';
-						document.querySelector(plsFocus).focus();
-						if (!this.item.planned_time) {
-							this.item.planned_time = 0;
-						}
-					}
+					this.setPlannedTimeNewItem(item, event);
 					return;
 				}
-				e.preventDefault();
 				if (field == 'addTag' && this.newTag) {
 					this.prepareTag(item);
 					return;
@@ -37411,6 +37336,7 @@ __WEBPACK_IMPORTED_MODULE_0_jquery___default.a.getJSON('/api/items', function (f
 				// If in an EMPTY BODY
 				if (field != 'body' || field == 'body' && !this.newItem.body) {
 					e.preventDefault();
+					// console.log('this.newItemUnindent();');
 					this.newItemUnindent();
 					return;
 				}
@@ -37420,6 +37346,7 @@ __WEBPACK_IMPORTED_MODULE_0_jquery___default.a.getJSON('/api/items', function (f
 				// If in an EMPTY BODY
 				if (field != 'body' || field == 'body' && !this.newItem.body) {
 					e.preventDefault();
+					// console.log('this.newItemIndent();');
 					this.newItemIndent();
 					return;
 				}
@@ -37434,14 +37361,14 @@ __WEBPACK_IMPORTED_MODULE_0_jquery___default.a.getJSON('/api/items', function (f
 				}
 				if (field == 'planned-time') {
 					e.preventDefault();
-					var _plsFocus = '.addnewbox .newitem-body';
-					document.querySelector(_plsFocus).focus();
+					var plsFocus = '.addnewbox .newitem-body';
+					document.querySelector(plsFocus).focus();
 					return;
 				}
 				if (field == 'addTag') {
 					e.preventDefault();
-					var _plsFocus2 = '.addnewbox .update-planned-time>button';
-					document.querySelector(_plsFocus2).focus();
+					var _plsFocus = '.addnewbox .update-planned-time>button';
+					document.querySelector(_plsFocus).focus();
 					return;
 				}
 			}
@@ -37450,14 +37377,14 @@ __WEBPACK_IMPORTED_MODULE_0_jquery___default.a.getJSON('/api/items', function (f
 				// If body is empty!
 				if (field == 'body' && !this.newItem.body) {
 					e.preventDefault();
-					var _plsFocus3 = '.addnewbox .update-planned-time>button';
-					document.querySelector(_plsFocus3).focus();
+					var _plsFocus2 = '.addnewbox .update-planned-time>button';
+					document.querySelector(_plsFocus2).focus();
 					return;
 				}
 				if (field == 'planned-time') {
 					e.preventDefault();
-					var _plsFocus4 = '.addnewbox .prepare-tag';
-					document.querySelector(_plsFocus4).focus();
+					var _plsFocus3 = '.addnewbox .prepare-tag';
+					document.querySelector(_plsFocus3).focus();
 					return;
 				}
 				if (field == 'addTag' && !this.newItem.body) {
@@ -37488,18 +37415,11 @@ __WEBPACK_IMPORTED_MODULE_0_jquery___default.a.getJSON('/api/items', function (f
 			}
 			// ENTER
 			if (e.keyCode === 13 && !e.shiftKey && !e.altKey) {
+				e.preventDefault();
 				if (field == 'planned-time') {
-					if (e.srcElement.nodeName == 'INPUT') {
-						e.preventDefault();
-						var plsFocus = '#updatebox-' + item.id + ' .add-tag';
-						document.querySelector(plsFocus).focus();
-						if (!this.item.planned_time) {
-							this.item.planned_time = 0;
-						}
-					}
+					this.setPlannedTime(item, event);
 					return;
 				}
-				e.preventDefault();
 				if (field == 'addTag' && this.newTag) {
 					this.addTag(item);
 					return;
@@ -37514,14 +37434,14 @@ __WEBPACK_IMPORTED_MODULE_0_jquery___default.a.getJSON('/api/items', function (f
 				}
 				if (field == 'planned-time') {
 					e.preventDefault();
-					var _plsFocus5 = '#updatebox-' + item.id + ' .edititem-body';
-					document.querySelector(_plsFocus5).focus();
+					var plsFocus = '#updatebox-' + item.id + ' .edititem-body';
+					document.querySelector(plsFocus).focus();
 					return;
 				}
 				if (field == 'addTag') {
 					e.preventDefault();
-					var _plsFocus6 = '#updatebox-' + item.id + ' .update-planned-time>button';
-					document.querySelector(_plsFocus6).focus();
+					var _plsFocus4 = '#updatebox-' + item.id + ' .update-planned-time>button';
+					document.querySelector(_plsFocus4).focus();
 					return;
 				}
 			}
@@ -37532,8 +37452,8 @@ __WEBPACK_IMPORTED_MODULE_0_jquery___default.a.getJSON('/api/items', function (f
 				}
 				if (field == 'planned-time') {
 					e.preventDefault();
-					var _plsFocus7 = '#updatebox-' + item.id + ' .add-tag';
-					document.querySelector(_plsFocus7).focus();
+					var _plsFocus5 = '#updatebox-' + item.id + ' .add-tag';
+					document.querySelector(_plsFocus5).focus();
 					return;
 				}
 				if (field == 'addTag') {
@@ -37706,26 +37626,25 @@ __WEBPACK_IMPORTED_MODULE_0_jquery___default.a.getJSON('/api/items', function (f
 			var plsFocus = ".addnewbox .prepare-tag";
 			// let plsFocus;
 			// if(this.showAddNewBox == true){ plsFocus = "#new-under-"+item.id+" .prepare-tag"; }
-			// if(this.showAddNewBoxFirstChild == true){ plsFocus = "#new-firstchild-of-"+item.id+" .prepare-tag"; }
 			document.querySelector(plsFocus).focus();
 			var tagIndex = this.newItem.preparedTags.indexOf(tagIndex);
 			this.newItem.preparedTags.splice(tagIndex, 1);
 		},
-		setPlannedTime: function setPlannedTime(item, time, event) {
+		setPlannedTime: function setPlannedTime(item, event) {
+			item.planned_time = event.srcElement.value ? parseFloat(event.srcElement.value) : 0;
 			var plsFocus = '#updatebox-' + item.id + ' .add-tag';
-			setTimeout(function () {
+			Vue.nextTick(function () {
 				console.log('returning to editting: ' + plsFocus);
 				document.querySelector(plsFocus).focus();
-			}, 30);
-			item.planned_time = time;
+			});
 		},
-		setPlannedTimeNewItem: function setPlannedTimeNewItem(item, time, event) {
-			var plsFocus = ".addnewbox .prepare-tag";
-			setTimeout(function () {
+		setPlannedTimeNewItem: function setPlannedTimeNewItem(item, event) {
+			this.newItem.planned_time = event.srcElement.value ? parseFloat(event.srcElement.value) : 0;
+			var plsFocus = "#new-under-" + item.id + " .prepare-tag";
+			Vue.nextTick(function () {
 				console.log('returning to : ' + plsFocus);
 				document.querySelector(plsFocus).focus();
-			}, 30);
-			this.newItem.planned_time = time;
+			});
 		}
 	},
 	directives: {
@@ -38154,8 +38073,73 @@ var Selection = function () {
 	}
 
 	_createClass(Selection, [{
-		key: 'selectNext',
-		value: function selectNext() {}
+		key: 'clear',
+		value: function clear() {
+			this.filter = [];
+			this.tags = [];
+			this.hiddenTags = [];
+			this.hiddenItems = [];
+			this.hiddenBookmarks = [];
+		}
+	}, {
+		key: 'addKeywords',
+		value: function addKeywords(keyword, value, operator) {
+			if (keyword == 'tag') {
+				if (operator == 'NOT') {
+					if (this.hiddenTags.includes(value)) {
+						return;
+					}
+					this.hiddenTags.push(value);
+					return;
+				} else {
+					if (this.tags.includes(value)) {
+						return;
+					}
+					this.tags.push(value);
+				}
+			} else {
+				if (operator == 'NOT' && keyword == 'journal') {
+					this.hiddenBookmarks.push(keyword);
+					return;
+				}
+				if (keyword == 'journal') {
+					if (this.view.includes('journal')) {
+						return;
+					}
+					this.view = 'journal';
+				} else if (value) {
+					this.view = 'tree';
+					if (this.filter.includes(value)) {
+						return;
+					}
+					this.filter.push(value);
+				}
+			}
+		}
+	}, {
+		key: 'getHiddenItemsTotalUsedTime',
+		value: function getHiddenItemsTotalUsedTime() {
+			if (!this.hiddenItems.length) {
+				return 0;
+			}
+			return this.hiddenItems.reduce(function (a, id) {
+				var b = allItems.nodes[id].used_time;
+				console.log(b);
+				return a + b;
+			}, 0);
+		}
+	}, {
+		key: 'getHiddenItemsTotalPlannedTime',
+		value: function getHiddenItemsTotalPlannedTime() {
+			if (!this.hiddenItems.length) {
+				return 0;
+			}
+			return this.hiddenItems.reduce(function (a, id) {
+				var b = allItems.nodes[id].planned_time;
+				console.log(b);
+				return a + b;
+			}, 0);
+		}
 	}, {
 		key: 'selectPrevious',
 		value: function selectPrevious() {}
@@ -38275,7 +38259,7 @@ window.selection = new __WEBPACK_IMPORTED_MODULE_4__Selection_js__["a" /* defaul
 			if (!this.allData || !this.$children.length) {
 				return 0;
 			}
-			console.log('run totalSecLeft');
+			// console.log('run totalSecLeft');
 			var card = this.$children.find(function (child) {
 				return child.totalSecLeft || child.totalSecLeft == 0;
 			});
@@ -38285,7 +38269,7 @@ window.selection = new __WEBPACK_IMPORTED_MODULE_4__Selection_js__["a" /* defaul
 			if (!this.allData || !this.$children.length) {
 				return 0;
 			}
-			console.log('run totalUsedSec');
+			// console.log('run totalUsedSec');
 			var card = this.$children.find(function (child) {
 				return child.totalUsedSec || child.totalUsedSec == 0;
 			});
@@ -38296,6 +38280,26 @@ window.selection = new __WEBPACK_IMPORTED_MODULE_4__Selection_js__["a" /* defaul
 		},
 		totalHourMinLeft: function totalHourMinLeft() {
 			return __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_3__components_globalFunctions_js__["e" /* sec_to_hourmin */])(this.totalSecLeft);
+		},
+		hiddenItemsTotalUsedTime: function hiddenItemsTotalUsedTime() {
+			if (!this.selection.hiddenItems.length) {
+				return 0;
+			}
+			return this.selection.hiddenItems.reduce(function (a, id) {
+				var b = allItems.nodes[id].used_time;
+				console.log(b);
+				return a + b;
+			}, 0);
+		},
+		hiddenItemsTotalPlannedTime: function hiddenItemsTotalPlannedTime() {
+			if (!this.selection.hiddenItems.length) {
+				return 0;
+			}
+			return this.selection.hiddenItems.reduce(function (a, id) {
+				var b = allItems.nodes[id].planned_time;
+				console.log(b);
+				return a + b;
+			}, 0);
 		}
 	},
 	methods: {
@@ -38450,19 +38454,11 @@ window.selection = new __WEBPACK_IMPORTED_MODULE_4__Selection_js__["a" /* defaul
 			this.addingNewUnder = id;
 			selection.lastSelectedId = id;
 			selection.selectedId = null;
-			if (addAs == 'child') {
-				this.addingNewAsFirstChild = true;
-				this.addingNewAsChild = true;
-				setTimeout(function () {
-					$("#new-firstchild-of-" + id + " textarea").focus();
-				}, 10);
-			} else {
-				this.addingNewAsFirstChild = false;
-				this.addingNewAsChild = false;
-				setTimeout(function () {
-					$("#new-under-" + id + " textarea").focus();
-				}, 10);
-			}
+			this.addingNewAsFirstChild = addAs == 'child' ? true : false;
+			this.addingNewAsChild = addAs == 'child' ? true : false;
+			Vue.nextTick(function () {
+				document.querySelector("#new-under-" + id + " textarea").focus();
+			});
 		},
 		startEditTags: function startEditTags(id) {
 			id = id ? id : selection.selectedId;
@@ -38471,9 +38467,7 @@ window.selection = new __WEBPACK_IMPORTED_MODULE_4__Selection_js__["a" /* defaul
 			}
 			this.editingItemTags = id;
 			Vue.nextTick(function () {
-				// setTimeout(function(){
 				document.querySelector('#updatebox-' + id + ' > .update-tags > .update-custom-tags input').focus();
-				// },10);
 			});
 		},
 		stopPatching: function stopPatching() {
@@ -38736,58 +38730,9 @@ window.selection = new __WEBPACK_IMPORTED_MODULE_4__Selection_js__["a" /* defaul
 				}
 			}
 			if (!operator) {
-				selection.tags = [];
-				selection.filter = [];
-				selection.hiddenItems = [];
-				selection.hiddenTags = [];
-				selection.hiddenBookmarks = [];
+				selection.clear();
 			}
 
-			if (keyword == 'all') {
-				allItems.filterItems('all');
-				selection.view = 'tree';
-				return;
-			}
-
-			if (keyword == 'tag') {
-				if (operator == 'NOT') {
-					if (selection.hiddenTags.includes(value)) {
-						return;
-					}
-					selection.hiddenTags.push(value);
-					allItems.hideTaggedNodes(value);
-					return;
-				} else {
-					if (selection.tags.includes(value)) {
-						return;
-					}
-					selection.tags.push(value);
-				}
-			} else {
-				if (operator == 'NOT' && keyword == 'journal') {
-					selection.hiddenBookmarks.push(keyword);
-					allItems.hideDoneNodes();
-					return;
-				}
-				if (keyword == 'journal') {
-					if (selection.view.includes('journal')) {
-						return;
-					}
-					selection.view = 'journal';
-				} else if (value) {
-					selection.view = 'tree';
-					if (selection.filter.includes(value)) {
-						return;
-					}
-					selection.filter.push(value);
-				} else {
-					selection.view = 'tree';
-					if (selection.filter.includes(keyword)) {
-						return;
-					}
-					selection.filter.push(keyword);
-				}
-			}
 			if (keyword == 'journal' && !this.doneData.length) {
 				this.fetchDone(null, operator);
 			} else {
@@ -42742,7 +42687,9 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     attrs: {
       "id": 'card-' + _vm.item.id
     }
-  }, [(!_vm.isHidden || _vm.listIsEmpty) ? _c('div', [(_vm.journalDate) ? _c('div', {
+  }, [(!_vm.isHidden || _vm.listIsEmpty) ? _c('div', {
+    staticClass: "item-card-wrapper"
+  }, [(_vm.journalDate) ? _c('div', {
     staticClass: "title"
   }, [_c('span', [_vm._v(_vm._s(_vm.momentCalendar(_vm.journalDate)))]), _vm._v(" "), _c('span', {
     staticClass: "journal-date-small"
@@ -42940,10 +42887,13 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     class: {
       currentDuration: _vm.item.planned_time == 10, 'planned-time': true
     },
+    attrs: {
+      "value": "10"
+    },
     on: {
       "click": function($event) {
         $event.preventDefault();
-        _vm.setPlannedTime(_vm.item, 10, $event)
+        _vm.setPlannedTime(_vm.item, $event)
       },
       "keydown": function($event) {
         _vm.keydownOnEdit(_vm.item, $event, 'planned-time')
@@ -42956,10 +42906,13 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     class: {
       currentDuration: _vm.item.planned_time == 15, 'planned-time': true
     },
+    attrs: {
+      "value": "15"
+    },
     on: {
       "click": function($event) {
         $event.preventDefault();
-        _vm.setPlannedTime(_vm.item, 15, $event)
+        _vm.setPlannedTime(_vm.item, $event)
       },
       "keydown": function($event) {
         _vm.keydownOnEdit(_vm.item, $event, 'planned-time')
@@ -42972,10 +42925,13 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     class: {
       currentDuration: _vm.item.planned_time == 30, 'planned-time': true
     },
+    attrs: {
+      "value": "30"
+    },
     on: {
       "click": function($event) {
         $event.preventDefault();
-        _vm.setPlannedTime(_vm.item, 30, $event)
+        _vm.setPlannedTime(_vm.item, $event)
       },
       "keydown": function($event) {
         _vm.keydownOnEdit(_vm.item, $event, 'planned-time')
@@ -42988,10 +42944,13 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     class: {
       currentDuration: _vm.item.planned_time == 60, 'planned-time': true
     },
+    attrs: {
+      "value": "60"
+    },
     on: {
       "click": function($event) {
         $event.preventDefault();
-        _vm.setPlannedTime(_vm.item, 60, $event)
+        _vm.setPlannedTime(_vm.item, $event)
       },
       "keydown": function($event) {
         _vm.keydownOnEdit(_vm.item, $event, 'planned-time')
@@ -43170,202 +43129,15 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     }
   }, [_c('i', {
     staticClass: "zmdi zmdi-delete"
-  })]) : _vm._e()]) : _vm._e()])]) : _vm._e(), _vm._v(" "), (_vm.showAddNewBoxFirstChild) ? _c('form', {
-    class: ['addnewbox-firstchild', 'addnewbox', 'child'],
-    attrs: {
-      "id": 'new-firstchild-of-' + _vm.item.id
-    },
-    on: {
-      "submit": function($event) {
-        $event.preventDefault();
-      }
-    }
-  }, [_c('div', [_c('textarea', {
-    directives: [{
-      name: "focus",
-      rawName: "v-focus"
-    }, {
-      name: "model",
-      rawName: "v-model",
-      value: (_vm.newItem.body),
-      expression: "newItem.body"
-    }],
-    staticClass: "newitem-body",
-    attrs: {
-      "type": "text",
-      "placeholder": "...",
-      "autocomplete": "off",
-      "autofocus": "",
-      "rows": "1"
-    },
-    domProps: {
-      "value": _vm._s(_vm.newItem.body)
-    },
-    on: {
-      "blur": function($event) {
-        _vm.blurOnAddNew(_vm.item)
-      },
-      "keydown": function($event) {
-        _vm.keydownOnNew(_vm.item, $event, 'body')
-      },
-      "input": function($event) {
-        if ($event.target.composing) { return; }
-        _vm.newItem.body = $event.target.value
-      }
-    }
-  })]), _vm._v(" "), _c('div', {
-    staticClass: "update-tags"
-  }, [_c('div', {
-    staticClass: "update-planned-time"
-  }, [_vm._v("\n\t\t\t\tDuration:\n\t\t\t\t"), _c('button', {
-    class: {
-      currentDuration: _vm.newItem.planned_time == 10, 'planned-time': true
-    },
-    on: {
-      "click": function($event) {
-        $event.preventDefault();
-        _vm.setPlannedTimeNewItem(_vm.item, 10, $event)
-      },
-      "keydown": function($event) {
-        _vm.keydownOnNew(_vm.item, $event, 'planned-time')
-      },
-      "blur": function($event) {
-        _vm.blurOnAddNew(_vm.item)
-      }
-    }
-  }, [_vm._v("10 min")]), _vm._v(" "), _c('button', {
-    class: {
-      currentDuration: _vm.newItem.planned_time == 15, 'planned-time': true
-    },
-    on: {
-      "click": function($event) {
-        $event.preventDefault();
-        _vm.setPlannedTimeNewItem(_vm.item, 15, $event)
-      },
-      "keydown": function($event) {
-        _vm.keydownOnNew(_vm.item, $event, 'planned-time')
-      },
-      "blur": function($event) {
-        _vm.blurOnAddNew(_vm.item)
-      }
-    }
-  }, [_vm._v("15 min")]), _vm._v(" "), _c('button', {
-    class: {
-      currentDuration: _vm.newItem.planned_time == 30, 'planned-time': true
-    },
-    on: {
-      "click": function($event) {
-        $event.preventDefault();
-        _vm.setPlannedTimeNewItem(_vm.item, 30, $event)
-      },
-      "keydown": function($event) {
-        _vm.keydownOnNew(_vm.item, $event, 'planned-time')
-      },
-      "blur": function($event) {
-        _vm.blurOnAddNew(_vm.item)
-      }
-    }
-  }, [_vm._v("30 min")]), _vm._v(" "), _c('button', {
-    class: {
-      currentDuration: _vm.newItem.planned_time == 60, 'planned-time': true
-    },
-    on: {
-      "click": function($event) {
-        $event.preventDefault();
-        _vm.setPlannedTimeNewItem(_vm.item, 60, $event)
-      },
-      "keydown": function($event) {
-        _vm.keydownOnNew(_vm.item, $event, 'planned-time')
-      },
-      "blur": function($event) {
-        _vm.blurOnAddNew(_vm.item)
-      }
-    }
-  }, [_vm._v("1 hour")]), _vm._v(" "), _c('div', [_c('input', {
-    directives: [{
-      name: "show",
-      rawName: "v-show",
-      value: (true),
-      expression: "true"
-    }, {
-      name: "model",
-      rawName: "v-model",
-      value: (_vm.newItem.planned_time),
-      expression: "newItem.planned_time"
-    }],
-    staticClass: "planned-time",
-    attrs: {
-      "type": "number"
-    },
-    domProps: {
-      "value": _vm._s(_vm.newItem.planned_time)
-    },
-    on: {
-      "blur": [function($event) {
-        _vm.blurOnAddNew(_vm.item)
-      }, function($event) {
-        _vm.$forceUpdate()
-      }],
-      "keydown": function($event) {
-        _vm.keydownOnNew(_vm.item, $event, 'planned-time')
-      },
-      "input": function($event) {
-        if ($event.target.composing) { return; }
-        _vm.newItem.planned_time = _vm._n($event.target.value)
-      }
-    }
-  }), _vm._v("min")])]), _vm._v(" "), _c('div', {
-    staticClass: "update-custom-tags"
-  }, [_c('label', [_vm._v("\n\t\t\t\t\tAdd Tag: \n\t\t\t\t\t"), _c('input', {
-    directives: [{
-      name: "model",
-      rawName: "v-model",
-      value: (_vm.newTag),
-      expression: "newTag"
-    }],
-    staticClass: "prepare-tag",
-    attrs: {
-      "type": "text"
-    },
-    domProps: {
-      "value": _vm._s(_vm.newTag)
-    },
-    on: {
-      "keydown": function($event) {
-        _vm.keydownOnNew(_vm.item, $event, 'addTag')
-      },
-      "blur": function($event) {
-        _vm.blurOnAddNew(_vm.item)
-      },
-      "input": function($event) {
-        if ($event.target.composing) { return; }
-        _vm.newTag = $event.target.value
-      }
-    }
-  })])]), _vm._v(" "), _c('div', {
-    staticClass: "item-tags prepared-tags"
-  }, _vm._l((_vm.newItem.preparedTags), function(tag) {
-    return (_vm.newItem.preparedTags.length) ? _c('span', {
-      class: (tag == 'Today') ? 'duedate' : 'custom-tag'
-    }, [_vm._v(_vm._s(tag) + "\n\t\t\t\t\t"), (!_vm.parentTags.includes(tag)) ? _c('button', {
-      staticClass: "delete-tag",
-      on: {
-        "click": function($event) {
-          $event.preventDefault();
-          _vm.deletePreparedTag(tag, _vm.item)
-        }
-      }
-    }, [_c('i', {
-      staticClass: "zmdi zmdi-close-circle"
-    })]) : _vm._e()]) : _vm._e()
-  }))])]) : _vm._e(), _vm._v(" "), (_vm.item.children.length) ? _c('div', {
+  })]) : _vm._e()]) : _vm._e()])]) : _vm._e(), _vm._v(" "), (_vm.item.children.length) ? _c('div', {
     directives: [{
       name: "show",
       rawName: "v-show",
       value: (_vm.item.show_children),
       expression: "item.show_children"
     }],
-    staticClass: "children"
+    staticClass: "children",
+    style: ((_vm.addingNewAsFirstChild) ? 'order:3;' : '')
   }, _vm._l((_vm.item.children), function(childCard) {
     return _c('Card', {
       key: childCard.id,
@@ -43373,8 +43145,18 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
         "item": childCard
       }
     })
-  })) : _vm._e(), _vm._v(" "), (_vm.showAddNewBox || (_vm.listIsEmpty && _vm.basis.selection.view != 'journal')) ? _c('form', {
-    class: ['addnewbox'],
+  })) : _vm._e(), _vm._v(" "), _c('form', {
+    directives: [{
+      name: "show",
+      rawName: "v-show",
+      value: (_vm.item.id == 383 || _vm.showAddNewBox || (_vm.listIsEmpty && _vm.basis.selection.view != 'journal')),
+      expression: "item.id == 383 || showAddNewBox || (listIsEmpty && basis.selection.view != 'journal')"
+    }],
+    class: {
+      'addnewbox': true,
+      'child': _vm.addingNewAsChild,
+      'first-child': _vm.addingNewAsFirstChild,
+    },
     attrs: {
       "id": 'new-under-' + _vm.item.id
     },
@@ -43424,10 +43206,13 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     class: {
       currentDuration: _vm.newItem.planned_time == 10, 'planned-time': true
     },
+    attrs: {
+      "value": "10"
+    },
     on: {
       "click": function($event) {
         $event.preventDefault();
-        _vm.setPlannedTimeNewItem(_vm.item, 10, $event)
+        _vm.setPlannedTimeNewItem(_vm.item, $event)
       },
       "keydown": function($event) {
         _vm.keydownOnNew(_vm.item, $event, 'planned-time')
@@ -43440,10 +43225,13 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     class: {
       currentDuration: _vm.newItem.planned_time == 15, 'planned-time': true
     },
+    attrs: {
+      "value": "15"
+    },
     on: {
       "click": function($event) {
         $event.preventDefault();
-        _vm.setPlannedTimeNewItem(_vm.item, 15, $event)
+        _vm.setPlannedTimeNewItem(_vm.item, $event)
       },
       "keydown": function($event) {
         _vm.keydownOnNew(_vm.item, $event, 'planned-time')
@@ -43456,10 +43244,13 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     class: {
       currentDuration: _vm.newItem.planned_time == 30, 'planned-time': true
     },
+    attrs: {
+      "value": "30"
+    },
     on: {
       "click": function($event) {
         $event.preventDefault();
-        _vm.setPlannedTimeNewItem(_vm.item, 30, $event)
+        _vm.setPlannedTimeNewItem(_vm.item, $event)
       },
       "keydown": function($event) {
         _vm.keydownOnNew(_vm.item, $event, 'planned-time')
@@ -43472,10 +43263,13 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     class: {
       currentDuration: _vm.newItem.planned_time == 60, 'planned-time': true
     },
+    attrs: {
+      "value": "60"
+    },
     on: {
       "click": function($event) {
         $event.preventDefault();
-        _vm.setPlannedTimeNewItem(_vm.item, 60, $event)
+        _vm.setPlannedTimeNewItem(_vm.item, $event)
       },
       "keydown": function($event) {
         _vm.keydownOnNew(_vm.item, $event, 'planned-time')
@@ -43556,7 +43350,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     }, [_c('i', {
       staticClass: "zmdi zmdi-close-circle"
     })]) : _vm._e()]) : _vm._e()
-  }))])]) : _vm._e()]) : _vm._e()]) : _vm._e()
+  }))])])]) : _vm._e()]) : _vm._e()
 },staticRenderFns: []}
 module.exports.render._withStripped = true
 if (false) {

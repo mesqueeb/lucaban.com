@@ -84,13 +84,13 @@ export default {
 		},
 		totalSecLeft(){
 			if(!this.allData || !this.$children.length){ return 0; }
-			console.log('run totalSecLeft');
+			// console.log('run totalSecLeft');
 			let card = this.$children.find(child => (child.totalSecLeft || child.totalSecLeft == 0));
 			return card.totalSecLeft;
 		},
 		totalUsedSec(){
 			if(!this.allData || !this.$children.length){ return 0; }
-			console.log('run totalUsedSec');
+			// console.log('run totalUsedSec');
 			let card = this.$children.find(child => (child.totalUsedSec || child.totalUsedSec == 0));
 			return card.totalUsedSec;
 		},
@@ -99,6 +99,24 @@ export default {
 		},
 		totalHourMinLeft(){
 			return sec_to_hourmin(this.totalSecLeft);
+		},
+		hiddenItemsTotalUsedTime()
+		{
+			if(!this.selection.hiddenItems.length){ return 0; }
+			return this.selection.hiddenItems.reduce(function(a,id){
+				let b = allItems.nodes[id].used_time;
+				console.log(b);
+				return a + b;
+			}, 0);
+		},
+		hiddenItemsTotalPlannedTime()
+		{
+			if(!this.selection.hiddenItems.length){ return 0; }		
+			return this.selection.hiddenItems.reduce(function(a,id){
+				let b = allItems.nodes[id].planned_time;
+				console.log(b);
+				return a + b;
+			}, 0);
 		},
 	},
 	methods:{
@@ -231,24 +249,18 @@ export default {
 			this.addingNewUnder = id;
 			selection.lastSelectedId = id;
 			selection.selectedId = null;
-			if(addAs == 'child'){
-				this.addingNewAsFirstChild = true;
-				this.addingNewAsChild = true;
-				setTimeout(function(){$("#new-firstchild-of-"+id+" textarea").focus();},10);
-			} else {
-				this.addingNewAsFirstChild = false;
-				this.addingNewAsChild = false;
-				setTimeout(function(){$("#new-under-"+id+" textarea").focus();},10);
-			}
+			this.addingNewAsFirstChild = (addAs == 'child') ? true : false;
+			this.addingNewAsChild = (addAs == 'child') ? true : false;
+			Vue.nextTick(function () {
+				document.querySelector("#new-under-"+id+" textarea").focus();
+			});
 		},
 		startEditTags(id){
 			id = (id) ? id : selection.selectedId;
 			if(!id){ return; }
 			this.editingItemTags = id;
 			Vue.nextTick(function () {
-			// setTimeout(function(){
 				document.querySelector('#updatebox-'+id+' > .update-tags > .update-custom-tags input').focus();
-			// },10);
 			});
 		},
 		stopPatching(){
@@ -492,48 +504,9 @@ export default {
 				}
 			}
 			if(!operator){
-				selection.tags = [];
-				selection.filter = [];
-				selection.hiddenItems = [];
-				selection.hiddenTags = [];
-				selection.hiddenBookmarks = [];
+				selection.clear();
 			}
 
-			if(keyword == 'all'){
-				allItems.filterItems('all');
-				selection.view = 'tree';
-				return;
-			}
-
-			if(keyword == 'tag'){
-				if(operator == 'NOT'){
-					if(selection.hiddenTags.includes(value)){ return; }
-					selection.hiddenTags.push(value);
-					allItems.hideTaggedNodes(value);
-					return;
-				} else {
-					if(selection.tags.includes(value)){ return; }
-					selection.tags.push(value);
-				}
-			} else {
-				if(operator == 'NOT' && keyword == 'journal'){
-					selection.hiddenBookmarks.push(keyword);
-					allItems.hideDoneNodes();
-					return;
-				}
-				if(keyword == 'journal'){
-					if(selection.view.includes('journal')){ return; }
-					selection.view = 'journal';
-				} else if(value){
-					selection.view = 'tree';
-					if(selection.filter.includes(value)){ return; }
-					selection.filter.push(value);
-				} else {
-					selection.view = 'tree';
-					if(selection.filter.includes(keyword)){ return; }
-					selection.filter.push(keyword);
-				}
-			}
 			if (keyword == 'journal' && !this.doneData.length){
 				this.fetchDone(null,operator);
 			} else {

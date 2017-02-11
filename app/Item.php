@@ -9,8 +9,24 @@ class Item extends Model
 {
 	use Taggable;
 	protected $table = 'items';
-	// protected $fillable = ['done','done_date','body','children_order','parent_id','depth','planned_time','used_time','due_date', 'children', 'show_children', 'completion_memo', 'parents_bodies', 'memo'];
-	protected $guarded = ['id', 'created_at', 'updated_at', 'tagged', 'parent_id_backup', 'dueDateParent', 'preparedTags'];
+	protected $fillable = [
+		'parent_id',
+		'created_by',
+		'depth',
+		'children_order',
+		'body',
+		'memo',
+		'planned_time',
+		'used_time',
+		'completion_rate',
+		'due_date',
+		'done_date',
+		'done',
+		'completion_memo',
+		'show_children',
+		'deleted_at',
+		'parents_bodies',
+	];
 
 	public function users()
 	{

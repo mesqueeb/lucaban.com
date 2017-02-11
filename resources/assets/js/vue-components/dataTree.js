@@ -714,21 +714,28 @@ export default class Tree {
 		this.root.children.forEach(function(item){
 			item.parent_id = item.parent_id_backup;
 		});
+		if(operator == 'NOT' && keyword == 'journal'){
+			this.hideDoneNodes();
+			selection.addKeywords(keyword,value,operator);
+			return;
+		} else if (operator == 'NOT' && keyword == 'tag'){
+			this.hideTaggedNodes(value);
+			selection.addKeywords(keyword,value,operator);
+			return;
+		}
 		let arrayToFilter;
-		if(operator == 'NOT'){
-			arrayToFilter = this.root.children;
-		} else if(operator == 'AND'){
+		if(operator == 'AND'){
 			arrayToFilter = this.flattenTree(this.root.children);
 		} else {
+			selection.clear();
 			arrayToFilter = this.flattenTree(this.backups.rootChildren);
 		}
+
 		let filteredArray = [];
 		if (keyword == 'all'){
 			filteredArray = this.backups.rootChildren;
 		}
 		if (keyword == 'journal'){
-			// if(operator != 'NOT'){
-			// currently if operator is 'NOT' the this function won't even been launched.
 			if(!this.doneitems.length){
 				console.log('waiting for done items...');
 				setTimeout(function(){
@@ -737,13 +744,7 @@ export default class Tree {
 				return;
 			}
 			filteredArray = this.doneitems;
-			// }
 			// Codementor: How do I know the following function will start after the fetch is over?
-
-			// let doneFilterResults = this.arrayFilterDone(arrayToFilter, operator);
-			// -> This is useless...
-			// Array.prototype.push.apply(filteredArray, arrayToFilter);			
-
 			setTimeout(function(){
 				flatpickrifyAllInputs();
 			}, 1000);
@@ -761,6 +762,7 @@ export default class Tree {
 		}.bind(this));
 		this.root.children = filteredArray;
 		this.resetChildrenOrder(this.root.id);
+		selection.addKeywords(keyword,value,operator);
 	}
 	arrayFilterTag(array, tags, operator){
 		let filteredArray = [];

@@ -2,6 +2,12 @@ label{
     font-weight: 300;
 }
 
+.loader{
+    svg path,
+    svg rect{
+      fill: $theme-color;
+    }
+}
 
 .navigation{
     display: flex;
@@ -113,6 +119,23 @@ label{
     display: flex;
     align-items: center;
 }
+form.addnewbox{
+    margin-left: 1.9em;
+}
+form.addnewbox.child{
+    margin-left: 3.8em;  
+}
+// form.addnewbox.first-child{
+//     order:2;
+// }
+// CODEMENTOR why doesn't this work?
+.item-card-wrapper{
+    display: flex;
+    flex-wrap: wrap;
+    >form, >div{
+        width: 100%;
+    }
+}
 .body-div{
     border-bottom: 1px solid #ededed;
     width: 100%;
@@ -123,9 +146,6 @@ label{
     }
 }
 
-.child{
-    margin-left: 1.5em;
-}
 .updatebox, .addnewbox {
     >div:first-child{
         display: flex;
@@ -186,12 +206,7 @@ label{
         border-bottom: 1px solid $theme-color;
     }
 }
-.addnewbox {
-    margin-left: 1.9em;
-}
-.addnewbox.child{
-    margin-left: 3.8em;  
-}
+
 .updatebox{
     width: 100%;
 }
@@ -299,7 +314,7 @@ label{
         align-items: center;
         display: flex;
         position:relative;
-        padding: 0.1em 0.5em;
+        padding: 0.3em 0.5em;
         margin: 0.1em;
         border-radius: 0.3em;
         color: white;

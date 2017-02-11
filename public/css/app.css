@@ -7560,7 +7560,6 @@ body {
   color: #4d4d4d;
   font-size: 14px;
   font-weight: 300;
-  line-height: 1.4em;
   -webkit-font-smoothing: antialiased;
   -moz-font-smoothing: antialiased;
   font-smoothing: antialiased;
@@ -7587,7 +7586,6 @@ textarea {
   color: #4d4d4d;
   font-size: 14px;
   font-weight: 300;
-  line-height: 1.4em;
   -webkit-font-smoothing: antialiased;
   -moz-font-smoothing: antialiased;
   font-smoothing: antialiased;
@@ -7601,7 +7599,6 @@ button {
   color: #4d4d4d;
   font-size: 14px;
   font-weight: 300;
-  line-height: 1.4em;
   -webkit-font-smoothing: antialiased;
   -moz-font-smoothing: antialiased;
   font-smoothing: antialiased;
@@ -7714,6 +7711,11 @@ button:focus {
 
 label {
   font-weight: 300;
+}
+
+.loader svg path,
+.loader svg rect {
+  fill: #5dc2af;
 }
 
 .navigation {
@@ -7877,6 +7879,27 @@ label {
           align-items: center;
 }
 
+form.addnewbox {
+  margin-left: 1.9em;
+}
+
+form.addnewbox.child {
+  margin-left: 3.8em;
+}
+
+.item-card-wrapper {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-wrap: wrap;
+      flex-wrap: wrap;
+}
+
+.item-card-wrapper > form,
+.item-card-wrapper > div {
+  width: 100%;
+}
+
 .body-div {
   border-bottom: 1px solid #ededed;
   width: 100%;
@@ -7892,10 +7915,6 @@ label {
   display: -webkit-inline-box;
   display: -ms-inline-flexbox;
   display: inline-flex;
-}
-
-.child {
-  margin-left: 1.5em;
 }
 
 .updatebox > div:first-child,
@@ -7991,14 +8010,6 @@ label {
 
 .update-tags .update-custom-tags input {
   border-bottom: 1px solid #5dc2af;
-}
-
-.addnewbox {
-  margin-left: 1.9em;
-}
-
-.addnewbox.child {
-  margin-left: 3.8em;
 }
 
 .updatebox {
@@ -8152,7 +8163,7 @@ label {
   display: -ms-flexbox;
   display: flex;
   position: relative;
-  padding: 0.1em 0.5em;
+  padding: 0.3em 0.5em;
   margin: 0.1em;
   border-radius: 0.3em;
   color: white;
@@ -8302,7 +8313,6 @@ label {
   color: #4d4d4d;
   font-size: 14px;
   font-weight: 300;
-  line-height: 1.4em;
   -webkit-font-smoothing: antialiased;
   -moz-font-smoothing: antialiased;
   font-smoothing: antialiased;
@@ -8388,7 +8398,7 @@ label {
   -webkit-box-pack: center;
       -ms-flex-pack: center;
           justify-content: center;
-  z-index: 4;
+  z-index: 5;
   position: fixed;
   top: 0;
   left: 0;
