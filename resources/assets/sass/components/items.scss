@@ -1,14 +1,6 @@
 label{
     font-weight: 300;
 }
-
-.loader{
-    svg path,
-    svg rect{
-      fill: $theme-color;
-    }
-}
-
 .navigation{
     display: flex;
     margin-bottom: 0.2em;

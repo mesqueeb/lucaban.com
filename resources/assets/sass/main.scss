@@ -49,14 +49,16 @@ button:focus {
     border-bottom: 1px solid;
 }
 #loading-icon{
-	z-index: 4;
+	.loader{
+	    svg path,
+	    svg rect{
+	      fill: $theme-color !important;
+	    }
+	}
+	z-index: 6;
 	position: fixed;
     right: 1em;
     top: 1em;
-    img{
-	    width: 30px;
-	    height: 30px;
-    }
     .patching-error{
     	color: rgba(230, 94, 77, 1);
 	    font-weight: 600;

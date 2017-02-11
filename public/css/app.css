@@ -7616,15 +7616,15 @@ button:focus {
 }
 
 #loading-icon {
-  z-index: 4;
+  z-index: 6;
   position: fixed;
   right: 1em;
   top: 1em;
 }
 
-#loading-icon img {
-  width: 30px;
-  height: 30px;
+#loading-icon .loader svg path,
+#loading-icon .loader svg rect {
+  fill: #5dc2af !important;
 }
 
 #loading-icon .patching-error {
@@ -7711,11 +7711,6 @@ button:focus {
 
 label {
   font-weight: 300;
-}
-
-.loader svg path,
-.loader svg rect {
-  fill: #5dc2af;
 }
 
 .navigation {

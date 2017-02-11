@@ -43149,8 +43149,8 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     directives: [{
       name: "show",
       rawName: "v-show",
-      value: (_vm.item.id == 383 || _vm.showAddNewBox || (_vm.listIsEmpty && _vm.basis.selection.view != 'journal')),
-      expression: "item.id == 383 || showAddNewBox || (listIsEmpty && basis.selection.view != 'journal')"
+      value: (_vm.showAddNewBox || (_vm.listIsEmpty && _vm.basis.selection.view != 'journal')),
+      expression: "showAddNewBox || (listIsEmpty && basis.selection.view != 'journal')"
     }],
     class: {
       'addnewbox': true,

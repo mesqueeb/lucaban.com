@@ -256,7 +256,7 @@
 			'child':addingNewAsChild,
 			'first-child':addingNewAsFirstChild,}"
 		:id="'new-under-'+ item.id "
-		v-show="item.id == 383 || showAddNewBox || (listIsEmpty && basis.selection.view != 'journal')"
+		v-show="showAddNewBox || (listIsEmpty && basis.selection.view != 'journal')"
 		@submit.prevent
 	>
 		<div>
