@@ -8553,6 +8553,14 @@ input.flatpickr {
   display: none;
 }
 
+.journal-wrapper .parent-string {
+  border: 1px solid;
+  display: initial;
+  padding: 0em 0.5em;
+  border-top: none;
+  border-left: none;
+}
+
 .journal-wrapper .title {
   color: #46c5b6;
   font-size: 1.2em;

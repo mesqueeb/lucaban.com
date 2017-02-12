@@ -10,16 +10,20 @@
 >
 <div class="item-card-wrapper" v-if="!isHidden || listIsEmpty">
 	<div class="title"
-	v-if="journalDate"
+		v-if="journalDate"
 	>
 		<!-- Codementor: Is this the correct way to format something like this? -->
 		<span>{{ momentCalendar(journalDate) }}</span>
 		<span class="journal-date-small">{{ journalDate }}</span>
 	</div>
-	<div class="parent-string"
-	v-if="journalView && item.depth != 0"
-	@click="selectItem(item)"
-	>{{ item.parents_bodies }}:</div>
+	<div
+		v-if="journalView && item.depth != 0"
+		@click="selectItem(item)"
+	>
+		<div class="parent-string">
+			{{ item.parents_bodies }}
+		</div>
+	</div>
 	<div 
 		v-if="item.depth != 0"
 		:class="{
@@ -89,7 +93,9 @@
 					></textarea>
 				</div>
 				<div class="update-tags">
-					<div class="update-planned-time" v-show="item.id != basis.editingItemTags">
+					<div class="update-planned-time"
+						v-show="item.id != basis.editingItemTags && basis.selection.view != 'journal'"
+					>
 						Duration:
 						<button
 							:class="{ currentDuration: item.planned_time == 10, 'planned-time': true }"
@@ -531,6 +537,9 @@ export default {
 			if(this.$root.addingNewAsChild){
 				this.$root.addingNewAsChild = false;
 				this.$root.addingNewAsFirstChild = false;
+				return;
+			}
+			if(selection.view == 'journal'){
 				return;
 			}
 			vm.$root.showAddNewItem(this.item.parent_id);

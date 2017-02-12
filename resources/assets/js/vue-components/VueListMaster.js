@@ -1,6 +1,7 @@
 import Card from './Card.vue';
 import Popups from './Popups.vue';
 import Popouts from './Popouts.vue';
+import ListAppKeyBindings from './ListAppKeyBindings.vue';
 import { arrayToString, sec_to_hourmin, sortObjectArrayByProperty, removeEmptyValuesFromArray } from '../components/globalFunctions.js';
 import Selection from './Selection.js';
 import Tree from './dataTree.js';
@@ -51,27 +52,92 @@ export default {
 				return true;
 			} return false;
 		},
+		selectionFilter(){
+			return selection.filter.map(function (val, i) {
+				if(selection.filter.length == i+1)
+				{
+					val = allItems.tagSlugToName(val);
+				}
+				else
+				{
+					val = allItems.tagSlugToName(val)+', ';
+				}
+				return val;
+			});
+		},
+		selectionTags(){
+			return selection.tags.map(function (val, i) {
+				if(selection.tags.length == i+1)
+				{
+					val = allItems.tagSlugToName(val);
+				}
+				else
+				{
+					val = allItems.tagSlugToName(val)+', ';
+				}
+				return val;
+			});
+		},
+		selectionHiddenTags(){
+			return selection.hiddenTags.map(function (val, i) {
+				if(selection.hiddenTags.length == i+1)
+				{
+					val = allItems.tagSlugToName(val);
+				}
+				else
+				{
+					val = allItems.tagSlugToName(val)+', ';
+				}
+				return val;
+			});
+		},
+		allVisibleItems()
+		{
+			if(!this.allData){ return []; }
+			let items = allItems.flattenTree(allItems.root.children);
+			return items.filter(function(item)
+			{
+				return !selection.hiddenItems.includes(item.id);
+			});
+		},
 		allTagsComputed(){
 			if(!this.allData){ return []; }
-			let childrensTags = [];
+			let allTagsArray = [];
 			let items = allItems.flattenTree(allItems.root.children);
 			if(!items.length){ return []; }
-			items.forEach(function(child) {
+			items.forEach(function(child)
+			{
 				child.tagged.forEach(function(taggedObj){
-					if(!taggedObj.tag || !taggedObj.tag.name){
+					if(!taggedObj.tag || !taggedObj.tag.name)
+					{
 						return; // solves bugs with broken tags
 					}
-					let tagPresent = childrensTags.find(function(tagAlready){
-						return tagAlready.name == taggedObj.tag.name;
+					let tagAlreadyPushed = allTagsArray.find(function(pushedTag)
+					{
+						return pushedTag.name == taggedObj.tag.name;
 					}.bind(taggedObj));
-					if(!tagPresent){
-						childrensTags.push(taggedObj.tag);
+
+					if(!tagAlreadyPushed)
+					{
+						allTagsArray.push(taggedObj.tag);
 					}
-				}.bind(childrensTags));
-			}.bind(childrensTags));
+				}.bind(allTagsArray));
+
+				// allTagsArray = allTagsArray.filter(function(tagInArray)
+				// {
+				// 	let noItemWithTag = selection.hiddenItems.find(function(hiddenId)
+				// 	{
+				// 		return allItems.hasTag(hiddenId, tagInArray.name);
+				// 	}.bind(tagInArray));
+				// 	if(!noItemWithTag)
+				// 	{
+				// 		return true;
+				// 	}
+				// }.bind(allTagsArray));
+			}.bind(allTagsArray));
 			console.log('before sorting tags');
-			childrensTags = sortObjectArrayByProperty(childrensTags, 'name');
-			return childrensTags;
+			allTagsArray = sortObjectArrayByProperty(allTagsArray, 'name');
+			return allTagsArray;
 		},
 		childrenAmount(){
 			if(!this.allData){ return 0; }
@@ -105,7 +171,6 @@ export default {
 			if(!this.selection.hiddenItems.length){ return 0; }
 			return this.selection.hiddenItems.reduce(function(a,id){
 				let b = allItems.nodes[id].used_time;
-				console.log(b);
 				return a + b;
 			}, 0);
 		},
@@ -114,7 +179,6 @@ export default {
 			if(!this.selection.hiddenItems.length){ return 0; }		
 			return this.selection.hiddenItems.reduce(function(a,id){
 				let b = allItems.nodes[id].planned_time;
-				console.log(b);
 				return a + b;
 			}, 0);
 		},
@@ -327,7 +391,7 @@ export default {
 			this.$http.patch('/api/itemtags/' + id, patchObj, { method: 'PATCH'})
 			.then(function(tagResponse){
 				let syncedTags = tagResponse.data.tags;
-				console.log('patched ['+allItems.nodes[id].body+'] TAGS: '+tagResponse.data.tags+';');
+				console.log('tagged ['+allItems.nodes[id].body+'] with: '+tagResponse.data.tags+';');
 				console.log(tagResponse);
 				// Re-Add tags of item
 				this.$http.get('/api/itemtags/' + id, { type: 'tags'})
@@ -418,6 +482,7 @@ export default {
 		},
 		popout(id, type){
 			id = (!id) ? selection.selectedId : id ;
+			if(!id){ return; }
 			let item = allItems.nodes[id];
 			// let popoutExists = this.popouts.filter(function (popout) { return popout.item.id === id; })[0];
 			// if(!popoutExists){
@@ -556,45 +621,6 @@ export default {
 			});
 
 		},
-		keystroke(k){
-			if(selection.view == 'journal' && (
-				// Disable keystrokes when in the journal.
-				k == 'arrowRight' ||
-				k == 'arrowLeft' ||
-				k == 'meta_arrowUp' ||
-				k == 'meta_arrowDown' ||
-				k == 'meta_arrowRight' ||
-				k == 'meta_arrowLeft' ||
-				k == 'spaceBar' ||
-				k == 'tab' ||
-				k == 'shift_tab' ||
-				k == 't' ||
-				k == 's'
-			)){ console.log('cannot use '+k+' in journal mode'); return; }
-			console.log(k);
-			if(k == 'arrowUp'){ this.selectItem('prev')} else
-			if(k == 'arrowDown'){ this.selectItem('next')} else
-			if(k == 'arrowRight'){ this.showChildren(null, 'show')} else
-			if(k == 'arrowLeft'){ this.showChildren(null, 'hide')} else
-			if(k == 'meta_arrowUp'){ this.moveItem('up')} else
-			if(k == 'meta_arrowDown'){ this.moveItem('down')} else
-			if(k == 'meta_arrowRight'){ this.indent()} else
-			if(k == 'meta_arrowLeft'){ this.unindent()} else
-			if(k == 'spaceBar'){ this.markDone()} else
-			if(k == 'tab'){ this.indent()} else
-			if(k == 'shift_tab'){ this.unindent()} else
-			if(k == 'enter'){ this.showAddNewItem()} else
-			if(k == 'shift_enter'){ this.showAddNewItem(null, 'child')} else
-			if(k == 'meta_enter'){ eventHub.$emit('startEdit')} else
-			if(k == 'ctrl_u'){ eventHub.$emit('startEdit')} else
-			if(k == 't'){ this.setToday()} else
-			if(k == 'shift_t'){ this.startEditTags()} else
-			if(k == 's'){ this.addTimer()} else
-			if(k == 'meta_shift_d'){ this.duplicate()} else
-			if(k == 'meta_delete'){ this.deleteItem()} else
-			if(k == 'backspace'){ this.deleteItem()} else
-			if(k == 'delete'){ this.deleteItem()}
-		},
 		test(id){
 			// id = (!id) ? selection.selectedId : id ;
 			id = selection.selectedId;
@@ -613,158 +639,8 @@ export default {
             console.log(id);
             return;
         });
-      let vm = this;
-      window.addEventListener('keydown', function(e) {
-        let x = e.keyCode;
-       	if(document.activeElement.className == "flatpickr-days"){
-			if(x == 9){
-				console.log('hiya!');
-				e.preventDefault();
-				return;
-				// This stops the event listener when a flatpickr dialogue is open.
-			}
-		}
-    	if (vm.popouts.delete.length || vm.popouts.timer.length){
-    		if(x == 27) { // escape
-				e.preventDefault();
-				eventHub.$emit('clearAll');
-				console.log('Escape');
-			}
-			if(x == 9){ // TAB
-				e.preventDefault();
-				if (e.shiftKey){
-					$(".btn-cancel").focus();
-				} else {
-					$(".btn-ok").focus();
-				}
-	  		}
-			if(x == 37){ // arrow left
-				e.preventDefault();
-				$(".btn-cancel").focus();
-			}
-			if(x == 39){ // arrow right
-				e.preventDefault();
-				$(".btn-ok").focus();
-			}
-		} else if(vm.editingItem || vm.addingNewUnder){
-			if(!$('button:focus').length){
-				return;
-		    }
-			if(e.keyCode == 27){ // Escape
-				if(vm.editingItem){
-					eventHub.$emit('escapeOnEditButtonFocus');
-				} else if(vm.addingNewUnder){
-					eventHub.$emit('escapeOnNewButtonFocus');
-				}
-			}
-		} else if ( $('input:focus').length > 0
-        	||  $('textarea:focus').length > 0
-        	|| $('a:focus').length > 0
-        	|| $('button:focus').length > 0)
-		{
-        	return;
-		} else { 
-		  // INPUT AREAS NOT IN FOCUS
-          switch(e.keyCode) { 
-			case 37: // arrowLeft
-				e.preventDefault();
-				if (e.ctrlKey || e.metaKey){
-		  			vm.keystroke('meta_arrowLeft');
-		  			break;
-		  		}
-				vm.keystroke('arrowLeft');
-				break;
-			case 39: // arrowRight
-				e.preventDefault();
-				if (e.ctrlKey || e.metaKey){
-		  			vm.keystroke('meta_arrowRight');
-		  			break;
-		  		}
-				vm.keystroke('arrowRight');
-				break;
-			case 38: // arrowUp
-				e.preventDefault();
-				if (e.ctrlKey || e.metaKey){
-		  			vm.keystroke('meta_arrowUp');
-		  			break;
-		  		}
-				vm.keystroke('arrowUp');
-				break;
-			case 40: // arrowDown
-				e.preventDefault();
-				if (e.ctrlKey || e.metaKey){
-		  			vm.keystroke('meta_arrowDown');
-		  			break;
-		  		}
-				vm.keystroke('arrowDown');
-				break;
-			case 32: // spaceBar
-				e.preventDefault();
-				vm.keystroke('spaceBar');
-				break;
-			case 9: // tab
-				e.preventDefault();
-				if (e.shiftKey){
-		  			vm.keystroke('shift_tab');
-		  			break;
-		  		}
-				vm.keystroke('tab');
-				break;
-			case 13: // enter
-				e.preventDefault();
-				if (e.ctrlKey || e.metaKey){
-		  			vm.keystroke('meta_enter');
-		  		} else if (e.shiftKey) {
-					vm.keystroke('shift_enter');
-		  		} else {
-					vm.keystroke('enter');
-		  		}
-				break;
-			case 84: // key t
-				e.preventDefault();
-				if (e.ctrlKey || e.metaKey || e.shiftKey){
-		  			vm.keystroke('shift_t');
-		  		} else {
-					vm.keystroke('t');
-		  		}
-				break;
-			case 83: // key s
-				vm.keystroke('s');
-				break;
-			case 85: // key u
-				if (e.ctrlKey){
-					vm.keystroke('ctrl_u');
-		  			break;
-		  		}
-				vm.keystroke('u');
-				break;
-			case 68: // key d
-				e.preventDefault();
-				if ((e.ctrlKey || e.metaKey) && e.shiftKey){
-					vm.keystroke('meta_shift_d');
-		  			break;
-		  		}
-				break;
-			case 8: // DELETE (backspace)
-				e.preventDefault();
-				if (e.ctrlKey || e.metaKey){
-					vm.keystroke('meta_delete');
-		  			break;
-		  		}
-				vm.keystroke('backspace');
-				break;
-			case 46: // DELETE (real delete)
-				e.preventDefault();
-				vm.keystroke('delete');
-				break;
-          } // end switch
-    	} // END INPUT AREAS NOT IN FOCUS
-      });
     },
 	http: {
-		// root: '/root',
-	// 	// base: '/base',
-		// route: 'route',
 		headers: {
 			'X-CSRF-TOKEN': document.querySelector('#token').getAttribute('value'),
 		},

@@ -114,16 +114,18 @@ window.flatpickrifyAllInputs = function(){
 
 // JS Classes
 	import Tree from './vue-components/dataTree.js';
-
-
+	import ListAppKeyBindings from './components/ListAppKeyBindings.js';
 
 window.onscroll = function() {
 	if(!selection.filter.length && !selection.tags.length){ return; }
 	let el = document.getElementsByClassName('line');
 	// let el = $('.navigation');
-	if (!isElementInViewport(el[0])) {
+	if (!isElementInViewport(el[0]))
+	{
     	$("body").addClass("scrolled-down");
-	} else {
+	}
+	else
+	{
     	$("body").removeClass("scrolled-down");
 	}
 };
@@ -163,7 +165,7 @@ $.getJSON('/api/items',function(fetchedData){
 	console.log(allItems);
 	
 	window.vm = new Vue(VueListMaster);
-
+	new ListAppKeyBindings();
 	vm.allData = allItems.root;
 	vm.doneData = allItems.doneitems;
 

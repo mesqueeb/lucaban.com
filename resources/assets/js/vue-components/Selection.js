@@ -1,5 +1,6 @@
 export default class Selection {
-	constructor(){
+	constructor()
+	{
 		this.selectedId = null;
 		this.lastSelectedId = null;
 		this.filter = [];
@@ -17,7 +18,6 @@ export default class Selection {
 		this.hiddenItems = [];
 		this.hiddenBookmarks = [];
 	}
-
 	addKeywords(keyword,value,operator){
 		if(keyword == 'tag'){
 			if(operator == 'NOT'){

@@ -23981,9 +23981,9 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 
 
-var Tree = function () {
-	function Tree(items) {
-		_classCallCheck(this, Tree);
+var _class = function () {
+	function _class(items) {
+		_classCallCheck(this, _class);
 
 		// properties
 		if (!items) {
@@ -24005,7 +24005,7 @@ var Tree = function () {
 		this.firstInitialization();
 	}
 
-	_createClass(Tree, [{
+	_createClass(_class, [{
 		key: 'firstInitialization',
 		value: function firstInitialization() {
 			console.log('run first initialization at source-length: ' + this.source.length);
@@ -24146,6 +24146,9 @@ var Tree = function () {
 	}, {
 		key: 'tagNameToSlug',
 		value: function tagNameToSlug(tag) {
+			if (!tag) {
+				return;
+			}
 			return tag.split(' ').join('-').toLowerCase();
 		}
 	}, {
@@ -24466,6 +24469,8 @@ var Tree = function () {
 
 			// Patches etc.
 			this.attachParentBody(id);
+			var tags = this.itemTagArray(new_parent_id);
+			this.tagItem(id, tags);
 			vm.patch(id, 'depth');
 			vm.patch(id, 'parent_id');
 			vm.patch(new_parent_id, 'children_order');
@@ -24571,6 +24576,9 @@ var Tree = function () {
 			}
 			if (Array.isArray(tags)) {
 				tags = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__components_globalFunctions_js__["g" /* removeEmptyValuesFromArray */])(tags);
+				tags = tags.filter(function (t) {
+					return !this.hasTag(id, t);
+				}.bind(this));
 				if (!tags.length) {
 					return;
 				}
@@ -24578,18 +24586,26 @@ var Tree = function () {
 				if (!tags.replace(/\s/g, "").length) {
 					return;
 				}
-			}
-			var item = this.nodes[id];
-			if (this.hasTag(id, tags)) {
-				console.log('NG! Has the tag already!!');
-				return;
+				if (this.hasTag(id, tags)) {
+					console.log('NG! Has the tag already!!');
+					return;
+				}
 			}
 			vm.patchTag(id, tags);
+			var item = this.nodes[id];
 			if (item.children.length) {
 				item.children_order.forEach(function (childId) {
 					this.tagItem(childId, tags);
 				}.bind(this));
 			}
+		}
+	}, {
+		key: 'itemTagArray',
+		value: function itemTagArray(id) {
+			var item = this.nodes[id];
+			return item.tagged.map(function (tagObj) {
+				return tagObj.tag_name;
+			});
 		}
 	}, {
 		key: 'prepareTag',
@@ -25037,10 +25053,10 @@ var Tree = function () {
 		}
 	}]);
 
-	return Tree;
+	return _class;
 }();
 
-/* harmony default export */ __webpack_exports__["a"] = Tree;
+/* harmony default export */ __webpack_exports__["a"] = _class;
 
 /***/ }),
 /* 19 */
@@ -36422,6 +36438,7 @@ return zhTw;
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__vue_components_vueFilters_js__ = __webpack_require__(163);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__vue_components_VueListMaster_js__ = __webpack_require__(162);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_11__vue_components_dataTree_js__ = __webpack_require__(18);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_12__components_ListAppKeyBindings_js__ = __webpack_require__(202);
 // IMPORT jQuery
 
 
@@ -36544,6 +36561,7 @@ __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_9__vue_components_vueFilters_js_
 // JS Classes
 
 
+
 window.onscroll = function () {
 	if (!selection.filter.length && !selection.tags.length) {
 		return;
@@ -36592,7 +36610,7 @@ __WEBPACK_IMPORTED_MODULE_0_jquery___default.a.getJSON('/api/items', function (f
 	console.log(allItems);
 
 	window.vm = new __WEBPACK_IMPORTED_MODULE_7_vue___default.a(__WEBPACK_IMPORTED_MODULE_10__vue_components_VueListMaster_js__["a" /* default */]);
-
+	new __WEBPACK_IMPORTED_MODULE_12__components_ListAppKeyBindings_js__["a" /* default */]();
 	vm.allData = allItems.root;
 	vm.doneData = allItems.doneitems;
 
@@ -36645,6 +36663,12 @@ __WEBPACK_IMPORTED_MODULE_0_jquery___default.a.getJSON('/api/items', function (f
 "use strict";
 /* WEBPACK VAR INJECTION */(function($) {Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__components_valueMorphers2_js__ = __webpack_require__(9);
+//
+//
+//
+//
+//
+//
 //
 //
 //
@@ -37281,6 +37305,9 @@ __WEBPACK_IMPORTED_MODULE_0_jquery___default.a.getJSON('/api/items', function (f
 			if (this.$root.addingNewAsChild) {
 				this.$root.addingNewAsChild = false;
 				this.$root.addingNewAsFirstChild = false;
+				return;
+			}
+			if (selection.view == 'journal') {
 				return;
 			}
 			vm.$root.showAddNewItem(this.item.parent_id);
@@ -38155,15 +38182,17 @@ var Selection = function () {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* WEBPACK VAR INJECTION */(function($) {/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Card_vue__ = __webpack_require__(181);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Card_vue__ = __webpack_require__(181);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Card_vue___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0__Card_vue__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__Popups_vue__ = __webpack_require__(183);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__Popups_vue___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1__Popups_vue__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__Popouts_vue__ = __webpack_require__(182);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__Popouts_vue___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2__Popouts_vue__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__components_globalFunctions_js__ = __webpack_require__(8);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__Selection_js__ = __webpack_require__(161);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__dataTree_js__ = __webpack_require__(18);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__ListAppKeyBindings_vue__ = __webpack_require__(201);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__ListAppKeyBindings_vue___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_3__ListAppKeyBindings_vue__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__components_globalFunctions_js__ = __webpack_require__(8);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__Selection_js__ = __webpack_require__(161);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__dataTree_js__ = __webpack_require__(18);
 
 
 
@@ -38171,7 +38200,8 @@ var Selection = function () {
 
 
 
-window.selection = new __WEBPACK_IMPORTED_MODULE_4__Selection_js__["a" /* default */]();
+
+window.selection = new __WEBPACK_IMPORTED_MODULE_5__Selection_js__["a" /* default */]();
 
 /* harmony default export */ __webpack_exports__["a"] = {
 	el: '#items-app',
@@ -38216,11 +38246,50 @@ window.selection = new __WEBPACK_IMPORTED_MODULE_4__Selection_js__["a" /* defaul
 				return true;
 			}return false;
 		},
+		selectionFilter: function selectionFilter() {
+			return selection.filter.map(function (val, i) {
+				if (selection.filter.length == i + 1) {
+					val = allItems.tagSlugToName(val);
+				} else {
+					val = allItems.tagSlugToName(val) + ', ';
+				}
+				return val;
+			});
+		},
+		selectionTags: function selectionTags() {
+			return selection.tags.map(function (val, i) {
+				if (selection.tags.length == i + 1) {
+					val = allItems.tagSlugToName(val);
+				} else {
+					val = allItems.tagSlugToName(val) + ', ';
+				}
+				return val;
+			});
+		},
+		selectionHiddenTags: function selectionHiddenTags() {
+			return selection.hiddenTags.map(function (val, i) {
+				if (selection.hiddenTags.length == i + 1) {
+					val = allItems.tagSlugToName(val);
+				} else {
+					val = allItems.tagSlugToName(val) + ', ';
+				}
+				return val;
+			});
+		},
+		allVisibleItems: function allVisibleItems() {
+			if (!this.allData) {
+				return [];
+			}
+			var items = allItems.flattenTree(allItems.root.children);
+			return items.filter(function (item) {
+				return !selection.hiddenItems.includes(item.id);
+			});
+		},
 		allTagsComputed: function allTagsComputed() {
 			if (!this.allData) {
 				return [];
 			}
-			var childrensTags = [];
+			var allTagsArray = [];
 			var items = allItems.flattenTree(allItems.root.children);
 			if (!items.length) {
 				return [];
@@ -38230,17 +38299,30 @@ window.selection = new __WEBPACK_IMPORTED_MODULE_4__Selection_js__["a" /* defaul
 					if (!taggedObj.tag || !taggedObj.tag.name) {
 						return; // solves bugs with broken tags
 					}
-					var tagPresent = childrensTags.find(function (tagAlready) {
-						return tagAlready.name == taggedObj.tag.name;
+					var tagAlreadyPushed = allTagsArray.find(function (pushedTag) {
+						return pushedTag.name == taggedObj.tag.name;
 					}.bind(taggedObj));
-					if (!tagPresent) {
-						childrensTags.push(taggedObj.tag);
+
+					if (!tagAlreadyPushed) {
+						allTagsArray.push(taggedObj.tag);
 					}
-				}.bind(childrensTags));
-			}.bind(childrensTags));
+				}.bind(allTagsArray));
+
+				// allTagsArray = allTagsArray.filter(function(tagInArray)
+				// {
+				// 	let noItemWithTag = selection.hiddenItems.find(function(hiddenId)
+				// 	{
+				// 		return allItems.hasTag(hiddenId, tagInArray.name);
+				// 	}.bind(tagInArray));
+				// 	if(!noItemWithTag)
+				// 	{
+				// 		return true;
+				// 	}
+				// }.bind(allTagsArray));
+			}.bind(allTagsArray));
 			console.log('before sorting tags');
-			childrensTags = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_3__components_globalFunctions_js__["d" /* sortObjectArrayByProperty */])(childrensTags, 'name');
-			return childrensTags;
+			allTagsArray = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_4__components_globalFunctions_js__["d" /* sortObjectArrayByProperty */])(allTagsArray, 'name');
+			return allTagsArray;
 		},
 		childrenAmount: function childrenAmount() {
 			if (!this.allData) {
@@ -38276,10 +38358,10 @@ window.selection = new __WEBPACK_IMPORTED_MODULE_4__Selection_js__["a" /* defaul
 			return card.totalUsedSec;
 		},
 		totalUsedHourMin: function totalUsedHourMin() {
-			return __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_3__components_globalFunctions_js__["e" /* sec_to_hourmin */])(this.totalUsedSec);
+			return __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_4__components_globalFunctions_js__["e" /* sec_to_hourmin */])(this.totalUsedSec);
 		},
 		totalHourMinLeft: function totalHourMinLeft() {
-			return __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_3__components_globalFunctions_js__["e" /* sec_to_hourmin */])(this.totalSecLeft);
+			return __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_4__components_globalFunctions_js__["e" /* sec_to_hourmin */])(this.totalSecLeft);
 		},
 		hiddenItemsTotalUsedTime: function hiddenItemsTotalUsedTime() {
 			if (!this.selection.hiddenItems.length) {
@@ -38287,7 +38369,6 @@ window.selection = new __WEBPACK_IMPORTED_MODULE_4__Selection_js__["a" /* defaul
 			}
 			return this.selection.hiddenItems.reduce(function (a, id) {
 				var b = allItems.nodes[id].used_time;
-				console.log(b);
 				return a + b;
 			}, 0);
 		},
@@ -38297,7 +38378,6 @@ window.selection = new __WEBPACK_IMPORTED_MODULE_4__Selection_js__["a" /* defaul
 			}
 			return this.selection.hiddenItems.reduce(function (a, id) {
 				var b = allItems.nodes[id].planned_time;
-				console.log(b);
 				return a + b;
 			}, 0);
 		}
@@ -38507,7 +38587,7 @@ window.selection = new __WEBPACK_IMPORTED_MODULE_4__Selection_js__["a" /* defaul
 			var patchObj = {};
 			var patchVal = allItems.nodes[id][arg];
 			if (arg == 'children_order') {
-				patchVal = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_3__components_globalFunctions_js__["f" /* arrayToString */])(patchVal);
+				patchVal = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_4__components_globalFunctions_js__["f" /* arrayToString */])(patchVal);
 			}
 			patchObj[arg] = patchVal;
 			this.$http.patch('/api/items/' + id, patchObj, { method: 'PATCH' }).then(function (response) {
@@ -38527,7 +38607,7 @@ window.selection = new __WEBPACK_IMPORTED_MODULE_4__Selection_js__["a" /* defaul
 				return;
 			}
 			if (Array.isArray(tags)) {
-				tags = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_3__components_globalFunctions_js__["g" /* removeEmptyValuesFromArray */])(tags);
+				tags = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_4__components_globalFunctions_js__["g" /* removeEmptyValuesFromArray */])(tags);
 				if (!tags.length) {
 					return;
 				}
@@ -38546,7 +38626,7 @@ window.selection = new __WEBPACK_IMPORTED_MODULE_4__Selection_js__["a" /* defaul
 			patchObj['type'] = requestType;
 			this.$http.patch('/api/itemtags/' + id, patchObj, { method: 'PATCH' }).then(function (tagResponse) {
 				var syncedTags = tagResponse.data.tags;
-				console.log('patched [' + allItems.nodes[id].body + '] TAGS: ' + tagResponse.data.tags + ';');
+				console.log('tagged [' + allItems.nodes[id].body + '] with: ' + tagResponse.data.tags + ';');
 				console.log(tagResponse);
 				// Re-Add tags of item
 				this.$http.get('/api/itemtags/' + id, { type: 'tags' })
@@ -38641,6 +38721,9 @@ window.selection = new __WEBPACK_IMPORTED_MODULE_4__Selection_js__["a" /* defaul
 		},
 		popout: function popout(id, type) {
 			id = !id ? selection.selectedId : id;
+			if (!id) {
+				return;
+			}
 			var item = allItems.nodes[id];
 			// let popoutExists = this.popouts.filter(function (popout) { return popout.item.id === id; })[0];
 			// if(!popoutExists){
@@ -38749,7 +38832,7 @@ window.selection = new __WEBPACK_IMPORTED_MODULE_4__Selection_js__["a" /* defaul
 			this.startPatching();
 			// Prepare children_order for sending to DB.
 			if (newItem.children_order) {
-				newItem.children_order = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_3__components_globalFunctions_js__["f" /* arrayToString */])(newItem.children_order);
+				newItem.children_order = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_4__components_globalFunctions_js__["f" /* arrayToString */])(newItem.children_order);
 			}
 			// let data = {
 			// 	newItemArray: [newItem, newItem]
@@ -38784,59 +38867,6 @@ window.selection = new __WEBPACK_IMPORTED_MODULE_4__Selection_js__["a" /* defaul
 				_this3.patching = 'error';
 			});
 		},
-		keystroke: function keystroke(k) {
-			if (selection.view == 'journal' && (
-			// Disable keystrokes when in the journal.
-			k == 'arrowRight' || k == 'arrowLeft' || k == 'meta_arrowUp' || k == 'meta_arrowDown' || k == 'meta_arrowRight' || k == 'meta_arrowLeft' || k == 'spaceBar' || k == 'tab' || k == 'shift_tab' || k == 't' || k == 's')) {
-				console.log('cannot use ' + k + ' in journal mode');return;
-			}
-			console.log(k);
-			if (k == 'arrowUp') {
-				this.selectItem('prev');
-			} else if (k == 'arrowDown') {
-				this.selectItem('next');
-			} else if (k == 'arrowRight') {
-				this.showChildren(null, 'show');
-			} else if (k == 'arrowLeft') {
-				this.showChildren(null, 'hide');
-			} else if (k == 'meta_arrowUp') {
-				this.moveItem('up');
-			} else if (k == 'meta_arrowDown') {
-				this.moveItem('down');
-			} else if (k == 'meta_arrowRight') {
-				this.indent();
-			} else if (k == 'meta_arrowLeft') {
-				this.unindent();
-			} else if (k == 'spaceBar') {
-				this.markDone();
-			} else if (k == 'tab') {
-				this.indent();
-			} else if (k == 'shift_tab') {
-				this.unindent();
-			} else if (k == 'enter') {
-				this.showAddNewItem();
-			} else if (k == 'shift_enter') {
-				this.showAddNewItem(null, 'child');
-			} else if (k == 'meta_enter') {
-				eventHub.$emit('startEdit');
-			} else if (k == 'ctrl_u') {
-				eventHub.$emit('startEdit');
-			} else if (k == 't') {
-				this.setToday();
-			} else if (k == 'shift_t') {
-				this.startEditTags();
-			} else if (k == 's') {
-				this.addTimer();
-			} else if (k == 'meta_shift_d') {
-				this.duplicate();
-			} else if (k == 'meta_delete') {
-				this.deleteItem();
-			} else if (k == 'backspace') {
-				this.deleteItem();
-			} else if (k == 'delete') {
-				this.deleteItem();
-			}
-		},
 		test: function test(id) {
 			// id = (!id) ? selection.selectedId : id ;
 			id = selection.selectedId;
@@ -38855,179 +38885,14 @@ window.selection = new __WEBPACK_IMPORTED_MODULE_4__Selection_js__["a" /* defaul
 			console.log(id);
 			return;
 		});
-		var vm = this;
-		window.addEventListener('keydown', function (e) {
-			var x = e.keyCode;
-			if (document.activeElement.className == "flatpickr-days") {
-				if (x == 9) {
-					console.log('hiya!');
-					e.preventDefault();
-					return;
-					// This stops the event listener when a flatpickr dialogue is open.
-				}
-			}
-			if (vm.popouts.delete.length || vm.popouts.timer.length) {
-				if (x == 27) {
-					// escape
-					e.preventDefault();
-					eventHub.$emit('clearAll');
-					console.log('Escape');
-				}
-				if (x == 9) {
-					// TAB
-					e.preventDefault();
-					if (e.shiftKey) {
-						$(".btn-cancel").focus();
-					} else {
-						$(".btn-ok").focus();
-					}
-				}
-				if (x == 37) {
-					// arrow left
-					e.preventDefault();
-					$(".btn-cancel").focus();
-				}
-				if (x == 39) {
-					// arrow right
-					e.preventDefault();
-					$(".btn-ok").focus();
-				}
-			} else if (vm.editingItem || vm.addingNewUnder) {
-				if (!$('button:focus').length) {
-					return;
-				}
-				if (e.keyCode == 27) {
-					// Escape
-					if (vm.editingItem) {
-						eventHub.$emit('escapeOnEditButtonFocus');
-					} else if (vm.addingNewUnder) {
-						eventHub.$emit('escapeOnNewButtonFocus');
-					}
-				}
-			} else if ($('input:focus').length > 0 || $('textarea:focus').length > 0 || $('a:focus').length > 0 || $('button:focus').length > 0) {
-				return;
-			} else {
-				// INPUT AREAS NOT IN FOCUS
-				switch (e.keyCode) {
-					case 37:
-						// arrowLeft
-						e.preventDefault();
-						if (e.ctrlKey || e.metaKey) {
-							vm.keystroke('meta_arrowLeft');
-							break;
-						}
-						vm.keystroke('arrowLeft');
-						break;
-					case 39:
-						// arrowRight
-						e.preventDefault();
-						if (e.ctrlKey || e.metaKey) {
-							vm.keystroke('meta_arrowRight');
-							break;
-						}
-						vm.keystroke('arrowRight');
-						break;
-					case 38:
-						// arrowUp
-						e.preventDefault();
-						if (e.ctrlKey || e.metaKey) {
-							vm.keystroke('meta_arrowUp');
-							break;
-						}
-						vm.keystroke('arrowUp');
-						break;
-					case 40:
-						// arrowDown
-						e.preventDefault();
-						if (e.ctrlKey || e.metaKey) {
-							vm.keystroke('meta_arrowDown');
-							break;
-						}
-						vm.keystroke('arrowDown');
-						break;
-					case 32:
-						// spaceBar
-						e.preventDefault();
-						vm.keystroke('spaceBar');
-						break;
-					case 9:
-						// tab
-						e.preventDefault();
-						if (e.shiftKey) {
-							vm.keystroke('shift_tab');
-							break;
-						}
-						vm.keystroke('tab');
-						break;
-					case 13:
-						// enter
-						e.preventDefault();
-						if (e.ctrlKey || e.metaKey) {
-							vm.keystroke('meta_enter');
-						} else if (e.shiftKey) {
-							vm.keystroke('shift_enter');
-						} else {
-							vm.keystroke('enter');
-						}
-						break;
-					case 84:
-						// key t
-						e.preventDefault();
-						if (e.ctrlKey || e.metaKey || e.shiftKey) {
-							vm.keystroke('shift_t');
-						} else {
-							vm.keystroke('t');
-						}
-						break;
-					case 83:
-						// key s
-						vm.keystroke('s');
-						break;
-					case 85:
-						// key u
-						if (e.ctrlKey) {
-							vm.keystroke('ctrl_u');
-							break;
-						}
-						vm.keystroke('u');
-						break;
-					case 68:
-						// key d
-						e.preventDefault();
-						if ((e.ctrlKey || e.metaKey) && e.shiftKey) {
-							vm.keystroke('meta_shift_d');
-							break;
-						}
-						break;
-					case 8:
-						// DELETE (backspace)
-						e.preventDefault();
-						if (e.ctrlKey || e.metaKey) {
-							vm.keystroke('meta_delete');
-							break;
-						}
-						vm.keystroke('backspace');
-						break;
-					case 46:
-						// DELETE (real delete)
-						e.preventDefault();
-						vm.keystroke('delete');
-						break;
-				} // end switch
-			} // END INPUT AREAS NOT IN FOCUS
-		});
 	},
 
 	http: {
-		// root: '/root',
-		// 	// base: '/base',
-		// route: 'route',
 		headers: {
 			'X-CSRF-TOKEN': document.querySelector('#token').getAttribute('value')
 		}
 	}
 };
-/* WEBPACK VAR INJECTION */}.call(__webpack_exports__, __webpack_require__(2)))
 
 /***/ }),
 /* 163 */
@@ -42694,13 +42559,14 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
   }, [_c('span', [_vm._v(_vm._s(_vm.momentCalendar(_vm.journalDate)))]), _vm._v(" "), _c('span', {
     staticClass: "journal-date-small"
   }, [_vm._v(_vm._s(_vm.journalDate))])]) : _vm._e(), _vm._v(" "), (_vm.journalView && _vm.item.depth != 0) ? _c('div', {
-    staticClass: "parent-string",
     on: {
       "click": function($event) {
         _vm.selectItem(_vm.item)
       }
     }
-  }, [_vm._v(_vm._s(_vm.item.parents_bodies) + ":")]) : _vm._e(), _vm._v(" "), (_vm.item.depth != 0) ? _c('div', {
+  }, [_c('div', {
+    staticClass: "parent-string"
+  }, [_vm._v("\n\t\t\t" + _vm._s(_vm.item.parents_bodies) + "\n\t\t")])]) : _vm._e(), _vm._v(" "), (_vm.item.depth != 0) ? _c('div', {
     class: {
       'item-card': true,
       done: _vm.item.done,
@@ -42879,8 +42745,8 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     directives: [{
       name: "show",
       rawName: "v-show",
-      value: (_vm.item.id != _vm.basis.editingItemTags),
-      expression: "item.id != basis.editingItemTags"
+      value: (_vm.item.id != _vm.basis.editingItemTags && _vm.basis.selection.view != 'journal'),
+      expression: "item.id != basis.editingItemTags && basis.selection.view != 'journal'"
     }],
     staticClass: "update-planned-time"
   }, [_vm._v("\n\t\t\t\t\t\tDuration:\n\t\t\t\t\t\t"), _c('button', {
@@ -45026,6 +44892,520 @@ __webpack_require__(135);
 __webpack_require__(136);
 module.exports = __webpack_require__(137);
 
+
+/***/ }),
+/* 191 */,
+/* 192 */,
+/* 193 */,
+/* 194 */,
+/* 195 */,
+/* 196 */,
+/* 197 */,
+/* 198 */,
+/* 199 */,
+/* 200 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* WEBPACK VAR INJECTION */(function($) {Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+
+/* harmony default export */ __webpack_exports__["default"] = {
+	name: 'ListAppKeyBindings',
+	methods: {
+		keystroke: function keystroke(k) {
+			if (selection.view == 'journal' && (
+			// Disable keystrokes when in the journal.
+			k == 'arrowRight' || k == 'arrowLeft' || k == 'meta_arrowUp' || k == 'meta_arrowDown' || k == 'meta_arrowRight' || k == 'meta_arrowLeft' || k == 'spaceBar' || k == 'tab' || k == 'shift_tab' || k == 't' || k == 's')) {
+				console.log('cannot use ' + k + ' in journal mode');
+				return;
+			}
+			console.log(k);
+			if (k == 'arrowUp') {
+				vm.selectItem('prev');
+			} else if (k == 'arrowDown') {
+				vm.selectItem('next');
+			} else if (k == 'arrowRight') {
+				vm.showChildren(null, 'show');
+			} else if (k == 'arrowLeft') {
+				vm.showChildren(null, 'hide');
+			} else if (k == 'meta_arrowUp') {
+				vm.moveItem('up');
+			} else if (k == 'meta_arrowDown') {
+				vm.moveItem('down');
+			} else if (k == 'meta_arrowRight') {
+				vm.indent();
+			} else if (k == 'meta_arrowLeft') {
+				vm.unindent();
+			} else if (k == 'spaceBar') {
+				vm.markDone();
+			} else if (k == 'tab') {
+				vm.indent();
+			} else if (k == 'shift_tab') {
+				vm.unindent();
+			} else if (k == 'enter') {
+				vm.showAddNewItem();
+			} else if (k == 'shift_enter') {
+				vm.showAddNewItem(null, 'child');
+			} else if (k == 'meta_enter') {
+				eventHub.$emit('startEdit');
+			} else if (k == 'ctrl_u') {
+				eventHub.$emit('startEdit');
+			} else if (k == 't') {
+				vm.setToday();
+			} else if (k == 'shift_t') {
+				vm.startEditTags();
+			} else if (k == 's') {
+				vm.addTimer();
+			} else if (k == 'meta_shift_d') {
+				vm.duplicate();
+			} else if (k == 'meta_delete') {
+				vm.deleteItem();
+			} else if (k == 'backspace') {
+				vm.deleteItem();
+			} else if (k == 'delete') {
+				vm.deleteItem();
+			}
+		}
+	},
+	mounted: function mounted() {
+		var self = this;
+		window.addEventListener('keydown', function (e) {
+			var x = e.keyCode;
+			if (document.activeElement.className == "flatpickr-days") {
+				if (x == 9) {
+					console.log('hiya!');
+					e.preventDefault();
+					return;
+					// This stops the event listener when a flatpickr dialogue is open.
+				}
+			}
+			if (vm.popouts.delete.length || vm.popouts.timer.length) {
+				if (x == 27) {
+					// escape
+					e.preventDefault();
+					eventHub.$emit('clearAll');
+					console.log('Escape');
+				}
+				if (x == 9) {
+					// TAB
+					e.preventDefault();
+					if (e.shiftKey) {
+						$(".btn-cancel").focus();
+					} else {
+						$(".btn-ok").focus();
+					}
+				}
+				if (x == 37) {
+					// arrow left
+					e.preventDefault();
+					$(".btn-cancel").focus();
+				}
+				if (x == 39) {
+					// arrow right
+					e.preventDefault();
+					$(".btn-ok").focus();
+				}
+			} else if (vm.editingItem || vm.addingNewUnder) {
+				if (!$('button:focus').length) {
+					return;
+				}
+				if (e.keyCode == 27) {
+					// Escape
+					if (vm.editingItem) {
+						eventHub.$emit('escapeOnEditButtonFocus');
+					} else if (vm.addingNewUnder) {
+						eventHub.$emit('escapeOnNewButtonFocus');
+					}
+				}
+			} else if (document.querySelector('input:focus').length > 0 || document.querySelector('textarea:focus').length > 0 || document.querySelector('a:focus').length > 0 || document.querySelector('button:focus').length > 0) {
+				return;
+			} else {
+				// INPUT AREAS NOT IN FOCUS
+				switch (e.keyCode) {
+					case 37:
+						// arrowLeft
+						e.preventDefault();
+						if (e.ctrlKey || e.metaKey) {
+							self.keystroke('meta_arrowLeft');
+							break;
+						}
+						self.keystroke('arrowLeft');
+						break;
+					case 39:
+						// arrowRight
+						e.preventDefault();
+						if (e.ctrlKey || e.metaKey) {
+							self.keystroke('meta_arrowRight');
+							break;
+						}
+						self.keystroke('arrowRight');
+						break;
+					case 38:
+						// arrowUp
+						e.preventDefault();
+						if (e.ctrlKey || e.metaKey) {
+							self.keystroke('meta_arrowUp');
+							break;
+						}
+						self.keystroke('arrowUp');
+						break;
+					case 40:
+						// arrowDown
+						e.preventDefault();
+						if (e.ctrlKey || e.metaKey) {
+							self.keystroke('meta_arrowDown');
+							break;
+						}
+						self.keystroke('arrowDown');
+						break;
+					case 32:
+						// spaceBar
+						e.preventDefault();
+						self.keystroke('spaceBar');
+						break;
+					case 9:
+						// tab
+						e.preventDefault();
+						if (e.shiftKey) {
+							self.keystroke('shift_tab');
+							break;
+						}
+						self.keystroke('tab');
+						break;
+					case 13:
+						// enter
+						e.preventDefault();
+						if (e.ctrlKey || e.metaKey) {
+							self.keystroke('meta_enter');
+						} else if (e.shiftKey) {
+							self.keystroke('shift_enter');
+						} else {
+							self.keystroke('enter');
+						}
+						break;
+					case 84:
+						// key t
+						e.preventDefault();
+						if (e.ctrlKey || e.metaKey || e.shiftKey) {
+							self.keystroke('shift_t');
+						} else {
+							self.keystroke('t');
+						}
+						break;
+					case 83:
+						// key s
+						self.keystroke('s');
+						break;
+					case 85:
+						// key u
+						if (e.ctrlKey) {
+							self.keystroke('ctrl_u');
+							break;
+						}
+						self.keystroke('u');
+						break;
+					case 68:
+						// key d
+						e.preventDefault();
+						if ((e.ctrlKey || e.metaKey) && e.shiftKey) {
+							self.keystroke('meta_shift_d');
+							break;
+						}
+						break;
+					case 8:
+						// DELETE (backspace)
+						e.preventDefault();
+						if (e.ctrlKey || e.metaKey) {
+							self.keystroke('meta_delete');
+							break;
+						}
+						self.keystroke('backspace');
+						break;
+					case 46:
+						// DELETE (real delete)
+						e.preventDefault();
+						self.keystroke('delete');
+						break;
+				} // end switch
+			} // END INPUT AREAS NOT IN FOCUS
+		});
+	}
+};
+/* WEBPACK VAR INJECTION */}.call(__webpack_exports__, __webpack_require__(2)))
+
+/***/ }),
+/* 201 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var Component = __webpack_require__(4)(
+  /* script */
+  __webpack_require__(200),
+  /* template */
+  null,
+  /* scopeId */
+  null,
+  /* cssModules */
+  null
+)
+Component.options.__file = "/Users/lucaban/Sites/lucaban/resources/assets/js/vue-components/ListAppKeyBindings.vue"
+if (Component.esModule && Object.keys(Component.esModule).some(function (key) {return key !== "default" && key !== "__esModule"})) {console.error("named exports are not supported in *.vue files.")}
+
+/* hot reload */
+if (false) {(function () {
+  var hotAPI = require("vue-hot-reload-api")
+  hotAPI.install(require("vue"), false)
+  if (!hotAPI.compatible) return
+  module.hot.accept()
+  if (!module.hot.data) {
+    hotAPI.createRecord("data-v-19b5a313", Component.options)
+  } else {
+    hotAPI.reload("data-v-19b5a313", Component.options)
+  }
+})()}
+
+module.exports = Component.exports
+
+
+/***/ }),
+/* 202 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* WEBPACK VAR INJECTION */(function($) {var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var _class = function () {
+	function _class() {
+		_classCallCheck(this, _class);
+
+		var self = this;
+		window.addEventListener('keydown', function (e) {
+			var x = e.keyCode;
+			if (document.activeElement.className == "flatpickr-days") {
+				if (x == 9) {
+					console.log('hiya!');
+					e.preventDefault();
+					return;
+					// This stops the event listener when a flatpickr dialogue is open.
+				}
+			}
+			if (vm.popouts.delete.length || vm.popouts.timer.length) {
+				if (x == 27) {
+					// escape
+					e.preventDefault();
+					eventHub.$emit('clearAll');
+					console.log('Escape');
+				}
+				if (x == 9) {
+					// TAB
+					e.preventDefault();
+					if (e.shiftKey) {
+						$(".btn-cancel").focus();
+					} else {
+						$(".btn-ok").focus();
+					}
+				}
+				if (x == 37) {
+					// arrow left
+					e.preventDefault();
+					$(".btn-cancel").focus();
+				}
+				if (x == 39) {
+					// arrow right
+					e.preventDefault();
+					$(".btn-ok").focus();
+				}
+			} else if (vm.editingItem || vm.addingNewUnder) {
+				if (document.activeElement.nodeName != 'BUTTON') {
+					return;
+				}
+				if (e.keyCode == 27) {
+					// Escape
+					if (vm.editingItem) {
+						eventHub.$emit('escapeOnEditButtonFocus');
+					} else if (vm.addingNewUnder) {
+						eventHub.$emit('escapeOnNewButtonFocus');
+					}
+				}
+			} else if (document.activeElement.nodeType == 'INPUT' || document.activeElement.nodeType == 'TEXTAREA' || document.activeElement.nodeType == 'A' || document.activeElement.nodeType == 'BUTTON') {
+				return;
+			} else {
+				// INPUT AREAS NOT IN FOCUS
+				switch (e.keyCode) {
+					case 37:
+						// arrowLeft
+						e.preventDefault();
+						if (e.ctrlKey || e.metaKey) {
+							self.keystroke('meta_arrowLeft');
+							break;
+						}
+						self.keystroke('arrowLeft');
+						break;
+					case 39:
+						// arrowRight
+						e.preventDefault();
+						if (e.ctrlKey || e.metaKey) {
+							self.keystroke('meta_arrowRight');
+							break;
+						}
+						self.keystroke('arrowRight');
+						break;
+					case 38:
+						// arrowUp
+						e.preventDefault();
+						if (e.ctrlKey || e.metaKey) {
+							self.keystroke('meta_arrowUp');
+							break;
+						}
+						self.keystroke('arrowUp');
+						break;
+					case 40:
+						// arrowDown
+						e.preventDefault();
+						if (e.ctrlKey || e.metaKey) {
+							self.keystroke('meta_arrowDown');
+							break;
+						}
+						self.keystroke('arrowDown');
+						break;
+					case 32:
+						// spaceBar
+						e.preventDefault();
+						self.keystroke('spaceBar');
+						break;
+					case 9:
+						// tab
+						e.preventDefault();
+						if (e.shiftKey) {
+							self.keystroke('shift_tab');
+							break;
+						}
+						self.keystroke('tab');
+						break;
+					case 13:
+						// enter
+						e.preventDefault();
+						if (e.ctrlKey || e.metaKey) {
+							self.keystroke('meta_enter');
+						} else if (e.shiftKey) {
+							self.keystroke('shift_enter');
+						} else {
+							self.keystroke('enter');
+						}
+						break;
+					case 84:
+						// key t
+						e.preventDefault();
+						if (e.ctrlKey || e.metaKey || e.shiftKey) {
+							self.keystroke('shift_t');
+						} else {
+							self.keystroke('t');
+						}
+						break;
+					case 83:
+						// key s
+						self.keystroke('s');
+						break;
+					case 85:
+						// key u
+						if (e.ctrlKey) {
+							self.keystroke('ctrl_u');
+							break;
+						}
+						self.keystroke('u');
+						break;
+					case 68:
+						// key d
+						e.preventDefault();
+						if ((e.ctrlKey || e.metaKey) && e.shiftKey) {
+							self.keystroke('meta_shift_d');
+							break;
+						}
+						break;
+					case 8:
+						// DELETE (backspace)
+						e.preventDefault();
+						if (e.ctrlKey || e.metaKey) {
+							self.keystroke('meta_delete');
+							break;
+						}
+						self.keystroke('backspace');
+						break;
+					case 46:
+						// DELETE (real delete)
+						e.preventDefault();
+						self.keystroke('delete');
+						break;
+				} // end switch
+			} // END INPUT AREAS NOT IN FOCUS
+		});
+	}
+
+	_createClass(_class, [{
+		key: 'keystroke',
+		value: function keystroke(k) {
+			if (selection.view == 'journal' && (
+			// Disable keystrokes when in the journal.
+			k == 'arrowRight' || k == 'arrowLeft' || k == 'meta_arrowUp' || k == 'meta_arrowDown' || k == 'meta_arrowRight' || k == 'meta_arrowLeft' || k == 'spaceBar' || k == 'tab' || k == 'shift_tab' || k == 't' || k == 's')) {
+				console.log('cannot use ' + k + ' in journal mode');
+				return;
+			}
+			console.log(k);
+			if (k == 'arrowUp') {
+				vm.selectItem('prev');
+			} else if (k == 'arrowDown') {
+				vm.selectItem('next');
+			} else if (k == 'arrowRight') {
+				vm.showChildren(null, 'show');
+			} else if (k == 'arrowLeft') {
+				vm.showChildren(null, 'hide');
+			} else if (k == 'meta_arrowUp') {
+				vm.moveItem('up');
+			} else if (k == 'meta_arrowDown') {
+				vm.moveItem('down');
+			} else if (k == 'meta_arrowRight') {
+				vm.indent();
+			} else if (k == 'meta_arrowLeft') {
+				vm.unindent();
+			} else if (k == 'spaceBar') {
+				vm.markDone();
+			} else if (k == 'tab') {
+				vm.indent();
+			} else if (k == 'shift_tab') {
+				vm.unindent();
+			} else if (k == 'enter') {
+				vm.showAddNewItem();
+			} else if (k == 'shift_enter') {
+				vm.showAddNewItem(null, 'child');
+			} else if (k == 'meta_enter') {
+				eventHub.$emit('startEdit');
+			} else if (k == 'ctrl_u') {
+				eventHub.$emit('startEdit');
+			} else if (k == 't') {
+				vm.setToday();
+			} else if (k == 'shift_t') {
+				vm.startEditTags();
+			} else if (k == 's') {
+				vm.addTimer();
+			} else if (k == 'meta_shift_d') {
+				vm.duplicate();
+			} else if (k == 'meta_delete') {
+				vm.deleteItem();
+			} else if (k == 'backspace') {
+				vm.deleteItem();
+			} else if (k == 'delete') {
+				vm.deleteItem();
+			}
+		}
+	}]);
+
+	return _class;
+}(); // END default CLASS
+
+
+/* harmony default export */ __webpack_exports__["a"] = _class;
+/* WEBPACK VAR INJECTION */}.call(__webpack_exports__, __webpack_require__(2)))
 
 /***/ })
 /******/ ]);

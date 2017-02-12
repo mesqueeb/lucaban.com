@@ -45,7 +45,7 @@
 		<div class="menu">
 			<a href="#"
 				:class="{active: (selection.filter.length == 0 && selection.tags.length == 0 && selection.view == 'tree')}"
-				@click="filterItems('all')"
+				@click="filterItems('all', 'all')"
 			>All</a>
 			<a href="#"
 				:class="{active: selection.filter.includes('today')}"
@@ -72,11 +72,11 @@
 	<div class="panel-title"
 	>
 		<div>
-			<span v-if="selection.filter.length">@{{ selection.filter }}</span>
-			<span v-if="selection.tags.length">@{{ selection.tags }}</span>
+			<span v-if="selection.filter.length" v-for="sel in selectionFilter">@{{ sel }}</span>
+			<span v-if="selection.tags.length" v-for="sel in selectionTags">@{{ sel }}</span>
 		</div>
 		<div class="hidden-tags">
-			<span v-if="selection.hiddenTags.length">@{{ selection.hiddenTags }}</span>
+			<span v-if="selection.hiddenTags.length" v-for="hidden in selectionHiddenTags">@{{ hidden }}</span>
 		</div>
 	</div>
 	{{-- STATS --}}
