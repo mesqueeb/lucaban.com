@@ -1,10 +1,79 @@
 label{
     font-weight: 300;
 }
+.toggle-div{
+    width: 2em;
+    div, input{
+        margin: 0; // reset margins
+    }
+}
+.toggle{
+    cursor: pointer;
+    text-align: center;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    outline: none !important;
+}
+.toggle:after{
+    content: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="-10 -18 100 135"><circle cx="50" cy="50" r="50" fill="none" stroke="#ededed" stroke-width="3"/></svg>');
+    transform: scale(0.7);
+    display: block;
+    margin: 0 0 0 -1em;
+}
+.toggle:checked:after{
+    content: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="-10 -18 100 135"><circle cx="50" cy="50" r="50" fill="none" stroke="#bddad5" stroke-width="3"/><path fill="#5dc2af" d="M72 25L42 71 27 56l-4 4 20 20 34-52z"/></svg>');
+    transform: scale(0.7);
+    display: block;
+    margin: 0 0 0 -1em;
+}
+
+.styled-check{
+    display: none; 
+    cursor: pointer;
+}
+.styled-check + .arrow:before{
+    position: absolute;
+    content: "";
+    display: block;
+    top: 25%;
+    left: 30%;
+    border-left: black 1px solid;
+    border-bottom: black 1px solid;
+    transform: rotateZ(-135deg);
+    width: 0.5em;
+    height: 0.5em;
+    transition: transform 0.3s ease-in-out;
+}
+.styled-check:checked + .arrow:before{
+    transform: rotateZ(-45deg);
+}
+.arrow{
+  display: block;
+  position: relative;
+  height: 20px;
+  width: 20px;
+}
+.project{
+    >.bodybox{
+        font-weight: 600;
+    }
+}
+.bodybox{
+    padding: 0.5em;
+    display: inline-block;
+    white-space: pre-line;
+    word-break: break-word;
+    display: flex;
+    flex-direction: column;
+}
+.selected{
+    background: $selection-color;
+}
 .navigation{
     display: flex;
     margin-bottom: 0.2em;
-    a {
+    a{
         text-decoration: none;
         color: #4d4d4d;
         margin: 0em 0.5em;
@@ -16,7 +85,7 @@ label{
         text-decoration: line-through;
         color: $duedate-color;
     }
-    .menu {
+    .menu{
         display: flex;
     }
     .tag-menu{
@@ -72,7 +141,7 @@ label{
     font-size: 1.2em;
     padding: 6px 0 0;
 }
-.hidden-tags {
+.hidden-tags{
     text-decoration: line-through;
 }
 .scrolled-down .panel-title{
@@ -89,7 +158,7 @@ label{
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
-    button {
+    button{
         background: none;
         border: none;
         font-size: 1.5em;
@@ -103,13 +172,67 @@ label{
     background: white;
     padding: 1em;
 }
-.children .children {
+.children .children{
     margin-left: 2em;
 }
-.item-card {
+.item-card{
     margin: 0 0 0 0;
     display: flex;
     align-items: center;
+}
+.item-tags{
+    white-space: nowrap;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    font-size: 0.7em;
+    >span, >label{
+        align-items: center;
+        display: flex;
+        position:relative;
+        padding: 0.3em 0.5em;
+        margin: 0.1em;
+        border-radius: 0.3em;
+        color: white;
+    }
+    .done{
+        cursor: pointer;
+        color: #5a5a5a;
+        background: #e6e6e6;
+    }
+    .duration, .currentDuration{
+        background: $duration-color;
+    }
+    .duedate{
+        background: $duedate-color;
+    }
+    .duedate-parent{
+        background: $duedate-parent-color;
+        // padding: 0 0.4em !important;
+        // font-size: 0.9em;
+    }
+    .total-duration{
+        background:$duration-color-dark;
+    }
+    .custom-tag{
+        background: $theme-color;
+        cursor: pointer;
+    }
+    button{
+        color: white;
+        margin-left: 0.5em;
+        padding: 0;
+    }
+
+}
+.done .bodybox{
+    color: #d9d9d9;
+    text-decoration: line-through;
+}
+.completion-notes{
+    color: #a2999a;
+    padding: 2px 0 0 2em;
+    width: 100%;
 }
 form.addnewbox{
     margin-left: 1.9em;
@@ -138,7 +261,10 @@ form.addnewbox.child{
     }
 }
 
-.updatebox, .addnewbox {
+.updatebox{
+    width: 100%;
+}
+.updatebox, .addnewbox{
     >div:first-child{
         display: flex;
         align-items: center;
@@ -152,7 +278,7 @@ form.addnewbox.child{
     textarea{
         width: 100%;
     }
-    .tag {
+    .tag{
         color: black;
         background: #eaeaea;
     }
@@ -181,12 +307,12 @@ form.addnewbox.child{
             text-align: center;
             padding: 0;
         }
-        button {
+        button{
             color: $duration-color;
             font-size: 1em;
             padding: 0 0.2em;
         }
-        .currentDuration {
+        .currentDuration{
             background: $duration-color;
             padding: 0.1em 0.5em;
             margin: 0.1em;
@@ -194,96 +320,22 @@ form.addnewbox.child{
             color: white;
         }
     }
-    .update-custom-tags input {
+    .update-custom-tags input{
         border-bottom: 1px solid $theme-color;
     }
 }
-
-.updatebox{
-    width: 100%;
-}
-.body-div.updating-tags {
+.body-div.updating-tags{
     flex-wrap: wrap;
-    .updatebox {
+    .updatebox{
         margin: 0 auto;
-        order: 10;
         background: white;
         border: 1px $selection-color solid;
     }
 }
-.toggle-div{
-    width: 2em;
-    div, input{
-        margin: 0; // reset margins
-    }
-}
-.toggle{
-    cursor: pointer;
-    text-align: center;
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    appearance: none;
-    outline: none !important;
-}
-.toggle:after {
-    content: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="-10 -18 100 135"><circle cx="50" cy="50" r="50" fill="none" stroke="#ededed" stroke-width="3"/></svg>');
-    transform: scale(0.7);
-    display: block;
-    margin: 0 0 0 -1em;
-}
-.toggle:checked:after {
-    content: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="-10 -18 100 135"><circle cx="50" cy="50" r="50" fill="none" stroke="#bddad5" stroke-width="3"/><path fill="#5dc2af" d="M72 25L42 71 27 56l-4 4 20 20 34-52z"/></svg>');
-    transform: scale(0.7);
-    display: block;
-    margin: 0 0 0 -1em;
-}
 
-.styled-check {
-    display: none; 
-    cursor: pointer;
-}
-  .styled-check + .arrow:before {
-    position: absolute;
-    content: "";
-    display: block;
-    top: 25%;
-    left: 30%;
-    border-left: black 1px solid;
-    border-bottom: black 1px solid;
-    transform: rotateZ(-135deg);
-    width: 0.5em;
-    height: 0.5em;
-    transition: transform 0.3s ease-in-out;
-    }
-  .styled-check:checked + .arrow:before {
-    transform: rotateZ(-45deg); }
-
-.arrow {
-  display: block;
-  position: relative;
-  height: 20px;
-  width: 20px;
-  }
-.project{
-    >.bodybox{
-        font-weight: 600;
-    }
-}
-
-.bodybox{
-    padding: 0.5em;
-    display: inline-block;
-    white-space: pre-line;
-    word-break: break-word;
-    display: flex;
-    flex-direction: column;
-}
-.selected {
-    background: $selection-color;
-}
 .editing{
     .selected{
-        background: white;
+        background: none;
     }
     .body-div{
         flex-direction: column;
@@ -291,89 +343,13 @@ form.addnewbox.child{
         padding: 0.4em 0;
     }
 }
-.done .bodybox{
-    color: #d9d9d9;
-    text-decoration: line-through;
+.body-div.updating-tags{
+    flex-direction: column;
+    align-items:flex-start;
+    padding: 0.4em 0;    
+    background: none;
+    .bodybox{
+        width: 100%;
+        background: $selection-color;
+    }
 }
-
-.item-tags {
-    white-space: nowrap;
-    display: flex;
-    flex-wrap: wrap;
-    align-items: baseline;
-    font-size: 0.7em;
-    >span, >label {
-        align-items: center;
-        display: flex;
-        position:relative;
-        padding: 0.3em 0.5em;
-        margin: 0.1em;
-        border-radius: 0.3em;
-        color: white;
-    }
-    .done {
-        cursor: pointer;
-        color: #5a5a5a;
-        background: #e6e6e6;
-    }
-    .duration, .currentDuration {
-        background: $duration-color;
-    }
-    .duedate{
-        background: $duedate-color;
-    }
-    .duedate-parent{
-        background: $duedate-parent-color;
-        // padding: 0 0.4em !important;
-        // font-size: 0.9em;
-    }
-    .total-duration{
-        background:$duration-color-dark;
-    }
-    .custom-tag{
-        background: $theme-color;
-        cursor: pointer;
-    }
-    button{
-        color: white;
-        margin-left: 0.5em;
-        padding: 0;
-    }
-
-}
-.completion-notes {
-    color: #a2999a;
-    padding: 2px 0 0 2em;
-    width: 100%;
-}
-.journal-wrapper {
-    >.children>div:first-child .title {
-        border-top: none;
-        margin-top: 0;
-    }
-    .title {
-        border-top: 1px solid #ededed;
-        color: #46c5b6;
-        font-size: 1.2em;
-        text-align: left;
-        padding: 0.5em 0;
-        margin-top: 0.7em;
-    }
-    .item-card {
-        align-items: baseline;
-    }
-    .bodybox {
-        color: inherit;
-        text-decoration: none;
-    }
-    .body-div{
-        border-bottom:none;
-    }
-    .journal-date-small {
-        color: #dadada;
-        font-size: 0.8em;
-    }
-
-}
-
-

@@ -157,6 +157,7 @@ hasTag(id, tags)
 }
 hasParentWithTag(id, tags)
 {
+	if(!id){ return false; }
 	let item = this.nodes[id];
 	let parent_id = this.nodes[id].parent_id;
 	if(!parent_id){ return false; }
@@ -297,7 +298,9 @@ nextItemRecursion(id)
 isTopLvlItemInFilteredRoot(id)
 {
 	// debugger;
-	if((selection.filter.length+selection.tags.length) == 0){ return false; }
+	// console.log('length of filter: '+x);
+	let x = parseFloat(selection.filter.length)+parseFloat(selection.tags.length);
+	if(x == 0){ return false; }
 	if (id == this.root.id) {
 		return true;
 	} else if (this.root.children_order.includes(id)){
@@ -740,6 +743,8 @@ filterItems(keyword, value, operator)
 		selection.addKeywords(keyword,value,operator);
 		return;
 	}
+	selection.addKeywords(keyword,value,operator);
+
 	let arrayToFilter;
 	if(operator == 'AND'){
 		arrayToFilter = this.flattenTree(this.root.children);
@@ -779,15 +784,20 @@ filterItems(keyword, value, operator)
 	}.bind(this));
 	this.root.children = filteredArray;
 	this.resetChildrenOrder(this.root.id);
-	selection.addKeywords(keyword,value,operator);
 }
 arrayFilterTag(array, tags, operator){
 	let filteredArray = [];
 	array.forEach(function (item) {
 		let id = item.id;
 		let hasTag = this.hasTag(id, tags);
-		let hasParentWithTag = this.hasParentWithTag(id, tags);
 		let isTopLvlItemInFilteredRoot = this.isTopLvlItemInFilteredRoot(id);
+		
+		let hasParentWithTag;
+		if(!isTopLvlItemInFilteredRoot)
+		{
+			console.log('isTopLvlItemInFilteredRoot = false');
+			let hasParentWithTag = this.hasParentWithTag(id, tags);
+		}
 		// console.log(id+" - "+item.body+" →　hasTag["+tags+"]　=　"+hasTag);
 		// console.log(id+" - "+item.body+" →　hasParentWithTag["+tags+"] =　"+hasParentWithTag);
 		if(

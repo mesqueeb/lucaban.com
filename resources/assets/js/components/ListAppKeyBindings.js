@@ -35,7 +35,9 @@ constructor()
 				e.preventDefault();
 				$(".btn-ok").focus();
 			}
-		} else if(vm.editingItem || vm.addingNewUnder){
+		}
+		else if(vm.editingItem || vm.addingNewUnder || vm.editingItemTags)
+		{
 			if(document.activeElement.nodeName != 'BUTTON'){
 				return;
 		    }
@@ -44,6 +46,7 @@ constructor()
 				{
 					eventHub.$emit('escapeOnEditButtonFocus');
 				}
+				
 				else if(vm.addingNewUnder)
 				{
 					eventHub.$emit('escapeOnNewButtonFocus');
@@ -144,7 +147,7 @@ constructor()
 			case 8: // DELETE (backspace)
 				e.preventDefault();
 				if (e.ctrlKey || e.metaKey){
-					self.keystroke('meta_delete');
+					self.keystroke('meta_backspace');
 		  			break;
 		  		}
 				self.keystroke('backspace');
@@ -196,7 +199,7 @@ keystroke(k)
 	if(k == 'shift_t'){ vm.startEditTags()} else
 	if(k == 's'){ vm.addTimer()} else
 	if(k == 'meta_shift_d'){ vm.duplicate()} else
-	if(k == 'meta_delete'){ vm.deleteItem()} else
+	if(k == 'meta_backspace'){ vm.deleteItem()} else
 	if(k == 'backspace'){ vm.deleteItem()} else
 	if(k == 'delete'){ vm.deleteItem()}
 }

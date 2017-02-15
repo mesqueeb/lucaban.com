@@ -8,8 +8,12 @@
 		'journal-wrapper': journalView
 	}"
 >
-<div class="item-card-wrapper" v-if="!isHidden || listIsEmpty">
-	<div class="title"
+<div
+	class="item-card-wrapper"
+	v-if="!isHidden || listIsEmpty"
+>
+	<div
+		class="title"
 		v-if="journalDate"
 	>
 		<!-- Codementor: Is this the correct way to format something like this? -->
@@ -33,38 +37,47 @@
 			editing: item.id == basis.editingItem,
 		}"
 	>
-		<div class="toggle-div"
+		<div
+			class="toggle-div"
 			v-if="!journalView"
 		>
-			<input class="toggle"
+			<input
+				class="toggle"
 				type="checkbox"
 				v-if="item.children_order.length==0 || item.done == true"
 				v-model="item.done"
 				@change="updateDone(item.id)"
 			>
-			<input type="checkbox"
+			<input
+				type="checkbox"
 				class="styled-check"
 				:id="'show_children_'+item.id"
 				v-model="item.show_children"
 				@change="updateShowChildren(item.id)"
 			>
-			<label class="arrow"
+			<label
+				class="arrow"
 				:for="'show_children_'+item.id"
 				v-if="item.children_order.length>0"
 			></label>
 		</div>
-		<div class=""
+		<div
+			class=""
 			v-if="journalView"
 		>・</div>
-		<div class="body-div textarea-wrap"
-			:class="{ selected: item.id == basis.selection.selectedId,
-				project: isProject,
+		<div
+			:class="{
+				'body-div':true,
+				'textarea-wrap':true,
+				'selected': item.id == basis.selection.selectedId,
+				'project': isProject,
 				'updating-tags': item.id == basis.editingItemTags}"
 			@dblclick="startEdit(item, $event)"
 			@click="selectItem(item)"
 			@enter="console.log('yarrr')"
 		>
-			<div class="bodybox"
+			<div
+				class="bodybox"
 				v-show="item.id != basis.editingItem"
 			>
 				<div>{{ linkify(item.body) }}</div>
@@ -73,10 +86,18 @@
 					@click="selectItem(item)"
 				>{{ item.completion_memo }}</div>
 			</div>
+
 			<!-- For debugging: -->
-			<span v-if="false"> ({{item.id}}) D-{{item.depth}}) [{{item.children_order}}]</span>
-			
-			<form action="update"
+			<span v-if="false">
+				({{item.id}}) D-{{item.depth}})
+				<span v-if="item.children_order.length">
+					[{{item.children_order}}]
+				</span>
+			</span>
+			<!-- // For debugging: -->
+
+			<form
+				action="update"
 				class="updatebox"
 				:id="'updatebox-'+item.id"
 				v-show="item.id == basis.editingItem || item.id == basis.editingItemTags"
@@ -93,7 +114,8 @@
 					></textarea>
 				</div>
 				<div class="update-tags">
-					<div class="update-planned-time"
+					<div
+						class="update-planned-time"
 						v-show="item.id != basis.editingItemTags && basis.selection.view != 'journal'"
 					>
 						Duration:
@@ -137,97 +159,118 @@
 					<div class="update-custom-tags">
 						<label>
 							Add Tag: 
-							<input type="text"
+							<input
+								type="text"
 								class="add-tag"
-								@blur="blurOnEdit(item)"
 								v-model="newTag"
+								@blur="blurOnEdit(item)"
 								@keydown="keydownOnEdit(item, $event, 'addTag')"
 							>
 						</label>
-						<div class="tag-suggestions" v-if="false">
+
 						<!-- UNDER CONSTRUCTION -->
-							<label v-for="tag in allTags_c"
+						<div class="tag-suggestions" v-if="false">
+							<label
+								v-for="tag in allTags_c"
 								:class="'tag'"
 								@click="basis.patchTag(item.id, tag)"
-							>{{ tag.name }}
+							>
+								{{ tag.name }}
 							</label>
 						</div>
+						<!-- // UNDER CONSTRUCTION -->
+
 					</div>
 				</div>
-			</form>
+			</form><!-- /.updatebox -->
+
 			<div class="item-tags">
-				<label class="done"
-					v-if="item.done && item.id != basis.editingDoneDateItem && !journalView"
+				<label
+					class="done"
+					v-if="item.done
+						&& item.id != basis.editingDoneDateItem
+						&& !journalView"
 				>
-				<!-- Done {{ item.done_date | momentCalendar }} -->
-				Done {{ momentCalendar(item.done_date) }}
+					Done {{ momentCalendar(item.done_date) }}
 					<input class="flatpickr"
 						:id="'done-date-edit-' + item.id"
 						v-model="item.done_date"
 					>
 				</label>
-				<!-- <span class="total-duration">ttuc {{ totalUsedSec | sec-to-hourminsec }}</span> -->
-				<span v-if="
-					totalSecLeft > 0
-					&& totalSecLeft > secLeft
-					&& totalTimeDifferentFromParent
-					&& !item.done" class="total-duration">
-					<!-- {{ totalSecLeft | sec-to-hourminsec }} -->
-					{{ sec_to_hourminsec(totalSecLeft) }}
-					</span>
-
-				<span v-if="
-					item.id != basis.editingItem
-					&& secLeft > 0
-					
-					&& !item.done" class="duration"
+				<span
+					v-if="totalSecLeft > 0
+						&& totalSecLeft > secLeft
+						&& totalTimeDifferentFromParent
+						&& !item.done" class="total-duration"
 				>
-					<!-- {{ secLeft | sec-to-hourminsec }} -->
+					{{ sec_to_hourminsec(totalSecLeft) }}
+				</span>
+				<span
+					class="duration"
+					v-if="item.id != basis.editingItem
+						&& secLeft > 0
+						&& !item.done"
+				>
 					{{ sec_to_hourminsec(secLeft) }}
 				</span>
 				
-				<span v-if="hasDueDate && !item.done"
+				<span
+					v-if="hasDueDate && !item.done"
 					class="duedate"
 				>
-				<!-- {{ item.due_date | momentCalendar }}</span> -->
-				{{ momentCalendar(item.due_date) }}</span>
-
-				<span v-if="item.dueDateParent && !item.done"
+					{{ momentCalendar(item.due_date) }}
+				</span>
+				<span
+					v-if="item.dueDateParent && !item.done"
 					class="duedate-parent"
 				>
-				<!-- {{ item.dueDateParent | momentCalendar }}</span> -->
-				{{ momentCalendar(item.dueDateParent) }}</span>
-
-				<span v-for="tag in item.tagged"
+					{{ momentCalendar(item.dueDateParent) }}
+				</span>
+				<span
+					v-for="tag in item.tagged"
 					v-if="item.tagged.length"
 					v-show="!parentTags.includes(tag.tag_name)
-						|| item.id == basis.editingItem"
+						|| item.id == basis.editingItem
+						|| item.id == basis.editingItemTags"
 					class="custom-tag"
 					@dblclick.prevent="basis.filterItems('tag', tag.tag_slug, $event)"
-				>{{ tag.tag_name }}
-					<button class="delete-tag"
-						v-if="item.id == basis.editingItem
-						&& !parentTags.includes(tag.tag_name)"
+				>
+					{{ tag.tag_name }}
+					<button
+						class="delete-tag"
+						v-if="
+							(item.id == basis.editingItem
+							|| item.id == basis.editingItemTags)
+							&& !parentTags.includes(tag.tag_name)"
 						@click.prevent="deleteTag(item.id, tag.tag_name, $event)"
+						@keydown="keydownOnEdit(item, $event, 'delete-tag')"
+						:value="tag.tag_name"
 					>
 						<i class="zmdi zmdi-close-circle"></i>
 					</button>
 				</span>
+			</div><!-- / .item-tags -->
 
-			</div>
-			<div class="item-nav"
-				v-if="basis.editingItem != item.id && basis.selection.selectedId == item.id"
+			<div
+				class="item-nav"
+				v-if="
+					basis.editingItem != item.id
+					&& basis.editingItemTags != item.id
+					&& basis.selection.selectedId == item.id"
 			>
-				
-				<button v-if="!item.done"
+				<button
+					v-if="!item.done"
 					class="timer"
 					@click="addTimer(item)"
-				><i class="zmdi zmdi-timer"></i>
+				>
+					<i class="zmdi zmdi-timer"></i>
 				</button>
-				<button v-if="item.done"
+				<button
+					v-if="item.done"
 					class="more"
 					@click="basis.popup(item.id, 'afterDone')"
-				><i class="zmdi zmdi-more"></i>
+				>
+					<i class="zmdi zmdi-more"></i>
 				</button>
 				<!--
 				- font icon / woff format [font awesome]
@@ -236,12 +279,14 @@
 				- or image tag inside button
 				- svg tag -> add as pattern
 				-->
-				<button class="delete" 
+				<button
+					class="delete" 
 					v-if="item.children_order.length==0"
 					@click="deleteItem(item)"
-				><i class="zmdi zmdi-delete"></i>
+				>
+					<i class="zmdi zmdi-delete"></i>
 				</button>
-			</div>
+			</div><!-- / .item-nav -->
 			
 		</div>
 	</div>
@@ -298,6 +343,7 @@
 				<button
 					:class="{ currentDuration: newItem.planned_time == 30, 'planned-time': true }"
 					@click.prevent="setPlannedTimeNewItem(item, $event)"
+
 					@keydown="keydownOnNew(item, $event, 'planned-time')"
 					@blur="blurOnAddNew(item)"
 					value="30"
@@ -337,6 +383,8 @@
 					<button class="delete-tag"
 						v-if="!parentTags.includes(tag)"
 						@click.prevent="deletePreparedTag(tag, item)"
+						@keydown="keydownOnNew(item, $event, 'delete-tag')"
+						:value="tag"
 					>
 						<i class="zmdi zmdi-close-circle"></i>
 					</button>
@@ -355,15 +403,17 @@ import { linkify, momentCalendar, sec_to_hourminsec } from '../components/valueM
 export default {
 	name: 'Card',
 	template:'#items-card-template',
-	mounted(){
-		this.newItem.preparedTags = this.parentTags;
+	mounted()
+	{
+		this.newItem.preparedTags = JSON.parse(JSON.stringify(this.parentTags));
 		this.convertbodyURLtoHTML();
     	eventHub.$on('startEdit', this.startEdit);
     	eventHub.$on('escapeOnEditButtonFocus', this.cancelEdit);
     	eventHub.$on('escapeOnNewButtonFocus', this.cancelAddNew);
 	},
 	props: ['item'],
-	data(){
+	data()
+	{
 		return {
 			newItem: {
 				body: '',
@@ -379,13 +429,16 @@ export default {
 	// Flatpickr: Flatpickr,
 	// },
 	computed: {
-		listIsEmpty(){
+		listIsEmpty()
+		{
 			return this.$root.noItems;
 		},
-		basis(){
+		basis()
+		{
 			return this.$root;
 		},
-		totalPlannedMin(){ if(!this.item || !allItems){ return 0; }
+		totalPlannedMin()
+		{ if(!this.item || !allItems){ return 0; }
 			// console.log('trying at totalPlannedMin');
 			if(!this.item.children.length){ return (this.item.planned_time) ? this.item.planned_time : 0 ; }
 			let childrenArray = allItems.flattenTree(this.item.children);
@@ -393,7 +446,8 @@ export default {
 			x = x - this.$root.hiddenItemsTotalPlannedTime;
 		    return (x) ? x : 0;
 		},
-		totalUsedSec(){ if(!this.item || !allItems){ return 0; }
+		totalUsedSec()
+		{ if(!this.item || !allItems){ return 0; }
 			// console.log('trying at totalUsedSec');
 			if(!this.item.children.length){ return (this.item.used_time) ? this.item.used_time : 0 ; }
 			let childrenArray = allItems.flattenTree(this.item.children);
@@ -401,12 +455,14 @@ export default {
 		    x = x - this.$root.hiddenItemsTotalUsedTime;
 		    return (x) ? x : 0;
 		},
-		journalView(){ if(!this.item || !allItems){ return; }
+		journalView()
+		{ if(!this.item || !allItems){ return; }
 			if(this.$root.selection.view == 'journal'){
 				return true;
 			} else { return false; }
 		},
-		journalDate(){ if(!this.item || !allItems){ return; }
+		journalDate()
+		{ if(!this.item || !allItems){ return; }
 			// console.log('run on '+this.item.id+' - '+this.item.body);
 			if(this.$root.selection.view != 'journal'){ return false; }
 			if(this.journalView){
@@ -421,88 +477,113 @@ export default {
 			}
 			return false;
 		},
-		totalUsedMin(){ if(!this.item || !allItems){ return 0; }
+		totalUsedMin()
+		{ if(!this.item || !allItems){ return 0; }
 			return this.totalUsedSec/60;
 		},
-		totalPlannedSec(){ if(!this.item || !allItems){ return 0; }
+		totalPlannedSec()
+		{ if(!this.item || !allItems){ return 0; }
 			return this.totalPlannedMin*60;
 		},
-		totalPlannedHour(){ if(!this.item || !allItems){ return 0; }
+		totalPlannedHour()
+		{ if(!this.item || !allItems){ return 0; }
 			return this.totalPlannedMin/60;
 		},
-		isProject(){ if(!this.item || !allItems){ return; }
+		isProject()
+		{ if(!this.item || !allItems){ return; }
 			// console.log('checking isProject');
 			return allItems.isProject(this.item.id);	
 		},
-		siblingIndex(){ if(!this.item || !allItems){ return; }
+		siblingIndex()
+		{ if(!this.item || !allItems){ return; }
 			return allItems.siblingIndex(this.item.id);
 		},
-		olderSiblingId(){ if(!this.item || !allItems){ return; }
+		olderSiblingId()
+		{ if(!this.item || !allItems){ return; }
 			return allItems.olderSiblingId(this.item.id); 
 		},
-		parentsChildren_order(){ if(!this.item || !allItems){ return; }
+		parentsChildren_order()
+		{ if(!this.item || !allItems){ return; }
 			let pId = this.item.parent_id;
 			if(this.item.depth == 0){ return allItems.nodes[this.item.id].children_order; }
 			return allItems.nodes[pId].children_order;
 		},
-		showAddNewBox(){ if(!this.item || !allItems){ return; }
+		showAddNewBox()
+		{ if(!this.item || !allItems){ return; }
 			if(this.$root.addingNewUnder == this.item.id)
 			{ return true; }
 			return false;
 		},
-		addingNewAsFirstChild(){ if(!this.item || !allItems){ return; }
+		addingNewAsFirstChild()
+		{ if(!this.item || !allItems){ return; }
 			return this.$root.addingNewAsFirstChild;
 		},
-		addingNewAsChild(){ if(!this.item || !allItems){ return; }
+		addingNewAsChild()
+		{ if(!this.item || !allItems){ return; }
 			return this.$root.addingNewAsChild;
 		},
-		hasDueDate(){ if(!this.item || !allItems){ return; }
+		hasDueDate()
+		{ if(!this.item || !allItems){ return; }
 		    return (this.item.due_date && this.item.due_date != '0000-00-00 00:00:00');
 		},
-		hasDoneDate(){ if(!this.item || !allItems){ return; }
+		hasDoneDate()
+		{ if(!this.item || !allItems){ return; }
 		    return (this.item.done_date && this.item.done_date != '0000-00-00 00:00:00');
 		},
-		hastotalUsedSec(){ if(!this.item || !allItems){ return; }
+		hastotalUsedSec()
+		{ if(!this.item || !allItems){ return; }
 		    return (this.item.children_order.length
 		    	&& this.item.totalUsedSec
 		    	&& this.item.totalUsedSec != '0'
 		    	&& this.item.used_time != this.item.totalUsedSec);
 		},
-		hasTotalPlannedMin(){ if(!this.item || !allItems){ return; }
+		hasTotalPlannedMin()
+		{ if(!this.item || !allItems){ return; }
 		    return (this.item.children_order.length
 		    	&& this.totalPlannedMin
 		    	&& this.totalPlannedMin != '0'
 		    	&& this.item.planned_time != this.totalPlannedMin);
 		},
-		hasPlannedTime(){ if(!this.item || !allItems){ return; }
+		hasPlannedTime()
+		{ if(!this.item || !allItems){ return; }
 		    return (this.item.planned_time && this.item.planned_time != '0');
 		},
-		hasUsedTime(){ if(!this.item || !allItems){ return; }
+		hasUsedTime()
+		{ if(!this.item || !allItems){ return; }
 		    return (this.item.used_time && this.item.used_time != '0');
 		},
-		allTags_c(){ if(!this.item || !allItems){ return; }
+		allTags_c()
+		{ if(!this.item || !allItems){ return; }
 			return this.$root.allTags;
 		},
-		totalMinLeft(){ if(!this.item || !allItems){ return 0; }
+		totalMinLeft()
+		{ if(!this.item || !allItems){ return 0; }
 			return this.totalPlannedMin-this.totalUsedMin;
 		},
-		totalSecLeft(){ if(!this.item || !allItems){ return 0; }
+		totalSecLeft()
+		{ if(!this.item || !allItems){ return 0; }
 			return this.totalPlannedSec-this.totalUsedSec;
 		},
-		secLeft(){ if(!this.item || !allItems){ return 0; }
+		secLeft()
+		{ if(!this.item || !allItems){ return 0; }
 			return this.item.planned_time*60-this.item.used_time;
 		},
-		minLeft(){ if(!this.item || !allItems){ return 0; }
+		minLeft()
+		{ if(!this.item || !allItems){ return 0; }
 			return this.secLeft/60;
 		},
-		totalTimeDifferentFromParent(){ if(!this.item || !allItems){ return 0; }
+		totalTimeDifferentFromParent()
+		{ if(!this.item || !allItems){ return 0; }
 			if(!this.item.parent_id){ return true; }
 			return this.totalPlannedSec != this.$parent.totalPlannedSec;
 		},
-		parentTags(){ if(!this.item || !allItems || !this.item.parent_id){ return []; }
+		parentTags()
+		{ if(!this.item || !allItems || !this.item.parent_id){ return []; }
+		// console.log("running parentTags! this.item.parent_id = "+this.item.parent_id);
 			return allItems.returnTagsAsArray(this.item.parent_id);
 		},
-		isHidden(){ if(!this.item || !allItems){ return true; }
+		isHidden()
+		{ if(!this.item || !allItems){ return true; }
 			return this.$root.selection.hiddenItems.includes(this.item.id)
 		},
 	},
@@ -510,22 +591,27 @@ export default {
 		linkify,
 		momentCalendar,
 		sec_to_hourminsec,
-		convertbodyURLtoHTML(){
+		convertbodyURLtoHTML()
+		{
 			if(!this.item){ return; }
 			let bodyboxQS = "#card-"+this.item.id+" > div > .item-card > .body-div > .bodybox > div";
 			let a = document.querySelector(bodyboxQS);
 			if(!a){ return; }
 			a.innerHTML = a.innerHTML.replace("&lt;a href=", "<a href=").replace('target="_blank"&gt;','target="_blank">').replace("&lt;/a&gt;","</a>");
 		},
-		addTimer(item){
+		addTimer(item)
+		{
 			//Codementor
 			this.$root.addTimer(item.id);
 		},
-		selectItem(item){
+		selectItem(item)
+		{
 			selection.selectedId = item.id;
 		},
-		newItemIndent(){
-			if(!this.item.children.length || !this.item.show_children){
+		newItemIndent()
+		{
+			if(!this.item.children.length || !this.item.show_children)
+			{
         	// If item has no children yet / no visible children
 				this.$root.addingNewAsChild = true;
 				return;
@@ -533,52 +619,72 @@ export default {
 			let lastChildId = allItems.getLastChildId(this.item.id);
     		vm.$root.showAddNewItem(lastChildId);
 		},
-		newItemUnindent(){
-			if(this.$root.addingNewAsChild){
+		newItemUnindent()
+		{
+			if(this.$root.addingNewAsChild)
+			{
 				this.$root.addingNewAsChild = false;
 				this.$root.addingNewAsFirstChild = false;
 				return;
 			}
-			if(selection.view == 'journal'){
+			if(selection.view == 'journal')
+			{
 				return;
 			}
 			vm.$root.showAddNewItem(this.item.parent_id);
 		},
-		keydownOnNew(item, e, field) {
-			console.log('keydown on new: '+e.keyCode+' - '+field);
+		keydownOnNew(item, e, field)
+		{
 			console.log(e);
-
+			console.log('↑　keydown on new: '+e.keyCode+' - '+field);
 			// SHIFT-TAB
-			if (e.keyCode === 9 && e.shiftKey) {
-	        	if(field == 'body'){
+			if (e.keyCode === 9 && e.shiftKey)
+			{
+	        	if(field == 'body')
+	        	{
 	        		e.preventDefault();
 		        	this.newItemUnindent();
 		        	return;
 		        }
 			}
 			// TAB
-			if (e.keyCode === 9 && !e.shiftKey) {
-	        	if(field == 'addTag'){
-	        		e.preventDefault();
-		        	this.newItemIndent();
-		        	return;
+			if (e.keyCode === 9 && !e.shiftKey)
+			{
+	        	if(field == 'addTag')
+	        	{
+	        		// e.preventDefault();
+		        	// this.newItemIndent();
+		        	// return;
 		        }
 			}
+			// Delete / backspace
+			if (e.keyCode === 8 || e.keyCode === 46)
+			{
+	        	if(field == 'delete-tag')
+	        	{
+	        		let tagName = e.srcElement.value;
+					this.deletePreparedTag(item.id, tagName);
+	        	}
+			}			
 			// ENTER
-			if (e.keyCode === 13 && !e.shiftKey && !e.altKey && !e.metaKey && !e.ctrlKey) {
+			if (e.keyCode === 13 && !e.shiftKey && !e.altKey && !e.metaKey && !e.ctrlKey)
+			{
 				e.preventDefault();
-				if(field == 'planned-time'){
+				if(field == 'planned-time')
+				{
 					this.setPlannedTimeNewItem(item, event);
 					return;
 				}
-				if(field == 'addTag' && this.newTag){
+				if(field == 'addTag' && this.newTag)
+				{
 					this.prepareTag(item);
 					return;
 				}
 			  	if(!this.newItem.body){ return; }
 			  	this.addNew();
 			  	return;
-			} else if (e.keyCode === 13 && (e.metaKey || e.ctrlKey)) {
+			} else if (e.keyCode === 13 && (e.metaKey || e.ctrlKey))
+			{
 			// Command ENTER
 	        	e.preventDefault();
 			  	if(!this.newItem.body){ return; }
@@ -587,9 +693,11 @@ export default {
 			  	return;
 			}
 			// ArrowLeft
-			if (e.keyCode === 37){
+			if (e.keyCode === 37)
+			{
 				// If in an EMPTY BODY
-				if (field != 'body' || (field == 'body' && !this.newItem.body)) {
+				if (field != 'body' || (field == 'body' && !this.newItem.body))
+				{
 					e.preventDefault();
 		        	// console.log('this.newItemUnindent();');
 		        	this.newItemUnindent();
@@ -597,9 +705,11 @@ export default {
 				}
 			}
 			// ArrowRight
-			if (e.keyCode === 39){
+			if (e.keyCode === 39)
+			{
 				// If in an EMPTY BODY
-				if (field != 'body' || (field == 'body' && !this.newItem.body)) {
+				if (field != 'body' || (field == 'body' && !this.newItem.body))
+				{
 					e.preventDefault();
 		        	// console.log('this.newItemIndent();');
 		        	this.newItemIndent();
@@ -607,75 +717,103 @@ export default {
 				}
 			}
 			// ArrowUp
-			if (e.keyCode === 38) {
+			if (e.keyCode === 38)
+			{
 				// If body is empty!
-				if (field == 'body' && !this.newItem.body) {
+				if (field == 'body' && !this.newItem.body)
+				{
 		        	e.preventDefault();
 		        	this.cancelAddNew();
 		        	return;
 				}
-				if(field == 'planned-time'){
+				if(field == 'planned-time')
+				{
 					e.preventDefault();
-					let plsFocus = '.addnewbox .newitem-body';
+					let plsFocus = '#new-under-'+this.item.id+' .newitem-body';
 					document.querySelector(plsFocus).focus();
 					return;
 				}
-				if(field == 'addTag'){
+				if(field == 'addTag')
+				{
 					e.preventDefault();
-					let plsFocus = '.addnewbox .update-planned-time>button';
+					let plsFocus = '#new-under-'+this.item.id+' .update-planned-time>button';
 					document.querySelector(plsFocus).focus();
 					return;
 				}
 			}
 			// ArrowDown
-			if (e.keyCode === 40) {
+			if (e.keyCode === 40)
+			{
 				// If body is empty!
-				if (field == 'body' && !this.newItem.body) {
+				if (field == 'body' && !this.newItem.body)
+				{
 		        	e.preventDefault();
-					let plsFocus = '.addnewbox .update-planned-time>button';
-					document.querySelector(plsFocus).focus();
-					return;		        	
-				}
-				if(field == 'planned-time'){
-					e.preventDefault();
-					let plsFocus = '.addnewbox .prepare-tag';
+					let plsFocus = '#new-under-'+this.item.id+' .update-planned-time>button';
 					document.querySelector(plsFocus).focus();
 					return;
 				}
-				if(field == 'addTag' && !this.newItem.body){
+				if(field == 'planned-time')
+				{
+					e.preventDefault();
+					let plsFocus = '#new-under-'+this.item.id+' .prepare-tag';
+					document.querySelector(plsFocus).focus();
+					return;
+				}
+				if(field == 'addTag' && !this.newItem.body)
+				{
 					e.preventDefault();
 		        	this.cancelAddNew();
 		        	return;
 				}
 			}
 			// ESC
-			if (e.keyCode === 27){
+			if (e.keyCode === 27)
+			{
 			   	e.preventDefault();
 	        	this.cancelAddNew();
 	        	return;
 			}
 	    },
-		keydownOnEdit(item, e, field) {
+		keydownOnEdit(item, e, field)
+		{
+			console.log('Keydown on edit!');
 			// SHIFT-TAB
-			if (e.keyCode === 9 && e.shiftKey) {
-	        	if(field == 'body'){
+			if (e.keyCode === 9 && e.shiftKey)
+			{
+	        	if(field == 'body')
+	        	{
 	        		e.preventDefault(); return;
 		        }
 			}
 			// TAB
-			if (e.keyCode === 9 && !e.shiftKey) {
-	        	if(field == 'addTag'){
-	        		e.preventDefault(); return;
+			if (e.keyCode === 9 && !e.shiftKey)
+			{
+	        	if(field == 'addTag')
+	        	{
+	        		// e.preventDefault(); return;
+	        		// commented out because we want to be able to focus tag-delete buttons.
 		        }
 			}
+			// Delete / backspace
+			if (e.keyCode === 8 || e.keyCode === 46)
+			{
+	        	if(field == 'delete-tag')
+	        	{
+	        		let tagName = e.srcElement.value;
+					this.deleteTag(item.id, tagName);
+	        	}
+			}			
 			// ENTER
-			if (e.keyCode === 13 && !e.shiftKey && !e.altKey) {
+			if (e.keyCode === 13 && !e.shiftKey && !e.altKey)
+			{
 				e.preventDefault();
-				if(field == 'planned-time'){
+				if(field == 'planned-time')
+				{
 					this.setPlannedTime(item, event);
 					return;
 				}
-				if(field == 'addTag' && this.newTag){
+				if(field == 'addTag' && this.newTag)
+				{
 					this.addTag(item);
 					return;
 				}
@@ -683,17 +821,21 @@ export default {
 				return;
 			}
 			// ArrowUp
-			if (e.keyCode === 38) {
-				if (field == 'body') {
+			if (e.keyCode === 38)
+			{
+				if (field == 'body')
+				{
 		        	return;
 				}
-				if(field == 'planned-time'){
+				if(field == 'planned-time')
+				{
 					e.preventDefault();
 					let plsFocus = '#updatebox-'+item.id+' .edititem-body';
 					document.querySelector(plsFocus).focus();
 					return;
 				}
-				if(field == 'addTag'){
+				if(field == 'addTag')
+				{
 					e.preventDefault();
 					let plsFocus = '#updatebox-'+item.id+' .update-planned-time>button';
 					document.querySelector(plsFocus).focus();
@@ -701,66 +843,78 @@ export default {
 				}
 			}
 			// ArrowDown
-			if (e.keyCode === 40) {
-				if (field == 'body') {
+			if (e.keyCode === 40)
+			{
+				if (field == 'body')
+				{
 					return;		        	
 				}
-				if(field == 'planned-time'){
-					e.preventDefault();
+				e.preventDefault();
+				if(field == 'planned-time')
+				{
 					let plsFocus = '#updatebox-'+item.id+' .add-tag';
 					document.querySelector(plsFocus).focus();
 					return;
 				}
-				if(field == 'addTag'){
-					e.preventDefault();
-		        	
+				if(field == 'addTag')
+				{
 		        	return;
 				}
 			}
-			if (e.keyCode === 27) {
+			// ESC
+			if (e.keyCode === 27)
+			{
 				this.cancelEdit(item);
 			}
 	    },
-	    blurOnEdit(item) {
-	    	let component = this;
-	    	setTimeout(function(){
-		    	if ( $('.updatebox input:focus').length > 0
-		    		||  $('.updatebox textarea:focus').length > 0
-		    		||  $('.updatebox a:focus').length > 0
-		    		||  $('.updatebox button:focus').length > 0
-		    	) {
+	    blurOnEdit(item)
+	    {
+	    	let self = this;
+	    	setTimeout(function()
+	    	{
+		    	if ( document.activeElement.nodeName == 'INPUT'
+		    		||  document.activeElement.nodeName == 'TEXTAREA'
+		    		||  document.activeElement.nodeName == 'A'
+		    		||  document.activeElement.nodeName == 'BUTTON' )
+		    	{
 	        		return;
 				}　else {
 			    	console.log('blurring on edit');
-					component.doneEdit(item);
+					self.doneEdit(item);
 				}
 	    	},50);
 	    	// Codementor: is there any better way than this?
 	    },
-	    blurOnAddNew(item) {
-	    	let component = this;
-	    	setTimeout(function(){
-		    	if ( $('.addnewbox input:focus').length > 0
-		    		||  $('.addnewbox textarea:focus').length > 0
-		    		||  $('.addnewbox a:focus').length > 0
-		    		||  $('.addnewbox button:focus').length > 0
-		    	) {
+	    blurOnAddNew(item)
+	    {
+	    	let self = this;
+	    	setTimeout(function()
+	    	{
+		    	if ( document.activeElement.nodeName == 'INPUT'
+		    		||  document.activeElement.nodeName == 'TEXTAREA'
+		    		||  document.activeElement.nodeName == 'A'
+		    		||  document.activeElement.nodeName == 'BUTTON' )
+		    	{
 	        		return;
 				}　else {
-					component.cancelAddNew();
+					self.cancelAddNew();
 				}
 	    	},50);
 	    },
-		updateDone(id){
+		updateDone(id)
+		{
 			allItems.prepareDonePatch(id);
 		},
-		updateShowChildren(id){
+		updateShowChildren(id)
+		{
 			this.$root.patch(id,'show_children');
 		},
-		startEdit(item, event){
+		startEdit(item, event)
+		{
 			if (event &&
 				(event.srcElement.hasClass('done')
-				|| event.srcElement.hasClass('custom-tag'))){
+				|| event.srcElement.hasClass('custom-tag')))
+			{
 				return;
 			}
 			console.log('startEdit');
@@ -768,39 +922,48 @@ export default {
 			this.$root.beforeEditCache_body = item.body;
 			this.$root.beforeEditCache_planned_time = item.planned_time;
 			this.$root.editingItem = item.id;
-			Vue.nextTick(function () {
+			Vue.nextTick(function ()
+			{
 				let plsFocus = '#updatebox-'+item.id+' > .update-body > textarea';
 				document.querySelector(plsFocus).focus();
 			});
 		},
-		doneEdit(item) {
+		doneEdit(item)
+		{
 			item = (item) ? item : allItems.nodes[selection.selectedId];
-			// if (!this.$root.editingItem) {
+			// if (!this.$root.editingItem)
+			// {
 			// 	return;
 			// }
 			this.$root.editingItem = null;
-			if(this.$root.editingItemTags){
+			if(this.$root.editingItemTags)
+			{
 				this.$root.editingItemTags = null;
 				return;
 			}
-			if (!item.body) {
+			if (!item.body)
+			{
 				item.body = this.$root.beforeEditCache_body;
 			}
 			item.body = item.body.trim();
 
-			if (item.planned_time != this.$root.beforeEditCache_planned_time){
+			if (item.planned_time != this.$root.beforeEditCache_planned_time)
+			{
 				vm.patch(item.id, 'planned_time');
 			}
-			if (item.body != this.$root.beforeEditCache_body){
+			if (item.body != this.$root.beforeEditCache_body)
+			{
 				vm.patch(item.id, 'body');
 				allItems.copyParentBodyToAllChildren(item.id);
 			}
 			this.$root.beforeEditCache_body = null;
 			this.$root.beforeEditCache_planned_time = null;
 		},
-		cancelEdit(item) {
+		cancelEdit(item)
+		{
 			item = (item) ? item : allItems.nodes[selection.selectedId];
-			if(this.$root.editingItem){
+			if(this.$root.editingItem)
+			{
 				console.log("cancel edit. Reverting to:");
 				console.log(this.$root.beforeEditCache_body);
 				item.body = this.$root.beforeEditCache_body;
@@ -809,45 +972,61 @@ export default {
 			this.$root.editingItem = null;
 			this.$root.editingItemTags = null;
 		},
-		startEditDoneDate(item, event){
+		startEditDoneDate(item, event)
+		{
 			console.log('startEditDoneDate');
 			item = (item) ? item : allItems.nodes[selection.selectedId];
 			this.$root.beforeEditCache_done_date = item.done_date;
 			this.$root.editingDoneDateItem = item.id;
-			setTimeout(function(){
+			setTimeout(function()
+			{
 				let el = "done-date-edit-"+item.id;
 				document.getElementById(el).flatpickr();
 				// window.flatpickr(event.target);
 	    	},20);
 		},
-		deleteItem(item){
+		deleteItem(item)
+		{
 			let id = item.id;
 			this.$root.deleteItem(id);
 		},
-		addNew(addNextItemAs){
+		addNew(addNextItemAs)
+		{
+			let newItem;
+			let index;
+			let addTags;
+
 			console.log('sending newItem:');
-			let newItem = this.newItem;
+			newItem = this.newItem;
 			newItem.parent_id = (this.item.parent_id) ? this.item.parent_id : allItems.root.id;
 			newItem.depth = this.item.depth;
 
 			let OlderSiblingIndex = this.siblingIndex;
-			let index = (isNaN(OlderSiblingIndex)) ? 0 : OlderSiblingIndex+1;
+			index = (isNaN(OlderSiblingIndex)) ? 0 : OlderSiblingIndex+1;
 			
-			if (this.$root.addingNewAsChild || this.listIsEmpty){
+			addTags = this.newItem.preparedTags;
+			
+			if (this.$root.addingNewAsChild || this.listIsEmpty)
+			{
 				newItem.depth = this.item.depth + 1;
         		newItem.parent_id = this.item.id;
         		index = 0;
+				// Add tags        		
+        		let toBeParentTags = allItems.itemTagArray(this.item.id);
+				Array.prototype.push.apply(addTags, toBeParentTags);
 			}
-			if(selection.view == "journal"){
+			if(selection.view == "journal")
+			{
 				newItem.done = 1;
 			}
-			if (this.newItem.preparedTags.includes('Today') || selection.filter.includes('today')){
+			if (this.newItem.preparedTags.includes('Today') || selection.filter.includes('today'))
+			{
 				newItem.due_date = moment().format();
-				this.newItem.preparedTags = this.newItem.preparedTags.filter(function(val){
+				this.newItem.preparedTags = this.newItem.preparedTags.filter(function(val)
+				{
 					return val != 'Today';
 				});
 			}
-			let addTags = this.newItem.preparedTags;
 			
 			console.log(newItem);
 			// Send to Root for Ajax call.
@@ -857,9 +1036,10 @@ export default {
 			this.newItem.body = '';
 			this.newItem.due_date = '0000-00-00 00:00:00';
 			this.newItem.planned_time = '';
-			this.newItem.preparedTags = this.parentTags;
+			this.newItem.preparedTags = JSON.parse(JSON.stringify(this.parentTags));
 		},
-		cancelAddNew(lastSelectedId){
+		cancelAddNew(lastSelectedId)
+		{
 			this.newItem.body = '';
 			this.$root.addingNewUnder = null;
 			selection.selectedId = selection.lastSelectedId;
@@ -867,46 +1047,53 @@ export default {
 			this.$root.addingNewAsChild = false;			
 			$(':focus').blur();
 		},
-		addTag(item){
+		addTag(item)
+		{
 			let id = (item) ? item.id : selection.selectedId;
 			let tag = this.newTag;
 			allItems.tagItem(id, tag);
 			this.newTag = null;
 		},
-		prepareTag(item){
+		prepareTag(item)
+		{
 			let id = (item) ? item.id : selection.selectedId;
 			let tag = this.newTag;
-			if(tag=='t' || tag=='T' || tag=='today' || tag=='Today'){
+			if(tag=='t' || tag=='T' || tag=='today' || tag=='Today')
+			{
 				tag = 'Today';
 			}
 			this.newItem.preparedTags.push(tag);
 			this.newTag = null;
 		},
-		deleteTag(id, tagName, event){
-			let plsFocus = '#updatebox-'+id+' .edititem-body';
+		deleteTag(id, tagName, event)
+		{
+			let plsFocus = '#updatebox-'+id+' .add-tag';
 			document.querySelector(plsFocus).focus();
 			this.$root.patchTag(id, tagName, 'untag');
 		},
-		deletePreparedTag(tag, item){
-			let plsFocus = ".addnewbox .prepare-tag";
-			// let plsFocus;
-			// if(this.showAddNewBox == true){ plsFocus = "#new-under-"+item.id+" .prepare-tag"; }
+		deletePreparedTag(tag, item)
+		{
+			let plsFocus = '#new-under-'+this.item.id+' .prepare-tag';
 			document.querySelector(plsFocus).focus();
 			let tagIndex = this.newItem.preparedTags.indexOf(tagIndex);
 			this.newItem.preparedTags.splice(tagIndex, 1)
 		},
-		setPlannedTime(item, event){
+		setPlannedTime(item, event)
+		{
 			item.planned_time = (event.srcElement.value) ? parseFloat(event.srcElement.value) : 0 ;
 			let plsFocus = '#updatebox-'+item.id+' .add-tag';
-			Vue.nextTick(function () {
+			Vue.nextTick(function ()
+			{
 				console.log('returning to editting: '+plsFocus);
 				document.querySelector(plsFocus).focus();
 			});
 		},
-		setPlannedTimeNewItem(item, event){
+		setPlannedTimeNewItem(item, event)
+		{
 			this.newItem.planned_time = (event.srcElement.value) ? parseFloat(event.srcElement.value) : 0 ;
 			let plsFocus = "#new-under-"+item.id+" .prepare-tag";
-			Vue.nextTick(function () {
+			Vue.nextTick(function ()
+			{
 				console.log('returning to : '+plsFocus);
 				document.querySelector(plsFocus).focus();
 	    	});
@@ -914,18 +1101,23 @@ export default {
 	},
 	directives: {
 		// My old directive:
-		// 'item-focus': function (value) {
-		// 	if (!value) {
-		// 		return;
-		// 	}
-		// 	let el = this.el;
-		// 	Vue.nextTick(function () {
+		// 'item-focus': function (value)
+		// {
+		// // 	if (!value)
+		// {
+		// // 		return;
+		// // 	}
+		// // 	let el = this.el;
+		// // 	Vue.nextTick(function ()
+		// {
 		// 		el.focus();
 		// 	});
 		// }
 		focus: {
-			inserted(el) {
-				Vue.nextTick(function () {
+			inserted(el)
+			{
+				Vue.nextTick(function ()
+				{
 					el.focus();
 				});
 			}

@@ -24203,6 +24203,9 @@ var _class = function () {
 	}, {
 		key: 'hasParentWithTag',
 		value: function hasParentWithTag(id, tags) {
+			if (!id) {
+				return false;
+			}
 			var item = this.nodes[id];
 			var parent_id = this.nodes[id].parent_id;
 			if (!parent_id) {
@@ -24370,7 +24373,9 @@ var _class = function () {
 		key: 'isTopLvlItemInFilteredRoot',
 		value: function isTopLvlItemInFilteredRoot(id) {
 			// debugger;
-			if (selection.filter.length + selection.tags.length == 0) {
+			// console.log('length of filter: '+x);
+			var x = parseFloat(selection.filter.length) + parseFloat(selection.tags.length);
+			if (x == 0) {
 				return false;
 			}
 			if (id == this.root.id) {
@@ -24907,6 +24912,8 @@ var _class = function () {
 				selection.addKeywords(keyword, value, operator);
 				return;
 			}
+			selection.addKeywords(keyword, value, operator);
+
 			var arrayToFilter = void 0;
 			if (operator == 'AND') {
 				arrayToFilter = this.flattenTree(this.root.children);
@@ -24946,7 +24953,6 @@ var _class = function () {
 			}.bind(this));
 			this.root.children = filteredArray;
 			this.resetChildrenOrder(this.root.id);
-			selection.addKeywords(keyword, value, operator);
 		}
 	}, {
 		key: 'arrayFilterTag',
@@ -24955,8 +24961,13 @@ var _class = function () {
 			array.forEach(function (item) {
 				var id = item.id;
 				var hasTag = this.hasTag(id, tags);
-				var hasParentWithTag = this.hasParentWithTag(id, tags);
 				var isTopLvlItemInFilteredRoot = this.isTopLvlItemInFilteredRoot(id);
+
+				var hasParentWithTag = void 0;
+				if (!isTopLvlItemInFilteredRoot) {
+					console.log('isTopLvlItemInFilteredRoot = false');
+					var _hasParentWithTag = this.hasParentWithTag(id, tags);
+				}
 				// console.log(id+" - "+item.body+" →　hasTag["+tags+"]　=　"+hasTag);
 				// console.log(id+" - "+item.body+" →　hasParentWithTag["+tags+"] =　"+hasParentWithTag);
 				if (isTopLvlItemInFilteredRoot && hasTag || !isTopLvlItemInFilteredRoot && hasTag && !hasParentWithTag) {
@@ -37012,6 +37023,54 @@ __WEBPACK_IMPORTED_MODULE_0_jquery___default.a.getJSON('/api/items', function (f
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 // import Morph from '../components/valueMorphers.js'
 // window.Morph = new Morph();
@@ -37021,7 +37080,7 @@ __WEBPACK_IMPORTED_MODULE_0_jquery___default.a.getJSON('/api/items', function (f
 	name: 'Card',
 	template: '#items-card-template',
 	mounted: function mounted() {
-		this.newItem.preparedTags = this.parentTags;
+		this.newItem.preparedTags = JSON.parse(JSON.stringify(this.parentTags));
 		this.convertbodyURLtoHTML();
 		eventHub.$on('startEdit', this.startEdit);
 		eventHub.$on('escapeOnEditButtonFocus', this.cancelEdit);
@@ -37261,6 +37320,7 @@ __WEBPACK_IMPORTED_MODULE_0_jquery___default.a.getJSON('/api/items', function (f
 			if (!this.item || !allItems || !this.item.parent_id) {
 				return [];
 			}
+			// console.log("running parentTags! this.item.parent_id = "+this.item.parent_id);
 			return allItems.returnTagsAsArray(this.item.parent_id);
 		},
 		isHidden: function isHidden() {
@@ -37313,9 +37373,8 @@ __WEBPACK_IMPORTED_MODULE_0_jquery___default.a.getJSON('/api/items', function (f
 			vm.$root.showAddNewItem(this.item.parent_id);
 		},
 		keydownOnNew: function keydownOnNew(item, e, field) {
-			console.log('keydown on new: ' + e.keyCode + ' - ' + field);
 			console.log(e);
-
+			console.log('↑　keydown on new: ' + e.keyCode + ' - ' + field);
 			// SHIFT-TAB
 			if (e.keyCode === 9 && e.shiftKey) {
 				if (field == 'body') {
@@ -37327,9 +37386,16 @@ __WEBPACK_IMPORTED_MODULE_0_jquery___default.a.getJSON('/api/items', function (f
 			// TAB
 			if (e.keyCode === 9 && !e.shiftKey) {
 				if (field == 'addTag') {
-					e.preventDefault();
-					this.newItemIndent();
-					return;
+					// e.preventDefault();
+					// this.newItemIndent();
+					// return;
+				}
+			}
+			// Delete / backspace
+			if (e.keyCode === 8 || e.keyCode === 46) {
+				if (field == 'delete-tag') {
+					var tagName = e.srcElement.value;
+					this.deletePreparedTag(item.id, tagName);
 				}
 			}
 			// ENTER
@@ -37388,13 +37454,13 @@ __WEBPACK_IMPORTED_MODULE_0_jquery___default.a.getJSON('/api/items', function (f
 				}
 				if (field == 'planned-time') {
 					e.preventDefault();
-					var plsFocus = '.addnewbox .newitem-body';
+					var plsFocus = '#new-under-' + this.item.id + ' .newitem-body';
 					document.querySelector(plsFocus).focus();
 					return;
 				}
 				if (field == 'addTag') {
 					e.preventDefault();
-					var _plsFocus = '.addnewbox .update-planned-time>button';
+					var _plsFocus = '#new-under-' + this.item.id + ' .update-planned-time>button';
 					document.querySelector(_plsFocus).focus();
 					return;
 				}
@@ -37404,13 +37470,13 @@ __WEBPACK_IMPORTED_MODULE_0_jquery___default.a.getJSON('/api/items', function (f
 				// If body is empty!
 				if (field == 'body' && !this.newItem.body) {
 					e.preventDefault();
-					var _plsFocus2 = '.addnewbox .update-planned-time>button';
+					var _plsFocus2 = '#new-under-' + this.item.id + ' .update-planned-time>button';
 					document.querySelector(_plsFocus2).focus();
 					return;
 				}
 				if (field == 'planned-time') {
 					e.preventDefault();
-					var _plsFocus3 = '.addnewbox .prepare-tag';
+					var _plsFocus3 = '#new-under-' + this.item.id + ' .prepare-tag';
 					document.querySelector(_plsFocus3).focus();
 					return;
 				}
@@ -37428,6 +37494,7 @@ __WEBPACK_IMPORTED_MODULE_0_jquery___default.a.getJSON('/api/items', function (f
 			}
 		},
 		keydownOnEdit: function keydownOnEdit(item, e, field) {
+			console.log('Keydown on edit!');
 			// SHIFT-TAB
 			if (e.keyCode === 9 && e.shiftKey) {
 				if (field == 'body') {
@@ -37437,7 +37504,15 @@ __WEBPACK_IMPORTED_MODULE_0_jquery___default.a.getJSON('/api/items', function (f
 			// TAB
 			if (e.keyCode === 9 && !e.shiftKey) {
 				if (field == 'addTag') {
-					e.preventDefault();return;
+					// e.preventDefault(); return;
+					// commented out because we want to be able to focus tag-delete buttons.
+				}
+			}
+			// Delete / backspace
+			if (e.keyCode === 8 || e.keyCode === 46) {
+				if (field == 'delete-tag') {
+					var tagName = e.srcElement.value;
+					this.deleteTag(item.id, tagName);
 				}
 			}
 			// ENTER
@@ -37477,41 +37552,40 @@ __WEBPACK_IMPORTED_MODULE_0_jquery___default.a.getJSON('/api/items', function (f
 				if (field == 'body') {
 					return;
 				}
+				e.preventDefault();
 				if (field == 'planned-time') {
-					e.preventDefault();
 					var _plsFocus5 = '#updatebox-' + item.id + ' .add-tag';
 					document.querySelector(_plsFocus5).focus();
 					return;
 				}
 				if (field == 'addTag') {
-					e.preventDefault();
-
 					return;
 				}
 			}
+			// ESC
 			if (e.keyCode === 27) {
 				this.cancelEdit(item);
 			}
 		},
 		blurOnEdit: function blurOnEdit(item) {
-			var component = this;
+			var self = this;
 			setTimeout(function () {
-				if ($('.updatebox input:focus').length > 0 || $('.updatebox textarea:focus').length > 0 || $('.updatebox a:focus').length > 0 || $('.updatebox button:focus').length > 0) {
+				if (document.activeElement.nodeName == 'INPUT' || document.activeElement.nodeName == 'TEXTAREA' || document.activeElement.nodeName == 'A' || document.activeElement.nodeName == 'BUTTON') {
 					return;
 				} else {
 					console.log('blurring on edit');
-					component.doneEdit(item);
+					self.doneEdit(item);
 				}
 			}, 50);
 			// Codementor: is there any better way than this?
 		},
 		blurOnAddNew: function blurOnAddNew(item) {
-			var component = this;
+			var self = this;
 			setTimeout(function () {
-				if ($('.addnewbox input:focus').length > 0 || $('.addnewbox textarea:focus').length > 0 || $('.addnewbox a:focus').length > 0 || $('.addnewbox button:focus').length > 0) {
+				if (document.activeElement.nodeName == 'INPUT' || document.activeElement.nodeName == 'TEXTAREA' || document.activeElement.nodeName == 'A' || document.activeElement.nodeName == 'BUTTON') {
 					return;
 				} else {
-					component.cancelAddNew();
+					self.cancelAddNew();
 				}
 			}, 50);
 		},
@@ -37537,7 +37611,8 @@ __WEBPACK_IMPORTED_MODULE_0_jquery___default.a.getJSON('/api/items', function (f
 		},
 		doneEdit: function doneEdit(item) {
 			item = item ? item : allItems.nodes[selection.selectedId];
-			// if (!this.$root.editingItem) {
+			// if (!this.$root.editingItem)
+			// {
 			// 	return;
 			// }
 			this.$root.editingItem = null;
@@ -37587,18 +37662,27 @@ __WEBPACK_IMPORTED_MODULE_0_jquery___default.a.getJSON('/api/items', function (f
 			this.$root.deleteItem(id);
 		},
 		addNew: function addNew(addNextItemAs) {
+			var newItem = void 0;
+			var index = void 0;
+			var addTags = void 0;
+
 			console.log('sending newItem:');
-			var newItem = this.newItem;
+			newItem = this.newItem;
 			newItem.parent_id = this.item.parent_id ? this.item.parent_id : allItems.root.id;
 			newItem.depth = this.item.depth;
 
 			var OlderSiblingIndex = this.siblingIndex;
-			var index = isNaN(OlderSiblingIndex) ? 0 : OlderSiblingIndex + 1;
+			index = isNaN(OlderSiblingIndex) ? 0 : OlderSiblingIndex + 1;
+
+			addTags = this.newItem.preparedTags;
 
 			if (this.$root.addingNewAsChild || this.listIsEmpty) {
 				newItem.depth = this.item.depth + 1;
 				newItem.parent_id = this.item.id;
 				index = 0;
+				// Add tags        		
+				var toBeParentTags = allItems.itemTagArray(this.item.id);
+				Array.prototype.push.apply(addTags, toBeParentTags);
 			}
 			if (selection.view == "journal") {
 				newItem.done = 1;
@@ -37609,7 +37693,6 @@ __WEBPACK_IMPORTED_MODULE_0_jquery___default.a.getJSON('/api/items', function (f
 					return val != 'Today';
 				});
 			}
-			var addTags = this.newItem.preparedTags;
 
 			console.log(newItem);
 			// Send to Root for Ajax call.
@@ -37619,7 +37702,7 @@ __WEBPACK_IMPORTED_MODULE_0_jquery___default.a.getJSON('/api/items', function (f
 			this.newItem.body = '';
 			this.newItem.due_date = '0000-00-00 00:00:00';
 			this.newItem.planned_time = '';
-			this.newItem.preparedTags = this.parentTags;
+			this.newItem.preparedTags = JSON.parse(JSON.stringify(this.parentTags));
 		},
 		cancelAddNew: function cancelAddNew(lastSelectedId) {
 			this.newItem.body = '';
@@ -37645,14 +37728,12 @@ __WEBPACK_IMPORTED_MODULE_0_jquery___default.a.getJSON('/api/items', function (f
 			this.newTag = null;
 		},
 		deleteTag: function deleteTag(id, tagName, event) {
-			var plsFocus = '#updatebox-' + id + ' .edititem-body';
+			var plsFocus = '#updatebox-' + id + ' .add-tag';
 			document.querySelector(plsFocus).focus();
 			this.$root.patchTag(id, tagName, 'untag');
 		},
 		deletePreparedTag: function deletePreparedTag(tag, item) {
-			var plsFocus = ".addnewbox .prepare-tag";
-			// let plsFocus;
-			// if(this.showAddNewBox == true){ plsFocus = "#new-under-"+item.id+" .prepare-tag"; }
+			var plsFocus = '#new-under-' + this.item.id + ' .prepare-tag';
 			document.querySelector(plsFocus).focus();
 			var tagIndex = this.newItem.preparedTags.indexOf(tagIndex);
 			this.newItem.preparedTags.splice(tagIndex, 1);
@@ -37676,12 +37757,15 @@ __WEBPACK_IMPORTED_MODULE_0_jquery___default.a.getJSON('/api/items', function (f
 	},
 	directives: {
 		// My old directive:
-		// 'item-focus': function (value) {
-		// 	if (!value) {
-		// 		return;
-		// 	}
-		// 	let el = this.el;
-		// 	Vue.nextTick(function () {
+		// 'item-focus': function (value)
+		// {
+		// // 	if (!value)
+		// {
+		// // 		return;
+		// // 	}
+		// // 	let el = this.el;
+		// // 	Vue.nextTick(function ()
+		// {
 		// 		el.focus();
 		// 	});
 		// }
@@ -42652,10 +42736,11 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
       "for": 'show_children_' + _vm.item.id
     }
   }) : _vm._e()]) : _vm._e(), _vm._v(" "), (_vm.journalView) ? _c('div', {}, [_vm._v("・")]) : _vm._e(), _vm._v(" "), _c('div', {
-    staticClass: "body-div textarea-wrap",
     class: {
-      selected: _vm.item.id == _vm.basis.selection.selectedId,
-        project: _vm.isProject,
+      'body-div': true,
+      'textarea-wrap': true,
+      'selected': _vm.item.id == _vm.basis.selection.selectedId,
+        'project': _vm.isProject,
         'updating-tags': _vm.item.id == _vm.basis.editingItemTags
     },
     on: {
@@ -42684,7 +42769,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
         _vm.selectItem(_vm.item)
       }
     }
-  }, [_vm._v(_vm._s(_vm.item.completion_memo))]) : _vm._e()]), _vm._v(" "), (false) ? _c('span', [_vm._v(" (" + _vm._s(_vm.item.id) + ") D-" + _vm._s(_vm.item.depth) + ") [" + _vm._s(_vm.item.children_order) + "]")]) : _vm._e(), _vm._v(" "), _c('form', {
+  }, [_vm._v(_vm._s(_vm.item.completion_memo))]) : _vm._e()]), _vm._v(" "), (false) ? _c('span', [_vm._v("\n\t\t\t\t(" + _vm._s(_vm.item.id) + ") D-" + _vm._s(_vm.item.depth) + ")\n\t\t\t\t"), (_vm.item.children_order.length) ? _c('span', [_vm._v("\n\t\t\t\t\t[" + _vm._s(_vm.item.children_order) + "]\n\t\t\t\t")]) : _vm._e()]) : _vm._e(), _vm._v(" "), _c('form', {
     directives: [{
       name: "show",
       rawName: "v-show",
@@ -42896,12 +42981,14 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
           _vm.basis.patchTag(_vm.item.id, tag)
         }
       }
-    }, [_vm._v(_vm._s(tag.name) + "\n\t\t\t\t\t\t\t")])
+    }, [_vm._v("\n\t\t\t\t\t\t\t\t" + _vm._s(tag.name) + "\n\t\t\t\t\t\t\t")])
   })) : _vm._e()])])]), _vm._v(" "), _c('div', {
     staticClass: "item-tags"
-  }, [(_vm.item.done && _vm.item.id != _vm.basis.editingDoneDateItem && !_vm.journalView) ? _c('label', {
+  }, [(_vm.item.done &&
+    _vm.item.id != _vm.basis.editingDoneDateItem &&
+    !_vm.journalView) ? _c('label', {
     staticClass: "done"
-  }, [_vm._v("\n\t\t\t\tDone " + _vm._s(_vm.momentCalendar(_vm.item.done_date)) + "\n\t\t\t\t\t"), _c('input', {
+  }, [_vm._v("\n\t\t\t\t\tDone " + _vm._s(_vm.momentCalendar(_vm.item.done_date)) + "\n\t\t\t\t\t"), _c('input', {
     directives: [{
       name: "model",
       rawName: "v-model",
@@ -42921,31 +43008,28 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
         _vm.item.done_date = $event.target.value
       }
     }
-  })]) : _vm._e(), _vm._v(" "), (
-    _vm.totalSecLeft > 0 &&
+  })]) : _vm._e(), _vm._v(" "), (_vm.totalSecLeft > 0 &&
     _vm.totalSecLeft > _vm.secLeft &&
     _vm.totalTimeDifferentFromParent &&
     !_vm.item.done) ? _c('span', {
     staticClass: "total-duration"
-  }, [_vm._v("\n\t\t\t\t\t" + _vm._s(_vm.sec_to_hourminsec(_vm.totalSecLeft)) + "\n\t\t\t\t\t")]) : _vm._e(), _vm._v(" "), (
-    _vm.item.id != _vm.basis.editingItem &&
-    _vm.secLeft > 0
-
-    &&
+  }, [_vm._v("\n\t\t\t\t\t" + _vm._s(_vm.sec_to_hourminsec(_vm.totalSecLeft)) + "\n\t\t\t\t")]) : _vm._e(), _vm._v(" "), (_vm.item.id != _vm.basis.editingItem &&
+    _vm.secLeft > 0 &&
     !_vm.item.done) ? _c('span', {
     staticClass: "duration"
   }, [_vm._v("\n\t\t\t\t\t" + _vm._s(_vm.sec_to_hourminsec(_vm.secLeft)) + "\n\t\t\t\t")]) : _vm._e(), _vm._v(" "), (_vm.hasDueDate && !_vm.item.done) ? _c('span', {
     staticClass: "duedate"
-  }, [_vm._v("\n\t\t\t\t" + _vm._s(_vm.momentCalendar(_vm.item.due_date)))]) : _vm._e(), _vm._v(" "), (_vm.item.dueDateParent && !_vm.item.done) ? _c('span', {
+  }, [_vm._v("\n\t\t\t\t\t" + _vm._s(_vm.momentCalendar(_vm.item.due_date)) + "\n\t\t\t\t")]) : _vm._e(), _vm._v(" "), (_vm.item.dueDateParent && !_vm.item.done) ? _c('span', {
     staticClass: "duedate-parent"
-  }, [_vm._v("\n\t\t\t\t" + _vm._s(_vm.momentCalendar(_vm.item.dueDateParent)))]) : _vm._e(), _vm._v(" "), _vm._l((_vm.item.tagged), function(tag) {
+  }, [_vm._v("\n\t\t\t\t\t" + _vm._s(_vm.momentCalendar(_vm.item.dueDateParent)) + "\n\t\t\t\t")]) : _vm._e(), _vm._v(" "), _vm._l((_vm.item.tagged), function(tag) {
     return (_vm.item.tagged.length) ? _c('span', {
       directives: [{
         name: "show",
         rawName: "v-show",
         value: (!_vm.parentTags.includes(tag.tag_name) ||
-          _vm.item.id == _vm.basis.editingItem),
-        expression: "!parentTags.includes(tag.tag_name)\n\t\t\t\t\t\t|| item.id == basis.editingItem"
+          _vm.item.id == _vm.basis.editingItem ||
+          _vm.item.id == _vm.basis.editingItemTags),
+        expression: "!parentTags.includes(tag.tag_name)\n\t\t\t\t\t\t|| item.id == basis.editingItem\n\t\t\t\t\t\t|| item.id == basis.editingItemTags"
       }],
       staticClass: "custom-tag",
       on: {
@@ -42954,19 +43038,30 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
           _vm.basis.filterItems('tag', tag.tag_slug, $event)
         }
       }
-    }, [_vm._v(_vm._s(tag.tag_name) + "\n\t\t\t\t\t"), (_vm.item.id == _vm.basis.editingItem &&
+    }, [_vm._v("\n\t\t\t\t\t" + _vm._s(tag.tag_name) + "\n\t\t\t\t\t"), (
+      (_vm.item.id == _vm.basis.editingItem ||
+        _vm.item.id == _vm.basis.editingItemTags) &&
       !_vm.parentTags.includes(tag.tag_name)) ? _c('button', {
       staticClass: "delete-tag",
+      attrs: {
+        "value": tag.tag_name
+      },
       on: {
         "click": function($event) {
           $event.preventDefault();
           _vm.deleteTag(_vm.item.id, tag.tag_name, $event)
+        },
+        "keydown": function($event) {
+          _vm.keydownOnEdit(_vm.item, $event, 'delete-tag')
         }
       }
     }, [_c('i', {
       staticClass: "zmdi zmdi-close-circle"
     })]) : _vm._e()]) : _vm._e()
-  })], 2), _vm._v(" "), (_vm.basis.editingItem != _vm.item.id && _vm.basis.selection.selectedId == _vm.item.id) ? _c('div', {
+  })], 2), _vm._v(" "), (
+    _vm.basis.editingItem != _vm.item.id &&
+    _vm.basis.editingItemTags != _vm.item.id &&
+    _vm.basis.selection.selectedId == _vm.item.id) ? _c('div', {
     staticClass: "item-nav"
   }, [(!_vm.item.done) ? _c('button', {
     staticClass: "timer",
@@ -43207,10 +43302,16 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
       class: (tag == 'Today') ? 'duedate' : 'custom-tag'
     }, [_vm._v(_vm._s(tag) + "\n\t\t\t\t\t"), (!_vm.parentTags.includes(tag)) ? _c('button', {
       staticClass: "delete-tag",
+      attrs: {
+        "value": tag
+      },
       on: {
         "click": function($event) {
           $event.preventDefault();
           _vm.deletePreparedTag(tag, _vm.item)
+        },
+        "keydown": function($event) {
+          _vm.keydownOnNew(_vm.item, $event, 'delete-tag')
         }
       }
     }, [_c('i', {
@@ -45216,7 +45317,7 @@ var _class = function () {
 					e.preventDefault();
 					$(".btn-ok").focus();
 				}
-			} else if (vm.editingItem || vm.addingNewUnder) {
+			} else if (vm.editingItem || vm.addingNewUnder || vm.editingItemTags) {
 				if (document.activeElement.nodeName != 'BUTTON') {
 					return;
 				}
@@ -45327,7 +45428,7 @@ var _class = function () {
 						// DELETE (backspace)
 						e.preventDefault();
 						if (e.ctrlKey || e.metaKey) {
-							self.keystroke('meta_delete');
+							self.keystroke('meta_backspace');
 							break;
 						}
 						self.keystroke('backspace');
@@ -45390,7 +45491,7 @@ var _class = function () {
 				vm.addTimer();
 			} else if (k == 'meta_shift_d') {
 				vm.duplicate();
-			} else if (k == 'meta_delete') {
+			} else if (k == 'meta_backspace') {
 				vm.deleteItem();
 			} else if (k == 'backspace') {
 				vm.deleteItem();
