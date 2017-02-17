@@ -25,12 +25,15 @@
         color: #dadada;
         font-size: 0.8em;
     }
-    .parent-string{
+    .parent-string>div{
         border: 1px solid;
         display: initial;
         padding: 0em 0.5em;
         border-top: none;
         border-left: none;
+    }
+    .parent-string{
+        margin-bottom: 1px;
     }
     .completion-notes {
         color: #a2999a;

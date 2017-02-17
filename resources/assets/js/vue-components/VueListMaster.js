@@ -315,9 +315,10 @@ export default {
 			selection.selectedId = null;
 			this.addingNewAsFirstChild = (addAs == 'child') ? true : false;
 			this.addingNewAsChild = (addAs == 'child') ? true : false;
-			Vue.nextTick(function () {
-				document.querySelector("#new-under-"+id+" textarea").focus();
-			});
+			// Solved with v-focus:
+			// Vue.nextTick(function () {
+			// 	document.querySelector("#new-under-"+id+" textarea").focus();
+			// });
 		},
 		startEditTags(id){
 			id = (id) ? id : selection.selectedId;
@@ -469,15 +470,14 @@ export default {
                 time: 10, // not yet fully integrated
             });
             if (type == 'afterDone') {
-				setTimeout(function() {
-		        	document.querySelector('#popups>div:first-child textarea').focus();
+				Vue.nextTick(function() {
 					let fpId = "#done-date-edit-"+id;
 					let fpEl = document.querySelector(fpId);
 					fpEl.flatpickrify();
 					let fpId_b = "#done-date-edit-"+id+"-popup";
 					let fpEl_b = document.querySelector(fpId_b);
 					fpEl_b.flatpickrify();
-				}, 20);
+				});
             }
 		},
 		popout(id, type){
@@ -496,9 +496,10 @@ export default {
 				}
 				if(type=='confirm-delete'){
 					this.popouts.delete.push(item);
-					Vue.nextTick(function () {
-						document.querySelector('#popouts-mask>div:first-child .btn-ok').focus();
-					});
+					// solved with v-focus:
+					// Vue.nextTick(function () {
+					// 	document.querySelector('#popouts-mask>div:first-child .btn-ok').focus();
+					// });
 				}
 			// }
 		},
@@ -642,7 +643,7 @@ export default {
     },
 	http: {
 		headers: {
-			'X-CSRF-TOKEN': document.querySelector('#token').getAttribute('value'),
+			'X-CSRF-TOKEN': document.querySelector('#csrf-token').getAttribute('content'),
 		},
     },
 }

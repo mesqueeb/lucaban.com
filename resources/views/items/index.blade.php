@@ -1,7 +1,8 @@
 <html>
 <head>
 	<meta charset="UTF-8">
-	<meta name="token" id="token" value="{{csrf_token()}}">
+	{{-- <meta name="token" id="token" value="{{csrf_token()}}"> --}}
+	<meta name="csrf-token" id="csrf-token" content="{{ csrf_token() }}">
 	<title>THINGS</title>
 	<link rel="stylesheet" href="/css/app.css">
 	{{-- <link rel="stylesheet" href="/css/fonts/material-design-iconic-font.min.css"> --}}

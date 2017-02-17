@@ -28,6 +28,7 @@
               v-model="popup.item.completion_memo"
               v-autosize="popup.item.completion_memo"
               @keydown="keydownInCompletionMemo(popup, $event)"
+              v-focus
             ></textarea>
           </div>
           <div class="used-time">
@@ -98,6 +99,12 @@ export default {
             }
             let index = this.$root.popups.indexOf(popup);
             this.$root.popups.splice(index, 1);
+            Vue.nextTick(function () {
+                if(vm.popups.length){
+                    document.querySelector('#popups>div:first-child textarea').focus();
+                }
+            });
+
         },
         incrementUsedTime(item, amount) {
             if (!item.used_time){ 
@@ -115,13 +122,6 @@ export default {
                 || e.keyCode == 27
             ){
                 this.removePopup(popup);
-                setTimeout(function(){
-                    if(vm.popups.length){
-                        document.querySelector('#popups>div:first-child textarea').focus();
-                    }
-                }.bind(this), 200);
-            } else {
-
             }
         },
         keydownInPopup(popup, e, field){

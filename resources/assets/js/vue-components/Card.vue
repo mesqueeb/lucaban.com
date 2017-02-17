@@ -21,10 +21,11 @@
 		<span class="journal-date-small">{{ journalDate }}</span>
 	</div>
 	<div
+		class="parent-string"
 		v-if="journalView && item.depth != 0"
 		@click="selectItem(item)"
 	>
-		<div class="parent-string">
+		<div>
 			{{ item.parents_bodies }}
 		</div>
 	</div>
@@ -74,7 +75,6 @@
 				'updating-tags': item.id == basis.editingItemTags}"
 			@dblclick="startEdit(item, $event)"
 			@click="selectItem(item)"
-			@enter="console.log('yarrr')"
 		>
 			<div
 				class="bodybox"
@@ -100,7 +100,7 @@
 				action="update"
 				class="updatebox"
 				:id="'updatebox-'+item.id"
-				v-show="item.id == basis.editingItem || item.id == basis.editingItemTags"
+				v-if="item.id == basis.editingItem || item.id == basis.editingItemTags"
 				@submit.prevent="doneEdit(item)"
 			>
 				<div class="update-body" v-show="item.id != basis.editingItemTags">
@@ -307,7 +307,7 @@
 			'child':addingNewAsChild,
 			'first-child':addingNewAsFirstChild,}"
 		:id="'new-under-'+ item.id "
-		v-show="showAddNewBox || (listIsEmpty && basis.selection.view != 'journal')"
+		v-if="showAddNewBox || (listIsEmpty && basis.selection.view != 'journal')"
 		@submit.prevent
 	>
 		<div>
@@ -807,6 +807,11 @@ export default {
 			if (e.keyCode === 13 && !e.shiftKey && !e.altKey)
 			{
 				e.preventDefault();
+	        	if(field == 'delete-tag')
+	        	{
+	        		let tagName = e.srcElement.value;
+					this.deleteTag(item.id, tagName);
+	        	}
 				if(field == 'planned-time')
 				{
 					this.setPlannedTime(item, event);
@@ -922,11 +927,11 @@ export default {
 			this.$root.beforeEditCache_body = item.body;
 			this.$root.beforeEditCache_planned_time = item.planned_time;
 			this.$root.editingItem = item.id;
-			Vue.nextTick(function ()
-			{
-				let plsFocus = '#updatebox-'+item.id+' > .update-body > textarea';
-				document.querySelector(plsFocus).focus();
-			});
+			// Vue.nextTick(function ()
+			// {
+			// 	let plsFocus = '#updatebox-'+item.id+' > .update-body > textarea';
+			// 	// document.querySelector(plsFocus).focus();
+			// });
 		},
 		doneEdit(item)
 		{
@@ -978,7 +983,7 @@ export default {
 			item = (item) ? item : allItems.nodes[selection.selectedId];
 			this.$root.beforeEditCache_done_date = item.done_date;
 			this.$root.editingDoneDateItem = item.id;
-			setTimeout(function()
+			Vue.nextTick(function()
 			{
 				let el = "done-date-edit-"+item.id;
 				document.getElementById(el).flatpickr();
@@ -1100,19 +1105,6 @@ export default {
 		},
 	},
 	directives: {
-		// My old directive:
-		// 'item-focus': function (value)
-		// {
-		// // 	if (!value)
-		// {
-		// // 		return;
-		// // 	}
-		// // 	let el = this.el;
-		// // 	Vue.nextTick(function ()
-		// {
-		// 		el.focus();
-		// 	});
-		// }
 		focus: {
 			inserted(el)
 			{
@@ -1123,11 +1115,5 @@ export default {
 			}
 		},
 	},
-	// http: {
-	// 	// base: '/base',
-	// 	headers: {
-	// 		'X-CSRF-TOKEN': document.querySelector('#token').getAttribute('value'),
-	// 	},
- //    },
 }
 </script>

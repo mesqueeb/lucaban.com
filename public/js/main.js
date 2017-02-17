@@ -24376,7 +24376,7 @@ var _class = function () {
 			// console.log('length of filter: '+x);
 			var x = parseFloat(selection.filter.length) + parseFloat(selection.tags.length);
 			if (x == 0) {
-				return false;
+				console.log('the root is not filtered');return false;
 			}
 			if (id == this.root.id) {
 				return true;
@@ -24912,7 +24912,6 @@ var _class = function () {
 				selection.addKeywords(keyword, value, operator);
 				return;
 			}
-			selection.addKeywords(keyword, value, operator);
 
 			var arrayToFilter = void 0;
 			if (operator == 'AND') {
@@ -24921,6 +24920,7 @@ var _class = function () {
 				selection.clear();
 				arrayToFilter = this.flattenTree(this.backups.rootChildren);
 			}
+			selection.addKeywords(keyword, value, operator);
 
 			var filteredArray = [];
 			if (keyword == 'all') {
@@ -24956,21 +24956,17 @@ var _class = function () {
 		}
 	}, {
 		key: 'arrayFilterTag',
-		value: function arrayFilterTag(array, tags, operator) {
+		value: function arrayFilterTag(array, tags) {
 			var filteredArray = [];
 			array.forEach(function (item) {
 				var id = item.id;
-				var hasTag = this.hasTag(id, tags);
-				var isTopLvlItemInFilteredRoot = this.isTopLvlItemInFilteredRoot(id);
-
-				var hasParentWithTag = void 0;
-				if (!isTopLvlItemInFilteredRoot) {
-					console.log('isTopLvlItemInFilteredRoot = false');
-					var _hasParentWithTag = this.hasParentWithTag(id, tags);
+				var target = this.hasTag(id, tags);
+				if (selection.view == 'tree' && target && this.hasParentWithTag(id, tags)) {
+					target = false;
 				}
 				// console.log(id+" - "+item.body+" →　hasTag["+tags+"]　=　"+hasTag);
 				// console.log(id+" - "+item.body+" →　hasParentWithTag["+tags+"] =　"+hasParentWithTag);
-				if (isTopLvlItemInFilteredRoot && hasTag || !isTopLvlItemInFilteredRoot && hasTag && !hasParentWithTag) {
+				if (target) {
 					item.show_children = 1;
 					filteredArray.push(item);
 				}
@@ -36631,6 +36627,14 @@ __WEBPACK_IMPORTED_MODULE_0_jquery___default.a.getJSON('/api/items', function (f
 		flatpickrifyAllInputs();
 	}, 1000);
 
+	__WEBPACK_IMPORTED_MODULE_7_vue___default.a.directive('focus', {
+		// When the bound element is inserted into the DOM...
+		inserted: function inserted(el) {
+			// Focus the element
+			el.focus();
+		}
+	});
+
 	vm.patching = false;
 	vm.loading = false;
 }); // end ajax - get data
@@ -37518,6 +37522,10 @@ __WEBPACK_IMPORTED_MODULE_0_jquery___default.a.getJSON('/api/items', function (f
 			// ENTER
 			if (e.keyCode === 13 && !e.shiftKey && !e.altKey) {
 				e.preventDefault();
+				if (field == 'delete-tag') {
+					var _tagName = e.srcElement.value;
+					this.deleteTag(item.id, _tagName);
+				}
 				if (field == 'planned-time') {
 					this.setPlannedTime(item, event);
 					return;
@@ -37604,10 +37612,11 @@ __WEBPACK_IMPORTED_MODULE_0_jquery___default.a.getJSON('/api/items', function (f
 			this.$root.beforeEditCache_body = item.body;
 			this.$root.beforeEditCache_planned_time = item.planned_time;
 			this.$root.editingItem = item.id;
-			Vue.nextTick(function () {
-				var plsFocus = '#updatebox-' + item.id + ' > .update-body > textarea';
-				document.querySelector(plsFocus).focus();
-			});
+			// Vue.nextTick(function ()
+			// {
+			// 	let plsFocus = '#updatebox-'+item.id+' > .update-body > textarea';
+			// 	// document.querySelector(plsFocus).focus();
+			// });
 		},
 		doneEdit: function doneEdit(item) {
 			item = item ? item : allItems.nodes[selection.selectedId];
@@ -37651,7 +37660,7 @@ __WEBPACK_IMPORTED_MODULE_0_jquery___default.a.getJSON('/api/items', function (f
 			item = item ? item : allItems.nodes[selection.selectedId];
 			this.$root.beforeEditCache_done_date = item.done_date;
 			this.$root.editingDoneDateItem = item.id;
-			setTimeout(function () {
+			Vue.nextTick(function () {
 				var el = "done-date-edit-" + item.id;
 				document.getElementById(el).flatpickr();
 				// window.flatpickr(event.target);
@@ -37756,19 +37765,6 @@ __WEBPACK_IMPORTED_MODULE_0_jquery___default.a.getJSON('/api/items', function (f
 		}
 	},
 	directives: {
-		// My old directive:
-		// 'item-focus': function (value)
-		// {
-		// // 	if (!value)
-		// {
-		// // 		return;
-		// // 	}
-		// // 	let el = this.el;
-		// // 	Vue.nextTick(function ()
-		// {
-		// 		el.focus();
-		// 	});
-		// }
 		focus: {
 			inserted: function inserted(el) {
 				Vue.nextTick(function () {
@@ -37787,6 +37783,8 @@ __WEBPACK_IMPORTED_MODULE_0_jquery___default.a.getJSON('/api/items', function (f
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__components_valueMorphers2_js__ = __webpack_require__(9);
+//
+//
 //
 //
 //
@@ -38098,6 +38096,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
 
 
 
@@ -38122,6 +38121,11 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
             }
             var index = this.$root.popups.indexOf(popup);
             this.$root.popups.splice(index, 1);
+            Vue.nextTick(function () {
+                if (vm.popups.length) {
+                    document.querySelector('#popups>div:first-child textarea').focus();
+                }
+            });
         },
         incrementUsedTime: function incrementUsedTime(item, amount) {
             if (!item.used_time) {
@@ -38137,12 +38141,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
             if ( // ESCape
             e.keyCode == 13 && (e.ctrlKey || e.metaKey) || e.keyCode == 27) {
                 this.removePopup(popup);
-                setTimeout(function () {
-                    if (vm.popups.length) {
-                        document.querySelector('#popups>div:first-child textarea').focus();
-                    }
-                }.bind(this), 200);
-            } else {}
+            }
         },
         keydownInPopup: function keydownInPopup(popup, e, field) {
             if (field == 'flatPickr') {
@@ -38620,9 +38619,10 @@ window.selection = new __WEBPACK_IMPORTED_MODULE_5__Selection_js__["a" /* defaul
 			selection.selectedId = null;
 			this.addingNewAsFirstChild = addAs == 'child' ? true : false;
 			this.addingNewAsChild = addAs == 'child' ? true : false;
-			Vue.nextTick(function () {
-				document.querySelector("#new-under-" + id + " textarea").focus();
-			});
+			// Solved with v-focus:
+			// Vue.nextTick(function () {
+			// 	document.querySelector("#new-under-"+id+" textarea").focus();
+			// });
 		},
 		startEditTags: function startEditTags(id) {
 			id = id ? id : selection.selectedId;
@@ -38792,15 +38792,14 @@ window.selection = new __WEBPACK_IMPORTED_MODULE_5__Selection_js__["a" /* defaul
 				timeout: true, // not yet fully integrated
 				time: 10 });
 			if (type == 'afterDone') {
-				setTimeout(function () {
-					document.querySelector('#popups>div:first-child textarea').focus();
+				Vue.nextTick(function () {
 					var fpId = "#done-date-edit-" + id;
 					var fpEl = document.querySelector(fpId);
 					fpEl.flatpickrify();
 					var fpId_b = "#done-date-edit-" + id + "-popup";
 					var fpEl_b = document.querySelector(fpId_b);
 					fpEl_b.flatpickrify();
-				}, 20);
+				});
 			}
 		},
 		popout: function popout(id, type) {
@@ -38821,9 +38820,10 @@ window.selection = new __WEBPACK_IMPORTED_MODULE_5__Selection_js__["a" /* defaul
 			}
 			if (type == 'confirm-delete') {
 				this.popouts.delete.push(item);
-				Vue.nextTick(function () {
-					document.querySelector('#popouts-mask>div:first-child .btn-ok').focus();
-				});
+				// solved with v-focus:
+				// Vue.nextTick(function () {
+				// 	document.querySelector('#popouts-mask>div:first-child .btn-ok').focus();
+				// });
 			}
 			// }
 		},
@@ -38973,7 +38973,7 @@ window.selection = new __WEBPACK_IMPORTED_MODULE_5__Selection_js__["a" /* defaul
 
 	http: {
 		headers: {
-			'X-CSRF-TOKEN': document.querySelector('#token').getAttribute('value')
+			'X-CSRF-TOKEN': document.querySelector('#csrf-token').getAttribute('content')
 		}
 	}
 };
@@ -42538,6 +42538,9 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
         rawName: "v-autosize",
         value: (popup.item.completion_memo),
         expression: "popup.item.completion_memo"
+      }, {
+        name: "focus",
+        rawName: "v-focus"
       }],
       attrs: {
         "name": "completion_memo"
@@ -42643,14 +42646,13 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
   }, [_c('span', [_vm._v(_vm._s(_vm.momentCalendar(_vm.journalDate)))]), _vm._v(" "), _c('span', {
     staticClass: "journal-date-small"
   }, [_vm._v(_vm._s(_vm.journalDate))])]) : _vm._e(), _vm._v(" "), (_vm.journalView && _vm.item.depth != 0) ? _c('div', {
+    staticClass: "parent-string",
     on: {
       "click": function($event) {
         _vm.selectItem(_vm.item)
       }
     }
-  }, [_c('div', {
-    staticClass: "parent-string"
-  }, [_vm._v("\n\t\t\t" + _vm._s(_vm.item.parents_bodies) + "\n\t\t")])]) : _vm._e(), _vm._v(" "), (_vm.item.depth != 0) ? _c('div', {
+  }, [_c('div', [_vm._v("\n\t\t\t" + _vm._s(_vm.item.parents_bodies) + "\n\t\t")])]) : _vm._e(), _vm._v(" "), (_vm.item.depth != 0) ? _c('div', {
     class: {
       'item-card': true,
       done: _vm.item.done,
@@ -42749,9 +42751,6 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
       },
       "click": function($event) {
         _vm.selectItem(_vm.item)
-      },
-      "enter": function($event) {
-        _vm.console.log('yarrr')
       }
     }
   }, [_c('div', {
@@ -42769,13 +42768,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
         _vm.selectItem(_vm.item)
       }
     }
-  }, [_vm._v(_vm._s(_vm.item.completion_memo))]) : _vm._e()]), _vm._v(" "), (false) ? _c('span', [_vm._v("\n\t\t\t\t(" + _vm._s(_vm.item.id) + ") D-" + _vm._s(_vm.item.depth) + ")\n\t\t\t\t"), (_vm.item.children_order.length) ? _c('span', [_vm._v("\n\t\t\t\t\t[" + _vm._s(_vm.item.children_order) + "]\n\t\t\t\t")]) : _vm._e()]) : _vm._e(), _vm._v(" "), _c('form', {
-    directives: [{
-      name: "show",
-      rawName: "v-show",
-      value: (_vm.item.id == _vm.basis.editingItem || _vm.item.id == _vm.basis.editingItemTags),
-      expression: "item.id == basis.editingItem || item.id == basis.editingItemTags"
-    }],
+  }, [_vm._v(_vm._s(_vm.item.completion_memo))]) : _vm._e()]), _vm._v(" "), (false) ? _c('span', [_vm._v("\n\t\t\t\t(" + _vm._s(_vm.item.id) + ") D-" + _vm._s(_vm.item.depth) + ")\n\t\t\t\t"), (_vm.item.children_order.length) ? _c('span', [_vm._v("\n\t\t\t\t\t[" + _vm._s(_vm.item.children_order) + "]\n\t\t\t\t")]) : _vm._e()]) : _vm._e(), _vm._v(" "), (_vm.item.id == _vm.basis.editingItem || _vm.item.id == _vm.basis.editingItemTags) ? _c('form', {
     staticClass: "updatebox",
     attrs: {
       "action": "update",
@@ -42982,7 +42975,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
         }
       }
     }, [_vm._v("\n\t\t\t\t\t\t\t\t" + _vm._s(tag.name) + "\n\t\t\t\t\t\t\t")])
-  })) : _vm._e()])])]), _vm._v(" "), _c('div', {
+  })) : _vm._e()])])]) : _vm._e(), _vm._v(" "), _c('div', {
     staticClass: "item-tags"
   }, [(_vm.item.done &&
     _vm.item.id != _vm.basis.editingDoneDateItem &&
@@ -43106,13 +43099,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
         "item": childCard
       }
     })
-  })) : _vm._e(), _vm._v(" "), _c('form', {
-    directives: [{
-      name: "show",
-      rawName: "v-show",
-      value: (_vm.showAddNewBox || (_vm.listIsEmpty && _vm.basis.selection.view != 'journal')),
-      expression: "showAddNewBox || (listIsEmpty && basis.selection.view != 'journal')"
-    }],
+  })) : _vm._e(), _vm._v(" "), (_vm.showAddNewBox || (_vm.listIsEmpty && _vm.basis.selection.view != 'journal')) ? _c('form', {
     class: {
       'addnewbox': true,
       'child': _vm.addingNewAsChild,
@@ -43317,7 +43304,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     }, [_c('i', {
       staticClass: "zmdi zmdi-close-circle"
     })]) : _vm._e()]) : _vm._e()
-  }))])])]) : _vm._e()]) : _vm._e()
+  }))])]) : _vm._e()]) : _vm._e()]) : _vm._e()
 },staticRenderFns: []}
 module.exports.render._withStripped = true
 if (false) {
@@ -43362,6 +43349,10 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
         }
       }
     }, [_vm._v("Cancel")]), _vm._v(" "), _c('button', {
+      directives: [{
+        name: "focus",
+        rawName: "v-focus"
+      }],
       staticClass: "btn-ok",
       on: {
         "click": function($event) {

@@ -57,7 +57,8 @@ organizeAfterInitialization()
 	    let item = this.nodes[id];
 		// this.attachParentBody(id);　//Maybe I should only do this when pressing DONE
 	}.bind(this));
-	if(this.root){
+	if(this.root)
+	{
 		this.backups.rootChildren = this.root.children;
 	}
 }
@@ -85,7 +86,8 @@ setDefaultItemValues(item)
 	if(!item.used_time)	{ item.used_time = 0 					 }
 	if(!item.tagged)	{ item.tagged = []	 					 }
 	if(!item.children_order){ item.children_order = [];			 }
-	else if (typeof item.children_order === 'string'){
+	else if (typeof item.children_order === 'string')
+	{
 		item.children_order = item.children_order.split(',').map(Number);
 	}
 	return item;
@@ -94,7 +96,8 @@ addAndCleanNodesRecursively(item)
 {
 	this.setDefaultItemValues(item);
 	this.nodes[item.id] = item;
-	if(item.children){
+	if(item.children)
+	{
 		item.children.forEach(function(child) {
 			return allItems.addAndCleanNodesRecursively(child);
 		});
@@ -112,7 +115,9 @@ addItem(item, index, addNextItemAs, addTags, duplication)
 
 	// Patches etc.
     selection.selectedId = item.id;
-	if(this.isTopLvlItemInFilteredRoot(item.id) && item.parent_id == this.root.id){
+	if ( this.isTopLvlItemInFilteredRoot(item.id)
+		&& item.parent_id == this.root.id )
+	{
 		this.backups.rootChildren.push(item);
 		vm.patchRootChildrenOrderWithFilter(item.id);
 	} else {
@@ -121,7 +126,8 @@ addItem(item, index, addNextItemAs, addTags, duplication)
     if(addTags){ this.tagItem(item.id, addTags); }
 	this.attachParentBody(item.id);
 	this.autoCalculateDoneState(item.parent_id);
-    if(!duplication){
+    if (!duplication)
+    {
 	    vm.showAddNewItem(item.id, addNextItemAs);
     }
 }
@@ -142,7 +148,8 @@ hasTag(id, tags)
 	if(!item){ console.log("[hasTag(id, tags)] what is this shit... id:"+id); return false;}
 	if (!item.tagged || !item.tagged.length){ return false; }
 	let hasTags;
-	if (tags instanceof Array){
+	if (tags instanceof Array)
+	{
 		tags.forEach(function (tag) {
 			tag = this.tagNameToSlug(tag);
 			let tagExists = item.tagged.find(itemTags => itemTags.tag_slug == tag);
@@ -163,7 +170,8 @@ hasParentWithTag(id, tags)
 	if(!parent_id){ return false; }
 	
 	let parentHasTag = this.hasTag(parent_id, tags);
-	if (parentHasTag){
+	if (parentHasTag)
+	{
 		return true;
 	} else {
 		return this.hasParentWithTag(parent_id, tags);
@@ -180,7 +188,8 @@ parentIdWithTag(id, tags)
 	let parentHasTag = this.hasTag(parent_id, tags);
 	console.log('parentHasTag');
 	console.log(parentHasTag);
-	if (parentHasTag){
+	if (parentHasTag)
+	{
 		return parent_id;
 	} else {
 		return this.parentIdWithTag(parent_id, tags);
@@ -194,8 +203,10 @@ hideTaggedNodes(tag)
 {
 	Object.keys(this.nodes).forEach(function(id) {
 		id = parseFloat(id);
-		if(this.hasTag(id, tag)){
-			if(!selection.hiddenItems.includes(id)){
+		if(this.hasTag(id, tag))
+		{
+			if(!selection.hiddenItems.includes(id))
+			{
 				selection.hiddenItems.push(id);
 			}
 		}
@@ -224,7 +235,8 @@ olderSiblingId(id)
 	let parent_id = this.nodes[id].parent_id;
 	if(!parent_id){ return; }
 	let siblingsArray = this.nodes[parent_id].children_order;
-	if(siblingsArray.length <= 1 || this.siblingIndex(id) == 0){
+	if(siblingsArray.length <= 1 || this.siblingIndex(id) == 0)
+	{
 		return parent_id;
 	}
 	let siblingIndex = siblingsArray.indexOf(id);
@@ -235,12 +247,14 @@ nextItemId(id)
 	let item = this.nodes[id];
 	let nextItemId;
 	// Select first child if any.
-	if (item.show_children && item.children.length > 0){
+	if (item.show_children && item.children.length > 0)
+	{
 		nextItemId = item.children_order[0];
  	} else {
 		nextItemId = this.nextItemRecursion(id);
  	}
- 	if(selection.hiddenItems.includes(nextItemId)){
+ 	if(selection.hiddenItems.includes(nextItemId))
+ 	{
 	 	return this.nextItemId(nextItemId);
  	} else {
 	 	return nextItemId;
@@ -251,7 +265,8 @@ nextSiblingOrParentsSiblingId(id)
 	let parent_id = this.nodes[id].parent_id;
 	let children_order = this.nodes[parent_id].children_order;
 	let nextIndex = this.siblingIndex(id)+1;
-	if (nextIndex == children_order.length){
+	if (nextIndex == children_order.length)
+	{
 		return this.nextSiblingOrParentsSiblingId(parent_id);
 	} else {
 		return children_order[nextIndex];
@@ -266,13 +281,15 @@ prevItemId(id)
 	let index = this.siblingIndex(id);
 	let tagsSelected = selection.tags.length;
 	let prevItemId;
-	if (index == 0){
+	if (index == 0)
+	{
 		prevItemId = parent_id;
 	} else {
 		prevItemId = this.nodes[parent_id].children_order[index-1];
 		prevItemId = this.getDeepestLastChildId(prevItemId);
 	}
- 	if(selection.hiddenItems.includes(prevItemId)){
+ 	if(selection.hiddenItems.includes(prevItemId))
+ 	{
 	 	return this.prevItemId(prevItemId);
  	} else {
 	 	return prevItemId;
@@ -288,7 +305,8 @@ nextItemRecursion(id)
 	let itemIsLastSibling = (nextIndex == parentsChildrenOrder.length);
 	let tagsSelected = selection.tags.length;
 	
-	if(itemIsLastSibling){
+	if(itemIsLastSibling)
+	{
 		if(parent_id == this.root.id){ return; }
 		return this.nextItemRecursion(parent_id);
 	}
@@ -300,8 +318,9 @@ isTopLvlItemInFilteredRoot(id)
 	// debugger;
 	// console.log('length of filter: '+x);
 	let x = parseFloat(selection.filter.length)+parseFloat(selection.tags.length);
-	if(x == 0){ return false; }
-	if (id == this.root.id) {
+	if(x == 0){ console.log('the root is not filtered'); return false; }
+	if (id == this.root.id)
+	{
 		return true;
 	} else if (this.root.children_order.includes(id)){
 		return true;
@@ -325,7 +344,8 @@ sortChildren(id)
 	item.children_order = item.children_order.filter(id => ~item.children.indexOf(this.nodes[id]));
 	let order = item.children_order;
 	let items = item.children;
-	if (order instanceof Array){
+	if (order instanceof Array)
+	{
 		item.children = order.map(id => items.find(t => t.id === id));
 	}
 }
@@ -339,7 +359,8 @@ resetChildrenOrder(id)
 }
 giveNewParent(id, new_parent_id, specificNewIndex)
 {	
-	if(this.isTopLvlItemInFilteredRoot(id)){ 
+	if(this.isTopLvlItemInFilteredRoot(id))
+	{ 
 		console.log("can't give new parent to topLvlItem in filtered list");
 		return;
 	}
@@ -436,7 +457,8 @@ attachParentBody(id)
 isProject(id)
 {
 	if(!id){ return false; }
-	if (this.nodes[id].body.slice(-1) == ':'){
+	if (this.nodes[id].body.slice(-1) == ':')
+	{
 		return true;
 	} else {
 		return false;
@@ -447,7 +469,8 @@ deleteItem(id)
 	let item = this.nodes[id];
 	let newSelectedId = this.nextItemId(id);
 	// Delete all children as well!
-	if (Array.isArray(item.children) && item.children.length) {
+	if (Array.isArray(item.children) && item.children.length)
+	{
 		let allChildrenIds = this.getAllChildrenIds(id);
 		vm.deleteItemApi(allChildrenIds);
 	}
@@ -467,7 +490,8 @@ tagItem(id, tags)
 {
 	console.log(tags);
 	if(!tags){ return; }
-	if(Array.isArray(tags)){
+	if(Array.isArray(tags))
+	{
 		tags = removeEmptyValuesFromArray(tags);
 		tags = tags.filter(function(t){
 			return !this.hasTag(id,t);
@@ -475,14 +499,16 @@ tagItem(id, tags)
 		if(!tags.length){ return; }
 	} else {
 		if(!tags.replace(/\s/g, "").length){ return; }
-		if(this.hasTag(id, tags)){
+		if(this.hasTag(id, tags))
+		{
 			console.log('NG! Has the tag already!!');
 			return;
 		}
 	}
 	vm.patchTag(id, tags);
 	let item = this.nodes[id];
-	if(item.children.length){
+	if(item.children.length)
+	{
 		item.children_order.forEach(function(childId){
 			this.tagItem(childId, tags);
 		}.bind(this));
@@ -506,11 +532,13 @@ prepareDonePatch(id)
 	let done_date = moment().format();
 	item.done_date = done_date;
 	vm.patchDone(id);
-	if(item.done){
+	if(item.done)
+	{
 		vm.popup(id, 'afterDone');
 	}
 	this.autoCalculateDoneState(item.parent_id);
-	if (item.done){ // IF DONE:
+	if (item.done)
+	{ // IF DONE:
 		//Add parent's body
 		this.attachParentBody(id);
 		//Add Flatpickr
@@ -524,7 +552,8 @@ prepareDonePatch(id)
 autoCalculateDoneState(id)
 {
 	if (this.nodes[id].depth == 0){ return; }
-	if (this.allChildrenDone(id) == true && !this.isProject(id)){
+	if (this.allChildrenDone(id) == true && !this.isProject(id))
+	{
 		vm.markDone(id, 'done');
 	} else {
 		vm.markDone(id, 'notDone');
@@ -538,7 +567,8 @@ allChildrenDone(id)
 		let a = (child.done) ? 1 : 0 ;
 		return this.AplusB(a,prev);
 	}.bind(this), 0);
-	if(children.length == doneAmount){
+	if(children.length == doneAmount)
+	{
 		return true;
 	} else {
 		return false;
@@ -553,7 +583,8 @@ getAllChildrenIds(id)
 getAllChildrenIdsRecursive(id, allChildrenIds)
 {
 	let item = this.nodes[id];
-	if (!(Array.isArray(item.children) && item.children.length)) {
+	if (!(Array.isArray(item.children) && item.children.length))
+	{
 		return;
 	} else {
 		item.children_order.forEach(item => { allChildrenIds.push(item); });
@@ -572,7 +603,8 @@ calTotalPlannedTime(id)
 {
 	let item = this.nodes[id];
 	let totalPlannedTime;
-    if (!(Array.isArray(item.children) && item.children.length)) {
+    if (!(Array.isArray(item.children) && item.children.length))
+    {
     	// if we don't have children, do nothing, leave the time as-is
 		totalPlannedTime = (!item.done || selection.view == 'journal') ? parseFloat(item.planned_time) : 0 ;
     } else {
@@ -588,7 +620,8 @@ calTotalUsedTime(id)
 {
 	let item = this.nodes[id];
 	let totalUsedTime;
-    if (!(Array.isArray(item.children) && item.children.length)) {
+    if (!(Array.isArray(item.children) && item.children.length))
+    {
     	// if we don't have children, do nothing, leave the time as-is
 		totalUsedTime = (!item.done || selection.view == 'journal') ? parseFloat(item.used_time) : 0 ;
     } else {
@@ -607,7 +640,8 @@ checkValParentTree(id, val)
 	if (!pId){ return false; }
 	let checkVal = this.nodes[pId].item[val];
 	console.log('checkValParentTree checkVal: '+checkVal);
-	if (checkVal){
+	if (checkVal)
+	{
 		return checkVal;
 	} else {
 		return this.checkValParentTree(pId, val);
@@ -619,7 +653,8 @@ AplusB(a, b)
 }
 moveItem(id, direction)
 {
-	if(this.isTopLvlItemInFilteredRoot(id)){ 
+	if(this.isTopLvlItemInFilteredRoot(id))
+	{ 
 		console.log("can't move a TopLvlItemInFilteredRoot");
 		return; 
 	}
@@ -629,7 +664,8 @@ moveItem(id, direction)
 	let index = this.siblingIndex(id);
 	if(direction == 'up')
 	{
-		if(index == 0){
+		if(index == 0)
+		{
 			// Jump to last child of previous Sibling
 			let parentOlderSiblingId = this.olderSiblingId(pId);
 			let newInd = (parentOlderSiblingId == parent.parent_id) ? 0 : null;
@@ -643,7 +679,8 @@ moveItem(id, direction)
 	}
 	else if (direction == 'down')
 	{
-		if( index+1 == parent.children_order.length ){
+		if( index+1 == parent.children_order.length )
+		{
 			// Jump to First child of next Sibling
 			let new_parent_id = this.nextSiblingOrParentsSiblingId(id);
 			console.log('new_parent_id: '+new_parent_id);
@@ -661,7 +698,8 @@ flushDoneItems() // Do not use yet. Not sure how to best implement this...
 	let nodes = this.nodes;
 	let keys = Object.keys(nodes);
 	let doneItemsObject = keys.reduce((prev,id) => {
-		if(nodes[id].done){
+		if(nodes[id].done)
+		{
 			this.deleteItem(id);
 		}
 	});
@@ -694,7 +732,8 @@ getLastChildId(id)
 {
 	let item = this.nodes[id];
 	let childrenCount = item.children.length;
-	if(childrenCount && item.show_children){
+	if(childrenCount && item.show_children)
+	{
 		let lastChild = item.children[childrenCount-1];
 		return lastChild.id;
 	}
@@ -705,7 +744,8 @@ getDeepestLastChildId(id)
 	// debugger;
 	let lastChildId = this.getLastChildId(id);
 	let item = this.nodes[lastChildId];
-	if(item.children.length && item.show_children){
+	if(item.children.length && item.show_children)
+	{
 		return this.getDeepestLastChildId(lastChildId);
 	}
 	return lastChildId;
@@ -715,7 +755,8 @@ updateChildrenDueDate(id)
 	let item = this.nodes[id];
 	if (!item.children.length){ return false; }
 	item.children.forEach(function(child){
-		if (item.dueDateParent){
+		if (item.dueDateParent)
+		{
 			child.dueDateParent = item.dueDateParent;
 			this.updateChildrenDueDate(child.id);
 		} else if (item.due_date && item.due_date != '0000-00-00 00:00:00') {
@@ -734,31 +775,40 @@ filterItems(keyword, value, operator)
 	this.root.children.forEach(function(item){
 		item.parent_id = item.parent_id_backup;
 	});
-	if(operator == 'NOT' && keyword == 'journal'){
+	if (operator == 'NOT' && keyword == 'journal')
+	{
 		this.hideDoneNodes();
 		selection.addKeywords(keyword,value,operator);
 		return;
-	} else if (operator == 'NOT' && keyword == 'tag'){
+	}
+	else if (operator == 'NOT' && keyword == 'tag')
+	{
 		this.hideTaggedNodes(value);
 		selection.addKeywords(keyword,value,operator);
 		return;
 	}
-	selection.addKeywords(keyword,value,operator);
 
 	let arrayToFilter;
-	if(operator == 'AND'){
+	if (operator == 'AND')
+	{
 		arrayToFilter = this.flattenTree(this.root.children);
-	} else {
+	}
+	else
+	{
 		selection.clear();
 		arrayToFilter = this.flattenTree(this.backups.rootChildren);
 	}
+	selection.addKeywords(keyword,value,operator);
 
 	let filteredArray = [];
-	if (keyword == 'all'){
+	if (keyword == 'all')
+	{
 		filteredArray = this.backups.rootChildren;
 	}
-	if (keyword == 'journal'){
-		if(!this.doneitems.length){
+	if (keyword == 'journal')
+	{
+		if (!this.doneitems.length)
+		{
 			console.log('waiting for done items...');
 			setTimeout(function(){
 				this.filterItems(keyword, value, operator);
@@ -771,11 +821,13 @@ filterItems(keyword, value, operator)
 			flatpickrifyAllInputs();
 		}, 1000);
 	}
-	if (keyword == 'duedate'){
+	if (keyword == 'duedate')
+	{
 		let dueDateFilterResults = this.arrayFilterDate(arrayToFilter, value, operator);
 		Array.prototype.push.apply(filteredArray, dueDateFilterResults);
 	}
-	if (keyword == 'tag'){
+	if (keyword == 'tag')
+	{
 		let tagFilterResults = this.arrayFilterTag(arrayToFilter, value, operator);
 		Array.prototype.push.apply(filteredArray, tagFilterResults);
 	}
@@ -785,44 +837,45 @@ filterItems(keyword, value, operator)
 	this.root.children = filteredArray;
 	this.resetChildrenOrder(this.root.id);
 }
-arrayFilterTag(array, tags, operator){
+arrayFilterTag(array, tags)
+{
 	let filteredArray = [];
 	array.forEach(function (item) {
 		let id = item.id;
-		let hasTag = this.hasTag(id, tags);
-		let isTopLvlItemInFilteredRoot = this.isTopLvlItemInFilteredRoot(id);
-		
-		let hasParentWithTag;
-		if(!isTopLvlItemInFilteredRoot)
+		let target = this.hasTag(id, tags);
+		if ( selection.view == 'tree'
+			&& target
+			&& this.hasParentWithTag(id, tags) )
 		{
-			console.log('isTopLvlItemInFilteredRoot = false');
-			let hasParentWithTag = this.hasParentWithTag(id, tags);
+			target = false;
 		}
 		// console.log(id+" - "+item.body+" →　hasTag["+tags+"]　=　"+hasTag);
 		// console.log(id+" - "+item.body+" →　hasParentWithTag["+tags+"] =　"+hasParentWithTag);
-		if(
-			(isTopLvlItemInFilteredRoot && hasTag)
-			|| (!isTopLvlItemInFilteredRoot && hasTag && !hasParentWithTag)
-		){
+		if(target)
+		{
 			item.show_children = 1;
 			filteredArray.push(item);
 		}
 	}.bind(this));
 	return filteredArray;
 }
-arrayFilterDone(array, operator){
+arrayFilterDone(array, operator)
+{
 	let filteredArray = [];
 	array.forEach(function (item) {
-		if(item.done){
+		if(item.done)
+		{
 			item.show_children = 1;
 			filteredArray.push(item);
 		}
 	}.bind(this));
 	return filteredArray;
 }
-arrayFilterDate(array, date, operator){
+arrayFilterDate(array, date, operator)
+{
 	let filteredArray = [];
-	if(date == 'today'){
+	if(date == 'today')
+	{
 		array.forEach(function (item) {
 			let diff = moment(item.due_date).diff(moment(), 'days');
 			if (diff <= 0){
@@ -834,7 +887,8 @@ arrayFilterDate(array, date, operator){
 }
 hideItem(id)
 {
-	if(!selection.hiddenItems.includes(id)){
+	if(!selection.hiddenItems.includes(id))
+	{
 		selection.hiddenItems.push(id);
 	}
 	this.nodes[id].children.forEach(function(child) {
@@ -846,7 +900,8 @@ flattenTree(array)
 	let flattenedTree = [];
 	array.forEach(function(item){
 		flattenedTree.push(item);
-		if(item.children.length){
+		if(item.children.length)
+		{
 			Array.prototype.push.apply(flattenedTree, this.flattenTree(item.children));
 		}
 	}.bind(this));
@@ -854,7 +909,8 @@ flattenTree(array)
 }
 rebindArrayParentIds(array, newParentId)
 {
-	if(newParentId == 'backup'){
+	if(newParentId == 'backup')
+	{
 		array.forEach(function(item){
 			item.parent_id = item.parent_id_backup;
 		});
@@ -867,10 +923,12 @@ rebindArrayParentIds(array, newParentId)
 formatDone(doneArray)
 {
 	let doneItemsObject = doneArray.reduce((prev,item) => {
-		if(item.done){
+		if(item.done)
+		{
 		  	let donePropName = moment(item.done_date).format('YYYY/MM/DD');
 		  	// if we don't have a slot for this date, make one
-		  	if(!prev.hasOwnProperty(donePropName)){
+		  	if(!prev.hasOwnProperty(donePropName))
+		  	{
 		    	prev[donePropName] = [];
 		  	}
 			prev[donePropName].push(item);

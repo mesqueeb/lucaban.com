@@ -175,6 +175,14 @@ $.getJSON('/api/items',function(fetchedData){
 		flatpickrifyAllInputs();
 	}, 1000);
 
+	Vue.directive('focus', {
+	  // When the bound element is inserted into the DOM...
+	  inserted: function (el) {
+	    // Focus the element
+	    el.focus()
+	  }
+	})
+
 	vm.patching = false;
 	vm.loading = false;
 }); // end ajax - get data

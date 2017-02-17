@@ -7814,7 +7814,8 @@ label {
 .navigation a {
   text-decoration: none;
   color: #4d4d4d;
-  margin: 0em 0.5em;
+  margin: 0em 0.2em;
+  padding: 0.3em;
 }
 
 .navigation .active {
@@ -8567,12 +8568,16 @@ input.flatpickr {
   font-size: 0.8em;
 }
 
-.journal-wrapper .parent-string {
+.journal-wrapper .parent-string > div {
   border: 1px solid;
   display: initial;
   padding: 0em 0.5em;
   border-top: none;
   border-left: none;
+}
+
+.journal-wrapper .parent-string {
+  margin-bottom: 1px;
 }
 
 .journal-wrapper .completion-notes {
