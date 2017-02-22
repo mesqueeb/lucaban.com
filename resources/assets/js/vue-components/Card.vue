@@ -12,6 +12,7 @@
 	class="item-card-wrapper"
 	v-if="!isHidden || listIsEmpty"
 >
+
 	<div
 		class="title"
 		v-if="journalDate"
@@ -106,6 +107,7 @@
 				<div class="update-body" v-show="item.id != basis.editingItemTags">
 					<textarea
 						v-focus
+						v-autoheight
 						class="edititem-body"
 						:rows="item.rows"
 						v-model="item.body"
@@ -192,10 +194,16 @@
 						&& !journalView"
 				>
 					Done {{ momentCalendar(item.done_date) }}
-					<input class="flatpickr"
+					<Flatpickr
+						class="flatpickr"
+						:id="'done-date-edit-'+item.id"
+						:options="flatPickConfig"
+						v-model="item.done_date"
+					/>
+					<!-- <input class="flatpickr"
 						:id="'done-date-edit-' + item.id"
 						v-model="item.done_date"
-					>
+					> -->
 				</label>
 				<span
 					v-if="totalSecLeft > 0
@@ -313,6 +321,7 @@
 		<div>
 			<textarea type="text"
 				v-focus
+				v-autoheight
 				class="newitem-body"
 				v-model="newItem.body"
 				@blur="blurOnAddNew(item)"
@@ -399,6 +408,8 @@
 // import Morph from '../components/valueMorphers.js'
 // window.Morph = new Morph();
 import { linkify, momentCalendar, sec_to_hourminsec } from '../components/valueMorphers2.js';
+import flatPickConfig from '../components/flatPickrOptions.js';
+import autosize from 'autosize';
 
 export default {
 	name: 'Card',
@@ -423,6 +434,7 @@ export default {
 				children: '',
 			},
 			newTag: null,
+			flatPickConfig,
 		};
 	},
 	// components: { 
@@ -683,7 +695,8 @@ export default {
 			  	if(!this.newItem.body){ return; }
 			  	this.addNew();
 			  	return;
-			} else if (e.keyCode === 13 && (e.metaKey || e.ctrlKey))
+			}
+			else if (e.keyCode === 13 && (e.metaKey || e.ctrlKey))
 			{
 			// Command ENTER
 	        	e.preventDefault();
@@ -776,7 +789,11 @@ export default {
 	    },
 		keydownOnEdit(item, e, field)
 		{
-			console.log('Keydown on edit!');
+			preventKeydownListener();
+			let bodyboxHeight = $("#card-"+this.item.id+" .bodybox").height();
+			$('#updatebox-'+item.id+' .edititem-body').height(bodyboxHeight+6);
+
+			// console.log('Keydown on edit: '+field);
 			// SHIFT-TAB
 			if (e.keyCode === 9 && e.shiftKey)
 			{
@@ -802,7 +819,7 @@ export default {
 	        		let tagName = e.srcElement.value;
 					this.deleteTag(item.id, tagName);
 	        	}
-			}			
+			}
 			// ENTER
 			if (e.keyCode === 13 && !e.shiftKey && !e.altKey)
 			{
@@ -811,6 +828,7 @@ export default {
 	        	{
 	        		let tagName = e.srcElement.value;
 					this.deleteTag(item.id, tagName);
+					return;
 	        	}
 				if(field == 'planned-time')
 				{
@@ -935,6 +953,7 @@ export default {
 		},
 		doneEdit(item)
 		{
+			console.log('Done edit!');
 			item = (item) ? item : allItems.nodes[selection.selectedId];
 			// if (!this.$root.editingItem)
 			// {
@@ -983,12 +1002,12 @@ export default {
 			item = (item) ? item : allItems.nodes[selection.selectedId];
 			this.$root.beforeEditCache_done_date = item.done_date;
 			this.$root.editingDoneDateItem = item.id;
-			Vue.nextTick(function()
-			{
-				let el = "done-date-edit-"+item.id;
-				document.getElementById(el).flatpickr();
+			// Vue.nextTick(function()
+			// {
+				// let el = "done-date-edit-"+item.id;
+				// document.getElementById(el).flatpickr();
 				// window.flatpickr(event.target);
-	    	},20);
+	    	// },20);
 		},
 		deleteItem(item)
 		{
@@ -1111,6 +1130,15 @@ export default {
 				Vue.nextTick(function ()
 				{
 					el.focus();
+				});
+			}
+		},
+		autoheight: {
+			inserted(el, binding)
+			{
+				Vue.nextTick(function ()
+				{
+					autosize(el);
 				});
 			}
 		},

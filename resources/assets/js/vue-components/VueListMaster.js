@@ -47,12 +47,23 @@ export default {
 		Popouts,
 	},
 	computed:{
-		noItems(){
+		noItems()
+		{
 			if(!this.allData || !allItems.root || !allItems.root.children.length){
 				return true;
 			} return false;
 		},
-		selectionFilter(){
+		doneItems()
+		{
+			return Object.keys(allItems.nodes).reduce(function(result, id) {
+				if(allItems.nodes[id].done){
+					result.push(allItems.nodes[id]);
+				}
+				return result;
+			}, []);
+		},
+		selectionFilter()
+		{
 			return selection.filter.map(function (val, i) {
 				if(selection.filter.length == i+1)
 				{
@@ -65,7 +76,8 @@ export default {
 				return val;
 			});
 		},
-		selectionTags(){
+		selectionTags()
+		{
 			return selection.tags.map(function (val, i) {
 				if(selection.tags.length == i+1)
 				{
@@ -78,7 +90,8 @@ export default {
 				return val;
 			});
 		},
-		selectionHiddenTags(){
+		selectionHiddenTags()
+		{
 			return selection.hiddenTags.map(function (val, i) {
 				if(selection.hiddenTags.length == i+1)
 				{
@@ -100,7 +113,8 @@ export default {
 				return !selection.hiddenItems.includes(item.id);
 			});
 		},
-		allTagsComputed(){
+		allTagsComputed()
+		{
 			if(!this.allData){ return []; }
 			let allTagsArray = [];
 			let items = allItems.flattenTree(allItems.root.children);
@@ -139,31 +153,37 @@ export default {
 			allTagsArray = sortObjectArrayByProperty(allTagsArray, 'name');
 			return allTagsArray;
 		},
-		childrenAmount(){
+		childrenAmount()
+		{
 			if(!this.allData){ return 0; }
 			let x = this.countChildren(this.allData);
 			return x;
 		},
-		doneChildrenAmount(){
+		doneChildrenAmount()
+		{
 			if(!this.allData){ return 0; }
 			return this.countDoneChildren(this.allData);
 		},
-		totalSecLeft(){
+		totalSecLeft()
+		{
 			if(!this.allData || !this.$children.length){ return 0; }
 			// console.log('run totalSecLeft');
 			let card = this.$children.find(child => (child.totalSecLeft || child.totalSecLeft == 0));
 			return card.totalSecLeft;
 		},
-		totalUsedSec(){
+		totalUsedSec()
+		{
 			if(!this.allData || !this.$children.length){ return 0; }
 			// console.log('run totalUsedSec');
 			let card = this.$children.find(child => (child.totalUsedSec || child.totalUsedSec == 0));
 			return card.totalUsedSec;
 		},
-		totalUsedHourMin(){
+		totalUsedHourMin()
+		{
 			return sec_to_hourmin(this.totalUsedSec);
 		},
-		totalHourMinLeft(){
+		totalHourMinLeft()
+		{
 			return sec_to_hourmin(this.totalSecLeft);
 		},
 		hiddenItemsTotalUsedTime()
@@ -458,7 +478,8 @@ export default {
 				});
 			}
 		},
-		popup(id, type){
+		popup(id, type)
+		{
 			id = (!id) ? selection.selectedId : id ;
 			let item = allItems.nodes[id];
 			let popupExists = this.popups.filter(function (popup) { return popup.item.id === id; })[0];
@@ -469,16 +490,16 @@ export default {
                 timeout: true, // not yet fully integrated
                 time: 10, // not yet fully integrated
             });
-            if (type == 'afterDone') {
-				Vue.nextTick(function() {
-					let fpId = "#done-date-edit-"+id;
-					let fpEl = document.querySelector(fpId);
-					fpEl.flatpickrify();
-					let fpId_b = "#done-date-edit-"+id+"-popup";
-					let fpEl_b = document.querySelector(fpId_b);
-					fpEl_b.flatpickrify();
-				});
-            }
+    //         if (type == 'afterDone') {
+				// Vue.nextTick(function() {
+				// 	let fpId = "#done-date-edit-"+id;
+				// 	let fpEl = document.querySelector(fpId);
+				// 	fpEl.flatpickrify();
+				// 	let fpId_b = "#done-date-edit-"+id+"-popup";
+				// 	let fpEl_b = document.querySelector(fpId_b);
+				// 	fpEl_b.flatpickrify();
+				// });
+    //         }
 		},
 		popout(id, type){
 			id = (!id) ? selection.selectedId : id ;

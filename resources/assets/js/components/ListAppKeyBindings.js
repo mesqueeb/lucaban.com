@@ -4,6 +4,14 @@ constructor()
 {
 	let self = this;
 	window.addEventListener('keydown', function(e) {
+		if(keydownListenerPaused
+			|| vm.popouts.delete.length
+			|| vm.popouts.timer.length
+			|| vm.popups.length)
+		{ 
+			// console.log('keydownListenerPaused'); 
+			return;
+		}
         let x = e.keyCode;
        	if(document.activeElement.className == "flatpickr-days"){
 			if(x == 9){
@@ -46,7 +54,6 @@ constructor()
 				{
 					eventHub.$emit('escapeOnEditButtonFocus');
 				}
-				
 				else if(vm.addingNewUnder)
 				{
 					eventHub.$emit('escapeOnNewButtonFocus');
@@ -59,10 +66,12 @@ constructor()
         	|| document.activeElement.nodeType == 'A'
         	|| document.activeElement.nodeType == 'BUTTON' )
 		{
+			console.log('inputs or buttons are focussed!');
         	return;
 		}
 		else
 		{ 
+			console.log('keydown event: NO inputs or buttons are focussed!');
 		  // INPUT AREAS NOT IN FOCUS
           switch(e.keyCode) { 
 			case 37: // arrowLeft

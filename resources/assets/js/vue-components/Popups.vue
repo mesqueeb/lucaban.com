@@ -1,87 +1,93 @@
 <template id="popups-template">
 <div id="popups">
-  <div v-for="popup in popups"
-      :class="popup.type ? popup.type : 'secondary'"
-      transition="fade"
-  >
+<div
+    v-for="popup in popups"
+    :class="popup.type ? popup.type : 'secondary'"
+    transition="fade"
+>
     <div
       class="popup callout animated"
       v-if="popup.type=='afterDone'"
     >
-      <div class="top">
-          <div class="title">Completed {{popup.item.body}}
-          <label class="done-after-done"
-              @keydown="keydownInPopup(popup, $event, 'flatPicker')"
-          >{{ momentCalendar(popup.item.done_date) }}
-            <input class="flatpickr"
-              :id="'done-date-edit-'+popup.item.id+'-popup'"
-              v-model="popup.item.done_date"
-              @keydown="keydownInPopup(popup, $event, 'flatPicker')"
-            >
-          </label></div>
-      </div>
-      
-      <div class="body">
-          <div class="completion-memo">
-            <label>Journal notes</label>
-            <textarea name="completion_memo"
-              v-model="popup.item.completion_memo"
-              v-autosize="popup.item.completion_memo"
-              @keydown="keydownInCompletionMemo(popup, $event)"
-              v-focus
-            ></textarea>
-          </div>
-          <div class="used-time">
-            <div>
-              <label class="">Used time</label>
-              <!-- <input v-model="popup.item.used_time" type="number"/> -->
-              <span class="">{{ sec_to_hhmmss(popup.item.used_time) }}</span>
+        <div class="top">
+            <div class="title">Completed {{popup.item.body}}
+            <label class="done-after-done"
+                @keydown="keydownInPopup(popup, $event, 'flatPicker')"
+            >{{ momentCalendar(popup.item.done_date) }}
+              <Flatpickr
+                class="flatpickr"
+                :id="'done-date-edit-'+popup.item.id+'-popup'"
+                v-model="popup.item.done_date"
+                :options="flatPickConfig"
+                @keydown="keydownInPopup(popup, $event, 'flatPicker')"
+              />
+            </label></div>
+        </div>
+        
+        <div class="body">
+            <div class="completion-memo">
+              <label>Journal notes</label>
+              <textarea name="completion_memo"
+                v-model="popup.item.completion_memo"
+                @keydown="keydownInCompletionMemo(popup, $event)"
+                v-focus
+                v-autoheight
+              ></textarea>
             </div>
-            <div class="buttons">
+            <div class="used-time">
               <div>
-                <button class="forward"
-                  @click="incrementUsedTime(popup.item, 60)"
-                >+1 min</button>
-                <button class="forward"
-                  @click="incrementUsedTime(popup.item, 300)"
-                >+5 min</button>
-                <button class="forward"
-                  @click="incrementUsedTime(popup.item, 600)"
-                >+10 min</button>
-              </div><div>
-                <button class="forward"
-                  @click="incrementUsedTime(popup.item, 1800)"
-                >+30 min</button>
-                <!-- <button class="forward"
-                  @click="incrementUsedTime(popup.item, 3600)"
-                >+1 hour</button> -->
-                <button class="reset"
-                  @click="resetUsedTime(popup.item)"
-                >Reset</button>
+                <label class="">Used time</label>
+                <!-- <input v-model="popup.item.used_time" type="number"/> -->
+                <span class="">{{ sec_to_hhmmss(popup.item.used_time) }}</span>
+              </div>
+              <div class="buttons">
+                <div>
+                  <button class="forward"
+                    @click="incrementUsedTime(popup.item, 60)"
+                  >+1 min</button>
+                  <button class="forward"
+                    @click="incrementUsedTime(popup.item, 300)"
+                  >+5 min</button>
+                  <button class="forward"
+                    @click="incrementUsedTime(popup.item, 600)"
+                  >+10 min</button>
+                </div><div>
+                  <button class="forward"
+                    @click="incrementUsedTime(popup.item, 1800)"
+                  >+30 min</button>
+                  <!-- <button class="forward"
+                    @click="incrementUsedTime(popup.item, 3600)"
+                  >+1 hour</button> -->
+                  <button class="reset"
+                    @click="resetUsedTime(popup.item)"
+                  >Reset</button>
+                </div>
               </div>
             </div>
-          </div>
-      </div>
-      <button
-        @click="removePopup(popup)"
-        @keydown="keydownInPopup(popup, $event, 'closeButton')"
-        class="close-button"
-        aria-label="Close alert"
-        type="button"
-      >
-          <span aria-hidden="true">&times;</span>
-      </button>
+        </div>
+        <button
+          @click="removePopup(popup)"
+          @keydown="keydownInPopup(popup, $event, 'closeButton')"
+          class="close-button"
+          aria-label="Close alert"
+          type="button"
+        >
+            <span aria-hidden="true">&times;</span>
+        </button>
     </div>
-  </div>
+</div>
 </div>
 </template>
 <script>
 import { sec_to_hhmmss, momentCalendar } from '../components/valueMorphers2.js'
+import autosize from 'autosize';
+import flatPickConfig from '../components/flatPickrOptions.js';
 
 export default {
     name: 'Popups',
     template: '#popups-template',
     props: ['popups'],
+    data(){ return { flatPickConfig }; },
     methods: {
         sec_to_hhmmss, momentCalendar,
         addPopup(popup) {
@@ -135,6 +141,20 @@ export default {
                     e.preventDefault();
                 }
             }
+        },
+    },
+    directives: {
+        focus: {
+          inserted(el)
+          {
+            Vue.nextTick(function () { el.focus(); });
+          }
+        },
+        autoheight: {
+          inserted(el, binding)
+          {
+            Vue.nextTick(function () { autosize(el); });
+          }
         },
     },
 }

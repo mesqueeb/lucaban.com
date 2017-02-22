@@ -542,11 +542,11 @@ prepareDonePatch(id)
 		//Add parent's body
 		this.attachParentBody(id);
 		//Add Flatpickr
-		setTimeout(function(){
-			let fpId = "done-date-edit-"+id;
-			let fpEl = document.getElementById(fpId);
-			fpEl.flatpickrify();
-		},100);
+		// setTimeout(function(){
+		// 	let fpId = "done-date-edit-"+id;
+		// 	let fpEl = document.getElementById(fpId);
+		// 	fpEl.flatpickrify();
+		// },100);
 	}
 }
 autoCalculateDoneState(id)
@@ -817,9 +817,9 @@ filterItems(keyword, value, operator)
 		}
 		filteredArray = this.doneitems;
 		// Codementor: How do I know the following function will start after the fetch is over?
-		setTimeout(function(){
-			flatpickrifyAllInputs();
-		}, 1000);
+		// setTimeout(function(){
+		// 	flatpickrifyAllInputs();
+		// }, 1000);
 	}
 	if (keyword == 'duedate')
 	{
