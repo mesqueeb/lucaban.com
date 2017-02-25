@@ -9,6 +9,9 @@ function arrayToString(arr)
 	});
 	return c_o.substring(1);
 }
+function objectToArray(obj) {
+	return Object.keys(obj).map(function (key) { return obj[key]; });
+}
 
 function sec_to_hourmin(val){
 	function pad(num, unit){
@@ -55,11 +58,15 @@ function removeEmptyValuesFromArray(array){
 	return cleanArray;
 }
 
-function sortObjectArrayByProperty(array, propertyName){
+function sortObjectArrayByProperty(array, propertyName, order){
 	return array.sort(function(a, b){
 	    let textA = a[propertyName].toUpperCase();
 	    let textB = b[propertyName].toUpperCase();
-	    return (textA < textB) ? -1 : (textA > textB) ? 1 : 0;
+	    if(!order || order =='asc'){
+		    return (textA < textB) ? -1 : (textA > textB) ? 1 : 0;
+	    } else if (order == 'desc'){
+		    return (textA > textB) ? -1 : (textA < textB) ? 1 : 0;
+	    }
 	}.bind(propertyName));
 }
 
@@ -79,6 +86,20 @@ function btnEffect(event){
 		// $el.blur();
 	}, 1000);
 }
+function uniqBy(a, key) {
+    key = (key) ? key : JSON.stringify;
+    let seen = {};
+    return a.filter(function(item) {
+        let k = key(item);
+        return seen.hasOwnProperty(k) ? false : (seen[k] = true);
+    })
+}
+function uniq(a) {
+    // return a.sort().filter(function(item, pos, ary) {
+    //     return !pos || item != ary[pos - 1];
+    // })
+    return Array.from(new Set(a));
+}
 
 function isElementInViewport (el) {
 
@@ -87,7 +108,7 @@ function isElementInViewport (el) {
     //     el = el[0];
     // }
 
-    var rect = el.getBoundingClientRect();
+    let rect = el.getBoundingClientRect();
 
     return (
         rect.top >= 0 &&
@@ -97,4 +118,4 @@ function isElementInViewport (el) {
     );
 }
 
-export { arrayToString, sec_to_hourmin, hasClass, btnEffect, isElementInViewport, sortObjectArrayByProperty, removeEmptyValuesFromArray }
+export { objectToArray, uniqBy, uniq, arrayToString, sec_to_hourmin, hasClass, btnEffect, isElementInViewport, sortObjectArrayByProperty, removeEmptyValuesFromArray }

@@ -97,7 +97,7 @@
 window.keydownListenerPaused = false;
 window.preventKeydownListener = function(){
 	window.keydownListenerPaused = true;
-	setTimeout(function(){ window.keydownListenerPaused = false; }.bind(this), 1000);
+	setTimeout(function(){ window.keydownListenerPaused = false; }.bind(this), 200);
 };
 
 // Vue Basics
@@ -161,11 +161,12 @@ $.getJSON('/api/items',function(fetchedData){
 	window.eventHub = new Vue();
 	window.allItems = new Tree(fetchedData);
 	console.log(allItems);
-	
+
 	window.vm = new Vue(VueListMaster);
 	new ListAppKeyBindings();
 	vm.allData = allItems.root;
 	vm.doneData = allItems.doneitems;
+	vm.nodes = allItems.nodes;
 
 	console.log('allItems ↓');
 	console.log(allItems);

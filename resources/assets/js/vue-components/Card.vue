@@ -23,7 +23,7 @@
 	</div>
 	<div
 		class="parent-string"
-		v-if="journalView && item.depth != 0"
+		v-if="journalView && item.depth != 0 && item.parents_bodies"
 		@click="selectItem(item)"
 	>
 		<div>
@@ -97,14 +97,15 @@
 			</span>
 			<!-- // For debugging: -->
 
+<!-- UPDATE BOX -->
 			<form
 				action="update"
 				class="updatebox"
 				:id="'updatebox-'+item.id"
-				v-if="item.id == basis.editingItem || item.id == basis.editingItemTags"
+				v-if="item.id == basis.editingItem"
 				@submit.prevent="doneEdit(item)"
 			>
-				<div class="update-body" v-show="item.id != basis.editingItemTags">
+				<div class="update-body">
 					<textarea
 						v-focus
 						v-autoheight
@@ -118,7 +119,7 @@
 				<div class="update-tags">
 					<div
 						class="update-planned-time"
-						v-show="item.id != basis.editingItemTags && basis.selection.view != 'journal'"
+						v-show="basis.selection.view != 'journal'"
 					>
 						Duration:
 						<button
@@ -158,35 +159,31 @@
 							@keydown="keydownOnEdit(item, $event, 'planned-time')"
 						/>min</div>
 					</div>
-					<div class="update-custom-tags">
-						<label>
-							Add Tag: 
-							<input
-								type="text"
-								class="add-tag"
-								v-model="newTag"
-								@blur="blurOnEdit(item)"
-								@keydown="keydownOnEdit(item, $event, 'addTag')"
-							>
-						</label>
-
-						<!-- UNDER CONSTRUCTION -->
-						<div class="tag-suggestions" v-if="false">
-							<label
-								v-for="tag in allTags_c"
-								:class="'tag'"
-								@click="basis.patchTag(item.id, tag)"
-							>
-								{{ tag.name }}
-							</label>
-						</div>
-						<!-- // UNDER CONSTRUCTION -->
-
-					</div>
 				</div>
-			</form><!-- /.updatebox -->
+			</form>
+<!-- / .UPDATEBOX -->
 
+<!-- ITEM TAGS -->
 			<div class="item-tags">
+				<div
+					class="add-tag-wrapper"
+					:id="'add-tag-'+item.id"
+					v-if="item.id == basis.editingItem || item.id == basis.editingItemTags"
+				>
+					<label>
+						Add Tag: 
+						<input
+							type="text"
+							class="add-tag"
+							v-model="newTag"
+							v-autowidth
+							v-focus
+							@blur="blurOnEdit(item)"
+							@keydown="keydownOnEdit(item, $event, 'addTag')"
+							placeholder="..."
+						>
+					</label>
+				</div>
 				<label
 					class="done"
 					v-if="item.done
@@ -217,19 +214,22 @@
 					class="duration"
 					v-if="item.id != basis.editingItem
 						&& secLeft > 0
-						&& !item.done"
+						&& !item.done
+						&& item.id != basis.editingItemTags"
 				>
 					{{ sec_to_hourminsec(secLeft) }}
 				</span>
 				
 				<span
-					v-if="hasDueDate && !item.done"
+					v-if="hasDueDate && !item.done
+						&& item.id != basis.editingItemTags"
 					class="duedate"
 				>
 					{{ momentCalendar(item.due_date) }}
 				</span>
 				<span
-					v-if="item.dueDateParent && !item.done"
+					v-if="item.dueDateParent && !item.done
+					 && item.id != basis.editingItemTags"
 					class="duedate-parent"
 				>
 					{{ momentCalendar(item.dueDateParent) }}
@@ -257,7 +257,8 @@
 						<i class="zmdi zmdi-close-circle"></i>
 					</button>
 				</span>
-			</div><!-- / .item-tags -->
+			</div>
+<!-- / .ITEM-TAGS -->
 
 			<div
 				class="item-nav"
@@ -299,6 +300,7 @@
 		</div>
 	</div>
 
+<!-- CHILDREN -->
 	<div class="children"
 		v-if="item.children.length"
 		v-show="item.show_children"
@@ -309,7 +311,9 @@
 			:key="childCard.id"
 		></Card>
 	</div>
+<!-- / CHILDREN -->
 
+<!-- ADD NEW BOX -->
 	<form 
 		:class="{'addnewbox':true, 
 			'child':addingNewAsChild,
@@ -326,7 +330,7 @@
 				v-model="newItem.body"
 				@blur="blurOnAddNew(item)"
 				@keydown="keydownOnNew(item, $event, 'body')"
-				placeholder="..."
+				placeholder="...　　"
 				autocomplete="off"
 				autofocus 
 				rows="1"
@@ -373,24 +377,26 @@
 					@blur="blurOnAddNew(item)"
 				/>min</div>
 			</div>
-			<div class="update-custom-tags">
-				<label>
-					Add Tag: 
-					<input type="text"
-						class="prepare-tag"
-						@keydown="keydownOnNew(item, $event, 'addTag')"
-						@blur="blurOnAddNew(item)"
-						v-model="newTag"
-					>
-				</label>
-			</div>
 			<div class="item-tags prepared-tags">
-				<span v-if="newItem.preparedTags.length"
-					v-for="tag in newItem.preparedTags"
+				<div class="add-prepared-tag-wrapper">
+					<label>
+						Add Tag: 
+						<input type="text"
+							class="prepare-tag"
+							@keydown="keydownOnNew(item, $event, 'prepare-tag')"
+							@blur="blurOnAddNew(item)"
+							v-model="newTag"
+							v-autowidth
+							placeholder="..."
+						>
+					</label>
+				</div>
+				<span v-if="preparedPlusComputedTags.length"
+					v-for="tag in preparedPlusComputedTags"
 					:class="(tag=='Today') ? 'duedate' : 'custom-tag'"
 				>{{ tag }}
 					<button class="delete-tag"
-						v-if="!parentTags.includes(tag)"
+						v-if="newItem.preparedTags.includes(tag)"
 						@click.prevent="deletePreparedTag(tag, item)"
 						@keydown="keydownOnNew(item, $event, 'delete-tag')"
 						:value="tag"
@@ -401,6 +407,8 @@
 			</div>
 		</div>
 	</form>
+<!-- / ADD NEW BOX -->
+
 </div>
 </div>
 </template>
@@ -410,13 +418,15 @@
 import { linkify, momentCalendar, sec_to_hourminsec } from '../components/valueMorphers2.js';
 import flatPickConfig from '../components/flatPickrOptions.js';
 import autosize from 'autosize';
+import autosizeInput from 'autosize-input';
+import { uniq } from '../components/globalFunctions.js';
 
 export default {
 	name: 'Card',
 	template:'#items-card-template',
 	mounted()
 	{
-		this.newItem.preparedTags = JSON.parse(JSON.stringify(this.parentTags));
+		// this.newItem.preparedTags = JSON.parse(JSON.stringify(this.parentTags));
 		this.convertbodyURLtoHTML();
     	eventHub.$on('startEdit', this.startEdit);
     	eventHub.$on('escapeOnEditButtonFocus', this.cancelEdit);
@@ -441,12 +451,31 @@ export default {
 	// Flatpickr: Flatpickr,
 	// },
 	computed: {
+		preparedPlusComputedTags()
+		{ if(!this.item || !allItems){ return 0; }
+			let alltags = this.newItem.preparedTags;
+			if (selection.tags.length)
+			{
+				alltags = alltags.concat(selection.tags.map(tag => allItems.tagSlugToName(tag)));
+			}
+			if (this.parentTags.length)
+			{
+				alltags = alltags.concat(this.parentTags);
+			}
+			if (this.$root.addingNewAsChild)
+			{
+				let tagz = allItems.returnTagsAsArray(this.item.id);
+				alltags = alltags.concat(tagz);
+			}
+			alltags = uniq(alltags);
+			return alltags.sort();
+		},
 		listIsEmpty()
-		{
+		{ if(!this.item || !allItems){ return 0; }
 			return this.$root.noItems;
 		},
 		basis()
-		{
+		{ if(!this.item || !allItems){ return 0; }
 			return this.$root;
 		},
 		totalPlannedMin()
@@ -516,9 +545,8 @@ export default {
 		},
 		parentsChildren_order()
 		{ if(!this.item || !allItems){ return; }
-			let pId = this.item.parent_id;
 			if(this.item.depth == 0){ return allItems.nodes[this.item.id].children_order; }
-			return allItems.nodes[pId].children_order;
+			return this.$parent.item.children_order;
 		},
 		showAddNewBox()
 		{ if(!this.item || !allItems){ return; }
@@ -590,9 +618,8 @@ export default {
 			return this.totalPlannedSec != this.$parent.totalPlannedSec;
 		},
 		parentTags()
-		{ if(!this.item || !allItems || !this.item.parent_id){ return []; }
-		// console.log("running parentTags! this.item.parent_id = "+this.item.parent_id);
-			return allItems.returnTagsAsArray(this.item.parent_id);
+		{ if(!this.item || !allItems || !this.item.parent_id || !this.$parent.item){ return []; }
+			return this.$parent.item.tagged.map(obj => obj.tag_name);
 		},
 		isHidden()
 		{ if(!this.item || !allItems){ return true; }
@@ -647,6 +674,10 @@ export default {
 		},
 		keydownOnNew(item, e, field)
 		{
+			if (this.newTag && this.newTag.substring(0,1) != ' ')
+			{
+				this.newTag = ' '+this.newTag;
+			}
 			console.log(e);
 			console.log('↑　keydown on new: '+e.keyCode+' - '+field);
 			// SHIFT-TAB
@@ -662,7 +693,7 @@ export default {
 			// TAB
 			if (e.keyCode === 9 && !e.shiftKey)
 			{
-	        	if(field == 'addTag')
+	        	if(field == 'prepare-tag')
 	        	{
 	        		// e.preventDefault();
 		        	// this.newItemIndent();
@@ -687,11 +718,16 @@ export default {
 					this.setPlannedTimeNewItem(item, event);
 					return;
 				}
-				if(field == 'addTag' && this.newTag)
+				if(field == 'prepare-tag' && this.newTag)
 				{
 					this.prepareTag(item);
 					return;
 				}
+	        	if(field == 'delete-tag')
+	        	{
+	        		let tagName = e.srcElement.value;
+					this.deletePreparedTag(item.id, tagName);
+	        	}
 			  	if(!this.newItem.body){ return; }
 			  	this.addNew();
 			  	return;
@@ -709,7 +745,7 @@ export default {
 			if (e.keyCode === 37)
 			{
 				// If in an EMPTY BODY
-				if (field != 'body' || (field == 'body' && !this.newItem.body))
+				if ((field != 'body' && field != 'prepare-tag') || (field == 'body' && !this.newItem.body))
 				{
 					e.preventDefault();
 		        	// console.log('this.newItemUnindent();');
@@ -721,7 +757,7 @@ export default {
 			if (e.keyCode === 39)
 			{
 				// If in an EMPTY BODY
-				if (field != 'body' || (field == 'body' && !this.newItem.body))
+				if ((field != 'body' && field != 'prepare-tag') || (field == 'body' && !this.newItem.body))
 				{
 					e.preventDefault();
 		        	// console.log('this.newItemIndent();');
@@ -746,7 +782,7 @@ export default {
 					document.querySelector(plsFocus).focus();
 					return;
 				}
-				if(field == 'addTag')
+				if(field == 'prepare-tag')
 				{
 					e.preventDefault();
 					let plsFocus = '#new-under-'+this.item.id+' .update-planned-time>button';
@@ -772,7 +808,7 @@ export default {
 					document.querySelector(plsFocus).focus();
 					return;
 				}
-				if(field == 'addTag' && !this.newItem.body)
+				if(field == 'prepare-tag' && !this.newItem.body)
 				{
 					e.preventDefault();
 		        	this.cancelAddNew();
@@ -784,16 +820,21 @@ export default {
 			{
 			   	e.preventDefault();
 	        	this.cancelAddNew();
-	        	return;
+	    		this.$root.cancelThroughKeydown = true;
+		    	setTimeout(function()
+		    	{
+		    		this.$root.cancelThroughKeydown = false;
+		    	}.bind(this),100);
 			}
 	    },
 		keydownOnEdit(item, e, field)
 		{
 			preventKeydownListener();
-			let bodyboxHeight = $("#card-"+this.item.id+" .bodybox").height();
-			$('#updatebox-'+item.id+' .edititem-body').height(bodyboxHeight+6);
-
 			// console.log('Keydown on edit: '+field);
+			if (this.newTag && this.newTag.substring(0,1) != ' ')
+			{
+				this.newTag = ' '+this.newTag;
+			}
 			// SHIFT-TAB
 			if (e.keyCode === 9 && e.shiftKey)
 			{
@@ -875,7 +916,7 @@ export default {
 				e.preventDefault();
 				if(field == 'planned-time')
 				{
-					let plsFocus = '#updatebox-'+item.id+' .add-tag';
+					let plsFocus = '#add-tag-'+item.id+' .add-tag';
 					document.querySelector(plsFocus).focus();
 					return;
 				}
@@ -888,10 +929,16 @@ export default {
 			if (e.keyCode === 27)
 			{
 				this.cancelEdit(item);
+	    		this.$root.cancelThroughKeydown = true;
+		    	setTimeout(function()
+		    	{
+		    		this.$root.cancelThroughKeydown = false;
+		    	}.bind(this),100);
 			}
 	    },
 	    blurOnEdit(item)
 	    {
+	    	if(this.$root.cancelThroughKeydown){ return; }
 	    	let self = this;
 	    	setTimeout(function()
 	    	{
@@ -910,6 +957,7 @@ export default {
 	    },
 	    blurOnAddNew(item)
 	    {
+	    	if(this.$root.cancelThroughKeydown){ return; }
 	    	let self = this;
 	    	setTimeout(function()
 	    	{
@@ -1020,7 +1068,6 @@ export default {
 			let index;
 			let addTags;
 
-			console.log('sending newItem:');
 			newItem = this.newItem;
 			newItem.parent_id = (this.item.parent_id) ? this.item.parent_id : allItems.root.id;
 			newItem.depth = this.item.depth;
@@ -1028,31 +1075,34 @@ export default {
 			let OlderSiblingIndex = this.siblingIndex;
 			index = (isNaN(OlderSiblingIndex)) ? 0 : OlderSiblingIndex+1;
 			
-			addTags = this.newItem.preparedTags;
+			addTags = this.preparedPlusComputedTags;
 			
 			if (this.$root.addingNewAsChild || this.listIsEmpty)
 			{
 				newItem.depth = this.item.depth + 1;
         		newItem.parent_id = this.item.id;
         		index = 0;
-				// Add tags        		
-        		let toBeParentTags = allItems.itemTagArray(this.item.id);
-				Array.prototype.push.apply(addTags, toBeParentTags);
+				// Add tags
+         		// let toBeParentTags = allItems.itemTagArray(this.item.id);
+				// Array.prototype.push.apply(addTags, toBeParentTags);
+				// ↑　solved wih this.preparedPlusComputedTags
 			}
 			if(selection.view == "journal")
 			{
 				newItem.done = 1;
+				newItem.done_date = this.item.done_date;
 			}
 			if (this.newItem.preparedTags.includes('Today') || selection.filter.includes('today'))
 			{
 				newItem.due_date = moment().format();
-				this.newItem.preparedTags = this.newItem.preparedTags.filter(function(val)
-				{
+				addTags = addTags.filter(function(val){
 					return val != 'Today';
 				});
 			}
-			
+			console.log('sending newItem:');			
 			console.log(newItem);
+			console.log('sending tags:');			
+			console.log(addTags);
 			// Send to Root for Ajax call.
 			this.$root.postNewItem(newItem, index, addNextItemAs, addTags);
 
@@ -1060,7 +1110,7 @@ export default {
 			this.newItem.body = '';
 			this.newItem.due_date = '0000-00-00 00:00:00';
 			this.newItem.planned_time = '';
-			this.newItem.preparedTags = JSON.parse(JSON.stringify(this.parentTags));
+			this.newItem.preparedTags = [];
 		},
 		cancelAddNew(lastSelectedId)
 		{
@@ -1105,7 +1155,7 @@ export default {
 		setPlannedTime(item, event)
 		{
 			item.planned_time = (event.srcElement.value) ? parseFloat(event.srcElement.value) : 0 ;
-			let plsFocus = '#updatebox-'+item.id+' .add-tag';
+			let plsFocus = '#add-tag-'+item.id+' .add-tag';
 			Vue.nextTick(function ()
 			{
 				console.log('returning to editting: '+plsFocus);
@@ -1139,6 +1189,15 @@ export default {
 				Vue.nextTick(function ()
 				{
 					autosize(el);
+				});
+			}
+		},
+		autowidth: {
+			inserted(el, binding)
+			{
+				Vue.nextTick(function ()
+				{
+					autosizeInput(el);
 				});
 			}
 		},

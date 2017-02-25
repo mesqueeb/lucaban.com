@@ -2,7 +2,7 @@ import Card from './Card.vue';
 import Popups from './Popups.vue';
 import Popouts from './Popouts.vue';
 import ListAppKeyBindings from './ListAppKeyBindings.vue';
-import { arrayToString, sec_to_hourmin, sortObjectArrayByProperty, removeEmptyValuesFromArray } from '../components/globalFunctions.js';
+import { objectToArray, uniqBy, uniq, arrayToString, sec_to_hourmin, sortObjectArrayByProperty, removeEmptyValuesFromArray } from '../components/globalFunctions.js';
 import Selection from './Selection.js';
 import Tree from './dataTree.js';
 
@@ -25,6 +25,7 @@ export default {
 			"tagged":[],
 			"used_time":0
 		},
+		nodes: {},
 		selection,
 		addingNewUnder: null,
 		addingNewAsChild: false,
@@ -39,6 +40,8 @@ export default {
 		timerItems: [],
 		beforeEditCache_body: null,
 		beforeEditCache_planned_time: null,
+		fetchedDone: false,
+		cancelThroughKeydown: false,
 		// allTags: [],
 	},
 	components: {
@@ -55,14 +58,10 @@ export default {
 		},
 		doneItems()
 		{
-			return Object.keys(allItems.nodes).reduce(function(result, id) {
-				if(allItems.nodes[id].done){
-					result.push(allItems.nodes[id]);
-				}
-				return result;
-			}, []);
+			// Codementor: Not reactive...
+			return objectToArray(this.nodes).filter(item => item.done);
 		},
-		selectionFilter()
+		selectionFilter() // For list title
 		{
 			return selection.filter.map(function (val, i) {
 				if(selection.filter.length == i+1)
@@ -76,7 +75,7 @@ export default {
 				return val;
 			});
 		},
-		selectionTags()
+		selectionTags() // For list title
 		{
 			return selection.tags.map(function (val, i) {
 				if(selection.tags.length == i+1)
@@ -90,7 +89,7 @@ export default {
 				return val;
 			});
 		},
-		selectionHiddenTags()
+		selectionHiddenTags() // For list title
 		{
 			return selection.hiddenTags.map(function (val, i) {
 				if(selection.hiddenTags.length == i+1)
@@ -115,13 +114,15 @@ export default {
 		},
 		allTagsComputed()
 		{
+			var t0 = performance.now();
 			if(!this.allData){ return []; }
 			let allTagsArray = [];
-			let items = allItems.flattenTree(allItems.root.children);
+			// let items = allItems.flattenTree(allItems.root.children);
+			let items = this.allVisibleItems;
 			if(!items.length){ return []; }
-			items.forEach(function(child)
+			items.forEach(function(item)
 			{
-				child.tagged.forEach(function(taggedObj){
+				item.tagged.forEach(function(taggedObj){
 					if(!taggedObj.tag || !taggedObj.tag.name)
 					{
 						return; // solves bugs with broken tags
@@ -136,21 +137,81 @@ export default {
 						allTagsArray.push(taggedObj.tag);
 					}
 				}.bind(allTagsArray));
-
-				// allTagsArray = allTagsArray.filter(function(tagInArray)
-				// {
-				// 	let noItemWithTag = selection.hiddenItems.find(function(hiddenId)
-				// 	{
-				// 		return allItems.hasTag(hiddenId, tagInArray.name);
-				// 	}.bind(tagInArray));
-				// 	if(!noItemWithTag)
-				// 	{
-				// 		return true;
-				// 	}
-				// }.bind(allTagsArray));
 			}.bind(allTagsArray));
-			console.log('before sorting tags');
 			allTagsArray = sortObjectArrayByProperty(allTagsArray, 'name');
+			var t1 = performance.now();
+			console.log("Call to allTagsComputed took " + (t1 - t0) + " milliseconds.")
+			return allTagsArray;
+		},
+		allTagsComputed_2()
+		{
+			let t2_0 = performance.now();
+			if(!this.allData){ return []; }
+			let allTagsArray = [];
+			// let items = allItems.flattenTree(allItems.root.children);
+			let items = this.allVisibleItems;
+			if(!items.length){ return []; }
+			allTagsArray = items.reduce(function(a, item)
+			{
+				let tags = item.tagged.map(taggedObj => taggedObj.tag);
+				return a.concat(tags);
+			}, []);
+			allTagsArray = uniqBy(allTagsArray);
+			allTagsArray = sortObjectArrayByProperty(allTagsArray, 'name');
+			let t2_1 = performance.now();
+			console.log("Call to allTagsComputed_2 took " + (t2_1 - t2_0) + " milliseconds.")
+			return allTagsArray;
+		},
+		allTagsComputed_3()
+		{
+			let t3_0 = performance.now();
+			if(!this.allData){ return []; }
+			let allTagsArray = new Set();
+			// let items = allItems.flattenTree(allItems.root.children);
+			let items = this.allVisibleItems;
+			if(!items.length){ return []; }
+			items.forEach(function(item)
+			{
+				if(item.tagged.length){
+					item.tagged.forEach(taggedObj => allTagsArray.add(taggedObj.tag));
+				}
+			}.bind(allTagsArray));
+			allTagsArray = [...allTagsArray];
+			allTagsArray = uniqBy(allTagsArray);
+			allTagsArray = sortObjectArrayByProperty(allTagsArray, 'name');
+			let t3_1 = performance.now();
+			console.log("Call to allTagsComputed_3 took " + (t3_1 - t3_0) + " milliseconds.")
+			return allTagsArray;
+		},
+		allTagsComputed_1b()
+		{
+			var t0 = performance.now();
+			if(!this.allData){ return []; }
+			let allTagsArray = [];
+			// let items = allItems.flattenTree(allItems.root.children);
+			let items = this.allVisibleItems;
+			if(!items.length){ return []; }
+			items.forEach(function(item)
+			{
+				item.tagged.forEach(function(taggedObj){
+					if(!taggedObj.tag || !taggedObj.tag.name)
+					{
+						return; // solves bugs with broken tags
+					}
+					let tagAlreadyPushed = allTagsArray.find(function(pushedTag)
+					{
+						return pushedTag.name == taggedObj.tag.name;
+					}.bind(taggedObj));
+
+					if(!tagAlreadyPushed)
+					{
+						allTagsArray.push(taggedObj.tag);
+					}
+				}.bind(allTagsArray));
+			}.bind(allTagsArray));
+			allTagsArray = sortObjectArrayByProperty(allTagsArray, 'name');
+			var t1 = performance.now();
+			console.log("Call to allTagsComputed took " + (t1 - t0) + " milliseconds.")
 			return allTagsArray;
 		},
 		childrenAmount()
@@ -204,7 +265,16 @@ export default {
 		},
 	},
 	methods:{
-
+		resetDoneData()
+		{
+			let dd = objectToArray(this.nodes).filter(item => item.done);
+			sortObjectArrayByProperty(dd,'done_date','desc');
+			this.doneData = dd;
+		},
+		tagSlugToName(tagslug)
+		{
+			return allItems.tagSlugToName(tagslug);
+		},
 		countChildren(item){
 			if (!item.children){ return 0; }
 			let children = allItems.flattenTree(item.children);
@@ -335,18 +405,11 @@ export default {
 			selection.selectedId = null;
 			this.addingNewAsFirstChild = (addAs == 'child') ? true : false;
 			this.addingNewAsChild = (addAs == 'child') ? true : false;
-			// Solved with v-focus:
-			// Vue.nextTick(function () {
-			// 	document.querySelector("#new-under-"+id+" textarea").focus();
-			// });
 		},
 		startEditTags(id){
 			id = (id) ? id : selection.selectedId;
 			if(!id){ return; }
 			this.editingItemTags = id;
-			Vue.nextTick(function () {
-				document.querySelector('#updatebox-'+id+' > .update-tags > .update-custom-tags input').focus();
-			});
 		},
 		stopPatching(){
 			if(window.stopPatchingIcon){ clearTimeout(window.stopPatchingIcon); }
@@ -533,6 +596,7 @@ export default {
 			this.loading = true;
 			this.$http.get('/api/items/fetchdone').then(function(response){
 				// debugger;
+				this.fetchedDone = true;
 				console.log('fetched Done');
 				let data = response.data;
 				console.log(data);
@@ -545,8 +609,9 @@ export default {
 				data.forEach(item => {
 					item = allItems.setDefaultItemValues(item)
 					if(!allItems.nodes[item.id]){ allItems.nodes[item.id] = item; }
-					if(!allItems.doneitems.includes(item)){ allItems.doneitems.push(item); }
+					// if(!allItems.doneitems.includes(item)){ allItems.doneitems.push(item); }
 				});
+				this.resetDoneData();
 				allItems.filterItems('journal',null,operator);
 				this.loading = false;
 			});
@@ -594,11 +659,10 @@ export default {
 				selection.clear();
 			}
 
-			if (keyword == 'journal' && !this.doneData.length){
+			if (keyword == 'journal' && !this.fetchedDone){
 				this.fetchDone(null,operator);
-			} else {
-				allItems.filterItems(keyword,value,operator);
 			}
+			allItems.filterItems(keyword,value,operator);
 		},
 		duplicate(id){
 			id = (!id) ? selection.selectedId : id ;

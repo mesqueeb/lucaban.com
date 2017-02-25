@@ -81,8 +81,12 @@
 				><i class="zmdi zmdi-pause"></i>
 				</button>
 				<button class="forward btn btn-dipclick"
-					@click="timerNav('forward', item)"
+					@click="timerNav('forward', item, 1)"
 				>+1 min
+				</button>
+				<button class="forward btn btn-dipclick"
+					@click="timerNav('forward', item, 5)"
+				>+5 min
 				</button>
 				<button class="reset btn btn-dipclick"
 					@click="timerNav('reset', item)"
@@ -154,10 +158,10 @@ export default {
         	allItems.prepareDonePatch(item.id);
         	document.querySelector('.btn-ok').focus();
         },
-        timerNav(button, item){
+        timerNav(button, item, value){
         	if(button == 'play'){ this.playTimer(item); }
 			if(button == 'pause'){ this.pauseTimer(item); }
-			if(button == 'forward'){ this.forwardTimer(item); }
+			if(button == 'forward'){ this.forwardTimer(item, value); }
 			if(button == 'reset'){ this.resetTimer(item); }
 			if(button == 'close'){ this.closeTimer(item); }
         },
@@ -186,8 +190,9 @@ export default {
 			vm.patch(item.id, 'used_time');
 			allItems.calculateTotalTime(item.id);
 		},
-		forwardTimer(item){
-			item.used_time = item.used_time+60;
+		forwardTimer(item, time){
+			time = time*60;
+			item.used_time = item.used_time+time;
 		},
 		resetTimer(item){
         	console.log("timer reset: "+moment().format('HH:mm:ss'));

@@ -45,7 +45,7 @@
 	<div class="navigation">
 		<div class="menu">
 			<a href="#"
-				:class="{active: (selection.filter.length == 0 && selection.tags.length == 0 && selection.view == 'tree')}"
+				:class="{active: selection.filter.includes('all')}"
 				@click="filterItems('all', 'all')"
 			>All</a>
 			<a href="#"
@@ -66,6 +66,10 @@
 					'filtered-out': selection.hiddenTags.includes(tag.slug)}"
 				@click="filterItems('tag', tag.slug, $event)"
 			>@{{ tag.name }}</a>
+			<a v-for="tag in selection.hiddenTags"
+				class="filtered-out" href="#"
+				@click="filterItems('tag', tag, $event)"
+			>@{{ tagSlugToName(tag) }}</a>
 			
 		</div>
 	</div>

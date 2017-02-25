@@ -1,10 +1,25 @@
+@mixin tag($colour) {
+    align-items: center;
+    display: flex;
+    position:relative;
+    padding: 0.3em 0.5em;
+    margin: 0.1em;
+    border-radius: 0.3em;
+    color: white;
+    background-color: $colour;
+    min-height: 2.1em;
+    font-size: 0.7em;
+}
+
 label{
     font-weight: 300;
 }
 .toggle-div{
-    width: 2em;
+    margin-right: 0.3em;
     div, input{
         margin: 0; // reset margins
+        height: auto;
+        width: 1.6em;
     }
 }
 .toggle{
@@ -16,16 +31,10 @@ label{
     outline: none !important;
 }
 .toggle:after{
-    content: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="-10 -18 100 135"><circle cx="50" cy="50" r="50" fill="none" stroke="#ededed" stroke-width="3"/></svg>');
-    transform: scale(0.7);
-    display: block;
-    margin: 0 0 0 -1em;
+    content: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="50" fill="none" stroke="#e6e6e6" stroke-width="3"/></svg>');
 }
 .toggle:checked:after{
-    content: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="-10 -18 100 135"><circle cx="50" cy="50" r="50" fill="none" stroke="#bddad5" stroke-width="3"/><path fill="#5dc2af" d="M72 25L42 71 27 56l-4 4 20 20 34-52z"/></svg>');
-    transform: scale(0.7);
-    display: block;
-    margin: 0 0 0 -1em;
+    content: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="50" fill="none" stroke="#bddad5" stroke-width="3"/><path fill="#5dc2af" d="M72 25L42 71 27 56l-4 4 20 20 34-52z"/></svg>');
 }
 
 .styled-check{
@@ -181,42 +190,31 @@ label{
     display: flex;
     align-items: center;
 }
+
 .item-tags{
     white-space: nowrap;
     display: flex;
     flex-wrap: wrap;
-    align-items: baseline;
-    font-size: 0.7em;
-    >span, >label{
-        align-items: center;
-        display: flex;
-        position:relative;
-        padding: 0.3em 0.5em;
-        margin: 0.1em;
-        border-radius: 0.3em;
-        color: white;
-    }
+    align-items: center;
     .done{
+        @include tag(#e6e6e6);
         cursor: pointer;
         color: #5a5a5a;
-        background: #e6e6e6;
     }
     .duration, .currentDuration{
-        background: $duration-color;
+        @include tag($duration-color);
     }
     .duedate{
-        background: $duedate-color;
+        @include tag($duedate-color);
     }
     .duedate-parent{
-        background: $duedate-parent-color;
-        // padding: 0 0.4em !important;
-        // font-size: 0.9em;
+        @include tag($duedate-parent-color);
     }
     .total-duration{
-        background:$duration-color-dark;
+        @include tag($duration-color-dark);
     }
     .custom-tag{
-        background: $theme-color;
+        @include tag($theme-color);
         cursor: pointer;
     }
     button{
@@ -228,15 +226,19 @@ label{
 }
 .done .bodybox{
     color: #d9d9d9;
-    text-decoration: line-through;
+    >div:first-child{
+        text-decoration: line-through;
+    }
 }
 .completion-notes{
     color: #a2999a;
     padding: 2px 0 0 2em;
     width: 100%;
+    background: none !important;
 }
 form.addnewbox{
     margin-left: 1.9em;
+    border-bottom: thin solid rgba(245, 215, 110, 0.7);
 }
 form.addnewbox.child{
     margin-left: 3.8em;  
@@ -312,6 +314,7 @@ form.addnewbox.child{
             color: $duration-color;
             font-size: 1em;
             padding: 0 0.2em;
+            min-height: 2.1em;
         }
         .currentDuration{
             background: $duration-color;
@@ -321,19 +324,10 @@ form.addnewbox.child{
             color: white;
         }
     }
-    .update-custom-tags input{
-        border-bottom: 1px solid $theme-color;
-    }
+    // .update-custom-tags input{
+    //     border-bottom: 1px solid $theme-color;
+    // }
 }
-.body-div.updating-tags{
-    flex-wrap: wrap;
-    .updatebox{
-        margin: 0 auto;
-        background: white;
-        border: 1px $selection-color solid;
-    }
-}
-
 .editing{
     .selected{
         background: none;
@@ -341,16 +335,45 @@ form.addnewbox.child{
     .body-div{
         flex-direction: column;
         align-items:flex-start;
-        padding: 0.4em 0;
+        padding-bottom: 0.4em;
+        border-bottom: thin solid rgba(245, 215, 110, 0.7);
     }
 }
 .body-div.updating-tags{
     flex-direction: column;
+    flex-wrap: wrap;
     align-items:flex-start;
-    padding: 0.4em 0;    
+    padding-bottom: 0.4em;
     background: none;
+    border-bottom: thin solid rgba(245, 215, 110, 0.7);
+    .updatebox{
+        margin: 0 auto;
+        background: white;
+        border: thin solid rgba(245, 215, 110, 0.7);
+    }
     .bodybox{
         width: 100%;
         background: $selection-color;
     }
+    .item-tags{
+        margin-top: 0.3em;
+    }
+}
+.add-prepared-tag-wrapper>label,
+.add-tag-wrapper>label {
+    display: flex;
+    align-items: baseline;
+}
+.add-tag-wrapper>label {
+    font-size: 0.85em;
+    margin-left: 0.3em;
+}
+input.add-tag, input.prepare-tag{
+    @include tag($theme-color);
+    margin-left: 0.3em;
+    min-width: 3em;
+}
+input.prepare-tag::-webkit-input-placeholder,
+input.add-tag::-webkit-input-placeholder {
+    color: white;
 }

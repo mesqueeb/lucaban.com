@@ -42,7 +42,7 @@ initialize(item, index)
 	node = this.setDefaultItemValues(node);
 	node.parent_id_backup = node.parent_id;
 	// Register and organize nodes:
-	if(node.depth == 0) { this.root = node; console.log('mnode');}
+	if(node.depth == 0) { this.root = node; console.log('root-node');}
 	else if (parent) { parent.children.push(node); }
 	else { this.orphans.push(node); }
 	this.nodes[node.id] = node;
@@ -340,8 +340,15 @@ prevFilteredItemId(id)
 }
 sortChildren(id)
 {
+	console.log('sortingChildren');
 	let item = this.nodes[id];
-	item.children_order = item.children_order.filter(id => ~item.children.indexOf(this.nodes[id]));
+	item.children_order = item.children_order.filter(function(id){
+		let child = this.nodes[id];
+		let a = item.children.indexOf(child);
+		let b = ~a; // Anything that's not -1 will become something else than 0, so will be included.
+		return b;
+	}.bind(this));
+
 	let order = item.children_order;
 	let items = item.children;
 	if (order instanceof Array)
@@ -536,7 +543,7 @@ prepareDonePatch(id)
 	{
 		vm.popup(id, 'afterDone');
 	}
-	this.autoCalculateDoneState(item.parent_id);
+	// this.autoCalculateDoneState(item.parent_id);
 	if (item.done)
 	{ // IF DONE:
 		//Add parent's body
@@ -807,19 +814,8 @@ filterItems(keyword, value, operator)
 	}
 	if (keyword == 'journal')
 	{
-		if (!this.doneitems.length)
-		{
-			console.log('waiting for done items...');
-			setTimeout(function(){
-				this.filterItems(keyword, value, operator);
-			}.bind(this), 200);
-			return;
-		}
-		filteredArray = this.doneitems;
-		// Codementor: How do I know the following function will start after the fetch is over?
-		// setTimeout(function(){
-		// 	flatpickrifyAllInputs();
-		// }, 1000);
+		filteredArray = vm.doneData;
+		vm.resetDoneData();
 	}
 	if (keyword == 'duedate')
 	{

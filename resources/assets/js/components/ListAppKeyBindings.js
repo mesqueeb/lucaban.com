@@ -3,68 +3,76 @@ export default class
 constructor()
 {
 	let self = this;
-	window.addEventListener('keydown', function(e) {
-		if(keydownListenerPaused
-			|| vm.popouts.delete.length
-			|| vm.popouts.timer.length
-			|| vm.popups.length)
+	window.addEventListener('keydown', function(e){
+		if (keydownListenerPaused)
 		{ 
 			// console.log('keydownListenerPaused'); 
 			return;
 		}
         let x = e.keyCode;
-       	if(document.activeElement.className == "flatpickr-days"){
-			if(x == 9){
+       	if(document.activeElement.className == "flatpickr-days")
+       	{
+			if(x == 9)
+			{
 				console.log('hiya!');
 				e.preventDefault();
 				return;
 				// This stops the event listener when a flatpickr dialogue is open.
 			}
 		}
-    	if (vm.popouts.delete.length || vm.popouts.timer.length){
-    		if(x == 27) { // escape
+    	if (vm.popouts.delete.length || vm.popouts.timer.length)
+    	{
+    		if(x == 27)
+    		{ // escape
 				e.preventDefault();
 				eventHub.$emit('clearAll');
 				console.log('Escape');
 			}
-			if(x == 9){ // TAB
+			if(x == 9)
+			{ // TAB
 				e.preventDefault();
-				if (e.shiftKey){
+				if (e.shiftKey)
+				{
 					$(".btn-cancel").focus();
 				} else {
 					$(".btn-ok").focus();
 				}
 	  		}
-			if(x == 37){ // arrow left
+			if(x == 37)
+			{ // arrow left
 				e.preventDefault();
 				$(".btn-cancel").focus();
 			}
-			if(x == 39){ // arrow right
+			if(x == 39)
+			{ // arrow right
 				e.preventDefault();
 				$(".btn-ok").focus();
 			}
 		}
 		else if(vm.editingItem || vm.addingNewUnder || vm.editingItemTags)
 		{
-			if(document.activeElement.nodeName != 'BUTTON'){
+			if(document.activeElement.nodeName != 'BUTTON')
+			{
 				return;
 		    }
-			if(e.keyCode == 27){ // Escape
+			if(e.keyCode == 27)
+			{ // Escape
 				if(vm.editingItem)
 				{
 					eventHub.$emit('escapeOnEditButtonFocus');
+					console.log('escapeOnEditButtonFocus');
 				}
 				else if(vm.addingNewUnder)
 				{
 					eventHub.$emit('escapeOnNewButtonFocus');
+					console.log('escapeOnNewButtonFocus');
 				}
 			}
 		}
-		else if ( 
-			document.activeElement.nodeType == 'INPUT'
-        	|| document.activeElement.nodeType == 'TEXTAREA'
-        	|| document.activeElement.nodeType == 'A'
-        	|| document.activeElement.nodeType == 'BUTTON' )
+		else if ( document.activeElement.nodeName == 'INPUT'
+        	   || document.activeElement.nodeName == 'TEXTAREA'
+        	   || document.activeElement.nodeName == 'A'
+        	   || document.activeElement.nodeName == 'BUTTON' )
 		{
 			console.log('inputs or buttons are focussed!');
         	return;
@@ -73,10 +81,12 @@ constructor()
 		{ 
 			console.log('keydown event: NO inputs or buttons are focussed!');
 		  // INPUT AREAS NOT IN FOCUS
-          switch(e.keyCode) { 
+          switch(e.keyCode)
+          { 
 			case 37: // arrowLeft
 				e.preventDefault();
-				if (e.ctrlKey || e.metaKey){
+				if (e.ctrlKey || e.metaKey)
+				{
 		  			self.keystroke('meta_arrowLeft');
 		  			break;
 		  		}
@@ -84,7 +94,8 @@ constructor()
 				break;
 			case 39: // arrowRight
 				e.preventDefault();
-				if (e.ctrlKey || e.metaKey){
+				if (e.ctrlKey || e.metaKey)
+				{
 		  			self.keystroke('meta_arrowRight');
 		  			break;
 		  		}
@@ -92,7 +103,8 @@ constructor()
 				break;
 			case 38: // arrowUp
 				e.preventDefault();
-				if (e.ctrlKey || e.metaKey){
+				if (e.ctrlKey || e.metaKey)
+				{
 		  			self.keystroke('meta_arrowUp');
 		  			break;
 		  		}
@@ -100,7 +112,8 @@ constructor()
 				break;
 			case 40: // arrowDown
 				e.preventDefault();
-				if (e.ctrlKey || e.metaKey){
+				if (e.ctrlKey || e.metaKey)
+				{
 		  			self.keystroke('meta_arrowDown');
 		  			break;
 		  		}
@@ -112,7 +125,8 @@ constructor()
 				break;
 			case 9: // tab
 				e.preventDefault();
-				if (e.shiftKey){
+				if (e.shiftKey)
+				{
 		  			self.keystroke('shift_tab');
 		  			break;
 		  		}
@@ -120,9 +134,11 @@ constructor()
 				break;
 			case 13: // enter
 				e.preventDefault();
-				if (e.ctrlKey || e.metaKey){
+				if (e.ctrlKey || e.metaKey)
+				{
 		  			self.keystroke('meta_enter');
-		  		} else if (e.shiftKey) {
+		  		} else if (e.shiftKey)
+		  		{
 					self.keystroke('shift_enter');
 		  		} else {
 					self.keystroke('enter');
@@ -130,7 +146,8 @@ constructor()
 				break;
 			case 84: // key t
 				e.preventDefault();
-				if (e.ctrlKey || e.metaKey || e.shiftKey){
+				if (e.ctrlKey || e.metaKey || e.shiftKey)
+				{
 		  			self.keystroke('shift_t');
 		  		} else {
 					self.keystroke('t');
@@ -140,7 +157,8 @@ constructor()
 				self.keystroke('s');
 				break;
 			case 85: // key u
-				if (e.ctrlKey){
+				if (e.ctrlKey)
+				{
 					self.keystroke('ctrl_u');
 		  			break;
 		  		}
@@ -148,14 +166,16 @@ constructor()
 				break;
 			case 68: // key d
 				e.preventDefault();
-				if ((e.ctrlKey || e.metaKey) && e.shiftKey){
+				if ((e.ctrlKey || e.metaKey) && e.shiftKey)
+				{
 					self.keystroke('meta_shift_d');
 		  			break;
 		  		}
 				break;
 			case 8: // DELETE (backspace)
 				e.preventDefault();
-				if (e.ctrlKey || e.metaKey){
+				if (e.ctrlKey || e.metaKey)
+				{
 					self.keystroke('meta_backspace');
 		  			break;
 		  		}

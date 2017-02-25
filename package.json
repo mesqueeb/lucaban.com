@@ -16,6 +16,7 @@
   },
   "dependencies": {
     "autosize": "^3.0.20",
+    "autosize-input": "^0.4.0",
     "bootstrap-sass": "^3.3.7",
     "countdown": "^2.6.0",
     "flatpickr": "^2.3.5",

@@ -14895,13 +14895,16 @@ module.exports = g;
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* WEBPACK VAR INJECTION */(function($) {/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "f", function() { return arrayToString; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "e", function() { return sec_to_hourmin; });
+/* WEBPACK VAR INJECTION */(function($) {/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "d", function() { return objectToArray; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "f", function() { return uniqBy; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "j", function() { return uniq; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "h", function() { return arrayToString; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "g", function() { return sec_to_hourmin; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return hasClass; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return btnEffect; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "c", function() { return isElementInViewport; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "d", function() { return sortObjectArrayByProperty; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "g", function() { return removeEmptyValuesFromArray; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "e", function() { return sortObjectArrayByProperty; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "i", function() { return removeEmptyValuesFromArray; });
 function arrayToString(arr) {
 	if (!Array.isArray(arr) || !arr.length) {
 		return '';
@@ -14911,6 +14914,11 @@ function arrayToString(arr) {
 		c_o = c_o + ',' + entry;
 	});
 	return c_o.substring(1);
+}
+function objectToArray(obj) {
+	return Object.keys(obj).map(function (key) {
+		return obj[key];
+	});
 }
 
 function sec_to_hourmin(val) {
@@ -14958,11 +14966,15 @@ function removeEmptyValuesFromArray(array) {
 	return cleanArray;
 }
 
-function sortObjectArrayByProperty(array, propertyName) {
+function sortObjectArrayByProperty(array, propertyName, order) {
 	return array.sort(function (a, b) {
 		var textA = a[propertyName].toUpperCase();
 		var textB = b[propertyName].toUpperCase();
-		return textA < textB ? -1 : textA > textB ? 1 : 0;
+		if (!order || order == 'asc') {
+			return textA < textB ? -1 : textA > textB ? 1 : 0;
+		} else if (order == 'desc') {
+			return textA > textB ? -1 : textA < textB ? 1 : 0;
+		}
 	}.bind(propertyName));
 }
 
@@ -14981,6 +14993,20 @@ function btnEffect(event) {
 	setTimeout(function () {
 		// $el.blur();
 	}, 1000);
+}
+function uniqBy(a, key) {
+	key = key ? key : JSON.stringify;
+	var seen = {};
+	return a.filter(function (item) {
+		var k = key(item);
+		return seen.hasOwnProperty(k) ? false : seen[k] = true;
+	});
+}
+function uniq(a) {
+	// return a.sort().filter(function(item, pos, ary) {
+	//     return !pos || item != ary[pos - 1];
+	// })
+	return Array.from(new Set(a));
 }
 
 function isElementInViewport(el) {
@@ -24031,7 +24057,7 @@ var _class = function () {
 			node.parent_id_backup = node.parent_id;
 			// Register and organize nodes:
 			if (node.depth == 0) {
-				this.root = node;console.log('mnode');
+				this.root = node;console.log('root-node');
 			} else if (parent) {
 				parent.children.push(node);
 			} else {
@@ -24401,12 +24427,15 @@ var _class = function () {
 	}, {
 		key: 'sortChildren',
 		value: function sortChildren(id) {
-			var _this2 = this;
-
+			console.log('sortingChildren');
 			var item = this.nodes[id];
 			item.children_order = item.children_order.filter(function (id) {
-				return ~item.children.indexOf(_this2.nodes[id]);
-			});
+				var child = this.nodes[id];
+				var a = item.children.indexOf(child);
+				var b = ~a; // Anything that's not -1 will become something else than 0, so will be included.
+				return b;
+			}.bind(this));
+
 			var order = item.children_order;
 			var items = item.children;
 			if (order instanceof Array) {
@@ -24505,7 +24534,7 @@ var _class = function () {
 	}, {
 		key: 'copyParentBodyToAllChildren',
 		value: function copyParentBodyToAllChildren(parent_id) {
-			var _this3 = this;
+			var _this2 = this;
 
 			if (!parent_id) {
 				return;
@@ -24516,7 +24545,7 @@ var _class = function () {
 			}
 			var b = item.body;
 			item.children_order.forEach(function (childId) {
-				var child = _this3.nodes[childId];
+				var child = _this2.nodes[childId];
 				child.parents_bodies = b;
 				if (!vm) {
 					return;
@@ -24580,7 +24609,7 @@ var _class = function () {
 				return;
 			}
 			if (Array.isArray(tags)) {
-				tags = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__components_globalFunctions_js__["g" /* removeEmptyValuesFromArray */])(tags);
+				tags = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__components_globalFunctions_js__["i" /* removeEmptyValuesFromArray */])(tags);
 				tags = tags.filter(function (t) {
 					return !this.hasTag(id, t);
 				}.bind(this));
@@ -24627,7 +24656,7 @@ var _class = function () {
 			if (item.done) {
 				vm.popup(id, 'afterDone');
 			}
-			this.autoCalculateDoneState(item.parent_id);
+			// this.autoCalculateDoneState(item.parent_id);
 			if (item.done) {
 				// IF DONE:
 				//Add parent's body
@@ -24812,13 +24841,13 @@ var _class = function () {
 		key: 'flushDoneItems',
 		value: function flushDoneItems() // Do not use yet. Not sure how to best implement this...
 		{
-			var _this4 = this;
+			var _this3 = this;
 
 			var nodes = this.nodes;
 			var keys = Object.keys(nodes);
 			var doneItemsObject = keys.reduce(function (prev, id) {
 				if (nodes[id].done) {
-					_this4.deleteItem(id);
+					_this3.deleteItem(id);
 				}
 			});
 		}
@@ -24927,18 +24956,8 @@ var _class = function () {
 				filteredArray = this.backups.rootChildren;
 			}
 			if (keyword == 'journal') {
-				if (!this.doneitems.length) {
-					console.log('waiting for done items...');
-					setTimeout(function () {
-						this.filterItems(keyword, value, operator);
-					}.bind(this), 200);
-					return;
-				}
-				filteredArray = this.doneitems;
-				// Codementor: How do I know the following function will start after the fetch is over?
-				// setTimeout(function(){
-				// 	flatpickrifyAllInputs();
-				// }, 1000);
+				filteredArray = vm.doneData;
+				vm.resetDoneData();
 			}
 			if (keyword == 'duedate') {
 				var dueDateFilterResults = this.arrayFilterDate(arrayToFilter, value, operator);
@@ -36548,7 +36567,7 @@ window.preventKeydownListener = function () {
 	window.keydownListenerPaused = true;
 	setTimeout(function () {
 		window.keydownListenerPaused = false;
-	}.bind(this), 1000);
+	}.bind(this), 200);
 };
 
 // Vue Basics
@@ -36615,6 +36634,7 @@ __WEBPACK_IMPORTED_MODULE_0_jquery___default.a.getJSON('/api/items', function (f
 	new __WEBPACK_IMPORTED_MODULE_12__components_ListAppKeyBindings_js__["a" /* default */]();
 	vm.allData = allItems.root;
 	vm.doneData = allItems.doneitems;
+	vm.nodes = allItems.nodes;
 
 	console.log('allItems ↓');
 	console.log(allItems);
@@ -36676,6 +36696,17 @@ __WEBPACK_IMPORTED_MODULE_0_jquery___default.a.getJSON('/api/items', function (f
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__components_flatPickrOptions_js__ = __webpack_require__(206);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_autosize__ = __webpack_require__(207);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_autosize___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_autosize__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_autosize_input__ = __webpack_require__(208);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_autosize_input___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_3_autosize_input__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__components_globalFunctions_js__ = __webpack_require__(8);
+//
+//
+//
+//
+//
+//
+//
+//
 //
 //
 //
@@ -37089,11 +37120,13 @@ __WEBPACK_IMPORTED_MODULE_0_jquery___default.a.getJSON('/api/items', function (f
 
 
 
+
+
 /* harmony default export */ __webpack_exports__["default"] = {
 	name: 'Card',
 	template: '#items-card-template',
 	mounted: function mounted() {
-		this.newItem.preparedTags = JSON.parse(JSON.stringify(this.parentTags));
+		// this.newItem.preparedTags = JSON.parse(JSON.stringify(this.parentTags));
 		this.convertbodyURLtoHTML();
 		eventHub.$on('startEdit', this.startEdit);
 		eventHub.$on('escapeOnEditButtonFocus', this.cancelEdit);
@@ -37119,10 +37152,36 @@ __WEBPACK_IMPORTED_MODULE_0_jquery___default.a.getJSON('/api/items', function (f
 	// Flatpickr: Flatpickr,
 	// },
 	computed: {
+		preparedPlusComputedTags: function preparedPlusComputedTags() {
+			if (!this.item || !allItems) {
+				return 0;
+			}
+			var alltags = this.newItem.preparedTags;
+			if (selection.tags.length) {
+				alltags = alltags.concat(selection.tags.map(function (tag) {
+					return allItems.tagSlugToName(tag);
+				}));
+			}
+			if (this.parentTags.length) {
+				alltags = alltags.concat(this.parentTags);
+			}
+			if (this.$root.addingNewAsChild) {
+				var tagz = allItems.returnTagsAsArray(this.item.id);
+				alltags = alltags.concat(tagz);
+			}
+			alltags = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_4__components_globalFunctions_js__["j" /* uniq */])(alltags);
+			return alltags.sort();
+		},
 		listIsEmpty: function listIsEmpty() {
+			if (!this.item || !allItems) {
+				return 0;
+			}
 			return this.$root.noItems;
 		},
 		basis: function basis() {
+			if (!this.item || !allItems) {
+				return 0;
+			}
 			return this.$root;
 		},
 		totalPlannedMin: function totalPlannedMin() {
@@ -37228,11 +37287,10 @@ __WEBPACK_IMPORTED_MODULE_0_jquery___default.a.getJSON('/api/items', function (f
 			if (!this.item || !allItems) {
 				return;
 			}
-			var pId = this.item.parent_id;
 			if (this.item.depth == 0) {
 				return allItems.nodes[this.item.id].children_order;
 			}
-			return allItems.nodes[pId].children_order;
+			return this.$parent.item.children_order;
 		},
 		showAddNewBox: function showAddNewBox() {
 			if (!this.item || !allItems) {
@@ -37331,11 +37389,12 @@ __WEBPACK_IMPORTED_MODULE_0_jquery___default.a.getJSON('/api/items', function (f
 			return this.totalPlannedSec != this.$parent.totalPlannedSec;
 		},
 		parentTags: function parentTags() {
-			if (!this.item || !allItems || !this.item.parent_id) {
+			if (!this.item || !allItems || !this.item.parent_id || !this.$parent.item) {
 				return [];
 			}
-			// console.log("running parentTags! this.item.parent_id = "+this.item.parent_id);
-			return allItems.returnTagsAsArray(this.item.parent_id);
+			return this.$parent.item.tagged.map(function (obj) {
+				return obj.tag_name;
+			});
 		},
 		isHidden: function isHidden() {
 			if (!this.item || !allItems) {
@@ -37387,6 +37446,9 @@ __WEBPACK_IMPORTED_MODULE_0_jquery___default.a.getJSON('/api/items', function (f
 			vm.$root.showAddNewItem(this.item.parent_id);
 		},
 		keydownOnNew: function keydownOnNew(item, e, field) {
+			if (this.newTag && this.newTag.substring(0, 1) != ' ') {
+				this.newTag = ' ' + this.newTag;
+			}
 			console.log(e);
 			console.log('↑　keydown on new: ' + e.keyCode + ' - ' + field);
 			// SHIFT-TAB
@@ -37399,7 +37461,7 @@ __WEBPACK_IMPORTED_MODULE_0_jquery___default.a.getJSON('/api/items', function (f
 			}
 			// TAB
 			if (e.keyCode === 9 && !e.shiftKey) {
-				if (field == 'addTag') {
+				if (field == 'prepare-tag') {
 					// e.preventDefault();
 					// this.newItemIndent();
 					// return;
@@ -37419,9 +37481,13 @@ __WEBPACK_IMPORTED_MODULE_0_jquery___default.a.getJSON('/api/items', function (f
 					this.setPlannedTimeNewItem(item, event);
 					return;
 				}
-				if (field == 'addTag' && this.newTag) {
+				if (field == 'prepare-tag' && this.newTag) {
 					this.prepareTag(item);
 					return;
+				}
+				if (field == 'delete-tag') {
+					var _tagName = e.srcElement.value;
+					this.deletePreparedTag(item.id, _tagName);
 				}
 				if (!this.newItem.body) {
 					return;
@@ -37441,7 +37507,7 @@ __WEBPACK_IMPORTED_MODULE_0_jquery___default.a.getJSON('/api/items', function (f
 			// ArrowLeft
 			if (e.keyCode === 37) {
 				// If in an EMPTY BODY
-				if (field != 'body' || field == 'body' && !this.newItem.body) {
+				if (field != 'body' && field != 'prepare-tag' || field == 'body' && !this.newItem.body) {
 					e.preventDefault();
 					// console.log('this.newItemUnindent();');
 					this.newItemUnindent();
@@ -37451,7 +37517,7 @@ __WEBPACK_IMPORTED_MODULE_0_jquery___default.a.getJSON('/api/items', function (f
 			// ArrowRight
 			if (e.keyCode === 39) {
 				// If in an EMPTY BODY
-				if (field != 'body' || field == 'body' && !this.newItem.body) {
+				if (field != 'body' && field != 'prepare-tag' || field == 'body' && !this.newItem.body) {
 					e.preventDefault();
 					// console.log('this.newItemIndent();');
 					this.newItemIndent();
@@ -37472,7 +37538,7 @@ __WEBPACK_IMPORTED_MODULE_0_jquery___default.a.getJSON('/api/items', function (f
 					document.querySelector(plsFocus).focus();
 					return;
 				}
-				if (field == 'addTag') {
+				if (field == 'prepare-tag') {
 					e.preventDefault();
 					var _plsFocus = '#new-under-' + this.item.id + ' .update-planned-time>button';
 					document.querySelector(_plsFocus).focus();
@@ -37494,7 +37560,7 @@ __WEBPACK_IMPORTED_MODULE_0_jquery___default.a.getJSON('/api/items', function (f
 					document.querySelector(_plsFocus3).focus();
 					return;
 				}
-				if (field == 'addTag' && !this.newItem.body) {
+				if (field == 'prepare-tag' && !this.newItem.body) {
 					e.preventDefault();
 					this.cancelAddNew();
 					return;
@@ -37504,15 +37570,18 @@ __WEBPACK_IMPORTED_MODULE_0_jquery___default.a.getJSON('/api/items', function (f
 			if (e.keyCode === 27) {
 				e.preventDefault();
 				this.cancelAddNew();
-				return;
+				this.$root.cancelThroughKeydown = true;
+				setTimeout(function () {
+					this.$root.cancelThroughKeydown = false;
+				}.bind(this), 100);
 			}
 		},
 		keydownOnEdit: function keydownOnEdit(item, e, field) {
 			preventKeydownListener();
-			var bodyboxHeight = $("#card-" + this.item.id + " .bodybox").height();
-			$('#updatebox-' + item.id + ' .edititem-body').height(bodyboxHeight + 6);
-
 			// console.log('Keydown on edit: '+field);
+			if (this.newTag && this.newTag.substring(0, 1) != ' ') {
+				this.newTag = ' ' + this.newTag;
+			}
 			// SHIFT-TAB
 			if (e.keyCode === 9 && e.shiftKey) {
 				if (field == 'body') {
@@ -37537,8 +37606,8 @@ __WEBPACK_IMPORTED_MODULE_0_jquery___default.a.getJSON('/api/items', function (f
 			if (e.keyCode === 13 && !e.shiftKey && !e.altKey) {
 				e.preventDefault();
 				if (field == 'delete-tag') {
-					var _tagName = e.srcElement.value;
-					this.deleteTag(item.id, _tagName);
+					var _tagName2 = e.srcElement.value;
+					this.deleteTag(item.id, _tagName2);
 					return;
 				}
 				if (field == 'planned-time') {
@@ -37577,7 +37646,7 @@ __WEBPACK_IMPORTED_MODULE_0_jquery___default.a.getJSON('/api/items', function (f
 				}
 				e.preventDefault();
 				if (field == 'planned-time') {
-					var _plsFocus5 = '#updatebox-' + item.id + ' .add-tag';
+					var _plsFocus5 = '#add-tag-' + item.id + ' .add-tag';
 					document.querySelector(_plsFocus5).focus();
 					return;
 				}
@@ -37588,9 +37657,16 @@ __WEBPACK_IMPORTED_MODULE_0_jquery___default.a.getJSON('/api/items', function (f
 			// ESC
 			if (e.keyCode === 27) {
 				this.cancelEdit(item);
+				this.$root.cancelThroughKeydown = true;
+				setTimeout(function () {
+					this.$root.cancelThroughKeydown = false;
+				}.bind(this), 100);
 			}
 		},
 		blurOnEdit: function blurOnEdit(item) {
+			if (this.$root.cancelThroughKeydown) {
+				return;
+			}
 			var self = this;
 			setTimeout(function () {
 				if (document.activeElement.nodeName == 'INPUT' || document.activeElement.nodeName == 'TEXTAREA' || document.activeElement.nodeName == 'A' || document.activeElement.nodeName == 'BUTTON') {
@@ -37603,6 +37679,9 @@ __WEBPACK_IMPORTED_MODULE_0_jquery___default.a.getJSON('/api/items', function (f
 			// Codementor: is there any better way than this?
 		},
 		blurOnAddNew: function blurOnAddNew(item) {
+			if (this.$root.cancelThroughKeydown) {
+				return;
+			}
 			var self = this;
 			setTimeout(function () {
 				if (document.activeElement.nodeName == 'INPUT' || document.activeElement.nodeName == 'TEXTAREA' || document.activeElement.nodeName == 'A' || document.activeElement.nodeName == 'BUTTON') {
@@ -37692,7 +37771,6 @@ __WEBPACK_IMPORTED_MODULE_0_jquery___default.a.getJSON('/api/items', function (f
 			var index = void 0;
 			var addTags = void 0;
 
-			console.log('sending newItem:');
 			newItem = this.newItem;
 			newItem.parent_id = this.item.parent_id ? this.item.parent_id : allItems.root.id;
 			newItem.depth = this.item.depth;
@@ -37700,27 +37778,31 @@ __WEBPACK_IMPORTED_MODULE_0_jquery___default.a.getJSON('/api/items', function (f
 			var OlderSiblingIndex = this.siblingIndex;
 			index = isNaN(OlderSiblingIndex) ? 0 : OlderSiblingIndex + 1;
 
-			addTags = this.newItem.preparedTags;
+			addTags = this.preparedPlusComputedTags;
 
 			if (this.$root.addingNewAsChild || this.listIsEmpty) {
 				newItem.depth = this.item.depth + 1;
 				newItem.parent_id = this.item.id;
 				index = 0;
-				// Add tags        		
-				var toBeParentTags = allItems.itemTagArray(this.item.id);
-				Array.prototype.push.apply(addTags, toBeParentTags);
+				// Add tags
+				// let toBeParentTags = allItems.itemTagArray(this.item.id);
+				// Array.prototype.push.apply(addTags, toBeParentTags);
+				// ↑　solved wih this.preparedPlusComputedTags
 			}
 			if (selection.view == "journal") {
 				newItem.done = 1;
+				newItem.done_date = this.item.done_date;
 			}
 			if (this.newItem.preparedTags.includes('Today') || selection.filter.includes('today')) {
 				newItem.due_date = moment().format();
-				this.newItem.preparedTags = this.newItem.preparedTags.filter(function (val) {
+				addTags = addTags.filter(function (val) {
 					return val != 'Today';
 				});
 			}
-
+			console.log('sending newItem:');
 			console.log(newItem);
+			console.log('sending tags:');
+			console.log(addTags);
 			// Send to Root for Ajax call.
 			this.$root.postNewItem(newItem, index, addNextItemAs, addTags);
 
@@ -37728,7 +37810,7 @@ __WEBPACK_IMPORTED_MODULE_0_jquery___default.a.getJSON('/api/items', function (f
 			this.newItem.body = '';
 			this.newItem.due_date = '0000-00-00 00:00:00';
 			this.newItem.planned_time = '';
-			this.newItem.preparedTags = JSON.parse(JSON.stringify(this.parentTags));
+			this.newItem.preparedTags = [];
 		},
 		cancelAddNew: function cancelAddNew(lastSelectedId) {
 			this.newItem.body = '';
@@ -37766,7 +37848,7 @@ __WEBPACK_IMPORTED_MODULE_0_jquery___default.a.getJSON('/api/items', function (f
 		},
 		setPlannedTime: function setPlannedTime(item, event) {
 			item.planned_time = event.srcElement.value ? parseFloat(event.srcElement.value) : 0;
-			var plsFocus = '#updatebox-' + item.id + ' .add-tag';
+			var plsFocus = '#add-tag-' + item.id + ' .add-tag';
 			Vue.nextTick(function () {
 				console.log('returning to editting: ' + plsFocus);
 				document.querySelector(plsFocus).focus();
@@ -37793,6 +37875,13 @@ __WEBPACK_IMPORTED_MODULE_0_jquery___default.a.getJSON('/api/items', function (f
 			inserted: function inserted(el, binding) {
 				Vue.nextTick(function () {
 					__WEBPACK_IMPORTED_MODULE_2_autosize___default()(el);
+				});
+			}
+		},
+		autowidth: {
+			inserted: function inserted(el, binding) {
+				Vue.nextTick(function () {
+					__WEBPACK_IMPORTED_MODULE_3_autosize_input___default()(el);
 				});
 			}
 		}
@@ -38135,6 +38224,10 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
+//
+//
+//
 
 // import PopoutConfirmation from './PopoutConfirmation.vue';
 
@@ -38195,7 +38288,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 			allItems.prepareDonePatch(item.id);
 			document.querySelector('.btn-ok').focus();
 		},
-		timerNav: function timerNav(button, item) {
+		timerNav: function timerNav(button, item, value) {
 			if (button == 'play') {
 				this.playTimer(item);
 			}
@@ -38203,7 +38296,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 				this.pauseTimer(item);
 			}
 			if (button == 'forward') {
-				this.forwardTimer(item);
+				this.forwardTimer(item, value);
 			}
 			if (button == 'reset') {
 				this.resetTimer(item);
@@ -38243,8 +38336,9 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 			vm.patch(item.id, 'used_time');
 			allItems.calculateTotalTime(item.id);
 		},
-		forwardTimer: function forwardTimer(item) {
-			item.used_time = item.used_time + 60;
+		forwardTimer: function forwardTimer(item, time) {
+			time = time * 60;
+			item.used_time = item.used_time + time;
 		},
 		resetTimer: function resetTimer(item) {
 			console.log("timer reset: " + moment().format('HH:mm:ss'));
@@ -38457,7 +38551,7 @@ var _class = function () {
 
 		var self = this;
 		window.addEventListener('keydown', function (e) {
-			if (keydownListenerPaused || vm.popouts.delete.length || vm.popouts.timer.length || vm.popups.length) {
+			if (keydownListenerPaused) {
 				// console.log('keydownListenerPaused'); 
 				return;
 			}
@@ -38504,11 +38598,13 @@ var _class = function () {
 					// Escape
 					if (vm.editingItem) {
 						eventHub.$emit('escapeOnEditButtonFocus');
+						console.log('escapeOnEditButtonFocus');
 					} else if (vm.addingNewUnder) {
 						eventHub.$emit('escapeOnNewButtonFocus');
+						console.log('escapeOnNewButtonFocus');
 					}
 				}
-			} else if (document.activeElement.nodeType == 'INPUT' || document.activeElement.nodeType == 'TEXTAREA' || document.activeElement.nodeType == 'A' || document.activeElement.nodeType == 'BUTTON') {
+			} else if (document.activeElement.nodeName == 'INPUT' || document.activeElement.nodeName == 'TEXTAREA' || document.activeElement.nodeName == 'A' || document.activeElement.nodeName == 'BUTTON') {
 				console.log('inputs or buttons are focussed!');
 				return;
 			} else {
@@ -38704,7 +38800,7 @@ var Selection = function () {
 
 		this.selectedId = null;
 		this.lastSelectedId = null;
-		this.filter = [];
+		this.filter = ['all'];
 		this.tags = [];
 		this.hiddenTags = [];
 		this.hiddenItems = [];
@@ -38806,6 +38902,8 @@ var Selection = function () {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__components_globalFunctions_js__ = __webpack_require__(8);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__Selection_js__ = __webpack_require__(163);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__dataTree_js__ = __webpack_require__(18);
+function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
+
 
 
 
@@ -38833,6 +38931,7 @@ window.selection = new __WEBPACK_IMPORTED_MODULE_5__Selection_js__["a" /* defaul
 			"tagged": [],
 			"used_time": 0
 		},
+		nodes: {},
 		selection: selection,
 		addingNewUnder: null,
 		addingNewAsChild: false,
@@ -38846,7 +38945,9 @@ window.selection = new __WEBPACK_IMPORTED_MODULE_5__Selection_js__["a" /* defaul
 		popouts: { 'delete': [], 'timer': [] },
 		timerItems: [],
 		beforeEditCache_body: null,
-		beforeEditCache_planned_time: null
+		beforeEditCache_planned_time: null,
+		fetchedDone: false,
+		cancelThroughKeydown: false
 	},
 	components: {
 		Card: __WEBPACK_IMPORTED_MODULE_0__Card_vue___default.a,
@@ -38860,14 +38961,13 @@ window.selection = new __WEBPACK_IMPORTED_MODULE_5__Selection_js__["a" /* defaul
 			}return false;
 		},
 		doneItems: function doneItems() {
-			return Object.keys(allItems.nodes).reduce(function (result, id) {
-				if (allItems.nodes[id].done) {
-					result.push(allItems.nodes[id]);
-				}
-				return result;
-			}, []);
+			// Codementor: Not reactive...
+			return __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_4__components_globalFunctions_js__["d" /* objectToArray */])(this.nodes).filter(function (item) {
+				return item.done;
+			});
 		},
-		selectionFilter: function selectionFilter() {
+		selectionFilter: function selectionFilter() // For list title
+		{
 			return selection.filter.map(function (val, i) {
 				if (selection.filter.length == i + 1) {
 					val = allItems.tagSlugToName(val);
@@ -38877,7 +38977,8 @@ window.selection = new __WEBPACK_IMPORTED_MODULE_5__Selection_js__["a" /* defaul
 				return val;
 			});
 		},
-		selectionTags: function selectionTags() {
+		selectionTags: function selectionTags() // For list title
+		{
 			return selection.tags.map(function (val, i) {
 				if (selection.tags.length == i + 1) {
 					val = allItems.tagSlugToName(val);
@@ -38887,7 +38988,8 @@ window.selection = new __WEBPACK_IMPORTED_MODULE_5__Selection_js__["a" /* defaul
 				return val;
 			});
 		},
-		selectionHiddenTags: function selectionHiddenTags() {
+		selectionHiddenTags: function selectionHiddenTags() // For list title
+		{
 			return selection.hiddenTags.map(function (val, i) {
 				if (selection.hiddenTags.length == i + 1) {
 					val = allItems.tagSlugToName(val);
@@ -38907,16 +39009,18 @@ window.selection = new __WEBPACK_IMPORTED_MODULE_5__Selection_js__["a" /* defaul
 			});
 		},
 		allTagsComputed: function allTagsComputed() {
+			var t0 = performance.now();
 			if (!this.allData) {
 				return [];
 			}
 			var allTagsArray = [];
-			var items = allItems.flattenTree(allItems.root.children);
+			// let items = allItems.flattenTree(allItems.root.children);
+			var items = this.allVisibleItems;
 			if (!items.length) {
 				return [];
 			}
-			items.forEach(function (child) {
-				child.tagged.forEach(function (taggedObj) {
+			items.forEach(function (item) {
+				item.tagged.forEach(function (taggedObj) {
 					if (!taggedObj.tag || !taggedObj.tag.name) {
 						return; // solves bugs with broken tags
 					}
@@ -38928,21 +39032,88 @@ window.selection = new __WEBPACK_IMPORTED_MODULE_5__Selection_js__["a" /* defaul
 						allTagsArray.push(taggedObj.tag);
 					}
 				}.bind(allTagsArray));
-
-				// allTagsArray = allTagsArray.filter(function(tagInArray)
-				// {
-				// 	let noItemWithTag = selection.hiddenItems.find(function(hiddenId)
-				// 	{
-				// 		return allItems.hasTag(hiddenId, tagInArray.name);
-				// 	}.bind(tagInArray));
-				// 	if(!noItemWithTag)
-				// 	{
-				// 		return true;
-				// 	}
-				// }.bind(allTagsArray));
 			}.bind(allTagsArray));
-			console.log('before sorting tags');
-			allTagsArray = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_4__components_globalFunctions_js__["d" /* sortObjectArrayByProperty */])(allTagsArray, 'name');
+			allTagsArray = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_4__components_globalFunctions_js__["e" /* sortObjectArrayByProperty */])(allTagsArray, 'name');
+			var t1 = performance.now();
+			console.log("Call to allTagsComputed took " + (t1 - t0) + " milliseconds.");
+			return allTagsArray;
+		},
+		allTagsComputed_2: function allTagsComputed_2() {
+			var t2_0 = performance.now();
+			if (!this.allData) {
+				return [];
+			}
+			var allTagsArray = [];
+			// let items = allItems.flattenTree(allItems.root.children);
+			var items = this.allVisibleItems;
+			if (!items.length) {
+				return [];
+			}
+			allTagsArray = items.reduce(function (a, item) {
+				var tags = item.tagged.map(function (taggedObj) {
+					return taggedObj.tag;
+				});
+				return a.concat(tags);
+			}, []);
+			allTagsArray = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_4__components_globalFunctions_js__["f" /* uniqBy */])(allTagsArray);
+			allTagsArray = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_4__components_globalFunctions_js__["e" /* sortObjectArrayByProperty */])(allTagsArray, 'name');
+			var t2_1 = performance.now();
+			console.log("Call to allTagsComputed_2 took " + (t2_1 - t2_0) + " milliseconds.");
+			return allTagsArray;
+		},
+		allTagsComputed_3: function allTagsComputed_3() {
+			var t3_0 = performance.now();
+			if (!this.allData) {
+				return [];
+			}
+			var allTagsArray = new Set();
+			// let items = allItems.flattenTree(allItems.root.children);
+			var items = this.allVisibleItems;
+			if (!items.length) {
+				return [];
+			}
+			items.forEach(function (item) {
+				if (item.tagged.length) {
+					item.tagged.forEach(function (taggedObj) {
+						return allTagsArray.add(taggedObj.tag);
+					});
+				}
+			}.bind(allTagsArray));
+			allTagsArray = [].concat(_toConsumableArray(allTagsArray));
+			allTagsArray = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_4__components_globalFunctions_js__["f" /* uniqBy */])(allTagsArray);
+			allTagsArray = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_4__components_globalFunctions_js__["e" /* sortObjectArrayByProperty */])(allTagsArray, 'name');
+			var t3_1 = performance.now();
+			console.log("Call to allTagsComputed_3 took " + (t3_1 - t3_0) + " milliseconds.");
+			return allTagsArray;
+		},
+		allTagsComputed_1b: function allTagsComputed_1b() {
+			var t0 = performance.now();
+			if (!this.allData) {
+				return [];
+			}
+			var allTagsArray = [];
+			// let items = allItems.flattenTree(allItems.root.children);
+			var items = this.allVisibleItems;
+			if (!items.length) {
+				return [];
+			}
+			items.forEach(function (item) {
+				item.tagged.forEach(function (taggedObj) {
+					if (!taggedObj.tag || !taggedObj.tag.name) {
+						return; // solves bugs with broken tags
+					}
+					var tagAlreadyPushed = allTagsArray.find(function (pushedTag) {
+						return pushedTag.name == taggedObj.tag.name;
+					}.bind(taggedObj));
+
+					if (!tagAlreadyPushed) {
+						allTagsArray.push(taggedObj.tag);
+					}
+				}.bind(allTagsArray));
+			}.bind(allTagsArray));
+			allTagsArray = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_4__components_globalFunctions_js__["e" /* sortObjectArrayByProperty */])(allTagsArray, 'name');
+			var t1 = performance.now();
+			console.log("Call to allTagsComputed took " + (t1 - t0) + " milliseconds.");
 			return allTagsArray;
 		},
 		childrenAmount: function childrenAmount() {
@@ -38979,10 +39150,10 @@ window.selection = new __WEBPACK_IMPORTED_MODULE_5__Selection_js__["a" /* defaul
 			return card.totalUsedSec;
 		},
 		totalUsedHourMin: function totalUsedHourMin() {
-			return __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_4__components_globalFunctions_js__["e" /* sec_to_hourmin */])(this.totalUsedSec);
+			return __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_4__components_globalFunctions_js__["g" /* sec_to_hourmin */])(this.totalUsedSec);
 		},
 		totalHourMinLeft: function totalHourMinLeft() {
-			return __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_4__components_globalFunctions_js__["e" /* sec_to_hourmin */])(this.totalSecLeft);
+			return __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_4__components_globalFunctions_js__["g" /* sec_to_hourmin */])(this.totalSecLeft);
 		},
 		hiddenItemsTotalUsedTime: function hiddenItemsTotalUsedTime() {
 			if (!this.selection.hiddenItems.length) {
@@ -39004,6 +39175,16 @@ window.selection = new __WEBPACK_IMPORTED_MODULE_5__Selection_js__["a" /* defaul
 		}
 	},
 	methods: {
+		resetDoneData: function resetDoneData() {
+			var dd = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_4__components_globalFunctions_js__["d" /* objectToArray */])(this.nodes).filter(function (item) {
+				return item.done;
+			});
+			__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_4__components_globalFunctions_js__["e" /* sortObjectArrayByProperty */])(dd, 'done_date', 'desc');
+			this.doneData = dd;
+		},
+		tagSlugToName: function tagSlugToName(tagslug) {
+			return allItems.tagSlugToName(tagslug);
+		},
 		countChildren: function countChildren(item) {
 			if (!item.children) {
 				return 0;
@@ -39157,10 +39338,6 @@ window.selection = new __WEBPACK_IMPORTED_MODULE_5__Selection_js__["a" /* defaul
 			selection.selectedId = null;
 			this.addingNewAsFirstChild = addAs == 'child' ? true : false;
 			this.addingNewAsChild = addAs == 'child' ? true : false;
-			// Solved with v-focus:
-			// Vue.nextTick(function () {
-			// 	document.querySelector("#new-under-"+id+" textarea").focus();
-			// });
 		},
 		startEditTags: function startEditTags(id) {
 			id = id ? id : selection.selectedId;
@@ -39168,9 +39345,6 @@ window.selection = new __WEBPACK_IMPORTED_MODULE_5__Selection_js__["a" /* defaul
 				return;
 			}
 			this.editingItemTags = id;
-			Vue.nextTick(function () {
-				document.querySelector('#updatebox-' + id + ' > .update-tags > .update-custom-tags input').focus();
-			});
 		},
 		stopPatching: function stopPatching() {
 			if (window.stopPatchingIcon) {
@@ -39209,7 +39383,7 @@ window.selection = new __WEBPACK_IMPORTED_MODULE_5__Selection_js__["a" /* defaul
 			var patchObj = {};
 			var patchVal = allItems.nodes[id][arg];
 			if (arg == 'children_order') {
-				patchVal = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_4__components_globalFunctions_js__["f" /* arrayToString */])(patchVal);
+				patchVal = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_4__components_globalFunctions_js__["h" /* arrayToString */])(patchVal);
 			}
 			patchObj[arg] = patchVal;
 			this.$http.patch('/api/items/' + id, patchObj, { method: 'PATCH' }).then(function (response) {
@@ -39229,7 +39403,7 @@ window.selection = new __WEBPACK_IMPORTED_MODULE_5__Selection_js__["a" /* defaul
 				return;
 			}
 			if (Array.isArray(tags)) {
-				tags = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_4__components_globalFunctions_js__["g" /* removeEmptyValuesFromArray */])(tags);
+				tags = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_4__components_globalFunctions_js__["i" /* removeEmptyValuesFromArray */])(tags);
 				if (!tags.length) {
 					return;
 				}
@@ -39374,6 +39548,7 @@ window.selection = new __WEBPACK_IMPORTED_MODULE_5__Selection_js__["a" /* defaul
 			this.loading = true;
 			this.$http.get('/api/items/fetchdone').then(function (response) {
 				// debugger;
+				this.fetchedDone = true;
 				console.log('fetched Done');
 				var data = response.data;
 				console.log(data);
@@ -39388,10 +39563,9 @@ window.selection = new __WEBPACK_IMPORTED_MODULE_5__Selection_js__["a" /* defaul
 					if (!allItems.nodes[item.id]) {
 						allItems.nodes[item.id] = item;
 					}
-					if (!allItems.doneitems.includes(item)) {
-						allItems.doneitems.push(item);
-					}
+					// if(!allItems.doneitems.includes(item)){ allItems.doneitems.push(item); }
 				});
+				this.resetDoneData();
 				allItems.filterItems('journal', null, operator);
 				this.loading = false;
 			});
@@ -39438,11 +39612,10 @@ window.selection = new __WEBPACK_IMPORTED_MODULE_5__Selection_js__["a" /* defaul
 				selection.clear();
 			}
 
-			if (keyword == 'journal' && !this.doneData.length) {
+			if (keyword == 'journal' && !this.fetchedDone) {
 				this.fetchDone(null, operator);
-			} else {
-				allItems.filterItems(keyword, value, operator);
 			}
+			allItems.filterItems(keyword, value, operator);
 		},
 		duplicate: function duplicate(id) {
 			id = !id ? selection.selectedId : id;
@@ -39454,7 +39627,7 @@ window.selection = new __WEBPACK_IMPORTED_MODULE_5__Selection_js__["a" /* defaul
 			this.startPatching();
 			// Prepare children_order for sending to DB.
 			if (newItem.children_order) {
-				newItem.children_order = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_4__components_globalFunctions_js__["f" /* arrayToString */])(newItem.children_order);
+				newItem.children_order = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_4__components_globalFunctions_js__["h" /* arrayToString */])(newItem.children_order);
 			}
 			// let data = {
 			// 	newItemArray: [newItem, newItem]
@@ -41424,7 +41597,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     staticClass: "title"
   }, [_c('span', [_vm._v(_vm._s(_vm.momentCalendar(_vm.journalDate)))]), _vm._v(" "), _c('span', {
     staticClass: "journal-date-small"
-  }, [_vm._v(_vm._s(_vm.journalDate))])]) : _vm._e(), _vm._v(" "), (_vm.journalView && _vm.item.depth != 0) ? _c('div', {
+  }, [_vm._v(_vm._s(_vm.journalDate))])]) : _vm._e(), _vm._v(" "), (_vm.journalView && _vm.item.depth != 0 && _vm.item.parents_bodies) ? _c('div', {
     staticClass: "parent-string",
     on: {
       "click": function($event) {
@@ -41547,7 +41720,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
         _vm.selectItem(_vm.item)
       }
     }
-  }, [_vm._v(_vm._s(_vm.item.completion_memo))]) : _vm._e()]), _vm._v(" "), (false) ? _c('span', [_vm._v("\n\t\t\t\t(" + _vm._s(_vm.item.id) + ") D-" + _vm._s(_vm.item.depth) + ")\n\t\t\t\t"), (_vm.item.children_order.length) ? _c('span', [_vm._v("\n\t\t\t\t\t[" + _vm._s(_vm.item.children_order) + "]\n\t\t\t\t")]) : _vm._e()]) : _vm._e(), _vm._v(" "), (_vm.item.id == _vm.basis.editingItem || _vm.item.id == _vm.basis.editingItemTags) ? _c('form', {
+  }, [_vm._v(_vm._s(_vm.item.completion_memo))]) : _vm._e()]), _vm._v(" "), (false) ? _c('span', [_vm._v("\n\t\t\t\t(" + _vm._s(_vm.item.id) + ") D-" + _vm._s(_vm.item.depth) + ")\n\t\t\t\t"), (_vm.item.children_order.length) ? _c('span', [_vm._v("\n\t\t\t\t\t[" + _vm._s(_vm.item.children_order) + "]\n\t\t\t\t")]) : _vm._e()]) : _vm._e(), _vm._v(" "), (_vm.item.id == _vm.basis.editingItem) ? _c('form', {
     staticClass: "updatebox",
     attrs: {
       "action": "update",
@@ -41560,12 +41733,6 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
       }
     }
   }, [_c('div', {
-    directives: [{
-      name: "show",
-      rawName: "v-show",
-      value: (_vm.item.id != _vm.basis.editingItemTags),
-      expression: "item.id != basis.editingItemTags"
-    }],
     staticClass: "update-body"
   }, [_c('textarea', {
     directives: [{
@@ -41605,8 +41772,8 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     directives: [{
       name: "show",
       rawName: "v-show",
-      value: (_vm.item.id != _vm.basis.editingItemTags && _vm.basis.selection.view != 'journal'),
-      expression: "item.id != basis.editingItemTags && basis.selection.view != 'journal'"
+      value: (_vm.basis.selection.view != 'journal'),
+      expression: "basis.selection.view != 'journal'"
     }],
     staticClass: "update-planned-time"
   }, [_vm._v("\n\t\t\t\t\t\tDuration:\n\t\t\t\t\t\t"), _c('button', {
@@ -41718,18 +41885,30 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
         _vm.item.planned_time = _vm._n($event.target.value)
       }
     }
-  }), _vm._v("min")])]), _vm._v(" "), _c('div', {
-    staticClass: "update-custom-tags"
-  }, [_c('label', [_vm._v("\n\t\t\t\t\t\t\tAdd Tag: \n\t\t\t\t\t\t\t"), _c('input', {
+  }), _vm._v("min")])])])]) : _vm._e(), _vm._v(" "), _c('div', {
+    staticClass: "item-tags"
+  }, [(_vm.item.id == _vm.basis.editingItem || _vm.item.id == _vm.basis.editingItemTags) ? _c('div', {
+    staticClass: "add-tag-wrapper",
+    attrs: {
+      "id": 'add-tag-' + _vm.item.id
+    }
+  }, [_c('label', [_vm._v("\n\t\t\t\t\t\tAdd Tag: \n\t\t\t\t\t\t"), _c('input', {
     directives: [{
       name: "model",
       rawName: "v-model",
       value: (_vm.newTag),
       expression: "newTag"
+    }, {
+      name: "autowidth",
+      rawName: "v-autowidth"
+    }, {
+      name: "focus",
+      rawName: "v-focus"
     }],
     staticClass: "add-tag",
     attrs: {
-      "type": "text"
+      "type": "text",
+      "placeholder": "..."
     },
     domProps: {
       "value": _vm._s(_vm.newTag)
@@ -41746,20 +41925,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
         _vm.newTag = $event.target.value
       }
     }
-  })]), _vm._v(" "), (false) ? _c('div', {
-    staticClass: "tag-suggestions"
-  }, _vm._l((_vm.allTags_c), function(tag) {
-    return _c('label', {
-      class: 'tag',
-      on: {
-        "click": function($event) {
-          _vm.basis.patchTag(_vm.item.id, tag)
-        }
-      }
-    }, [_vm._v("\n\t\t\t\t\t\t\t\t" + _vm._s(tag.name) + "\n\t\t\t\t\t\t\t")])
-  })) : _vm._e()])])]) : _vm._e(), _vm._v(" "), _c('div', {
-    staticClass: "item-tags"
-  }, [(_vm.item.done &&
+  })])]) : _vm._e(), _vm._v(" "), (_vm.item.done &&
     _vm.item.id != _vm.basis.editingDoneDateItem &&
     !_vm.journalView) ? _c('label', {
     staticClass: "done"
@@ -41790,11 +41956,14 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     staticClass: "total-duration"
   }, [_vm._v("\n\t\t\t\t\t" + _vm._s(_vm.sec_to_hourminsec(_vm.totalSecLeft)) + "\n\t\t\t\t")]) : _vm._e(), _vm._v(" "), (_vm.item.id != _vm.basis.editingItem &&
     _vm.secLeft > 0 &&
-    !_vm.item.done) ? _c('span', {
+    !_vm.item.done &&
+    _vm.item.id != _vm.basis.editingItemTags) ? _c('span', {
     staticClass: "duration"
-  }, [_vm._v("\n\t\t\t\t\t" + _vm._s(_vm.sec_to_hourminsec(_vm.secLeft)) + "\n\t\t\t\t")]) : _vm._e(), _vm._v(" "), (_vm.hasDueDate && !_vm.item.done) ? _c('span', {
+  }, [_vm._v("\n\t\t\t\t\t" + _vm._s(_vm.sec_to_hourminsec(_vm.secLeft)) + "\n\t\t\t\t")]) : _vm._e(), _vm._v(" "), (_vm.hasDueDate && !_vm.item.done &&
+    _vm.item.id != _vm.basis.editingItemTags) ? _c('span', {
     staticClass: "duedate"
-  }, [_vm._v("\n\t\t\t\t\t" + _vm._s(_vm.momentCalendar(_vm.item.due_date)) + "\n\t\t\t\t")]) : _vm._e(), _vm._v(" "), (_vm.item.dueDateParent && !_vm.item.done) ? _c('span', {
+  }, [_vm._v("\n\t\t\t\t\t" + _vm._s(_vm.momentCalendar(_vm.item.due_date)) + "\n\t\t\t\t")]) : _vm._e(), _vm._v(" "), (_vm.item.dueDateParent && !_vm.item.done &&
+    _vm.item.id != _vm.basis.editingItemTags) ? _c('span', {
     staticClass: "duedate-parent"
   }, [_vm._v("\n\t\t\t\t\t" + _vm._s(_vm.momentCalendar(_vm.item.dueDateParent)) + "\n\t\t\t\t")]) : _vm._e(), _vm._v(" "), _vm._l((_vm.item.tagged), function(tag) {
     return (_vm.item.tagged.length) ? _c('span', {
@@ -41911,7 +42080,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     staticClass: "newitem-body",
     attrs: {
       "type": "text",
-      "placeholder": "...",
+      "placeholder": "...　　",
       "autocomplete": "off",
       "autofocus": "",
       "rows": "1"
@@ -42040,24 +42209,30 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
       }
     }
   }) : _vm._e(), _vm._v("min")])]), _vm._v(" "), _c('div', {
-    staticClass: "update-custom-tags"
-  }, [_c('label', [_vm._v("\n\t\t\t\t\tAdd Tag: \n\t\t\t\t\t"), _c('input', {
+    staticClass: "item-tags prepared-tags"
+  }, [_c('div', {
+    staticClass: "add-prepared-tag-wrapper"
+  }, [_c('label', [_vm._v("\n\t\t\t\t\t\tAdd Tag: \n\t\t\t\t\t\t"), _c('input', {
     directives: [{
       name: "model",
       rawName: "v-model",
       value: (_vm.newTag),
       expression: "newTag"
+    }, {
+      name: "autowidth",
+      rawName: "v-autowidth"
     }],
     staticClass: "prepare-tag",
     attrs: {
-      "type": "text"
+      "type": "text",
+      "placeholder": "..."
     },
     domProps: {
       "value": _vm._s(_vm.newTag)
     },
     on: {
       "keydown": function($event) {
-        _vm.keydownOnNew(_vm.item, $event, 'addTag')
+        _vm.keydownOnNew(_vm.item, $event, 'prepare-tag')
       },
       "blur": function($event) {
         _vm.blurOnAddNew(_vm.item)
@@ -42067,12 +42242,10 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
         _vm.newTag = $event.target.value
       }
     }
-  })])]), _vm._v(" "), _c('div', {
-    staticClass: "item-tags prepared-tags"
-  }, _vm._l((_vm.newItem.preparedTags), function(tag) {
-    return (_vm.newItem.preparedTags.length) ? _c('span', {
+  })])]), _vm._v(" "), _vm._l((_vm.preparedPlusComputedTags), function(tag) {
+    return (_vm.preparedPlusComputedTags.length) ? _c('span', {
       class: (tag == 'Today') ? 'duedate' : 'custom-tag'
-    }, [_vm._v(_vm._s(tag) + "\n\t\t\t\t\t"), (!_vm.parentTags.includes(tag)) ? _c('button', {
+    }, [_vm._v(_vm._s(tag) + "\n\t\t\t\t\t"), (_vm.newItem.preparedTags.includes(tag)) ? _c('button', {
       staticClass: "delete-tag",
       attrs: {
         "value": tag
@@ -42089,7 +42262,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     }, [_c('i', {
       staticClass: "zmdi zmdi-close-circle"
     })]) : _vm._e()]) : _vm._e()
-  }))])]) : _vm._e()]) : _vm._e()]) : _vm._e()
+  })], 2)])]) : _vm._e()]) : _vm._e()]) : _vm._e()
 },staticRenderFns: []}
 module.exports.render._withStripped = true
 if (false) {
@@ -42240,10 +42413,17 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
       staticClass: "forward btn btn-dipclick",
       on: {
         "click": function($event) {
-          _vm.timerNav('forward', item)
+          _vm.timerNav('forward', item, 1)
         }
       }
     }, [_vm._v("+1 min\n\t\t\t\t")]), _vm._v(" "), _c('button', {
+      staticClass: "forward btn btn-dipclick",
+      on: {
+        "click": function($event) {
+          _vm.timerNav('forward', item, 5)
+        }
+      }
+    }, [_vm._v("+5 min\n\t\t\t\t")]), _vm._v(" "), _c('button', {
       staticClass: "reset btn btn-dipclick",
       on: {
         "click": function($event) {
@@ -44133,6 +44313,107 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
 
 	module.exports = autosize;
 });
+
+/***/ }),
+/* 208 */
+/***/ (function(module, exports, __webpack_require__) {
+
+(function () {
+  // Compile and cache the needed regular expressions.
+  var SPACE = /\s/g
+  var LESS_THAN = />/g
+  var MORE_THAN = /</g
+
+  // We need to swap out these characters with their character-entity
+  // equivalents because we're assigning the resulting string to
+  // `ghost.innerHTML`.
+  function escape (str) {
+    return str.replace(SPACE, '&nbsp;')
+              .replace(LESS_THAN, '&lt;')
+              .replace(MORE_THAN, '&gt;')
+  }
+
+  // Create the `ghost` element, with inline styles to hide it and ensure
+  // that the text is all on a single line.
+  var GHOST_ELEMENT_ID = '__autosizeInputGhost'
+  function createGhostElement () {
+    var ghost = document.createElement('div')
+    ghost.id = GHOST_ELEMENT_ID
+    ghost.style.cssText = 'display:inline-block;height:0;overflow:hidden;position:absolute;top:0;visibility:hidden;white-space:nowrap;'
+    document.body.appendChild(ghost)
+    return ghost
+  }
+
+  // Create the `ghost` element.
+  var ghost = createGhostElement()
+
+  function autosizeInput (element, options) {
+    // Copy all width-affecting styles to the ghost element
+    var elementStyle = window.getComputedStyle(element)
+    var elementCssText = 'box-sizing:' + elementStyle.boxSizing +
+                        ';border-left:' + elementStyle.borderLeftWidth + ' solid black' +
+                        ';border-right:' + elementStyle.borderRightWidth + ' solid black' +
+                        ';font-family:' + elementStyle.fontFamily +
+                        ';font-feature-settings:' + elementStyle.fontFeatureSettings +
+                        ';font-kerning:' + elementStyle.fontKerning +
+                        ';font-size:' + elementStyle.fontSize +
+                        ';font-stretch:' + elementStyle.fontStretch +
+                        ';font-style:' + elementStyle.fontStyle +
+                        ';font-variant:' + elementStyle.fontVariant +
+                        ';font-variant-caps:' + elementStyle.fontVariantCaps +
+                        ';font-variant-ligatures:' + elementStyle.fontVariantLigatures +
+                        ';font-variant-numeric:' + elementStyle.fontVariantNumeric +
+                        ';font-weight:' + elementStyle.fontWeight +
+                        ';letter-spacing:' + elementStyle.letterSpacing +
+                        ';margin-left:' + elementStyle.marginLeft +
+                        ';margin-right:' + elementStyle.marginRight +
+                        ';padding-left:' + elementStyle.paddingLeft +
+                        ';padding-right:' + elementStyle.paddingRight +
+                        ';text-indent:' + elementStyle.textIndent +
+                        ';text-transform:' + elementStyle.textTransform
+
+    // Helper function that:
+    // 1. Copies `font-family`, `font-size` and other styles of our `element` onto `ghost`.
+    // 2. Sets the contents of `ghost` to the specified `str`.
+    // 3. Copies the width of `ghost` onto our `element`.
+    function set (str) {
+      str = str || element.value || element.getAttribute('placeholder') || ''
+      // Check if the `ghost` element still exists. If no, create it.
+      if (document.getElementById(GHOST_ELEMENT_ID) === null) {
+        ghost = createGhostElement()
+      }
+      ghost.style.cssText += elementCssText
+      ghost.innerHTML = escape(str)
+      var width = window.getComputedStyle(ghost).width
+      element.style.width = width
+      return width
+    }
+
+    // Call `set` on every `input` event (IE9+).
+    element.addEventListener('input', function () {
+      set()
+    })
+
+    // Initialise the `element` width.
+    var width = set()
+
+    // Set `min-width` if `options.minWidth` was set, and only if the initial
+    // width is non-zero.
+    if (options && options.minWidth && width !== '0px') {
+      element.style.minWidth = width
+    }
+
+    // Return the `set` function.
+    return set
+  }
+
+  if (true) {
+    module.exports = autosizeInput
+  } else {
+    window.autosizeInput = autosizeInput
+  }
+})()
+
 
 /***/ })
 /******/ ]);

@@ -3,7 +3,7 @@ export default class Selection {
 	{
 		this.selectedId = null;
 		this.lastSelectedId = null;
-		this.filter = [];
+		this.filter = ['all'];
 		this.tags = [];
 		this.hiddenTags = [];
 		this.hiddenItems = [];

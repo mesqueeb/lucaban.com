@@ -104,8 +104,6 @@ class ItemTagController extends Controller
      */
     public function update(Request $request, $id)
     {
-        // var_dump($request->input);
-
         if ($request['type'] == 'tag' || !$request['type']){
             Item::findOrFail($id)->tag($request['tags']); // attach the tag
         }

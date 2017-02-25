@@ -12,6 +12,10 @@
     transition: opacity .3s ease;	
 }
 .popout {
+    z-index: 5;
+    background: white;
+    border-radius: 0.3em;
+    margin: 1em;
     .overtime-notice{
         color: $duedate-color;
         font-size: 0.3em;
@@ -25,14 +29,9 @@
         flex-direction: column;
     }
     .toggle-div{
-        width: 2em;
-        height: 1em;
-        margin-top: -4em;
+        margin-top: -0.2em;
+        margin-right: 0.5em;
     }
-    z-index: 5;
-    background: white;
-    border-radius: 0.3em;
-    margin: 1em;
     .bodybox {
         padding: 1em;
         border-bottom: 1px solid #e3e3e3;
@@ -61,10 +60,8 @@
         font-size: 1.1em;
 	    padding: 0 0.4em;
 	    margin: 0 0.3em;
-        margin-bottom: 1px;
 	}
     button:focus {
-        margin-bottom: 0;
     }
     button.play, button.pause {
         font-size: 1.3em;
