@@ -21,13 +21,14 @@
 		<span>{{ momentCalendar(journalDate) }}</span>
 		<span class="journal-date-small">{{ journalDate }}</span>
 	</div>
+		<!-- v-if="journalView && item.depth != 0 && item.parents_bodies" -->
 	<div
 		class="parent-string"
-		v-if="journalView && item.depth != 0 && item.parents_bodies"
+		v-if="journalParentString"
 		@click="selectItem(item)"
 	>
 		<div>
-			{{ item.parents_bodies }}
+			{{ journalParentString }}
 		</div>
 	</div>
 	<div 
@@ -46,7 +47,7 @@
 			<input
 				class="toggle"
 				type="checkbox"
-				v-if="item.children_order.length==0 || item.done == true"
+				v-if="item.children_order.length==0 || item.done == true || allChildrenDone"
 				v-model="item.done"
 				@change="updateDone(item.id)"
 			>
@@ -60,6 +61,7 @@
 			<label
 				class="arrow"
 				:for="'show_children_'+item.id"
+				:style="(allChildrenDone) ? 'margin-left: 0.1em; margin-right: -0.5em;':''"
 				v-if="item.children_order.length>0"
 			></label>
 		</div>
@@ -191,16 +193,13 @@
 						&& !journalView"
 				>
 					Done {{ momentCalendar(item.done_date) }}
-					<Flatpickr
-						class="flatpickr"
+					<input
+						v-flatpicky
 						:id="'done-date-edit-'+item.id"
-						:options="flatPickConfig"
+						class="flatpickr"
+						:name="item.id"
 						v-model="item.done_date"
-					/>
-					<!-- <input class="flatpickr"
-						:id="'done-date-edit-' + item.id"
-						v-model="item.done_date"
-					> -->
+					>
 				</label>
 				<span
 					v-if="totalSecLeft > 0
@@ -444,7 +443,6 @@ export default {
 				children: '',
 			},
 			newTag: null,
-			flatPickConfig,
 		};
 	},
 	// components: { 
@@ -514,6 +512,23 @@ export default {
 				let thisDoneDate = moment(this.item.done_date).format('YYYY/MM/DD');
 				if (thisDoneDate != prevDoneDate){
 					return thisDoneDate;
+				}
+			}
+			return false;
+		},
+		journalParentString()
+		{ if(!this.item || !allItems){ return; }
+			// console.log('run on '+this.item.id+' - '+this.item.body);
+			if(this.$root.selection.view != 'journal'){ return false; }
+			if(this.journalView){
+				if(this.item.depth == 0){ return; }
+				let prevId = allItems.prevItemId(this.item.id);
+				let parentString = this.item.parents_bodies;
+				let prevParentString = allItems.nodes[prevId].parents_bodies;
+				if (parentString != prevParentString
+					&& (parentString && prevParentString))
+				{
+					return parentString;
 				}
 			}
 			return false;
@@ -624,6 +639,10 @@ export default {
 		isHidden()
 		{ if(!this.item || !allItems){ return true; }
 			return this.$root.selection.hiddenItems.includes(this.item.id)
+		},
+		allChildrenDone()
+		{ if(!this.item || !allItems){ return true; }
+			return allItems.allChildrenDone(this.item.id);
 		},
 	},
 	methods: {
@@ -1050,12 +1069,6 @@ export default {
 			item = (item) ? item : allItems.nodes[selection.selectedId];
 			this.$root.beforeEditCache_done_date = item.done_date;
 			this.$root.editingDoneDateItem = item.id;
-			// Vue.nextTick(function()
-			// {
-				// let el = "done-date-edit-"+item.id;
-				// document.getElementById(el).flatpickr();
-				// window.flatpickr(event.target);
-	    	// },20);
 		},
 		deleteItem(item)
 		{

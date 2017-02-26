@@ -14,7 +14,7 @@
 
 <div id="loading-icon">
 	<div class="loader loader--style1" title="loading" alt="Loading"
-		v-show="patching"
+		v-show="patching || loading"
 	>
 	  <svg version="1.1" id="loader-1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
 	   width="40px" height="40px" viewBox="0 0 40 40" enable-background="new 0 0 40 40" xml:space="preserve">

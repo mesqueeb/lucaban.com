@@ -7715,6 +7715,9 @@ label {
 
 .toggle-div {
   margin-right: 0.3em;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
 }
 
 .toggle-div div,

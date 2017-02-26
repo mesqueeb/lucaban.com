@@ -16,6 +16,7 @@ label{
 }
 .toggle-div{
     margin-right: 0.3em;
+    display: flex;
     div, input{
         margin: 0; // reset margins
         height: auto;

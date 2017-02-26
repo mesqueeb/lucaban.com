@@ -2,6 +2,63 @@ export default class
 {
 constructor()
 {
+	this.invokeKeydownListenerPause();
+	this.invokeKeyBindingListener();
+}
+keystroke(k)
+{
+	if(selection.view == 'journal' && (
+		// Disable keystrokes when in the journal.
+		k == 'arrowRight' ||
+		k == 'arrowLeft' ||
+		k == 'meta_arrowUp' ||
+		k == 'meta_arrowDown' ||
+		k == 'meta_arrowRight' ||
+		k == 'meta_arrowLeft' ||
+		k == 'spaceBar' ||
+		k == 'tab' ||
+		k == 'shift_tab' ||
+		k == 't' ||
+		k == 's' ))
+	{
+		console.log('cannot use '+k+' in journal mode');
+		return;
+	}
+	console.log(k);
+	if(k == 'arrowUp'){ vm.selectItem('prev')} else
+	if(k == 'arrowDown'){ vm.selectItem('next')} else
+	if(k == 'arrowRight'){ vm.showChildren(null, 'show')} else
+	if(k == 'arrowLeft'){ vm.showChildren(null, 'hide')} else
+	if(k == 'meta_arrowUp'){ vm.moveItem('up')} else
+	if(k == 'meta_arrowDown'){ vm.moveItem('down')} else
+	if(k == 'meta_arrowRight'){ vm.indent()} else
+	if(k == 'meta_arrowLeft'){ vm.unindent()} else
+	if(k == 'spaceBar'){ vm.markDone()} else
+	if(k == 'tab'){ vm.indent()} else
+	if(k == 'shift_tab'){ vm.unindent()} else
+	if(k == 'enter'){ vm.showAddNewItem()} else
+	if(k == 'shift_enter'){ vm.showAddNewItem(null, 'child')} else
+	if(k == 'meta_enter'){ eventHub.$emit('startEdit')} else
+	if(k == 'ctrl_u'){ eventHub.$emit('startEdit')} else
+	if(k == 't'){ vm.setToday()} else
+	if(k == 'shift_t'){ vm.startEditTags()} else
+	if(k == 's'){ vm.addTimer()} else
+	if(k == 'meta_shift_d'){ vm.duplicate()} else
+	if(k == 'meta_backspace'){ vm.deleteItem()} else
+	if(k == 'backspace'){ vm.deleteItem()} else
+	if(k == 'delete'){ vm.deleteItem()}
+}
+invokeKeydownListenerPause()
+{
+	//Codementor: crappy hack down here.
+	window.keydownListenerPaused = false;
+	window.preventKeydownListener = function(){
+		window.keydownListenerPaused = true;
+		setTimeout(function(){ window.keydownListenerPaused = false; }.bind(this), 200);
+	};
+}
+invokeKeyBindingListener()
+{
 	let self = this;
 	window.addEventListener('keydown', function(e){
 		if (keydownListenerPaused)
@@ -188,49 +245,6 @@ constructor()
           } // end switch
     	} // END INPUT AREAS NOT IN FOCUS
     });
-}
-keystroke(k)
-{
-	if(selection.view == 'journal' && (
-		// Disable keystrokes when in the journal.
-		k == 'arrowRight' ||
-		k == 'arrowLeft' ||
-		k == 'meta_arrowUp' ||
-		k == 'meta_arrowDown' ||
-		k == 'meta_arrowRight' ||
-		k == 'meta_arrowLeft' ||
-		k == 'spaceBar' ||
-		k == 'tab' ||
-		k == 'shift_tab' ||
-		k == 't' ||
-		k == 's' ))
-	{
-		console.log('cannot use '+k+' in journal mode');
-		return;
-	}
-	console.log(k);
-	if(k == 'arrowUp'){ vm.selectItem('prev')} else
-	if(k == 'arrowDown'){ vm.selectItem('next')} else
-	if(k == 'arrowRight'){ vm.showChildren(null, 'show')} else
-	if(k == 'arrowLeft'){ vm.showChildren(null, 'hide')} else
-	if(k == 'meta_arrowUp'){ vm.moveItem('up')} else
-	if(k == 'meta_arrowDown'){ vm.moveItem('down')} else
-	if(k == 'meta_arrowRight'){ vm.indent()} else
-	if(k == 'meta_arrowLeft'){ vm.unindent()} else
-	if(k == 'spaceBar'){ vm.markDone()} else
-	if(k == 'tab'){ vm.indent()} else
-	if(k == 'shift_tab'){ vm.unindent()} else
-	if(k == 'enter'){ vm.showAddNewItem()} else
-	if(k == 'shift_enter'){ vm.showAddNewItem(null, 'child')} else
-	if(k == 'meta_enter'){ eventHub.$emit('startEdit')} else
-	if(k == 'ctrl_u'){ eventHub.$emit('startEdit')} else
-	if(k == 't'){ vm.setToday()} else
-	if(k == 'shift_t'){ vm.startEditTags()} else
-	if(k == 's'){ vm.addTimer()} else
-	if(k == 'meta_shift_d'){ vm.duplicate()} else
-	if(k == 'meta_backspace'){ vm.deleteItem()} else
-	if(k == 'backspace'){ vm.deleteItem()} else
-	if(k == 'delete'){ vm.deleteItem()}
 }
 
 }// END default CLASS

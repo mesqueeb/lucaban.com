@@ -2,7 +2,7 @@ import Card from './Card.vue';
 import Popups from './Popups.vue';
 import Popouts from './Popouts.vue';
 import ListAppKeyBindings from './ListAppKeyBindings.vue';
-import { objectToArray, uniqBy, uniq, arrayToString, sec_to_hourmin, sortObjectArrayByProperty, removeEmptyValuesFromArray } from '../components/globalFunctions.js';
+import { isElementInViewport, objectToArray, uniqBy, uniq, arrayToString, sec_to_hourmin, sortObjectArrayByProperty, removeEmptyValuesFromArray } from '../components/globalFunctions.js';
 import Selection from './Selection.js';
 import Tree from './dataTree.js';
 
@@ -429,7 +429,7 @@ export default {
 				});
 			});
 		},
-		patch(id, arg){
+		patch(id, arg, value){
 			if(allItems.isTopLvlItemInFilteredRoot(id)){ 
 				if(arg == 'children_order' || arg == 'parent_id'){
 					console.log("you can't sync a toplvlItem when filtering");
@@ -438,7 +438,7 @@ export default {
 			}
 			this.startPatching();
 			let patchObj = {};
-			let patchVal = allItems.nodes[id][arg];
+			let patchVal = (value) ? value : allItems.nodes[id][arg];
 			if(arg == 'children_order'){
 				patchVal = arrayToString(patchVal);
 			}
@@ -725,6 +725,19 @@ export default {
             console.log(id);
             return;
         });
+        window.onscroll = function() {
+			if(!selection.filter.length && !selection.tags.length){ return; }
+			let el = document.getElementsByClassName('line');
+			// let el = $('.navigation');
+			if (!isElementInViewport(el[0]))
+			{
+		    	$("body").addClass("scrolled-down");
+			}
+			else
+			{
+		    	$("body").removeClass("scrolled-down");
+			}
+		};
     },
 	http: {
 		headers: {

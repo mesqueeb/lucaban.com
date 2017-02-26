@@ -318,7 +318,7 @@ isTopLvlItemInFilteredRoot(id)
 	// debugger;
 	// console.log('length of filter: '+x);
 	let x = parseFloat(selection.filter.length)+parseFloat(selection.tags.length);
-	if(x == 0){ console.log('the root is not filtered'); return false; }
+	if(x <= 1){ console.log('the root is not filtered'); return false; }
 	if (id == this.root.id)
 	{
 		return true;

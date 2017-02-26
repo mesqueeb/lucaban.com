@@ -6,21 +6,21 @@
     transition="fade"
 >
     <div
-      class="popup callout animated"
-      v-if="popup.type=='afterDone'"
+        class="popup callout animated"
+        v-if="popup.type=='afterDone'"
     >
         <div class="top">
             <div class="title">Completed {{popup.item.body}}
             <label class="done-after-done"
                 @keydown="keydownInPopup(popup, $event, 'flatPicker')"
             >{{ momentCalendar(popup.item.done_date) }}
-              <Flatpickr
-                class="flatpickr"
-                :id="'done-date-edit-'+popup.item.id+'-popup'"
-                v-model="popup.item.done_date"
-                :options="flatPickConfig"
-                @keydown="keydownInPopup(popup, $event, 'flatPicker')"
-              />
+                <input
+                    v-flatpicky
+                    :id="'done-date-edit-'+popup.item.id"
+                    class="flatpickr"
+                    :name="popup.item.id"
+                    v-model="popup.item.done_date"
+                >
             </label></div>
         </div>
         
