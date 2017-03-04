@@ -1,8 +1,7 @@
 import Card from './Card.vue';
 import Popups from './Popups.vue';
 import Popouts from './Popouts.vue';
-import ListAppKeyBindings from './ListAppKeyBindings.vue';
-import { isElementInViewport, objectToArray, uniqBy, uniq, arrayToString, sec_to_hourmin, sortObjectArrayByProperty, removeEmptyValuesFromArray } from '../components/globalFunctions.js';
+import { isElementInViewport, objectToArray, uniqBy, uniq, arrayToString, sec_to_hourmin, sortObjectArrayByProperty, sortObjectArrayByTwoProperties, removeEmptyValuesFromArray } from '../components/globalFunctions.js';
 import Selection from './Selection.js';
 import Tree from './dataTree.js';
 
@@ -268,7 +267,7 @@ export default {
 		resetDoneData()
 		{
 			let dd = objectToArray(this.nodes).filter(item => item.done);
-			sortObjectArrayByProperty(dd,'done_date','desc');
+			dd = sortObjectArrayByTwoProperties(dd,'done_date','parents_bodies','desc','asc');
 			this.doneData = dd;
 		},
 		tagSlugToName(tagslug)

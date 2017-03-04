@@ -1,0 +1,7 @@
+$icon-font-path: "~bootstrap-sass/assets/fonts/bootstrap/";
+
+@import "node_modules/bootstrap/scss/bootstrap";
+@import "global.scss";
+@import "lp/_variables.scss";
+@import "lp/bootstrap-customization.scss";
+@import "lp/main.scss";

@@ -525,8 +525,15 @@ export default {
 				let prevId = allItems.prevItemId(this.item.id);
 				let parentString = this.item.parents_bodies;
 				let prevParentString = allItems.nodes[prevId].parents_bodies;
-				if (parentString != prevParentString
-					&& (parentString && prevParentString))
+
+				let prevDoneDate = allItems.nodes[prevId].done_date;
+				prevDoneDate = moment(prevDoneDate).format('YYYY/MM/DD');
+				let thisDoneDate = moment(this.item.done_date).format('YYYY/MM/DD');
+
+				if (
+					parentString
+					&& ( parentString != prevParentString
+						|| thisDoneDate != prevDoneDate ) )
 				{
 					return parentString;
 				}
@@ -920,6 +927,7 @@ export default {
 				if(field == 'addTag')
 				{
 					e.preventDefault();
+		        	if(vm.editingItemTags){ vm.editingItemTags = null; return; }
 					let plsFocus = '#updatebox-'+item.id+' .update-planned-time>button';
 					document.querySelector(plsFocus).focus();
 					return;
@@ -941,6 +949,7 @@ export default {
 				}
 				if(field == 'addTag')
 				{
+		        	if(vm.editingItemTags){ vm.editingItemTags = null; }
 		        	return;
 				}
 			}
@@ -1036,7 +1045,7 @@ export default {
 			{
 				item.body = this.$root.beforeEditCache_body;
 			}
-			item.body = item.body.trim();
+			// item.body = item.body.trim();
 
 			if (item.planned_time != this.$root.beforeEditCache_planned_time)
 			{
@@ -1154,7 +1163,7 @@ export default {
 		},
 		deleteTag(id, tagName, event)
 		{
-			let plsFocus = '#updatebox-'+id+' .add-tag';
+			let plsFocus = '#add-tag-'+id+' .add-tag';
 			document.querySelector(plsFocus).focus();
 			this.$root.patchTag(id, tagName, 'untag');
 		},

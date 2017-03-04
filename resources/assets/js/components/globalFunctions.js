@@ -69,6 +69,48 @@ function sortObjectArrayByProperty(array, propertyName, order){
 	    }
 	}.bind(propertyName));
 }
+function sortObjectArrayByTwoProperties(array, prop1, prop2, order, order2){
+	let props = {prop1, prop2};
+	return array.sort(function(a, b){
+		prop1 = props['prop1'];
+		prop2 = props['prop2'];
+	    let textA = a[prop1].toUpperCase();
+	    let textB = b[prop1].toUpperCase();
+
+	    if(!order || order =='asc'){
+	    	if (textA < textB) { return -1; }
+	    	else if (textA > textB) { return 1; }
+	    	else
+	    	{
+				if (!a[prop2] || !b[prop2]){ return 0; }
+			    let text2A = a[prop2].toUpperCase();
+			    let text2B = b[prop2].toUpperCase();
+				if (!order2 || order2 == 'asc')
+				{
+					return (text2A > text2B) ? -1 : (text2A < text2B) ? 1 : 0;
+				} else if (order2 == 'desc') {
+					return (text2A < text2B) ? -1 : (text2A > text2B) ? 1 : 0;
+				}
+	    	}
+	    } else if (order == 'desc'){
+	    	if (textA > textB) { return -1; }
+	    	else if (textA < textB) { return 1; }
+	    	else
+	    	{
+				if (!a[prop2] || !b[prop2]){ return 0; }
+			    let text2A = a[prop2].toUpperCase();
+			    let text2B = b[prop2].toUpperCase();
+				console.log('text2A: '+text2A+' | text2B: '+text2B);
+				if (!order2 || order2 == 'asc')
+				{
+					return (text2A > text2B) ? -1 : (text2A < text2B) ? 1 : 0;
+				} else if (order2 == 'desc') {
+					return (text2A < text2B) ? -1 : (text2A > text2B) ? 1 : 0;
+				}
+	    	}
+	    }
+	}.bind(props));
+}
 
 function btnEffect(event){
 	console.log(event);
@@ -118,4 +160,4 @@ function isElementInViewport (el) {
     );
 }
 
-export { objectToArray, uniqBy, uniq, arrayToString, sec_to_hourmin, hasClass, btnEffect, isElementInViewport, sortObjectArrayByProperty, removeEmptyValuesFromArray }
+export { objectToArray, uniqBy, uniq, arrayToString, sec_to_hourmin, hasClass, btnEffect, isElementInViewport, sortObjectArrayByProperty, sortObjectArrayByTwoProperties, removeEmptyValuesFromArray }

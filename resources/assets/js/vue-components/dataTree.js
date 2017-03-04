@@ -315,10 +315,12 @@ nextItemRecursion(id)
 }
 isTopLvlItemInFilteredRoot(id)
 {
-	// debugger;
-	// console.log('length of filter: '+x);
-	let x = parseFloat(selection.filter.length)+parseFloat(selection.tags.length);
-	if(x <= 1){ console.log('the root is not filtered'); return false; }
+	let s = selection;
+	if(s.tags.length == 0 && s.filter.includes('all'))
+	{
+		console.log('the root is not filtered');
+		return false;
+	}
 	if (id == this.root.id)
 	{
 		return true;
@@ -814,8 +816,8 @@ filterItems(keyword, value, operator)
 	}
 	if (keyword == 'journal')
 	{
-		filteredArray = vm.doneData;
 		vm.resetDoneData();
+		filteredArray = vm.doneData;
 	}
 	if (keyword == 'duedate')
 	{

@@ -53,19 +53,30 @@
 					</div>{{ item.body }}
 				</div>
 				<div v-if="!item.planned_time"
-					class="timer-time" 
+					 class="timer-time" 
 				>
-				<!-- {{ item.used_time | hhmmss }}</div> -->
-				{{ sec_to_hhmmss(item.used_time) }}</div>
-				<div v-if="item.planned_time"
+					{{ sec_to_hhmmss(item.used_time) }}
+				</div>
+				<div
+					v-if="item.planned_time"
 					:class="{
 						'timer-time':true,
 						'countdown':true,
 						'overtime':item.used_time>item.planned_time*60,
 					}"
 				>
-					<div v-if="item.used_time>item.planned_time*60" class="overtime-notice">overtime</div>
+					<div
+						v-if="item.used_time>item.planned_time*60"
+						class="overtime-notice"
+					>
+						overtime
+					</div>
 					<div>{{ countdownTimer(item.used_time,item.planned_time) }}</div>
+				</div>
+				<div
+					v-if="item.used_time>item.planned_time*60"
+				>
+					Total  {{ sec_to_hhmmss(item.used_time) }}
 				</div>
 				<!-- {{ item.used_time }}</div> -->
 			</div>
@@ -115,21 +126,24 @@ export default {
 			timerRunning: true,
 		};
 	},
-	mounted(){
+	mounted()
+	{
 		eventHub.$on('playTimer', this.playTimer);
 		eventHub.$on('clearAll', this.clearAll);
 	},
     methods: {
     	sec_to_hhmmss, momentCalendar,
-    	countdownTimer(used_time, planned_time){
+    	countdownTimer(used_time, planned_time)
+    	{
     		let secondsLeft = planned_time*60-used_time;
     		if(secondsLeft>0){
 	    		return this.sec_to_hhmmss(secondsLeft);
     		} else {
-	    		return this.sec_to_hhmmss(used_time);
+	    		return this.sec_to_hhmmss(used_time-planned_time*60);
     		}
     	},
-        removePopout(item) {
+        removePopout(item)
+        {
             this.timerRunning = false;
         	let index = this.$root.popouts.timer.indexOf(item);
         	if(index == -1){
@@ -139,12 +153,15 @@ export default {
         	}
             this.$root.popouts.timer.splice(index, 1);
         },
-        popoutCall(msg, item){
+        popoutCall(msg, item)
+        {
         	eventHub.$emit(msg, item.id);
         	this.removePopout(item);
         },
-        clearAll(event){
-        	if(!event || event.target.id == 'popouts-mask'){
+        clearAll(event)
+        {
+        	if(!event || event.target.id == 'popouts-mask')
+        	{
 	        	vm.popouts.timer.forEach(function(item) {
 					this.closeTimer(item);
 	        	}.bind(this));
@@ -153,24 +170,28 @@ export default {
 	        	}.bind(this));
         	}
         },
-        updateDone(item){
+        updateDone(item)
+        {
         	this.pauseTimer(item);
         	allItems.prepareDonePatch(item.id);
         	document.querySelector('.btn-ok').focus();
         },
-        timerNav(button, item, value){
+        timerNav(button, item, value)
+        {
         	if(button == 'play'){ this.playTimer(item); }
 			if(button == 'pause'){ this.pauseTimer(item); }
 			if(button == 'forward'){ this.forwardTimer(item, value); }
 			if(button == 'reset'){ this.resetTimer(item); }
 			if(button == 'close'){ this.closeTimer(item); }
         },
-        playTimer(item){
+        playTimer(item)
+        {
         	// console.log(item);
         	console.log("timer started: "+moment().format('HH:mm:ss'));
         	this.timerRunning = true;
 			let update = function(){
-				if(item.planned_time>0){
+				if(item.planned_time>0)
+				{
 					item.used_time = ++item.used_time;
 				} else {
 					item.used_time = ++item.used_time;
@@ -180,7 +201,8 @@ export default {
 			if(timers[item.id]){ return; }
 			timers[item.id] = setInterval(update,1000);
 		},
-		pauseTimer(item){
+		pauseTimer(item)
+		{
         	console.log("timer paused: "+moment().format('HH:mm:ss'));
 			this.timerRunning = false;
 			if (!window.timers) { return; }
@@ -190,23 +212,28 @@ export default {
 			vm.patch(item.id, 'used_time');
 			allItems.calculateTotalTime(item.id);
 		},
-		forwardTimer(item, time){
+		forwardTimer(item, time)
+		{
 			time = time*60;
 			item.used_time = item.used_time+time;
 		},
-		resetTimer(item){
+		resetTimer(item)
+		{
         	console.log("timer reset: "+moment().format('HH:mm:ss'));
 			item.used_time = 0;
 			vm.patch(item.id, 'used_time');
 			allItems.calculateTotalTime(item.id);
 		},
-		closeTimer(item){
+		closeTimer(item)
+		{
         	console.log("timer closed: "+moment().format('HH:mm:ss'));
-			if (window.timers && window.timers[item.id]){
+			if (window.timers && window.timers[item.id])
+			{
 				clearInterval(window.timers[item.id]);
 				delete window.timers[item.id];
 			}
-			if(item.used_time < 5){
+			if(item.used_time < 5)
+			{
 				item.used_time = 0;
 			} else {
 				vm.patch(item.id, 'used_time');

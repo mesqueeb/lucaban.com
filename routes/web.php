@@ -12,7 +12,7 @@
 */
 
 Auth::routes();
-Route::get('/', function(){ return view('welcome'); });
+Route::get('/', function(){ return view('layouts.welcome'); });
 // Route::get('/home', 'HomeController@index');
 Route::get('/home', ['as' => 'home', 'uses' => 'ViewController@index']);
 Route::get('/items', ['as' => 'items', 'uses' => 'ViewController@items']);

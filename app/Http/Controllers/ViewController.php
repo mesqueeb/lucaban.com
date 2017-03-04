@@ -8,11 +8,11 @@ class viewController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('auth');
+        $this->middleware('auth', ['except'=>'welcome']);
     }
     public function index()
     {
-        return view('home');
+        return view('welcome');
     }
     public function items()
     {

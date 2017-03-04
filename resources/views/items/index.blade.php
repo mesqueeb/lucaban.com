@@ -3,8 +3,8 @@
 	<meta charset="UTF-8">
 	{{-- <meta name="token" id="token" value="{{csrf_token()}}"> --}}
 	<meta name="csrf-token" id="csrf-token" content="{{ csrf_token() }}">
-	<title>THINGS</title>
-	<link rel="stylesheet" href="/css/app.css">
+	<title>Items</title>
+	<link rel="stylesheet" href="/css/items.css">
 	{{-- <link rel="stylesheet" href="/css/fonts/material-design-iconic-font.min.css"> --}}
 
 </head>
@@ -106,6 +106,6 @@
 
 
 </div>
-<script src="js/main.js"></script>
+<script src="js/items.js"></script>
 </body>
 </html>

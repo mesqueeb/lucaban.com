@@ -9,7 +9,7 @@
     width: 100vw;
     height: 100vh;
     background-color: rgba(0, 0, 0, .5);
-    transition: opacity .3s ease;	
+    transition: opacity .3s ease;   
 }
 .popout {
     z-index: 5;
@@ -27,19 +27,20 @@
     .body{
         display: flex;
         flex-direction: column;
+        align-items: center;
     }
     .toggle-div{
         margin-top: -0.2em;
         margin-right: 0.5em;
     }
     .bodybox {
-        padding: 1em;
         border-bottom: 1px solid #e3e3e3;
         display: flex;
         flex-direction: row;
         align-items: center;
         font-size: 1.1em;
         padding: 1em;
+        width: 100%;
     }
     .confirm-delete .bodybox{
         padding: 1em 2em;
@@ -58,9 +59,9 @@
     }
     button {
         font-size: 1.1em;
-	    padding: 0 0.4em;
-	    margin: 0 0.3em;
-	}
+        padding: 0 0.4em;
+        margin: 0 0.3em;
+    }
     button:focus {
     }
     button.play, button.pause {
