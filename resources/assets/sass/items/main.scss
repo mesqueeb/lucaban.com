@@ -74,7 +74,16 @@ button:focus {
         font-weight: 600;
     }
 }
-
+#floating-add-btn{
+    position: fixed;
+    right: 0.5em;
+    bottom: 0.3em;
+    background-size: 100%;
+    z-index: 3;
+    opacity: 0.7;
+    font-size: 3em;
+    color: $theme-color;
+}
 
 label{
     font-weight: 300;

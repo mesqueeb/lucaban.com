@@ -1,7 +1,7 @@
 import Card from './Card.vue';
 import Popups from './Popups.vue';
 import Popouts from './Popouts.vue';
-import { isElementInViewport, objectToArray, uniqBy, uniq, arrayToString, sec_to_hourmin, sortObjectArrayByProperty, sortObjectArrayByTwoProperties, removeEmptyValuesFromArray } from '../components/globalFunctions.js';
+import { mobilecheck, isElementInViewport, objectToArray, uniqBy, uniq, arrayToString, sec_to_hourmin, sortObjectArrayByProperty, sortObjectArrayByTwoProperties, removeEmptyValuesFromArray } from '../components/globalFunctions.js';
 import Selection from './Selection.js';
 import Tree from './dataTree.js';
 
@@ -49,6 +49,10 @@ export default {
 		Popouts,
 	},
 	computed:{
+		mobile()
+		{
+			return mobilecheck();
+		},
 		noItems()
 		{
 			if(!this.allData || !allItems.root || !allItems.root.children.length){
@@ -396,7 +400,7 @@ export default {
 			allItems.setDueDate(id);
 		},
 		showAddNewItem(id, addAs){
-			id = (id) ? id : selection.selectedId;
+			id = (id) ? id : (selection.selectedId) ? selection.selectedId : allItems.root.id ;
 			if(!id){ return; }
 			console.log('showAddNewItem for ['+allItems.nodes[id].body+']');
 			this.addingNewUnder = id;

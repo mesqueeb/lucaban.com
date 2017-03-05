@@ -116,6 +116,9 @@
 			{{-- :alltags="allTags" --}}
 		></Card>
 	</div>
+	<button id="floating-add-btn" v-if="true" @click="showAddNewItem()">
+		<i class="zmdi zmdi-plus-circle"></i>
+	</button>
 </div>
 
 
