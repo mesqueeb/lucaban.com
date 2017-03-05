@@ -25939,7 +25939,7 @@ var _class = function () {
 			}
 
 			var arrayToFilter = void 0;
-			if (operator == 'AND') {
+			if (operator == 'AND' || selection.view == 'journal') {
 				arrayToFilter = this.flattenTree(this.root.children);
 			} else {
 				selection.clear();

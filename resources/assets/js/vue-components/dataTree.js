@@ -800,7 +800,7 @@ filterItems(keyword, value, operator)
 	}
 
 	let arrayToFilter;
-	if (operator == 'AND')
+	if (operator == 'AND' || selection.view == 'journal')
 	{
 		arrayToFilter = this.flattenTree(this.root.children);
 	}
