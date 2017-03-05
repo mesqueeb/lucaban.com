@@ -800,12 +800,22 @@ filterItems(keyword, value, operator)
 	}
 
 	let arrayToFilter;
-	if (operator == 'AND' || selection.view == 'journal')
+	if (operator == 'AND'
+	 // || (selection.view == 'journal' && selection.nothingSelected())
+	 )
 	{
+		console.log('filterItems: a');
 		arrayToFilter = this.flattenTree(this.root.children);
+	}
+	else if (selection.view == 'journal')
+	{
+		console.log('filterItems: b');
+		selection.clear();
+		arrayToFilter = vm.doneData;
 	}
 	else
 	{
+		console.log('filterItems: c');
 		selection.clear();
 		arrayToFilter = this.flattenTree(this.backups.rootChildren);
 	}

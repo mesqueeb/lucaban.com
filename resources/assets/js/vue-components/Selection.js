@@ -18,6 +18,28 @@ export default class Selection {
 		this.hiddenItems = [];
 		this.hiddenBookmarks = [];
 	}
+	reset()
+	{
+		this.filter = ['all'];
+		this.tags = [];
+		this.hiddenTags = [];
+		this.hiddenItems = [];
+		this.hiddenBookmarks = [];
+	}
+	nothingSelected()
+	{
+		let n = (  !this.tags.length
+				&& !this.hiddenTags.length
+				&& !this.hiddenItems.length
+				&& !this.hiddenBookmarks.length
+				&& (
+					(this.filter.length == 1
+					 && this.filter.includes('all'))
+					|| (!this.filter.length)
+					)
+				);
+		return n;
+	}
 	addKeywords(keyword,value,operator){
 		if(keyword == 'tag'){
 			if(operator == 'NOT'){

@@ -25939,9 +25939,17 @@ var _class = function () {
 			}
 
 			var arrayToFilter = void 0;
-			if (operator == 'AND' || selection.view == 'journal') {
-				arrayToFilter = this.flattenTree(this.root.children);
+			if (operator == 'AND'
+			// || (selection.view == 'journal' && selection.nothingSelected())
+			) {
+					console.log('filterItems: a');
+					arrayToFilter = this.flattenTree(this.root.children);
+				} else if (selection.view == 'journal') {
+				console.log('filterItems: b');
+				selection.clear();
+				arrayToFilter = vm.doneData;
 			} else {
+				console.log('filterItems: c');
 				selection.clear();
 				arrayToFilter = this.flattenTree(this.backups.rootChildren);
 			}
@@ -39706,6 +39714,21 @@ var Selection = function () {
 			this.hiddenTags = [];
 			this.hiddenItems = [];
 			this.hiddenBookmarks = [];
+		}
+	}, {
+		key: 'reset',
+		value: function reset() {
+			this.filter = ['all'];
+			this.tags = [];
+			this.hiddenTags = [];
+			this.hiddenItems = [];
+			this.hiddenBookmarks = [];
+		}
+	}, {
+		key: 'nothingSelected',
+		value: function nothingSelected() {
+			var n = !this.tags.length && !this.hiddenTags.length && !this.hiddenItems.length && !this.hiddenBookmarks.length && (this.filter.length == 1 && this.filter.includes('all') || !this.filter.length);
+			return n;
 		}
 	}, {
 		key: 'addKeywords',
