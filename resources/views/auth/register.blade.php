@@ -4,6 +4,11 @@
 <div class="container">
     <div class="row">
         <div class="col-md-8 col-md-offset-2">
+            Already have an account?<a class="btn btn-link" href="{{ url('/login') }}">Click here to login</a>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-8 col-md-offset-2">
             <div class="panel panel-default">
                 <div class="panel-heading">Register</div>
                 <div class="panel-body">

@@ -12,8 +12,7 @@
 */
 
 Auth::routes();
-Route::get('/', function(){ return view('layouts.welcome'); });
-// Route::get('/home', 'HomeController@index');
+Route::get('/', ['as' => 'home', 'uses' => 'ViewController@index'])->name('home');
 Route::get('/home', ['as' => 'home', 'uses' => 'ViewController@index']);
 Route::get('/items', ['as' => 'items', 'uses' => 'ViewController@items']);
 // Codementor ↑ what's this?
@@ -24,6 +23,3 @@ Route::post('/api/itemtags/fetchTagged','ItemTagController@fetchTagged');
 Route::resource('/api/items','CardController');
 Route::resource('/api/itemtags','ItemTagController');
 ////////////////////////////////////////////////
-Route::get('/playground',function(){
-	return view('playground.index');
-});

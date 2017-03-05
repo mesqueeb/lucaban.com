@@ -675,6 +675,7 @@ moveItem(id, direction)
 	{
 		if(index == 0)
 		{
+			if(parent.depth == 0){ console.log('ceiling!'); return; }
 			// Jump to last child of previous Sibling
 			let parentOlderSiblingId = this.olderSiblingId(pId);
 			let newInd = (parentOlderSiblingId == parent.parent_id) ? 0 : null;
@@ -690,6 +691,7 @@ moveItem(id, direction)
 	{
 		if( index+1 == parent.children_order.length )
 		{
+			if(parent.depth == 0){ console.log('floor!'); return; }
 			// Jump to First child of next Sibling
 			let new_parent_id = this.nextSiblingOrParentsSiblingId(id);
 			console.log('new_parent_id: '+new_parent_id);

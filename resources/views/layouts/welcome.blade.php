@@ -56,25 +56,55 @@
         <div class="col-12">
             <p>{{ config('app.name', 'Laravel') }} is focussed on the following features:</p>
         </div>
+        {{-- <div class="card">
+            <img class="card-img-top"
+                src="img/all.png"
+                alt="example image"
+            >
+            <div class="card-block">
+                <h4 class="card-title">Simplicity</h4>
+                <p class="card-text">It needs to "just work". I believe an app shouldn't require a manual to know how to work it. Intuition is the prime pillar.</p>
+            </div>
+        </div> --}}
         <div class="col-md-4">
             <h4>Simplicity</h4>
             <p>It needs to "just work". I believe an app shouldn't require a manual to know how to work it. Intuition is the prime pillar.</p>
-        </div>
-        <div class="col-md-4">
-            <h4>Keyboard controls</h4>
-            <p>Keep it fast and easy to work with. And powerfull for power users.</p>
+            <p><img class="img-fluid img-thumbnail"
+                src="img/all.png"
+                alt="example image"
+            ></p>
         </div>
         <div class="col-md-4">
             <h4>Time management</h4>
             <p>Add 'planned time' for a perspective of your taskload. You can use timers for increased productivity. You can easily log how much time you have spent on a task.</p>
+            <p><img class="img-fluid img-thumbnail"
+                src="img/timer.png"
+                alt="example image"
+            ></p>
         </div>
         <div class="col-md-4">
             <h4>A journal of done tasks</h4>
             <p>The most important feature to know what you've done.</p>
+            <p><img class="img-fluid img-thumbnail"
+                src="img/journal.png"
+                alt="example image"
+            ></p>
         </div>
         <div class="col-md-4">
             <h4>Tags</h4>
             <p>Tags for filtering and organization.</p>
+            <p><img class="img-fluid img-thumbnail"
+                src="img/filter.png"
+                alt="example image"
+            ></p>
+        </div>
+        <div class="col-md-4">
+            <h4>Keyboard controls</h4>
+            <p>Keep it fast and easy to work with. And powerfull for power users.</p>
+            <p><img class="img-fluid img-thumbnail"
+                src="img/keyboard.jpg"
+                alt="example image"
+            ></p>
         </div>
     </section>
     <section class="row marketting">
@@ -86,8 +116,8 @@
         <div class="col-12">
             <h4>About the Author</h4>
             <p>Hello community. My name is Luca Ban. I always wanted to build the perfect task list app that fits my needs. I have used about all task list apps out there. But there was always something missing. So that's why I decided to create {{ config('app.name', 'Laravel') }}.
-
-            This app has been my introduction to programming and I fell in love. There are still great plans for new features so stay tuned! (I was greatly inspired by (Checkvist)[https://checkvist.com/].)</p>
+            <br><br>
+            <span v-html="aboutMe"></span></p>
         </div>
     </section>
 </div>

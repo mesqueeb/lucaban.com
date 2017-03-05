@@ -57,6 +57,9 @@
 					'filtered-out': selection.hiddenBookmarks.includes('journal')}"
 				@click="filterItems('journal', 'journal', $event)"
 			>Journal</a>
+			<a href="#"
+				@click="popouts.guide = true"
+			>?</a>
 		</div>
 		<div class="tag-menu">
 
@@ -88,12 +91,22 @@
 	<div class="stats"
 		v-show="true"
 	>
-		<div>Used time <div class="used-time">@{{ totalUsedHourMin }}</div></div>
-		<div
-			v-show="!selection.filter.includes('done')"
-		>Time left <div class="time-left">@{{ totalHourMinLeft }}</div></div>
-		<div>Items <div class="children-amount">@{{ childrenAmount }}</div></div>
-		<div>Done <div class="done-children-amount">@{{ doneChildrenAmount }}</div></div>
+		<div v-show="totalUsedHourMin && selection.view != 'journal'">
+			Used time
+			<div class="used-time">@{{ totalUsedHourMin }}</div>
+		</div>
+		<div v-show="totalHourMinLeft && selection.view != 'journal'">
+			Time left
+			<div class="time-left">@{{ totalHourMinLeft }}</div>
+		</div>
+		<div v-show="selection.view != 'journal'">
+			Items
+			<div class="children-amount">@{{ childrenAmount }}</div>
+		</div>
+		<div>
+			@{{ (selection.view != 'journal') ? 'Done' : 'Total' }}
+			<div class="done-children-amount">@{{ doneChildrenAmount }}</div>
+		</div>
 	</div>
 	<!-- DATA -->
 	<div class="items-wrapper"

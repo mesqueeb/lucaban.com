@@ -479,11 +479,11 @@ export default {
 		totalPlannedMin()
 		{ if(!this.item || !allItems){ return 0; }
 			// console.log('trying at totalPlannedMin');
-			if(!this.item.children.length){ return (this.item.planned_time) ? this.item.planned_time : 0 ; }
+			if(!this.item.children.length){ return (this.item.planned_time) ? parseFloat(this.item.planned_time) : 0 ; }
 			let childrenArray = allItems.flattenTree(this.item.children);
-			let x = childrenArray.reduce((prevVal, child) => prevVal + child.planned_time, this.item.planned_time);
+			let x = childrenArray.reduce((prevVal, child) => prevVal + parseFloat(child.planned_time), parseFloat(this.item.planned_time));
 			x = x - this.$root.hiddenItemsTotalPlannedTime;
-		    return (x) ? x : 0;
+		    return (x) ? parseFloat(x) : 0;
 		},
 		totalUsedSec()
 		{ if(!this.item || !allItems){ return 0; }
@@ -704,6 +704,7 @@ export default {
 			{
 				this.newTag = ' '+this.newTag;
 			}
+			if (field == 'planned-time'){ this.newItem.planned_time = parseFloat(this.newItem.planned_time); }
 			console.log(e);
 			console.log('↑　keydown on new: '+e.keyCode+' - '+field);
 			// SHIFT-TAB
@@ -855,6 +856,8 @@ export default {
 	    },
 		keydownOnEdit(item, e, field)
 		{
+			if (field == 'planned-time'){ item.planned_time = parseFloat(item.planned_time); }
+
 			preventKeydownListener();
 			// console.log('Keydown on edit: '+field);
 			if (this.newTag && this.newTag.substring(0,1) != ' ')

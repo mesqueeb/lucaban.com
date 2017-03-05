@@ -1,7 +1,7 @@
 <template id="popouts-template">
 <div id="popouts-mask"
-	v-if="popouts.timer.length || popouts.delete.length"
-	@click="clearAll($event)"
+	v-if="popoutExists"
+	@click="maskClick($event)"
 >
 <!-- 	<Popout-Confirmation
 		v-if="popouts.delete.length"
@@ -30,11 +30,38 @@
 			</div>
 		</div>
 	</div>
+
+	<div v-if="popouts.guide"
+		class="popout"
+	>
+		<div 
+			class="guide"
+		>
+			<div class="bodybox">
+				<table>
+					<tr>
+						<th>Action</th><th>Key</th>
+					</tr>
+					<tr v-for="row in keybindings">
+						<td v-html="row.note"></td><td>{{ row.key }}</td>
+					</tr>
+				</table>
+			</div>
+			<div class="nav">
+				<button
+					class="btn-ok"
+					v-focus
+					@click="this.clearAll"
+				>OK</button>
+			</div>
+		</div>
+	</div>
+
+
 	<div v-if="popouts.timer.length"
 		v-for="item in popouts.timer"
 		class="popout"
 	>
-
 		<div 
 			:class="{
 				done: item.done,
@@ -71,38 +98,52 @@
 					>
 						overtime
 					</div>
-					<div>{{ countdownTimer(item.used_time,item.planned_time) }}</div>
+					<div>
+						{{ countdownTimer(item.used_time,item.planned_time) }}
+					</div>
 				</div>
 				<div
-					v-if="item.used_time>item.planned_time*60"
+					v-if="item.used_time>item.planned_time*60 && item.planned_time"
 				>
 					Total  {{ sec_to_hhmmss(item.used_time) }}
 				</div>
 				<!-- {{ item.used_time }}</div> -->
 			</div>
 			<div class="nav">
-				<button class="play btn btn-dipclick"
+				<button
+					class="play btn btn-dipclick"
 					v-show="!timerRunning"
 					@click="timerNav('play', item)"
 				><i class="zmdi zmdi-play"></i>
 				</button>
-				<button class="pause btn btn-dipclick"
+				<button
+					class="pause btn btn-dipclick"
 					v-show="timerRunning"
 					@click="timerNav('pause', item)"
 				><i class="zmdi zmdi-pause"></i>
 				</button>
-				<button class="forward btn btn-dipclick"
+				<button
+					class="forward btn btn-dipclick"
 					@click="timerNav('forward', item, 1)"
-				>+1 min
+				>
+				<span v-if="item.planned_time && item.used_time<item.planned_time*60"
+				>-</span><span v-else>+</span>
+				1 min
 				</button>
-				<button class="forward btn btn-dipclick"
+				<button
+					class="forward btn btn-dipclick"
 					@click="timerNav('forward', item, 5)"
-				>+5 min
+				>
+				<span v-if="item.planned_time && item.used_time<item.planned_time*60"
+				>-</span><span v-else>+</span>
+				5 min
 				</button>
-				<button class="reset btn btn-dipclick"
+				<button
+					class="reset btn btn-dipclick"
 					@click="timerNav('reset', item)"
 				>Reset</button>
-				<button class="btn-ok"
+				<button
+					class="btn-ok"
 					@click="timerNav('close', item)"
 				>OK</button>
 			</div>
@@ -124,12 +165,28 @@ export default {
 	data(){
 		return {
 			timerRunning: true,
+			keybindings: [
+				{'key':'T','note':'Do <u>T</u>oday'},
+				{'key':'S','note':'<u>S</u>topwatch / Timer'},
+				{'key':'tab','note':'Indent item'},
+				{'key':'enter','note':'Add item'},
+				{'key':'cmd/ctrl + enter','note':'Edit item'},
+				{'key':'shift + T','note':'Edit tags'},
+				{'key':'alt + click on tag','note':'Hide tag'},
+				{'key':'cmd/ctrl + ↑↓','note':'Move item up/down'},
+			],
 		};
 	},
 	mounted()
 	{
 		eventHub.$on('playTimer', this.playTimer);
 		eventHub.$on('clearAll', this.clearAll);
+	},
+	computed: {
+		popoutExists()
+		{
+			return (this.popouts.timer.length || this.popouts.delete.length || this.popouts.guide);
+		},
 	},
     methods: {
     	sec_to_hhmmss, momentCalendar,
@@ -158,17 +215,19 @@ export default {
         	eventHub.$emit(msg, item.id);
         	this.removePopout(item);
         },
+        maskClick(event)
+        {
+        	if(event.target.id == 'popouts-mask')
+        	{
+        		this.clearAll();
+        	}
+        },
         clearAll(event)
         {
-        	if(!event || event.target.id == 'popouts-mask')
-        	{
-	        	vm.popouts.timer.forEach(function(item) {
-					this.closeTimer(item);
-	        	}.bind(this));
-	        	vm.popouts.delete.forEach(function(item) {
-					this.removePopout(item);
-	        	}.bind(this));
-        	}
+        	vm.popouts.timer.forEach(item => this.closeTimer(item));
+        	vm.popouts.delete = [];
+        	vm.popouts.guide = false;
+        	window.timers = {};
         },
         updateDone(item)
         {
@@ -210,7 +269,6 @@ export default {
 			clearInterval(window.timers[item.id]);
 			delete window.timers[item.id];
 			vm.patch(item.id, 'used_time');
-			allItems.calculateTotalTime(item.id);
 		},
 		forwardTimer(item, time)
 		{
@@ -222,7 +280,6 @@ export default {
         	console.log("timer reset: "+moment().format('HH:mm:ss'));
 			item.used_time = 0;
 			vm.patch(item.id, 'used_time');
-			allItems.calculateTotalTime(item.id);
 		},
 		closeTimer(item)
 		{

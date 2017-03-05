@@ -5,6 +5,8 @@
 	window.$ = $;
 	window.jQuery = jQuery;
 
+import marked from 'marked';
+window.marked = marked;
 import Vue from 'vue';
 window.Vue = Vue;
 
@@ -12,7 +14,19 @@ import { isElementInViewport } from './components/globalFunctions.js';
 const VueLpMaster = {
 	el:'.lp-wrapper',
 	data: {
+        aboutMeTxt: "This app has been my introduction to programming and I fell in love. There are still great plans for new features so stay tuned! (I was greatly inspired by [Checkvist](https://checkvist.com/).)",
 	},
+    filters: {
+        marked(text)
+        {
+            return marked(text);
+        },
+    },
+    computed: {
+        aboutMe(){
+            return marked(this.aboutMeTxt);
+        },
+    },
 	mounted()
 	{
         window.onscroll = function() {

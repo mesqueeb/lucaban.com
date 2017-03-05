@@ -35,7 +35,7 @@ export default {
 		loading: true,
 		patching: true,
 		popups: [],
-		popouts: {'delete':[], 'timer':[]},
+		popouts: {'delete':[], 'timer':[], 'guide':false},
 		timerItems: [],
 		beforeEditCache_body: null,
 		beforeEditCache_planned_time: null,

@@ -2,22 +2,20 @@ section.jumbotron {
     padding-top: 6rem;
 	background: url("img/lp-jumbo-bg.jpg"), $black;
     background-size: cover;
-    background-position: center;
+    background-position: top;
     background-repeat: no-repeat;
-    background-radius: 0;
+    border-radius: 0;
     color: white;
 }
 
 a {
 	transition: all 0.35s;
 	color: $main-color;
+	text-decoration: none;
 	&:hover,
 	&:focus {
 		color: $main-color-dark;
 	}
-}
-nav a {
-	color: $gray-black;
 }
 nav {
 	li:first-child {
@@ -27,12 +25,15 @@ nav {
 		color: white;
 	}
 	&.scrolled-down {
-		background: rgba(255, 255, 255, 0.9);
-		background-color: white;
+		background-color: rgba(255, 255, 255, 0.96);
 		border-color: rgba(34, 34, 34, 0.05);
 		transition: all 0.35s;
 		a {
 			color: $gray-black;
+			&:hover,
+			&:focus {
+				color: $main-color-dark;
+			}
 		}
 	}
 }
