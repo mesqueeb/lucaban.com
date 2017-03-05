@@ -1,11 +1,12 @@
 <html>
 <head>
 	<meta charset="UTF-8">
-	{{-- <meta name="token" id="token" value="{{csrf_token()}}"> --}}
 	<meta name="csrf-token" id="csrf-token" content="{{ csrf_token() }}">
-	<title>Items</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 	<link rel="stylesheet" href="/css/items.css">
 	{{-- <link rel="stylesheet" href="/css/fonts/material-design-iconic-font.min.css"> --}}
+
+	<title>Items</title>
 
 </head>
 <body>
