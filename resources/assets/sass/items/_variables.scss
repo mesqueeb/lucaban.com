@@ -1,0 +1,39 @@
+$selection-color: rgba(245,215,110,0.5);
+$theme-color: #5dc2af;
+$duration-color: #5dacce;
+$duration-color-dark: #4679a7;
+$duedate-color: rgba(230, 94, 77, 1);
+$duedate-parent-color: rgba(230, 94, 77, 0.5);
+$done-color: #1E824C;
+$used-time-color: #5d67b3;
+$border-gray: #ededed;
+$border-grey: $border-gray;
+$sepia-background:#f5f2eb;
+$sepia-brown:#a59174;
+$sepia-grey:#c0b2b4;
+
+// $font-family-base
+// Check Bootstrap/scss for this variable.
+@mixin text-settings() {
+    font-family: $font-family-base;
+    color: #4d4d4d;
+    font-size: 16px;
+    font-weight: 300;
+    -webkit-font-smoothing: antialiased;
+    -moz-font-smoothing: antialiased;
+    font-smoothing: antialiased;
+    resize: none;
+}
+
+@mixin tag($colour) {
+    align-items: center;
+    display: flex;
+    position:relative;
+    padding: 0.3em 0.5em;
+    margin: 0.1em;
+    border-radius: 0.3em;
+    color: white;
+    background-color: $colour;
+    min-height: 2.1em;
+    font-size: 0.7em;
+}

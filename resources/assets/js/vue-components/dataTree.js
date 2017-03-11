@@ -7,7 +7,7 @@ constructor(items)
 	this.source		= items;
 	this.nodes 		= {}; // →　"id":{ task obj };
 	this.orphans	= [];
-	this.doneitems	= [];
+	// this.doneitems	= [];
 	this.filteredItemRoot = {
 		children_order:[], children:[], body:"",
 		// totalPlannedTime:0, totalUsedTime:0,
@@ -40,7 +40,7 @@ initialize(item, index)
 
 	// assign extra item values
 	node = this.setDefaultItemValues(node);
-	node.parent_id_backup = node.parent_id;
+	// node.parent_id_backup = node.parent_id;
 	// Register and organize nodes:
 	if(node.depth == 0) { this.root = node; console.log('root-node');}
 	else if (parent) { parent.children.push(node); }
@@ -76,7 +76,7 @@ duplicate(id)
 }
 setDefaultItemValues(item)
 {
-	item.parent_id_backup = item.parent_id;
+	// item.parent_id_backup = item.parent_id;
 	item.depth = Number(item.depth);
 	if(item.show_children == null){ item.show_children = 1 		 }
 	if(!item.children)	{ item.children = []					 }
@@ -115,14 +115,14 @@ addItem(item, index, addNextItemAs, addTags, duplication)
 
 	// Patches etc.
     selection.selectedId = item.id;
-	if ( this.isTopLvlItemInFilteredRoot(item.id)
-		&& item.parent_id == this.root.id )
-	{
-		this.backups.rootChildren.push(item);
-		vm.patchRootChildrenOrderWithFilter(item.id);
-	} else {
+	// if ( this.isTopLvlItemInFilteredRoot(item.id)
+	// 	&& item.parent_id == this.root.id )
+	// {
+	// 	this.backups.rootChildren.push(item);
+	// 	vm.patchRootChildrenOrderWithFilter(item.id);
+	// } else {
 	    vm.patch(item.parent_id, 'children_order');
-	}
+	// }
     if(addTags){ this.tagItem(item.id, addTags); }
 	this.attachParentBody(item.id);
 	this.autoCalculateDoneState(item.parent_id);
@@ -133,7 +133,7 @@ addItem(item, index, addNextItemAs, addTags, duplication)
 }
 tagNameToSlug(tag)
 {
-	if(!tag){ return; }
+	if(!tag || typeof tag != 'string'){ return; }
 	return tag.split(' ').join('-').toLowerCase();
 }
 tagSlugToName(tag)
@@ -168,7 +168,10 @@ hasParentWithTag(id, tags)
 	let item = this.nodes[id];
 	let parent_id = this.nodes[id].parent_id;
 	if(!parent_id){ return false; }
-	
+	if(!this.nodes[parent_id]){
+		// console.log('Parent of ('+id+')['+item.body+'] is non existant.');
+		return false;
+	}
 	let parentHasTag = this.hasTag(parent_id, tags);
 	if (parentHasTag)
 	{
@@ -242,24 +245,50 @@ olderSiblingId(id)
 	let siblingIndex = siblingsArray.indexOf(id);
 	return this.nodes[parent_id].children_order[siblingIndex-1];
 }
-nextItemId(id)
+nextItemId(id, debug)
 {
+	if(debug){ debugger; }
+	if(!id){ return; }
 	let item = this.nodes[id];
 	let nextItemId;
+	// Select next item on top level.
+	if ( this.isTopLvlItemInFilteredRoot(id) && !item.show_children
+	  || selection.view == 'journal' )
+	{
+		let ind = vm.$refs.root.childrenOrder.indexOf(id);
+		return vm.$refs.root.childrenOrder[ind+1];
+	}
 	// Select first child if any.
-	if (item.show_children && item.children.length > 0)
+	if (item.show_children && item.children.length)
 	{
 		nextItemId = item.children_order[0];
+		if(vm.hiddenItemIds.includes(nextItemId))
+	 	{
+	 		nextItemId = this.nextItemRecursion(nextItemId);
+	 	}
  	} else {
 		nextItemId = this.nextItemRecursion(id);
  	}
- 	if(selection.hiddenItems.includes(nextItemId))
- 	{
-	 	return this.nextItemId(nextItemId);
- 	} else {
-	 	return nextItemId;
- 	}
+ 	return nextItemId;
 }
+// nextVisibleItemId(id)
+// {
+// 	let item = this.nodes[id];
+// 	let nextItemId;
+// 	// Select first child if any.
+// 	if (item.show_children && item.children.length > 0)
+// 	{
+// 		nextItemId = item.children_order[0];
+//  	} else {
+// 		nextItemId = this.nextItemRecursion(id);
+//  	}
+//  	if(vm.hiddenItemIds.includes(nextItemId))
+//  	{
+// 	 	return this.nextVisibleItemId(nextItemId);
+//  	} else {
+// 	 	return nextItemId;
+//  	}
+// }
 nextSiblingOrParentsSiblingId(id)
 {
 	let parent_id = this.nodes[id].parent_id;
@@ -272,23 +301,43 @@ nextSiblingOrParentsSiblingId(id)
 		return children_order[nextIndex];
 	}
 }
-prevItemId(id)
+deepestChild(id)
 {
+	return vm.$refs.root.childrensDeepestChildren.find(obj => (obj.id == id)).deepestChild;
+}
+topLvlParentOfDeepestChild(id)
+{
+	return vm.$refs.root.childrensDeepestChildren.find(obj => (obj.deepestChild == id)).id;
+}
+prevItemId(id, debug)
+{
+	if(debug){ debugger; }
 	if(!id){ return false; }
 	let item = this.nodes[id];
 	if(item.depth == 0){ return false; }
 	let parent_id = item.parent_id;
-	let index = this.siblingIndex(id);
-	let tagsSelected = selection.tags.length;
 	let prevItemId;
-	if (index == 0)
+	let index;
+	// Select next item on top level.
+	if (this.isTopLvlItemInFilteredRoot(id) || selection.view == 'journal')
 	{
-		prevItemId = parent_id;
+		let childrenIds = vm.$refs.root.childrenOrder;
+		index = childrenIds.indexOf(id);
+		if (index == 0) {
+			return this.deepestChild(childrenIds[childrenIds.length-1]);
+		}
+		prevItemId = childrenIds[index-1];
+		prevItemId = this.deepestChild(prevItemId);
 	} else {
-		prevItemId = this.nodes[parent_id].children_order[index-1];
-		prevItemId = this.getDeepestLastChildId(prevItemId);
+		index = this.siblingIndex(id);
+		if (index == 0) {
+			prevItemId = parent_id;
+		} else {
+			prevItemId = this.nodes[parent_id].children_order[index-1];
+			prevItemId = this.getDeepestLastChildId(prevItemId);
+		}
 	}
- 	if(selection.hiddenItems.includes(prevItemId))
+ 	if (vm.hiddenItemIds.includes(prevItemId))
  	{
 	 	return this.prevItemId(prevItemId);
  	} else {
@@ -301,22 +350,50 @@ nextItemRecursion(id)
 	let nextIndex = this.siblingIndex(id)+1;
 	let item = this.nodes[id];
 	let parent_id = item.parent_id;
+	// let tagsSelected = selection.tags.length;
+
+	if (vm.itIsADeepestChild(id))
+	{
+		let topLvlItemId = this.topLvlParentOfDeepestChild(id);
+		let topLvlChildrenIds = vm.$refs.root.childrenOrder;
+		let ind = topLvlChildrenIds.indexOf(topLvlItemId);
+		if (ind+1 == topLvlChildrenIds.length){ return topLvlChildrenIds[0]; }
+		return topLvlChildrenIds[ind+1];
+	}
 	let parentsChildrenOrder = this.nodes[parent_id].children_order;
 	let itemIsLastSibling = (nextIndex == parentsChildrenOrder.length);
-	let tagsSelected = selection.tags.length;
-	
 	if(itemIsLastSibling)
 	{
 		if(parent_id == this.root.id){ return; }
 		return this.nextItemRecursion(parent_id);
 	}
 	let nextItemId = this.nodes[parent_id].children_order[nextIndex];
+	if (vm.hiddenItemIds.includes(nextItemId))
+	{
+		return this.nextItemRecursion(nextItemId);
+	}
 	return nextItemId;
 }
+// nextVisibleItemRecursion(id)
+// {
+// 	// debugger;
+// 	let nextIndex = this.siblingIndex(id)+1;
+// 	let item = this.nodes[id];
+// 	let parent_id = item.parent_id;
+// 	let parentsChildrenOrder = this.nodes[parent_id].children_order;
+// 	let itemIsLastSibling = (nextIndex == parentsChildrenOrder.length);	
+// 	if(itemIsLastSibling)
+// 	{
+// 		if(parent_id == this.root.id){ return; }
+// 		return this.nextItemRecursion(parent_id);
+// 	}
+// 	let nextItemId = this.nodes[parent_id].children_order[nextIndex];
+// 	return nextItemId;
+// }
 isTopLvlItemInFilteredRoot(id)
 {
 	let s = selection;
-	if(s.tags.length == 0 && s.filter.includes('all'))
+	if (selection.nothingSelected() && selection.view == 'tree')
 	{
 		console.log('the root is not filtered');
 		return false;
@@ -324,22 +401,22 @@ isTopLvlItemInFilteredRoot(id)
 	if (id == this.root.id)
 	{
 		return true;
-	} else if (this.root.children_order.includes(id)){
+	} else if (vm.$refs.root.childrenOrder.includes(id)) {
 		return true;
 	} else {
 		return false;
 	}
 }
-nextFilteredItemId(id)
-{
-	let index = this.root.children_order.indexOf(id);
-	return this.root.children_order[index+1];
-}
-prevFilteredItemId(id)
-{
-	let index = this.root.children_order.indexOf(id);
-	return this.root.children_order[index-1];
-}
+// nextFilteredItemId(id)
+// {
+// 	let index = this.root.children_order.indexOf(id);
+// 	return this.root.children_order[index+1];
+// }
+// prevFilteredItemId(id)
+// {
+// 	let index = this.root.children_order.indexOf(id);
+// 	return this.root.children_order[index-1];
+// }
 sortChildren(id)
 {
 	console.log('sortingChildren');
@@ -353,19 +430,19 @@ sortChildren(id)
 
 	let order = item.children_order;
 	let items = item.children;
-	if (order instanceof Array)
+	if (order instanceof Array && order.length)
 	{
 		item.children = order.map(id => items.find(t => t.id === id));
 	}
 }
-resetChildrenOrder(id)
-{
-	let item = this.nodes[id];
-	let resetChildrenOrder = item.children.map(function(child){
-	   return child.id;
-	});
-	this.nodes[id].children_order = resetChildrenOrder;
-}
+// resetChildrenOrder(id)
+// {
+// 	let item = this.nodes[id];
+// 	let resetChildrenOrder = item.children.map(function(child){
+// 	   return child.id;
+// 	});
+// 	this.nodes[id].children_order = resetChildrenOrder;
+// }
 giveNewParent(id, new_parent_id, specificNewIndex)
 {	
 	if(this.isTopLvlItemInFilteredRoot(id))
@@ -454,13 +531,37 @@ copyParentBodyToAllChildren(parent_id)
 		vm.patch(child.id, 'parents_bodies');
 	});
 }
+hasParentDueToday(id)
+{
+	id = (id) ? id : selection.selectedId;
+	let item = this.nodes[id];
+	if (!item.parent_id){ return false; }
+	let parent = this.nodes[item.parent_id];
+	if (!parent){ return false; }
+	let diff = moment(parent.due_date).diff(moment(), 'days');
+	if (diff <= 0)
+	{
+		return true;
+	} else {
+		return this.hasParentDueToday(item.parent_id);
+	}
+}
+isDueToday(id)
+{
+	id = (id) ? id : selection.selectedId;
+	let item = this.nodes[id];
+	let diff = moment(item.due_date).diff(moment(), 'days');
+	if (diff <= 0) { return true; }
+	return false;
+}
 attachParentBody(id)
 {
 	if (!id){ return; }
 	let item = this.nodes[id];
 	if (!item.parent_id){ return; }
-	let parentBody = this.nodes[item.parent_id].body;
-	item.parents_bodies = parentBody;
+	let parent = this.nodes[item.parent_id];
+	if (!parent){ return; }
+	item.parents_bodies = parent.body;
 	vm.patch(id, 'parents_bodies');
 }
 isProject(id)
@@ -494,6 +595,7 @@ deleteItem(id)
     vm.deleteItemApi(id);
 	this.autoCalculateDoneState(parent_id);
     selection.selectedId = newSelectedId;
+	delete this.nodes[id];
 }
 tagItem(id, tags)
 {
@@ -550,12 +652,6 @@ prepareDonePatch(id)
 	{ // IF DONE:
 		//Add parent's body
 		this.attachParentBody(id);
-		//Add Flatpickr
-		// setTimeout(function(){
-		// 	let fpId = "done-date-edit-"+id;
-		// 	let fpEl = document.getElementById(fpId);
-		// 	fpEl.flatpickrify();
-		// },100);
 	}
 }
 autoCalculateDoneState(id)
@@ -779,132 +875,133 @@ updateChildrenDueDate(id)
 		}
 	}.bind(this))
 }
-filterItems(keyword, value, operator)
-{
-	// debugger;
-	// Start by resetting the parent id's to their original state
-	this.root.children.forEach(function(item){
-		item.parent_id = item.parent_id_backup;
-	});
-	if (operator == 'NOT' && keyword == 'journal')
-	{
-		this.hideDoneNodes();
-		selection.addKeywords(keyword,value,operator);
-		return;
-	}
-	else if (operator == 'NOT' && keyword == 'tag')
-	{
-		this.hideTaggedNodes(value);
-		selection.addKeywords(keyword,value,operator);
-		return;
-	}
+// FILTER REWRITE
+// filterItems(keyword, value, operator)
+// {
+// 	// debugger;
+// 	// Start by resetting the parent id's to their original state
+// 	this.root.children.forEach(function(item){
+// 		item.parent_id = item.parent_id_backup;
+// 	});
+// 	if (operator == 'NOT' && keyword == 'journal')
+// 	{
+// 		this.hideDoneNodes();
+// 		selection.addKeywords(keyword,value,operator);
+// 		return;
+// 	}
+// 	else if (operator == 'NOT' && keyword == 'tag')
+// 	{
+// 		this.hideTaggedNodes(value);
+// 		selection.addKeywords(keyword,value,operator);
+// 		return;
+// 	}
 
-	let arrayToFilter;
-	if (operator == 'AND'
-	 // || (selection.view == 'journal' && selection.nothingSelected())
-	 )
-	{
-		console.log('filterItems: a');
-		arrayToFilter = this.flattenTree(this.root.children);
-	}
-	else if (selection.view == 'journal')
-	{
-		console.log('filterItems: b');
-		selection.clear();
-		arrayToFilter = vm.doneData;
-	}
-	else
-	{
-		console.log('filterItems: c');
-		selection.clear();
-		arrayToFilter = this.flattenTree(this.backups.rootChildren);
-	}
-	selection.addKeywords(keyword,value,operator);
+// 	let arrayToFilter;
+// 	if (operator == 'AND'
+// 	 // || (selection.view == 'journal' && selection.nothingSelected())
+// 	 )
+// 	{
+// 		console.log('filterItems: a');
+// 		arrayToFilter = this.flattenTree(this.root.children);
+// 	}
+// 	else if (selection.view == 'journal')
+// 	{
+// 		console.log('filterItems: b');
+// 		selection.clear();
+// 		arrayToFilter = vm.doneData;
+// 	}
+// 	else
+// 	{
+// 		console.log('filterItems: c');
+// 		selection.clear();
+// 		arrayToFilter = this.flattenTree(this.backups.rootChildren);
+// 	}
+// 	selection.addKeywords(keyword,value,operator);
 
-	let filteredArray = [];
-	if (keyword == 'all')
-	{
-		filteredArray = this.backups.rootChildren;
-	}
-	if (keyword == 'journal')
-	{
-		vm.resetDoneData();
-		filteredArray = vm.doneData;
-	}
-	if (keyword == 'duedate')
-	{
-		let dueDateFilterResults = this.arrayFilterDate(arrayToFilter, value, operator);
-		Array.prototype.push.apply(filteredArray, dueDateFilterResults);
-	}
-	if (keyword == 'tag')
-	{
-		let tagFilterResults = this.arrayFilterTag(arrayToFilter, value, operator);
-		Array.prototype.push.apply(filteredArray, tagFilterResults);
-	}
-	filteredArray.forEach(function(item){
-		item.parent_id = this.root.id;
-	}.bind(this));
-	this.root.children = filteredArray;
-	this.resetChildrenOrder(this.root.id);
-}
-arrayFilterTag(array, tags)
-{
-	let filteredArray = [];
-	array.forEach(function (item) {
-		let id = item.id;
-		let target = this.hasTag(id, tags);
-		if ( selection.view == 'tree'
-			&& target
-			&& this.hasParentWithTag(id, tags) )
-		{
-			target = false;
-		}
-		// console.log(id+" - "+item.body+" →　hasTag["+tags+"]　=　"+hasTag);
-		// console.log(id+" - "+item.body+" →　hasParentWithTag["+tags+"] =　"+hasParentWithTag);
-		if(target)
-		{
-			item.show_children = 1;
-			filteredArray.push(item);
-		}
-	}.bind(this));
-	return filteredArray;
-}
-arrayFilterDone(array, operator)
-{
-	let filteredArray = [];
-	array.forEach(function (item) {
-		if(item.done)
-		{
-			item.show_children = 1;
-			filteredArray.push(item);
-		}
-	}.bind(this));
-	return filteredArray;
-}
-arrayFilterDate(array, date, operator)
-{
-	let filteredArray = [];
-	if(date == 'today')
-	{
-		array.forEach(function (item) {
-			let diff = moment(item.due_date).diff(moment(), 'days');
-			if (diff <= 0){
-				filteredArray.push(item);
-			}
-		}.bind(this));
-	}
-	return filteredArray;
-}
-hideItem(id)
-{
-	if(!selection.hiddenItems.includes(id))
-	{
-		selection.hiddenItems.push(id);
-	}
-	this.nodes[id].children.forEach(function(child) {
-		this.hideItem(child.id)
-	}.bind(this));
-}
+// 	let filteredArray = [];
+// 	if (keyword == 'all')
+// 	{
+// 		filteredArray = this.backups.rootChildren;
+// 	}
+// 	if (keyword == 'journal')
+// 	{
+// 		vm.resetDoneData();
+// 		filteredArray = vm.doneData;
+// 	}
+// 	if (keyword == 'duedate')
+// 	{
+// 		let dueDateFilterResults = this.arrayFilterDate(arrayToFilter, value, operator);
+// 		Array.prototype.push.apply(filteredArray, dueDateFilterResults);
+// 	}
+// 	if (keyword == 'tag')
+// 	{
+// 		let tagFilterResults = this.arrayFilterTag(arrayToFilter, value, operator);
+// 		Array.prototype.push.apply(filteredArray, tagFilterResults);
+// 	}
+// 	filteredArray.forEach(function(item){
+// 		item.parent_id = this.root.id;
+// 	}.bind(this));
+// 	this.root.children = filteredArray;
+// 	this.resetChildrenOrder(this.root.id);
+// }
+// arrayFilterTag(array, tags)
+// {
+// 	let filteredArray = [];
+// 	array.forEach(function (item) {
+// 		let id = item.id;
+// 		let target = this.hasTag(id, tags);
+// 		if ( selection.view == 'tree'
+// 			&& target
+// 			&& this.hasParentWithTag(id, tags) )
+// 		{
+// 			target = false;
+// 		}
+// 		// console.log(id+" - "+item.body+" →　hasTag["+tags+"]　=　"+hasTag);
+// 		// console.log(id+" - "+item.body+" →　hasParentWithTag["+tags+"] =　"+hasParentWithTag);
+// 		if(target)
+// 		{
+// 			item.show_children = 1;
+// 			filteredArray.push(item);
+// 		}
+// 	}.bind(this));
+// 	return filteredArray;
+// }
+// arrayFilterDone(array, operator)
+// {
+// 	let filteredArray = [];
+// 	array.forEach(function (item) {
+// 		if(item.done)
+// 		{
+// 			item.show_children = 1;
+// 			filteredArray.push(item);
+// 		}
+// 	}.bind(this));
+// 	return filteredArray;
+// }
+// arrayFilterDate(array, date, operator)
+// {
+// 	let filteredArray = [];
+// 	if(date == 'today')
+// 	{
+// 		array.forEach(function (item) {
+// 			let diff = moment(item.due_date).diff(moment(), 'days');
+// 			if (diff <= 0){
+// 				filteredArray.push(item);
+// 			}
+// 		}.bind(this));
+// 	}
+// 	return filteredArray;
+// }
+// hideItem(id)
+// {
+// 	if(!selection.hiddenItems.includes(id))
+// 	{
+// 		selection.hiddenItems.push(id);
+// 	}
+// 	this.nodes[id].children.forEach(function(child) {
+// 		this.hideItem(child.id)
+// 	}.bind(this));
+// }
 flattenTree(array)
 {
 	let flattenedTree = [];
@@ -917,19 +1014,19 @@ flattenTree(array)
 	}.bind(this));
 	return flattenedTree;
 }
-rebindArrayParentIds(array, newParentId)
-{
-	if(newParentId == 'backup')
-	{
-		array.forEach(function(item){
-			item.parent_id = item.parent_id_backup;
-		});
-	} else {
-		array.forEach(function(item){
-			item.parent_id = newParentId;
-		});
-	}
-}
+// rebindArrayParentIds(array, newParentId)
+// {
+// 	if(newParentId == 'backup')
+// 	{
+// 		array.forEach(function(item){
+// 			item.parent_id = item.parent_id_backup;
+// 		});
+// 	} else {
+// 		array.forEach(function(item){
+// 			item.parent_id = newParentId;
+// 		});
+// 	}
+// }
 formatDone(doneArray)
 {
 	let doneItemsObject = doneArray.reduce((prev,item) => {

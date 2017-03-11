@@ -1,5 +1,4 @@
 <template id="items-card-template">
-
 <div
 	v-if="item || listIsEmpty"
 	:id="'card-'+item.id"
@@ -95,6 +94,8 @@
 				({{item.id}}) D-{{item.depth}})
 				<span v-if="item.children_order.length">
 					[{{item.children_order}}]
+				</span>
+				<span>
 				</span>
 			</span>
 			<!-- // For debugging: -->
@@ -305,9 +306,10 @@
 		v-show="item.show_children"
 		:style="(addingNewAsFirstChild)?'order:3;':''"
 	>
-		<Card v-for="childCard in item.children"
+		<Card v-for="childCard in visibleChildren"
 			:item="childCard"
 			:key="childCard.id"
+			:parentsChildrenOrder="childrenOrder"
 		></Card>
 	</div>
 <!-- / CHILDREN -->
@@ -431,7 +433,7 @@ export default {
     	eventHub.$on('escapeOnEditButtonFocus', this.cancelEdit);
     	eventHub.$on('escapeOnNewButtonFocus', this.cancelAddNew);
 	},
-	props: ['item'],
+	props: ['item','parentsChildrenOrder'],
 	data()
 	{
 		return {
@@ -449,6 +451,21 @@ export default {
 	// Flatpickr: Flatpickr,
 	// },
 	computed: {
+		visibleChildren()
+		{ if(!this.item || !this.item.children.length || !allItems){ return []; }
+			if(typeof parseFloat(this.item.id) != 'number' || this.item.id == 'x')
+			{
+				// return [];
+			}
+			// console.log(this.item);
+			return this.item.children.filter(child => !this.$root.hiddenItemIds.includes(child.id));
+		},
+		allVisibleChildItems()
+		{ if(!this.item || !this.item.children.length || !allItems){ return []; }
+			let flattenedTree = allItems.flattenTree(this.item.children);
+			let visibleChildren = flattenedTree.filter(item => !this.$root.hiddenItemIds.includes(item.id));
+			return visibleChildren;
+		},
 		preparedPlusComputedTags()
 		{ if(!this.item || !allItems){ return 0; }
 			let alltags = this.newItem.preparedTags;
@@ -478,20 +495,22 @@ export default {
 		},
 		totalPlannedMin()
 		{ if(!this.item || !allItems){ return 0; }
-			// console.log('trying at totalPlannedMin');
-			if(!this.item.children.length){ return (this.item.planned_time) ? parseFloat(this.item.planned_time) : 0 ; }
-			let childrenArray = allItems.flattenTree(this.item.children);
-			let x = childrenArray.reduce((prevVal, child) => prevVal + parseFloat(child.planned_time), parseFloat(this.item.planned_time));
-			x = x - this.$root.hiddenItemsTotalPlannedTime;
+			let selfValue = (this.item.planned_time) ? parseFloat(this.item.planned_time) : 0;
+			let childrenArray = this.allVisibleChildItems;
+			if (!childrenArray || !childrenArray.length) { return selfValue; }
+			let x = childrenArray.reduce(function(prevVal, child){
+				return prevVal + parseFloat(child.planned_time);
+			}, selfValue);
 		    return (x) ? parseFloat(x) : 0;
 		},
 		totalUsedSec()
 		{ if(!this.item || !allItems){ return 0; }
-			// console.log('trying at totalUsedSec');
-			if(!this.item.children.length){ return (this.item.used_time) ? this.item.used_time : 0 ; }
-			let childrenArray = allItems.flattenTree(this.item.children);
-			let x = childrenArray.reduce((prevVal, child) => prevVal + child.used_time, this.item.used_time);
-		    x = x - this.$root.hiddenItemsTotalUsedTime;
+			let selfValue = (this.item.used_time) ? parseFloat(this.item.used_time) : 0;
+			let childrenArray = this.allVisibleChildItems;
+			if (!childrenArray || !childrenArray.length) { return selfValue; }
+			let x = childrenArray.reduce(function(prevVal, child){
+				return prevVal + parseFloat(child.used_time);
+			}, selfValue);
 		    return (x) ? x : 0;
 		},
 		journalView()
@@ -500,13 +519,19 @@ export default {
 				return true;
 			} else { return false; }
 		},
+		visiblePrevItemId()
+		{ if(!this.item || !allItems){ return; }
+			let index = this.parentsChildrenOrder.indexOf(this.item.id);
+			if (index == 0){ return allItems.root.id; }
+			return this.parentsChildrenOrder[index-1];
+		},
 		journalDate()
 		{ if(!this.item || !allItems){ return; }
 			// console.log('run on '+this.item.id+' - '+this.item.body);
 			if(this.$root.selection.view != 'journal'){ return false; }
 			if(this.journalView){
 				if(this.item.depth == 0){ return; }
-				let prevId = allItems.prevItemId(this.item.id);
+				let prevId = this.visiblePrevItemId;
 				let prevDoneDate = allItems.nodes[prevId].done_date;
 				prevDoneDate = moment(prevDoneDate).format('YYYY/MM/DD');
 				let thisDoneDate = moment(this.item.done_date).format('YYYY/MM/DD');
@@ -522,7 +547,7 @@ export default {
 			if(this.$root.selection.view != 'journal'){ return false; }
 			if(this.journalView){
 				if(this.item.depth == 0){ return; }
-				let prevId = allItems.prevItemId(this.item.id);
+				let prevId = this.visiblePrevItemId;
 				let parentString = this.item.parents_bodies;
 				let prevParentString = allItems.nodes[prevId].parents_bodies;
 
@@ -569,6 +594,30 @@ export default {
 		{ if(!this.item || !allItems){ return; }
 			if(this.item.depth == 0){ return allItems.nodes[this.item.id].children_order; }
 			return this.$parent.item.children_order;
+		},
+		childrenOrder()
+		{ if(!this.item || !allItems){ return 0; }
+			return this.visibleChildren.map(child => child.id);
+		},
+		// deepestChild()
+		// { if(!this.item || !allItems){ return; }
+		// 	let dc;
+		// 	if (!this.childrenOrder.length)
+		// 	{
+		// 		return this.item.id;
+		// 	} else {
+		// 		let i = this.visibleChildren.length;
+		// 		return this.visibleChildren[i-1].deepestChild;
+		// 	}
+		// },
+		childrensDeepestChildren()
+		{ if(!this.item || !allItems){ return; }
+			return this.visibleChildren.map(function(item){
+				return {
+					'id':item.id,
+					'deepestChild':this.$root.findDeepestVisibleChild(item.id)
+				};
+			}.bind(this));
 		},
 		showAddNewBox()
 		{ if(!this.item || !allItems){ return; }
@@ -645,12 +694,13 @@ export default {
 		},
 		isHidden()
 		{ if(!this.item || !allItems){ return true; }
-			return this.$root.selection.hiddenItems.includes(this.item.id)
+			return this.$root.hiddenItemIds.includes(this.item.id)
 		},
 		allChildrenDone()
 		{ if(!this.item || !allItems){ return true; }
 			return allItems.allChildrenDone(this.item.id);
 		},
+		thebody(){ return this.item.body },
 	},
 	methods: {
 		linkify,
@@ -658,10 +708,11 @@ export default {
 		sec_to_hourminsec,
 		convertbodyURLtoHTML()
 		{
-			if(!this.item){ return; }
-			let bodyboxQS = "#card-"+this.item.id+" > div > .item-card > .body-div > .bodybox > div";
+			// console.log('converting');
+			if(!this.item || this.item.depth == 0){ return; }
+			let bodyboxQS = '#'+this.$el.id+' .bodybox';
 			let a = document.querySelector(bodyboxQS);
-			if(!a){ return; }
+			if(!a || !a.innerHTML.includes('a href')){ return; }
 			a.innerHTML = a.innerHTML.replace("&lt;a href=", "<a href=").replace('target="_blank"&gt;','target="_blank">').replace("&lt;/a&gt;","</a>");
 		},
 		addTimer(item)
@@ -676,8 +727,7 @@ export default {
 		newItemIndent()
 		{
 			if(!this.item.children.length || !this.item.show_children)
-			{
-        	// If item has no children yet / no visible children
+			{ // If item has no children yet / no visible children
 				this.$root.addingNewAsChild = true;
 				return;
 			}
@@ -1050,6 +1100,10 @@ export default {
 			}
 			// item.body = item.body.trim();
 
+			if (typeof item.planned_time != 'number' || Number.isNaN(item.planned_time))
+			{
+				item.planned_time = 0;
+			}
 			if (item.planned_time != this.$root.beforeEditCache_planned_time)
 			{
 				vm.patch(item.id, 'planned_time');
@@ -1061,6 +1115,7 @@ export default {
 			}
 			this.$root.beforeEditCache_body = null;
 			this.$root.beforeEditCache_planned_time = null;
+			// setTimeout(() => this.convertbodyURLtoHTML(),1000);
 		},
 		cancelEdit(item)
 		{
@@ -1117,16 +1172,18 @@ export default {
 				newItem.done = 1;
 				newItem.done_date = this.item.done_date;
 			}
-			if (this.newItem.preparedTags.includes('Today') || selection.filter.includes('today'))
+			if (  selection.filter.includes('today')
+			   && allItems.isTopLvlItemInFilteredRoot(this.item.id)
+			   && !vm.addingNewAsChild )
 			{
 				newItem.due_date = moment().format();
 				addTags = addTags.filter(function(val){
 					return val != 'Today';
 				});
 			}
-			console.log('sending newItem:');			
+			console.log('sending newItem:');
 			console.log(newItem);
-			console.log('sending tags:');			
+			console.log('sending tags:');
 			console.log(addTags);
 			// Send to Root for Ajax call.
 			this.$root.postNewItem(newItem, index, addNextItemAs, addTags);

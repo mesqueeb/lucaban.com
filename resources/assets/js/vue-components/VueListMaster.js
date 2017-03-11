@@ -11,19 +11,20 @@ export default {
 	el:'#items-app',
 	data: {
 		doneData: null,
-		allData: {
-			"body":"ALL",
-			"children":[],
-			"children_order":[],
-			"depth":0,
-			"done":false,
-			"done_date":"0000-00-00 00:00:00",
-			"due_date":"0000-00-00 00:00:00",
-			"id":"x",
-			"show_children":1,
-			"tagged":[],
-			"used_time":0
-		},
+		// FILTER REWRITE
+		// allData: {
+		// 	"body":"ALL",
+		// 	"children":[],
+		// 	"children_order":[],
+		// 	"depth":0,
+		// 	"done":false,
+		// 	"done_date":"0000-00-00 00:00:00",
+		// 	"due_date":"0000-00-00 00:00:00",
+		// 	"id":"x",
+		// 	"show_children":1,
+		// 	"tagged":[],
+		// 	"used_time":0
+		// },
 		nodes: {},
 		selection,
 		addingNewUnder: null,
@@ -48,21 +49,188 @@ export default {
 		Popups,
 		Popouts,
 	},
+	mounted() {
+        eventHub.$on('confirm-ok', function(id) {
+            console.log('computer says "ok"...');
+            console.log(id);
+            allItems.deleteItem(id);
+        });
+        eventHub.$on('confirm-cancel', function(id) {
+            console.log('computer says "no"...');
+            console.log(id);
+            return;
+        });
+        window.onscroll = function() {
+			if(!selection.filter.length && !selection.tags.length){ return; }
+			let el = document.getElementsByClassName('line');
+			// let el = $('.navigation');
+			if (!isElementInViewport(el[0]))
+			{
+		    	$("body").addClass("scrolled-down");
+			}
+			else
+			{
+		    	$("body").removeClass("scrolled-down");
+			}
+		};
+    },
 	computed:{
+		allData(){
+			if(this.noItems)
+			{
+				return {
+					"body":"ALL",
+					"children":[],
+					"children_order":[],
+					"depth":0,
+					"done":false,
+					"done_date":"0000-00-00 00:00:00",
+					"due_date":"0000-00-00 00:00:00",
+					"id":"x",
+					"show_children":1,
+					"tagged":[],
+					"used_time":0
+				};
+			}
+			return {
+				"body":"ALL",
+				"children":this.filteredItems,
+				"children_order":this.nodes[allItems.root.id].children_order,
+				"id":this.nodes[allItems.root.id],
+				"depth":0,
+				"done":false,
+				"done_date":"0000-00-00 00:00:00",
+				"due_date":"0000-00-00 00:00:00",
+				"show_children":1,
+				"tagged":[],
+				"used_time":0
+			}
+		},
 		mobile()
 		{
 			return mobilecheck();
 		},
 		noItems()
 		{
-			if(!this.allData || !allItems.root || !allItems.root.children.length){
+			if(!allItems || !allItems.root || !allItems.root.children.length){
 				return true;
 			} return false;
 		},
-		doneItems()
+		// doneItems() // Flat
+		// {
+		// 	return this.filteredItemsFlat.filter(child => child.done);
+		// },
+		filteredItems()
 		{
-			// Codementor: Not reactive...
-			return objectToArray(this.nodes).filter(item => item.done);
+			if(this.noItems){ return []; }
+			if (this.selection.view == 'tree')
+			{
+				return this.filteredItemsTree;
+			}
+			else if (this.selection.view == 'journal')
+			{
+				return this.filteredItemsFlat;
+			}
+		},
+		filteredItemsFlat()
+		{
+			let ar = objectToArray(this.nodes).filter(function(item){
+				let target = this.selection.tags.every(tag => allItems.hasTag(item.id, tag));
+				let targetHidden = this.selection.hiddenTags.some(tag => allItems.hasTag(item.id, tag));
+				let targetDone = (selection.view == 'journal') ? item.done : true;
+				let targetToday = true;
+				if ( selection.filter.includes('today') )
+				{
+					targetToday = false;
+					let diff = moment(item.due_date).diff(moment(), 'days');
+					if ( diff <= 0 || allItems.hasParentDueToday(item.id) )
+					{
+						targetToday = true;
+					}
+					let doneDateDiff = moment(item.done_date).diff(moment(), 'days');
+					if (doneDateDiff <= 1) { targetToday = false; }
+				}
+				if(target && !targetHidden && targetDone && targetToday)
+				{
+					return true;
+				}
+			}.bind(this));
+			if (selection.view == 'journal')
+			{
+				ar = sortObjectArrayByTwoProperties(ar,'done_date','parents_bodies','desc','asc');
+			}
+			return ar;
+		},
+		filteredItemsTree()
+		{
+			//Go through ALL ITEMS and return those that have the tag AND no parent with the tag.
+			let children = objectToArray(this.nodes).filter(function(item){
+				let target;
+				let hasParentWithTag;
+				let targetToday;
+				let topLvlItem;
+				if (this.selection.noFilterOrTag())
+				{
+					topLvlItem = (item.depth == 1) ? true : false;
+					if (topLvlItem){ return true; } else { return false; }
+				}
+
+				if (this.selection.tags.length > 1)
+				{
+					hasParentWithTag = this.selection.tags.every(tag => allItems.hasParentWithTag(item.id, tag));
+				} else {
+					hasParentWithTag = this.selection.tags.some(tag => allItems.hasParentWithTag(item.id, tag));
+				}
+				target = this.selection.tags.every(tag => allItems.hasTag(item.id, tag));
+
+				if ( !selection.filter.includes('today') && target && !hasParentWithTag )
+				{
+					return true;
+				}
+
+				if ( selection.filter.includes('today') )
+				{
+					let doneDateDiff = moment(item.done_date).diff(moment(), 'days');
+					if (doneDateDiff <= 1) { return false; }
+					let hasParentDueToday = allItems.hasParentDueToday(item.id);
+					let isDue = allItems.isDueToday(item.id);
+					if(!selection.tags.length && isDue)
+					{
+						console.log('(!selection.tags.length && isDue)');
+						return true;
+					}
+					else if ( 	selection.tags.length
+							&& 	target
+							&& 	(isDue || hasParentDueToday)
+							&& 	!(hasParentWithTag && hasParentDueToday) )
+					{
+						return true;
+					}
+				}
+				return false;
+			}.bind(this));
+			// Sort on root children_order when no filter:
+			if(this.selection.noFilterOrTag())
+			{
+				let order = allItems.root.children_order;
+				if (order instanceof Array && order.length)
+				{
+					// order = order.filter(id => this.$refs.root.childrenOrder.includes(id));
+					children = order.map(id => children.find(t => t.id === id));
+				}
+			}
+			if ( selection.filter.includes('today') )
+			{
+				children = sortObjectArrayByProperty(children,'done_date');
+			}
+			return children;
+		},
+		hiddenItemIds()
+		{
+			return objectToArray(this.nodes).filter(function(item){
+				let targetHidden = this.selection.hiddenTags.some(tag => allItems.hasTag(item.id, tag));
+				if(targetHidden){ return true; }
+			}.bind(this)).map(item => item.id);
 		},
 		selectionFilter() // For list title
 		{
@@ -106,22 +274,26 @@ export default {
 				return val;
 			});
 		},
-		allVisibleItems()
-		{
-			if(!this.allData){ return []; }
-			let items = allItems.flattenTree(allItems.root.children);
-			return items.filter(function(item)
-			{
-				return !selection.hiddenItems.includes(item.id);
-			});
-		},
+		// allVisibleItems()
+		// {
+		// 	if(!this.allData){ return []; }
+		// 	return filteredItemsFlat;
+		// 	// let items = allItems.flattenTree(allItems.root.children);
+		// 	// return items.filter(function(item)
+		// 	// {
+		// 	// 	return !selection.hiddenItems.includes(item.id);
+		// 	// });
+		// },
 		allTagsComputed()
 		{
 			var t0 = performance.now();
-			if(!this.allData){ return []; }
+			if(this.noItems){ return []; }
 			let allTagsArray = [];
 			// let items = allItems.flattenTree(allItems.root.children);
-			let items = this.allVisibleItems;
+			// FILTER REWRITE
+			// let items = this.allVisibleItems;
+			// let items = (this.$refs.root) ? this.$refs.root.allVisibleChildItems : [] ;
+			let items = (this.filteredItemsFlat.length) ? this.filteredItemsFlat : [] ;
 			if(!items.length){ return []; }
 			items.forEach(function(item)
 			{
@@ -149,10 +321,16 @@ export default {
 		allTagsComputed_2()
 		{
 			let t2_0 = performance.now();
-			if(!this.allData){ return []; }
+			if(this.noItems){ return []; }
 			let allTagsArray = [];
 			// let items = allItems.flattenTree(allItems.root.children);
-			let items = this.allVisibleItems;
+			// FILTER REWRITE
+			// let items = this.allVisibleItems;
+			// let items = (this.$refs.root) ? this.$refs.root.allVisibleChildItems : [] ;
+			let items = (this.filteredItemsFlat.length) ? this.filteredItemsFlat : [] ;
+			console.log('allTagsComputed_2');
+			console.log('this.$refs.root.allVisibleChildItems');
+			console.log(this.$refs.root.allVisibleChildItems);
 			if(!items.length){ return []; }
 			allTagsArray = items.reduce(function(a, item)
 			{
@@ -168,10 +346,13 @@ export default {
 		allTagsComputed_3()
 		{
 			let t3_0 = performance.now();
-			if(!this.allData){ return []; }
+			if(this.noItems){ return []; }
 			let allTagsArray = new Set();
 			// let items = allItems.flattenTree(allItems.root.children);
-			let items = this.allVisibleItems;
+			// FILTER REWRITE
+			// let items = this.allVisibleItems;
+			// let items = (this.$refs.root) ? this.$refs.root.allVisibleChildItems : [] ;
+			let items = (this.filteredItemsFlat.length) ? this.filteredItemsFlat : [] ;
 			if(!items.length){ return []; }
 			items.forEach(function(item)
 			{
@@ -189,10 +370,13 @@ export default {
 		allTagsComputed_1b()
 		{
 			var t0 = performance.now();
-			if(!this.allData){ return []; }
+			if(this.noItems){ return []; }
 			let allTagsArray = [];
 			// let items = allItems.flattenTree(allItems.root.children);
-			let items = this.allVisibleItems;
+			// FILTER REWRITE
+			// let items = this.allVisibleItems;
+			// let items = (this.$refs.root) ? this.$refs.root.allVisibleChildItems : [] ;
+			let items = (this.filteredItemsFlat.length) ? this.filteredItemsFlat : [] ;
 			if(!items.length){ return []; }
 			items.forEach(function(item)
 			{
@@ -217,30 +401,50 @@ export default {
 			console.log("Call to allTagsComputed took " + (t1 - t0) + " milliseconds.")
 			return allTagsArray;
 		},
-		childrenAmount()
+		itemAmount()
 		{
-			if(!this.allData){ return 0; }
-			let x = this.countChildren(this.allData);
-			return x;
+			if(this.noItems){ return 0; }
+			// let x = this.countChildren(this.allData);
+			// let x = this.$refs.root.allVisibleChildItems.length;
+			let items = (this.filteredItemsFlat.length) ? this.filteredItemsFlat : [] ;
+			return items.length;
 		},
-		doneChildrenAmount()
+		doneItemAmount()
 		{
-			if(!this.allData){ return 0; }
-			return this.countDoneChildren(this.allData);
+			if(this.noItems){ return 0; }
+			// let doneChildren = this.$refs.root.allVisibleChildItems.filter(child => child.done).length;
+			let items = (this.filteredItemsFlat.length) ? this.filteredItemsFlat : [] ;
+			let doneChildren = items.filter(child => child.done).length;
+			return doneChildren;
+		},
+		totalPlannedMin()
+		{ if(this.noItems){ return 0; }
+			let selfValue = 0;
+			let childrenArray = this.filteredItemsFlat;
+			if (!childrenArray || !childrenArray.length) { return selfValue; }
+			let x = childrenArray.reduce(function(prevVal, child){
+				return prevVal + parseFloat(child.planned_time);
+			}, selfValue);
+		    return (x) ? parseFloat(x) : 0;
+		},
+		totalPlannedSec()
+		{
+			return this.totalPlannedMin*60;
+		},
+		totalUsedSec()
+		{ if(this.noItems){ return 0; }
+			let selfValue = 0;
+			let childrenArray = this.filteredItemsFlat;
+			if (!childrenArray || !childrenArray.length) { return selfValue; }
+			let x = childrenArray.reduce(function(prevVal, child){
+				return prevVal + parseFloat(child.used_time);
+			}, selfValue);
+		    return (x) ? x : 0;
 		},
 		totalSecLeft()
 		{
-			if(!this.allData || !this.$children.length){ return 0; }
-			// console.log('run totalSecLeft');
-			let card = this.$children.find(child => (child.totalSecLeft || child.totalSecLeft == 0));
-			return card.totalSecLeft;
-		},
-		totalUsedSec()
-		{
-			if(!this.allData || !this.$children.length){ return 0; }
-			// console.log('run totalUsedSec');
-			let card = this.$children.find(child => (child.totalUsedSec || child.totalUsedSec == 0));
-			return card.totalUsedSec;
+			if(this.noItems){ return 0; }
+			return this.totalPlannedSec-this.totalUsedSec;
 		},
 		totalUsedHourMin()
 		{
@@ -250,36 +454,83 @@ export default {
 		{
 			return sec_to_hourmin(this.totalSecLeft);
 		},
-		hiddenItemsTotalUsedTime()
-		{
-			if(!this.selection.hiddenItems.length){ return 0; }
-			return this.selection.hiddenItems.reduce(function(a,id){
-				let b = allItems.nodes[id].used_time;
-				return a + b;
-			}, 0);
-		},
-		hiddenItemsTotalPlannedTime()
-		{
-			if(!this.selection.hiddenItems.length){ return 0; }		
-			return this.selection.hiddenItems.reduce(function(a,id){
-				let b = allItems.nodes[id].planned_time;
-				return a + b;
-			}, 0);
-		},
+		// hiddenItemsTotalUsedTime()
+		// {
+		// 	// CodeMentor
+		// 	if(!this.selection.hiddenItems.length){ return 0; }
+		// 	return this.selection.hiddenItems.reduce(function(a,id){
+		// 		let b = allItems.nodes[id].used_time;
+		// 		return a + b;
+		// 	}, 0);
+		// },
+		// hiddenItemsTotalPlannedTime()
+		// {
+		// 	// CodeMentor
+		// 	if(!this.selection.hiddenItems.length){ return 0; }		
+		// 	return this.selection.hiddenItems.reduce(function(a,id){
+		// 		let b = allItems.nodes[id].planned_time;
+		// 		return a + b;
+		// 	}, 0);
+		// },
 	},
 	methods:{
-		resetDoneData()
+		itIsADeepestChild(id)
 		{
-			let dd = objectToArray(this.nodes).filter(item => item.done);
-			dd = sortObjectArrayByTwoProperties(dd,'done_date','parents_bodies','desc','asc');
-			this.doneData = dd;
+			if (!id){ console.log('you need an ID'); return; }
+			if (this.$refs.root.childrensDeepestChildren.map(item => item.deepestChild).includes(id))
+			{
+				return true;
+			} return false;
 		},
+		checkFilteredItemsTree()
+		{
+			//Go through ALL ITEMS and return those that have the tag AND no parent with the tag.
+			objectToArray(this.nodes).forEach(function(item){
+				let target;
+				let targetHidden;
+				let hasParentWithTag;
+				let targetToday;
+				let topLvlItem;
+				if (this.selection.nothingSelected())
+				{
+					topLvlItem = (item.depth == 1) ? true : false;
+					if (topLvlItem){ return true; }
+				} else {
+					target = this.selection.tags.every(tag => allItems.hasTag(item.id, tag));
+					targetHidden = this.selection.hiddenTags.some(tag => allItems.hasTag(item.id, tag));
+					hasParentWithTag = this.selection.tags.some(tag => allItems.hasParentWithTag(item.id, tag));
+					targetToday = true;
+					if ( selection.filter.includes('today') )
+					{
+						targetToday = false;
+						let diff = moment(item.due_date).diff(moment(), 'days');
+						if (diff <= 0) { targetToday = true; }
+					}
+				}
+				if (target){
+					console.log(`target = [${item.body}]
+					hidden: ${targetHidden}
+					parentwithTag: ${hasParentWithTag}
+					targetToday: ${targetToday}`);
+				}
+				// if ( target && !targetHidden && !hasParentWithTag && targetToday )
+				// {
+				// 	return true;
+				// }
+			}.bind(this));
+		},
+		// resetDoneData()
+		// {
+		// 	let dd = objectToArray(this.nodes).filter(item => item.done);
+		// 	dd = sortObjectArrayByTwoProperties(dd,'done_date','parents_bodies','desc','asc');
+		// 	this.doneData = dd;
+		// },
 		tagSlugToName(tagslug)
 		{
 			return allItems.tagSlugToName(tagslug);
 		},
 		countChildren(item){
-			if (!item.children){ return 0; }
+			if (!item || !item.children){ return 0; }
 			let children = allItems.flattenTree(item.children);
 			let x = children.length;
 			return x;
@@ -372,22 +623,24 @@ export default {
 			}
 			allItems.giveNewParent(id,new_parent_id);
 		},
-		selectItem(direction){
+		selectItem(direction)
+		{
 			let id = selection.selectedId;
 			let item = allItems.nodes[id];
 			let sel;
-			if(direction == 'next'){
-				if(!id || id == allItems.root.id){
-					sel = allItems.root.children_order[0];
+			if(direction == 'next')
+			{
+				if (!id || id == allItems.root.id)
+				{
+					sel = this.$refs.root.childrenOrder[0];
 				} else {
 					sel = allItems.nextItemId(id);
 				}
-			} else if (direction == 'prev'){
-				let olderSiblingId = allItems.olderSiblingId(id);
-				let olderSibling = allItems.nodes[olderSiblingId];
-				if(!id || id == allItems.root.id){
-					let l = allItems.root.children_order.length;
-					sel = allItems.root.children_order[l-1];
+			} else if (direction == 'prev') {
+				if (!id || id == allItems.root.id)
+				{
+					let l = this.$refs.root.childrenOrder.length;
+					sel = this.$refs.root.childrenOrder[l-1];
 				} else {
 					sel = allItems.prevItemId(id);
 				}
@@ -395,8 +648,19 @@ export default {
 			selection.selectedId = sel;
 			document.getElementById('card-'+sel).scrollIntoViewIfNeeded();
 		},
-		setToday(id){
+		findDeepestVisibleChild(id)
+		{
 			id = (id) ? id : selection.selectedId;
+			let item = allItems.nodes[id];
+			let children = item.children.filter(child => !this.hiddenItemIds.includes(child.id));
+			if (!children.length) { return id; }
+			let deepestId = children[children.length-1].id;
+			return this.findDeepestVisibleChild(deepestId);
+		},
+		setToday(id)
+		{
+			id = (id) ? id : selection.selectedId;
+			if(allItems.hasParentDueToday(id)){ console.log('parent is already due'); return; }
 			allItems.setDueDate(id);
 		},
 		showAddNewItem(id, addAs){
@@ -433,12 +697,12 @@ export default {
 			});
 		},
 		patch(id, arg, value){
-			if(allItems.isTopLvlItemInFilteredRoot(id)){ 
-				if(arg == 'children_order' || arg == 'parent_id'){
-					console.log("you can't sync a toplvlItem when filtering");
-					return;
-				}
-			}
+			// if(allItems.isTopLvlItemInFilteredRoot(id)){ 
+			// 	if(arg == 'children_order' || arg == 'parent_id'){
+			// 		console.log("you can't sync a toplvlItem when filtering");
+			// 		return;
+			// 	}
+			// }
 			this.startPatching();
 			let patchObj = {};
 			let patchVal = (value) ? value : allItems.nodes[id][arg];
@@ -467,10 +731,6 @@ export default {
 			} else {
 				if(!tags.replace(/\s/g, "").length){ return; }
 			}
-			if(tags=='t' || tags=='T' || tags=='today' || tags=='Today'){
-				this.setToday(id);
-				return;
-			}
 			this.startPatching();
 			let patchObj = {};
 			patchObj['tags'] = tags;
@@ -484,9 +744,8 @@ export default {
 				this.$http.get('/api/itemtags/' + id, { type: 'tags'})
 				// Codementor: Request type doesn't work......
 				.then(function(updatedTagList){
-					console.log('updatedTagList');
-					console.log(updatedTagList.data);
 					allItems.nodes[id].tagged = updatedTagList.data;
+					console.log('updatedTagList of ['+allItems.nodes[id].body+'] with: '+updatedTagList.data.map(t => t.tag_name)+';');
 				});
 				this.stopPatching();
 			});
@@ -612,60 +871,69 @@ export default {
 				data.forEach(item => {
 					item = allItems.setDefaultItemValues(item)
 					if(!allItems.nodes[item.id]){ allItems.nodes[item.id] = item; }
-					// if(!allItems.doneitems.includes(item)){ allItems.doneitems.push(item); }
 				});
-				this.resetDoneData();
-				allItems.filterItems('journal',null,operator);
+				// Codementor
+				this.selection.view = null;
+				this.selection.view = 'journal';
 				this.loading = false;
 			});
 		},
 
-		fetchTagged(tags, requestType){
-			/* requestType can be:
-				'withAnyTag': fetch articles with any tag listed
-				'withAllTags': only fetch articles with all the tags
-				'tagNames': fetch all existing tags
-			*/
-			this.loading = true;
-			let request = {};
-			requestType = (!requestType) ? 'withAnyTag' : requestType;
-			request['tags'] = tags;
-			request['type'] = requestType;
-			console.log('request');
-			console.log(request);
-			this.$http.post('/api/itemtags/fetchTagged', request).then(function(response){
-				let aaa = response.data;
-				aaa = json(aaa);
-				console.log('fetched tagged items!');
-				console.log(response);
-				console.log(response.json());
-				console.log(aaa);
-				allItems.filteredTagItems = aaa;
-				allItems.nodes = aaa;
-				allItems.root = aaa;
-				this.allData = aaa;
-				this.loading = false;
-			});
-		},
-		filterItems(keyword, value, event){
+		// fetchTagged(tags, requestType){
+		// 	/* requestType can be:
+		// 		'withAnyTag': fetch articles with any tag listed
+		// 		'withAllTags': only fetch articles with all the tags
+		// 		'tagNames': fetch all existing tags
+		// 	*/
+		// 	this.loading = true;
+		// 	let request = {};
+		// 	requestType = (!requestType) ? 'withAnyTag' : requestType;
+		// 	request['tags'] = tags;
+		// 	request['type'] = requestType;
+		// 	console.log('request');
+		// 	console.log(request);
+		// 	this.$http.post('/api/itemtags/fetchTagged', request).then(function(response){
+		// 		let aaa = response.data;
+		// 		aaa = json(aaa);
+		// 		console.log('fetched tagged items!');
+		// 		console.log(response);
+		// 		console.log(response.json());
+		// 		console.log(aaa);
+		// 		allItems.filteredTagItems = aaa;
+		// 		allItems.nodes = aaa;
+		// 		allItems.root = aaa;
+		// 		this.allData = aaa;
+		// 		this.loading = false;
+		// 	});
+		// },
+		filterItems(keyword, value, event)
+		{
 			// debugger;
 			let operator = null;
-			if(event){
+			if (event){
 				event.preventDefault();
-				if (event.ctrlKey || event.metaKey){
+				if (event.ctrlKey || event.metaKey)
+				{
 					operator = 'AND';
-				} else if (event.altKey){
+				} else if (event.altKey) {
 					operator = 'NOT';
 				}
 			}
-			if(!operator){
+			if (!operator)
+			{
 				selection.clear();
 			}
-
-			if (keyword == 'journal' && !this.fetchedDone){
+			if (keyword == 'journal' && !this.fetchedDone)
+			{
 				this.fetchDone(null,operator);
 			}
-			allItems.filterItems(keyword,value,operator);
+			selection.addKeywords(keyword,value,operator);
+			// FILTER REWRITE
+			// allItems.filterItems(keyword,value,operator);
+		},
+		removeFilter(tag)
+		{
+			selection.hiddenTags = selection.hiddenTags.filter(x => x !== tag);
 		},
 		duplicate(id){
 			id = (!id) ? selection.selectedId : id ;
@@ -717,31 +985,6 @@ export default {
 			this.patchTag(id, 'bloem', 'tag');
 		},
 	},
-	mounted() {
-        eventHub.$on('confirm-ok', function(id) {
-            console.log('computer says "ok"...');
-            console.log(id);
-            allItems.deleteItem(id);
-        });
-        eventHub.$on('confirm-cancel', function(id) {
-            console.log('computer says "no"...');
-            console.log(id);
-            return;
-        });
-        window.onscroll = function() {
-			if(!selection.filter.length && !selection.tags.length){ return; }
-			let el = document.getElementsByClassName('line');
-			// let el = $('.navigation');
-			if (!isElementInViewport(el[0]))
-			{
-		    	$("body").addClass("scrolled-down");
-			}
-			else
-			{
-		    	$("body").removeClass("scrolled-down");
-			}
-		};
-    },
 	http: {
 		headers: {
 			'X-CSRF-TOKEN': document.querySelector('#csrf-token').getAttribute('content'),

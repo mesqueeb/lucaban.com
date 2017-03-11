@@ -1,23 +1,12 @@
-$selection-color: rgba(245,215,110,0.5);
-$theme-color: #5dc2af;
-$duration-color: #5dacce;
-$duration-color-dark: #4679a7;
-$duedate-color: rgba(230, 94, 77, 1);
-$duedate-parent-color: rgba(230, 94, 77, 0.5);
-$done-color: #1E824C;
-$used-time-color: #5d67b3;
-
-$sepia-background:#f5f2eb;
-$sepia-brown:#a59174;
-$sepia-grey:#c0b2b4;
-
+@import 'node_modules/bootstrap/scss/bootstrap-reboot.scss';
 @import 'global.scss';
 
 @import 'node_modules/material-design-iconic-font/scss/material-design-iconic-font.scss';
 @import 'node_modules/flatpickr/dist/flatpickr.min';
+
+@import 'items/_variables.scss';
 @import 'items/main.scss';
 @import 'items/components/transition_effects.scss';
-@import 'items/components/items.scss';
 @import 'items/components/alert.sass';
 @import 'items/components/popups.scss';
 @import 'items/components/popouts.scss';

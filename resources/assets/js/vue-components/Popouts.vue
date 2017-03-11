@@ -23,10 +23,10 @@
 					@click="popoutCall('confirm-cancel', item)"
 				>Cancel</button>
 				<button
-					class="btn-ok"
+					class="btn-ok btn-warning"
 					v-focus
 					@click="popoutCall('confirm-ok', item)"
-				>OK</button>
+				>Delete</button>
 			</div>
 		</div>
 	</div>

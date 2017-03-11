@@ -14822,15 +14822,15 @@ module.exports = g;
 "use strict";
 /* WEBPACK VAR INJECTION */(function($) {/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "d", function() { return mobilecheck; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "e", function() { return objectToArray; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "g", function() { return uniqBy; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "h", function() { return uniqBy; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "l", function() { return uniq; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "j", function() { return arrayToString; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "h", function() { return sec_to_hourmin; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "i", function() { return sec_to_hourmin; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "c", function() { return hasClass; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return btnEffect; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return isElementInViewport; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "f", function() { return sortObjectArrayByProperty; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "i", function() { return sortObjectArrayByTwoProperties; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "g", function() { return sortObjectArrayByProperty; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "f", function() { return sortObjectArrayByTwoProperties; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "k", function() { return removeEmptyValuesFromArray; });
 function mobilecheck() {
 	var check = false;
@@ -25013,7 +25013,7 @@ var _class = function () {
 		this.source = items;
 		this.nodes = {}; // →　"id":{ task obj };
 		this.orphans = [];
-		this.doneitems = [];
+		// this.doneitems	= [];
 		this.filteredItemRoot = {
 			children_order: [], children: [], body: "",
 			// totalPlannedTime:0, totalUsedTime:0,
@@ -25049,7 +25049,7 @@ var _class = function () {
 
 			// assign extra item values
 			node = this.setDefaultItemValues(node);
-			node.parent_id_backup = node.parent_id;
+			// node.parent_id_backup = node.parent_id;
 			// Register and organize nodes:
 			if (node.depth == 0) {
 				this.root = node;console.log('root-node');
@@ -25093,7 +25093,7 @@ var _class = function () {
 	}, {
 		key: 'setDefaultItemValues',
 		value: function setDefaultItemValues(item) {
-			item.parent_id_backup = item.parent_id;
+			// item.parent_id_backup = item.parent_id;
 			item.depth = Number(item.depth);
 			if (item.show_children == null) {
 				item.show_children = 1;
@@ -25149,12 +25149,14 @@ var _class = function () {
 
 			// Patches etc.
 			selection.selectedId = item.id;
-			if (this.isTopLvlItemInFilteredRoot(item.id) && item.parent_id == this.root.id) {
-				this.backups.rootChildren.push(item);
-				vm.patchRootChildrenOrderWithFilter(item.id);
-			} else {
-				vm.patch(item.parent_id, 'children_order');
-			}
+			// if ( this.isTopLvlItemInFilteredRoot(item.id)
+			// 	&& item.parent_id == this.root.id )
+			// {
+			// 	this.backups.rootChildren.push(item);
+			// 	vm.patchRootChildrenOrderWithFilter(item.id);
+			// } else {
+			vm.patch(item.parent_id, 'children_order');
+			// }
 			if (addTags) {
 				this.tagItem(item.id, addTags);
 			}
@@ -25167,7 +25169,7 @@ var _class = function () {
 	}, {
 		key: 'tagNameToSlug',
 		value: function tagNameToSlug(tag) {
-			if (!tag) {
+			if (!tag || typeof tag != 'string') {
 				return;
 			}
 			return tag.split(' ').join('-').toLowerCase();
@@ -25228,7 +25230,10 @@ var _class = function () {
 			if (!parent_id) {
 				return false;
 			}
-
+			if (!this.nodes[parent_id]) {
+				// console.log('Parent of ('+id+')['+item.body+'] is non existant.');
+				return false;
+			}
 			var parentHasTag = this.hasTag(parent_id, tags);
 			if (parentHasTag) {
 				return true;
@@ -25313,21 +25318,50 @@ var _class = function () {
 		}
 	}, {
 		key: 'nextItemId',
-		value: function nextItemId(id) {
+		value: function nextItemId(id, debug) {
+			if (debug) {
+				debugger;
+			}
+			if (!id) {
+				return;
+			}
 			var item = this.nodes[id];
 			var nextItemId = void 0;
+			// Select next item on top level.
+			if (this.isTopLvlItemInFilteredRoot(id) && !item.show_children || selection.view == 'journal') {
+				var ind = vm.$refs.root.childrenOrder.indexOf(id);
+				return vm.$refs.root.childrenOrder[ind + 1];
+			}
 			// Select first child if any.
-			if (item.show_children && item.children.length > 0) {
+			if (item.show_children && item.children.length) {
 				nextItemId = item.children_order[0];
+				if (vm.hiddenItemIds.includes(nextItemId)) {
+					nextItemId = this.nextItemRecursion(nextItemId);
+				}
 			} else {
 				nextItemId = this.nextItemRecursion(id);
 			}
-			if (selection.hiddenItems.includes(nextItemId)) {
-				return this.nextItemId(nextItemId);
-			} else {
-				return nextItemId;
-			}
+			return nextItemId;
 		}
+		// nextVisibleItemId(id)
+		// {
+		// 	let item = this.nodes[id];
+		// 	let nextItemId;
+		// 	// Select first child if any.
+		// 	if (item.show_children && item.children.length > 0)
+		// 	{
+		// 		nextItemId = item.children_order[0];
+		//  	} else {
+		// 		nextItemId = this.nextItemRecursion(id);
+		//  	}
+		//  	if(vm.hiddenItemIds.includes(nextItemId))
+		//  	{
+		// 	 	return this.nextVisibleItemId(nextItemId);
+		//  	} else {
+		// 	 	return nextItemId;
+		//  	}
+		// }
+
 	}, {
 		key: 'nextSiblingOrParentsSiblingId',
 		value: function nextSiblingOrParentsSiblingId(id) {
@@ -25341,8 +25375,25 @@ var _class = function () {
 			}
 		}
 	}, {
+		key: 'deepestChild',
+		value: function deepestChild(id) {
+			return vm.$refs.root.childrensDeepestChildren.find(function (obj) {
+				return obj.id == id;
+			}).deepestChild;
+		}
+	}, {
+		key: 'topLvlParentOfDeepestChild',
+		value: function topLvlParentOfDeepestChild(id) {
+			return vm.$refs.root.childrensDeepestChildren.find(function (obj) {
+				return obj.deepestChild == id;
+			}).id;
+		}
+	}, {
 		key: 'prevItemId',
-		value: function prevItemId(id) {
+		value: function prevItemId(id, debug) {
+			if (debug) {
+				debugger;
+			}
 			if (!id) {
 				return false;
 			}
@@ -25351,16 +25402,27 @@ var _class = function () {
 				return false;
 			}
 			var parent_id = item.parent_id;
-			var index = this.siblingIndex(id);
-			var tagsSelected = selection.tags.length;
 			var prevItemId = void 0;
-			if (index == 0) {
-				prevItemId = parent_id;
+			var index = void 0;
+			// Select next item on top level.
+			if (this.isTopLvlItemInFilteredRoot(id) || selection.view == 'journal') {
+				var childrenIds = vm.$refs.root.childrenOrder;
+				index = childrenIds.indexOf(id);
+				if (index == 0) {
+					return this.deepestChild(childrenIds[childrenIds.length - 1]);
+				}
+				prevItemId = childrenIds[index - 1];
+				prevItemId = this.deepestChild(prevItemId);
 			} else {
-				prevItemId = this.nodes[parent_id].children_order[index - 1];
-				prevItemId = this.getDeepestLastChildId(prevItemId);
+				index = this.siblingIndex(id);
+				if (index == 0) {
+					prevItemId = parent_id;
+				} else {
+					prevItemId = this.nodes[parent_id].children_order[index - 1];
+					prevItemId = this.getDeepestLastChildId(prevItemId);
+				}
 			}
-			if (selection.hiddenItems.includes(prevItemId)) {
+			if (vm.hiddenItemIds.includes(prevItemId)) {
 				return this.prevItemId(prevItemId);
 			} else {
 				return prevItemId;
@@ -25373,10 +25435,19 @@ var _class = function () {
 			var nextIndex = this.siblingIndex(id) + 1;
 			var item = this.nodes[id];
 			var parent_id = item.parent_id;
+			// let tagsSelected = selection.tags.length;
+
+			if (vm.itIsADeepestChild(id)) {
+				var topLvlItemId = this.topLvlParentOfDeepestChild(id);
+				var topLvlChildrenIds = vm.$refs.root.childrenOrder;
+				var ind = topLvlChildrenIds.indexOf(topLvlItemId);
+				if (ind + 1 == topLvlChildrenIds.length) {
+					return topLvlChildrenIds[0];
+				}
+				return topLvlChildrenIds[ind + 1];
+			}
 			var parentsChildrenOrder = this.nodes[parent_id].children_order;
 			var itemIsLastSibling = nextIndex == parentsChildrenOrder.length;
-			var tagsSelected = selection.tags.length;
-
 			if (itemIsLastSibling) {
 				if (parent_id == this.root.id) {
 					return;
@@ -25384,36 +25455,55 @@ var _class = function () {
 				return this.nextItemRecursion(parent_id);
 			}
 			var nextItemId = this.nodes[parent_id].children_order[nextIndex];
+			if (vm.hiddenItemIds.includes(nextItemId)) {
+				return this.nextItemRecursion(nextItemId);
+			}
 			return nextItemId;
 		}
+		// nextVisibleItemRecursion(id)
+		// {
+		// 	// debugger;
+		// 	let nextIndex = this.siblingIndex(id)+1;
+		// 	let item = this.nodes[id];
+		// 	let parent_id = item.parent_id;
+		// 	let parentsChildrenOrder = this.nodes[parent_id].children_order;
+		// 	let itemIsLastSibling = (nextIndex == parentsChildrenOrder.length);	
+		// 	if(itemIsLastSibling)
+		// 	{
+		// 		if(parent_id == this.root.id){ return; }
+		// 		return this.nextItemRecursion(parent_id);
+		// 	}
+		// 	let nextItemId = this.nodes[parent_id].children_order[nextIndex];
+		// 	return nextItemId;
+		// }
+
 	}, {
 		key: 'isTopLvlItemInFilteredRoot',
 		value: function isTopLvlItemInFilteredRoot(id) {
 			var s = selection;
-			if (s.tags.length == 0 && s.filter.includes('all')) {
+			if (selection.nothingSelected() && selection.view == 'tree') {
 				console.log('the root is not filtered');
 				return false;
 			}
 			if (id == this.root.id) {
 				return true;
-			} else if (this.root.children_order.includes(id)) {
+			} else if (vm.$refs.root.childrenOrder.includes(id)) {
 				return true;
 			} else {
 				return false;
 			}
 		}
-	}, {
-		key: 'nextFilteredItemId',
-		value: function nextFilteredItemId(id) {
-			var index = this.root.children_order.indexOf(id);
-			return this.root.children_order[index + 1];
-		}
-	}, {
-		key: 'prevFilteredItemId',
-		value: function prevFilteredItemId(id) {
-			var index = this.root.children_order.indexOf(id);
-			return this.root.children_order[index - 1];
-		}
+		// nextFilteredItemId(id)
+		// {
+		// 	let index = this.root.children_order.indexOf(id);
+		// 	return this.root.children_order[index+1];
+		// }
+		// prevFilteredItemId(id)
+		// {
+		// 	let index = this.root.children_order.indexOf(id);
+		// 	return this.root.children_order[index-1];
+		// }
+
 	}, {
 		key: 'sortChildren',
 		value: function sortChildren(id) {
@@ -25428,7 +25518,7 @@ var _class = function () {
 
 			var order = item.children_order;
 			var items = item.children;
-			if (order instanceof Array) {
+			if (order instanceof Array && order.length) {
 				item.children = order.map(function (id) {
 					return items.find(function (t) {
 						return t.id === id;
@@ -25436,15 +25526,15 @@ var _class = function () {
 				});
 			}
 		}
-	}, {
-		key: 'resetChildrenOrder',
-		value: function resetChildrenOrder(id) {
-			var item = this.nodes[id];
-			var resetChildrenOrder = item.children.map(function (child) {
-				return child.id;
-			});
-			this.nodes[id].children_order = resetChildrenOrder;
-		}
+		// resetChildrenOrder(id)
+		// {
+		// 	let item = this.nodes[id];
+		// 	let resetChildrenOrder = item.children.map(function(child){
+		// 	   return child.id;
+		// 	});
+		// 	this.nodes[id].children_order = resetChildrenOrder;
+		// }
+
 	}, {
 		key: 'giveNewParent',
 		value: function giveNewParent(id, new_parent_id, specificNewIndex) {
@@ -25544,6 +25634,36 @@ var _class = function () {
 			});
 		}
 	}, {
+		key: 'hasParentDueToday',
+		value: function hasParentDueToday(id) {
+			id = id ? id : selection.selectedId;
+			var item = this.nodes[id];
+			if (!item.parent_id) {
+				return false;
+			}
+			var parent = this.nodes[item.parent_id];
+			if (!parent) {
+				return false;
+			}
+			var diff = moment(parent.due_date).diff(moment(), 'days');
+			if (diff <= 0) {
+				return true;
+			} else {
+				return this.hasParentDueToday(item.parent_id);
+			}
+		}
+	}, {
+		key: 'isDueToday',
+		value: function isDueToday(id) {
+			id = id ? id : selection.selectedId;
+			var item = this.nodes[id];
+			var diff = moment(item.due_date).diff(moment(), 'days');
+			if (diff <= 0) {
+				return true;
+			}
+			return false;
+		}
+	}, {
 		key: 'attachParentBody',
 		value: function attachParentBody(id) {
 			if (!id) {
@@ -25553,8 +25673,11 @@ var _class = function () {
 			if (!item.parent_id) {
 				return;
 			}
-			var parentBody = this.nodes[item.parent_id].body;
-			item.parents_bodies = parentBody;
+			var parent = this.nodes[item.parent_id];
+			if (!parent) {
+				return;
+			}
+			item.parents_bodies = parent.body;
 			vm.patch(id, 'parents_bodies');
 		}
 	}, {
@@ -25590,6 +25713,7 @@ var _class = function () {
 			vm.deleteItemApi(id);
 			this.autoCalculateDoneState(parent_id);
 			selection.selectedId = newSelectedId;
+			delete this.nodes[id];
 		}
 	}, {
 		key: 'tagItem',
@@ -25651,12 +25775,6 @@ var _class = function () {
 				// IF DONE:
 				//Add parent's body
 				this.attachParentBody(id);
-				//Add Flatpickr
-				// setTimeout(function(){
-				// 	let fpId = "done-date-edit-"+id;
-				// 	let fpEl = document.getElementById(fpId);
-				// 	fpEl.flatpickrify();
-				// },100);
 			}
 		}
 	}, {
@@ -25920,118 +26038,134 @@ var _class = function () {
 				}
 			}.bind(this));
 		}
-	}, {
-		key: 'filterItems',
-		value: function filterItems(keyword, value, operator) {
-			// debugger;
-			// Start by resetting the parent id's to their original state
-			this.root.children.forEach(function (item) {
-				item.parent_id = item.parent_id_backup;
-			});
-			if (operator == 'NOT' && keyword == 'journal') {
-				this.hideDoneNodes();
-				selection.addKeywords(keyword, value, operator);
-				return;
-			} else if (operator == 'NOT' && keyword == 'tag') {
-				this.hideTaggedNodes(value);
-				selection.addKeywords(keyword, value, operator);
-				return;
-			}
+		// FILTER REWRITE
+		// filterItems(keyword, value, operator)
+		// {
+		// 	// debugger;
+		// 	// Start by resetting the parent id's to their original state
+		// 	this.root.children.forEach(function(item){
+		// 		item.parent_id = item.parent_id_backup;
+		// 	});
+		// 	if (operator == 'NOT' && keyword == 'journal')
+		// 	{
+		// 		this.hideDoneNodes();
+		// 		selection.addKeywords(keyword,value,operator);
+		// 		return;
+		// 	}
+		// 	else if (operator == 'NOT' && keyword == 'tag')
+		// 	{
+		// 		this.hideTaggedNodes(value);
+		// 		selection.addKeywords(keyword,value,operator);
+		// 		return;
+		// 	}
 
-			var arrayToFilter = void 0;
-			if (operator == 'AND'
-			// || (selection.view == 'journal' && selection.nothingSelected())
-			) {
-					console.log('filterItems: a');
-					arrayToFilter = this.flattenTree(this.root.children);
-				} else if (selection.view == 'journal') {
-				console.log('filterItems: b');
-				selection.clear();
-				arrayToFilter = vm.doneData;
-			} else {
-				console.log('filterItems: c');
-				selection.clear();
-				arrayToFilter = this.flattenTree(this.backups.rootChildren);
-			}
-			selection.addKeywords(keyword, value, operator);
+		// 	let arrayToFilter;
+		// 	if (operator == 'AND'
+		// 	 // || (selection.view == 'journal' && selection.nothingSelected())
+		// 	 )
+		// 	{
+		// 		console.log('filterItems: a');
+		// 		arrayToFilter = this.flattenTree(this.root.children);
+		// 	}
+		// 	else if (selection.view == 'journal')
+		// 	{
+		// 		console.log('filterItems: b');
+		// 		selection.clear();
+		// 		arrayToFilter = vm.doneData;
+		// 	}
+		// 	else
+		// 	{
+		// 		console.log('filterItems: c');
+		// 		selection.clear();
+		// 		arrayToFilter = this.flattenTree(this.backups.rootChildren);
+		// 	}
+		// 	selection.addKeywords(keyword,value,operator);
 
-			var filteredArray = [];
-			if (keyword == 'all') {
-				filteredArray = this.backups.rootChildren;
-			}
-			if (keyword == 'journal') {
-				vm.resetDoneData();
-				filteredArray = vm.doneData;
-			}
-			if (keyword == 'duedate') {
-				var dueDateFilterResults = this.arrayFilterDate(arrayToFilter, value, operator);
-				Array.prototype.push.apply(filteredArray, dueDateFilterResults);
-			}
-			if (keyword == 'tag') {
-				var tagFilterResults = this.arrayFilterTag(arrayToFilter, value, operator);
-				Array.prototype.push.apply(filteredArray, tagFilterResults);
-			}
-			filteredArray.forEach(function (item) {
-				item.parent_id = this.root.id;
-			}.bind(this));
-			this.root.children = filteredArray;
-			this.resetChildrenOrder(this.root.id);
-		}
-	}, {
-		key: 'arrayFilterTag',
-		value: function arrayFilterTag(array, tags) {
-			var filteredArray = [];
-			array.forEach(function (item) {
-				var id = item.id;
-				var target = this.hasTag(id, tags);
-				if (selection.view == 'tree' && target && this.hasParentWithTag(id, tags)) {
-					target = false;
-				}
-				// console.log(id+" - "+item.body+" →　hasTag["+tags+"]　=　"+hasTag);
-				// console.log(id+" - "+item.body+" →　hasParentWithTag["+tags+"] =　"+hasParentWithTag);
-				if (target) {
-					item.show_children = 1;
-					filteredArray.push(item);
-				}
-			}.bind(this));
-			return filteredArray;
-		}
-	}, {
-		key: 'arrayFilterDone',
-		value: function arrayFilterDone(array, operator) {
-			var filteredArray = [];
-			array.forEach(function (item) {
-				if (item.done) {
-					item.show_children = 1;
-					filteredArray.push(item);
-				}
-			}.bind(this));
-			return filteredArray;
-		}
-	}, {
-		key: 'arrayFilterDate',
-		value: function arrayFilterDate(array, date, operator) {
-			var filteredArray = [];
-			if (date == 'today') {
-				array.forEach(function (item) {
-					var diff = moment(item.due_date).diff(moment(), 'days');
-					if (diff <= 0) {
-						filteredArray.push(item);
-					}
-				}.bind(this));
-			}
-			return filteredArray;
-		}
-	}, {
-		key: 'hideItem',
-		value: function hideItem(id) {
-			if (!selection.hiddenItems.includes(id)) {
-				selection.hiddenItems.push(id);
-			}
-			this.nodes[id].children.forEach(function (child) {
-				this.hideItem(child.id);
-			}.bind(this));
-		}
+		// 	let filteredArray = [];
+		// 	if (keyword == 'all')
+		// 	{
+		// 		filteredArray = this.backups.rootChildren;
+		// 	}
+		// 	if (keyword == 'journal')
+		// 	{
+		// 		vm.resetDoneData();
+		// 		filteredArray = vm.doneData;
+		// 	}
+		// 	if (keyword == 'duedate')
+		// 	{
+		// 		let dueDateFilterResults = this.arrayFilterDate(arrayToFilter, value, operator);
+		// 		Array.prototype.push.apply(filteredArray, dueDateFilterResults);
+		// 	}
+		// 	if (keyword == 'tag')
+		// 	{
+		// 		let tagFilterResults = this.arrayFilterTag(arrayToFilter, value, operator);
+		// 		Array.prototype.push.apply(filteredArray, tagFilterResults);
+		// 	}
+		// 	filteredArray.forEach(function(item){
+		// 		item.parent_id = this.root.id;
+		// 	}.bind(this));
+		// 	this.root.children = filteredArray;
+		// 	this.resetChildrenOrder(this.root.id);
+		// }
+		// arrayFilterTag(array, tags)
+		// {
+		// 	let filteredArray = [];
+		// 	array.forEach(function (item) {
+		// 		let id = item.id;
+		// 		let target = this.hasTag(id, tags);
+		// 		if ( selection.view == 'tree'
+		// 			&& target
+		// 			&& this.hasParentWithTag(id, tags) )
+		// 		{
+		// 			target = false;
+		// 		}
+		// 		// console.log(id+" - "+item.body+" →　hasTag["+tags+"]　=　"+hasTag);
+		// 		// console.log(id+" - "+item.body+" →　hasParentWithTag["+tags+"] =　"+hasParentWithTag);
+		// 		if(target)
+		// 		{
+		// 			item.show_children = 1;
+		// 			filteredArray.push(item);
+		// 		}
+		// 	}.bind(this));
+		// 	return filteredArray;
+		// }
+		// arrayFilterDone(array, operator)
+		// {
+		// 	let filteredArray = [];
+		// 	array.forEach(function (item) {
+		// 		if(item.done)
+		// 		{
+		// 			item.show_children = 1;
+		// 			filteredArray.push(item);
+		// 		}
+		// 	}.bind(this));
+		// 	return filteredArray;
+		// }
+		// arrayFilterDate(array, date, operator)
+		// {
+		// 	let filteredArray = [];
+		// 	if(date == 'today')
+		// 	{
+		// 		array.forEach(function (item) {
+		// 			let diff = moment(item.due_date).diff(moment(), 'days');
+		// 			if (diff <= 0){
+		// 				filteredArray.push(item);
+		// 			}
+		// 		}.bind(this));
+		// 	}
+		// 	return filteredArray;
+		// }
+		// hideItem(id)
+		// {
+		// 	if(!selection.hiddenItems.includes(id))
+		// 	{
+		// 		selection.hiddenItems.push(id);
+		// 	}
+		// 	this.nodes[id].children.forEach(function(child) {
+		// 		this.hideItem(child.id)
+		// 	}.bind(this));
+		// }
+
 	}, {
 		key: 'flattenTree',
 		value: function flattenTree(array) {
@@ -26044,19 +26178,20 @@ var _class = function () {
 			}.bind(this));
 			return flattenedTree;
 		}
-	}, {
-		key: 'rebindArrayParentIds',
-		value: function rebindArrayParentIds(array, newParentId) {
-			if (newParentId == 'backup') {
-				array.forEach(function (item) {
-					item.parent_id = item.parent_id_backup;
-				});
-			} else {
-				array.forEach(function (item) {
-					item.parent_id = newParentId;
-				});
-			}
-		}
+		// rebindArrayParentIds(array, newParentId)
+		// {
+		// 	if(newParentId == 'backup')
+		// 	{
+		// 		array.forEach(function(item){
+		// 			item.parent_id = item.parent_id_backup;
+		// 		});
+		// 	} else {
+		// 		array.forEach(function(item){
+		// 			item.parent_id = newParentId;
+		// 		});
+		// 	}
+		// }
+
 	}, {
 		key: 'formatDone',
 		value: function formatDone(doneArray) {
@@ -37538,7 +37673,7 @@ __WEBPACK_IMPORTED_MODULE_0_jquery___default.a.getJSON('/api/items', function (f
 
 	window.vm = new __WEBPACK_IMPORTED_MODULE_8_vue___default.a(__WEBPACK_IMPORTED_MODULE_11__vue_components_VueListMaster_js__["a" /* default */]);
 	new __WEBPACK_IMPORTED_MODULE_13__components_ListAppKeyBindings_js__["a" /* default */]();
-	vm.allData = allItems.root;
+	// vm.allData = allItems.root;
 	vm.doneData = allItems.doneitems;
 	vm.nodes = allItems.nodes;
 
@@ -38125,6 +38260,8 @@ __WEBPACK_IMPORTED_MODULE_0_jquery___default.a.getJSON('/api/items', function (f
 //
 //
 //
+//
+//
 
 // import Morph from '../components/valueMorphers.js'
 // window.Morph = new Morph();
@@ -38145,7 +38282,7 @@ __WEBPACK_IMPORTED_MODULE_0_jquery___default.a.getJSON('/api/items', function (f
 		eventHub.$on('escapeOnNewButtonFocus', this.cancelAddNew);
 	},
 
-	props: ['item'],
+	props: ['item', 'parentsChildrenOrder'],
 	data: function data() {
 		return {
 			newItem: {
@@ -38163,6 +38300,32 @@ __WEBPACK_IMPORTED_MODULE_0_jquery___default.a.getJSON('/api/items', function (f
 	// Flatpickr: Flatpickr,
 	// },
 	computed: {
+		visibleChildren: function visibleChildren() {
+			var _this = this;
+
+			if (!this.item || !this.item.children.length || !allItems) {
+				return [];
+			}
+			if (typeof parseFloat(this.item.id) != 'number' || this.item.id == 'x') {}
+			// return [];
+
+			// console.log(this.item);
+			return this.item.children.filter(function (child) {
+				return !_this.$root.hiddenItemIds.includes(child.id);
+			});
+		},
+		allVisibleChildItems: function allVisibleChildItems() {
+			var _this2 = this;
+
+			if (!this.item || !this.item.children.length || !allItems) {
+				return [];
+			}
+			var flattenedTree = allItems.flattenTree(this.item.children);
+			var visibleChildren = flattenedTree.filter(function (item) {
+				return !_this2.$root.hiddenItemIds.includes(item.id);
+			});
+			return visibleChildren;
+		},
 		preparedPlusComputedTags: function preparedPlusComputedTags() {
 			if (!this.item || !allItems) {
 				return 0;
@@ -38199,30 +38362,28 @@ __WEBPACK_IMPORTED_MODULE_0_jquery___default.a.getJSON('/api/items', function (f
 			if (!this.item || !allItems) {
 				return 0;
 			}
-			// console.log('trying at totalPlannedMin');
-			if (!this.item.children.length) {
-				return this.item.planned_time ? parseFloat(this.item.planned_time) : 0;
+			var selfValue = this.item.planned_time ? parseFloat(this.item.planned_time) : 0;
+			var childrenArray = this.allVisibleChildItems;
+			if (!childrenArray || !childrenArray.length) {
+				return selfValue;
 			}
-			var childrenArray = allItems.flattenTree(this.item.children);
 			var x = childrenArray.reduce(function (prevVal, child) {
 				return prevVal + parseFloat(child.planned_time);
-			}, parseFloat(this.item.planned_time));
-			x = x - this.$root.hiddenItemsTotalPlannedTime;
+			}, selfValue);
 			return x ? parseFloat(x) : 0;
 		},
 		totalUsedSec: function totalUsedSec() {
 			if (!this.item || !allItems) {
 				return 0;
 			}
-			// console.log('trying at totalUsedSec');
-			if (!this.item.children.length) {
-				return this.item.used_time ? this.item.used_time : 0;
+			var selfValue = this.item.used_time ? parseFloat(this.item.used_time) : 0;
+			var childrenArray = this.allVisibleChildItems;
+			if (!childrenArray || !childrenArray.length) {
+				return selfValue;
 			}
-			var childrenArray = allItems.flattenTree(this.item.children);
 			var x = childrenArray.reduce(function (prevVal, child) {
-				return prevVal + child.used_time;
-			}, this.item.used_time);
-			x = x - this.$root.hiddenItemsTotalUsedTime;
+				return prevVal + parseFloat(child.used_time);
+			}, selfValue);
 			return x ? x : 0;
 		},
 		journalView: function journalView() {
@@ -38234,6 +38395,16 @@ __WEBPACK_IMPORTED_MODULE_0_jquery___default.a.getJSON('/api/items', function (f
 			} else {
 				return false;
 			}
+		},
+		visiblePrevItemId: function visiblePrevItemId() {
+			if (!this.item || !allItems) {
+				return;
+			}
+			var index = this.parentsChildrenOrder.indexOf(this.item.id);
+			if (index == 0) {
+				return allItems.root.id;
+			}
+			return this.parentsChildrenOrder[index - 1];
 		},
 		journalDate: function journalDate() {
 			if (!this.item || !allItems) {
@@ -38247,7 +38418,7 @@ __WEBPACK_IMPORTED_MODULE_0_jquery___default.a.getJSON('/api/items', function (f
 				if (this.item.depth == 0) {
 					return;
 				}
-				var prevId = allItems.prevItemId(this.item.id);
+				var prevId = this.visiblePrevItemId;
 				var prevDoneDate = allItems.nodes[prevId].done_date;
 				prevDoneDate = moment(prevDoneDate).format('YYYY/MM/DD');
 				var thisDoneDate = moment(this.item.done_date).format('YYYY/MM/DD');
@@ -38269,7 +38440,7 @@ __WEBPACK_IMPORTED_MODULE_0_jquery___default.a.getJSON('/api/items', function (f
 				if (this.item.depth == 0) {
 					return;
 				}
-				var prevId = allItems.prevItemId(this.item.id);
+				var prevId = this.visiblePrevItemId;
 				var parentString = this.item.parents_bodies;
 				var prevParentString = allItems.nodes[prevId].parents_bodies;
 
@@ -38328,6 +38499,37 @@ __WEBPACK_IMPORTED_MODULE_0_jquery___default.a.getJSON('/api/items', function (f
 				return allItems.nodes[this.item.id].children_order;
 			}
 			return this.$parent.item.children_order;
+		},
+		childrenOrder: function childrenOrder() {
+			if (!this.item || !allItems) {
+				return 0;
+			}
+			return this.visibleChildren.map(function (child) {
+				return child.id;
+			});
+		},
+
+		// deepestChild()
+		// { if(!this.item || !allItems){ return; }
+		// 	let dc;
+		// 	if (!this.childrenOrder.length)
+		// 	{
+		// 		return this.item.id;
+		// 	} else {
+		// 		let i = this.visibleChildren.length;
+		// 		return this.visibleChildren[i-1].deepestChild;
+		// 	}
+		// },
+		childrensDeepestChildren: function childrensDeepestChildren() {
+			if (!this.item || !allItems) {
+				return;
+			}
+			return this.visibleChildren.map(function (item) {
+				return {
+					'id': item.id,
+					'deepestChild': this.$root.findDeepestVisibleChild(item.id)
+				};
+			}.bind(this));
 		},
 		showAddNewBox: function showAddNewBox() {
 			if (!this.item || !allItems) {
@@ -38437,13 +38639,16 @@ __WEBPACK_IMPORTED_MODULE_0_jquery___default.a.getJSON('/api/items', function (f
 			if (!this.item || !allItems) {
 				return true;
 			}
-			return this.$root.selection.hiddenItems.includes(this.item.id);
+			return this.$root.hiddenItemIds.includes(this.item.id);
 		},
 		allChildrenDone: function allChildrenDone() {
 			if (!this.item || !allItems) {
 				return true;
 			}
 			return allItems.allChildrenDone(this.item.id);
+		},
+		thebody: function thebody() {
+			return this.item.body;
 		}
 	},
 	methods: {
@@ -38451,12 +38656,13 @@ __WEBPACK_IMPORTED_MODULE_0_jquery___default.a.getJSON('/api/items', function (f
 		momentCalendar: __WEBPACK_IMPORTED_MODULE_0__components_valueMorphers2_js__["b" /* momentCalendar */],
 		sec_to_hourminsec: __WEBPACK_IMPORTED_MODULE_0__components_valueMorphers2_js__["d" /* sec_to_hourminsec */],
 		convertbodyURLtoHTML: function convertbodyURLtoHTML() {
-			if (!this.item) {
+			// console.log('converting');
+			if (!this.item || this.item.depth == 0) {
 				return;
 			}
-			var bodyboxQS = "#card-" + this.item.id + " > div > .item-card > .body-div > .bodybox > div";
+			var bodyboxQS = '#' + this.$el.id + ' .bodybox';
 			var a = document.querySelector(bodyboxQS);
-			if (!a) {
+			if (!a || !a.innerHTML.includes('a href')) {
 				return;
 			}
 			a.innerHTML = a.innerHTML.replace("&lt;a href=", "<a href=").replace('target="_blank"&gt;', 'target="_blank">').replace("&lt;/a&gt;", "</a>");
@@ -38785,6 +38991,9 @@ __WEBPACK_IMPORTED_MODULE_0_jquery___default.a.getJSON('/api/items', function (f
 			}
 			// item.body = item.body.trim();
 
+			if (typeof item.planned_time != 'number' || Number.isNaN(item.planned_time)) {
+				item.planned_time = 0;
+			}
 			if (item.planned_time != this.$root.beforeEditCache_planned_time) {
 				vm.patch(item.id, 'planned_time');
 			}
@@ -38794,6 +39003,7 @@ __WEBPACK_IMPORTED_MODULE_0_jquery___default.a.getJSON('/api/items', function (f
 			}
 			this.$root.beforeEditCache_body = null;
 			this.$root.beforeEditCache_planned_time = null;
+			// setTimeout(() => this.convertbodyURLtoHTML(),1000);
 		},
 		cancelEdit: function cancelEdit(item) {
 			item = item ? item : allItems.nodes[selection.selectedId];
@@ -38843,7 +39053,7 @@ __WEBPACK_IMPORTED_MODULE_0_jquery___default.a.getJSON('/api/items', function (f
 				newItem.done = 1;
 				newItem.done_date = this.item.done_date;
 			}
-			if (this.newItem.preparedTags.includes('Today') || selection.filter.includes('today')) {
+			if (selection.filter.includes('today') && allItems.isTopLvlItemInFilteredRoot(this.item.id) && !vm.addingNewAsChild) {
 				newItem.due_date = moment().format();
 				addTags = addTags.filter(function (val) {
 					return val != 'Today';
@@ -39697,6 +39907,7 @@ var Selection = function () {
 		_classCallCheck(this, Selection);
 
 		this.selectedId = null;
+		this.si = this.getSelectedId();
 		this.lastSelectedId = null;
 		this.filter = ['all'];
 		this.tags = [];
@@ -39725,9 +39936,20 @@ var Selection = function () {
 			this.hiddenBookmarks = [];
 		}
 	}, {
+		key: 'getSelectedId',
+		value: function getSelectedId() {
+			return this.selectedId;
+		}
+	}, {
 		key: 'nothingSelected',
 		value: function nothingSelected() {
 			var n = !this.tags.length && !this.hiddenTags.length && !this.hiddenItems.length && !this.hiddenBookmarks.length && (this.filter.length == 1 && this.filter.includes('all') || !this.filter.length);
+			return n;
+		}
+	}, {
+		key: 'noFilterOrTag',
+		value: function noFilterOrTag() {
+			var n = !this.tags.length && (this.filter.length == 1 && this.filter.includes('all') || !this.filter.length);
 			return n;
 		}
 	}, {
@@ -39739,12 +39961,17 @@ var Selection = function () {
 						return;
 					}
 					this.hiddenTags.push(value);
-					return;
+					this.tags = this.tags.filter(function (tag) {
+						return tag !== value;
+					});
 				} else {
 					if (this.tags.includes(value)) {
 						return;
 					}
 					this.tags.push(value);
+					this.hiddenTags = this.hiddenTags.filter(function (tag) {
+						return tag !== value;
+					});
 				}
 			} else {
 				if (operator == 'NOT' && keyword == 'journal') {
@@ -39752,7 +39979,7 @@ var Selection = function () {
 					return;
 				}
 				if (keyword == 'journal') {
-					if (this.view.includes('journal')) {
+					if (this.view == 'journal') {
 						return;
 					}
 					this.view = 'journal';
@@ -39828,19 +40055,20 @@ window.selection = new __WEBPACK_IMPORTED_MODULE_4__Selection_js__["a" /* defaul
 	el: '#items-app',
 	data: {
 		doneData: null,
-		allData: {
-			"body": "ALL",
-			"children": [],
-			"children_order": [],
-			"depth": 0,
-			"done": false,
-			"done_date": "0000-00-00 00:00:00",
-			"due_date": "0000-00-00 00:00:00",
-			"id": "x",
-			"show_children": 1,
-			"tagged": [],
-			"used_time": 0
-		},
+		// FILTER REWRITE
+		// allData: {
+		// 	"body":"ALL",
+		// 	"children":[],
+		// 	"children_order":[],
+		// 	"depth":0,
+		// 	"done":false,
+		// 	"done_date":"0000-00-00 00:00:00",
+		// 	"due_date":"0000-00-00 00:00:00",
+		// 	"id":"x",
+		// 	"show_children":1,
+		// 	"tagged":[],
+		// 	"used_time":0
+		// },
 		nodes: {},
 		selection: selection,
 		addingNewUnder: null,
@@ -39864,19 +40092,191 @@ window.selection = new __WEBPACK_IMPORTED_MODULE_4__Selection_js__["a" /* defaul
 		Popups: __WEBPACK_IMPORTED_MODULE_1__Popups_vue___default.a,
 		Popouts: __WEBPACK_IMPORTED_MODULE_2__Popouts_vue___default.a
 	},
+	mounted: function mounted() {
+		eventHub.$on('confirm-ok', function (id) {
+			console.log('computer says "ok"...');
+			console.log(id);
+			allItems.deleteItem(id);
+		});
+		eventHub.$on('confirm-cancel', function (id) {
+			console.log('computer says "no"...');
+			console.log(id);
+			return;
+		});
+		window.onscroll = function () {
+			if (!selection.filter.length && !selection.tags.length) {
+				return;
+			}
+			var el = document.getElementsByClassName('line');
+			// let el = $('.navigation');
+			if (!__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_3__components_globalFunctions_js__["a" /* isElementInViewport */])(el[0])) {
+				$("body").addClass("scrolled-down");
+			} else {
+				$("body").removeClass("scrolled-down");
+			}
+		};
+	},
+
 	computed: {
+		allData: function allData() {
+			if (this.noItems) {
+				return {
+					"body": "ALL",
+					"children": [],
+					"children_order": [],
+					"depth": 0,
+					"done": false,
+					"done_date": "0000-00-00 00:00:00",
+					"due_date": "0000-00-00 00:00:00",
+					"id": "x",
+					"show_children": 1,
+					"tagged": [],
+					"used_time": 0
+				};
+			}
+			return {
+				"body": "ALL",
+				"children": this.filteredItems,
+				"children_order": this.nodes[allItems.root.id].children_order,
+				"id": this.nodes[allItems.root.id],
+				"depth": 0,
+				"done": false,
+				"done_date": "0000-00-00 00:00:00",
+				"due_date": "0000-00-00 00:00:00",
+				"show_children": 1,
+				"tagged": [],
+				"used_time": 0
+			};
+		},
 		mobile: function mobile() {
 			return __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_3__components_globalFunctions_js__["d" /* mobilecheck */])();
 		},
 		noItems: function noItems() {
-			if (!this.allData || !allItems.root || !allItems.root.children.length) {
+			if (!allItems || !allItems.root || !allItems.root.children.length) {
 				return true;
 			}return false;
 		},
-		doneItems: function doneItems() {
-			// Codementor: Not reactive...
+
+		// doneItems() // Flat
+		// {
+		// 	return this.filteredItemsFlat.filter(child => child.done);
+		// },
+		filteredItems: function filteredItems() {
+			if (this.noItems) {
+				return [];
+			}
+			if (this.selection.view == 'tree') {
+				return this.filteredItemsTree;
+			} else if (this.selection.view == 'journal') {
+				return this.filteredItemsFlat;
+			}
+		},
+		filteredItemsFlat: function filteredItemsFlat() {
+			var ar = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_3__components_globalFunctions_js__["e" /* objectToArray */])(this.nodes).filter(function (item) {
+				var target = this.selection.tags.every(function (tag) {
+					return allItems.hasTag(item.id, tag);
+				});
+				var targetHidden = this.selection.hiddenTags.some(function (tag) {
+					return allItems.hasTag(item.id, tag);
+				});
+				var targetDone = selection.view == 'journal' ? item.done : true;
+				var targetToday = true;
+				if (selection.filter.includes('today')) {
+					targetToday = false;
+					var diff = moment(item.due_date).diff(moment(), 'days');
+					if (diff <= 0 || allItems.hasParentDueToday(item.id)) {
+						targetToday = true;
+					}
+					var doneDateDiff = moment(item.done_date).diff(moment(), 'days');
+					if (doneDateDiff <= 1) {
+						targetToday = false;
+					}
+				}
+				if (target && !targetHidden && targetDone && targetToday) {
+					return true;
+				}
+			}.bind(this));
+			if (selection.view == 'journal') {
+				ar = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_3__components_globalFunctions_js__["f" /* sortObjectArrayByTwoProperties */])(ar, 'done_date', 'parents_bodies', 'desc', 'asc');
+			}
+			return ar;
+		},
+		filteredItemsTree: function filteredItemsTree() {
+			//Go through ALL ITEMS and return those that have the tag AND no parent with the tag.
+			var children = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_3__components_globalFunctions_js__["e" /* objectToArray */])(this.nodes).filter(function (item) {
+				var target = void 0;
+				var hasParentWithTag = void 0;
+				var targetToday = void 0;
+				var topLvlItem = void 0;
+				if (this.selection.noFilterOrTag()) {
+					topLvlItem = item.depth == 1 ? true : false;
+					if (topLvlItem) {
+						return true;
+					} else {
+						return false;
+					}
+				}
+
+				if (this.selection.tags.length > 1) {
+					hasParentWithTag = this.selection.tags.every(function (tag) {
+						return allItems.hasParentWithTag(item.id, tag);
+					});
+				} else {
+					hasParentWithTag = this.selection.tags.some(function (tag) {
+						return allItems.hasParentWithTag(item.id, tag);
+					});
+				}
+				target = this.selection.tags.every(function (tag) {
+					return allItems.hasTag(item.id, tag);
+				});
+
+				if (!selection.filter.includes('today') && target && !hasParentWithTag) {
+					return true;
+				}
+
+				if (selection.filter.includes('today')) {
+					var doneDateDiff = moment(item.done_date).diff(moment(), 'days');
+					if (doneDateDiff <= 1) {
+						return false;
+					}
+					var hasParentDueToday = allItems.hasParentDueToday(item.id);
+					var isDue = allItems.isDueToday(item.id);
+					if (!selection.tags.length && isDue) {
+						console.log('(!selection.tags.length && isDue)');
+						return true;
+					} else if (selection.tags.length && target && (isDue || hasParentDueToday) && !(hasParentWithTag && hasParentDueToday)) {
+						return true;
+					}
+				}
+				return false;
+			}.bind(this));
+			// Sort on root children_order when no filter:
+			if (this.selection.noFilterOrTag()) {
+				var order = allItems.root.children_order;
+				if (order instanceof Array && order.length) {
+					// order = order.filter(id => this.$refs.root.childrenOrder.includes(id));
+					children = order.map(function (id) {
+						return children.find(function (t) {
+							return t.id === id;
+						});
+					});
+				}
+			}
+			if (selection.filter.includes('today')) {
+				children = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_3__components_globalFunctions_js__["g" /* sortObjectArrayByProperty */])(children, 'done_date');
+			}
+			return children;
+		},
+		hiddenItemIds: function hiddenItemIds() {
 			return __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_3__components_globalFunctions_js__["e" /* objectToArray */])(this.nodes).filter(function (item) {
-				return item.done;
+				var targetHidden = this.selection.hiddenTags.some(function (tag) {
+					return allItems.hasTag(item.id, tag);
+				});
+				if (targetHidden) {
+					return true;
+				}
+			}.bind(this)).map(function (item) {
+				return item.id;
 			});
 		},
 		selectionFilter: function selectionFilter() // For list title
@@ -39912,23 +40312,28 @@ window.selection = new __WEBPACK_IMPORTED_MODULE_4__Selection_js__["a" /* defaul
 				return val;
 			});
 		},
-		allVisibleItems: function allVisibleItems() {
-			if (!this.allData) {
-				return [];
-			}
-			var items = allItems.flattenTree(allItems.root.children);
-			return items.filter(function (item) {
-				return !selection.hiddenItems.includes(item.id);
-			});
-		},
+
+		// allVisibleItems()
+		// {
+		// 	if(!this.allData){ return []; }
+		// 	return filteredItemsFlat;
+		// 	// let items = allItems.flattenTree(allItems.root.children);
+		// 	// return items.filter(function(item)
+		// 	// {
+		// 	// 	return !selection.hiddenItems.includes(item.id);
+		// 	// });
+		// },
 		allTagsComputed: function allTagsComputed() {
 			var t0 = performance.now();
-			if (!this.allData) {
+			if (this.noItems) {
 				return [];
 			}
 			var allTagsArray = [];
 			// let items = allItems.flattenTree(allItems.root.children);
-			var items = this.allVisibleItems;
+			// FILTER REWRITE
+			// let items = this.allVisibleItems;
+			// let items = (this.$refs.root) ? this.$refs.root.allVisibleChildItems : [] ;
+			var items = this.filteredItemsFlat.length ? this.filteredItemsFlat : [];
 			if (!items.length) {
 				return [];
 			}
@@ -39946,19 +40351,25 @@ window.selection = new __WEBPACK_IMPORTED_MODULE_4__Selection_js__["a" /* defaul
 					}
 				}.bind(allTagsArray));
 			}.bind(allTagsArray));
-			allTagsArray = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_3__components_globalFunctions_js__["f" /* sortObjectArrayByProperty */])(allTagsArray, 'name');
+			allTagsArray = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_3__components_globalFunctions_js__["g" /* sortObjectArrayByProperty */])(allTagsArray, 'name');
 			var t1 = performance.now();
 			console.log("Call to allTagsComputed took " + (t1 - t0) + " milliseconds.");
 			return allTagsArray;
 		},
 		allTagsComputed_2: function allTagsComputed_2() {
 			var t2_0 = performance.now();
-			if (!this.allData) {
+			if (this.noItems) {
 				return [];
 			}
 			var allTagsArray = [];
 			// let items = allItems.flattenTree(allItems.root.children);
-			var items = this.allVisibleItems;
+			// FILTER REWRITE
+			// let items = this.allVisibleItems;
+			// let items = (this.$refs.root) ? this.$refs.root.allVisibleChildItems : [] ;
+			var items = this.filteredItemsFlat.length ? this.filteredItemsFlat : [];
+			console.log('allTagsComputed_2');
+			console.log('this.$refs.root.allVisibleChildItems');
+			console.log(this.$refs.root.allVisibleChildItems);
 			if (!items.length) {
 				return [];
 			}
@@ -39968,20 +40379,23 @@ window.selection = new __WEBPACK_IMPORTED_MODULE_4__Selection_js__["a" /* defaul
 				});
 				return a.concat(tags);
 			}, []);
-			allTagsArray = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_3__components_globalFunctions_js__["g" /* uniqBy */])(allTagsArray);
-			allTagsArray = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_3__components_globalFunctions_js__["f" /* sortObjectArrayByProperty */])(allTagsArray, 'name');
+			allTagsArray = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_3__components_globalFunctions_js__["h" /* uniqBy */])(allTagsArray);
+			allTagsArray = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_3__components_globalFunctions_js__["g" /* sortObjectArrayByProperty */])(allTagsArray, 'name');
 			var t2_1 = performance.now();
 			console.log("Call to allTagsComputed_2 took " + (t2_1 - t2_0) + " milliseconds.");
 			return allTagsArray;
 		},
 		allTagsComputed_3: function allTagsComputed_3() {
 			var t3_0 = performance.now();
-			if (!this.allData) {
+			if (this.noItems) {
 				return [];
 			}
 			var allTagsArray = new Set();
 			// let items = allItems.flattenTree(allItems.root.children);
-			var items = this.allVisibleItems;
+			// FILTER REWRITE
+			// let items = this.allVisibleItems;
+			// let items = (this.$refs.root) ? this.$refs.root.allVisibleChildItems : [] ;
+			var items = this.filteredItemsFlat.length ? this.filteredItemsFlat : [];
 			if (!items.length) {
 				return [];
 			}
@@ -39993,20 +40407,23 @@ window.selection = new __WEBPACK_IMPORTED_MODULE_4__Selection_js__["a" /* defaul
 				}
 			}.bind(allTagsArray));
 			allTagsArray = [].concat(_toConsumableArray(allTagsArray));
-			allTagsArray = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_3__components_globalFunctions_js__["g" /* uniqBy */])(allTagsArray);
-			allTagsArray = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_3__components_globalFunctions_js__["f" /* sortObjectArrayByProperty */])(allTagsArray, 'name');
+			allTagsArray = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_3__components_globalFunctions_js__["h" /* uniqBy */])(allTagsArray);
+			allTagsArray = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_3__components_globalFunctions_js__["g" /* sortObjectArrayByProperty */])(allTagsArray, 'name');
 			var t3_1 = performance.now();
 			console.log("Call to allTagsComputed_3 took " + (t3_1 - t3_0) + " milliseconds.");
 			return allTagsArray;
 		},
 		allTagsComputed_1b: function allTagsComputed_1b() {
 			var t0 = performance.now();
-			if (!this.allData) {
+			if (this.noItems) {
 				return [];
 			}
 			var allTagsArray = [];
 			// let items = allItems.flattenTree(allItems.root.children);
-			var items = this.allVisibleItems;
+			// FILTER REWRITE
+			// let items = this.allVisibleItems;
+			// let items = (this.$refs.root) ? this.$refs.root.allVisibleChildItems : [] ;
+			var items = this.filteredItemsFlat.length ? this.filteredItemsFlat : [];
 			if (!items.length) {
 				return [];
 			}
@@ -40024,82 +40441,139 @@ window.selection = new __WEBPACK_IMPORTED_MODULE_4__Selection_js__["a" /* defaul
 					}
 				}.bind(allTagsArray));
 			}.bind(allTagsArray));
-			allTagsArray = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_3__components_globalFunctions_js__["f" /* sortObjectArrayByProperty */])(allTagsArray, 'name');
+			allTagsArray = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_3__components_globalFunctions_js__["g" /* sortObjectArrayByProperty */])(allTagsArray, 'name');
 			var t1 = performance.now();
 			console.log("Call to allTagsComputed took " + (t1 - t0) + " milliseconds.");
 			return allTagsArray;
 		},
-		childrenAmount: function childrenAmount() {
-			if (!this.allData) {
+		itemAmount: function itemAmount() {
+			if (this.noItems) {
 				return 0;
 			}
-			var x = this.countChildren(this.allData);
-			return x;
+			// let x = this.countChildren(this.allData);
+			// let x = this.$refs.root.allVisibleChildItems.length;
+			var items = this.filteredItemsFlat.length ? this.filteredItemsFlat : [];
+			return items.length;
 		},
-		doneChildrenAmount: function doneChildrenAmount() {
-			if (!this.allData) {
+		doneItemAmount: function doneItemAmount() {
+			if (this.noItems) {
 				return 0;
 			}
-			return this.countDoneChildren(this.allData);
+			// let doneChildren = this.$refs.root.allVisibleChildItems.filter(child => child.done).length;
+			var items = this.filteredItemsFlat.length ? this.filteredItemsFlat : [];
+			var doneChildren = items.filter(function (child) {
+				return child.done;
+			}).length;
+			return doneChildren;
 		},
-		totalSecLeft: function totalSecLeft() {
-			if (!this.allData || !this.$children.length) {
+		totalPlannedMin: function totalPlannedMin() {
+			if (this.noItems) {
 				return 0;
 			}
-			// console.log('run totalSecLeft');
-			var card = this.$children.find(function (child) {
-				return child.totalSecLeft || child.totalSecLeft == 0;
-			});
-			return card.totalSecLeft;
+			var selfValue = 0;
+			var childrenArray = this.filteredItemsFlat;
+			if (!childrenArray || !childrenArray.length) {
+				return selfValue;
+			}
+			var x = childrenArray.reduce(function (prevVal, child) {
+				return prevVal + parseFloat(child.planned_time);
+			}, selfValue);
+			return x ? parseFloat(x) : 0;
+		},
+		totalPlannedSec: function totalPlannedSec() {
+			return this.totalPlannedMin * 60;
 		},
 		totalUsedSec: function totalUsedSec() {
-			if (!this.allData || !this.$children.length) {
+			if (this.noItems) {
 				return 0;
 			}
-			// console.log('run totalUsedSec');
-			var card = this.$children.find(function (child) {
-				return child.totalUsedSec || child.totalUsedSec == 0;
-			});
-			return card.totalUsedSec;
+			var selfValue = 0;
+			var childrenArray = this.filteredItemsFlat;
+			if (!childrenArray || !childrenArray.length) {
+				return selfValue;
+			}
+			var x = childrenArray.reduce(function (prevVal, child) {
+				return prevVal + parseFloat(child.used_time);
+			}, selfValue);
+			return x ? x : 0;
+		},
+		totalSecLeft: function totalSecLeft() {
+			if (this.noItems) {
+				return 0;
+			}
+			return this.totalPlannedSec - this.totalUsedSec;
 		},
 		totalUsedHourMin: function totalUsedHourMin() {
-			return __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_3__components_globalFunctions_js__["h" /* sec_to_hourmin */])(this.totalUsedSec);
+			return __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_3__components_globalFunctions_js__["i" /* sec_to_hourmin */])(this.totalUsedSec);
 		},
 		totalHourMinLeft: function totalHourMinLeft() {
-			return __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_3__components_globalFunctions_js__["h" /* sec_to_hourmin */])(this.totalSecLeft);
-		},
-		hiddenItemsTotalUsedTime: function hiddenItemsTotalUsedTime() {
-			if (!this.selection.hiddenItems.length) {
-				return 0;
-			}
-			return this.selection.hiddenItems.reduce(function (a, id) {
-				var b = allItems.nodes[id].used_time;
-				return a + b;
-			}, 0);
-		},
-		hiddenItemsTotalPlannedTime: function hiddenItemsTotalPlannedTime() {
-			if (!this.selection.hiddenItems.length) {
-				return 0;
-			}
-			return this.selection.hiddenItems.reduce(function (a, id) {
-				var b = allItems.nodes[id].planned_time;
-				return a + b;
-			}, 0);
+			return __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_3__components_globalFunctions_js__["i" /* sec_to_hourmin */])(this.totalSecLeft);
 		}
 	},
 	methods: {
-		resetDoneData: function resetDoneData() {
-			var dd = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_3__components_globalFunctions_js__["e" /* objectToArray */])(this.nodes).filter(function (item) {
-				return item.done;
-			});
-			dd = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_3__components_globalFunctions_js__["i" /* sortObjectArrayByTwoProperties */])(dd, 'done_date', 'parents_bodies', 'desc', 'asc');
-			this.doneData = dd;
+		itIsADeepestChild: function itIsADeepestChild(id) {
+			if (!id) {
+				console.log('you need an ID');return;
+			}
+			if (this.$refs.root.childrensDeepestChildren.map(function (item) {
+				return item.deepestChild;
+			}).includes(id)) {
+				return true;
+			}return false;
 		},
+		checkFilteredItemsTree: function checkFilteredItemsTree() {
+			//Go through ALL ITEMS and return those that have the tag AND no parent with the tag.
+			__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_3__components_globalFunctions_js__["e" /* objectToArray */])(this.nodes).forEach(function (item) {
+				var target = void 0;
+				var targetHidden = void 0;
+				var hasParentWithTag = void 0;
+				var targetToday = void 0;
+				var topLvlItem = void 0;
+				if (this.selection.nothingSelected()) {
+					topLvlItem = item.depth == 1 ? true : false;
+					if (topLvlItem) {
+						return true;
+					}
+				} else {
+					target = this.selection.tags.every(function (tag) {
+						return allItems.hasTag(item.id, tag);
+					});
+					targetHidden = this.selection.hiddenTags.some(function (tag) {
+						return allItems.hasTag(item.id, tag);
+					});
+					hasParentWithTag = this.selection.tags.some(function (tag) {
+						return allItems.hasParentWithTag(item.id, tag);
+					});
+					targetToday = true;
+					if (selection.filter.includes('today')) {
+						targetToday = false;
+						var diff = moment(item.due_date).diff(moment(), 'days');
+						if (diff <= 0) {
+							targetToday = true;
+						}
+					}
+				}
+				if (target) {
+					console.log('target = [' + item.body + ']\n\t\t\t\t\thidden: ' + targetHidden + '\n\t\t\t\t\tparentwithTag: ' + hasParentWithTag + '\n\t\t\t\t\ttargetToday: ' + targetToday);
+				}
+				// if ( target && !targetHidden && !hasParentWithTag && targetToday )
+				// {
+				// 	return true;
+				// }
+			}.bind(this));
+		},
+
+		// resetDoneData()
+		// {
+		// 	let dd = objectToArray(this.nodes).filter(item => item.done);
+		// 	dd = sortObjectArrayByTwoProperties(dd,'done_date','parents_bodies','desc','asc');
+		// 	this.doneData = dd;
+		// },
 		tagSlugToName: function tagSlugToName(tagslug) {
 			return allItems.tagSlugToName(tagslug);
 		},
 		countChildren: function countChildren(item) {
-			if (!item.children) {
+			if (!item || !item.children) {
 				return 0;
 			}
 			var children = allItems.flattenTree(item.children);
@@ -40219,16 +40693,14 @@ window.selection = new __WEBPACK_IMPORTED_MODULE_4__Selection_js__["a" /* defaul
 			var sel = void 0;
 			if (direction == 'next') {
 				if (!id || id == allItems.root.id) {
-					sel = allItems.root.children_order[0];
+					sel = this.$refs.root.childrenOrder[0];
 				} else {
 					sel = allItems.nextItemId(id);
 				}
 			} else if (direction == 'prev') {
-				var olderSiblingId = allItems.olderSiblingId(id);
-				var olderSibling = allItems.nodes[olderSiblingId];
 				if (!id || id == allItems.root.id) {
-					var l = allItems.root.children_order.length;
-					sel = allItems.root.children_order[l - 1];
+					var l = this.$refs.root.childrenOrder.length;
+					sel = this.$refs.root.childrenOrder[l - 1];
 				} else {
 					sel = allItems.prevItemId(id);
 				}
@@ -40236,8 +40708,25 @@ window.selection = new __WEBPACK_IMPORTED_MODULE_4__Selection_js__["a" /* defaul
 			selection.selectedId = sel;
 			document.getElementById('card-' + sel).scrollIntoViewIfNeeded();
 		},
+		findDeepestVisibleChild: function findDeepestVisibleChild(id) {
+			var _this = this;
+
+			id = id ? id : selection.selectedId;
+			var item = allItems.nodes[id];
+			var children = item.children.filter(function (child) {
+				return !_this.hiddenItemIds.includes(child.id);
+			});
+			if (!children.length) {
+				return id;
+			}
+			var deepestId = children[children.length - 1].id;
+			return this.findDeepestVisibleChild(deepestId);
+		},
 		setToday: function setToday(id) {
 			id = id ? id : selection.selectedId;
+			if (allItems.hasParentDueToday(id)) {
+				console.log('parent is already due');return;
+			}
 			allItems.setDueDate(id);
 		},
 		showAddNewItem: function showAddNewItem(id, addAs) {
@@ -40284,14 +40773,14 @@ window.selection = new __WEBPACK_IMPORTED_MODULE_4__Selection_js__["a" /* defaul
 			});
 		},
 		patch: function patch(id, arg, value) {
-			var _this = this;
+			var _this2 = this;
 
-			if (allItems.isTopLvlItemInFilteredRoot(id)) {
-				if (arg == 'children_order' || arg == 'parent_id') {
-					console.log("you can't sync a toplvlItem when filtering");
-					return;
-				}
-			}
+			// if(allItems.isTopLvlItemInFilteredRoot(id)){ 
+			// 	if(arg == 'children_order' || arg == 'parent_id'){
+			// 		console.log("you can't sync a toplvlItem when filtering");
+			// 		return;
+			// 	}
+			// }
 			this.startPatching();
 			var patchObj = {};
 			var patchVal = value ? value : allItems.nodes[id][arg];
@@ -40303,7 +40792,7 @@ window.selection = new __WEBPACK_IMPORTED_MODULE_4__Selection_js__["a" /* defaul
 				console.log('patched [' + allItems.nodes[id].body + '].' + arg + ' = ' + patchObj[arg] + ';');
 				this.stopPatching();
 			}, function (response) {
-				_this.patching = 'error';
+				_this2.patching = 'error';
 			});
 		},
 		patchTag: function patchTag(id, tags, requestType) {
@@ -40325,10 +40814,6 @@ window.selection = new __WEBPACK_IMPORTED_MODULE_4__Selection_js__["a" /* defaul
 					return;
 				}
 			}
-			if (tags == 't' || tags == 'T' || tags == 'today' || tags == 'Today') {
-				this.setToday(id);
-				return;
-			}
 			this.startPatching();
 			var patchObj = {};
 			patchObj['tags'] = tags;
@@ -40341,9 +40826,10 @@ window.selection = new __WEBPACK_IMPORTED_MODULE_4__Selection_js__["a" /* defaul
 				this.$http.get('/api/itemtags/' + id, { type: 'tags' })
 				// Codementor: Request type doesn't work......
 				.then(function (updatedTagList) {
-					console.log('updatedTagList');
-					console.log(updatedTagList.data);
 					allItems.nodes[id].tagged = updatedTagList.data;
+					console.log('updatedTagList of [' + allItems.nodes[id].body + '] with: ' + updatedTagList.data.map(function (t) {
+						return t.tag_name;
+					}) + ';');
 				});
 				this.stopPatching();
 			});
@@ -40383,13 +40869,13 @@ window.selection = new __WEBPACK_IMPORTED_MODULE_4__Selection_js__["a" /* defaul
 			this.popout(id, 'confirm-delete');
 		},
 		deleteItemApi: function deleteItemApi(idOrArray) {
-			var _this2 = this;
+			var _this3 = this;
 
 			this.startPatching();
 			if (Array.isArray(idOrArray) && idOrArray.length) {
 				var array = idOrArray; // It's an array!
 				array.forEach(function (id) {
-					_this2.deleteItemApi(id);
+					_this3.deleteItemApi(id);
 				});
 			} else {
 				var id = idOrArray; // It's an ID!
@@ -40474,40 +40960,42 @@ window.selection = new __WEBPACK_IMPORTED_MODULE_4__Selection_js__["a" /* defaul
 					if (!allItems.nodes[item.id]) {
 						allItems.nodes[item.id] = item;
 					}
-					// if(!allItems.doneitems.includes(item)){ allItems.doneitems.push(item); }
 				});
-				this.resetDoneData();
-				allItems.filterItems('journal', null, operator);
+				// Codementor
+				this.selection.view = null;
+				this.selection.view = 'journal';
 				this.loading = false;
 			});
 		},
-		fetchTagged: function fetchTagged(tags, requestType) {
-			/* requestType can be:
-   	'withAnyTag': fetch articles with any tag listed
-   	'withAllTags': only fetch articles with all the tags
-   	'tagNames': fetch all existing tags
-   */
-			this.loading = true;
-			var request = {};
-			requestType = !requestType ? 'withAnyTag' : requestType;
-			request['tags'] = tags;
-			request['type'] = requestType;
-			console.log('request');
-			console.log(request);
-			this.$http.post('/api/itemtags/fetchTagged', request).then(function (response) {
-				var aaa = response.data;
-				aaa = json(aaa);
-				console.log('fetched tagged items!');
-				console.log(response);
-				console.log(response.json());
-				console.log(aaa);
-				allItems.filteredTagItems = aaa;
-				allItems.nodes = aaa;
-				allItems.root = aaa;
-				this.allData = aaa;
-				this.loading = false;
-			});
-		},
+
+
+		// fetchTagged(tags, requestType){
+		// 	/* requestType can be:
+		// 		'withAnyTag': fetch articles with any tag listed
+		// 		'withAllTags': only fetch articles with all the tags
+		// 		'tagNames': fetch all existing tags
+		// 	*/
+		// 	this.loading = true;
+		// 	let request = {};
+		// 	requestType = (!requestType) ? 'withAnyTag' : requestType;
+		// 	request['tags'] = tags;
+		// 	request['type'] = requestType;
+		// 	console.log('request');
+		// 	console.log(request);
+		// 	this.$http.post('/api/itemtags/fetchTagged', request).then(function(response){
+		// 		let aaa = response.data;
+		// 		aaa = json(aaa);
+		// 		console.log('fetched tagged items!');
+		// 		console.log(response);
+		// 		console.log(response.json());
+		// 		console.log(aaa);
+		// 		allItems.filteredTagItems = aaa;
+		// 		allItems.nodes = aaa;
+		// 		allItems.root = aaa;
+		// 		this.allData = aaa;
+		// 		this.loading = false;
+		// 	});
+		// },
 		filterItems: function filterItems(keyword, value, event) {
 			// debugger;
 			var operator = null;
@@ -40522,18 +41010,24 @@ window.selection = new __WEBPACK_IMPORTED_MODULE_4__Selection_js__["a" /* defaul
 			if (!operator) {
 				selection.clear();
 			}
-
 			if (keyword == 'journal' && !this.fetchedDone) {
 				this.fetchDone(null, operator);
 			}
-			allItems.filterItems(keyword, value, operator);
+			selection.addKeywords(keyword, value, operator);
+			// FILTER REWRITE
+			// allItems.filterItems(keyword,value,operator);
+		},
+		removeFilter: function removeFilter(tag) {
+			selection.hiddenTags = selection.hiddenTags.filter(function (x) {
+				return x !== tag;
+			});
 		},
 		duplicate: function duplicate(id) {
 			id = !id ? selection.selectedId : id;
 			allItems.duplicate(id);
 		},
 		postNewItem: function postNewItem(newItem, index, addNextItemAs, addTags, duplication) {
-			var _this3 = this;
+			var _this4 = this;
 
 			this.startPatching();
 			// Prepare children_order for sending to DB.
@@ -40570,7 +41064,7 @@ window.selection = new __WEBPACK_IMPORTED_MODULE_4__Selection_js__["a" /* defaul
 				allItems.addItem(storedItem, index, addNextItemAs, addTags, duplication);
 				this.stopPatching();
 			}, function (response) {
-				_this3.patching = 'error';
+				_this4.patching = 'error';
 			});
 		},
 		test: function test(id) {
@@ -40580,31 +41074,6 @@ window.selection = new __WEBPACK_IMPORTED_MODULE_4__Selection_js__["a" /* defaul
 			this.patchTag(id, 'bloem', 'tag');
 		}
 	},
-	mounted: function mounted() {
-		eventHub.$on('confirm-ok', function (id) {
-			console.log('computer says "ok"...');
-			console.log(id);
-			allItems.deleteItem(id);
-		});
-		eventHub.$on('confirm-cancel', function (id) {
-			console.log('computer says "no"...');
-			console.log(id);
-			return;
-		});
-		window.onscroll = function () {
-			if (!selection.filter.length && !selection.tags.length) {
-				return;
-			}
-			var el = document.getElementsByClassName('line');
-			// let el = $('.navigation');
-			if (!__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_3__components_globalFunctions_js__["a" /* isElementInViewport */])(el[0])) {
-				$("body").addClass("scrolled-down");
-			} else {
-				$("body").removeClass("scrolled-down");
-			}
-		};
-	},
-
 	http: {
 		headers: {
 			'X-CSRF-TOKEN': document.querySelector('#csrf-token').getAttribute('content')
@@ -44624,7 +45093,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
         _vm.selectItem(_vm.item)
       }
     }
-  }, [_vm._v(_vm._s(_vm.item.completion_memo))]) : _vm._e()]), _vm._v(" "), (false) ? _c('span', [_vm._v("\n\t\t\t\t(" + _vm._s(_vm.item.id) + ") D-" + _vm._s(_vm.item.depth) + ")\n\t\t\t\t"), (_vm.item.children_order.length) ? _c('span', [_vm._v("\n\t\t\t\t\t[" + _vm._s(_vm.item.children_order) + "]\n\t\t\t\t")]) : _vm._e()]) : _vm._e(), _vm._v(" "), (_vm.item.id == _vm.basis.editingItem) ? _c('form', {
+  }, [_vm._v(_vm._s(_vm.item.completion_memo))]) : _vm._e()]), _vm._v(" "), (false) ? _c('span', [_vm._v("\n\t\t\t\t(" + _vm._s(_vm.item.id) + ") D-" + _vm._s(_vm.item.depth) + ")\n\t\t\t\t"), (_vm.item.children_order.length) ? _c('span', [_vm._v("\n\t\t\t\t\t[" + _vm._s(_vm.item.children_order) + "]\n\t\t\t\t")]) : _vm._e(), _vm._v(" "), _c('span')]) : _vm._e(), _vm._v(" "), (_vm.item.id == _vm.basis.editingItem) ? _c('form', {
     staticClass: "updatebox",
     attrs: {
       "action": "update",
@@ -44951,11 +45420,12 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     }],
     staticClass: "children",
     style: ((_vm.addingNewAsFirstChild) ? 'order:3;' : '')
-  }, _vm._l((_vm.item.children), function(childCard) {
+  }, _vm._l((_vm.visibleChildren), function(childCard) {
     return _c('Card', {
       key: childCard.id,
       attrs: {
-        "item": childCard
+        "item": childCard,
+        "parentsChildrenOrder": _vm.childrenOrder
       }
     })
   })) : _vm._e(), _vm._v(" "), (_vm.showAddNewBox || (_vm.listIsEmpty && _vm.basis.selection.view != 'journal')) ? _c('form', {
@@ -45219,13 +45689,13 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
         name: "focus",
         rawName: "v-focus"
       }],
-      staticClass: "btn-ok",
+      staticClass: "btn-ok btn-warning",
       on: {
         "click": function($event) {
           _vm.popoutCall('confirm-ok', item)
         }
       }
-    }, [_vm._v("OK")])])])]) : _vm._e()
+    }, [_vm._v("Delete")])])])]) : _vm._e()
   }), _vm._v(" "), (_vm.popouts.guide) ? _c('div', {
     staticClass: "popout"
   }, [_c('div', {
