@@ -78,11 +78,16 @@ label{
 .toggle-div{
     margin-right: 0.3em;
     display: flex;
-    width: 1.6em;
-    div, input{
+    div, input, label{
         margin: 0; // reset margins
         height: auto;
-        width: 100%;
+        width: 1.6em;
+    }
+    &.both{
+        margin-left: -0.3em;
+        input {
+            margin-left: 0.4em;
+        }
     }
 }
 .toggle{
@@ -240,9 +245,13 @@ label{
         border: none;
         font-size: 1.5em;
         color: $theme-color;
+        margin: 0.5rem;
     }
     .delete{
         color: rgba(231, 76, 60, 0.3);
+    }
+    .edit{
+        font-size: 1em;
     }
 }
 .panel-body{
@@ -306,6 +315,17 @@ label{
 form.addnewbox{
     margin-left: 1.9em;
     border-bottom: thin solid rgba(245, 215, 110, 0.7);
+}
+.mobile form.addnewbox{
+    position: fixed;
+    background-color: white;
+    z-index: 999;
+    top: 0;
+    width: 100vw !important;
+    left: 0;
+    margin: 0;
+    border-bottom: thin solid rgba(245, 215, 110, 1);
+    padding: 0.8em;
 }
 form.addnewbox.child{
     margin-left: 3.8em;  

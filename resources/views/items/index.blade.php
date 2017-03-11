@@ -14,7 +14,7 @@
 </head>
 <body>
 {{-- <a href="{{route('home')}}">Go home</a> --}}
-<div id="items-app">
+<div id="items-app" :class="{'mobile':mobile}">
 
 <div id="loading-icon">
 	<div class="loader loader--style1" title="loading" alt="Loading"

@@ -38262,6 +38262,14 @@ __WEBPACK_IMPORTED_MODULE_0_jquery___default.a.getJSON('/api/items', function (f
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
 
 // import Morph from '../components/valueMorphers.js'
 // window.Morph = new Morph();
@@ -38926,6 +38934,9 @@ __WEBPACK_IMPORTED_MODULE_0_jquery___default.a.getJSON('/api/items', function (f
 			}
 		},
 		blurOnEdit: function blurOnEdit(item) {
+			if (vm.mobile) {
+				this.doneEdit();
+			}
 			if (this.$root.cancelThroughKeydown) {
 				return;
 			}
@@ -38941,6 +38952,9 @@ __WEBPACK_IMPORTED_MODULE_0_jquery___default.a.getJSON('/api/items', function (f
 			// Codementor: is there any better way than this?
 		},
 		blurOnAddNew: function blurOnAddNew(item) {
+			if (vm.mobile) {
+				this.addNew();
+			}
 			if (this.$root.cancelThroughKeydown) {
 				return;
 			}
@@ -39032,6 +39046,9 @@ __WEBPACK_IMPORTED_MODULE_0_jquery___default.a.getJSON('/api/items', function (f
 			var addTags = void 0;
 
 			newItem = this.newItem;
+			if (!newItem.body) {
+				return;
+			}
 			newItem.parent_id = this.item.parent_id ? this.item.parent_id : allItems.root.id;
 			newItem.depth = this.item.depth;
 
@@ -44984,43 +45001,10 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
         editing: _vm.item.id == _vm.basis.editingItem,
     }
   }, [(!_vm.journalView) ? _c('div', {
-    staticClass: "toggle-div"
-  }, [(_vm.item.children_order.length == 0 || _vm.item.done == true || _vm.allChildrenDone) ? _c('input', {
-    directives: [{
-      name: "model",
-      rawName: "v-model",
-      value: (_vm.item.done),
-      expression: "item.done"
-    }],
-    staticClass: "toggle",
-    attrs: {
-      "type": "checkbox"
-    },
-    domProps: {
-      "checked": Array.isArray(_vm.item.done) ? _vm._i(_vm.item.done, null) > -1 : (_vm.item.done)
-    },
-    on: {
-      "change": function($event) {
-        _vm.updateDone(_vm.item.id)
-      },
-      "__c": function($event) {
-        var $$a = _vm.item.done,
-          $$el = $event.target,
-          $$c = $$el.checked ? (true) : (false);
-        if (Array.isArray($$a)) {
-          var $$v = null,
-            $$i = _vm._i($$a, $$v);
-          if ($$c) {
-            $$i < 0 && (_vm.item.done = $$a.concat($$v))
-          } else {
-            $$i > -1 && (_vm.item.done = $$a.slice(0, $$i).concat($$a.slice($$i + 1)))
-          }
-        } else {
-          _vm.item.done = $$c
-        }
-      }
+    class: {
+      'toggle-div': true, 'both': _vm.item.children_order.length > 0 && (_vm.item.done == true || _vm.allChildrenDone)
     }
-  }) : _vm._e(), _vm._v(" "), _c('input', {
+  }, [_c('input', {
     directives: [{
       name: "model",
       rawName: "v-model",
@@ -45061,6 +45045,41 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     style: ((_vm.allChildrenDone) ? 'margin-left: 0.1em; margin-right: -0.5em;' : ''),
     attrs: {
       "for": 'show_children_' + _vm.item.id
+    }
+  }) : _vm._e(), _vm._v(" "), (_vm.item.children_order.length == 0 || _vm.item.done == true || _vm.allChildrenDone) ? _c('input', {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: (_vm.item.done),
+      expression: "item.done"
+    }],
+    staticClass: "toggle",
+    attrs: {
+      "type": "checkbox"
+    },
+    domProps: {
+      "checked": Array.isArray(_vm.item.done) ? _vm._i(_vm.item.done, null) > -1 : (_vm.item.done)
+    },
+    on: {
+      "change": function($event) {
+        _vm.updateDone(_vm.item.id)
+      },
+      "__c": function($event) {
+        var $$a = _vm.item.done,
+          $$el = $event.target,
+          $$c = $$el.checked ? (true) : (false);
+        if (Array.isArray($$a)) {
+          var $$v = null,
+            $$i = _vm._i($$a, $$v);
+          if ($$c) {
+            $$i < 0 && (_vm.item.done = $$a.concat($$v))
+          } else {
+            $$i > -1 && (_vm.item.done = $$a.slice(0, $$i).concat($$a.slice($$i + 1)))
+          }
+        } else {
+          _vm.item.done = $$c
+        }
+      }
     }
   }) : _vm._e()]) : _vm._e(), _vm._v(" "), (_vm.journalView) ? _c('div', {}, [_vm._v("・")]) : _vm._e(), _vm._v(" "), _c('div', {
     class: {
@@ -45384,7 +45403,14 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     _vm.basis.editingItemTags != _vm.item.id &&
     _vm.basis.selection.selectedId == _vm.item.id) ? _c('div', {
     staticClass: "item-nav"
-  }, [(!_vm.item.done) ? _c('button', {
+  }, [(_vm.basis.mobile) ? _c('button', {
+    staticClass: "edit",
+    on: {
+      "click": function($event) {
+        _vm.startEdit(_vm.item)
+      }
+    }
+  }, [_vm._v("\n\t\t\t\t\tEdit\n\t\t\t\t")]) : _vm._e(), _vm._v(" "), (!_vm.item.done) ? _c('button', {
     staticClass: "timer",
     on: {
       "click": function($event) {

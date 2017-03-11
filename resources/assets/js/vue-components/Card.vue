@@ -40,16 +40,10 @@
 		}"
 	>
 		<div
-			class="toggle-div"
+			class=""
 			v-if="!journalView"
+			:class="{'toggle-div':true, 'both':item.children_order.length>0&&(item.done == true || allChildrenDone)}"
 		>
-			<input
-				class="toggle"
-				type="checkbox"
-				v-if="item.children_order.length==0 || item.done == true || allChildrenDone"
-				v-model="item.done"
-				@change="updateDone(item.id)"
-			>
 			<input
 				type="checkbox"
 				class="styled-check"
@@ -63,6 +57,13 @@
 				:style="(allChildrenDone) ? 'margin-left: 0.1em; margin-right: -0.5em;':''"
 				v-if="item.children_order.length>0"
 			></label>
+			<input
+				class="toggle"
+				type="checkbox"
+				v-if="item.children_order.length==0 || item.done == true || allChildrenDone"
+				v-model="item.done"
+				@change="updateDone(item.id)"
+			>
 		</div>
 		<div
 			class=""
@@ -267,6 +268,13 @@
 					&& basis.editingItemTags != item.id
 					&& basis.selection.selectedId == item.id"
 			>
+				<button
+					v-if="basis.mobile"
+					class="edit"
+					@click="startEdit(item)"
+				>
+					Edit
+				</button>
 				<button
 					v-if="!item.done"
 					class="timer"
@@ -1019,6 +1027,7 @@ export default {
 	    },
 	    blurOnEdit(item)
 	    {
+	    	if(vm.mobile){ this.doneEdit(); }
 	    	if(this.$root.cancelThroughKeydown){ return; }
 	    	let self = this;
 	    	setTimeout(function()
@@ -1038,6 +1047,7 @@ export default {
 	    },
 	    blurOnAddNew(item)
 	    {
+	    	if(vm.mobile){ this.addNew(); }
 	    	if(this.$root.cancelThroughKeydown){ return; }
 	    	let self = this;
 	    	setTimeout(function()
@@ -1147,8 +1157,9 @@ export default {
 			let newItem;
 			let index;
 			let addTags;
-
+			
 			newItem = this.newItem;
+			if(!newItem.body){ return; }
 			newItem.parent_id = (this.item.parent_id) ? this.item.parent_id : allItems.root.id;
 			newItem.depth = this.item.depth;
 
