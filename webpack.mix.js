@@ -22,4 +22,10 @@ mix
    .copy('resources/assets/svg', 'public/css/svg')
    .copy('resources/assets/img', 'public/img')
    // Copy MATERIAL FONT
-   .copy('node_modules/material-design-iconic-font/dist/fonts', 'public/css/fonts');
+   .copy('node_modules/material-design-iconic-font/dist/fonts', 'public/css/fonts')
+   .browserSync({
+      browser: "google chrome",
+      proxy: "lucaban.dev",
+   })
+   .disableNotifications();
+   ;

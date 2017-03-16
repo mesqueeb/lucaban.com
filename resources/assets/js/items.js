@@ -7,6 +7,9 @@
 
 // IMPORT Own jQuery replacement functions
 	import { arrayToString, hasClass, btnEffect, isElementInViewport } from './components/globalFunctions.js';
+	import autosize from 'autosize';
+	import autosizeInput from 'autosize-input';
+
 	window.btnEffect = btnEffect;
 	// Make hasClass(el) available as el.hasClass();
 	window.Element.prototype.hasClass = function(config){ return hasClass(this,config)};
@@ -79,10 +82,31 @@ $.getJSON('/api/items',function(fetchedData){
 		},
 	});
 	Vue.directive('focus', {
-		inserted: function (el) {
+		inserted(el, binding)
+		{
+			if(vm.mobile && !binding.modifiers.mobile){ return; }
 			el.focus()
 		}
 	});
+	Vue.directive('autoheight', {
+		inserted(el, binding)
+		{
+			Vue.nextTick(function ()
+			{
+				autosize(el);
+			});
+		}
+	});
+	Vue.directive('autowidth', {
+		inserted(el, binding)
+		{
+			Vue.nextTick(function ()
+			{
+				autosizeInput(el);
+			});
+		}
+	});	
+
 
 	vm.patching = false;
 	vm.loading = false;

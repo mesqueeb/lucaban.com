@@ -9,6 +9,7 @@
 		:item="item"
 	></Popout-Confirmation> -->
 
+<!-- Popout DELETE -->
 	<div v-if="popouts.delete.length"
 		v-for="item in popouts.delete"
 		class="popout"
@@ -30,7 +31,8 @@
 			</div>
 		</div>
 	</div>
-
+<!-- Popout /DELETE -->
+<!-- Popout GUIDE -->
 	<div v-if="popouts.guide"
 		class="popout"
 	>
@@ -56,8 +58,8 @@
 			</div>
 		</div>
 	</div>
-
-
+<!-- Popout /GUIDE -->
+<!-- Popout TIMER -->
 	<div v-if="popouts.timer.length"
 		v-for="item in popouts.timer"
 		class="popout"
@@ -149,19 +151,100 @@
 			</div>
 		</div>
 	</div>
+<!-- Popout /TIMER -->
+<!-- Popout EDIT -->
+	<div v-if="popouts.edit.length"
+		v-for="item in popouts.edit"
+		class="popout"
+	>
+		<div>
+			<div class="body">
+				<form
+					action="update"
+					class="updatebox"
+					:id="'updatebox-'+item.id"
+					
+					@submit.prevent="card.doneEdit(item)"
+				>
+					<div class="update-body">
+						<textarea
+							v-focus
+							v-autoheight
+							class="edititem-body"
+							v-model="item.body"
+							@blur="card.blurOnEdit(item)"
+							@keydown="card.keydownOnEdit(item, $event, 'body')"
+						></textarea>
+					</div>
+					<div class="update-tags">
+						<div
+							class="update-planned-time"
+						>
+							<span>Duration:</span>
+							<button
+								:class="{ currentDuration: item.planned_time == 10, 'planned-time': true }"
+								@click.prevent="card.setPlannedTime(item, $event)"
+								@keydown="card.keydownOnEdit(item, $event, 'planned-time')"
+								@blur="card.blurOnEdit(item)"
+								value="10"
+							>10 min</button>
+							<button
+								:class="{ currentDuration: item.planned_time == 15, 'planned-time': true }"
+								@click.prevent="card.setPlannedTime(item, $event)"
+								@keydown="card.keydownOnEdit(item, $event, 'planned-time')"
+								@blur="card.blurOnEdit(item)"
+								value="15"
+							>15 min</button>
+							<button
+								:class="{ currentDuration: item.planned_time == 30, 'planned-time': true }"
+								@click.prevent="card.setPlannedTime(item, $event)"
+								@keydown="card.keydownOnEdit(item, $event, 'planned-time')"
+								@blur="card.blurOnEdit(item)"
+								value="30"
+							>30 min</button>
+							<button
+								:class="{ currentDuration: item.planned_time == 60, 'planned-time': true }"
+								@click.prevent="card.setPlannedTime(item, $event)"
+								@keydown="card.keydownOnEdit(item, $event, 'planned-time')"
+								@blur="card.blurOnEdit(item)"
+								value="60"
+							>1 hour</button>
+							<div><input
+								class="planned-time" 
+								type="number"
+								v-show="true"
+								v-model="item.planned_time"
+								@blur="card.blurOnEdit(item)"
+								@keydown="card.keydownOnEdit(item, $event, 'planned-time')"
+							/>min</div>
+						</div>
+					</div>
+				</form>
+			</div>
+			<div class="nav">
+				<button
+					class="btn"
+					@click="card.cancelEdit(item)"
+				>Cancel</button>
+				<button
+					class="btn"
+					@click="card.doneEdit(item)"
+				>Save</button>
+			</div>
+		</div>
+	</div>
+<!-- Popout /EDIT -->
 </div>
 </template>
 <script>
 // import PopoutConfirmation from './PopoutConfirmation.vue';
 import { sec_to_hhmmss, momentCalendar } from '../components/valueMorphers2.js'
+import autosize from 'autosize';
 
 export default {
     name: 'Popouts',
     template: '#popouts-template',
     props: ['popouts'],
-    // components: {
-    // 	PopoutConfirmation
-    // },
 	data(){
 		return {
 			timerRunning: true,
@@ -183,9 +266,20 @@ export default {
 		eventHub.$on('clearAll', this.clearAll);
 	},
 	computed: {
+		card()
+		{
+			return this.$root.$refs.root;
+		},
+		basis()
+		{
+			return this.$root;
+		},
 		popoutExists()
 		{
-			return (this.popouts.timer.length || this.popouts.delete.length || this.popouts.guide);
+			return ( this.popouts.timer.length
+					|| this.popouts.delete.length
+					|| this.popouts.edit.length
+					|| this.popouts.guide );
 		},
 	},
     methods: {
@@ -224,8 +318,9 @@ export default {
         },
         clearAll(event)
         {
-        	vm.popouts.timer.forEach(item => this.closeTimer(item));
         	vm.popouts.delete = [];
+        	vm.popouts.timer.forEach(item => this.closeTimer(item));
+        	vm.popouts.edit.forEach(item => vm.cancelEdit(item));
         	vm.popouts.guide = false;
         	window.timers = {};
         },
@@ -298,11 +393,5 @@ export default {
 			this.removePopout(item);
 		},
     },
- //    ready() {
-	// 	var vm = this;		
-	// 	window.addEventListener('keydown', function(e) {
-
-	// 	});
-	// },
 }
 </script>

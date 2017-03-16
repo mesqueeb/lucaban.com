@@ -5,7 +5,7 @@
 
 	<meta charset="UTF-8">
 	<meta name="csrf-token" id="csrf-token" content="{{ csrf_token() }}">
-	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	<meta name="viewport" content="width=device-width, initial-scale=1"">
 	<link rel="stylesheet" href="/css/items.css">
 	{{-- <link rel="stylesheet" href="/css/fonts/material-design-iconic-font.min.css"> --}}
 
@@ -13,6 +13,8 @@
 
 </head>
 <body>
+<div style="position: fixed; height:100vh; width:100vw; top:0; left:0;">
+<div style="height:calc(100vh - 1px); width:100vw; z-index: 1; overflow-y: scroll; -webkit-overflow-scrolling: touch;">
 {{-- <a href="{{route('home')}}">Go home</a> --}}
 <div id="items-app" :class="{'mobile':mobile}">
 
@@ -48,6 +50,7 @@
 			>Journal</a>
 			<a href="#"
 				@click="popouts.guide = true"
+				v-if="!mobile"
 			>?</a>
 		</div>
 		<div class="tag-menu">
@@ -110,7 +113,9 @@
 </div>
 
 
-</div>
+</div>{{-- /Items App --}}
+</div>{{-- /Inner Wrapper  --}}
+</div>{{-- /Outer Wrapper  --}}
 <script src="js/items.js"></script>
 </body>
 </html>

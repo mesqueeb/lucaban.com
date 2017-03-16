@@ -38,8 +38,8 @@ keystroke(k)
 	if(k == 'shift_tab'){ vm.unindent()} else
 	if(k == 'enter'){ vm.showAddNewItem()} else
 	if(k == 'shift_enter'){ vm.showAddNewItem(null, 'child')} else
-	if(k == 'meta_enter'){ eventHub.$emit('startEdit')} else
-	if(k == 'ctrl_u'){ eventHub.$emit('startEdit')} else
+	if(k == 'meta_enter'){ vm.startEdit()} else
+	if(k == 'ctrl_u'){ vm.startEdit()} else
 	if(k == 't'){ vm.setToday()} else
 	if(k == 'shift_t'){ vm.startEditTags()} else
 	if(k == 's'){ vm.addTimer()} else
@@ -116,12 +116,12 @@ invokeKeyBindingListener()
 			{ // Escape
 				if(vm.editingItem)
 				{
-					eventHub.$emit('escapeOnEditButtonFocus');
+					vm.cancelEdit;
 					console.log('escapeOnEditButtonFocus');
 				}
 				else if(vm.addingNewUnder)
 				{
-					eventHub.$emit('escapeOnNewButtonFocus');
+					vm.cancelAddNew;
 					console.log('escapeOnNewButtonFocus');
 				}
 			}

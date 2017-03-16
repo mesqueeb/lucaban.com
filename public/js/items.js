@@ -25162,7 +25162,7 @@ var _class = function () {
 			}
 			this.attachParentBody(item.id);
 			this.autoCalculateDoneState(item.parent_id);
-			if (!duplication) {
+			if (!duplication && addNextItemAs != 'stop') {
 				vm.showAddNewItem(item.id, addNextItemAs);
 			}
 		}
@@ -37586,25 +37586,29 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_jquery__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_jquery___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_jquery__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__components_globalFunctions_js__ = __webpack_require__(5);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_linkifyjs__ = __webpack_require__(173);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_linkifyjs___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_linkifyjs__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_linkifyjs_html__ = __webpack_require__(172);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_linkifyjs_html___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_3_linkifyjs_html__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_linkifyjs_plugins_hashtag__ = __webpack_require__(183);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_linkifyjs_plugins_hashtag___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_4_linkifyjs_plugins_hashtag__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5_moment__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5_moment___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_5_moment__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6_flatpickr__ = __webpack_require__(171);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6_flatpickr___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_6_flatpickr__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__components_flatPickrOptions_js__ = __webpack_require__(10);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8_vue__ = __webpack_require__(7);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8_vue___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_8_vue__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9_vue_resource__ = __webpack_require__(195);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9_vue_resource___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_9_vue_resource__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__vue_components_vueFilters_js__ = __webpack_require__(169);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_11__vue_components_VueListMaster_js__ = __webpack_require__(168);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_12__vue_components_dataTree_js__ = __webpack_require__(20);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_13__components_ListAppKeyBindings_js__ = __webpack_require__(166);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_autosize__ = __webpack_require__(14);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_autosize___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_autosize__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_autosize_input__ = __webpack_require__(142);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_autosize_input___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_3_autosize_input__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_linkifyjs__ = __webpack_require__(173);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_linkifyjs___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_4_linkifyjs__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5_linkifyjs_html__ = __webpack_require__(172);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5_linkifyjs_html___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_5_linkifyjs_html__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6_linkifyjs_plugins_hashtag__ = __webpack_require__(183);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6_linkifyjs_plugins_hashtag___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_6_linkifyjs_plugins_hashtag__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7_moment__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7_moment___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_7_moment__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8_flatpickr__ = __webpack_require__(171);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8_flatpickr___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_8_flatpickr__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__components_flatPickrOptions_js__ = __webpack_require__(10);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10_vue__ = __webpack_require__(7);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10_vue___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_10_vue__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_11_vue_resource__ = __webpack_require__(195);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_11_vue_resource___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_11_vue_resource__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_12__vue_components_vueFilters_js__ = __webpack_require__(169);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_13__vue_components_VueListMaster_js__ = __webpack_require__(168);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_14__vue_components_dataTree_js__ = __webpack_require__(20);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_15__components_ListAppKeyBindings_js__ = __webpack_require__(166);
 // IMPORT jQuery
 
 
@@ -37613,6 +37617,9 @@ window.$ = __WEBPACK_IMPORTED_MODULE_0_jquery___default.a;
 window.jQuery = __WEBPACK_IMPORTED_MODULE_0_jquery___default.a;
 
 // IMPORT Own jQuery replacement functions
+
+
+
 
 window.btnEffect = __WEBPACK_IMPORTED_MODULE_1__components_globalFunctions_js__["b" /* btnEffect */];
 // Make hasClass(el) available as el.hasClass();
@@ -37624,9 +37631,9 @@ window.Element.prototype.hasClass = function (config) {
 
 
  // optional
-window.linkifyHtml = __WEBPACK_IMPORTED_MODULE_3_linkifyjs_html___default.a;
-window.hashtag = __WEBPACK_IMPORTED_MODULE_4_linkifyjs_plugins_hashtag___default.a;
-__WEBPACK_IMPORTED_MODULE_4_linkifyjs_plugins_hashtag___default()(__WEBPACK_IMPORTED_MODULE_2_linkifyjs__);
+window.linkifyHtml = __WEBPACK_IMPORTED_MODULE_5_linkifyjs_html___default.a;
+window.hashtag = __WEBPACK_IMPORTED_MODULE_6_linkifyjs_plugins_hashtag___default.a;
+__WEBPACK_IMPORTED_MODULE_6_linkifyjs_plugins_hashtag___default()(__WEBPACK_IMPORTED_MODULE_4_linkifyjs__);
 
 // IMPORT Moment
 // having trouble with these:
@@ -37635,21 +37642,21 @@ __WEBPACK_IMPORTED_MODULE_4_linkifyjs_plugins_hashtag___default()(__WEBPACK_IMPO
 // moment-countdown/dist/moment-countdown.min.js
 // var moment = require('moment');
 
-window.moment = __WEBPACK_IMPORTED_MODULE_5_moment___default.a;
+window.moment = __WEBPACK_IMPORTED_MODULE_7_moment___default.a;
 
 // IMPORT FlatPickr
 
-window.Flatpickr = __WEBPACK_IMPORTED_MODULE_6_flatpickr___default.a;
+window.Flatpickr = __WEBPACK_IMPORTED_MODULE_8_flatpickr___default.a;
 
 
 // Vue Basics
 
-window.Vue = __WEBPACK_IMPORTED_MODULE_8_vue___default.a;
+window.Vue = __WEBPACK_IMPORTED_MODULE_10_vue___default.a;
 
-__WEBPACK_IMPORTED_MODULE_8_vue___default.a.use(__WEBPACK_IMPORTED_MODULE_9_vue_resource___default.a);
+__WEBPACK_IMPORTED_MODULE_10_vue___default.a.use(__WEBPACK_IMPORTED_MODULE_11_vue_resource___default.a);
 
 
-__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_10__vue_components_vueFilters_js__["a" /* default */])(__WEBPACK_IMPORTED_MODULE_8_vue___default.a);
+__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_12__vue_components_vueFilters_js__["a" /* default */])(__WEBPACK_IMPORTED_MODULE_10_vue___default.a);
 // Vue Components
 
 
@@ -37667,12 +37674,12 @@ __WEBPACK_IMPORTED_MODULE_0_jquery___default.a.getJSON('/api/items', function (f
 	console.log('fetched all items');
 
 	//response
-	window.eventHub = new __WEBPACK_IMPORTED_MODULE_8_vue___default.a();
-	window.allItems = new __WEBPACK_IMPORTED_MODULE_12__vue_components_dataTree_js__["a" /* default */](fetchedData);
+	window.eventHub = new __WEBPACK_IMPORTED_MODULE_10_vue___default.a();
+	window.allItems = new __WEBPACK_IMPORTED_MODULE_14__vue_components_dataTree_js__["a" /* default */](fetchedData);
 	console.log(allItems);
 
-	window.vm = new __WEBPACK_IMPORTED_MODULE_8_vue___default.a(__WEBPACK_IMPORTED_MODULE_11__vue_components_VueListMaster_js__["a" /* default */]);
-	new __WEBPACK_IMPORTED_MODULE_13__components_ListAppKeyBindings_js__["a" /* default */]();
+	window.vm = new __WEBPACK_IMPORTED_MODULE_10_vue___default.a(__WEBPACK_IMPORTED_MODULE_13__vue_components_VueListMaster_js__["a" /* default */]);
+	new __WEBPACK_IMPORTED_MODULE_15__components_ListAppKeyBindings_js__["a" /* default */]();
 	// vm.allData = allItems.root;
 	vm.doneData = allItems.doneitems;
 	vm.nodes = allItems.nodes;
@@ -37680,14 +37687,31 @@ __WEBPACK_IMPORTED_MODULE_0_jquery___default.a.getJSON('/api/items', function (f
 	console.log('allItems ↓');
 	console.log(allItems);
 
-	__WEBPACK_IMPORTED_MODULE_8_vue___default.a.directive('flatpicky', {
+	__WEBPACK_IMPORTED_MODULE_10_vue___default.a.directive('flatpicky', {
 		inserted: function inserted(el) {
-			new __WEBPACK_IMPORTED_MODULE_6_flatpickr___default.a(el, __WEBPACK_IMPORTED_MODULE_7__components_flatPickrOptions_js__["a" /* default */]);
+			new __WEBPACK_IMPORTED_MODULE_8_flatpickr___default.a(el, __WEBPACK_IMPORTED_MODULE_9__components_flatPickrOptions_js__["a" /* default */]);
 		}
 	});
-	__WEBPACK_IMPORTED_MODULE_8_vue___default.a.directive('focus', {
-		inserted: function inserted(el) {
+	__WEBPACK_IMPORTED_MODULE_10_vue___default.a.directive('focus', {
+		inserted: function inserted(el, binding) {
+			if (vm.mobile && !binding.modifiers.mobile) {
+				return;
+			}
 			el.focus();
+		}
+	});
+	__WEBPACK_IMPORTED_MODULE_10_vue___default.a.directive('autoheight', {
+		inserted: function inserted(el, binding) {
+			__WEBPACK_IMPORTED_MODULE_10_vue___default.a.nextTick(function () {
+				__WEBPACK_IMPORTED_MODULE_2_autosize___default()(el);
+			});
+		}
+	});
+	__WEBPACK_IMPORTED_MODULE_10_vue___default.a.directive('autowidth', {
+		inserted: function inserted(el, binding) {
+			__WEBPACK_IMPORTED_MODULE_10_vue___default.a.nextTick(function () {
+				__WEBPACK_IMPORTED_MODULE_3_autosize_input___default()(el);
+			});
 		}
 	});
 
@@ -37839,7 +37863,7 @@ __WEBPACK_IMPORTED_MODULE_0_jquery___default.a.getJSON('/api/items', function (f
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* WEBPACK VAR INJECTION */(function($) {Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__components_valueMorphers2_js__ = __webpack_require__(11);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__components_flatPickrOptions_js__ = __webpack_require__(10);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_autosize__ = __webpack_require__(14);
@@ -37847,6 +37871,10 @@ __WEBPACK_IMPORTED_MODULE_0_jquery___default.a.getJSON('/api/items', function (f
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_autosize_input__ = __webpack_require__(142);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_autosize_input___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_3_autosize_input__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__components_globalFunctions_js__ = __webpack_require__(5);
+//
+//
+//
+//
 //
 //
 //
@@ -38285,9 +38313,6 @@ __WEBPACK_IMPORTED_MODULE_0_jquery___default.a.getJSON('/api/items', function (f
 	mounted: function mounted() {
 		// this.newItem.preparedTags = JSON.parse(JSON.stringify(this.parentTags));
 		this.convertbodyURLtoHTML();
-		eventHub.$on('startEdit', this.startEdit);
-		eventHub.$on('escapeOnEditButtonFocus', this.cancelEdit);
-		eventHub.$on('escapeOnNewButtonFocus', this.cancelAddNew);
 	},
 
 	props: ['item', 'parentsChildrenOrder'],
@@ -38682,6 +38707,15 @@ __WEBPACK_IMPORTED_MODULE_0_jquery___default.a.getJSON('/api/items', function (f
 		selectItem: function selectItem(item) {
 			selection.selectedId = item.id;
 		},
+		clickOnAddNewCurtain: function clickOnAddNewCurtain(event) {
+			if (!vm.mobile) {
+				return;
+			}
+			if (event && event.srcElement.nodeName != 'FORM') {
+				return;
+			}
+			this.$root.cancelAddNew();
+		},
 		newItemIndent: function newItemIndent() {
 			if (!this.item.children.length || !this.item.show_children) {
 				// If item has no children yet / no visible children
@@ -38689,7 +38723,7 @@ __WEBPACK_IMPORTED_MODULE_0_jquery___default.a.getJSON('/api/items', function (f
 				return;
 			}
 			var lastChildId = allItems.getLastChildId(this.item.id);
-			vm.$root.showAddNewItem(lastChildId);
+			vm.showAddNewItem(lastChildId);
 		},
 		newItemUnindent: function newItemUnindent() {
 			if (this.$root.addingNewAsChild) {
@@ -38700,7 +38734,7 @@ __WEBPACK_IMPORTED_MODULE_0_jquery___default.a.getJSON('/api/items', function (f
 			if (selection.view == 'journal') {
 				return;
 			}
-			vm.$root.showAddNewItem(this.item.parent_id);
+			vm.showAddNewItem(this.item.parent_id);
 		},
 		keydownOnNew: function keydownOnNew(item, e, field) {
 			if (this.newTag && this.newTag.substring(0, 1) != ' ') {
@@ -38736,6 +38770,9 @@ __WEBPACK_IMPORTED_MODULE_0_jquery___default.a.getJSON('/api/items', function (f
 			}
 			// ENTER
 			if (e.keyCode === 13 && !e.shiftKey && !e.altKey && !e.metaKey && !e.ctrlKey) {
+				if (vm.mobile && field == 'body') {
+					return;
+				}
 				e.preventDefault();
 				if (field == 'planned-time') {
 					this.setPlannedTimeNewItem(item, event);
@@ -38868,6 +38905,9 @@ __WEBPACK_IMPORTED_MODULE_0_jquery___default.a.getJSON('/api/items', function (f
 			}
 			// ENTER
 			if (e.keyCode === 13 && !e.shiftKey && !e.altKey) {
+				if (vm.mobile && field == 'body') {
+					return;
+				}
 				e.preventDefault();
 				if (field == 'delete-tag') {
 					var _tagName2 = e.srcElement.value;
@@ -38934,9 +38974,6 @@ __WEBPACK_IMPORTED_MODULE_0_jquery___default.a.getJSON('/api/items', function (f
 			}
 		},
 		blurOnEdit: function blurOnEdit(item) {
-			if (vm.mobile) {
-				this.doneEdit();
-			}
 			if (this.$root.cancelThroughKeydown) {
 				return;
 			}
@@ -38952,10 +38989,11 @@ __WEBPACK_IMPORTED_MODULE_0_jquery___default.a.getJSON('/api/items', function (f
 			// Codementor: is there any better way than this?
 		},
 		blurOnAddNew: function blurOnAddNew(item) {
-			if (vm.mobile) {
-				this.addNew();
-			}
 			if (this.$root.cancelThroughKeydown) {
+				return;
+			}
+			console.log('Blur on Add New');
+			if (vm.mobile) {
 				return;
 			}
 			var self = this;
@@ -38963,6 +39001,10 @@ __WEBPACK_IMPORTED_MODULE_0_jquery___default.a.getJSON('/api/items', function (f
 				if (document.activeElement.nodeName == 'INPUT' || document.activeElement.nodeName == 'TEXTAREA' || document.activeElement.nodeName == 'A' || document.activeElement.nodeName == 'BUTTON') {
 					return;
 				} else {
+					// if(vm.mobile){ self.addNew('stop'); return; }
+					if (vm.mobile) {
+						return;
+					}
 					self.cancelAddNew();
 				}
 			}, 50);
@@ -38973,62 +39015,14 @@ __WEBPACK_IMPORTED_MODULE_0_jquery___default.a.getJSON('/api/items', function (f
 		updateShowChildren: function updateShowChildren(id) {
 			this.$root.patch(id, 'show_children');
 		},
+		cancelEdit: function cancelEdit(item) {
+			this.$root.cancelEdit(item);
+		},
 		startEdit: function startEdit(item, event) {
-			if (event && (event.srcElement.hasClass('done') || event.srcElement.hasClass('custom-tag'))) {
-				return;
-			}
-			console.log('startEdit');
-			item = item ? item : allItems.nodes[selection.selectedId];
-			this.$root.beforeEditCache_body = item.body;
-			this.$root.beforeEditCache_planned_time = item.planned_time;
-			this.$root.editingItem = item.id;
-			// Vue.nextTick(function ()
-			// {
-			// 	let plsFocus = '#updatebox-'+item.id+' > .update-body > textarea';
-			// 	// document.querySelector(plsFocus).focus();
-			// });
+			this.$root.startEdit(item, event);
 		},
 		doneEdit: function doneEdit(item) {
-			console.log('Done edit!');
-			item = item ? item : allItems.nodes[selection.selectedId];
-			// if (!this.$root.editingItem)
-			// {
-			// 	return;
-			// }
-			this.$root.editingItem = null;
-			if (this.$root.editingItemTags) {
-				this.$root.editingItemTags = null;
-				return;
-			}
-			if (!item.body) {
-				item.body = this.$root.beforeEditCache_body;
-			}
-			// item.body = item.body.trim();
-
-			if (typeof item.planned_time != 'number' || Number.isNaN(item.planned_time)) {
-				item.planned_time = 0;
-			}
-			if (item.planned_time != this.$root.beforeEditCache_planned_time) {
-				vm.patch(item.id, 'planned_time');
-			}
-			if (item.body != this.$root.beforeEditCache_body) {
-				vm.patch(item.id, 'body');
-				allItems.copyParentBodyToAllChildren(item.id);
-			}
-			this.$root.beforeEditCache_body = null;
-			this.$root.beforeEditCache_planned_time = null;
-			// setTimeout(() => this.convertbodyURLtoHTML(),1000);
-		},
-		cancelEdit: function cancelEdit(item) {
-			item = item ? item : allItems.nodes[selection.selectedId];
-			if (this.$root.editingItem) {
-				console.log("cancel edit. Reverting to:");
-				console.log(this.$root.beforeEditCache_body);
-				item.body = this.$root.beforeEditCache_body;
-				item.planned_time = this.$root.beforeEditCache_planned_time;
-			}
-			this.$root.editingItem = null;
-			this.$root.editingItemTags = null;
+			this.$root.doneEdit(item);
 		},
 		startEditDoneDate: function startEditDoneDate(item, event) {
 			console.log('startEditDoneDate');
@@ -39041,61 +39035,15 @@ __WEBPACK_IMPORTED_MODULE_0_jquery___default.a.getJSON('/api/items', function (f
 			this.$root.deleteItem(id);
 		},
 		addNew: function addNew(addNextItemAs) {
-			var newItem = void 0;
-			var index = void 0;
-			var addTags = void 0;
-
-			newItem = this.newItem;
-			if (!newItem.body) {
-				return;
-			}
-			newItem.parent_id = this.item.parent_id ? this.item.parent_id : allItems.root.id;
-			newItem.depth = this.item.depth;
-
-			var OlderSiblingIndex = this.siblingIndex;
-			index = isNaN(OlderSiblingIndex) ? 0 : OlderSiblingIndex + 1;
-
-			addTags = this.preparedPlusComputedTags;
-
-			if (this.$root.addingNewAsChild || this.listIsEmpty) {
-				newItem.depth = this.item.depth + 1;
-				newItem.parent_id = this.item.id;
-				index = 0;
-				// Add tags
-				// let toBeParentTags = allItems.itemTagArray(this.item.id);
-				// Array.prototype.push.apply(addTags, toBeParentTags);
-				// ↑　solved wih this.preparedPlusComputedTags
-			}
-			if (selection.view == "journal") {
-				newItem.done = 1;
-				newItem.done_date = this.item.done_date;
-			}
-			if (selection.filter.includes('today') && allItems.isTopLvlItemInFilteredRoot(this.item.id) && !vm.addingNewAsChild) {
-				newItem.due_date = moment().format();
-				addTags = addTags.filter(function (val) {
-					return val != 'Today';
-				});
-			}
-			console.log('sending newItem:');
-			console.log(newItem);
-			console.log('sending tags:');
-			console.log(addTags);
-			// Send to Root for Ajax call.
-			this.$root.postNewItem(newItem, index, addNextItemAs, addTags);
-
-			// Reset stuff
-			this.newItem.body = '';
-			this.newItem.due_date = '0000-00-00 00:00:00';
-			this.newItem.planned_time = '';
-			this.newItem.preparedTags = [];
+			var addTags = this.preparedPlusComputedTags;
+			var parentToBe = this.item;
+			var newItem = this.newItem;
+			// debugger;
+			this.$root.addNew(addNextItemAs, newItem, parentToBe, addTags);
 		},
-		cancelAddNew: function cancelAddNew(lastSelectedId) {
+		cancelAddNew: function cancelAddNew() {
 			this.newItem.body = '';
-			this.$root.addingNewUnder = null;
-			selection.selectedId = selection.lastSelectedId;
-			// Reset newItem to sibling stance.
-			this.$root.addingNewAsChild = false;
-			$(':focus').blur();
+			this.$root.cancelAddNew();
 		},
 		addTag: function addTag(item) {
 			var id = item ? item.id : selection.selectedId;
@@ -39139,32 +39087,8 @@ __WEBPACK_IMPORTED_MODULE_0_jquery___default.a.getJSON('/api/items', function (f
 				document.querySelector(plsFocus).focus();
 			});
 		}
-	},
-	directives: {
-		focus: {
-			inserted: function inserted(el) {
-				Vue.nextTick(function () {
-					el.focus();
-				});
-			}
-		},
-		autoheight: {
-			inserted: function inserted(el, binding) {
-				Vue.nextTick(function () {
-					__WEBPACK_IMPORTED_MODULE_2_autosize___default()(el);
-				});
-			}
-		},
-		autowidth: {
-			inserted: function inserted(el, binding) {
-				Vue.nextTick(function () {
-					__WEBPACK_IMPORTED_MODULE_3_autosize_input___default()(el);
-				});
-			}
-		}
 	}
 };
-/* WEBPACK VAR INJECTION */}.call(__webpack_exports__, __webpack_require__(1)))
 
 /***/ }),
 /* 163 */
@@ -39173,6 +39097,93 @@ __WEBPACK_IMPORTED_MODULE_0_jquery___default.a.getJSON('/api/items', function (f
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__components_valueMorphers2_js__ = __webpack_require__(11);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_autosize__ = __webpack_require__(14);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_autosize___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_autosize__);
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 //
 //
 //
@@ -39330,13 +39341,11 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 // import PopoutConfirmation from './PopoutConfirmation.vue';
 
 
+
 /* harmony default export */ __webpack_exports__["default"] = {
 	name: 'Popouts',
 	template: '#popouts-template',
 	props: ['popouts'],
-	// components: {
-	// 	PopoutConfirmation
-	// },
 	data: function data() {
 		return {
 			timerRunning: true,
@@ -39349,8 +39358,14 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 	},
 
 	computed: {
+		card: function card() {
+			return this.$root.$refs.root;
+		},
+		basis: function basis() {
+			return this.$root;
+		},
 		popoutExists: function popoutExists() {
-			return this.popouts.timer.length || this.popouts.delete.length || this.popouts.guide;
+			return this.popouts.timer.length || this.popouts.delete.length || this.popouts.edit.length || this.popouts.guide;
 		}
 	},
 	methods: {
@@ -39385,10 +39400,13 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 		clearAll: function clearAll(event) {
 			var _this = this;
 
+			vm.popouts.delete = [];
 			vm.popouts.timer.forEach(function (item) {
 				return _this.closeTimer(item);
 			});
-			vm.popouts.delete = [];
+			vm.popouts.edit.forEach(function (item) {
+				return vm.cancelEdit(item);
+			});
 			vm.popouts.guide = false;
 			window.timers = {};
 		},
@@ -39697,9 +39715,9 @@ var _class = function () {
 			} else if (k == 'shift_enter') {
 				vm.showAddNewItem(null, 'child');
 			} else if (k == 'meta_enter') {
-				eventHub.$emit('startEdit');
+				vm.startEdit();
 			} else if (k == 'ctrl_u') {
-				eventHub.$emit('startEdit');
+				vm.startEdit();
 			} else if (k == 't') {
 				vm.setToday();
 			} else if (k == 'shift_t') {
@@ -39779,10 +39797,10 @@ var _class = function () {
 					if (e.keyCode == 27) {
 						// Escape
 						if (vm.editingItem) {
-							eventHub.$emit('escapeOnEditButtonFocus');
+							vm.cancelEdit;
 							console.log('escapeOnEditButtonFocus');
 						} else if (vm.addingNewUnder) {
-							eventHub.$emit('escapeOnNewButtonFocus');
+							vm.cancelAddNew;
 							console.log('escapeOnNewButtonFocus');
 						}
 					}
@@ -40097,12 +40115,21 @@ window.selection = new __WEBPACK_IMPORTED_MODULE_4__Selection_js__["a" /* defaul
 		loading: true,
 		patching: true,
 		popups: [],
-		popouts: { 'delete': [], 'timer': [], 'guide': false },
+		popouts: { 'delete': [], 'timer': [], 'edit': [], 'guide': false },
 		timerItems: [],
 		beforeEditCache_body: null,
 		beforeEditCache_planned_time: null,
 		fetchedDone: false,
-		cancelThroughKeydown: false
+		cancelThroughKeydown: false,
+		manualMobile: false,
+		newItem: {
+			body: '',
+			planned_time: 0,
+			preparedTags: [],
+			due_date: '0000-00-00 00:00:00',
+			children: ''
+		},
+		newTag: null
 	},
 	components: {
 		Card: __WEBPACK_IMPORTED_MODULE_0__Card_vue___default.a,
@@ -40166,6 +40193,9 @@ window.selection = new __WEBPACK_IMPORTED_MODULE_4__Selection_js__["a" /* defaul
 			};
 		},
 		mobile: function mobile() {
+			if (this.manualMobile) {
+				return true;
+			}
 			return __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_3__components_globalFunctions_js__["d" /* mobilecheck */])();
 		},
 		noItems: function noItems() {
@@ -40528,6 +40558,121 @@ window.selection = new __WEBPACK_IMPORTED_MODULE_4__Selection_js__["a" /* defaul
 		}
 	},
 	methods: {
+		startEdit: function startEdit(item, event) {
+			// debugger;
+			if (event && (event.srcElement.hasClass('done') || event.srcElement.hasClass('custom-tag'))) {
+				return;
+			}
+			console.log('startEdit');
+			item = item ? item : allItems.nodes[selection.selectedId];
+			this.beforeEditCache_body = item.body;
+			this.beforeEditCache_planned_time = item.planned_time;
+			if (this.mobile) {
+				this.popouts.edit.push(item);
+				return;
+			}
+			this.editingItem = item.id;
+			// Vue.nextTick(function ()
+			// {
+			// 	let plsFocus = '#updatebox-'+item.id+' > .update-body > textarea';
+			// 	// document.querySelector(plsFocus).focus();
+			// });
+		},
+		doneEdit: function doneEdit(item) {
+			console.log('Done edit!');
+			item = item ? item : allItems.nodes[selection.selectedId];
+			// if (!this.editingItem)
+			// {
+			// 	return;
+			// }
+			this.editingItem = null;
+			vm.popouts.edit = [];
+			if (this.editingItemTags) {
+				this.editingItemTags = null;
+				return;
+			}
+			if (!item.body) {
+				item.body = this.beforeEditCache_body;
+			}
+			// item.body = item.body.trim();
+
+			if (typeof item.planned_time != 'number' || Number.isNaN(item.planned_time)) {
+				item.planned_time = 0;
+			}
+			if (item.planned_time != this.beforeEditCache_planned_time) {
+				this.patch(item.id, 'planned_time');
+			}
+			if (item.body != this.beforeEditCache_body) {
+				this.patch(item.id, 'body');
+				allItems.copyParentBodyToAllChildren(item.id);
+			}
+			this.beforeEditCache_body = null;
+			this.beforeEditCache_planned_time = null;
+			// setTimeout(() => this.convertbodyURLtoHTML(),1000);
+		},
+		cancelEdit: function cancelEdit(item) {
+			item = item ? item : allItems.nodes[selection.selectedId];
+			if (this.editingItem || this.popouts.edit.length) {
+				console.log("cancel edit. Reverting to:");
+				console.log(this.beforeEditCache_body);
+				item.body = this.beforeEditCache_body;
+				item.planned_time = this.beforeEditCache_planned_time;
+			}
+			this.editingItem = null;
+			this.editingItemTags = null;
+			this.popouts.edit = [];
+		},
+		cancelAddNew: function cancelAddNew() {
+			console.log('cancelAddNew');
+			this.addingNewUnder = null;
+			selection.selectedId = selection.lastSelectedId;
+			// Reset newItem to sibling stance.
+			this.addingNewAsChild = false;
+			// $(':focus').blur();
+		},
+		addNew: function addNew(addNextItemAs, newItem, parentToBe, addTags) {
+			parentToBe = parentToBe ? parentToBe : allItems.nodes[selection.selectedId];
+			newItem = newItem ? newItem : this.newItem;
+			addTags = addTags ? addTags : [];
+			var index = void 0;
+
+			if (!newItem.body) {
+				return;
+			}
+			newItem.parent_id = parentToBe.parent_id ? parentToBe.parent_id : allItems.root.id;
+			newItem.depth = parentToBe.depth;
+
+			var OlderSiblingIndex = allItems.siblingIndex(parentToBe.id);
+			index = isNaN(OlderSiblingIndex) ? 0 : OlderSiblingIndex + 1;
+
+			if (this.addingNewAsChild || this.noItems) {
+				newItem.depth = parentToBe.depth + 1;
+				newItem.parent_id = parentToBe.id;
+				index = 0;
+			}
+			if (selection.view == "journal") {
+				newItem.done = 1;
+				newItem.done_date = parentToBe.done_date;
+			}
+			if (selection.filter.includes('today') && allItems.isTopLvlItemInFilteredRoot(parentToBe.id) && !this.addingNewAsChild) {
+				newItem.due_date = moment().format();
+				addTags = addTags.filter(function (val) {
+					return val != 'Today';
+				});
+			}
+			console.log('sending newItem:');
+			console.log(newItem);
+			console.log('sending tags:');
+			console.log(addTags);
+			// Send to Root for Ajax call.
+			this.postNewItem(newItem, index, addNextItemAs, addTags);
+
+			// Reset stuff
+			this.newItem.body = '';
+			this.newItem.due_date = '0000-00-00 00:00:00';
+			this.newItem.planned_time = '';
+			this.newItem.preparedTags = [];
+		},
 		itIsADeepestChild: function itIsADeepestChild(id) {
 			if (!id) {
 				console.log('you need an ID');return;
@@ -40936,7 +41081,7 @@ window.selection = new __WEBPACK_IMPORTED_MODULE_4__Selection_js__["a" /* defaul
 			var item = allItems.nodes[id];
 			// let popoutExists = this.popouts.filter(function (popout) { return popout.item.id === id; })[0];
 			// if(!popoutExists){
-			console.log("poppy doesn't exist");
+			// console.log("poppy doesn't exist");
 			if (type == 'timer') {
 				this.popouts.timer.push(item);
 				Vue.nextTick(function () {
@@ -40946,10 +41091,6 @@ window.selection = new __WEBPACK_IMPORTED_MODULE_4__Selection_js__["a" /* defaul
 			}
 			if (type == 'confirm-delete') {
 				this.popouts.delete.push(item);
-				// solved with v-focus:
-				// Vue.nextTick(function () {
-				// 	document.querySelector('#popouts-mask>div:first-child .btn-ok').focus();
-				// });
 			}
 			// }
 		},
@@ -45140,9 +45281,6 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
       expression: "item.body"
     }],
     staticClass: "edititem-body",
-    attrs: {
-      "rows": _vm.item.rows
-    },
     domProps: {
       "value": (_vm.item.body)
     },
@@ -45466,12 +45604,18 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     on: {
       "submit": function($event) {
         $event.preventDefault();
+      },
+      "click": function($event) {
+        _vm.clickOnAddNewCurtain($event)
       }
     }
   }, [_c('div', [_c('textarea', {
     directives: [{
       name: "focus",
-      rawName: "v-focus"
+      rawName: "v-focus.mobile",
+      modifiers: {
+        "mobile": true
+      }
     }, {
       name: "autoheight",
       rawName: "v-autoheight"
@@ -45486,7 +45630,6 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
       "type": "text",
       "placeholder": "...　　",
       "autocomplete": "off",
-      "autofocus": "",
       "rows": "1"
     },
     domProps: {
@@ -45666,7 +45809,23 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     }, [_c('i', {
       staticClass: "zmdi zmdi-close-circle"
     })]) : _vm._e()]) : _vm._e()
-  })], 2)])]) : _vm._e()]) : _vm._e()]) : _vm._e()
+  })], 2), _vm._v(" "), (_vm.basis.mobile) ? _c('div', {
+    staticClass: "buttonrow"
+  }, [_c('button', {
+    on: {
+      "click": _vm.cancelAddNew
+    }
+  }, [_vm._v("Cancel")]), _vm._v(" "), _c('button', {
+    on: {
+      "click": _vm.addNew
+    }
+  }, [_vm._v("Add and continue")]), _vm._v(" "), _c('button', {
+    on: {
+      "click": function($event) {
+        _vm.addNew('stop')
+      }
+    }
+  }, [_vm._v("Add and close")])]) : _vm._e()])]) : _vm._e()]) : _vm._e()]) : _vm._e()
 },staticRenderFns: []}
 module.exports.render._withStripped = true
 if (false) {
@@ -45865,6 +46024,184 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
         }
       }
     }, [_vm._v("OK")])])])]) : _vm._e()
+  }), _vm._v(" "), _vm._l((_vm.popouts.edit), function(item) {
+    return (_vm.popouts.edit.length) ? _c('div', {
+      staticClass: "popout"
+    }, [_c('div', [_c('div', {
+      staticClass: "body"
+    }, [_c('form', {
+      staticClass: "updatebox",
+      attrs: {
+        "action": "update",
+        "id": 'updatebox-' + item.id
+      },
+      on: {
+        "submit": function($event) {
+          $event.preventDefault();
+          _vm.card.doneEdit(item)
+        }
+      }
+    }, [_c('div', {
+      staticClass: "update-body"
+    }, [_c('textarea', {
+      directives: [{
+        name: "focus",
+        rawName: "v-focus"
+      }, {
+        name: "autoheight",
+        rawName: "v-autoheight"
+      }, {
+        name: "model",
+        rawName: "v-model",
+        value: (item.body),
+        expression: "item.body"
+      }],
+      staticClass: "edititem-body",
+      domProps: {
+        "value": (item.body)
+      },
+      on: {
+        "blur": function($event) {
+          _vm.card.blurOnEdit(item)
+        },
+        "keydown": function($event) {
+          _vm.card.keydownOnEdit(item, $event, 'body')
+        },
+        "input": function($event) {
+          if ($event.target.composing) { return; }
+          item.body = $event.target.value
+        }
+      }
+    })]), _vm._v(" "), _c('div', {
+      staticClass: "update-tags"
+    }, [_c('div', {
+      staticClass: "update-planned-time"
+    }, [_c('span', [_vm._v("Duration:")]), _vm._v(" "), _c('button', {
+      class: {
+        currentDuration: item.planned_time == 10, 'planned-time': true
+      },
+      attrs: {
+        "value": "10"
+      },
+      on: {
+        "click": function($event) {
+          $event.preventDefault();
+          _vm.card.setPlannedTime(item, $event)
+        },
+        "keydown": function($event) {
+          _vm.card.keydownOnEdit(item, $event, 'planned-time')
+        },
+        "blur": function($event) {
+          _vm.card.blurOnEdit(item)
+        }
+      }
+    }, [_vm._v("10 min")]), _vm._v(" "), _c('button', {
+      class: {
+        currentDuration: item.planned_time == 15, 'planned-time': true
+      },
+      attrs: {
+        "value": "15"
+      },
+      on: {
+        "click": function($event) {
+          $event.preventDefault();
+          _vm.card.setPlannedTime(item, $event)
+        },
+        "keydown": function($event) {
+          _vm.card.keydownOnEdit(item, $event, 'planned-time')
+        },
+        "blur": function($event) {
+          _vm.card.blurOnEdit(item)
+        }
+      }
+    }, [_vm._v("15 min")]), _vm._v(" "), _c('button', {
+      class: {
+        currentDuration: item.planned_time == 30, 'planned-time': true
+      },
+      attrs: {
+        "value": "30"
+      },
+      on: {
+        "click": function($event) {
+          $event.preventDefault();
+          _vm.card.setPlannedTime(item, $event)
+        },
+        "keydown": function($event) {
+          _vm.card.keydownOnEdit(item, $event, 'planned-time')
+        },
+        "blur": function($event) {
+          _vm.card.blurOnEdit(item)
+        }
+      }
+    }, [_vm._v("30 min")]), _vm._v(" "), _c('button', {
+      class: {
+        currentDuration: item.planned_time == 60, 'planned-time': true
+      },
+      attrs: {
+        "value": "60"
+      },
+      on: {
+        "click": function($event) {
+          $event.preventDefault();
+          _vm.card.setPlannedTime(item, $event)
+        },
+        "keydown": function($event) {
+          _vm.card.keydownOnEdit(item, $event, 'planned-time')
+        },
+        "blur": function($event) {
+          _vm.card.blurOnEdit(item)
+        }
+      }
+    }, [_vm._v("1 hour")]), _vm._v(" "), _c('div', [_c('input', {
+      directives: [{
+        name: "show",
+        rawName: "v-show",
+        value: (true),
+        expression: "true"
+      }, {
+        name: "model",
+        rawName: "v-model",
+        value: (item.planned_time),
+        expression: "item.planned_time"
+      }],
+      staticClass: "planned-time",
+      attrs: {
+        "type": "number"
+      },
+      domProps: {
+        "value": (item.planned_time)
+      },
+      on: {
+        "blur": [function($event) {
+          _vm.card.blurOnEdit(item)
+        }, function($event) {
+          _vm.$forceUpdate()
+        }],
+        "keydown": function($event) {
+          _vm.card.keydownOnEdit(item, $event, 'planned-time')
+        },
+        "input": function($event) {
+          if ($event.target.composing) { return; }
+          item.planned_time = $event.target.value
+        }
+      }
+    }), _vm._v("min")])])])])]), _vm._v(" "), _c('div', {
+      staticClass: "nav"
+    }, [_c('button', {
+      staticClass: "btn",
+      on: {
+        "click": function($event) {
+          _vm.card.cancelEdit(item)
+        }
+      }
+    }, [_vm._v("Cancel")]), _vm._v(" "), _c('button', {
+      staticClass: "btn",
+      on: {
+        "click": function($event) {
+          _vm.card.doneEdit(item)
+        }
+      }
+    }, [_vm._v("Save")])])])]) : _vm._e()
   })], 2) : _vm._e()
 },staticRenderFns: [function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
   return _c('tr', [_c('th', [_vm._v("Action")]), _c('th', [_vm._v("Key")])])

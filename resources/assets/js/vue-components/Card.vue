@@ -114,7 +114,6 @@
 						v-focus
 						v-autoheight
 						class="edititem-body"
-						:rows="item.rows"
 						v-model="item.body"
 						@blur="blurOnEdit(item)"
 						@keydown="keydownOnEdit(item, $event, 'body')"
@@ -330,10 +329,11 @@
 		:id="'new-under-'+ item.id "
 		v-if="showAddNewBox || (listIsEmpty && basis.selection.view != 'journal')"
 		@submit.prevent
+		@click="clickOnAddNewCurtain($event)"
 	>
 		<div>
 			<textarea type="text"
-				v-focus
+				v-focus.mobile
 				v-autoheight
 				class="newitem-body"
 				v-model="newItem.body"
@@ -341,7 +341,6 @@
 				@keydown="keydownOnNew(item, $event, 'body')"
 				placeholder="...　　"
 				autocomplete="off"
-				autofocus 
 				rows="1"
 			></textarea>
 		</div>
@@ -414,6 +413,11 @@
 					</button>
 				</span>
 			</div>
+			<div class="buttonrow" v-if="basis.mobile">
+				<button @click="cancelAddNew">Cancel</button>
+				<button @click="addNew">Add and continue</button>
+				<button @click="addNew('stop')">Add and close</button>
+			</div>
 		</div>
 	</form>
 <!-- / ADD NEW BOX -->
@@ -437,9 +441,6 @@ export default {
 	{
 		// this.newItem.preparedTags = JSON.parse(JSON.stringify(this.parentTags));
 		this.convertbodyURLtoHTML();
-    	eventHub.$on('startEdit', this.startEdit);
-    	eventHub.$on('escapeOnEditButtonFocus', this.cancelEdit);
-    	eventHub.$on('escapeOnNewButtonFocus', this.cancelAddNew);
 	},
 	props: ['item','parentsChildrenOrder'],
 	data()
@@ -732,6 +733,12 @@ export default {
 		{
 			selection.selectedId = item.id;
 		},
+		clickOnAddNewCurtain(event)
+		{
+			if(!vm.mobile){ return; }
+			if(event && event.srcElement.nodeName != 'FORM'){ return; }
+			this.$root.cancelAddNew();
+		},
 		newItemIndent()
 		{
 			if(!this.item.children.length || !this.item.show_children)
@@ -740,7 +747,7 @@ export default {
 				return;
 			}
 			let lastChildId = allItems.getLastChildId(this.item.id);
-    		vm.$root.showAddNewItem(lastChildId);
+    		vm.showAddNewItem(lastChildId);
 		},
 		newItemUnindent()
 		{
@@ -754,7 +761,7 @@ export default {
 			{
 				return;
 			}
-			vm.$root.showAddNewItem(this.item.parent_id);
+			vm.showAddNewItem(this.item.parent_id);
 		},
 		keydownOnNew(item, e, field)
 		{
@@ -797,6 +804,7 @@ export default {
 			// ENTER
 			if (e.keyCode === 13 && !e.shiftKey && !e.altKey && !e.metaKey && !e.ctrlKey)
 			{
+			  	if(vm.mobile && field == 'body'){ return; }
 				e.preventDefault();
 				if(field == 'planned-time')
 				{
@@ -951,6 +959,7 @@ export default {
 			// ENTER
 			if (e.keyCode === 13 && !e.shiftKey && !e.altKey)
 			{
+				if(vm.mobile && field == 'body'){ return; }
 				e.preventDefault();
 	        	if(field == 'delete-tag')
 	        	{
@@ -1027,7 +1036,6 @@ export default {
 	    },
 	    blurOnEdit(item)
 	    {
-	    	if(vm.mobile){ this.doneEdit(); }
 	    	if(this.$root.cancelThroughKeydown){ return; }
 	    	let self = this;
 	    	setTimeout(function()
@@ -1047,8 +1055,9 @@ export default {
 	    },
 	    blurOnAddNew(item)
 	    {
-	    	if(vm.mobile){ this.addNew(); }
 	    	if(this.$root.cancelThroughKeydown){ return; }
+	    	console.log('Blur on Add New');
+	    	if(vm.mobile){ return; }
 	    	let self = this;
 	    	setTimeout(function()
 	    	{
@@ -1059,6 +1068,8 @@ export default {
 		    	{
 	        		return;
 				}　else {
+			    	// if(vm.mobile){ self.addNew('stop'); return; }
+			    	if(vm.mobile){ return; }
 					self.cancelAddNew();
 				}
 	    	},50);
@@ -1071,74 +1082,17 @@ export default {
 		{
 			this.$root.patch(id,'show_children');
 		},
+		cancelEdit(item)
+		{
+			this.$root.cancelEdit(item);
+		},
 		startEdit(item, event)
 		{
-			if (event &&
-				(event.srcElement.hasClass('done')
-				|| event.srcElement.hasClass('custom-tag')))
-			{
-				return;
-			}
-			console.log('startEdit');
-			item = (item) ? item : allItems.nodes[selection.selectedId];
-			this.$root.beforeEditCache_body = item.body;
-			this.$root.beforeEditCache_planned_time = item.planned_time;
-			this.$root.editingItem = item.id;
-			// Vue.nextTick(function ()
-			// {
-			// 	let plsFocus = '#updatebox-'+item.id+' > .update-body > textarea';
-			// 	// document.querySelector(plsFocus).focus();
-			// });
+			this.$root.startEdit(item, event);
 		},
 		doneEdit(item)
 		{
-			console.log('Done edit!');
-			item = (item) ? item : allItems.nodes[selection.selectedId];
-			// if (!this.$root.editingItem)
-			// {
-			// 	return;
-			// }
-			this.$root.editingItem = null;
-			if(this.$root.editingItemTags)
-			{
-				this.$root.editingItemTags = null;
-				return;
-			}
-			if (!item.body)
-			{
-				item.body = this.$root.beforeEditCache_body;
-			}
-			// item.body = item.body.trim();
-
-			if (typeof item.planned_time != 'number' || Number.isNaN(item.planned_time))
-			{
-				item.planned_time = 0;
-			}
-			if (item.planned_time != this.$root.beforeEditCache_planned_time)
-			{
-				vm.patch(item.id, 'planned_time');
-			}
-			if (item.body != this.$root.beforeEditCache_body)
-			{
-				vm.patch(item.id, 'body');
-				allItems.copyParentBodyToAllChildren(item.id);
-			}
-			this.$root.beforeEditCache_body = null;
-			this.$root.beforeEditCache_planned_time = null;
-			// setTimeout(() => this.convertbodyURLtoHTML(),1000);
-		},
-		cancelEdit(item)
-		{
-			item = (item) ? item : allItems.nodes[selection.selectedId];
-			if(this.$root.editingItem)
-			{
-				console.log("cancel edit. Reverting to:");
-				console.log(this.$root.beforeEditCache_body);
-				item.body = this.$root.beforeEditCache_body;
-				item.planned_time = this.$root.beforeEditCache_planned_time;
-			}
-			this.$root.editingItem = null;
-			this.$root.editingItemTags = null;
+			this.$root.doneEdit(item);
 		},
 		startEditDoneDate(item, event)
 		{
@@ -1154,65 +1108,16 @@ export default {
 		},
 		addNew(addNextItemAs)
 		{
-			let newItem;
-			let index;
-			let addTags;
-			
-			newItem = this.newItem;
-			if(!newItem.body){ return; }
-			newItem.parent_id = (this.item.parent_id) ? this.item.parent_id : allItems.root.id;
-			newItem.depth = this.item.depth;
-
-			let OlderSiblingIndex = this.siblingIndex;
-			index = (isNaN(OlderSiblingIndex)) ? 0 : OlderSiblingIndex+1;
-			
-			addTags = this.preparedPlusComputedTags;
-			
-			if (this.$root.addingNewAsChild || this.listIsEmpty)
-			{
-				newItem.depth = this.item.depth + 1;
-        		newItem.parent_id = this.item.id;
-        		index = 0;
-				// Add tags
-         		// let toBeParentTags = allItems.itemTagArray(this.item.id);
-				// Array.prototype.push.apply(addTags, toBeParentTags);
-				// ↑　solved wih this.preparedPlusComputedTags
-			}
-			if(selection.view == "journal")
-			{
-				newItem.done = 1;
-				newItem.done_date = this.item.done_date;
-			}
-			if (  selection.filter.includes('today')
-			   && allItems.isTopLvlItemInFilteredRoot(this.item.id)
-			   && !vm.addingNewAsChild )
-			{
-				newItem.due_date = moment().format();
-				addTags = addTags.filter(function(val){
-					return val != 'Today';
-				});
-			}
-			console.log('sending newItem:');
-			console.log(newItem);
-			console.log('sending tags:');
-			console.log(addTags);
-			// Send to Root for Ajax call.
-			this.$root.postNewItem(newItem, index, addNextItemAs, addTags);
-
-			// Reset stuff
-			this.newItem.body = '';
-			this.newItem.due_date = '0000-00-00 00:00:00';
-			this.newItem.planned_time = '';
-			this.newItem.preparedTags = [];
+			let addTags = this.preparedPlusComputedTags;
+			let parentToBe = this.item;
+			let newItem = this.newItem;
+			// debugger;
+			this.$root.addNew(addNextItemAs, newItem, parentToBe, addTags)
 		},
-		cancelAddNew(lastSelectedId)
+		cancelAddNew()
 		{
 			this.newItem.body = '';
-			this.$root.addingNewUnder = null;
-			selection.selectedId = selection.lastSelectedId;
-			// Reset newItem to sibling stance.
-			this.$root.addingNewAsChild = false;			
-			$(':focus').blur();
+			this.$root.cancelAddNew();
 		},
 		addTag(item)
 		{
@@ -1264,35 +1169,6 @@ export default {
 				console.log('returning to : '+plsFocus);
 				document.querySelector(plsFocus).focus();
 	    	});
-		},
-	},
-	directives: {
-		focus: {
-			inserted(el)
-			{
-				Vue.nextTick(function ()
-				{
-					el.focus();
-				});
-			}
-		},
-		autoheight: {
-			inserted(el, binding)
-			{
-				Vue.nextTick(function ()
-				{
-					autosize(el);
-				});
-			}
-		},
-		autowidth: {
-			inserted(el, binding)
-			{
-				Vue.nextTick(function ()
-				{
-					autosizeInput(el);
-				});
-			}
 		},
 	},
 }

@@ -126,7 +126,7 @@ addItem(item, index, addNextItemAs, addTags, duplication)
     if(addTags){ this.tagItem(item.id, addTags); }
 	this.attachParentBody(item.id);
 	this.autoCalculateDoneState(item.parent_id);
-    if (!duplication)
+    if (!duplication && addNextItemAs != 'stop')
     {
 	    vm.showAddNewItem(item.id, addNextItemAs);
     }

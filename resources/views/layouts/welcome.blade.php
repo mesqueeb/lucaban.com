@@ -49,7 +49,7 @@
 <section class="jumbotron" id="page-top">
     <h1 class="">Say hello to {{ config('app.name', 'Laravel') }}</h1>
     <p class="lead">
-        {{ config('app.name', 'Laravel') }} is a simple task list for people who want to be organized without making things more complicated.
+        A simple task list for people who want to be organized without making things more complicated.
     </p>
     <p><a class="btn btn-lg btn-outline" href="{{ url('/items') }}" role="button">Try it out</a></p>
 </section>

@@ -1,7 +1,7 @@
 import Card from './Card.vue';
 import Popups from './Popups.vue';
 import Popouts from './Popouts.vue';
-import { mobilecheck, isElementInViewport, objectToArray, uniqBy, uniq, arrayToString, sec_to_hourmin, sortObjectArrayByProperty, sortObjectArrayByTwoProperties, removeEmptyValuesFromArray } from '../components/globalFunctions.js';
+import { hasClass, mobilecheck, isElementInViewport, objectToArray, uniqBy, uniq, arrayToString, sec_to_hourmin, sortObjectArrayByProperty, sortObjectArrayByTwoProperties, removeEmptyValuesFromArray } from '../components/globalFunctions.js';
 import Selection from './Selection.js';
 import Tree from './dataTree.js';
 
@@ -36,12 +36,21 @@ export default {
 		loading: true,
 		patching: true,
 		popups: [],
-		popouts: {'delete':[], 'timer':[], 'guide':false},
+		popouts: {'delete':[], 'timer':[], 'edit':[], 'guide':false },
 		timerItems: [],
 		beforeEditCache_body: null,
 		beforeEditCache_planned_time: null,
 		fetchedDone: false,
 		cancelThroughKeydown: false,
+		manualMobile: false,
+		newItem: {
+			body: '',
+			planned_time:0,
+			preparedTags:[],
+			due_date: '0000-00-00 00:00:00',
+			children: '',
+		},
+		newTag: null,
 		// allTags: [],
 	},
 	components: {
@@ -108,6 +117,9 @@ export default {
 		},
 		mobile()
 		{
+			if(this.manualMobile){
+				return true;
+			}
 			return mobilecheck();
 		},
 		noItems()
@@ -474,6 +486,139 @@ export default {
 		// },
 	},
 	methods:{
+		startEdit(item, event)
+		{
+			// debugger;
+			if (event &&
+				(event.srcElement.hasClass('done')
+				|| event.srcElement.hasClass('custom-tag')))
+			{
+				return;
+			}
+			console.log('startEdit');
+			item = (item) ? item : allItems.nodes[selection.selectedId];
+			this.beforeEditCache_body = item.body;
+			this.beforeEditCache_planned_time = item.planned_time;
+			if( this.mobile )
+			{
+				this.popouts.edit.push(item);
+				return;
+			}
+			this.editingItem = item.id;
+			// Vue.nextTick(function ()
+			// {
+			// 	let plsFocus = '#updatebox-'+item.id+' > .update-body > textarea';
+			// 	// document.querySelector(plsFocus).focus();
+			// });
+		},
+		doneEdit(item)
+		{
+			console.log('Done edit!');
+			item = (item) ? item : allItems.nodes[selection.selectedId];
+			// if (!this.editingItem)
+			// {
+			// 	return;
+			// }
+			this.editingItem = null;
+			vm.popouts.edit = [];
+			if(this.editingItemTags)
+			{
+				this.editingItemTags = null;
+				return;
+			}
+			if (!item.body)
+			{
+				item.body = this.beforeEditCache_body;
+			}
+			// item.body = item.body.trim();
+
+			if (typeof item.planned_time != 'number' || Number.isNaN(item.planned_time))
+			{
+				item.planned_time = 0;
+			}
+			if (item.planned_time != this.beforeEditCache_planned_time)
+			{
+				this.patch(item.id, 'planned_time');
+			}
+			if (item.body != this.beforeEditCache_body)
+			{
+				this.patch(item.id, 'body');
+				allItems.copyParentBodyToAllChildren(item.id);
+			}
+			this.beforeEditCache_body = null;
+			this.beforeEditCache_planned_time = null;
+			// setTimeout(() => this.convertbodyURLtoHTML(),1000);
+		},
+		cancelEdit(item)
+		{
+			item = (item) ? item : allItems.nodes[selection.selectedId];
+			if(this.editingItem || this.popouts.edit.length)
+			{
+				console.log("cancel edit. Reverting to:");
+				console.log(this.beforeEditCache_body);
+				item.body = this.beforeEditCache_body;
+				item.planned_time = this.beforeEditCache_planned_time;
+			}
+			this.editingItem = null;
+			this.editingItemTags = null;
+			this.popouts.edit = [];
+		},
+		cancelAddNew()
+		{
+			console.log('cancelAddNew');
+			this.addingNewUnder = null;
+			selection.selectedId = selection.lastSelectedId;
+			// Reset newItem to sibling stance.
+			this.addingNewAsChild = false;
+			// $(':focus').blur();
+		},
+		addNew(addNextItemAs, newItem, parentToBe, addTags)
+		{
+			parentToBe = (parentToBe) ? parentToBe : allItems.nodes[selection.selectedId];
+			newItem = (newItem) ? newItem : this.newItem;
+			addTags = (addTags) ? addTags : [];
+			let index;
+
+			if(!newItem.body){ return; }
+			newItem.parent_id = (parentToBe.parent_id) ? parentToBe.parent_id : allItems.root.id;
+			newItem.depth = parentToBe.depth;
+
+			let OlderSiblingIndex = allItems.siblingIndex(parentToBe.id);
+			index = (isNaN(OlderSiblingIndex)) ? 0 : OlderSiblingIndex+1;
+			
+			if (this.addingNewAsChild || this.noItems)
+			{
+				newItem.depth = parentToBe.depth + 1;
+        		newItem.parent_id = parentToBe.id;
+        		index = 0;
+			}
+			if(selection.view == "journal")
+			{
+				newItem.done = 1;
+				newItem.done_date = parentToBe.done_date;
+			}
+			if ( selection.filter.includes('today')
+			   && allItems.isTopLvlItemInFilteredRoot(parentToBe.id)
+			   && !this.addingNewAsChild )
+			{
+				newItem.due_date = moment().format();
+				addTags = addTags.filter(function(val){
+					return val != 'Today';
+				});
+			}
+			console.log('sending newItem:');
+			console.log(newItem);
+			console.log('sending tags:');
+			console.log(addTags);
+			// Send to Root for Ajax call.
+			this.postNewItem(newItem, index, addNextItemAs, addTags);
+
+			// Reset stuff
+			this.newItem.body = '';
+			this.newItem.due_date = '0000-00-00 00:00:00';
+			this.newItem.planned_time = '';
+			this.newItem.preparedTags = [];
+		},
 		itIsADeepestChild(id)
 		{
 			if (!id){ console.log('you need an ID'); return; }
@@ -832,7 +977,7 @@ export default {
 			let item = allItems.nodes[id];
 			// let popoutExists = this.popouts.filter(function (popout) { return popout.item.id === id; })[0];
 			// if(!popoutExists){
-				console.log("poppy doesn't exist");
+				// console.log("poppy doesn't exist");
 				if(type=='timer'){
 					this.popouts.timer.push(item);
 					Vue.nextTick(function () {
@@ -842,10 +987,6 @@ export default {
 				}
 				if(type=='confirm-delete'){
 					this.popouts.delete.push(item);
-					// solved with v-focus:
-					// Vue.nextTick(function () {
-					// 	document.querySelector('#popouts-mask>div:first-child .btn-ok').focus();
-					// });
 				}
 			// }
 		},
