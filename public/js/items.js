@@ -25162,7 +25162,9 @@ var _class = function () {
 			}
 			this.attachParentBody(item.id);
 			this.autoCalculateDoneState(item.parent_id);
-			if (!duplication && addNextItemAs != 'stop') {
+			if (duplication || addNextItemAs == 'stop') {
+				vm.addingNewUnder = null;
+			} else {
 				vm.showAddNewItem(item.id, addNextItemAs);
 			}
 		}
@@ -25482,7 +25484,7 @@ var _class = function () {
 		value: function isTopLvlItemInFilteredRoot(id) {
 			var s = selection;
 			if (selection.nothingSelected() && selection.view == 'tree') {
-				console.log('the root is not filtered');
+				// console.log('the root is not filtered');
 				return false;
 			}
 			if (id == this.root.id) {
@@ -25828,6 +25830,45 @@ var _class = function () {
 				});
 			}
 		}
+	}, {
+		key: 'updateItemTagsDom',
+		value: function updateItemTagsDom(id, tags, requestType) {
+			var _this2 = this;
+
+			/* requestType can be:
+   	'tag': tag item  (default if null)
+   	'untag': untag item with certain tag
+   	'retag': delete all tags and retag new ones
+   */
+			if (!tags) {
+				return;
+			}
+			if (Array.isArray(tags)) {
+				tags.forEach(function (t) {
+					return _this2.updateItemTagsDom(id, t, requestType);
+				});
+				return;
+			}
+			var tagName = tags.trim();
+			var tagSlug = this.tagNameToSlug(tagName);
+			var tempTag = { 'temp': 'temp',
+				'tag_name': tagName,
+				'tag_slug': tagSlug,
+				'tag': {
+					'name': tagName,
+					'slug': tagSlug
+				} };
+			if (requestType == 'tag' || !requestType) {
+				console.log(this.nodes[id].tagged);
+				this.nodes[id].tagged.push(tempTag);
+				console.log(this.nodes[id].tagged);
+			}
+			if (requestType == 'untag') {
+				this.nodes[id].tagged = this.nodes[id].tagged.filter(function (t) {
+					return t.tag_slug != tagSlug;
+				});
+			}
+		}
 		// calculateTotalTime(id)
 		// {
 		// 	let item = this.nodes[id];
@@ -25950,18 +25991,21 @@ var _class = function () {
 					}, 1000);
 				}
 			}
+			Vue.nextTick(function () {
+				return vm.scrollToItemIfNeeded(id);
+			});
 		}
 	}, {
 		key: 'flushDoneItems',
 		value: function flushDoneItems() // Do not use yet. Not sure how to best implement this...
 		{
-			var _this2 = this;
+			var _this3 = this;
 
 			var nodes = this.nodes;
 			var keys = Object.keys(nodes);
 			var doneItemsObject = keys.reduce(function (prev, id) {
 				if (nodes[id].done) {
-					_this2.deleteItem(id);
+					_this3.deleteItem(id);
 				}
 			});
 		}
@@ -37714,6 +37758,22 @@ __WEBPACK_IMPORTED_MODULE_0_jquery___default.a.getJSON('/api/items', function (f
 			});
 		}
 	});
+	__WEBPACK_IMPORTED_MODULE_10_vue___default.a.directive('ios-dblclick', {
+		inserted: function inserted(el, binding) {
+			// TODO create ios Double click directive
+			// clicks++;
+			// if (clicks == 1) {
+			//     setTimeout(function(){
+			//         if(clicks == 1) {
+			//             single_click_callback.call(self, event);
+			//         } else {
+			//             double_click_callback.call(self, event);
+			//         }
+			//     clicks = 0;
+			//     }, timeout || 300);
+			// }
+		}
+	});
 
 	vm.patching = false;
 	vm.loading = false;
@@ -38298,6 +38358,56 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 // import Morph from '../components/valueMorphers.js'
 // window.Morph = new Morph();
@@ -38381,9 +38491,14 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 		},
 		listIsEmpty: function listIsEmpty() {
 			if (!this.item || !allItems) {
-				return 0;
+				return false;
 			}
-			return this.$root.noItems;
+			if (this.item.id != allItems.root.id) {
+				return false;
+			}
+			if (!this.visibleChildren.length) {
+				return true;
+			}
 		},
 		basis: function basis() {
 			if (!this.item || !allItems) {
@@ -38716,6 +38831,15 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 			}
 			this.$root.cancelAddNew();
 		},
+		clickOnEditCurtain: function clickOnEditCurtain(item, event) {
+			if (!vm.mobile) {
+				return;
+			}
+			if (event && event.srcElement.nodeName != 'FORM') {
+				return;
+			}
+			this.doneEdit(item);
+		},
 		newItemIndent: function newItemIndent() {
 			if (!this.item.children.length || !this.item.show_children) {
 				// If item has no children yet / no visible children
@@ -38982,6 +39106,9 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 				if (document.activeElement.nodeName == 'INPUT' || document.activeElement.nodeName == 'TEXTAREA' || document.activeElement.nodeName == 'A' || document.activeElement.nodeName == 'BUTTON') {
 					return;
 				} else {
+					if (vm.mobile) {
+						return;
+					}
 					console.log('blurring on edit');
 					self.doneEdit(item);
 				}
@@ -39040,6 +39167,11 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 			var newItem = this.newItem;
 			// debugger;
 			this.$root.addNew(addNextItemAs, newItem, parentToBe, addTags);
+			// Reset stuff
+			this.newItem.body = '';
+			this.newItem.due_date = '0000-00-00 00:00:00';
+			this.newItem.planned_time = '';
+			this.newItem.preparedTags = [];
 		},
 		cancelAddNew: function cancelAddNew() {
 			this.newItem.body = '';
@@ -39808,7 +39940,7 @@ var _class = function () {
 					console.log('inputs or buttons are focussed!');
 					return;
 				} else {
-					console.log('keydown event: NO inputs or buttons are focussed!');
+					// console.log('keydown event: NO inputs or buttons are focussed!');
 					// INPUT AREAS NOT IN FOCUS
 					switch (e.keyCode) {
 						case 37:
@@ -40066,7 +40198,7 @@ var Selection = function () {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* WEBPACK VAR INJECTION */(function($) {/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Card_vue__ = __webpack_require__(188);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Card_vue__ = __webpack_require__(188);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Card_vue___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0__Card_vue__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__Popups_vue__ = __webpack_require__(190);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__Popups_vue___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1__Popups_vue__);
@@ -40147,23 +40279,34 @@ window.selection = new __WEBPACK_IMPORTED_MODULE_4__Selection_js__["a" /* defaul
 			console.log(id);
 			return;
 		});
-		window.onscroll = function () {
-			if (!selection.filter.length && !selection.tags.length) {
-				return;
-			}
-			var el = document.getElementsByClassName('line');
-			// let el = $('.navigation');
-			if (!__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_3__components_globalFunctions_js__["a" /* isElementInViewport */])(el[0])) {
-				$("body").addClass("scrolled-down");
-			} else {
-				$("body").removeClass("scrolled-down");
-			}
-		};
+		// window.addEventListener( "scroll", function( event ) {
+		//     console.log(vm.mobile); return;
+		// });
+		// window.addEventListener( "onscroll", function( event ) {
+		//     console.log(vm.mobile); return;
+		// });
+		//      window.onscroll = function(e) {
+		// console.log(vm.mobile); return; };
+		// 	if(vm.mobile){ return; }
+		// 	let el = document.getElementsByClassName('line');
+		// 	// let el = $('.navigation');
+		// 	if (!isElementInViewport(el[0]))
+		// 	{
+		//     	console.log('a');
+		//     	document.querySelector("body").className += " scrolled-down";
+		// 	}
+		// 	else
+		// 	{
+		//     	let a = document.querySelector("body");
+		//     	document.querySelector("body").className = a.className.replace('scrolled-down','');
+		//     	console.log(a.className);
+		// 	}
+		// }.bind(this);
 	},
 
 	computed: {
 		allData: function allData() {
-			if (this.noItems) {
+			if (!allItems || !allItems.root) {
 				return {
 					"body": "ALL",
 					"children": [],
@@ -40182,7 +40325,7 @@ window.selection = new __WEBPACK_IMPORTED_MODULE_4__Selection_js__["a" /* defaul
 				"body": "ALL",
 				"children": this.filteredItems,
 				"children_order": this.nodes[allItems.root.id].children_order,
-				"id": this.nodes[allItems.root.id],
+				"id": this.nodes[allItems.root.id].id,
 				"depth": 0,
 				"done": false,
 				"done_date": "0000-00-00 00:00:00",
@@ -40198,10 +40341,18 @@ window.selection = new __WEBPACK_IMPORTED_MODULE_4__Selection_js__["a" /* defaul
 			}
 			return __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_3__components_globalFunctions_js__["d" /* mobilecheck */])();
 		},
-		noItems: function noItems() {
-			if (!allItems || !allItems.root || !allItems.root.children.length) {
+		mobileSmall: function mobileSmall() {
+			if (window.innerWidth < 385) {
 				return true;
-			}return false;
+			}
+		},
+		noItems: function noItems() {
+			if (!this.allData.children.length) {
+				return true;
+			}
+			// if(!allItems || !allItems.root || !allItems.root.children.length){
+			// 	return true;
+			// } return false;
 		},
 
 		// doneItems() // Flat
@@ -40209,9 +40360,7 @@ window.selection = new __WEBPACK_IMPORTED_MODULE_4__Selection_js__["a" /* defaul
 		// 	return this.filteredItemsFlat.filter(child => child.done);
 		// },
 		filteredItems: function filteredItems() {
-			if (this.noItems) {
-				return [];
-			}
+			// if(this.noItems){ return []; }
 			if (this.selection.view == 'tree') {
 				return this.filteredItemsTree;
 			} else if (this.selection.view == 'journal') {
@@ -40555,7 +40704,67 @@ window.selection = new __WEBPACK_IMPORTED_MODULE_4__Selection_js__["a" /* defaul
 		},
 		totalHourMinLeft: function totalHourMinLeft() {
 			return __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_3__components_globalFunctions_js__["i" /* sec_to_hourmin */])(this.totalSecLeft);
+		},
+		lastItems: function lastItems() {
+			if (this.noItems || !this.$refs.root || !this.$refs.root.childrensDeepestChildren.length) {
+				return [];
+			}
+			var basis = this.$refs.root;
+			var dc = basis.childrensDeepestChildren;
+			return [basis.childrenOrder[basis.childrenOrder.length - 1], dc[dc.length - 1].deepestChild];
+		},
+		firstItem: function firstItem() {
+			if (this.noItems || !this.$refs.root) {
+				return null;
+			}
+			return this.$refs.root.childrenOrder[0];
+		},
+		topLvlItems: function topLvlItems() {
+			if (this.noItems || !this.$refs.root) {
+				return [];
+			}
+			return this.$refs.root.childrenOrder;
 		}
+	},
+	watch: {
+		// allTagsComputed()
+		// {
+		// 	alert('allTagsComputed changed');
+		// 	console.log('allTagsComputed changed');
+		// },
+		// selection:
+		// {
+		// 	handler() {
+		// try 2
+		// Vue.nextTick(() => {
+		// 	this.allTagsComputed.forEach(t => {
+		// 		let el = document.querySelector("a[value='"+t.slug+"']");
+		// 		if(selection.tags.includes(t.slug))
+		// 		{
+		// 			el.className += ' active';
+		// 		} else {
+		// 			el.className = el.className.replace('active','');
+		// 		}
+		// 	})				
+		// });
+		// Vue.nextTick(()=> console.log('a'));
+
+		// try 3
+		// setTimeout(() => {
+		// 	document.querySelectorAll(".tag-menu a").forEach(el => el.className = el.className.replace('active',''));
+		// 	this.allTagsComputed.forEach(t => {
+		// 		let el = document.querySelector("a[value='"+t.slug+"']");
+		// 		if(selection.tags.includes(t.slug))
+		// 		{
+		// 			el.className += ' active';
+		// 		} else {
+		// 			el.className = el.className.replace('active','');
+		// 		}
+		// 	})
+		// },1000);
+		// },
+		// deep: true
+		// },
 	},
 	methods: {
 		startEdit: function startEdit(item, event) {
@@ -40567,16 +40776,18 @@ window.selection = new __WEBPACK_IMPORTED_MODULE_4__Selection_js__["a" /* defaul
 			item = item ? item : allItems.nodes[selection.selectedId];
 			this.beforeEditCache_body = item.body;
 			this.beforeEditCache_planned_time = item.planned_time;
-			if (this.mobile) {
-				this.popouts.edit.push(item);
-				return;
-			}
-			this.editingItem = item.id;
-			// Vue.nextTick(function ()
+			// if( this.mobile )
 			// {
-			// 	let plsFocus = '#updatebox-'+item.id+' > .update-body > textarea';
-			// 	// document.querySelector(plsFocus).focus();
-			// });
+			// 	this.popouts.edit.push(item);
+			// 	return;
+			// }
+			this.editingItem = item.id;
+		},
+		scrollToItemIfNeeded: function scrollToItemIfNeeded(id) {
+			var el = document.getElementById('item-body-' + id);
+			if (!__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_3__components_globalFunctions_js__["a" /* isElementInViewport */])(el)) {
+				el.scrollIntoView();
+			}
 		},
 		doneEdit: function doneEdit(item) {
 			console.log('Done edit!');
@@ -40666,12 +40877,6 @@ window.selection = new __WEBPACK_IMPORTED_MODULE_4__Selection_js__["a" /* defaul
 			console.log(addTags);
 			// Send to Root for Ajax call.
 			this.postNewItem(newItem, index, addNextItemAs, addTags);
-
-			// Reset stuff
-			this.newItem.body = '';
-			this.newItem.due_date = '0000-00-00 00:00:00';
-			this.newItem.planned_time = '';
-			this.newItem.preparedTags = [];
 		},
 		itIsADeepestChild: function itIsADeepestChild(id) {
 			if (!id) {
@@ -40868,7 +41073,7 @@ window.selection = new __WEBPACK_IMPORTED_MODULE_4__Selection_js__["a" /* defaul
 				}
 			}
 			selection.selectedId = sel;
-			document.getElementById('card-' + sel).scrollIntoViewIfNeeded();
+			this.scrollToItemIfNeeded(sel);
 		},
 		findDeepestVisibleChild: function findDeepestVisibleChild(id) {
 			var _this = this;
@@ -40966,6 +41171,7 @@ window.selection = new __WEBPACK_IMPORTED_MODULE_4__Selection_js__["a" /* defaul
 			if (!tags) {
 				return;
 			}
+			allItems.updateItemTagsDom(id, tags, requestType);
 			if (Array.isArray(tags)) {
 				tags = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_3__components_globalFunctions_js__["k" /* removeEmptyValuesFromArray */])(tags);
 				if (!tags.length) {
@@ -41174,6 +41380,14 @@ window.selection = new __WEBPACK_IMPORTED_MODULE_4__Selection_js__["a" /* defaul
 			selection.addKeywords(keyword, value, operator);
 			// FILTER REWRITE
 			// allItems.filterItems(keyword,value,operator);
+			// setTimeout(()=>{ 
+			// 	let a = selection.tags;
+			// 	selection.tags = [];
+			// 	selection.tags = a;
+			// 	console.log(selection.tags);
+			// },500);
+			// console.log(selection.tags);
+			// setTimeout(()=>{ vm.test() },1000);
 		},
 		removeFilter: function removeFilter(tag) {
 			selection.hiddenTags = selection.hiddenTags.filter(function (x) {
@@ -41226,11 +41440,27 @@ window.selection = new __WEBPACK_IMPORTED_MODULE_4__Selection_js__["a" /* defaul
 			});
 		},
 		test: function test(id) {
+			document.querySelectorAll(".tag-menu a").forEach(function (el) {
+				return alert(JSON.stringify(el.style.color));
+			});
 			// id = (!id) ? selection.selectedId : id ;
-			id = selection.selectedId;
-			var item = allItems.nodes[id];
-			this.patchTag(id, 'bloem', 'tag');
-		}
+			// id = selection.selectedId;
+			// let item = allItems.nodes[id];
+			// this.patchTag(id, 'bloem', 'tag');
+		},
+		alert: function (_alert) {
+			function alert(_x) {
+				return _alert.apply(this, arguments);
+			}
+
+			alert.toString = function () {
+				return _alert.toString();
+			};
+
+			return alert;
+		}(function (value) {
+			alert(value);
+		})
 	},
 	http: {
 		headers: {
@@ -41238,7 +41468,6 @@ window.selection = new __WEBPACK_IMPORTED_MODULE_4__Selection_js__["a" /* defaul
 		}
 	}
 };
-/* WEBPACK VAR INJECTION */}.call(__webpack_exports__, __webpack_require__(1)))
 
 /***/ }),
 /* 169 */
@@ -45140,6 +45369,9 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
       done: _vm.item.done,
         show_children: _vm.item.show_children,
         editing: _vm.item.id == _vm.basis.editingItem,
+    },
+    attrs: {
+      "id": 'item-body-' + _vm.item.id
     }
   }, [(!_vm.journalView) ? _c('div', {
     class: {
@@ -45263,6 +45495,9 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
       "submit": function($event) {
         $event.preventDefault();
         _vm.doneEdit(_vm.item)
+      },
+      "click": function($event) {
+        _vm.clickOnEditCurtain(_vm.item, $event)
       }
     }
   }, [_c('div', {
@@ -45325,7 +45560,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
         _vm.blurOnEdit(_vm.item)
       }
     }
-  }, [_vm._v("10 min")]), _vm._v(" "), _c('button', {
+  }, [_vm._v("10" + _vm._s((_vm.basis.mobileSmall) ? 'm' : ' min'))]), _vm._v(" "), (!_vm.basis.mobileSmall) ? _c('button', {
     class: {
       currentDuration: _vm.item.planned_time == 15, 'planned-time': true
     },
@@ -45344,7 +45579,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
         _vm.blurOnEdit(_vm.item)
       }
     }
-  }, [_vm._v("15 min")]), _vm._v(" "), _c('button', {
+  }, [_vm._v("15" + _vm._s((_vm.basis.mobileSmall) ? 'm' : ' min'))]) : _vm._e(), _vm._v(" "), _c('button', {
     class: {
       currentDuration: _vm.item.planned_time == 30, 'planned-time': true
     },
@@ -45363,7 +45598,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
         _vm.blurOnEdit(_vm.item)
       }
     }
-  }, [_vm._v("30 min")]), _vm._v(" "), _c('button', {
+  }, [_vm._v("30" + _vm._s((_vm.basis.mobileSmall) ? 'm' : ' min'))]), _vm._v(" "), _c('button', {
     class: {
       currentDuration: _vm.item.planned_time == 60, 'planned-time': true
     },
@@ -45382,7 +45617,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
         _vm.blurOnEdit(_vm.item)
       }
     }
-  }, [_vm._v("1 hour")]), _vm._v(" "), _c('div', [_c('input', {
+  }, [_vm._v("1" + _vm._s((_vm.basis.mobileSmall) ? 'h' : ' hour'))]), _vm._v(" "), _c('div', [_c('input', {
     directives: [{
       name: "show",
       rawName: "v-show",
@@ -45415,7 +45650,84 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
         _vm.item.planned_time = $event.target.value
       }
     }
-  }), _vm._v("min")])])])]) : _vm._e(), _vm._v(" "), _c('div', {
+  }), _vm._v("min")])]), _vm._v(" "), (_vm.basis.mobile && (_vm.item.id == _vm.basis.editingItem || _vm.item.id == _vm.basis.editingItemTags)) ? _c('div', {
+    staticClass: "item-tags"
+  }, [_c('div', {
+    staticClass: "add-tag-wrapper",
+    attrs: {
+      "id": 'add-tag-' + _vm.item.id
+    }
+  }, [_c('label', [_vm._v("\n\t\t\t\t\t\t\t\tAdd Tag: \n\t\t\t\t\t\t\t\t"), _c('input', {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: (_vm.newTag),
+      expression: "newTag"
+    }, {
+      name: "autowidth",
+      rawName: "v-autowidth"
+    }, {
+      name: "focus",
+      rawName: "v-focus"
+    }],
+    staticClass: "add-tag",
+    attrs: {
+      "type": "text",
+      "placeholder": "..."
+    },
+    domProps: {
+      "value": (_vm.newTag)
+    },
+    on: {
+      "blur": function($event) {
+        _vm.blurOnEdit(_vm.item)
+      },
+      "keydown": function($event) {
+        _vm.keydownOnEdit(_vm.item, $event, 'addTag')
+      },
+      "input": function($event) {
+        if ($event.target.composing) { return; }
+        _vm.newTag = $event.target.value
+      }
+    }
+  })])]), _vm._v(" "), _vm._l((_vm.item.tagged), function(tag) {
+    return (_vm.item.tagged.length) ? _c('span', {
+      directives: [{
+        name: "show",
+        rawName: "v-show",
+        value: (!_vm.parentTags.includes(tag.tag_name) ||
+          _vm.item.id == _vm.basis.editingItem ||
+          _vm.item.id == _vm.basis.editingItemTags),
+        expression: "!parentTags.includes(tag.tag_name)\n\t\t\t\t\t\t\t\t|| item.id == basis.editingItem\n\t\t\t\t\t\t\t\t|| item.id == basis.editingItemTags"
+      }],
+      staticClass: "custom-tag",
+      on: {
+        "dblclick": function($event) {
+          $event.preventDefault();
+          _vm.basis.filterItems('tag', tag.tag_slug, $event)
+        }
+      }
+    }, [_vm._v("\n\t\t\t\t\t\t\t" + _vm._s(tag.tag_name) + "\n\t\t\t\t\t\t\t"), (
+      (_vm.item.id == _vm.basis.editingItem ||
+        _vm.item.id == _vm.basis.editingItemTags) &&
+      !_vm.parentTags.includes(tag.tag_name)) ? _c('button', {
+      staticClass: "delete-tag",
+      attrs: {
+        "value": tag.tag_name
+      },
+      on: {
+        "click": function($event) {
+          $event.preventDefault();
+          _vm.deleteTag(_vm.item.id, tag.tag_name, $event)
+        },
+        "keydown": function($event) {
+          _vm.keydownOnEdit(_vm.item, $event, 'delete-tag')
+        }
+      }
+    }, [_c('i', {
+      staticClass: "zmdi zmdi-close-circle"
+    })]) : _vm._e()]) : _vm._e()
+  })], 2) : _vm._e()])]) : _vm._e(), _vm._v(" "), _c('div', {
     staticClass: "item-tags"
   }, [(_vm.item.id == _vm.basis.editingItem || _vm.item.id == _vm.basis.editingItemTags) ? _c('div', {
     staticClass: "add-tag-wrapper",
@@ -45670,7 +45982,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
         _vm.blurOnAddNew(_vm.item)
       }
     }
-  }, [_vm._v("10 min")]), _vm._v(" "), _c('button', {
+  }, [_vm._v("10" + _vm._s((_vm.basis.mobileSmall) ? 'm' : ' min'))]), _vm._v(" "), (!_vm.basis.mobileSmall) ? _c('button', {
     class: {
       currentDuration: _vm.newItem.planned_time == 15, 'planned-time': true
     },
@@ -45689,7 +46001,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
         _vm.blurOnAddNew(_vm.item)
       }
     }
-  }, [_vm._v("15 min")]), _vm._v(" "), _c('button', {
+  }, [_vm._v("15" + _vm._s((_vm.basis.mobileSmall) ? 'm' : ' min'))]) : _vm._e(), _vm._v(" "), _c('button', {
     class: {
       currentDuration: _vm.newItem.planned_time == 30, 'planned-time': true
     },
@@ -45708,7 +46020,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
         _vm.blurOnAddNew(_vm.item)
       }
     }
-  }, [_vm._v("30 min")]), _vm._v(" "), _c('button', {
+  }, [_vm._v("30" + _vm._s((_vm.basis.mobileSmall) ? 'm' : ' min'))]), _vm._v(" "), _c('button', {
     class: {
       currentDuration: _vm.newItem.planned_time == 60, 'planned-time': true
     },
@@ -45727,7 +46039,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
         _vm.blurOnAddNew(_vm.item)
       }
     }
-  }, [_vm._v("1 hour")]), _vm._v(" "), _c('div', [(true) ? _c('input', {
+  }, [_vm._v("1" + _vm._s((_vm.basis.mobileSmall) ? 'h' : ' hour'))]), _vm._v(" "), _c('div', [(true) ? _c('input', {
     directives: [{
       name: "model",
       rawName: "v-model",
@@ -45811,11 +46123,11 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     })]) : _vm._e()]) : _vm._e()
   })], 2), _vm._v(" "), (_vm.basis.mobile) ? _c('div', {
     staticClass: "buttonrow"
-  }, [_c('button', {
+  }, [(!_vm.listIsEmpty) ? _c('button', {
     on: {
       "click": _vm.cancelAddNew
     }
-  }, [_vm._v("Cancel")]), _vm._v(" "), _c('button', {
+  }, [_vm._v("Cancel")]) : _vm._e(), _vm._v(" "), _c('button', {
     on: {
       "click": _vm.addNew
     }

@@ -32,6 +32,7 @@
 	</div>
 	<div 
 		v-if="item.depth != 0"
+		:id="'item-body-'+item.id"
 		:class="{
 			'item-card': true,
 			done: item.done,
@@ -108,6 +109,7 @@
 				:id="'updatebox-'+item.id"
 				v-if="item.id == basis.editingItem"
 				@submit.prevent="doneEdit(item)"
+				@click="clickOnEditCurtain(item, $event)"
 			>
 				<div class="update-body">
 					<textarea
@@ -131,28 +133,29 @@
 							@keydown="keydownOnEdit(item, $event, 'planned-time')"
 							@blur="blurOnEdit(item)"
 							value="10"
-						>10 min</button>
+						>10{{ (basis.mobileSmall) ? 'm' : ' min' }}</button>
 						<button
+							v-if="!basis.mobileSmall"
 							:class="{ currentDuration: item.planned_time == 15, 'planned-time': true }"
 							@click.prevent="setPlannedTime(item, $event)"
 							@keydown="keydownOnEdit(item, $event, 'planned-time')"
 							@blur="blurOnEdit(item)"
 							value="15"
-						>15 min</button>
+						>15{{ (basis.mobileSmall) ? 'm' : ' min' }}</button>
 						<button
 							:class="{ currentDuration: item.planned_time == 30, 'planned-time': true }"
 							@click.prevent="setPlannedTime(item, $event)"
 							@keydown="keydownOnEdit(item, $event, 'planned-time')"
 							@blur="blurOnEdit(item)"
 							value="30"
-						>30 min</button>
+						>30{{ (basis.mobileSmall) ? 'm' : ' min' }}</button>
 						<button
 							:class="{ currentDuration: item.planned_time == 60, 'planned-time': true }"
 							@click.prevent="setPlannedTime(item, $event)"
 							@keydown="keydownOnEdit(item, $event, 'planned-time')"
 							@blur="blurOnEdit(item)"
 							value="60"
-						>1 hour</button>
+						>1{{ (basis.mobileSmall) ? 'h' : ' hour' }}</button>
 						<div><input
 							class="planned-time" 
 							type="number"
@@ -161,6 +164,51 @@
 							@blur="blurOnEdit(item)"
 							@keydown="keydownOnEdit(item, $event, 'planned-time')"
 						/>min</div>
+					</div>
+					<div class="item-tags"
+						v-if="basis.mobile && (item.id == basis.editingItem || item.id == basis.editingItemTags)"
+					>
+						<div
+							class="add-tag-wrapper"
+							:id="'add-tag-'+item.id"
+						>
+							<label>
+								Add Tag: 
+								<input
+									type="text"
+									class="add-tag"
+									v-model="newTag"
+									v-autowidth
+									v-focus
+									@blur="blurOnEdit(item)"
+									@keydown="keydownOnEdit(item, $event, 'addTag')"
+									placeholder="..."
+								>
+							</label>
+						</div>
+						<span
+							v-for="tag in item.tagged"
+							v-if="item.tagged.length"
+							v-show="!parentTags.includes(tag.tag_name)
+								|| item.id == basis.editingItem
+								|| item.id == basis.editingItemTags"
+							class="custom-tag"
+							@dblclick.prevent="basis.filterItems('tag', tag.tag_slug, $event)"
+						>
+							{{ tag.tag_name }}
+							<button
+								class="delete-tag"
+								v-if="
+									(item.id == basis.editingItem
+									|| item.id == basis.editingItemTags)
+									&& !parentTags.includes(tag.tag_name)"
+								@click.prevent="deleteTag(item.id, tag.tag_name, $event)"
+								@keydown="keydownOnEdit(item, $event, 'delete-tag')"
+								:value="tag.tag_name"
+							>
+								<i class="zmdi zmdi-close-circle"></i>
+							</button>
+						</span>
 					</div>
 				</div>
 			</form>
@@ -260,6 +308,7 @@
 			</div>
 <!-- / .ITEM-TAGS -->
 
+<!-- ITEM-NAV -->
 			<div
 				class="item-nav"
 				v-if="
@@ -302,8 +351,8 @@
 				>
 					<i class="zmdi zmdi-delete"></i>
 				</button>
-			</div><!-- / .item-nav -->
-			
+			</div>
+<!-- / .ITEM-NAV -->
 		</div>
 	</div>
 
@@ -353,14 +402,15 @@
 					@keydown="keydownOnNew(item, $event, 'planned-time')"
 					@blur="blurOnAddNew(item)"
 					value="10"
-				>10 min</button>
+				>10{{ (basis.mobileSmall) ? 'm' : ' min' }}</button>
 				<button
+					v-if="!basis.mobileSmall"
 					:class="{ currentDuration: newItem.planned_time == 15, 'planned-time': true }"
 					@click.prevent="setPlannedTimeNewItem(item, $event)"
 					@keydown="keydownOnNew(item, $event, 'planned-time')"
 					@blur="blurOnAddNew(item)"
 					value="15"
-				>15 min</button>
+				>15{{ (basis.mobileSmall) ? 'm' : ' min' }}</button>
 				<button
 					:class="{ currentDuration: newItem.planned_time == 30, 'planned-time': true }"
 					@click.prevent="setPlannedTimeNewItem(item, $event)"
@@ -368,14 +418,14 @@
 					@keydown="keydownOnNew(item, $event, 'planned-time')"
 					@blur="blurOnAddNew(item)"
 					value="30"
-				>30 min</button>
+				>30{{ (basis.mobileSmall) ? 'm' : ' min' }}</button>
 				<button
 					:class="{ currentDuration: newItem.planned_time == 60, 'planned-time': true }"
 					@click.prevent="setPlannedTimeNewItem(item, $event)"
 					@keydown="keydownOnNew(item, $event, 'planned-time')"
 					@blur="blurOnAddNew(item)"
 					value="60"
-				>1 hour</button>
+				>1{{ (basis.mobileSmall) ? 'h' : ' hour' }}</button>
 				<div><input
 					class="planned-time"
 					v-if="true"
@@ -414,7 +464,7 @@
 				</span>
 			</div>
 			<div class="buttonrow" v-if="basis.mobile">
-				<button @click="cancelAddNew">Cancel</button>
+				<button @click="cancelAddNew" v-if="!listIsEmpty">Cancel</button>
 				<button @click="addNew">Add and continue</button>
 				<button @click="addNew('stop')">Add and close</button>
 			</div>
@@ -495,8 +545,10 @@ export default {
 			return alltags.sort();
 		},
 		listIsEmpty()
-		{ if(!this.item || !allItems){ return 0; }
-			return this.$root.noItems;
+		{
+			if(!this.item || !allItems){ return false; }
+			if(this.item.id != allItems.root.id){ return false; }
+			if(!this.visibleChildren.length){ return true; }
 		},
 		basis()
 		{ if(!this.item || !allItems){ return 0; }
@@ -739,6 +791,12 @@ export default {
 			if(event && event.srcElement.nodeName != 'FORM'){ return; }
 			this.$root.cancelAddNew();
 		},
+		clickOnEditCurtain(item, event)
+		{
+			if(!vm.mobile){ return; }
+			if(event && event.srcElement.nodeName != 'FORM'){ return; }
+			this.doneEdit(item);
+		},
 		newItemIndent()
 		{
 			if(!this.item.children.length || !this.item.show_children)
@@ -800,7 +858,7 @@ export default {
 	        		let tagName = e.srcElement.value;
 					this.deletePreparedTag(item.id, tagName);
 	        	}
-			}			
+			}
 			// ENTER
 			if (e.keyCode === 13 && !e.shiftKey && !e.altKey && !e.metaKey && !e.ctrlKey)
 			{
@@ -1047,6 +1105,7 @@ export default {
 		    	{
 	        		return;
 				}　else {
+    				if(vm.mobile){ return; }
 			    	console.log('blurring on edit');
 					self.doneEdit(item);
 				}
@@ -1113,6 +1172,11 @@ export default {
 			let newItem = this.newItem;
 			// debugger;
 			this.$root.addNew(addNextItemAs, newItem, parentToBe, addTags)
+			// Reset stuff
+			this.newItem.body = '';
+			this.newItem.due_date = '0000-00-00 00:00:00';
+			this.newItem.planned_time = '';
+			this.newItem.preparedTags = [];
 		},
 		cancelAddNew()
 		{
@@ -1140,7 +1204,7 @@ export default {
 		deleteTag(id, tagName, event)
 		{
 			let plsFocus = '#add-tag-'+id+' .add-tag';
-			document.querySelector(plsFocus).focus();
+			document.querySelector(plsFocus).focus();			
 			this.$root.patchTag(id, tagName, 'untag');
 		},
 		deletePreparedTag(tag, item)

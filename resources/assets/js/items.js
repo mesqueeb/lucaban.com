@@ -105,7 +105,24 @@ $.getJSON('/api/items',function(fetchedData){
 				autosizeInput(el);
 			});
 		}
-	});	
+	});
+	Vue.directive('ios-dblclick', {
+		inserted(el, binding)
+		{
+			// TODO create ios Double click directive
+			// clicks++;
+			// if (clicks == 1) {
+			//     setTimeout(function(){
+			//         if(clicks == 1) {
+			//             single_click_callback.call(self, event);
+			//         } else {
+			//             double_click_callback.call(self, event);
+			//         }
+			//     clicks = 0;
+			//     }, timeout || 300);
+			// }
+		}
+	});
 
 
 	vm.patching = false;

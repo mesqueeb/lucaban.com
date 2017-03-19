@@ -5,7 +5,7 @@
 
 	<meta charset="UTF-8">
 	<meta name="csrf-token" id="csrf-token" content="{{ csrf_token() }}">
-	<meta name="viewport" content="width=device-width, initial-scale=1"">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no">
 	<link rel="stylesheet" href="/css/items.css">
 	{{-- <link rel="stylesheet" href="/css/fonts/material-design-iconic-font.min.css"> --}}
 
@@ -13,8 +13,8 @@
 
 </head>
 <body>
-<div style="position: fixed; height:100vh; width:100vw; top:0; left:0;">
-<div style="height:calc(100vh - 1px); width:100vw; z-index: 1; overflow-y: scroll; -webkit-overflow-scrolling: touch;">
+<div style="position: fixed; height:100%; width:100%; top:0; left:0;">
+<div style="height:calc(100% - 1px); width:100%; z-index: 1; overflow-y: scroll; -webkit-overflow-scrolling: touch;">
 {{-- <a href="{{route('home')}}">Go home</a> --}}
 <div id="items-app" :class="{'mobile':mobile}">
 
@@ -51,13 +51,17 @@
 			<a href="#"
 				@click="popouts.guide = true"
 				v-if="!mobile"
-			>?</a>
+			>?</a>			
+			<a href="#"
+				@click="test()"
+				v-if="false"
+			>TEST</a>
 		</div>
 		<div class="tag-menu">
-
 			<a v-for="tag in allTagsComputed"
 				href="#"
 				:class="{active: selection.tags.includes(tag.slug)}"
+				:value="tag.slug"
 				@click="filterItems('tag', tag.slug, $event)"
 			>@{{ tag.name }}</a>
 			<a v-for="tag in selection.hiddenTags"
@@ -99,7 +103,7 @@
 			<div class="done-children-amount">@{{ doneItemAmount }}</div>
 		</div>
 	</div>
-	<!-- DATA -->
+{{-- DATA --}}
 	<div class="items-wrapper"
 	>
 		<Card :item="allData"
@@ -107,9 +111,42 @@
 			{{-- :alltags="allTags" --}}
 		></Card>
 	</div>
-	<button id="floating-add-btn" v-if="true" @click="showAddNewItem()">
-		<i class="zmdi zmdi-plus-circle"></i>
-	</button>
+{{-- / DATA --}}
+	<div id="mobile-item-nav" v-if="mobile">
+		<button id=""
+			@click="moveItem('up')"
+			v-show="selection.selectedId"
+			:class="{'disabled':(firstItem == selection.selectedId)}"
+			:disabled="firstItem == selection.selectedId"
+		>
+			<i class="zmdi zmdi-caret-up-circle"></i>
+		</button>
+		<button id=""
+			@click="moveItem('down')"
+			v-show="selection.selectedId"
+			:class="{'disabled':(lastItems.includes(selection.selectedId))}"
+			:disabled="lastItems.includes(selection.selectedId)"
+		>
+			<i class="zmdi zmdi-caret-down-circle"></i>
+		</button>
+		<button id=""
+			@click="unindent()"
+			v-show="selection.selectedId"
+			:class="{'disabled':(topLvlItems.includes(selection.selectedId))}"
+			:disabled="topLvlItems.includes(selection.selectedId)"
+		>
+			<i class="zmdi zmdi-caret-left-circle"></i>
+		</button>
+		<button id=""
+			@click="indent()"
+			v-show="selection.selectedId"
+		>
+			<i class="zmdi zmdi-caret-right-circle"></i>
+		</button>
+		<button id="floating-add-btn" @click="showAddNewItem()">
+			<i class="zmdi zmdi-plus-circle"></i>
+		</button>
+	</div>
 </div>
 
 

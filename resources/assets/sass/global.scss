@@ -10,7 +10,7 @@ input:not([type=checkbox]):not([type=radio]), textarea{
 	box-shadow: none;
 }
 
-html, body { height:100vh; width:100vw; }
+html, body { height:100%; width:100%; }
 
 input[type="color"],
 input[type="date"],

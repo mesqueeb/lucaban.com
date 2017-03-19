@@ -136,7 +136,7 @@ invokeKeyBindingListener()
 		}
 		else
 		{ 
-			console.log('keydown event: NO inputs or buttons are focussed!');
+			// console.log('keydown event: NO inputs or buttons are focussed!');
 		  // INPUT AREAS NOT IN FOCUS
           switch(e.keyCode)
           { 

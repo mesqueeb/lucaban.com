@@ -126,8 +126,10 @@ addItem(item, index, addNextItemAs, addTags, duplication)
     if(addTags){ this.tagItem(item.id, addTags); }
 	this.attachParentBody(item.id);
 	this.autoCalculateDoneState(item.parent_id);
-    if (!duplication && addNextItemAs != 'stop')
+    if (duplication || addNextItemAs == 'stop')
     {
+    	vm.addingNewUnder = null;
+    } else {
 	    vm.showAddNewItem(item.id, addNextItemAs);
     }
 }
@@ -395,7 +397,7 @@ isTopLvlItemInFilteredRoot(id)
 	let s = selection;
 	if (selection.nothingSelected() && selection.view == 'tree')
 	{
-		console.log('the root is not filtered');
+		// console.log('the root is not filtered');
 		return false;
 	}
 	if (id == this.root.id)
@@ -696,6 +698,39 @@ getAllChildrenIdsRecursive(id, allChildrenIds)
 		item.children_order.forEach(item => { return allItems.getAllChildrenIdsRecursive(item, allChildrenIds) });
 	}
 }
+
+updateItemTagsDom(id, tags, requestType)
+{
+	/* requestType can be:
+		'tag': tag item  (default if null)
+		'untag': untag item with certain tag
+		'retag': delete all tags and retag new ones
+	*/
+	if(!tags){ return; }
+	if(Array.isArray(tags)){
+		tags.forEach(t => this.updateItemTagsDom(id, t, requestType));
+		return;
+	}
+	let tagName = tags.trim();
+	let tagSlug = this.tagNameToSlug(tagName);
+	let tempTag = { 'temp':'temp',
+		'tag_name':tagName,
+		'tag_slug':tagSlug,
+		'tag':{
+			'name':tagName,
+			'slug':tagSlug
+		}};
+	if(requestType == 'tag' || !requestType)
+	{
+		console.log(this.nodes[id].tagged);
+		this.nodes[id].tagged.push(tempTag);
+		console.log(this.nodes[id].tagged);
+	}
+	if(requestType == 'untag')
+	{
+		this.nodes[id].tagged = this.nodes[id].tagged.filter(t => t.tag_slug != tagSlug);
+	}
+}
 // calculateTotalTime(id)
 // {
 // 	let item = this.nodes[id];
@@ -799,6 +834,7 @@ moveItem(id, direction)
 			window.patchDelay = setTimeout(function(){ vm.patch(pId, 'children_order'); },1000);
 		}
 	}
+	Vue.nextTick(()=> vm.scrollToItemIfNeeded(id));
 }
 flushDoneItems() // Do not use yet. Not sure how to best implement this...
 {

@@ -39,6 +39,9 @@ label{
     font-weight: 300;
     margin: 0;
 }
+.disabled{
+    color: $border-grey;
+}
 .guide{
     table tr>td:first-child {
         border-right: thin solid lightgrey;
@@ -64,15 +67,22 @@ label{
         font-weight: 600;
     }
 }
-#floating-add-btn{
+#mobile-item-nav{
     position: fixed;
     right: 0.5em;
     bottom: 0.3em;
-    background-size: 100%;
     z-index: 3;
-    opacity: 0.7;
-    font-size: 3em;
     color: $theme-color;
+    button{
+        background-color: white;
+        font-size: 3em;
+        height: 0.8em;
+        border-radius: 1em !important;
+        i{
+            position: relative;
+            top: -0.1em;
+        }
+    }
 }
 
 .toggle-div{
@@ -153,7 +163,7 @@ label{
     a{
         transition: all 0.35s;
         text-decoration: none;
-        color: #4d4d4d;
+        color: #4d4d4d !important;
         margin: 0em 0.2em;
         padding: 0.3em;
         &:hover{
@@ -161,7 +171,7 @@ label{
         }
     }
     .active{
-        color: $theme-color;
+        color: $theme-color !important;
     }
     .filtered-out{
         text-decoration: line-through;
@@ -316,53 +326,6 @@ form.addnewbox{
     margin-left: 1.9em;
     border-bottom: thin solid rgba(245, 215, 110, 0.7);
 }
-.mobile form.addnewbox{
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 10;
-    position: fixed;
-    width: 100vw;
-    height: 100vh;
-    background-color: rgba(0, 0, 0, .5);
-    transition: opacity .3s ease;   
-    top: 0;
-    left: 0;
-    margin: 0;
-    flex-wrap: wrap;
-
-    textarea{
-        font-size: 16px;
-    }
-
-    >div{
-        background-color: white;
-        width: 100%;
-        padding: 1rem;
-        margin: 0 2rem;
-        &:first-child{
-            border-top-left-radius: 0.3em;
-            border-top-right-radius: 0.3em;
-            margin-top: auto;
-            border: none;
-            textarea{
-                border: rgba(245, 215, 110, 0.5) solid thin;
-            }
-        }
-        &:last-child{
-            border-bottom-left-radius: 0.3em;
-            border-bottom-right-radius: 0.3em;
-            padding-top: 0;
-            margin-bottom: auto;
-        }
-    }
-    .buttonrow{
-        display: flex;
-        justify-content: space-between;
-        width: 100%;
-    }
-}
 form.addnewbox.child{
     margin-left: 3.8em;  
 }
@@ -411,7 +374,7 @@ form.addnewbox.child{
 
 }
 .update-tags{
-    font-size: 0.85em;
+    font-size: 0.8em;
     display: flex;
     flex-direction: column;
     align-items: baseline;
@@ -499,4 +462,78 @@ input.add-tag, input.prepare-tag{
 input.prepare-tag::-webkit-input-placeholder,
 input.add-tag::-webkit-input-placeholder {
     color: white;
+}
+
+.mobile{
+    .update-planned-time{
+        font-size: 14px;
+    }
+    .prepared-tags {
+        font-size: 14px;
+    }
+    .prepared-tags span{
+        font-size: 16px;
+    }
+    .updatebox .item-tags{
+        span{
+            font-size: 16px;
+        }
+        .add-tag-wrapper label:first-child{
+            margin: 0;
+            font-size: 14px;
+        }
+    }
+}
+.mobile form.addnewbox,
+.mobile form.updatebox{
+    display: flex;
+    flex-direction: column;
+    // align-items: flex-start;
+    // justify-content: center;
+    z-index: 10;
+    position: fixed;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, .5);
+    transition: opacity .3s ease;   
+    top: 0;
+    left: 0;
+    margin: 0;
+    flex-wrap: wrap;
+    font-size: 16px;
+
+    textarea{
+        font-size: 16px;
+    }
+
+    >div{
+        background-color: white;
+        padding: 1rem;
+        margin: 0 1rem;
+        &:first-child{
+            border-top-left-radius: 0.3em;
+            border-top-right-radius: 0.3em;
+            margin-top: 1rem;
+            padding-bottom: 0.7rem;
+            border: none;
+            textarea{
+                border: rgba(245, 215, 110, 0.5) solid thin;
+            }
+        }
+        &:last-child{
+            border-bottom-left-radius: 0.3em;
+            border-bottom-right-radius: 0.3em;
+            padding-top: 0;
+            margin-bottom: auto;
+        }
+    }
+    .buttonrow{
+        display: flex;
+        justify-content: space-between;
+        width: 100%;
+        margin-top:0.4em;
+        button{
+            font-size:15px;
+        }
+    }
 }

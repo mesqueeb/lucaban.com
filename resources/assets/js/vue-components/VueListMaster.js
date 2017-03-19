@@ -69,23 +69,33 @@ export default {
             console.log(id);
             return;
         });
-        window.onscroll = function() {
-			if(!selection.filter.length && !selection.tags.length){ return; }
-			let el = document.getElementsByClassName('line');
-			// let el = $('.navigation');
-			if (!isElementInViewport(el[0]))
-			{
-		    	$("body").addClass("scrolled-down");
-			}
-			else
-			{
-		    	$("body").removeClass("scrolled-down");
-			}
-		};
+		// window.addEventListener( "scroll", function( event ) {
+		//     console.log(vm.mobile); return;
+		// });
+		// window.addEventListener( "onscroll", function( event ) {
+		//     console.log(vm.mobile); return;
+		// });
+   //      window.onscroll = function(e) {
+			// console.log(vm.mobile); return; };
+		// 	if(vm.mobile){ return; }
+		// 	let el = document.getElementsByClassName('line');
+		// 	// let el = $('.navigation');
+		// 	if (!isElementInViewport(el[0]))
+		// 	{
+		//     	console.log('a');
+		//     	document.querySelector("body").className += " scrolled-down";
+		// 	}
+		// 	else
+		// 	{
+		//     	let a = document.querySelector("body");
+		//     	document.querySelector("body").className = a.className.replace('scrolled-down','');
+		//     	console.log(a.className);
+		// 	}
+		// }.bind(this);
     },
 	computed:{
 		allData(){
-			if(this.noItems)
+			if(!allItems || !allItems.root)
 			{
 				return {
 					"body":"ALL",
@@ -105,7 +115,7 @@ export default {
 				"body":"ALL",
 				"children":this.filteredItems,
 				"children_order":this.nodes[allItems.root.id].children_order,
-				"id":this.nodes[allItems.root.id],
+				"id":this.nodes[allItems.root.id].id,
 				"depth":0,
 				"done":false,
 				"done_date":"0000-00-00 00:00:00",
@@ -122,11 +132,16 @@ export default {
 			}
 			return mobilecheck();
 		},
+		mobileSmall()
+		{
+			if (window.innerWidth < 385){ return true; }
+		},
 		noItems()
 		{
-			if(!allItems || !allItems.root || !allItems.root.children.length){
-				return true;
-			} return false;
+			if(!this.allData.children.length){ return true; }
+			// if(!allItems || !allItems.root || !allItems.root.children.length){
+			// 	return true;
+			// } return false;
 		},
 		// doneItems() // Flat
 		// {
@@ -134,7 +149,7 @@ export default {
 		// },
 		filteredItems()
 		{
-			if(this.noItems){ return []; }
+			// if(this.noItems){ return []; }
 			if (this.selection.view == 'tree')
 			{
 				return this.filteredItemsTree;
@@ -466,6 +481,26 @@ export default {
 		{
 			return sec_to_hourmin(this.totalSecLeft);
 		},
+		lastItems()
+		{
+			if(this.noItems || !this.$refs.root || !this.$refs.root.childrensDeepestChildren.length ){ return []; }
+			let basis = this.$refs.root;
+			let dc = basis.childrensDeepestChildren;
+			return [
+				basis.childrenOrder[basis.childrenOrder.length-1],
+				dc[dc.length-1].deepestChild,
+			];
+		},
+		firstItem()
+		{
+			if(this.noItems || !this.$refs.root){ return null; }
+			return this.$refs.root.childrenOrder[0];
+		},
+		topLvlItems()
+		{
+			if(this.noItems || !this.$refs.root){ return []; }
+			return this.$refs.root.childrenOrder;
+		},
 		// hiddenItemsTotalUsedTime()
 		// {
 		// 	// CodeMentor
@@ -485,7 +520,49 @@ export default {
 		// 	}, 0);
 		// },
 	},
-	methods:{
+	watch:
+	{
+		// allTagsComputed()
+		// {
+		// 	alert('allTagsComputed changed');
+		// 	console.log('allTagsComputed changed');
+		// },
+		// selection:
+		// {
+		// 	handler() {
+				// try 2
+				// Vue.nextTick(() => {
+				// 	this.allTagsComputed.forEach(t => {
+				// 		let el = document.querySelector("a[value='"+t.slug+"']");
+				// 		if(selection.tags.includes(t.slug))
+				// 		{
+				// 			el.className += ' active';
+				// 		} else {
+				// 			el.className = el.className.replace('active','');
+				// 		}
+				// 	})				
+				// });
+				// Vue.nextTick(()=> console.log('a'));
+				
+				// try 3
+				// setTimeout(() => {
+				// 	document.querySelectorAll(".tag-menu a").forEach(el => el.className = el.className.replace('active',''));
+				// 	this.allTagsComputed.forEach(t => {
+				// 		let el = document.querySelector("a[value='"+t.slug+"']");
+				// 		if(selection.tags.includes(t.slug))
+				// 		{
+				// 			el.className += ' active';
+				// 		} else {
+				// 			el.className = el.className.replace('active','');
+				// 		}
+				// 	})
+				// },1000);
+		    // },
+		    // deep: true
+		// },
+	},
+	methods:
+	{
 		startEdit(item, event)
 		{
 			// debugger;
@@ -499,17 +576,20 @@ export default {
 			item = (item) ? item : allItems.nodes[selection.selectedId];
 			this.beforeEditCache_body = item.body;
 			this.beforeEditCache_planned_time = item.planned_time;
-			if( this.mobile )
-			{
-				this.popouts.edit.push(item);
-				return;
-			}
-			this.editingItem = item.id;
-			// Vue.nextTick(function ()
+			// if( this.mobile )
 			// {
-			// 	let plsFocus = '#updatebox-'+item.id+' > .update-body > textarea';
-			// 	// document.querySelector(plsFocus).focus();
-			// });
+			// 	this.popouts.edit.push(item);
+			// 	return;
+			// }
+			this.editingItem = item.id;
+		},
+		scrollToItemIfNeeded(id)
+		{
+			let el = document.getElementById('item-body-'+id);
+			if(!isElementInViewport(el))
+			{
+				el.scrollIntoView();
+			}
 		},
 		doneEdit(item)
 		{
@@ -612,12 +692,6 @@ export default {
 			console.log(addTags);
 			// Send to Root for Ajax call.
 			this.postNewItem(newItem, index, addNextItemAs, addTags);
-
-			// Reset stuff
-			this.newItem.body = '';
-			this.newItem.due_date = '0000-00-00 00:00:00';
-			this.newItem.planned_time = '';
-			this.newItem.preparedTags = [];
 		},
 		itIsADeepestChild(id)
 		{
@@ -791,7 +865,7 @@ export default {
 				}
 			}
 			selection.selectedId = sel;
-			document.getElementById('card-'+sel).scrollIntoViewIfNeeded();
+			this.scrollToItemIfNeeded(sel);
 		},
 		findDeepestVisibleChild(id)
 		{
@@ -870,6 +944,7 @@ export default {
 				'retag': delete all tags and retag new ones
 			*/
 			if(!tags){ return; }
+			allItems.updateItemTagsDom(id, tags, requestType);
 			if(Array.isArray(tags)){
 				tags = removeEmptyValuesFromArray(tags);
 				if(!tags.length){ return; }
@@ -1071,6 +1146,14 @@ export default {
 			selection.addKeywords(keyword,value,operator);
 			// FILTER REWRITE
 			// allItems.filterItems(keyword,value,operator);
+			// setTimeout(()=>{ 
+			// 	let a = selection.tags;
+			// 	selection.tags = [];
+			// 	selection.tags = a;
+			// 	console.log(selection.tags);
+			// },500);
+			// console.log(selection.tags);
+			// setTimeout(()=>{ vm.test() },1000);
 		},
 		removeFilter(tag)
 		{
@@ -1120,11 +1203,31 @@ export default {
 
 		},
 		test(id){
+			document.querySelectorAll(".tag-menu a").forEach(el => alert(JSON.stringify(el.style.color)));
 			// id = (!id) ? selection.selectedId : id ;
-			id = selection.selectedId;
-			let item = allItems.nodes[id];
-			this.patchTag(id, 'bloem', 'tag');
+			// id = selection.selectedId;
+			// let item = allItems.nodes[id];
+			// this.patchTag(id, 'bloem', 'tag');
+
 		},
+		alert(value)
+		{
+			alert(value);
+		},
+		// tagActive(tag)
+		// {
+		// 	console.log(tag);
+		// 	return selection.tags.includes(tag);
+		// 	console.log(this.allTagsComputed.map(t => t.name));
+		// 	console.log(selection.tags);
+		// 	if(selection.tags.includes(tagslug)){ console.log(tagslug); }
+		// 	let a;
+		// 	Vue.nextTick(() => {
+		// 		a = true;
+		// 		return selection.tags.includes(tagslug)
+		// 	});
+		// 	console.log(a);
+		// },
 	},
 	http: {
 		headers: {
