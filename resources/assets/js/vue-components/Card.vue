@@ -84,7 +84,8 @@
 				class="bodybox"
 				v-show="item.id != basis.editingItem"
 			>
-				<div>{{ linkify(item.body) }}</div>
+				<div :class="{'lightgray':item.temp}"
+				>{{ linkify(item.body) }}</div>
 				<div class="completion-notes bodybox"
 					v-if="item.completion_memo"
 					@click="selectItem(item)"

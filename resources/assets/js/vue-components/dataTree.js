@@ -109,6 +109,9 @@ addItem(item, index, addNextItemAs, addTags, duplication)
 	this.addAndCleanNodesRecursively(item);
 	const parent = this.nodes[item.parent_id];
 	if(!parent.children_order)	{ parent.children_order = [] 	 }
+	//Remove the Temp item
+	parent.children = parent.children.filter(i => !i.temp);
+	parent.children_order = parent.children_order.filter(i => i != 'x');
 	//Actually ADD the item!
 	parent.children.splice(index, 0, item);
 	parent.children_order.splice(index, 0, item.id);
@@ -129,9 +132,30 @@ addItem(item, index, addNextItemAs, addTags, duplication)
     if (duplication || addNextItemAs == 'stop')
     {
     	vm.addingNewUnder = null;
+    	Vue.nextTick(()=> vm.scrollToItemIfNeeded(item.id));
     } else {
 	    vm.showAddNewItem(item.id, addNextItemAs);
     }
+}
+addTempNewItem(item, index, addNextItemAs, addTags)
+{
+	item = JSON.parse(JSON.stringify(item));
+	console.log('temp item.body');
+	console.log(item.body);
+	item.id = 'x';
+	item.temp = true;
+	this.addAndCleanNodesRecursively(item);
+	console.log(item.body);
+	const parent = this.nodes[item.parent_id];
+	if(!parent.children_order)	{ parent.children_order = [] 	 }
+	//Actually ADD the item!
+	parent.children.splice(index, 0, item);
+	parent.children_order.splice(index, 0, item.id);
+    if (addNextItemAs == 'stop')
+    {
+    	vm.addingNewUnder = null;
+    	Vue.nextTick(()=> vm.scrollToItemIfNeeded(item.id));
+	}
 }
 tagNameToSlug(tag)
 {
@@ -230,14 +254,18 @@ hideDoneNodes()
 }
 siblingIndex(id)
 {
-	let parent_id = this.nodes[id].parent_id;
+	let item = this.nodes[id];
+	if(!item){ return; }
+	let parent_id = item.parent_id;
 	if(!parent_id){ return; }
 	let siblingsArray = this.nodes[parent_id].children_order;
 	return siblingsArray.indexOf(id);
 }
 olderSiblingId(id)
 {
-	let parent_id = this.nodes[id].parent_id;
+	let item = this.nodes[id];
+	if(!item){ return; }
+	let parent_id = item.parent_id;
 	if(!parent_id){ return; }
 	let siblingsArray = this.nodes[parent_id].children_order;
 	if(siblingsArray.length <= 1 || this.siblingIndex(id) == 0)
@@ -252,6 +280,7 @@ nextItemId(id, debug)
 	if(debug){ debugger; }
 	if(!id){ return; }
 	let item = this.nodes[id];
+	if(!item){ return; }
 	let nextItemId;
 	// Select next item on top level.
 	if ( this.isTopLvlItemInFilteredRoot(id) && !item.show_children
@@ -293,7 +322,10 @@ nextItemId(id, debug)
 // }
 nextSiblingOrParentsSiblingId(id)
 {
-	let parent_id = this.nodes[id].parent_id;
+	let item = this.nodes[id];
+	if(!item){ return; }
+	let parent_id = item.parent_id;
+	if(!parent_id){ return; }
 	let children_order = this.nodes[parent_id].children_order;
 	let nextIndex = this.siblingIndex(id)+1;
 	if (nextIndex == children_order.length)

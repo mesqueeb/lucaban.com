@@ -25143,6 +25143,13 @@ var _class = function () {
 			if (!parent.children_order) {
 				parent.children_order = [];
 			}
+			//Remove the Temp item
+			parent.children = parent.children.filter(function (i) {
+				return !i.temp;
+			});
+			parent.children_order = parent.children_order.filter(function (i) {
+				return i != 'x';
+			});
 			//Actually ADD the item!
 			parent.children.splice(index, 0, item);
 			parent.children_order.splice(index, 0, item.id);
@@ -25164,8 +25171,35 @@ var _class = function () {
 			this.autoCalculateDoneState(item.parent_id);
 			if (duplication || addNextItemAs == 'stop') {
 				vm.addingNewUnder = null;
+				Vue.nextTick(function () {
+					return vm.scrollToItemIfNeeded(item.id);
+				});
 			} else {
 				vm.showAddNewItem(item.id, addNextItemAs);
+			}
+		}
+	}, {
+		key: 'addTempNewItem',
+		value: function addTempNewItem(item, index, addNextItemAs, addTags) {
+			item = JSON.parse(JSON.stringify(item));
+			console.log('temp item.body');
+			console.log(item.body);
+			item.id = 'x';
+			item.temp = true;
+			this.addAndCleanNodesRecursively(item);
+			console.log(item.body);
+			var parent = this.nodes[item.parent_id];
+			if (!parent.children_order) {
+				parent.children_order = [];
+			}
+			//Actually ADD the item!
+			parent.children.splice(index, 0, item);
+			parent.children_order.splice(index, 0, item.id);
+			if (addNextItemAs == 'stop') {
+				vm.addingNewUnder = null;
+				Vue.nextTick(function () {
+					return vm.scrollToItemIfNeeded(item.id);
+				});
 			}
 		}
 	}, {
@@ -25297,7 +25331,11 @@ var _class = function () {
 	}, {
 		key: 'siblingIndex',
 		value: function siblingIndex(id) {
-			var parent_id = this.nodes[id].parent_id;
+			var item = this.nodes[id];
+			if (!item) {
+				return;
+			}
+			var parent_id = item.parent_id;
 			if (!parent_id) {
 				return;
 			}
@@ -25307,7 +25345,11 @@ var _class = function () {
 	}, {
 		key: 'olderSiblingId',
 		value: function olderSiblingId(id) {
-			var parent_id = this.nodes[id].parent_id;
+			var item = this.nodes[id];
+			if (!item) {
+				return;
+			}
+			var parent_id = item.parent_id;
 			if (!parent_id) {
 				return;
 			}
@@ -25328,6 +25370,9 @@ var _class = function () {
 				return;
 			}
 			var item = this.nodes[id];
+			if (!item) {
+				return;
+			}
 			var nextItemId = void 0;
 			// Select next item on top level.
 			if (this.isTopLvlItemInFilteredRoot(id) && !item.show_children || selection.view == 'journal') {
@@ -25367,7 +25412,14 @@ var _class = function () {
 	}, {
 		key: 'nextSiblingOrParentsSiblingId',
 		value: function nextSiblingOrParentsSiblingId(id) {
-			var parent_id = this.nodes[id].parent_id;
+			var item = this.nodes[id];
+			if (!item) {
+				return;
+			}
+			var parent_id = item.parent_id;
+			if (!parent_id) {
+				return;
+			}
 			var children_order = this.nodes[parent_id].children_order;
 			var nextIndex = this.siblingIndex(id) + 1;
 			if (nextIndex == children_order.length) {
@@ -38408,6 +38460,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
 
 // import Morph from '../components/valueMorphers.js'
 // window.Morph = new Morph();
@@ -40564,8 +40617,8 @@ window.selection = new __WEBPACK_IMPORTED_MODULE_4__Selection_js__["a" /* defaul
 			// let items = (this.$refs.root) ? this.$refs.root.allVisibleChildItems : [] ;
 			var items = this.filteredItemsFlat.length ? this.filteredItemsFlat : [];
 			console.log('allTagsComputed_2');
-			console.log('this.$refs.root.allVisibleChildItems');
-			console.log(this.$refs.root.allVisibleChildItems);
+			// console.log('this.$refs.root.allVisibleChildItems');
+			// console.log(this.$refs.root.allVisibleChildItems);
 			if (!items.length) {
 				return [];
 			}
@@ -40649,7 +40702,7 @@ window.selection = new __WEBPACK_IMPORTED_MODULE_4__Selection_js__["a" /* defaul
 			// let x = this.countChildren(this.allData);
 			// let x = this.$refs.root.allVisibleChildItems.length;
 			var items = this.filteredItemsFlat.length ? this.filteredItemsFlat : [];
-			return items.length;
+			return items.length - 1;
 		},
 		doneItemAmount: function doneItemAmount() {
 			if (this.noItems) {
@@ -40706,24 +40759,26 @@ window.selection = new __WEBPACK_IMPORTED_MODULE_4__Selection_js__["a" /* defaul
 			return __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_3__components_globalFunctions_js__["i" /* sec_to_hourmin */])(this.totalSecLeft);
 		},
 		lastItems: function lastItems() {
-			if (this.noItems || !this.$refs.root || !this.$refs.root.childrensDeepestChildren.length) {
+			if (this.noItems) {
 				return [];
 			}
-			var basis = this.$refs.root;
-			var dc = basis.childrensDeepestChildren;
-			return [basis.childrenOrder[basis.childrenOrder.length - 1], dc[dc.length - 1].deepestChild];
+			var lastChild = this.topLvlItems[this.topLvlItems.length - 1];
+			var deepestChild = this.findDeepestVisibleChild(lastChild);
+			return [lastChild, deepestChild];
 		},
 		firstItem: function firstItem() {
-			if (this.noItems || !this.$refs.root) {
+			if (this.noItems) {
 				return null;
 			}
-			return this.$refs.root.childrenOrder[0];
+			return this.topLvlItems[0];
 		},
 		topLvlItems: function topLvlItems() {
-			if (this.noItems || !this.$refs.root) {
+			if (this.noItems) {
 				return [];
 			}
-			return this.$refs.root.childrenOrder;
+			return this.filteredItemsTree.map(function (i) {
+				return i.id;
+			});
 		}
 	},
 	watch: {
@@ -40877,6 +40932,7 @@ window.selection = new __WEBPACK_IMPORTED_MODULE_4__Selection_js__["a" /* defaul
 			console.log(addTags);
 			// Send to Root for Ajax call.
 			this.postNewItem(newItem, index, addNextItemAs, addTags);
+			allItems.addTempNewItem(newItem, index, addNextItemAs, addTags);
 		},
 		itIsADeepestChild: function itIsADeepestChild(id) {
 			if (!id) {
@@ -41438,6 +41494,12 @@ window.selection = new __WEBPACK_IMPORTED_MODULE_4__Selection_js__["a" /* defaul
 			}, function (response) {
 				_this4.patching = 'error';
 			});
+		},
+		isFirstItem: function isFirstItem(id) {
+			if (this.noItems) {
+				return false;
+			}
+			return allItems.siblingIndex(id) == 0;
 		},
 		test: function test(id) {
 			document.querySelectorAll(".tag-menu a").forEach(function (el) {
@@ -45478,7 +45540,11 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
       expression: "item.id != basis.editingItem"
     }],
     staticClass: "bodybox"
-  }, [_c('div', [_vm._v(_vm._s(_vm.linkify(_vm.item.body)))]), _vm._v(" "), (_vm.item.completion_memo) ? _c('div', {
+  }, [_c('div', {
+    class: {
+      'lightgray': _vm.item.temp
+    }
+  }, [_vm._v(_vm._s(_vm.linkify(_vm.item.body)))]), _vm._v(" "), (_vm.item.completion_memo) ? _c('div', {
     staticClass: "completion-notes bodybox",
     on: {
       "click": function($event) {

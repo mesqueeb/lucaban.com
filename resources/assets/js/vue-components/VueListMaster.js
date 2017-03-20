@@ -356,8 +356,8 @@ export default {
 			// let items = (this.$refs.root) ? this.$refs.root.allVisibleChildItems : [] ;
 			let items = (this.filteredItemsFlat.length) ? this.filteredItemsFlat : [] ;
 			console.log('allTagsComputed_2');
-			console.log('this.$refs.root.allVisibleChildItems');
-			console.log(this.$refs.root.allVisibleChildItems);
+			// console.log('this.$refs.root.allVisibleChildItems');
+			// console.log(this.$refs.root.allVisibleChildItems);
 			if(!items.length){ return []; }
 			allTagsArray = items.reduce(function(a, item)
 			{
@@ -434,7 +434,7 @@ export default {
 			// let x = this.countChildren(this.allData);
 			// let x = this.$refs.root.allVisibleChildItems.length;
 			let items = (this.filteredItemsFlat.length) ? this.filteredItemsFlat : [] ;
-			return items.length;
+			return items.length-1;
 		},
 		doneItemAmount()
 		{
@@ -483,23 +483,20 @@ export default {
 		},
 		lastItems()
 		{
-			if(this.noItems || !this.$refs.root || !this.$refs.root.childrensDeepestChildren.length ){ return []; }
-			let basis = this.$refs.root;
-			let dc = basis.childrensDeepestChildren;
-			return [
-				basis.childrenOrder[basis.childrenOrder.length-1],
-				dc[dc.length-1].deepestChild,
-			];
+			if(this.noItems ){ return []; }
+			let lastChild = this.topLvlItems[this.topLvlItems.length-1];
+			let deepestChild = this.findDeepestVisibleChild(lastChild);
+			return [lastChild, deepestChild];
 		},
 		firstItem()
 		{
-			if(this.noItems || !this.$refs.root){ return null; }
-			return this.$refs.root.childrenOrder[0];
+			if(this.noItems){ return null; }
+			return this.topLvlItems[0];
 		},
 		topLvlItems()
 		{
-			if(this.noItems || !this.$refs.root){ return []; }
-			return this.$refs.root.childrenOrder;
+			if(this.noItems){ return []; }
+			return this.filteredItemsTree.map(i => i.id);
 		},
 		// hiddenItemsTotalUsedTime()
 		// {
@@ -692,6 +689,7 @@ export default {
 			console.log(addTags);
 			// Send to Root for Ajax call.
 			this.postNewItem(newItem, index, addNextItemAs, addTags);
+			allItems.addTempNewItem(newItem, index, addNextItemAs, addTags);
 		},
 		itIsADeepestChild(id)
 		{
@@ -1201,6 +1199,11 @@ export default {
 				this.patching = 'error';
 			});
 
+		},
+		isFirstItem(id)
+		{
+			if(this.noItems){ return false; }
+			return (allItems.siblingIndex(id) == 0);
 		},
 		test(id){
 			document.querySelectorAll(".tag-menu a").forEach(el => alert(JSON.stringify(el.style.color)));
