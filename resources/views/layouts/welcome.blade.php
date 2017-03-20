@@ -130,7 +130,9 @@
 </footer>
 
 </div>{{-- /.lp-wrapper  --}}
-<script>window.defaultLanguage = {!! json_encode($defaultLanguage) !!};</script>
+<script>
+    window.defaultLanguage = "{{ $_GET["l"] or $defaultLanguage }}";
+</script>
 <script src="js/lp.js"></script>
 </body>
 </html>
