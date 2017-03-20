@@ -381,7 +381,17 @@
 		@submit.prevent
 		@click="clickOnAddNewCurtain($event)"
 	>
-		<div>
+		<div class="flex flex-wrap">
+			<div class="languagePicker" v-if="listIsEmpty">
+				<a href="#"
+					@click="basis.setLanguage = 'ja'"
+					v-if="basis.language != 'ja'"
+				>日本語</a>
+				<a href="#"
+					@click="basis.setLanguage = 'en'"
+					v-if="basis.language != 'en'"
+				>English</a>
+			</div>
 			<textarea type="text"
 				v-focus.mobile
 				v-autoheight

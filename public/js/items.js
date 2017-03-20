@@ -38461,6 +38461,16 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 // import Morph from '../components/valueMorphers.js'
 // window.Morph = new Morph();
@@ -46132,7 +46142,29 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
         _vm.clickOnAddNewCurtain($event)
       }
     }
-  }, [_c('div', [_c('textarea', {
+  }, [_c('div', {
+    staticClass: "flex flex-wrap"
+  }, [(_vm.listIsEmpty) ? _c('div', {
+    staticClass: "languagePicker"
+  }, [(_vm.basis.language != 'ja') ? _c('a', {
+    attrs: {
+      "href": "#"
+    },
+    on: {
+      "click": function($event) {
+        _vm.basis.setLanguage = 'ja'
+      }
+    }
+  }, [_vm._v("日本語")]) : _vm._e(), _vm._v(" "), (_vm.basis.language != 'en') ? _c('a', {
+    attrs: {
+      "href": "#"
+    },
+    on: {
+      "click": function($event) {
+        _vm.basis.setLanguage = 'en'
+      }
+    }
+  }, [_vm._v("English")]) : _vm._e()]) : _vm._e(), _vm._v(" "), _c('textarea', {
     directives: [{
       name: "focus",
       rawName: "v-focus.mobile",

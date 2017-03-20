@@ -39,6 +39,20 @@ label{
     font-weight: 300;
     margin: 0;
 }
+.flex{
+    display: flex;
+}
+.flex-wrap{
+    flex-wrap: wrap;
+}
+.languagePicker{
+    width: 100%;
+    text-align: end;
+    a {
+        text-decoration: none;
+        color: $theme-color;
+    }
+}
 .lightgray{
     color: #d0d0d0 !important; 
 }
