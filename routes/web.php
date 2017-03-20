@@ -13,6 +13,7 @@
 
 Auth::routes();
 Route::get('/', ['as' => 'home', 'uses' => 'ViewController@index'])->name('home');
+Route::get('/ja', ['as' => 'home', 'uses' => 'ViewController@indexJA'])->name('home');
 Route::get('/home', ['as' => 'home', 'uses' => 'ViewController@index']);
 Route::get('/items', ['as' => 'items', 'uses' => 'ViewController@items']);
 // Codementor ↑ what's this?

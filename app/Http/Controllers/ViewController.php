@@ -14,7 +14,11 @@ class viewController extends Controller
     }
     public function index()
     {
-        return view('layouts.welcome');
+        return view('layouts.welcome')->with('defaultLanguage','en');
+    }
+    public function indexJA()
+    {
+        return view('layouts.welcome')->with('defaultLanguage','ja');
     }
     public function items()
     {

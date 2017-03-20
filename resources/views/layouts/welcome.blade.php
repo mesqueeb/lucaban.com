@@ -24,22 +24,34 @@
             <a class="nav-link active" href="#page-top">{{ config('app.name', 'Laravel') }}</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" href="#about">About</a>
+            <a class="nav-link" href="#"
+                @click="setLanguage = 'ja'"
+                v-if="language == 'en'"
+            >日本語</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" href="#author">Author</a>
+            <a class="nav-link" href="#"
+                @click="setLanguage = 'en'"
+                v-if="language == 'ja'"
+            >English</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="#about">@{{ contents.menu.about }}</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="#author">@{{ contents.menu.author }}</a>
         </li>
         @if (Route::has('login'))
             @if (Auth::check())
                 <li class="nav-item">
-                    <a class="nav-link" href="{{ url('/items') }}">My list</a>
+                    <a class="nav-link" href="{{ url('/items') }}">@{{ contents.menu.myList }}</a>
                 </li>
             @else
                 <li class="nav-item">
-                    <a class="nav-link" href="{{ url('/login') }}">Login</a>
+                    <a class="nav-link" href="{{ url('/login') }}">@{{ contents.menu.login }}</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="{{ url('/register') }}">Register</a>
+                    <a class="nav-link" href="{{ url('/register') }}">@{{ contents.menu.register }}</a>
                 </li>
             @endif
         @endif
@@ -47,80 +59,36 @@
 </nav>
 <div class="line"></div>
 <section class="jumbotron" id="page-top">
-    <h1 class="">Say hello to {{ config('app.name', 'Laravel') }}</h1>
-    <p class="lead">
-        A simple task list for people who want to be organized without making things more complicated.
+    <h1 class="">@{{contents.lp.jumbotron.title}} {{ config('app.name', 'Laravel') }} @{{contents.lp.jumbotron.title2}}</h1>
+    <p class="lead" v-html="contents.lp.jumbotron.body">
     </p>
-    <p><a class="btn btn-lg btn-outline" href="{{ url('/items') }}" role="button">Try it out</a></p>
+    <p><a class="btn btn-lg btn-outline" href="{{ url('/items') }}" role="button" v-html="contents.lp.jumbotron.btn"></a></p>
 </section>
 
 <div class="container">
     <section class="row about" id="about">
         <div class="col-12">
-            <p>{{ config('app.name', 'Laravel') }} is focussed on the following features:</p>
+            <p>{{ config('app.name', 'Laravel') }} @{{contents.lp.features.intro}}</p>
         </div>
-        {{-- <div class="card">
-            <img class="card-img-top"
-                src="img/all.png"
-                alt="example image"
-            >
-            <div class="card-block">
-                <h4 class="card-title">Simplicity</h4>
-                <p class="card-text">It needs to "just work". I believe an app shouldn't require a manual to know how to work it. Intuition is the prime pillar.</p>
-            </div>
-        </div> --}}
-        <div class="col-md-4">
-            <h4>Simplicity</h4>
-            <p>It needs to "just work". I believe an app shouldn't require a manual to know how to work it. Intuition is the prime pillar.</p>
+        <div class="col-md-4" v-for="card in contents.lp.features.cards">
+            <h4 v-html="card.title"></h4>
+            <p v-html="card.body"></p>
             <p><img class="img-fluid img-thumbnail"
-                src="img/all.png"
-                alt="example image"
-            ></p>
-        </div>
-        <div class="col-md-4">
-            <h4>Time management</h4>
-            <p>Add 'planned time' for a perspective of your taskload. You can use timers for increased productivity. You can easily log how much time you have spent on a task.</p>
-            <p><img class="img-fluid img-thumbnail"
-                src="img/timer.png"
-                alt="example image"
-            ></p>
-        </div>
-        <div class="col-md-4">
-            <h4>A journal of done tasks</h4>
-            <p>The most important feature to know what you've done.</p>
-            <p><img class="img-fluid img-thumbnail"
-                src="img/journal.png"
-                alt="example image"
-            ></p>
-        </div>
-        <div class="col-md-4">
-            <h4>Tags</h4>
-            <p>Tags for filtering and organization.</p>
-            <p><img class="img-fluid img-thumbnail"
-                src="img/filter.png"
-                alt="example image"
-            ></p>
-        </div>
-        <div class="col-md-4">
-            <h4>Keyboard controls</h4>
-            <p>Keep it fast and easy to work with. And powerfull for power users.</p>
-            <p><img class="img-fluid img-thumbnail"
-                src="img/keyboard.jpg"
+                :src="card.img"
                 alt="example image"
             ></p>
         </div>
     </section>
     <section class="row marketting">
         <div class="col-12">
-            <p><a class="btn btn-lg btn-success" href="{{ url('/items') }}" role="button">Try it out now</a></p>
+            <p><a class="btn btn-lg btn-success" href="{{ url('/items') }}" role="button" v-html="contents.lp.author.btn"></a></p>
         </div>
     </section>
     <section class="row about" id="author">
         <div class="col-12">
-            <h4>About the Author</h4>
-            <p>Hello community. My name is Luca Ban. I always wanted to build the perfect task list app that fits my needs. I have used about all task list apps out there. But there was always something missing. So that's why I decided to create {{ config('app.name', 'Laravel') }}.
-            <br><br>
-            <span v-html="aboutMe"></span></p>
+            <h4 v-html="contents.lp.author.title"></h4>
+            <p v-html="">@{{contents.lp.author.body1}}{{ config('app.name', 'Laravel') }}@{{contents.lp.author.body1b}}</p>
+            <p v-html="marked(contents.lp.author.body2)"></p>
         </div>
     </section>
 </div>
@@ -129,6 +97,7 @@
 </footer>
 
 </div>{{-- /.lp-wrapper  --}}
+<script>window.defaultLanguage = {!! json_encode($defaultLanguage) !!};</script>
 <script src="js/lp.js"></script>
 </body>
 </html>
