@@ -44,7 +44,14 @@
         @if (Route::has('login'))
             @if (Auth::check())
                 <li class="nav-item">
-                    <a class="nav-link" href="{{ url('/items') }}">@{{ contents.menu.myList }}</a>
+                    <a class="nav-link"
+                        href="{{ url('/items') }}"
+                        v-if="language == 'en'"
+                    >@{{ contents.menu.myList }}</a>
+                    <a class="nav-link"
+                        href="{{ url('/items?l=ja') }}"
+                        v-if="language == 'ja'"
+                    >@{{ contents.menu.myList }}</a>
                 </li>
             @else
                 <li class="nav-item">
@@ -62,7 +69,20 @@
     <h1 class="">@{{contents.lp.jumbotron.title}} {{ config('app.name', 'Laravel') }} @{{contents.lp.jumbotron.title2}}</h1>
     <p class="lead" v-html="contents.lp.jumbotron.body">
     </p>
-    <p><a class="btn btn-lg btn-outline" href="{{ url('/items') }}" role="button" v-html="contents.lp.jumbotron.btn"></a></p>
+    <p>
+        <a class="btn btn-lg btn-outline"
+            role="button"
+            v-if="language == 'ja'"
+            href="{{ url('/items?l=ja') }}"
+            v-html="contents.lp.jumbotron.btn"
+        ></a>
+        <a class="btn btn-lg btn-outline"
+            role="button"
+            v-if="language == 'en'"
+            href="{{ url('/items') }}"
+            v-html="contents.lp.jumbotron.btn"
+        ></a>
+    </p>
 </section>
 
 <div class="container">
@@ -81,7 +101,20 @@
     </section>
     <section class="row marketting">
         <div class="col-12">
-            <p><a class="btn btn-lg btn-success" href="{{ url('/items') }}" role="button" v-html="contents.lp.author.btn"></a></p>
+            <p>
+                <a class="btn btn-lg btn-success"
+                    role="button"
+                    v-if="language == 'ja'"
+                    href="{{ url('/items?l=ja') }}"
+                    v-html="contents.lp.author.btn"
+                ></a>
+                <a class="btn btn-lg btn-success"
+                    role="button"
+                    v-if="language == 'en'"
+                    href="{{ url('/items') }}"
+                    v-html="contents.lp.author.btn"
+                ></a>
+            </p>
         </div>
     </section>
     <section class="row about" id="author">

@@ -244,6 +244,7 @@ export default {
 		language()
 		{
 			if(this.setLanguage){ return this.setLanguage; }
+			else if (defaultLanguage) { return defaultLanguage; }
 			else { return 'en'; }
 		},
 		text()

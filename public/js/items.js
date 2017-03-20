@@ -40489,6 +40489,8 @@ window.selection = new __WEBPACK_IMPORTED_MODULE_4__Selection_js__["a" /* defaul
 		language: function language() {
 			if (this.setLanguage) {
 				return this.setLanguage;
+			} else if (defaultLanguage) {
+				return defaultLanguage;
 			} else {
 				return 'en';
 			}

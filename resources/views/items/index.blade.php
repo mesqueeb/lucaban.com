@@ -167,6 +167,9 @@
 </div>{{-- /Items App --}}
 </div>{{-- /Inner Wrapper  --}}
 </div>{{-- /Outer Wrapper  --}}
+<script>
+	window.defaultLanguage = "{{ $_GET["l"] or 'en' }}";
+</script>
 <script src="js/items.js"></script>
 </body>
 </html>
