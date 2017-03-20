@@ -69,7 +69,7 @@ $.getJSON('/api/items',function(fetchedData){
 	window.vm = new Vue(VueListMaster);
 	new ListAppKeyBindings();
 	// vm.allData = allItems.root;
-	vm.doneData = allItems.doneitems;
+	// vm.doneData = allItems.doneitems;
 	vm.nodes = allItems.nodes;
 
 	console.log('allItems ↓');

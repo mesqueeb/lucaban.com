@@ -14,15 +14,24 @@ class viewController extends Controller
     }
     public function index()
     {
-        return view('layouts.welcome')->with('defaultLanguage','en');
+        \App::setLocale('en');
+        view()->share('currentLanguage', 'en');
+        return view('layouts.welcome');
     }
     public function indexJA()
     {
-        return view('layouts.welcome')->with('defaultLanguage','ja');
+        \App::setLocale('ja');
+        view()->share('currentLanguage', 'ja');
+        return view('layouts.welcome');
     }
     public function items()
     {
     	$tags = \App\Item::existingTags();
 		return view('items.index')->with('tags',$tags);
+    }
+    public function itemsJA()
+    {
+        $tags = \App\Item::existingTags();
+        return view('items.index')->with('tags',$tags);
     }
 }

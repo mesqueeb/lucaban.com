@@ -12,10 +12,11 @@
 */
 
 Auth::routes();
-Route::get('/', ['as' => 'home', 'uses' => 'ViewController@index'])->name('home');
-Route::get('/ja', ['as' => 'home', 'uses' => 'ViewController@indexJA'])->name('home');
+Route::get('/', ['uses' => 'ViewController@index'])->name('en.home');
+Route::get('/ja', ['uses' => 'ViewController@indexJA'])->name('ja.home');
 Route::get('/home', ['as' => 'home', 'uses' => 'ViewController@index']);
 Route::get('/items', ['as' => 'items', 'uses' => 'ViewController@items']);
+Route::get('/ja/items', ['as' => 'items', 'uses' => 'ViewController@itemsJA']);
 // Codementor ↑ what's this?
 
 ////////////////////////////////////////////////

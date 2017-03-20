@@ -325,6 +325,13 @@
 					{{ basis.text.card.edit }}
 				</button>
 				<button
+					v-if="basis.mobile"
+					class="setToday"
+					@click="setToday(item.id)"
+				>
+					{{ basis.text.card.setToday }}
+				</button>
+				<button
 					v-if="!item.done"
 					class="timer"
 					@click="addTimer(item)"
@@ -377,12 +384,14 @@
 			'child':addingNewAsChild,
 			'first-child':addingNewAsFirstChild,}"
 		:id="'new-under-'+ item.id "
-		v-if="showAddNewBox || (listIsEmpty && basis.selection.view != 'journal')"
+		v-if=" showAddNewBox
+			|| (basis.addingNewEmptyList && basis.selection.view != 'journal')
+			|| (listIsEmpty && !basis.mobile && basis.selection.view != 'journal')"
 		@submit.prevent
 		@click="clickOnAddNewCurtain($event)"
 	>
 		<div class="flex flex-wrap">
-			<div class="languagePicker" v-if="listIsEmpty">
+			<div class="languagePicker" v-if="listIsEmpty && basis.mobile">
 				<a href="#"
 					@click="basis.setLanguage = 'ja'"
 					v-if="basis.language != 'ja'"
@@ -444,7 +453,7 @@
 					v-model="newItem.planned_time"
 					@keydown="keydownOnNew(item, $event, 'planned-time')"
 					@blur="blurOnAddNew(item)"
-				/>min</div>
+				/>{{ basis.text.global.min }}</div>
 			</div>
 			<div class="item-tags prepared-tags">
 				<div class="add-prepared-tag-wrapper">
@@ -502,6 +511,7 @@ export default {
 	{
 		// this.newItem.preparedTags = JSON.parse(JSON.stringify(this.parentTags));
 		this.convertbodyURLtoHTML();
+		if(this.listIsEmpty){ this.$root.addingNewEmptyList = true; }
 	},
 	props: ['item','parentsChildrenOrder'],
 	data()
@@ -1170,6 +1180,10 @@ export default {
 			item = (item) ? item : allItems.nodes[selection.selectedId];
 			this.$root.beforeEditCache_done_date = item.done_date;
 			this.$root.editingDoneDateItem = item.id;
+		},
+		setToday(id)
+		{
+			this.$root.setToday(id);
 		},
 		deleteItem(item)
 		{

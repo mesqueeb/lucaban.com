@@ -28,6 +28,7 @@ window.langContentsItems = {
 			'duration':'Duration:',
 			'addTag':'Add tag:',
 			'edit':'Edit',
+			'setToday':'Do today',
 			'addAndContinue':'Add and continue',
 			'addAndClose':'Add and close',
 		},
@@ -98,6 +99,7 @@ window.langContentsItems = {
 			'duration':'使用時間:',
 			'addTag':'タグを追加:',
 			'edit':'編集',
+			'setToday':'今日やる',
 			'addAndContinue':'複数追加',
 			'addAndClose':'追加して閉じる',
 		},
@@ -173,6 +175,7 @@ export default {
 		nodes: {},
 		selection,
 		addingNewUnder: null,
+		addingNewEmptyList: false,
 		addingNewAsChild: false,
 		addingNewAsFirstChild: false,
 		editingItem: null,
@@ -802,6 +805,7 @@ export default {
 		{
 			console.log('cancelAddNew');
 			this.addingNewUnder = null;
+			this.addingNewEmptyList = false;
 			selection.selectedId = selection.lastSelectedId;
 			// Reset newItem to sibling stance.
 			this.addingNewAsChild = false;
@@ -1035,6 +1039,7 @@ export default {
 		setToday(id)
 		{
 			id = (id) ? id : selection.selectedId;
+			if(!id){ return; }
 			if(allItems.hasParentDueToday(id)){ console.log('parent is already due'); return; }
 			allItems.setDueDate(id);
 		},

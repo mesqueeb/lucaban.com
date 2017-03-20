@@ -37777,7 +37777,7 @@ __WEBPACK_IMPORTED_MODULE_0_jquery___default.a.getJSON('/api/items', function (f
 	window.vm = new __WEBPACK_IMPORTED_MODULE_10_vue___default.a(__WEBPACK_IMPORTED_MODULE_13__vue_components_VueListMaster_js__["a" /* default */]);
 	new __WEBPACK_IMPORTED_MODULE_15__components_ListAppKeyBindings_js__["a" /* default */]();
 	// vm.allData = allItems.root;
-	vm.doneData = allItems.doneitems;
+	// vm.doneData = allItems.doneitems;
 	vm.nodes = allItems.nodes;
 
 	console.log('allItems ↓');
@@ -38471,6 +38471,15 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 // import Morph from '../components/valueMorphers.js'
 // window.Morph = new Morph();
@@ -38486,6 +38495,9 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 	mounted: function mounted() {
 		// this.newItem.preparedTags = JSON.parse(JSON.stringify(this.parentTags));
 		this.convertbodyURLtoHTML();
+		if (this.listIsEmpty) {
+			this.$root.addingNewEmptyList = true;
+		}
 	},
 
 	props: ['item', 'parentsChildrenOrder'],
@@ -39219,6 +39231,9 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 			item = item ? item : allItems.nodes[selection.selectedId];
 			this.$root.beforeEditCache_done_date = item.done_date;
 			this.$root.editingDoneDateItem = item.id;
+		},
+		setToday: function setToday(id) {
+			this.$root.setToday(id);
 		},
 		deleteItem: function deleteItem(item) {
 			var id = item.id;
@@ -40305,6 +40320,7 @@ window.langContentsItems = {
 			'duration': 'Duration:',
 			'addTag': 'Add tag:',
 			'edit': 'Edit',
+			'setToday': 'Do today',
 			'addAndContinue': 'Add and continue',
 			'addAndClose': 'Add and close'
 		},
@@ -40364,6 +40380,7 @@ window.langContentsItems = {
 			'duration': '使用時間:',
 			'addTag': 'タグを追加:',
 			'edit': '編集',
+			'setToday': '今日やる',
 			'addAndContinue': '複数追加',
 			'addAndClose': '追加して閉じる'
 		},
@@ -40428,6 +40445,7 @@ window.selection = new __WEBPACK_IMPORTED_MODULE_4__Selection_js__["a" /* defaul
 		nodes: {},
 		selection: selection,
 		addingNewUnder: null,
+		addingNewEmptyList: false,
 		addingNewAsChild: false,
 		addingNewAsFirstChild: false,
 		editingItem: null,
@@ -41046,6 +41064,7 @@ window.selection = new __WEBPACK_IMPORTED_MODULE_4__Selection_js__["a" /* defaul
 		cancelAddNew: function cancelAddNew() {
 			console.log('cancelAddNew');
 			this.addingNewUnder = null;
+			this.addingNewEmptyList = false;
 			selection.selectedId = selection.lastSelectedId;
 			// Reset newItem to sibling stance.
 			this.addingNewAsChild = false;
@@ -41302,6 +41321,9 @@ window.selection = new __WEBPACK_IMPORTED_MODULE_4__Selection_js__["a" /* defaul
 		},
 		setToday: function setToday(id) {
 			id = id ? id : selection.selectedId;
+			if (!id) {
+				return;
+			}
 			if (allItems.hasParentDueToday(id)) {
 				console.log('parent is already due');return;
 			}
@@ -46081,7 +46103,14 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
         _vm.startEdit(_vm.item)
       }
     }
-  }, [_vm._v("\n\t\t\t\t\t" + _vm._s(_vm.basis.text.card.edit) + "\n\t\t\t\t")]) : _vm._e(), _vm._v(" "), (!_vm.item.done) ? _c('button', {
+  }, [_vm._v("\n\t\t\t\t\t" + _vm._s(_vm.basis.text.card.edit) + "\n\t\t\t\t")]) : _vm._e(), _vm._v(" "), (_vm.basis.mobile) ? _c('button', {
+    staticClass: "setToday",
+    on: {
+      "click": function($event) {
+        _vm.setToday(_vm.item.id)
+      }
+    }
+  }, [_vm._v("\n\t\t\t\t\t" + _vm._s(_vm.basis.text.card.setToday) + "\n\t\t\t\t")]) : _vm._e(), _vm._v(" "), (!_vm.item.done) ? _c('button', {
     staticClass: "timer",
     on: {
       "click": function($event) {
@@ -46125,7 +46154,9 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
         "parentsChildrenOrder": _vm.childrenOrder
       }
     })
-  })) : _vm._e(), _vm._v(" "), (_vm.showAddNewBox || (_vm.listIsEmpty && _vm.basis.selection.view != 'journal')) ? _c('form', {
+  })) : _vm._e(), _vm._v(" "), (_vm.showAddNewBox ||
+    (_vm.basis.addingNewEmptyList && _vm.basis.selection.view != 'journal') ||
+    (_vm.listIsEmpty && !_vm.basis.mobile && _vm.basis.selection.view != 'journal')) ? _c('form', {
     class: {
       'addnewbox': true,
       'child': _vm.addingNewAsChild,
@@ -46144,7 +46175,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     }
   }, [_c('div', {
     staticClass: "flex flex-wrap"
-  }, [(_vm.listIsEmpty) ? _c('div', {
+  }, [(_vm.listIsEmpty && _vm.basis.mobile) ? _c('div', {
     staticClass: "languagePicker"
   }, [(_vm.basis.language != 'ja') ? _c('a', {
     attrs: {
@@ -46310,7 +46341,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
         _vm.newItem.planned_time = $event.target.value
       }
     }
-  }) : _vm._e(), _vm._v("min")])]), _vm._v(" "), _c('div', {
+  }) : _vm._e(), _vm._v(_vm._s(_vm.basis.text.global.min))])]), _vm._v(" "), _c('div', {
     staticClass: "item-tags prepared-tags"
   }, [_c('div', {
     staticClass: "add-prepared-tag-wrapper"
