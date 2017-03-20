@@ -17,17 +17,17 @@
 		<div 
 			class="delete"
 		>
-			<div class="bodybox">Really delete「{{ item.body }}」<strong v-if="item.children.length" style="padding-left:0 0.3em;"> and all children</strong>?
+			<div class="bodybox">{{ basis.text.popouts.reallyDelete }}「{{ item.body }}」<strong v-if="item.children.length" style="padding-left:0 0.3em;"> {{ basis.text.popouts.andAllChildren }}</strong>?
 			</div>
 			<div class="nav">
 				<button class="btn-cancel" 
 					@click="popoutCall('confirm-cancel', item)"
-				>Cancel</button>
+				>{{ basis.text.global.cancel }}</button>
 				<button
 					class="btn-ok btn-warning"
 					v-focus
 					@click="popoutCall('confirm-ok', item)"
-				>Delete</button>
+				>{{ basis.text.global.delete }}</button>
 			</div>
 		</div>
 	</div>
@@ -42,9 +42,9 @@
 			<div class="bodybox">
 				<table>
 					<tr>
-						<th>Action</th><th>Key</th>
+						<th>{{ basis.text.guide.action }}</th><th>{{ basis.text.guide.key }}</th>
 					</tr>
-					<tr v-for="row in keybindings">
+					<tr v-for="row in basis.text.guide.keybindings">
 						<td v-html="row.note"></td><td>{{ row.key }}</td>
 					</tr>
 				</table>
@@ -54,7 +54,7 @@
 					class="btn-ok"
 					v-focus
 					@click="this.clearAll"
-				>OK</button>
+				>{{ basis.text.popouts.ok }}</button>
 			</div>
 		</div>
 	</div>
@@ -98,7 +98,7 @@
 						v-if="item.used_time>item.planned_time*60"
 						class="overtime-notice"
 					>
-						overtime
+						{{ basis.text.popouts.overtime }}
 					</div>
 					<div>
 						{{ countdownTimer(item.used_time,item.planned_time) }}
@@ -107,7 +107,7 @@
 				<div
 					v-if="item.used_time>item.planned_time*60 && item.planned_time"
 				>
-					Total  {{ sec_to_hhmmss(item.used_time) }}
+					{{ basis.text.popouts.total }}  {{ sec_to_hhmmss(item.used_time) }}
 				</div>
 				<!-- {{ item.used_time }}</div> -->
 			</div>
@@ -130,7 +130,7 @@
 				>
 				<span v-if="item.planned_time && item.used_time<item.planned_time*60"
 				>-</span><span v-else>+</span>
-				1 min
+				1 {{ basis.text.global.min }}
 				</button>
 				<button
 					class="forward btn btn-dipclick"
@@ -138,16 +138,16 @@
 				>
 				<span v-if="item.planned_time && item.used_time<item.planned_time*60"
 				>-</span><span v-else>+</span>
-				5 min
+				5 {{ basis.text.global.min }}
 				</button>
 				<button
 					class="reset btn btn-dipclick"
 					@click="timerNav('reset', item)"
-				>Reset</button>
+				>{{ basis.text.popouts.reset }}</button>
 				<button
 					class="btn-ok"
 					@click="timerNav('close', item)"
-				>OK</button>
+				>{{ basis.text.popouts.ok }}</button>
 			</div>
 		</div>
 	</div>
@@ -180,35 +180,35 @@
 						<div
 							class="update-planned-time"
 						>
-							<span>Duration:</span>
+							<span>{{ basis.text.card.duration }}</span>
 							<button
 								:class="{ currentDuration: item.planned_time == 10, 'planned-time': true }"
 								@click.prevent="card.setPlannedTime(item, $event)"
 								@keydown="card.keydownOnEdit(item, $event, 'planned-time')"
 								@blur="card.blurOnEdit(item)"
 								value="10"
-							>10 min</button>
+							>10 {{ basis.text.global.min }}</button>
 							<button
 								:class="{ currentDuration: item.planned_time == 15, 'planned-time': true }"
 								@click.prevent="card.setPlannedTime(item, $event)"
 								@keydown="card.keydownOnEdit(item, $event, 'planned-time')"
 								@blur="card.blurOnEdit(item)"
 								value="15"
-							>15 min</button>
+							>15 {{ basis.text.global.min }}</button>
 							<button
 								:class="{ currentDuration: item.planned_time == 30, 'planned-time': true }"
 								@click.prevent="card.setPlannedTime(item, $event)"
 								@keydown="card.keydownOnEdit(item, $event, 'planned-time')"
 								@blur="card.blurOnEdit(item)"
 								value="30"
-							>30 min</button>
+							>30 {{ basis.text.global.min }}</button>
 							<button
 								:class="{ currentDuration: item.planned_time == 60, 'planned-time': true }"
 								@click.prevent="card.setPlannedTime(item, $event)"
 								@keydown="card.keydownOnEdit(item, $event, 'planned-time')"
 								@blur="card.blurOnEdit(item)"
 								value="60"
-							>1 hour</button>
+							>1 {{ basis.text.global.hour }}</button>
 							<div><input
 								class="planned-time" 
 								type="number"
@@ -216,7 +216,7 @@
 								v-model="item.planned_time"
 								@blur="card.blurOnEdit(item)"
 								@keydown="card.keydownOnEdit(item, $event, 'planned-time')"
-							/>min</div>
+							/>{{ basis.text.global.min }}</div>
 						</div>
 					</div>
 				</form>
@@ -225,11 +225,11 @@
 				<button
 					class="btn"
 					@click="card.cancelEdit(item)"
-				>Cancel</button>
+				>{{ basis.text.global.cancel }}</button>
 				<button
 					class="btn"
 					@click="card.doneEdit(item)"
-				>Save</button>
+				>{{ basis.text.global.save }}</button>
 			</div>
 		</div>
 	</div>
@@ -248,16 +248,6 @@ export default {
 	data(){
 		return {
 			timerRunning: true,
-			keybindings: [
-				{'key':'T','note':'Do <u>T</u>oday'},
-				{'key':'S','note':'<u>S</u>topwatch / Timer'},
-				{'key':'tab','note':'Indent item'},
-				{'key':'enter','note':'Add item'},
-				{'key':'cmd/ctrl + enter','note':'Edit item'},
-				{'key':'shift + T','note':'Edit tags'},
-				{'key':'alt + click on tag','note':'Hide tag'},
-				{'key':'cmd/ctrl + ↑↓','note':'Move item up/down'},
-			],
 		};
 	},
 	mounted()

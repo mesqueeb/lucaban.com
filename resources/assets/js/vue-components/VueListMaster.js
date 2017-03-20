@@ -1,3 +1,148 @@
+window.langContentsItems = {
+	'en':
+	{
+		'global'://
+		{
+			'min':'min',
+			'hour':'hour',
+			'm':'m',
+			'h':'h',
+			'cancel':'Cancel',
+			'delete':'Delete',
+			'save':'save',
+		},
+		'menu'://
+		{
+			'all':'All',
+			'today':'Today',
+			'journal':'Journal',
+			'?':'?',
+			'usedTime':'Used time',
+			'timeLeft':'Time left',
+			'items':'Items',
+			'done':'Done',
+			'total':'Total',
+		},
+		'card'://
+		{
+			'duration':'Duration:',
+			'addTag':'Add tag:',
+			'edit':'Edit',
+			'addAndContinue':'Add and continue',
+			'addAndClose':'Add and close',
+		},
+		'tags':
+		{
+			'done':'Done',
+			'today':'Today',
+		},
+		'popouts'://
+		{
+			'reset':'Reset',
+			'ok':'Ok',
+			'reallyDelete':'Really delete',
+			'andAllChildren':'And all children',
+			'overtime':'overtime',
+			'total':'Total',
+		},		
+		'popups'://
+		{
+			'journalNotes':'Journal notes',
+			'completed':'Completed',
+			'completedB':'',
+			'usedTime':'Used time',
+			'reset':'Reset',
+		},
+		'guide'://
+		{
+			'action':'Action',
+			'key':'Key',
+			'keybindings': [
+				{'key':'T','note':'Do <u>T</u>oday'},
+				{'key':'S','note':'<u>S</u>topwatch / Timer'},
+				{'key':'tab','note':'Indent item'},
+				{'key':'enter','note':'Add item'},
+				{'key':'cmd/ctrl + enter','note':'Edit item'},
+				{'key':'shift + T','note':'Edit tags'},
+				{'key':'alt + click on tag','note':'Hide tag'},
+				{'key':'cmd/ctrl + ↑↓','note':'Move item up/down'},
+			],
+		},
+	},
+	'ja':
+	{
+		'global'://
+		{
+			'min':'分',
+			'hour':'時',
+			'm':'分',
+			'h':'時',
+			'cancel':'キャンセル',
+			'delete':'削除',
+			'save':'保存',
+		},
+		'menu'://
+		{
+			'all':'全て',
+			'today':'今日',
+			'journal':'日報',
+			'?':'？',
+			'usedTime':'使用時間',
+			'timeLeft':'残時間',
+			'items':'アイテム',
+			'done':'完了',
+			'total':'合計',
+		},
+		'card'://
+		{
+			'duration':'使用時間:',
+			'addTag':'タグを追加:',
+			'edit':'編集',
+			'addAndContinue':'複数追加',
+			'addAndClose':'追加して閉じる',
+		},
+		'tags':
+		{
+			'done':'完了',
+			'today':'今日',
+		},
+		'popouts'://
+		{
+			'reset':'リセット',
+			'ok':'Ok',
+			'reallyDelete':'本当に削除しますか？',
+			'andAllChildren':'とその中の全てのアイテム',
+			'overtime':'オーバータイム',
+			'total':'合計',
+		},		
+		'popups'://
+		{
+			'journalNotes':'日報メモ',
+			'completed':'',
+			'completedB':'を完了致しました',
+			'usedTime':'使用時間',
+			'reset':'リセット',
+		},
+		'guide'://
+		{
+			'action':'アクション',
+			'key':'ショートカットキー',
+			'keybindings': [
+				{'key':'T','note':'今日のタスクとして設定'},
+				{'key':'S','note':'ストップウォッチ / タイマー'},
+				{'key':'tab','note':'アイテムを右へ'},
+				{'key':'enter','note':'アイテムを追加'},
+				{'key':'cmd/ctrl + enter','note':'アイテムを編集'},
+				{'key':'shift + T','note':'タグを編集'},
+				{'key':'alt + click on tag','note':'タグのアイテムを非表示'},
+				{'key':'cmd/ctrl + ↑↓','note':'アイテムを上下へ移動'},
+			],
+		},
+	},
+
+};
+
+
 import Card from './Card.vue';
 import Popups from './Popups.vue';
 import Popouts from './Popouts.vue';
@@ -51,6 +196,8 @@ export default {
 			children: '',
 		},
 		newTag: null,
+		setLanguage: null,
+		langContentsItems,
 		// allTags: [],
 	},
 	components: {
@@ -94,6 +241,16 @@ export default {
 		// }.bind(this);
     },
 	computed:{
+		language()
+		{
+			if(this.setLanguage){ return this.setLanguage; }
+			else { return 'en'; }
+		},
+		text()
+		{
+			if(this.language == 'en'){ return this.langContentsItems.en; }
+			if(this.language == 'ja'){ return this.langContentsItems.ja; }
+		},
 		allData(){
 			if(!allItems || !allItems.root)
 			{

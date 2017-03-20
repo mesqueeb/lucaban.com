@@ -127,14 +127,14 @@
 						class="update-planned-time"
 						v-show="basis.selection.view != 'journal'"
 					>
-						Duration:
+						{{ basis.text.card.duration }}
 						<button
 							:class="{ currentDuration: item.planned_time == 10, 'planned-time': true }"
 							@click.prevent="setPlannedTime(item, $event)"
 							@keydown="keydownOnEdit(item, $event, 'planned-time')"
 							@blur="blurOnEdit(item)"
 							value="10"
-						>10{{ (basis.mobileSmall) ? 'm' : ' min' }}</button>
+						>10{{ (basis.mobileSmall) ? basis.text.global.m : basis.text.global.min }}</button>
 						<button
 							v-if="!basis.mobileSmall"
 							:class="{ currentDuration: item.planned_time == 15, 'planned-time': true }"
@@ -142,21 +142,21 @@
 							@keydown="keydownOnEdit(item, $event, 'planned-time')"
 							@blur="blurOnEdit(item)"
 							value="15"
-						>15{{ (basis.mobileSmall) ? 'm' : ' min' }}</button>
+						>15{{ (basis.mobileSmall) ? basis.text.global.m : basis.text.global.min }}</button>
 						<button
 							:class="{ currentDuration: item.planned_time == 30, 'planned-time': true }"
 							@click.prevent="setPlannedTime(item, $event)"
 							@keydown="keydownOnEdit(item, $event, 'planned-time')"
 							@blur="blurOnEdit(item)"
 							value="30"
-						>30{{ (basis.mobileSmall) ? 'm' : ' min' }}</button>
+						>30{{ (basis.mobileSmall) ? basis.text.global.m : basis.text.global.min }}</button>
 						<button
 							:class="{ currentDuration: item.planned_time == 60, 'planned-time': true }"
 							@click.prevent="setPlannedTime(item, $event)"
 							@keydown="keydownOnEdit(item, $event, 'planned-time')"
 							@blur="blurOnEdit(item)"
 							value="60"
-						>1{{ (basis.mobileSmall) ? 'h' : ' hour' }}</button>
+						>1{{ (basis.mobileSmall) ? basis.text.global.h : basis.text.global.hour }}</button>
 						<div><input
 							class="planned-time" 
 							type="number"
@@ -164,7 +164,7 @@
 							v-model="item.planned_time"
 							@blur="blurOnEdit(item)"
 							@keydown="keydownOnEdit(item, $event, 'planned-time')"
-						/>min</div>
+						/>{{ basis.text.global.min }}</div>
 					</div>
 					<div class="item-tags"
 						v-if="basis.mobile && (item.id == basis.editingItem || item.id == basis.editingItemTags)"
@@ -174,7 +174,7 @@
 							:id="'add-tag-'+item.id"
 						>
 							<label>
-								Add Tag: 
+								{{ basis.text.card.addTag }}
 								<input
 									type="text"
 									class="add-tag"
@@ -223,7 +223,7 @@
 					v-if="item.id == basis.editingItem || item.id == basis.editingItemTags"
 				>
 					<label>
-						Add Tag: 
+						{{ basis.text.card.addTag }}
 						<input
 							type="text"
 							class="add-tag"
@@ -242,7 +242,7 @@
 						&& item.id != basis.editingDoneDateItem
 						&& !journalView"
 				>
-					Done {{ momentCalendar(item.done_date) }}
+					{{ basis.text.tags.done }} {{ momentCalendar(item.done_date) }}
 					<input
 						v-flatpicky
 						:id="'done-date-edit-'+item.id"
@@ -322,7 +322,7 @@
 					class="edit"
 					@click="startEdit(item)"
 				>
-					Edit
+					{{ basis.text.card.edit }}
 				</button>
 				<button
 					v-if="!item.done"
@@ -396,14 +396,14 @@
 		</div>
 		<div class="update-tags">
 			<div class="update-planned-time">
-				Duration:
+				{{ basis.text.card.duration }}
 				<button
 					:class="{ currentDuration: newItem.planned_time == 10, 'planned-time': true }"
 					@click.prevent="setPlannedTimeNewItem(item, $event)"
 					@keydown="keydownOnNew(item, $event, 'planned-time')"
 					@blur="blurOnAddNew(item)"
 					value="10"
-				>10{{ (basis.mobileSmall) ? 'm' : ' min' }}</button>
+				>10{{ (basis.mobileSmall) ? basis.text.global.m : basis.text.global.min }}</button>
 				<button
 					v-if="!basis.mobileSmall"
 					:class="{ currentDuration: newItem.planned_time == 15, 'planned-time': true }"
@@ -411,7 +411,7 @@
 					@keydown="keydownOnNew(item, $event, 'planned-time')"
 					@blur="blurOnAddNew(item)"
 					value="15"
-				>15{{ (basis.mobileSmall) ? 'm' : ' min' }}</button>
+				>15{{ (basis.mobileSmall) ? basis.text.global.m : basis.text.global.min }}</button>
 				<button
 					:class="{ currentDuration: newItem.planned_time == 30, 'planned-time': true }"
 					@click.prevent="setPlannedTimeNewItem(item, $event)"
@@ -419,14 +419,14 @@
 					@keydown="keydownOnNew(item, $event, 'planned-time')"
 					@blur="blurOnAddNew(item)"
 					value="30"
-				>30{{ (basis.mobileSmall) ? 'm' : ' min' }}</button>
+				>30{{ (basis.mobileSmall) ? basis.text.global.m : basis.text.global.min }}</button>
 				<button
 					:class="{ currentDuration: newItem.planned_time == 60, 'planned-time': true }"
 					@click.prevent="setPlannedTimeNewItem(item, $event)"
 					@keydown="keydownOnNew(item, $event, 'planned-time')"
 					@blur="blurOnAddNew(item)"
 					value="60"
-				>1{{ (basis.mobileSmall) ? 'h' : ' hour' }}</button>
+				>1{{ (basis.mobileSmall) ? basis.text.global.h : basis.text.global.hour }}</button>
 				<div><input
 					class="planned-time"
 					v-if="true"
@@ -439,7 +439,7 @@
 			<div class="item-tags prepared-tags">
 				<div class="add-prepared-tag-wrapper">
 					<label>
-						Add Tag: 
+						{{ basis.text.card.addTag }}
 						<input type="text"
 							class="prepare-tag"
 							@keydown="keydownOnNew(item, $event, 'prepare-tag')"
@@ -465,9 +465,9 @@
 				</span>
 			</div>
 			<div class="buttonrow" v-if="basis.mobile">
-				<button @click="cancelAddNew" v-if="!listIsEmpty">Cancel</button>
-				<button @click="addNew">Add and continue</button>
-				<button @click="addNew('stop')">Add and close</button>
+				<button @click="cancelAddNew" v-if="!listIsEmpty">{{ basis.text.global.cancel }}</button>
+				<button @click="addNew">{{ basis.text.card.addAndContinue }}</button>
+				<button @click="addNew('stop')">{{ basis.text.card.addAndClose }}</button>
 			</div>
 		</div>
 	</form>

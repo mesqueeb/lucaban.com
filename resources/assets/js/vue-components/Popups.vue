@@ -10,7 +10,7 @@
         v-if="popup.type=='afterDone'"
     >
         <div class="top">
-            <div class="title">Completed {{popup.item.body}}
+            <div class="title">{{ basis.text.popups.completed }} {{popup.item.body}} {{ basis.text.popups.completedB }}
             <label class="done-after-done"
                 @keydown="keydownInPopup(popup, $event, 'flatPicker')"
             >{{ momentCalendar(popup.item.done_date) }}
@@ -26,7 +26,7 @@
         
         <div class="body">
             <div class="completion-memo">
-              <label>Journal notes</label>
+              <label>{{ basis.text.popups.journalNotes }}</label>
               <textarea name="completion_memo"
                 v-model="popup.item.completion_memo"
                 @keydown="keydownInCompletionMemo(popup, $event)"
@@ -36,7 +36,7 @@
             </div>
             <div class="used-time">
               <div>
-                <label class="">Used time</label>
+                <label class="">{{ basis.text.popups.usedTime }}</label>
                 <!-- <input v-model="popup.item.used_time" type="number"/> -->
                 <span class="">{{ sec_to_hhmmss(popup.item.used_time) }}</span>
               </div>
@@ -44,23 +44,23 @@
                 <div>
                   <button class="forward"
                     @click="incrementUsedTime(popup.item, 60)"
-                  >+1 min</button>
+                  >+1 {{ basis.text.global.min }}</button>
                   <button class="forward"
                     @click="incrementUsedTime(popup.item, 300)"
-                  >+5 min</button>
+                  >+5 {{ basis.text.global.min }}</button>
                   <button class="forward"
                     @click="incrementUsedTime(popup.item, 600)"
-                  >+10 min</button>
+                  >+10 {{ basis.text.global.min }}</button>
                 </div><div>
                   <button class="forward"
                     @click="incrementUsedTime(popup.item, 1800)"
-                  >+30 min</button>
+                  >+30 {{ basis.text.global.min }}</button>
                   <!-- <button class="forward"
                     @click="incrementUsedTime(popup.item, 3600)"
                   >+1 hour</button> -->
                   <button class="reset"
                     @click="resetUsedTime(popup.item)"
-                  >Reset</button>
+                  >{{ basis.text.popups.reset }}</button>
                 </div>
               </div>
             </div>
@@ -88,6 +88,12 @@ export default {
     template: '#popups-template',
     props: ['popups'],
     data(){ return { flatPickConfig }; },
+    computed: {
+        basis()
+        {
+          return this.$root;
+        },
+    },
     methods: {
         sec_to_hhmmss, momentCalendar,
         addPopup(popup) {

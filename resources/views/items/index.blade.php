@@ -38,20 +38,28 @@
 			<a href="#"
 				:class="{active: selection.filter.includes('all')}"
 				@click="filterItems('all', 'all')"
-			>All</a>
+			>@{{ text.menu.all }}</a>
 			<a href="#"
 				:class="{active: selection.filter.includes('today')}"
 				@click="filterItems('duedate','today', $event)"
-			>Today</a>
+			>@{{ text.menu.today }}</a>
 			<a href="#"
 				:class="{active: selection.view.includes('journal'),
 					'filtered-out': selection.hiddenBookmarks.includes('journal')}"
 				@click="filterItems('journal', 'journal', $event)"
-			>Journal</a>
+			>@{{ text.menu.journal }}</a>
 			<a href="#"
 				@click="popouts.guide = true"
 				v-if="!mobile"
-			>?</a>			
+			>?</a>
+			<a href="#"
+				@click="setLanguage = 'ja'"
+				v-if="language != 'ja'"
+			>日本語</a>
+			<a href="#"
+				@click="setLanguage = 'en'"
+				v-if="language != 'en'"
+			>English</a>
 			<a href="#"
 				@click="test()"
 				v-if="false"
@@ -87,19 +95,19 @@
 		v-show="true"
 	>
 		<div v-show="totalUsedHourMin && selection.view != 'journal'">
-			Used time
+			@{{ text.menu.usedTime }}
 			<div class="used-time">@{{ totalUsedHourMin }}</div>
 		</div>
 		<div v-show="totalHourMinLeft && selection.view != 'journal'">
-			Time left
+			@{{ text.menu.timeLeft }}
 			<div class="time-left">@{{ totalHourMinLeft }}</div>
 		</div>
 		<div v-show="selection.view != 'journal'">
-			Items
+			@{{ text.menu.items }}
 			<div class="children-amount">@{{ itemAmount }}</div>
 		</div>
 		<div>
-			@{{ (selection.view != 'journal') ? 'Done' : 'Total' }}
+			@{{ (selection.view != 'journal') ? text.menu.done : text.menu.total }}
 			<div class="done-children-amount">@{{ doneItemAmount }}</div>
 		</div>
 	</div>
