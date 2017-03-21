@@ -175,7 +175,7 @@ export default {
 		nodes: {},
 		selection,
 		addingNewUnder: null,
-		addingNewEmptyList: false,
+		// addingNewEmptyList: false,
 		addingNewAsChild: false,
 		addingNewAsFirstChild: false,
 		editingItem: null,
@@ -190,7 +190,7 @@ export default {
 		beforeEditCache_planned_time: null,
 		fetchedDone: false,
 		cancelThroughKeydown: false,
-		manualMobile: false,
+		manualMobile: true,
 		newItem: {
 			body: '',
 			planned_time:0,
@@ -300,6 +300,7 @@ export default {
 		noItems()
 		{
 			if(!this.allData.children.length){ return true; }
+			return false;
 			// if(!allItems || !allItems.root || !allItems.root.children.length){
 			// 	return true;
 			// } return false;
@@ -360,6 +361,7 @@ export default {
 				if (this.selection.noFilterOrTag())
 				{
 					topLvlItem = (item.depth == 1) ? true : false;
+					// console.log(`topLvlItem = ${topLvlItem} for ${item.body}`);
 					if (topLvlItem){ return true; } else { return false; }
 				}
 
@@ -805,45 +807,49 @@ export default {
 		{
 			console.log('cancelAddNew');
 			this.addingNewUnder = null;
-			this.addingNewEmptyList = false;
+			// this.addingNewEmptyList = false;
 			selection.selectedId = selection.lastSelectedId;
 			// Reset newItem to sibling stance.
 			this.addingNewAsChild = false;
 			// $(':focus').blur();
 		},
-		addNew(addNextItemAs, newItem, parentToBe, addTags)
+		addNew(addNextItemAs, newItem, olderSibling, addTags)
 		{
-			if (parentToBe)
-			{
-				parentToBe = parentToBe;	
-			} else if (selection.selectedId) {
-				parentToBe = allItems.nodes[selection.selectedId];
-			} else {
-				parentToBe = allItems.root;
-			}
 			newItem = (newItem) ? newItem : this.newItem;
-			addTags = (addTags) ? addTags : [];
-
 			if(!newItem.body){ return; }
-			newItem.parent_id = (parentToBe.parent_id) ? parentToBe.parent_id : allItems.root.id;
-			newItem.depth = parentToBe.depth;
-
-			let OlderSiblingIndex = allItems.siblingIndex(parentToBe.id);
-			let index = (isNaN(OlderSiblingIndex)) ? 0 : OlderSiblingIndex+1;
-			
-			if (this.addingNewAsChild || this.noItems)
+			addTags = (addTags) ? addTags : [];
+			if (olderSibling)
 			{
-				newItem.depth = parentToBe.depth + 1;
-        		newItem.parent_id = parentToBe.id;
+				olderSibling = olderSibling;	
+			} else if (selection.selectedId) {
+				olderSibling = allItems.nodes[selection.selectedId];
+			} else {
+				olderSibling = false;
+			}
+			// Set parent ID and depth & protect against bugs when olderSibling is the root:
+			newItem.parent_id = (olderSibling.parent_id) ? olderSibling.parent_id : allItems.root.id;
+			newItem.depth = (olderSibling.depth == 0) ? 1 : olderSibling.depth;
+
+			let OlderSiblingIndex = allItems.siblingIndex(olderSibling.id);
+			let index = (isNaN(OlderSiblingIndex)) ? 0 : OlderSiblingIndex+1;
+			console.log(`
+				adding new item[${newItem.body}]
+				with parent id = ${newItem.parent_id}
+				depth = ${newItem.depth}
+				index = ${index}`);
+			if (this.addingNewAsChild)
+			{
+				newItem.depth = olderSibling.depth + 1;
+        		newItem.parent_id = olderSibling.id;
         		index = 0;
 			}
 			if(selection.view == "journal")
 			{
 				newItem.done = 1;
-				newItem.done_date = parentToBe.done_date;
+				newItem.done_date = olderSibling.done_date;
 			}
 			if ( selection.filter.includes('today')
-			   && allItems.isTopLvlItemInFilteredRoot(parentToBe.id)
+			   && allItems.isTopLvlItemInFilteredRoot(olderSibling.id)
 			   && !this.addingNewAsChild )
 			{
 				newItem.due_date = moment().format();
@@ -856,8 +862,8 @@ export default {
 			console.log('sending tags:');
 			console.log(addTags);
 			// Send to Root for Ajax call.
-			this.postNewItem(newItem, index, addNextItemAs, addTags);
 			allItems.addTempNewItem(newItem, index, addNextItemAs, addTags);
+			this.postNewItem(newItem, index, addNextItemAs, addTags);
 		},
 		itIsADeepestChild(id)
 		{
@@ -1051,7 +1057,7 @@ export default {
 		},
 		showAddNewItem(id, addAs){
 			id = (id) ? id : (selection.selectedId) ? selection.selectedId : allItems.root.id ;
-			if(!id){ return; }
+			if (!id){ return; }
 			console.log('showAddNewItem for ['+allItems.nodes[id].body+']');
 			this.addingNewUnder = id;
 			selection.lastSelectedId = id;
@@ -1182,10 +1188,11 @@ export default {
 				array.forEach(id => { this.deleteItemApi(id); });
 			} else {
 				let id = idOrArray; // It's an ID!
+				if (!id){ return; }
 				let item = allItems.nodes[id];
 				this.$http.delete('/api/items/' + id)
 				.then(function(response){
-					console.log('deleted: ['+item.body+']');
+					console.log(`deleted: ${id}[${item.body}]`);
 					this.stopPatching();
 				});
 			}

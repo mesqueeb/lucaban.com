@@ -385,7 +385,6 @@
 			'first-child':addingNewAsFirstChild,}"
 		:id="'new-under-'+ item.id "
 		v-if=" showAddNewBox
-			|| (basis.addingNewEmptyList && basis.selection.view != 'journal')
 			|| (listIsEmpty && !basis.mobile && basis.selection.view != 'journal')"
 		@submit.prevent
 		@click="clickOnAddNewCurtain($event)"
@@ -1193,10 +1192,10 @@ export default {
 		addNew(addNextItemAs)
 		{
 			let addTags = this.preparedPlusComputedTags;
-			let parentToBe = this.item;
+			let olderSibling = this.item;
 			let newItem = this.newItem;
 			// debugger;
-			this.$root.addNew(addNextItemAs, newItem, parentToBe, addTags)
+			this.$root.addNew(addNextItemAs, newItem, olderSibling, addTags)
 			// Reset stuff
 			this.newItem.body = '';
 			this.newItem.due_date = '0000-00-00 00:00:00';

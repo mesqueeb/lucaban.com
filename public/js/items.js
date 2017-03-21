@@ -25144,12 +25144,22 @@ var _class = function () {
 				parent.children_order = [];
 			}
 			//Remove the Temp item
-			parent.children = parent.children.filter(function (i) {
+			// console.log('Remove the Temp item');
+			// console.log(parent.children);
+			// console.log(parent.children_order);
+			this.nodes[item.parent_id].children = parent.children.filter(function (i) {
 				return !i.temp;
 			});
-			parent.children_order = parent.children_order.filter(function (i) {
+			this.nodes[item.parent_id].children_order = parent.children_order.filter(function (i) {
 				return i != 'x';
 			});
+			delete this.nodes['x'];
+			// let a = this.nodes[item.parent_id].children;
+			// let b = this.nodes[item.parent_id].children_order;
+			// console.log(`
+			// 	this.nodes[item.parent_id].children_order -> ${a}
+			// 	this.nodes[item.parent_id].children -> ${b}
+			// 	`);
 			//Actually ADD the item!
 			parent.children.splice(index, 0, item);
 			parent.children_order.splice(index, 0, item.id);
@@ -25333,12 +25343,15 @@ var _class = function () {
 		value: function siblingIndex(id) {
 			var item = this.nodes[id];
 			if (!item) {
-				return;
+				return false;
 			}
 			var parent_id = item.parent_id;
-			if (!parent_id) {
-				return;
+			if (!parent_id || !this.nodes[parent_id]) {
+				return false;
 			}
+			// console.log('sibind parent_id');
+			// console.log(parent_id);
+			// console.log(this.nodes[parent_id]);
 			var siblingsArray = this.nodes[parent_id].children_order;
 			return siblingsArray.indexOf(id);
 		}
@@ -25496,7 +25509,11 @@ var _class = function () {
 				var topLvlChildrenIds = vm.$refs.root.childrenOrder;
 				var ind = topLvlChildrenIds.indexOf(topLvlItemId);
 				if (ind + 1 == topLvlChildrenIds.length) {
-					return topLvlChildrenIds[0];
+					var firstItemId = topLvlChildrenIds[0];
+					if (firstItemId == id) {
+						return null;
+					}
+					return firstItemId;
 				}
 				return topLvlChildrenIds[ind + 1];
 			}
@@ -25750,7 +25767,7 @@ var _class = function () {
 		key: 'deleteItem',
 		value: function deleteItem(id) {
 			var item = this.nodes[id];
-			var newSelectedId = this.nextItemId(id);
+			var newSelectedId = this.nextItemId(id) ? this.nextItemId(id) : null;
 			// Delete all children as well!
 			if (Array.isArray(item.children) && item.children.length) {
 				var allChildrenIds = this.getAllChildrenIds(id);
@@ -25766,6 +25783,7 @@ var _class = function () {
 			vm.patch(parent_id, 'children_order');
 			vm.deleteItemApi(id);
 			this.autoCalculateDoneState(parent_id);
+			console.log('new selected ID is: ' + newSelectedId);
 			selection.selectedId = newSelectedId;
 			delete this.nodes[id];
 		}
@@ -38479,7 +38497,6 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
-//
 
 // import Morph from '../components/valueMorphers.js'
 // window.Morph = new Morph();
@@ -39241,10 +39258,10 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 		},
 		addNew: function addNew(addNextItemAs) {
 			var addTags = this.preparedPlusComputedTags;
-			var parentToBe = this.item;
+			var olderSibling = this.item;
 			var newItem = this.newItem;
 			// debugger;
-			this.$root.addNew(addNextItemAs, newItem, parentToBe, addTags);
+			this.$root.addNew(addNextItemAs, newItem, olderSibling, addTags);
 			// Reset stuff
 			this.newItem.body = '';
 			this.newItem.due_date = '0000-00-00 00:00:00';
@@ -40204,7 +40221,8 @@ var Selection = function () {
 	}, {
 		key: 'addKeywords',
 		value: function addKeywords(keyword, value, operator) {
-			vm.selectedId = null;
+			var _this = this;
+
 			if (keyword == 'tag') {
 				if (operator == 'NOT') {
 					if (this.hiddenTags.includes(value)) {
@@ -40241,6 +40259,13 @@ var Selection = function () {
 					this.filter.push(value);
 				}
 			}
+			Vue.nextTick(function () {
+				if (!vm.filteredItemsFlat.map(function (i) {
+					return i.id;
+				}).includes(_this.selectedId)) {
+					_this.selectedId = null;
+				}
+			});
 		}
 	}, {
 		key: 'getHiddenItemsTotalUsedTime',
@@ -40446,7 +40471,7 @@ window.selection = new __WEBPACK_IMPORTED_MODULE_4__Selection_js__["a" /* defaul
 		nodes: {},
 		selection: selection,
 		addingNewUnder: null,
-		addingNewEmptyList: false,
+		// addingNewEmptyList: false,
 		addingNewAsChild: false,
 		addingNewAsFirstChild: false,
 		editingItem: null,
@@ -40461,7 +40486,7 @@ window.selection = new __WEBPACK_IMPORTED_MODULE_4__Selection_js__["a" /* defaul
 		beforeEditCache_planned_time: null,
 		fetchedDone: false,
 		cancelThroughKeydown: false,
-		manualMobile: false,
+		manualMobile: true,
 		newItem: {
 			body: '',
 			planned_time: 0,
@@ -40577,6 +40602,7 @@ window.selection = new __WEBPACK_IMPORTED_MODULE_4__Selection_js__["a" /* defaul
 			if (!this.allData.children.length) {
 				return true;
 			}
+			return false;
 			// if(!allItems || !allItems.root || !allItems.root.children.length){
 			// 	return true;
 			// } return false;
@@ -40633,6 +40659,7 @@ window.selection = new __WEBPACK_IMPORTED_MODULE_4__Selection_js__["a" /* defaul
 				var topLvlItem = void 0;
 				if (this.selection.noFilterOrTag()) {
 					topLvlItem = item.depth == 1 ? true : false;
+					// console.log(`topLvlItem = ${topLvlItem} for ${item.body}`);
 					if (topLvlItem) {
 						return true;
 					} else {
@@ -41065,42 +41092,42 @@ window.selection = new __WEBPACK_IMPORTED_MODULE_4__Selection_js__["a" /* defaul
 		cancelAddNew: function cancelAddNew() {
 			console.log('cancelAddNew');
 			this.addingNewUnder = null;
-			this.addingNewEmptyList = false;
+			// this.addingNewEmptyList = false;
 			selection.selectedId = selection.lastSelectedId;
 			// Reset newItem to sibling stance.
 			this.addingNewAsChild = false;
 			// $(':focus').blur();
 		},
-		addNew: function addNew(addNextItemAs, newItem, parentToBe, addTags) {
-			if (parentToBe) {
-				parentToBe = parentToBe;
-			} else if (selection.selectedId) {
-				parentToBe = allItems.nodes[selection.selectedId];
-			} else {
-				parentToBe = allItems.root;
-			}
+		addNew: function addNew(addNextItemAs, newItem, olderSibling, addTags) {
 			newItem = newItem ? newItem : this.newItem;
-			addTags = addTags ? addTags : [];
-
 			if (!newItem.body) {
 				return;
 			}
-			newItem.parent_id = parentToBe.parent_id ? parentToBe.parent_id : allItems.root.id;
-			newItem.depth = parentToBe.depth;
+			addTags = addTags ? addTags : [];
+			if (olderSibling) {
+				olderSibling = olderSibling;
+			} else if (selection.selectedId) {
+				olderSibling = allItems.nodes[selection.selectedId];
+			} else {
+				olderSibling = false;
+			}
+			// Set parent ID and depth & protect against bugs when olderSibling is the root:
+			newItem.parent_id = olderSibling.parent_id ? olderSibling.parent_id : allItems.root.id;
+			newItem.depth = olderSibling.depth == 0 ? 1 : olderSibling.depth;
 
-			var OlderSiblingIndex = allItems.siblingIndex(parentToBe.id);
+			var OlderSiblingIndex = allItems.siblingIndex(olderSibling.id);
 			var index = isNaN(OlderSiblingIndex) ? 0 : OlderSiblingIndex + 1;
-
-			if (this.addingNewAsChild || this.noItems) {
-				newItem.depth = parentToBe.depth + 1;
-				newItem.parent_id = parentToBe.id;
+			console.log('\n\t\t\t\tadding new item[' + newItem.body + ']\n\t\t\t\twith parent id = ' + newItem.parent_id + '\n\t\t\t\tdepth = ' + newItem.depth + '\n\t\t\t\tindex = ' + index);
+			if (this.addingNewAsChild) {
+				newItem.depth = olderSibling.depth + 1;
+				newItem.parent_id = olderSibling.id;
 				index = 0;
 			}
 			if (selection.view == "journal") {
 				newItem.done = 1;
-				newItem.done_date = parentToBe.done_date;
+				newItem.done_date = olderSibling.done_date;
 			}
-			if (selection.filter.includes('today') && allItems.isTopLvlItemInFilteredRoot(parentToBe.id) && !this.addingNewAsChild) {
+			if (selection.filter.includes('today') && allItems.isTopLvlItemInFilteredRoot(olderSibling.id) && !this.addingNewAsChild) {
 				newItem.due_date = moment().format();
 				addTags = addTags.filter(function (val) {
 					return val != 'Today';
@@ -41111,8 +41138,8 @@ window.selection = new __WEBPACK_IMPORTED_MODULE_4__Selection_js__["a" /* defaul
 			console.log('sending tags:');
 			console.log(addTags);
 			// Send to Root for Ajax call.
-			this.postNewItem(newItem, index, addNextItemAs, addTags);
 			allItems.addTempNewItem(newItem, index, addNextItemAs, addTags);
+			this.postNewItem(newItem, index, addNextItemAs, addTags);
 		},
 		itIsADeepestChild: function itIsADeepestChild(id) {
 			if (!id) {
@@ -41486,9 +41513,12 @@ window.selection = new __WEBPACK_IMPORTED_MODULE_4__Selection_js__["a" /* defaul
 				});
 			} else {
 				var id = idOrArray; // It's an ID!
+				if (!id) {
+					return;
+				}
 				var item = allItems.nodes[id];
 				this.$http.delete('/api/items/' + id).then(function (response) {
-					console.log('deleted: [' + item.body + ']');
+					console.log('deleted: ' + id + '[' + item.body + ']');
 					this.stopPatching();
 				});
 			}
@@ -46161,7 +46191,6 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
       }
     })
   })) : _vm._e(), _vm._v(" "), (_vm.showAddNewBox ||
-    (_vm.basis.addingNewEmptyList && _vm.basis.selection.view != 'journal') ||
     (_vm.listIsEmpty && !_vm.basis.mobile && _vm.basis.selection.view != 'journal')) ? _c('form', {
     class: {
       'addnewbox': true,

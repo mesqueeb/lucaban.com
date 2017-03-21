@@ -107,11 +107,21 @@ addItem(item, index, addNextItemAs, addTags, duplication)
 {
 	// debugger;
 	this.addAndCleanNodesRecursively(item);
-	const parent = this.nodes[item.parent_id];
-	if(!parent.children_order)	{ parent.children_order = [] 	 }
+	let parent = this.nodes[item.parent_id];
+	if(!parent.children_order) { parent.children_order = []; }
 	//Remove the Temp item
-	parent.children = parent.children.filter(i => !i.temp);
-	parent.children_order = parent.children_order.filter(i => i != 'x');
+	// console.log('Remove the Temp item');
+	// console.log(parent.children);
+	// console.log(parent.children_order);
+	this.nodes[item.parent_id].children = parent.children.filter(i => !i.temp);
+	this.nodes[item.parent_id].children_order = parent.children_order.filter(i => i != 'x');
+	delete this.nodes['x'];
+	// let a = this.nodes[item.parent_id].children;
+	// let b = this.nodes[item.parent_id].children_order;
+	// console.log(`
+	// 	this.nodes[item.parent_id].children_order -> ${a}
+	// 	this.nodes[item.parent_id].children -> ${b}
+	// 	`);
 	//Actually ADD the item!
 	parent.children.splice(index, 0, item);
 	parent.children_order.splice(index, 0, item.id);
@@ -147,7 +157,7 @@ addTempNewItem(item, index, addNextItemAs, addTags)
 	this.addAndCleanNodesRecursively(item);
 	console.log(item.body);
 	const parent = this.nodes[item.parent_id];
-	if(!parent.children_order)	{ parent.children_order = [] 	 }
+	if(!parent.children_order) { parent.children_order = []; }
 	//Actually ADD the item!
 	parent.children.splice(index, 0, item);
 	parent.children_order.splice(index, 0, item.id);
@@ -255,9 +265,12 @@ hideDoneNodes()
 siblingIndex(id)
 {
 	let item = this.nodes[id];
-	if(!item){ return; }
+	if(!item){ return false; }
 	let parent_id = item.parent_id;
-	if(!parent_id){ return; }
+	if(!parent_id || !this.nodes[parent_id]){ return false; }
+	// console.log('sibind parent_id');
+	// console.log(parent_id);
+	// console.log(this.nodes[parent_id]);
 	let siblingsArray = this.nodes[parent_id].children_order;
 	return siblingsArray.indexOf(id);
 }
@@ -391,7 +404,12 @@ nextItemRecursion(id)
 		let topLvlItemId = this.topLvlParentOfDeepestChild(id);
 		let topLvlChildrenIds = vm.$refs.root.childrenOrder;
 		let ind = topLvlChildrenIds.indexOf(topLvlItemId);
-		if (ind+1 == topLvlChildrenIds.length){ return topLvlChildrenIds[0]; }
+		if (ind+1 == topLvlChildrenIds.length)
+		{ 
+			let firstItemId = topLvlChildrenIds[0];
+			if (firstItemId == id) { return null; }
+			return firstItemId;
+		}
 		return topLvlChildrenIds[ind+1];
 	}
 	let parentsChildrenOrder = this.nodes[parent_id].children_order;
@@ -611,7 +629,7 @@ isProject(id)
 deleteItem(id)
 {
 	let item = this.nodes[id];
-	let newSelectedId = this.nextItemId(id);
+	let newSelectedId = (this.nextItemId(id)) ? this.nextItemId(id) : null;
 	// Delete all children as well!
 	if (Array.isArray(item.children) && item.children.length)
 	{
@@ -628,6 +646,7 @@ deleteItem(id)
 	vm.patch(parent_id, 'children_order');
     vm.deleteItemApi(id);
 	this.autoCalculateDoneState(parent_id);
+	console.log(`new selected ID is: ${newSelectedId}`);
     selection.selectedId = newSelectedId;
 	delete this.nodes[id];
 }

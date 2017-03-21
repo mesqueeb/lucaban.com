@@ -57,7 +57,6 @@ export default class Selection {
 		return n;
 	}
 	addKeywords(keyword,value,operator){
-		vm.selectedId = null;
 		if (keyword == 'tag')
 		{
 			if (operator == 'NOT')
@@ -86,6 +85,12 @@ export default class Selection {
 				this.filter.push(value);
 			}
 		}
+		Vue.nextTick(()=>{
+			if (!vm.filteredItemsFlat.map(i => i.id).includes(this.selectedId))
+			{
+				this.selectedId = null;
+			}
+		});
 	}
 	getHiddenItemsTotalUsedTime()
 	{
