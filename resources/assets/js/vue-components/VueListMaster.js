@@ -58,7 +58,7 @@ window.langContentsItems = {
 		{
 			'action':'Action',
 			'key':'Key',
-			'keybindings': [
+			'keybindings': [//
 				{'key':'T','note':'Do <u>T</u>oday'},
 				{'key':'S','note':'<u>S</u>topwatch / Timer'},
 				{'key':'tab','note':'Indent item'},
@@ -68,6 +68,9 @@ window.langContentsItems = {
 				{'key':'alt + click on tag','note':'Hide tag'},
 				{'key':'cmd/ctrl + ↑↓','note':'Move item up/down'},
 			],
+			'hints': {//
+				'addItemHint':'Add some items!',
+			},
 		},
 	},
 	'ja':
@@ -139,6 +142,9 @@ window.langContentsItems = {
 				{'key':'alt + click on tag','note':'タグのアイテムを非表示'},
 				{'key':'cmd/ctrl + ↑↓','note':'アイテムを上下へ移動'},
 			],
+			'hints': {
+				'addItemHint':'アイテムを追加しよう！',
+			},
 		},
 	},
 

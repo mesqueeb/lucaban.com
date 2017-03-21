@@ -40375,7 +40375,11 @@ window.langContentsItems = {
 		{
 			'action': 'Action',
 			'key': 'Key',
-			'keybindings': [{ 'key': 'T', 'note': 'Do <u>T</u>oday' }, { 'key': 'S', 'note': '<u>S</u>topwatch / Timer' }, { 'key': 'tab', 'note': 'Indent item' }, { 'key': 'enter', 'note': 'Add item' }, { 'key': 'cmd/ctrl + enter', 'note': 'Edit item' }, { 'key': 'shift + T', 'note': 'Edit tags' }, { 'key': 'alt + click on tag', 'note': 'Hide tag' }, { 'key': 'cmd/ctrl + ↑↓', 'note': 'Move item up/down' }]
+			'keybindings': [//
+			{ 'key': 'T', 'note': 'Do <u>T</u>oday' }, { 'key': 'S', 'note': '<u>S</u>topwatch / Timer' }, { 'key': 'tab', 'note': 'Indent item' }, { 'key': 'enter', 'note': 'Add item' }, { 'key': 'cmd/ctrl + enter', 'note': 'Edit item' }, { 'key': 'shift + T', 'note': 'Edit tags' }, { 'key': 'alt + click on tag', 'note': 'Hide tag' }, { 'key': 'cmd/ctrl + ↑↓', 'note': 'Move item up/down' }],
+			'hints': { //
+				'addItemHint': 'Add some items!'
+			}
 		}
 	},
 	'ja': {
@@ -40435,7 +40439,10 @@ window.langContentsItems = {
 		{
 			'action': 'アクション',
 			'key': 'ショートカットキー',
-			'keybindings': [{ 'key': 'T', 'note': '今日のタスクとして設定' }, { 'key': 'S', 'note': 'ストップウォッチ / タイマー' }, { 'key': 'tab', 'note': 'アイテムを右へ' }, { 'key': 'enter', 'note': 'アイテムを追加' }, { 'key': 'cmd/ctrl + enter', 'note': 'アイテムを編集' }, { 'key': 'shift + T', 'note': 'タグを編集' }, { 'key': 'alt + click on tag', 'note': 'タグのアイテムを非表示' }, { 'key': 'cmd/ctrl + ↑↓', 'note': 'アイテムを上下へ移動' }]
+			'keybindings': [{ 'key': 'T', 'note': '今日のタスクとして設定' }, { 'key': 'S', 'note': 'ストップウォッチ / タイマー' }, { 'key': 'tab', 'note': 'アイテムを右へ' }, { 'key': 'enter', 'note': 'アイテムを追加' }, { 'key': 'cmd/ctrl + enter', 'note': 'アイテムを編集' }, { 'key': 'shift + T', 'note': 'タグを編集' }, { 'key': 'alt + click on tag', 'note': 'タグのアイテムを非表示' }, { 'key': 'cmd/ctrl + ↑↓', 'note': 'アイテムを上下へ移動' }],
+			'hints': {
+				'addItemHint': 'アイテムを追加しよう！'
+			}
 		}
 	}
 

@@ -1,8 +1,14 @@
+<div id="bottom-hint"
+	v-show="!itemAmount"
+	v-if="mobile && !selection.filter.includes('today') && selection.view != 'journal'"
+>@{{ text.guide.hints.addItemHint }}<br>➘</div>
+
 <div id="mobile-item-nav" v-if="mobile">
-	<div class="playstation-controller">
+	<div class="playstation-controller"
+		v-show="itemAmount && selection.selectedId && selection.view != 'journal'"
+	>
 		<button id=""
 			@click="unindent()"
-			v-show="selection.selectedId && selection.view != 'journal'"
 			:class="{'disabled':(topLvlItems.includes(selection.selectedId))}"
 			:disabled="topLvlItems.includes(selection.selectedId)"
 		>
@@ -11,7 +17,6 @@
 		<div>
 			<button id=""
 				@click="moveItem('up')"
-				v-show="selection.selectedId && selection.view != 'journal'"
 				:class="{'disabled':(firstItem == selection.selectedId)}"
 				:disabled="firstItem == selection.selectedId"
 			>
@@ -19,7 +24,6 @@
 			</button>
 			<button id=""
 				@click="moveItem('down')"
-				v-show="selection.selectedId && selection.view != 'journal'"
 				:class="{'disabled':(lastItems.includes(selection.selectedId))}"
 				:disabled="lastItems.includes(selection.selectedId)"
 			>
@@ -28,14 +32,13 @@
 		</div>
 		<button id=""
 			@click="indent()"
-			v-show="selection.selectedId && selection.view != 'journal'"
 			:class="{'disabled':(isFirstItem(selection.selectedId))}"
 			:disabled="isFirstItem(selection.selectedId)"
 		>
 			<i class="zmdi zmdi-caret-right-circle"></i>
 		</button>
 	</div>
-	<button id="floating-add-btn" @click="showAddNewItem()">
+	<button id="floating-add-btn" @click="showAddNewItem()" v-if="!selection.filter.includes('today') && selection.view != 'journal'">
 		<i class="zmdi zmdi-plus-circle"></i>
 	</button>
 </div>

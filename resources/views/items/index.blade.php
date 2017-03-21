@@ -14,7 +14,7 @@
 </head>
 <body>
 <div style="position: fixed; height:100%; width:100%; top:0; left:0;">
-<div style="height:calc(100% - 1px); width:100%; z-index: 1; overflow-y: scroll; -webkit-overflow-scrolling: touch;">
+<div style="height:calc(100% - 1px); width:100%; z-index: 1; overflow-y: scroll; -webkit-overflow-scrolling: touch;" id="background">
 {{-- <a href="{{route('home')}}">Go home</a> --}}
 @include('items.app')
 </div>{{-- /Inner Wrapper  --}}
