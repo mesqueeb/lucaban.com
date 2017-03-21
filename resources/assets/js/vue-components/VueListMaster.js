@@ -813,17 +813,23 @@ export default {
 		},
 		addNew(addNextItemAs, newItem, parentToBe, addTags)
 		{
-			parentToBe = (parentToBe) ? parentToBe : allItems.nodes[selection.selectedId];
+			if (parentToBe)
+			{
+				parentToBe = parentToBe;	
+			} else if (selection.selectedId) {
+				parentToBe = allItems.nodes[selection.selectedId];
+			} else {
+				parentToBe = allItems.root;
+			}
 			newItem = (newItem) ? newItem : this.newItem;
 			addTags = (addTags) ? addTags : [];
-			let index;
 
 			if(!newItem.body){ return; }
 			newItem.parent_id = (parentToBe.parent_id) ? parentToBe.parent_id : allItems.root.id;
 			newItem.depth = parentToBe.depth;
 
 			let OlderSiblingIndex = allItems.siblingIndex(parentToBe.id);
-			index = (isNaN(OlderSiblingIndex)) ? 0 : OlderSiblingIndex+1;
+			let index = (isNaN(OlderSiblingIndex)) ? 0 : OlderSiblingIndex+1;
 			
 			if (this.addingNewAsChild || this.noItems)
 			{

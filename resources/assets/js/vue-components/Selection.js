@@ -57,6 +57,7 @@ export default class Selection {
 		return n;
 	}
 	addKeywords(keyword,value,operator){
+		vm.selectedId = null;
 		if (keyword == 'tag')
 		{
 			if (operator == 'NOT')

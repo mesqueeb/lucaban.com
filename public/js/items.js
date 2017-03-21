@@ -40204,6 +40204,7 @@ var Selection = function () {
 	}, {
 		key: 'addKeywords',
 		value: function addKeywords(keyword, value, operator) {
+			vm.selectedId = null;
 			if (keyword == 'tag') {
 				if (operator == 'NOT') {
 					if (this.hiddenTags.includes(value)) {
@@ -41071,10 +41072,15 @@ window.selection = new __WEBPACK_IMPORTED_MODULE_4__Selection_js__["a" /* defaul
 			// $(':focus').blur();
 		},
 		addNew: function addNew(addNextItemAs, newItem, parentToBe, addTags) {
-			parentToBe = parentToBe ? parentToBe : allItems.nodes[selection.selectedId];
+			if (parentToBe) {
+				parentToBe = parentToBe;
+			} else if (selection.selectedId) {
+				parentToBe = allItems.nodes[selection.selectedId];
+			} else {
+				parentToBe = allItems.root;
+			}
 			newItem = newItem ? newItem : this.newItem;
 			addTags = addTags ? addTags : [];
-			var index = void 0;
 
 			if (!newItem.body) {
 				return;
@@ -41083,7 +41089,7 @@ window.selection = new __WEBPACK_IMPORTED_MODULE_4__Selection_js__["a" /* defaul
 			newItem.depth = parentToBe.depth;
 
 			var OlderSiblingIndex = allItems.siblingIndex(parentToBe.id);
-			index = isNaN(OlderSiblingIndex) ? 0 : OlderSiblingIndex + 1;
+			var index = isNaN(OlderSiblingIndex) ? 0 : OlderSiblingIndex + 1;
 
 			if (this.addingNewAsChild || this.noItems) {
 				newItem.depth = parentToBe.depth + 1;
