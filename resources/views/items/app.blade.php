@@ -18,8 +18,9 @@
 			{{-- :alltags="allTags" --}}
 		></Card>
 	</div>
-	{{-- Mobile NAV --}}
-	@include('items.mobileNav')
 </div>
+{{-- Mobile NAV --}}
+<div id="bottom-hint" v-if="!itemAmount">Add some tasks!<br>➘</div>
+@include('items.mobileNav')
 
 </div>{{-- /Items App --}}

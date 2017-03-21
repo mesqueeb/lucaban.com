@@ -85,7 +85,15 @@ label{
         font-weight: 600;
     }
 }
-
+#bottom-hint{
+    position: fixed;
+    right: 4rem;
+    bottom: 3rem;
+    z-index: -1;
+    text-align: right;
+    font-size: 1.4rem;
+    color: #acacac;
+}
 #mobile-item-nav{
     >div:first-child{    
         position: fixed;
