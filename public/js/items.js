@@ -25179,6 +25179,18 @@ var _class = function () {
 			}
 			this.attachParentBody(item.id);
 			this.autoCalculateDoneState(item.parent_id);
+
+			if (selection.view == 'journal') {
+				selection.view = null;
+				selection.view = 'journal';
+			}
+			if (selection.filter.includes('today')) {
+				selection.filter = selection.filter.filter(function (f) {
+					return f != 'today';
+				});
+				selection.filter.push('today');
+			}
+
 			if (duplication || addNextItemAs == 'stop') {
 				vm.addingNewUnder = null;
 				Vue.nextTick(function () {
@@ -37720,7 +37732,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_11_vue_resource__ = __webpack_require__(195);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_11_vue_resource___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_11_vue_resource__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_12__vue_components_vueFilters_js__ = __webpack_require__(169);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_13__vue_components_VueListMaster_js__ = __webpack_require__(168);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_13__items_app_js__ = __webpack_require__(214);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_14__vue_components_dataTree_js__ = __webpack_require__(20);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_15__components_ListAppKeyBindings_js__ = __webpack_require__(166);
 // IMPORT jQuery
@@ -37792,7 +37804,7 @@ __WEBPACK_IMPORTED_MODULE_0_jquery___default.a.getJSON('/api/items', function (f
 	window.allItems = new __WEBPACK_IMPORTED_MODULE_14__vue_components_dataTree_js__["a" /* default */](fetchedData);
 	console.log(allItems);
 
-	window.vm = new __WEBPACK_IMPORTED_MODULE_10_vue___default.a(__WEBPACK_IMPORTED_MODULE_13__vue_components_VueListMaster_js__["a" /* default */]);
+	window.vm = new __WEBPACK_IMPORTED_MODULE_10_vue___default.a(__WEBPACK_IMPORTED_MODULE_13__items_app_js__["a" /* default */]);
 	new __WEBPACK_IMPORTED_MODULE_15__components_ListAppKeyBindings_js__["a" /* default */]();
 	// vm.allData = allItems.root;
 	// vm.doneData = allItems.doneitems;
@@ -40302,1456 +40314,7 @@ var Selection = function () {
 /* harmony default export */ __webpack_exports__["a"] = Selection;
 
 /***/ }),
-/* 168 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Card_vue__ = __webpack_require__(188);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Card_vue___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0__Card_vue__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__Popups_vue__ = __webpack_require__(190);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__Popups_vue___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1__Popups_vue__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__Popouts_vue__ = __webpack_require__(189);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__Popouts_vue___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2__Popouts_vue__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__components_globalFunctions_js__ = __webpack_require__(5);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__Selection_js__ = __webpack_require__(167);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__dataTree_js__ = __webpack_require__(20);
-function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
-
-window.langContentsItems = {
-	'en': {
-		'global': //
-		{
-			'min': 'min',
-			'hour': 'hour',
-			'm': 'm',
-			'h': 'h',
-			'cancel': 'Cancel',
-			'delete': 'Delete',
-			'save': 'save'
-		},
-		'menu': //
-		{
-			'all': 'All',
-			'today': 'Today',
-			'journal': 'Journal',
-			'?': '?',
-			'usedTime': 'Used time',
-			'timeLeft': 'Time left',
-			'items': 'Items',
-			'done': 'Done',
-			'total': 'Total'
-		},
-		'card': //
-		{
-			'duration': 'Duration:',
-			'addTag': 'Add tag:',
-			'edit': 'Edit',
-			'setToday': 'Do today',
-			'addAndContinue': 'Add and continue',
-			'addAndClose': 'Add and close'
-		},
-		'tags': {
-			'done': 'Done',
-			'today': 'Today'
-		},
-		'popouts': //
-		{
-			'reset': 'Reset',
-			'ok': 'Ok',
-			'reallyDelete': 'Really delete',
-			'andAllChildren': 'And all children',
-			'overtime': 'overtime',
-			'total': 'Total'
-		},
-		'popups': //
-		{
-			'journalNotes': 'Journal notes',
-			'completed': 'Completed',
-			'completedB': '',
-			'usedTime': 'Used time',
-			'reset': 'Reset'
-		},
-		'guide': //
-		{
-			'action': 'Action',
-			'key': 'Key',
-			'keybindings': [//
-			{ 'key': 'T', 'note': 'Do <u>T</u>oday' }, { 'key': 'S', 'note': '<u>S</u>topwatch / Timer' }, { 'key': 'tab', 'note': 'Indent item' }, { 'key': 'enter', 'note': 'Add item' }, { 'key': 'cmd/ctrl + enter', 'note': 'Edit item' }, { 'key': 'shift + T', 'note': 'Edit tags' }, { 'key': 'alt + click on tag', 'note': 'Hide tag' }, { 'key': 'cmd/ctrl + ↑↓', 'note': 'Move item up/down' }],
-			'hints': { //
-				'addItemHint': 'Add some items!'
-			}
-		}
-	},
-	'ja': {
-		'global': //
-		{
-			'min': '分',
-			'hour': '時',
-			'm': '分',
-			'h': '時',
-			'cancel': 'キャンセル',
-			'delete': '削除',
-			'save': '保存'
-		},
-		'menu': //
-		{
-			'all': '全て',
-			'today': '今日',
-			'journal': '日報',
-			'?': '？',
-			'usedTime': '使用時間',
-			'timeLeft': '残時間',
-			'items': 'アイテム',
-			'done': '完了',
-			'total': '合計'
-		},
-		'card': //
-		{
-			'duration': '使用時間:',
-			'addTag': 'タグを追加:',
-			'edit': '編集',
-			'setToday': '今日やる',
-			'addAndContinue': '複数追加',
-			'addAndClose': '追加して閉じる'
-		},
-		'tags': {
-			'done': '完了',
-			'today': '今日'
-		},
-		'popouts': //
-		{
-			'reset': 'リセット',
-			'ok': 'Ok',
-			'reallyDelete': '本当に削除しますか？',
-			'andAllChildren': 'とその中の全てのアイテム',
-			'overtime': 'オーバータイム',
-			'total': '合計'
-		},
-		'popups': //
-		{
-			'journalNotes': '日報メモ',
-			'completed': '',
-			'completedB': 'を完了致しました',
-			'usedTime': '使用時間',
-			'reset': 'リセット'
-		},
-		'guide': //
-		{
-			'action': 'アクション',
-			'key': 'ショートカットキー',
-			'keybindings': [{ 'key': 'T', 'note': '今日のタスクとして設定' }, { 'key': 'S', 'note': 'ストップウォッチ / タイマー' }, { 'key': 'tab', 'note': 'アイテムを右へ' }, { 'key': 'enter', 'note': 'アイテムを追加' }, { 'key': 'cmd/ctrl + enter', 'note': 'アイテムを編集' }, { 'key': 'shift + T', 'note': 'タグを編集' }, { 'key': 'alt + click on tag', 'note': 'タグのアイテムを非表示' }, { 'key': 'cmd/ctrl + ↑↓', 'note': 'アイテムを上下へ移動' }],
-			'hints': {
-				'addItemHint': 'アイテムを追加しよう！'
-			}
-		}
-	}
-
-};
-
-
-
-
-
-
-
-
-window.selection = new __WEBPACK_IMPORTED_MODULE_4__Selection_js__["a" /* default */]();
-
-/* harmony default export */ __webpack_exports__["a"] = {
-	el: '#items-app',
-	data: {
-		doneData: null,
-		// FILTER REWRITE
-		// allData: {
-		// 	"body":"ALL",
-		// 	"children":[],
-		// 	"children_order":[],
-		// 	"depth":0,
-		// 	"done":false,
-		// 	"done_date":"0000-00-00 00:00:00",
-		// 	"due_date":"0000-00-00 00:00:00",
-		// 	"id":"x",
-		// 	"show_children":1,
-		// 	"tagged":[],
-		// 	"used_time":0
-		// },
-		nodes: {},
-		selection: selection,
-		addingNewUnder: null,
-		// addingNewEmptyList: false,
-		addingNewAsChild: false,
-		addingNewAsFirstChild: false,
-		editingItem: null,
-		editingItemTags: null,
-		editingDoneDateItem: null,
-		loading: true,
-		patching: true,
-		popups: [],
-		popouts: { 'delete': [], 'timer': [], 'edit': [], 'guide': false },
-		timerItems: [],
-		beforeEditCache_body: null,
-		beforeEditCache_planned_time: null,
-		fetchedDone: false,
-		cancelThroughKeydown: false,
-		manualMobile: true,
-		newItem: {
-			body: '',
-			planned_time: 0,
-			preparedTags: [],
-			due_date: '0000-00-00 00:00:00',
-			children: ''
-		},
-		newTag: null,
-		setLanguage: null,
-		langContentsItems: langContentsItems
-	},
-	components: {
-		Card: __WEBPACK_IMPORTED_MODULE_0__Card_vue___default.a,
-		Popups: __WEBPACK_IMPORTED_MODULE_1__Popups_vue___default.a,
-		Popouts: __WEBPACK_IMPORTED_MODULE_2__Popouts_vue___default.a
-	},
-	mounted: function mounted() {
-		eventHub.$on('confirm-ok', function (id) {
-			console.log('computer says "ok"...');
-			console.log(id);
-			allItems.deleteItem(id);
-		});
-		eventHub.$on('confirm-cancel', function (id) {
-			console.log('computer says "no"...');
-			console.log(id);
-			return;
-		});
-		// window.addEventListener( "scroll", function( event ) {
-		//     console.log(vm.mobile); return;
-		// });
-		// window.addEventListener( "onscroll", function( event ) {
-		//     console.log(vm.mobile); return;
-		// });
-		//      window.onscroll = function(e) {
-		// console.log(vm.mobile); return; };
-		// 	if(vm.mobile){ return; }
-		// 	let el = document.getElementsByClassName('line');
-		// 	// let el = $('.navigation');
-		// 	if (!isElementInViewport(el[0]))
-		// 	{
-		//     	console.log('a');
-		//     	document.querySelector("body").className += " scrolled-down";
-		// 	}
-		// 	else
-		// 	{
-		//     	let a = document.querySelector("body");
-		//     	document.querySelector("body").className = a.className.replace('scrolled-down','');
-		//     	console.log(a.className);
-		// 	}
-		// }.bind(this);
-	},
-
-	computed: {
-		language: function language() {
-			if (this.setLanguage) {
-				return this.setLanguage;
-			} else if (defaultLanguage) {
-				return defaultLanguage;
-			} else {
-				return 'en';
-			}
-		},
-		text: function text() {
-			if (this.language == 'en') {
-				return this.langContentsItems.en;
-			}
-			if (this.language == 'ja') {
-				return this.langContentsItems.ja;
-			}
-		},
-		allData: function allData() {
-			if (!allItems || !allItems.root) {
-				return {
-					"body": "ALL",
-					"children": [],
-					"children_order": [],
-					"depth": 0,
-					"done": false,
-					"done_date": "0000-00-00 00:00:00",
-					"due_date": "0000-00-00 00:00:00",
-					"id": "x",
-					"show_children": 1,
-					"tagged": [],
-					"used_time": 0
-				};
-			}
-			return {
-				"body": "ALL",
-				"children": this.filteredItems,
-				"children_order": this.nodes[allItems.root.id].children_order,
-				"id": this.nodes[allItems.root.id].id,
-				"depth": 0,
-				"done": false,
-				"done_date": "0000-00-00 00:00:00",
-				"due_date": "0000-00-00 00:00:00",
-				"show_children": 1,
-				"tagged": [],
-				"used_time": 0
-			};
-		},
-		mobile: function mobile() {
-			if (this.manualMobile) {
-				return true;
-			}
-			return __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_3__components_globalFunctions_js__["d" /* mobilecheck */])();
-		},
-		mobileSmall: function mobileSmall() {
-			if (window.innerWidth < 385) {
-				return true;
-			}
-		},
-		noItems: function noItems() {
-			if (!this.allData.children.length) {
-				return true;
-			}
-			return false;
-			// if(!allItems || !allItems.root || !allItems.root.children.length){
-			// 	return true;
-			// } return false;
-		},
-
-		// doneItems() // Flat
-		// {
-		// 	return this.filteredItemsFlat.filter(child => child.done);
-		// },
-		filteredItems: function filteredItems() {
-			// if(this.noItems){ return []; }
-			if (this.selection.view == 'tree') {
-				return this.filteredItemsTree;
-			} else if (this.selection.view == 'journal') {
-				return this.filteredItemsFlat;
-			}
-		},
-		filteredItemsFlat: function filteredItemsFlat() {
-			var ar = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_3__components_globalFunctions_js__["e" /* objectToArray */])(this.nodes).filter(function (item) {
-				var target = this.selection.tags.every(function (tag) {
-					return allItems.hasTag(item.id, tag);
-				});
-				var targetHidden = this.selection.hiddenTags.some(function (tag) {
-					return allItems.hasTag(item.id, tag);
-				});
-				var targetDone = selection.view == 'journal' ? item.done : true;
-				var targetToday = true;
-				if (selection.filter.includes('today')) {
-					targetToday = false;
-					var diff = moment(item.due_date).diff(moment(), 'days');
-					if (diff <= 0 || allItems.hasParentDueToday(item.id)) {
-						targetToday = true;
-					}
-					var doneDateDiff = moment(item.done_date).diff(moment(), 'days');
-					if (doneDateDiff <= 1) {
-						targetToday = false;
-					}
-				}
-				if (target && !targetHidden && targetDone && targetToday) {
-					return true;
-				}
-			}.bind(this));
-			if (selection.view == 'journal') {
-				ar = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_3__components_globalFunctions_js__["f" /* sortObjectArrayByTwoProperties */])(ar, 'done_date', 'parents_bodies', 'desc', 'asc');
-			}
-			return ar;
-		},
-		filteredItemsTree: function filteredItemsTree() {
-			//Go through ALL ITEMS and return those that have the tag AND no parent with the tag.
-			var children = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_3__components_globalFunctions_js__["e" /* objectToArray */])(this.nodes).filter(function (item) {
-				var target = void 0;
-				var hasParentWithTag = void 0;
-				var targetToday = void 0;
-				var topLvlItem = void 0;
-				if (this.selection.noFilterOrTag()) {
-					topLvlItem = item.depth == 1 ? true : false;
-					// console.log(`topLvlItem = ${topLvlItem} for ${item.body}`);
-					if (topLvlItem) {
-						return true;
-					} else {
-						return false;
-					}
-				}
-
-				if (this.selection.tags.length > 1) {
-					hasParentWithTag = this.selection.tags.every(function (tag) {
-						return allItems.hasParentWithTag(item.id, tag);
-					});
-				} else {
-					hasParentWithTag = this.selection.tags.some(function (tag) {
-						return allItems.hasParentWithTag(item.id, tag);
-					});
-				}
-				target = this.selection.tags.every(function (tag) {
-					return allItems.hasTag(item.id, tag);
-				});
-
-				if (!selection.filter.includes('today') && target && !hasParentWithTag) {
-					return true;
-				}
-
-				if (selection.filter.includes('today')) {
-					var doneDateDiff = moment(item.done_date).diff(moment(), 'days');
-					if (doneDateDiff <= 1) {
-						return false;
-					}
-					var hasParentDueToday = allItems.hasParentDueToday(item.id);
-					var isDue = allItems.isDueToday(item.id);
-					if (!selection.tags.length && isDue) {
-						console.log('(!selection.tags.length && isDue)');
-						return true;
-					} else if (selection.tags.length && target && (isDue || hasParentDueToday) && !(hasParentWithTag && hasParentDueToday)) {
-						return true;
-					}
-				}
-				return false;
-			}.bind(this));
-			// Sort on root children_order when no filter:
-			if (this.selection.noFilterOrTag()) {
-				var order = allItems.root.children_order;
-				if (order instanceof Array && order.length) {
-					// order = order.filter(id => this.$refs.root.childrenOrder.includes(id));
-					children = order.map(function (id) {
-						return children.find(function (t) {
-							return t.id === id;
-						});
-					});
-				}
-			}
-			if (selection.filter.includes('today')) {
-				children = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_3__components_globalFunctions_js__["g" /* sortObjectArrayByProperty */])(children, 'done_date');
-			}
-			return children;
-		},
-		hiddenItemIds: function hiddenItemIds() {
-			return __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_3__components_globalFunctions_js__["e" /* objectToArray */])(this.nodes).filter(function (item) {
-				var targetHidden = this.selection.hiddenTags.some(function (tag) {
-					return allItems.hasTag(item.id, tag);
-				});
-				if (targetHidden) {
-					return true;
-				}
-			}.bind(this)).map(function (item) {
-				return item.id;
-			});
-		},
-		selectionFilter: function selectionFilter() // For list title
-		{
-			return selection.filter.map(function (val, i) {
-				if (selection.filter.length == i + 1) {
-					val = allItems.tagSlugToName(val);
-				} else {
-					val = allItems.tagSlugToName(val) + ', ';
-				}
-				return val;
-			});
-		},
-		selectionTags: function selectionTags() // For list title
-		{
-			return selection.tags.map(function (val, i) {
-				if (selection.tags.length == i + 1) {
-					val = allItems.tagSlugToName(val);
-				} else {
-					val = allItems.tagSlugToName(val) + ', ';
-				}
-				return val;
-			});
-		},
-		selectionHiddenTags: function selectionHiddenTags() // For list title
-		{
-			return selection.hiddenTags.map(function (val, i) {
-				if (selection.hiddenTags.length == i + 1) {
-					val = allItems.tagSlugToName(val);
-				} else {
-					val = allItems.tagSlugToName(val) + ', ';
-				}
-				return val;
-			});
-		},
-
-		// allVisibleItems()
-		// {
-		// 	if(!this.allData){ return []; }
-		// 	return filteredItemsFlat;
-		// 	// let items = allItems.flattenTree(allItems.root.children);
-		// 	// return items.filter(function(item)
-		// 	// {
-		// 	// 	return !selection.hiddenItems.includes(item.id);
-		// 	// });
-		// },
-		allTagsComputed: function allTagsComputed() {
-			var t0 = performance.now();
-			if (this.noItems) {
-				return [];
-			}
-			var allTagsArray = [];
-			// let items = allItems.flattenTree(allItems.root.children);
-			// FILTER REWRITE
-			// let items = this.allVisibleItems;
-			// let items = (this.$refs.root) ? this.$refs.root.allVisibleChildItems : [] ;
-			var items = this.filteredItemsFlat.length ? this.filteredItemsFlat : [];
-			if (!items.length) {
-				return [];
-			}
-			items.forEach(function (item) {
-				item.tagged.forEach(function (taggedObj) {
-					if (!taggedObj.tag || !taggedObj.tag.name) {
-						return; // solves bugs with broken tags
-					}
-					var tagAlreadyPushed = allTagsArray.find(function (pushedTag) {
-						return pushedTag.name == taggedObj.tag.name;
-					}.bind(taggedObj));
-
-					if (!tagAlreadyPushed) {
-						allTagsArray.push(taggedObj.tag);
-					}
-				}.bind(allTagsArray));
-			}.bind(allTagsArray));
-			allTagsArray = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_3__components_globalFunctions_js__["g" /* sortObjectArrayByProperty */])(allTagsArray, 'name');
-			var t1 = performance.now();
-			console.log("Call to allTagsComputed took " + (t1 - t0) + " milliseconds.");
-			return allTagsArray;
-		},
-		allTagsComputed_2: function allTagsComputed_2() {
-			var t2_0 = performance.now();
-			if (this.noItems) {
-				return [];
-			}
-			var allTagsArray = [];
-			// let items = allItems.flattenTree(allItems.root.children);
-			// FILTER REWRITE
-			// let items = this.allVisibleItems;
-			// let items = (this.$refs.root) ? this.$refs.root.allVisibleChildItems : [] ;
-			var items = this.filteredItemsFlat.length ? this.filteredItemsFlat : [];
-			console.log('allTagsComputed_2');
-			// console.log('this.$refs.root.allVisibleChildItems');
-			// console.log(this.$refs.root.allVisibleChildItems);
-			if (!items.length) {
-				return [];
-			}
-			allTagsArray = items.reduce(function (a, item) {
-				var tags = item.tagged.map(function (taggedObj) {
-					return taggedObj.tag;
-				});
-				return a.concat(tags);
-			}, []);
-			allTagsArray = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_3__components_globalFunctions_js__["h" /* uniqBy */])(allTagsArray);
-			allTagsArray = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_3__components_globalFunctions_js__["g" /* sortObjectArrayByProperty */])(allTagsArray, 'name');
-			var t2_1 = performance.now();
-			console.log("Call to allTagsComputed_2 took " + (t2_1 - t2_0) + " milliseconds.");
-			return allTagsArray;
-		},
-		allTagsComputed_3: function allTagsComputed_3() {
-			var t3_0 = performance.now();
-			if (this.noItems) {
-				return [];
-			}
-			var allTagsArray = new Set();
-			// let items = allItems.flattenTree(allItems.root.children);
-			// FILTER REWRITE
-			// let items = this.allVisibleItems;
-			// let items = (this.$refs.root) ? this.$refs.root.allVisibleChildItems : [] ;
-			var items = this.filteredItemsFlat.length ? this.filteredItemsFlat : [];
-			if (!items.length) {
-				return [];
-			}
-			items.forEach(function (item) {
-				if (item.tagged.length) {
-					item.tagged.forEach(function (taggedObj) {
-						return allTagsArray.add(taggedObj.tag);
-					});
-				}
-			}.bind(allTagsArray));
-			allTagsArray = [].concat(_toConsumableArray(allTagsArray));
-			allTagsArray = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_3__components_globalFunctions_js__["h" /* uniqBy */])(allTagsArray);
-			allTagsArray = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_3__components_globalFunctions_js__["g" /* sortObjectArrayByProperty */])(allTagsArray, 'name');
-			var t3_1 = performance.now();
-			console.log("Call to allTagsComputed_3 took " + (t3_1 - t3_0) + " milliseconds.");
-			return allTagsArray;
-		},
-		allTagsComputed_1b: function allTagsComputed_1b() {
-			var t0 = performance.now();
-			if (this.noItems) {
-				return [];
-			}
-			var allTagsArray = [];
-			// let items = allItems.flattenTree(allItems.root.children);
-			// FILTER REWRITE
-			// let items = this.allVisibleItems;
-			// let items = (this.$refs.root) ? this.$refs.root.allVisibleChildItems : [] ;
-			var items = this.filteredItemsFlat.length ? this.filteredItemsFlat : [];
-			if (!items.length) {
-				return [];
-			}
-			items.forEach(function (item) {
-				item.tagged.forEach(function (taggedObj) {
-					if (!taggedObj.tag || !taggedObj.tag.name) {
-						return; // solves bugs with broken tags
-					}
-					var tagAlreadyPushed = allTagsArray.find(function (pushedTag) {
-						return pushedTag.name == taggedObj.tag.name;
-					}.bind(taggedObj));
-
-					if (!tagAlreadyPushed) {
-						allTagsArray.push(taggedObj.tag);
-					}
-				}.bind(allTagsArray));
-			}.bind(allTagsArray));
-			allTagsArray = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_3__components_globalFunctions_js__["g" /* sortObjectArrayByProperty */])(allTagsArray, 'name');
-			var t1 = performance.now();
-			console.log("Call to allTagsComputed took " + (t1 - t0) + " milliseconds.");
-			return allTagsArray;
-		},
-		itemAmount: function itemAmount() {
-			if (this.noItems) {
-				return 0;
-			}
-			// let x = this.countChildren(this.allData);
-			// let x = this.$refs.root.allVisibleChildItems.length;
-			var items = this.filteredItemsFlat.length ? this.filteredItemsFlat : [];
-			return items.length - 1;
-		},
-		doneItemAmount: function doneItemAmount() {
-			if (this.noItems) {
-				return 0;
-			}
-			// let doneChildren = this.$refs.root.allVisibleChildItems.filter(child => child.done).length;
-			var items = this.filteredItemsFlat.length ? this.filteredItemsFlat : [];
-			var doneChildren = items.filter(function (child) {
-				return child.done;
-			}).length;
-			return doneChildren;
-		},
-		totalPlannedMin: function totalPlannedMin() {
-			if (this.noItems) {
-				return 0;
-			}
-			var selfValue = 0;
-			var childrenArray = this.filteredItemsFlat;
-			if (!childrenArray || !childrenArray.length) {
-				return selfValue;
-			}
-			var x = childrenArray.reduce(function (prevVal, child) {
-				return prevVal + parseFloat(child.planned_time);
-			}, selfValue);
-			return x ? parseFloat(x) : 0;
-		},
-		totalPlannedSec: function totalPlannedSec() {
-			return this.totalPlannedMin * 60;
-		},
-		totalUsedSec: function totalUsedSec() {
-			if (this.noItems) {
-				return 0;
-			}
-			var selfValue = 0;
-			var childrenArray = this.filteredItemsFlat;
-			if (!childrenArray || !childrenArray.length) {
-				return selfValue;
-			}
-			var x = childrenArray.reduce(function (prevVal, child) {
-				return prevVal + parseFloat(child.used_time);
-			}, selfValue);
-			return x ? x : 0;
-		},
-		totalSecLeft: function totalSecLeft() {
-			if (this.noItems) {
-				return 0;
-			}
-			return this.totalPlannedSec - this.totalUsedSec;
-		},
-		totalUsedHourMin: function totalUsedHourMin() {
-			return __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_3__components_globalFunctions_js__["i" /* sec_to_hourmin */])(this.totalUsedSec);
-		},
-		totalHourMinLeft: function totalHourMinLeft() {
-			return __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_3__components_globalFunctions_js__["i" /* sec_to_hourmin */])(this.totalSecLeft);
-		},
-		lastItems: function lastItems() {
-			if (this.noItems) {
-				return [];
-			}
-			var lastChild = this.topLvlItems[this.topLvlItems.length - 1];
-			var deepestChild = this.findDeepestVisibleChild(lastChild);
-			return [lastChild, deepestChild];
-		},
-		firstItem: function firstItem() {
-			if (this.noItems) {
-				return null;
-			}
-			return this.topLvlItems[0];
-		},
-		topLvlItems: function topLvlItems() {
-			if (this.noItems) {
-				return [];
-			}
-			return this.filteredItemsTree.map(function (i) {
-				return i.id;
-			});
-		}
-	},
-	watch: {
-		// allTagsComputed()
-		// {
-		// 	alert('allTagsComputed changed');
-		// 	console.log('allTagsComputed changed');
-		// },
-		// selection:
-		// {
-		// 	handler() {
-		// try 2
-		// Vue.nextTick(() => {
-		// 	this.allTagsComputed.forEach(t => {
-		// 		let el = document.querySelector("a[value='"+t.slug+"']");
-		// 		if(selection.tags.includes(t.slug))
-		// 		{
-		// 			el.className += ' active';
-		// 		} else {
-		// 			el.className = el.className.replace('active','');
-		// 		}
-		// 	})				
-		// });
-		// Vue.nextTick(()=> console.log('a'));
-
-		// try 3
-		// setTimeout(() => {
-		// 	document.querySelectorAll(".tag-menu a").forEach(el => el.className = el.className.replace('active',''));
-		// 	this.allTagsComputed.forEach(t => {
-		// 		let el = document.querySelector("a[value='"+t.slug+"']");
-		// 		if(selection.tags.includes(t.slug))
-		// 		{
-		// 			el.className += ' active';
-		// 		} else {
-		// 			el.className = el.className.replace('active','');
-		// 		}
-		// 	})
-		// },1000);
-		// },
-		// deep: true
-		// },
-	},
-	methods: {
-		startEdit: function startEdit(item, event) {
-			// debugger;
-			if (event && (event.srcElement.hasClass('done') || event.srcElement.hasClass('custom-tag'))) {
-				return;
-			}
-			console.log('startEdit');
-			item = item ? item : allItems.nodes[selection.selectedId];
-			this.beforeEditCache_body = item.body;
-			this.beforeEditCache_planned_time = item.planned_time;
-			// if( this.mobile )
-			// {
-			// 	this.popouts.edit.push(item);
-			// 	return;
-			// }
-			this.editingItem = item.id;
-		},
-		scrollToItemIfNeeded: function scrollToItemIfNeeded(id) {
-			var el = document.getElementById('item-body-' + id);
-			if (!__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_3__components_globalFunctions_js__["a" /* isElementInViewport */])(el)) {
-				el.scrollIntoView();
-			}
-		},
-		doneEdit: function doneEdit(item) {
-			console.log('Done edit!');
-			item = item ? item : allItems.nodes[selection.selectedId];
-			// if (!this.editingItem)
-			// {
-			// 	return;
-			// }
-			this.editingItem = null;
-			vm.popouts.edit = [];
-			if (this.editingItemTags) {
-				this.editingItemTags = null;
-				return;
-			}
-			if (!item.body) {
-				item.body = this.beforeEditCache_body;
-			}
-			// item.body = item.body.trim();
-
-			if (typeof item.planned_time != 'number' || Number.isNaN(item.planned_time)) {
-				item.planned_time = 0;
-			}
-			if (item.planned_time != this.beforeEditCache_planned_time) {
-				this.patch(item.id, 'planned_time');
-			}
-			if (item.body != this.beforeEditCache_body) {
-				this.patch(item.id, 'body');
-				allItems.copyParentBodyToAllChildren(item.id);
-			}
-			this.beforeEditCache_body = null;
-			this.beforeEditCache_planned_time = null;
-			// setTimeout(() => this.convertbodyURLtoHTML(),1000);
-		},
-		cancelEdit: function cancelEdit(item) {
-			item = item ? item : allItems.nodes[selection.selectedId];
-			if (this.editingItem || this.popouts.edit.length) {
-				console.log("cancel edit. Reverting to:");
-				console.log(this.beforeEditCache_body);
-				item.body = this.beforeEditCache_body;
-				item.planned_time = this.beforeEditCache_planned_time;
-			}
-			this.editingItem = null;
-			this.editingItemTags = null;
-			this.popouts.edit = [];
-		},
-		cancelAddNew: function cancelAddNew() {
-			console.log('cancelAddNew');
-			this.addingNewUnder = null;
-			// this.addingNewEmptyList = false;
-			selection.selectedId = selection.lastSelectedId;
-			// Reset newItem to sibling stance.
-			this.addingNewAsChild = false;
-			// $(':focus').blur();
-		},
-		addNew: function addNew(addNextItemAs, newItem, olderSibling, addTags) {
-			newItem = newItem ? newItem : this.newItem;
-			if (!newItem.body) {
-				return;
-			}
-			addTags = addTags ? addTags : [];
-			if (olderSibling) {
-				olderSibling = olderSibling;
-			} else if (selection.selectedId) {
-				olderSibling = allItems.nodes[selection.selectedId];
-			} else {
-				olderSibling = false;
-			}
-			// Set parent ID and depth & protect against bugs when olderSibling is the root:
-			newItem.parent_id = olderSibling.parent_id ? olderSibling.parent_id : allItems.root.id;
-			newItem.depth = olderSibling.depth == 0 ? 1 : olderSibling.depth;
-
-			var OlderSiblingIndex = allItems.siblingIndex(olderSibling.id);
-			var index = isNaN(OlderSiblingIndex) ? 0 : OlderSiblingIndex + 1;
-			console.log('\n\t\t\t\tadding new item[' + newItem.body + ']\n\t\t\t\twith parent id = ' + newItem.parent_id + '\n\t\t\t\tdepth = ' + newItem.depth + '\n\t\t\t\tindex = ' + index);
-			if (this.addingNewAsChild) {
-				newItem.depth = olderSibling.depth + 1;
-				newItem.parent_id = olderSibling.id;
-				index = 0;
-			}
-			if (selection.view == "journal") {
-				newItem.done = 1;
-				newItem.done_date = olderSibling.done_date;
-			}
-			if (selection.filter.includes('today') && allItems.isTopLvlItemInFilteredRoot(olderSibling.id) && !this.addingNewAsChild) {
-				newItem.due_date = moment().format();
-				addTags = addTags.filter(function (val) {
-					return val != 'Today';
-				});
-			}
-			console.log('sending newItem:');
-			console.log(newItem);
-			console.log('sending tags:');
-			console.log(addTags);
-			// Send to Root for Ajax call.
-			allItems.addTempNewItem(newItem, index, addNextItemAs, addTags);
-			this.postNewItem(newItem, index, addNextItemAs, addTags);
-		},
-		itIsADeepestChild: function itIsADeepestChild(id) {
-			if (!id) {
-				console.log('you need an ID');return;
-			}
-			if (this.$refs.root.childrensDeepestChildren.map(function (item) {
-				return item.deepestChild;
-			}).includes(id)) {
-				return true;
-			}return false;
-		},
-		checkFilteredItemsTree: function checkFilteredItemsTree() {
-			//Go through ALL ITEMS and return those that have the tag AND no parent with the tag.
-			__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_3__components_globalFunctions_js__["e" /* objectToArray */])(this.nodes).forEach(function (item) {
-				var target = void 0;
-				var targetHidden = void 0;
-				var hasParentWithTag = void 0;
-				var targetToday = void 0;
-				var topLvlItem = void 0;
-				if (this.selection.nothingSelected()) {
-					topLvlItem = item.depth == 1 ? true : false;
-					if (topLvlItem) {
-						return true;
-					}
-				} else {
-					target = this.selection.tags.every(function (tag) {
-						return allItems.hasTag(item.id, tag);
-					});
-					targetHidden = this.selection.hiddenTags.some(function (tag) {
-						return allItems.hasTag(item.id, tag);
-					});
-					hasParentWithTag = this.selection.tags.some(function (tag) {
-						return allItems.hasParentWithTag(item.id, tag);
-					});
-					targetToday = true;
-					if (selection.filter.includes('today')) {
-						targetToday = false;
-						var diff = moment(item.due_date).diff(moment(), 'days');
-						if (diff <= 0) {
-							targetToday = true;
-						}
-					}
-				}
-				if (target) {
-					console.log('target = [' + item.body + ']\n\t\t\t\t\thidden: ' + targetHidden + '\n\t\t\t\t\tparentwithTag: ' + hasParentWithTag + '\n\t\t\t\t\ttargetToday: ' + targetToday);
-				}
-				// if ( target && !targetHidden && !hasParentWithTag && targetToday )
-				// {
-				// 	return true;
-				// }
-			}.bind(this));
-		},
-
-		// resetDoneData()
-		// {
-		// 	let dd = objectToArray(this.nodes).filter(item => item.done);
-		// 	dd = sortObjectArrayByTwoProperties(dd,'done_date','parents_bodies','desc','asc');
-		// 	this.doneData = dd;
-		// },
-		tagSlugToName: function tagSlugToName(tagslug) {
-			return allItems.tagSlugToName(tagslug);
-		},
-		countChildren: function countChildren(item) {
-			if (!item || !item.children) {
-				return 0;
-			}
-			var children = allItems.flattenTree(item.children);
-			var x = children.length;
-			return x;
-		},
-		countDoneChildren: function countDoneChildren(item) {
-			if (!item.children) {
-				return 0;
-			}
-			var children = allItems.flattenTree(item.children);
-			var doneChildren = children.filter(function (child) {
-				return child.done;
-			});
-			var x = doneChildren.length;
-			return x;
-		},
-
-		// returnDoneChildrenAmount(item){
-		// 	let x = item.children.reduce(function(prevChild, currChild) {
-		// 		let y = (currChild.done) ? 1 : 0;
-		// 		return prevChild + y;
-		// 	}, 0);
-		// 	return x;
-		// },
-		showChildren: function showChildren(id, show_or_hide) {
-			id = id ? id : selection.selectedId;
-			var item = allItems.nodes[id];
-			if (!item.children || !item.children.length) {
-				return;
-			}
-			if (show_or_hide == 'show') {
-				if (item.show_children) {
-					return;
-				}
-				item.show_children = true;
-			} else if (show_or_hide == 'hide') {
-				if (!item.show_children) {
-					return;
-				}
-				item.show_children = false;
-			} else {
-				item.show_children = !item.show_children;
-			}
-			this.patch(id, 'show_children');
-		},
-		markDone: function markDone(id, markAs) {
-			id = id ? id : selection.selectedId;
-			var item = allItems.nodes[id];
-			if (markAs == 'notDone') {
-				item.done = false;
-				allItems.prepareDonePatch(id);
-				return;
-			}
-			if (item.children.length && !allItems.allChildrenDone(id)) {
-				return;
-			}
-			if (markAs == 'done') {
-				item.done = true;
-			} else {
-				item.done = !item.done;
-			}
-			allItems.prepareDonePatch(id);
-		},
-		moveItem: function moveItem(direction) {
-			var id = selection.selectedId;
-			if (!id) {
-				return;
-			}
-			allItems.moveItem(id, direction);
-		},
-		indent: function indent(id) {
-			id = id ? id : selection.selectedId;
-			// if(!allItems.isTopLvlItemInFilteredRoot(id)){ 
-			// 	console.log("can't indent a topLvlItem in filtered list");
-			// 	return;
-			// }
-			var new_parent_id = allItems.olderSiblingId(id);
-			if (new_parent_id == allItems.nodes[id].parent_id) {
-				console.log('bump! ceiling!');return;
-			}
-			console.log('new_parent_id / olderSiblingId: ' + new_parent_id);
-			allItems.giveNewParent(id, new_parent_id);
-		},
-		unindent: function unindent(id) {
-			id = id ? id : selection.selectedId;
-			// if(!allItems.isTopLvlItemInFilteredRoot(id)){ 
-			// 	console.log("can't unindent a topLvlItem in filtered list");
-			// 	return;
-			// }
-			var depth = allItems.nodes[id].depth;
-			var olderSiblingId = allItems.olderSiblingId(id);
-			var olderSiblingDepth = allItems.nodes[olderSiblingId].depth;
-
-			while (olderSiblingDepth != depth - 1) {
-				olderSiblingId = allItems.olderSiblingId(olderSiblingId);
-				olderSiblingDepth = allItems.nodes[olderSiblingId].depth;
-			}
-			var new_parent_id = olderSiblingId;
-			var new_parent_depth = olderSiblingDepth;
-			console.log('new_parent: ' + new_parent_id);
-
-			if (!new_parent_id) {
-				console.log('crash! floor!');return;
-			}
-			if (new_parent_depth == 0 && depth == 1) {
-				console.log('crash! floor!');return;
-			}
-			if (new_parent_id == allItems.nodes[id].parent_id) {
-				new_parent_id = allItems.nodes[new_parent_id].parent_id;
-			}
-			allItems.giveNewParent(id, new_parent_id);
-		},
-		selectItem: function selectItem(direction) {
-			var id = selection.selectedId;
-			var item = allItems.nodes[id];
-			var sel = void 0;
-			if (direction == 'next') {
-				if (!id || id == allItems.root.id) {
-					sel = this.$refs.root.childrenOrder[0];
-				} else {
-					sel = allItems.nextItemId(id);
-				}
-			} else if (direction == 'prev') {
-				if (!id || id == allItems.root.id) {
-					var l = this.$refs.root.childrenOrder.length;
-					sel = this.$refs.root.childrenOrder[l - 1];
-				} else {
-					sel = allItems.prevItemId(id);
-				}
-			}
-			selection.selectedId = sel;
-			this.scrollToItemIfNeeded(sel);
-		},
-		findDeepestVisibleChild: function findDeepestVisibleChild(id) {
-			var _this = this;
-
-			id = id ? id : selection.selectedId;
-			var item = allItems.nodes[id];
-			var children = item.children.filter(function (child) {
-				return !_this.hiddenItemIds.includes(child.id);
-			});
-			if (!children.length) {
-				return id;
-			}
-			var deepestId = children[children.length - 1].id;
-			return this.findDeepestVisibleChild(deepestId);
-		},
-		setToday: function setToday(id) {
-			id = id ? id : selection.selectedId;
-			if (!id) {
-				return;
-			}
-			if (allItems.hasParentDueToday(id)) {
-				console.log('parent is already due');return;
-			}
-			allItems.setDueDate(id);
-		},
-		showAddNewItem: function showAddNewItem(id, addAs) {
-			id = id ? id : selection.selectedId ? selection.selectedId : allItems.root.id;
-			if (!id) {
-				return;
-			}
-			console.log('showAddNewItem for [' + allItems.nodes[id].body + ']');
-			this.addingNewUnder = id;
-			selection.lastSelectedId = id;
-			selection.selectedId = null;
-			this.addingNewAsFirstChild = addAs == 'child' ? true : false;
-			this.addingNewAsChild = addAs == 'child' ? true : false;
-		},
-		startEditTags: function startEditTags(id) {
-			id = id ? id : selection.selectedId;
-			if (!id) {
-				return;
-			}
-			this.editingItemTags = id;
-		},
-		stopPatching: function stopPatching() {
-			if (window.stopPatchingIcon) {
-				clearTimeout(window.stopPatchingIcon);
-			}
-			window.stopPatchingIcon = setTimeout(function () {
-				this.patching = false;
-			}.bind(this), 300);
-		},
-		startPatching: function startPatching() {
-			if (window.stopPatchingIcon) {
-				clearTimeout(window.stopPatchingIcon);
-			}
-			this.patching = true;
-		},
-		patchRootChildrenOrderWithFilter: function patchRootChildrenOrderWithFilter(id) {
-			this.$http.get('api/items/' + allItems.root.id).then(function (response) {
-				var rootChildrenOrder = response.data.children_order;
-				rootChildrenOrder = rootChildrenOrder + ',' + id;
-				this.$http.patch('api/items/' + allItems.root.id, { 'children_order': rootChildrenOrder }).then(function (response) {
-					var newRootChildrenOrder = response.data.children_order;
-					console.log('newRootChildrenOrder = ' + newRootChildrenOrder);
-				});
-			});
-		},
-		patch: function patch(id, arg, value) {
-			var _this2 = this;
-
-			// if(allItems.isTopLvlItemInFilteredRoot(id)){ 
-			// 	if(arg == 'children_order' || arg == 'parent_id'){
-			// 		console.log("you can't sync a toplvlItem when filtering");
-			// 		return;
-			// 	}
-			// }
-			this.startPatching();
-			var patchObj = {};
-			var patchVal = value ? value : allItems.nodes[id][arg];
-			if (arg == 'children_order') {
-				patchVal = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_3__components_globalFunctions_js__["j" /* arrayToString */])(patchVal);
-			}
-			patchObj[arg] = patchVal;
-			this.$http.patch('/api/items/' + id, patchObj, { method: 'PATCH' }).then(function (response) {
-				console.log('patched [' + allItems.nodes[id].body + '].' + arg + ' = ' + patchObj[arg] + ';');
-				this.stopPatching();
-			}, function (response) {
-				_this2.patching = 'error';
-			});
-		},
-		patchTag: function patchTag(id, tags, requestType) {
-			/* requestType can be:
-   	'tag': tag item  (default if null)
-   	'untag': untag item with certain tag
-   	'retag': delete all tags and retag new ones
-   */
-			if (!tags) {
-				return;
-			}
-			allItems.updateItemTagsDom(id, tags, requestType);
-			if (Array.isArray(tags)) {
-				tags = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_3__components_globalFunctions_js__["k" /* removeEmptyValuesFromArray */])(tags);
-				if (!tags.length) {
-					return;
-				}
-			} else {
-				if (!tags.replace(/\s/g, "").length) {
-					return;
-				}
-			}
-			this.startPatching();
-			var patchObj = {};
-			patchObj['tags'] = tags;
-			patchObj['type'] = requestType;
-			this.$http.patch('/api/itemtags/' + id, patchObj, { method: 'PATCH' }).then(function (tagResponse) {
-				var syncedTags = tagResponse.data.tags;
-				console.log('tagged [' + allItems.nodes[id].body + '] with: ' + tagResponse.data.tags + ';');
-				console.log(tagResponse);
-				// Re-Add tags of item
-				this.$http.get('/api/itemtags/' + id, { type: 'tags' })
-				// Codementor: Request type doesn't work......
-				.then(function (updatedTagList) {
-					allItems.nodes[id].tagged = updatedTagList.data;
-					console.log('updatedTagList of [' + allItems.nodes[id].body + '] with: ' + updatedTagList.data.map(function (t) {
-						return t.tag_name;
-					}) + ';');
-				});
-				this.stopPatching();
-			});
-		},
-		patchDueDate: function patchDueDate(id, duedate) {
-			this.startPatching();
-			if (duedate == '0000-00-00 00:00:00') {
-				this.$http.patch('/api/items/' + id, { 'due_date': duedate }).then(function (response) {
-					this.stopPatching();
-				});
-				return;
-			}
-			duedate = moment(duedate).format();
-			console.log('PatchDueDate: ' + duedate);
-			this.$http.patch('/api/items/' + id, { 'due_date': duedate }).then(function (response) {
-				this.stopPatching();
-			});
-		},
-		patchDone: function patchDone(id) {
-			this.startPatching();
-			var done_date = void 0;
-			var doneValue = allItems.nodes[id].done;
-			if (doneValue) {
-				done_date = moment().format();
-			} else {
-				done_date = '0000-00-00 00:00:00';
-			}
-			this.$http.patch('/api/items/' + id, { 'done': doneValue, 'done_date': done_date }).then(function (response) {
-				this.stopPatching();
-			});
-		},
-		deleteItem: function deleteItem(id) {
-			id = !id ? selection.selectedId : id;
-			// if (confirm("Do you really want to delete: "+allItems.nodes[id].body+"?") == false) {
-			//        return;
-			//    }
-			this.popout(id, 'confirm-delete');
-		},
-		deleteItemApi: function deleteItemApi(idOrArray) {
-			var _this3 = this;
-
-			this.startPatching();
-			if (Array.isArray(idOrArray) && idOrArray.length) {
-				var array = idOrArray; // It's an array!
-				array.forEach(function (id) {
-					_this3.deleteItemApi(id);
-				});
-			} else {
-				var id = idOrArray; // It's an ID!
-				if (!id) {
-					return;
-				}
-				var item = allItems.nodes[id];
-				this.$http.delete('/api/items/' + id).then(function (response) {
-					console.log('deleted: ' + id + '[' + item.body + ']');
-					this.stopPatching();
-				});
-			}
-		},
-		popup: function popup(id, type) {
-			id = !id ? selection.selectedId : id;
-			var item = allItems.nodes[id];
-			var popupExists = this.popups.filter(function (popup) {
-				return popup.item.id === id;
-			})[0];
-			if (popupExists) {
-				return;
-			}
-			this.popups.push({
-				item: item,
-				type: type,
-				timeout: true, // not yet fully integrated
-				time: 10 });
-			//         if (type == 'afterDone') {
-			// Vue.nextTick(function() {
-			// 	let fpId = "#done-date-edit-"+id;
-			// 	let fpEl = document.querySelector(fpId);
-			// 	fpEl.flatpickrify();
-			// 	let fpId_b = "#done-date-edit-"+id+"-popup";
-			// 	let fpEl_b = document.querySelector(fpId_b);
-			// 	fpEl_b.flatpickrify();
-			// });
-			//         }
-		},
-		popout: function popout(id, type) {
-			id = !id ? selection.selectedId : id;
-			if (!id) {
-				return;
-			}
-			var item = allItems.nodes[id];
-			// let popoutExists = this.popouts.filter(function (popout) { return popout.item.id === id; })[0];
-			// if(!popoutExists){
-			// console.log("poppy doesn't exist");
-			if (type == 'timer') {
-				this.popouts.timer.push(item);
-				Vue.nextTick(function () {
-					eventHub.$emit('playTimer', item);
-					console.log('emitted playTimer');
-				});
-			}
-			if (type == 'confirm-delete') {
-				this.popouts.delete.push(item);
-			}
-			// }
-		},
-		addTimer: function addTimer(id) {
-			id = !id ? selection.selectedId : id;
-			this.popout(id, 'timer');
-			return;
-		},
-		fetchDone: function fetchDone(tags, operator) {
-			this.loading = true;
-			this.$http.get('/api/items/fetchdone').then(function (response) {
-				// debugger;
-				this.fetchedDone = true;
-				console.log('fetched Done');
-				var data = response.data;
-				console.log(data);
-				if (!data.length) {
-					console.log('no done items...');
-					this.loading = false;
-					return;
-				}
-				// clean up and add as nodes
-				data.forEach(function (item) {
-					item = allItems.setDefaultItemValues(item);
-					if (!allItems.nodes[item.id]) {
-						allItems.nodes[item.id] = item;
-					}
-				});
-				// Codementor
-				this.selection.view = null;
-				this.selection.view = 'journal';
-				this.loading = false;
-			});
-		},
-
-
-		// fetchTagged(tags, requestType){
-		// 	/* requestType can be:
-		// 		'withAnyTag': fetch articles with any tag listed
-		// 		'withAllTags': only fetch articles with all the tags
-		// 		'tagNames': fetch all existing tags
-		// 	*/
-		// 	this.loading = true;
-		// 	let request = {};
-		// 	requestType = (!requestType) ? 'withAnyTag' : requestType;
-		// 	request['tags'] = tags;
-		// 	request['type'] = requestType;
-		// 	console.log('request');
-		// 	console.log(request);
-		// 	this.$http.post('/api/itemtags/fetchTagged', request).then(function(response){
-		// 		let aaa = response.data;
-		// 		aaa = json(aaa);
-		// 		console.log('fetched tagged items!');
-		// 		console.log(response);
-		// 		console.log(response.json());
-		// 		console.log(aaa);
-		// 		allItems.filteredTagItems = aaa;
-		// 		allItems.nodes = aaa;
-		// 		allItems.root = aaa;
-		// 		this.allData = aaa;
-		// 		this.loading = false;
-		// 	});
-		// },
-		filterItems: function filterItems(keyword, value, event) {
-			// debugger;
-			var operator = null;
-			if (event) {
-				event.preventDefault();
-				if (event.ctrlKey || event.metaKey) {
-					operator = 'AND';
-				} else if (event.altKey) {
-					operator = 'NOT';
-				}
-			}
-			if (!operator) {
-				selection.clear();
-			}
-			if (keyword == 'journal' && !this.fetchedDone) {
-				this.fetchDone(null, operator);
-			}
-			selection.addKeywords(keyword, value, operator);
-			// FILTER REWRITE
-			// allItems.filterItems(keyword,value,operator);
-			// setTimeout(()=>{ 
-			// 	let a = selection.tags;
-			// 	selection.tags = [];
-			// 	selection.tags = a;
-			// 	console.log(selection.tags);
-			// },500);
-			// console.log(selection.tags);
-			// setTimeout(()=>{ vm.test() },1000);
-		},
-		removeFilter: function removeFilter(tag) {
-			selection.hiddenTags = selection.hiddenTags.filter(function (x) {
-				return x !== tag;
-			});
-		},
-		duplicate: function duplicate(id) {
-			id = !id ? selection.selectedId : id;
-			allItems.duplicate(id);
-		},
-		postNewItem: function postNewItem(newItem, index, addNextItemAs, addTags, duplication) {
-			var _this4 = this;
-
-			this.startPatching();
-			// Prepare children_order for sending to DB.
-			if (newItem.children_order) {
-				newItem.children_order = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_3__components_globalFunctions_js__["j" /* arrayToString */])(newItem.children_order);
-			}
-			// let data = {
-			// 	newItemArray: [newItem, newItem]
-			// }
-			var data = newItem;
-			// newItem.id = 99999999;
-			// index = 0;
-			// allItems.addItem(newItem, index);
-			// return;
-
-			// let data = newItem;
-			// data = JSON.stringify(data);
-			this.$http.post('/api/items', data) //SEND
-			// this.$http.post('/api/items',newItem) //SEND
-			.then(function (response) {
-				//response
-				var storedItem = response.data;
-				// Revert old item's children_order back to string.
-				// storedItem.children_order = (!newItem.children_order) ? [] : newItem.children_order.split(',').map(Number);
-				// if(storedItem.constructor === Array){
-				// 	console.log(storedItem);
-				// 	console.log('storedItem ARRAY');
-				// 	storedItem.forEach(item => allItems.addItem(item));
-				// 	return;
-				// }
-				console.log('starting dom update...');
-				console.log('Index: ');
-				console.log(index);
-				allItems.addItem(storedItem, index, addNextItemAs, addTags, duplication);
-				this.stopPatching();
-			}, function (response) {
-				_this4.patching = 'error';
-			});
-		},
-		isFirstItem: function isFirstItem(id) {
-			if (this.noItems) {
-				return false;
-			}
-			return allItems.siblingIndex(id) == 0;
-		},
-		test: function test(id) {
-			document.querySelectorAll(".tag-menu a").forEach(function (el) {
-				return alert(JSON.stringify(el.style.color));
-			});
-			// id = (!id) ? selection.selectedId : id ;
-			// id = selection.selectedId;
-			// let item = allItems.nodes[id];
-			// this.patchTag(id, 'bloem', 'tag');
-		},
-		alert: function (_alert) {
-			function alert(_x) {
-				return _alert.apply(this, arguments);
-			}
-
-			alert.toString = function () {
-				return _alert.toString();
-			};
-
-			return alert;
-		}(function (value) {
-			alert(value);
-		})
-	},
-	http: {
-		headers: {
-			'X-CSRF-TOKEN': document.querySelector('#csrf-token').getAttribute('content')
-		}
-	}
-};
-
-/***/ }),
+/* 168 */,
 /* 169 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -48391,6 +46954,1473 @@ __webpack_require__(140);
 __webpack_require__(141);
 module.exports = __webpack_require__(139);
 
+
+/***/ }),
+/* 199 */,
+/* 200 */,
+/* 201 */,
+/* 202 */,
+/* 203 */,
+/* 204 */,
+/* 205 */,
+/* 206 */,
+/* 207 */,
+/* 208 */,
+/* 209 */,
+/* 210 */,
+/* 211 */,
+/* 212 */,
+/* 213 */,
+/* 214 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__vue_components_Card_vue__ = __webpack_require__(188);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__vue_components_Card_vue___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0__vue_components_Card_vue__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__vue_components_Popups_vue__ = __webpack_require__(190);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__vue_components_Popups_vue___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1__vue_components_Popups_vue__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__vue_components_Popouts_vue__ = __webpack_require__(189);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__vue_components_Popouts_vue___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2__vue_components_Popouts_vue__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__components_globalFunctions_js__ = __webpack_require__(5);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__vue_components_Selection_js__ = __webpack_require__(167);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__vue_components_dataTree_js__ = __webpack_require__(20);
+function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
+
+window.langContentsItems = {
+	'en': {
+		'global': //
+		{
+			'min': 'min',
+			'hour': 'hour',
+			'm': 'm',
+			'h': 'h',
+			'cancel': 'Cancel',
+			'delete': 'Delete',
+			'save': 'save'
+		},
+		'menu': //
+		{
+			'all': 'All',
+			'today': 'Today',
+			'journal': 'Journal',
+			'?': '?',
+			'usedTime': 'Used time',
+			'timeLeft': 'Time left',
+			'items': 'Items',
+			'done': 'Done',
+			'total': 'Total'
+		},
+		'card': //
+		{
+			'duration': 'Duration:',
+			'addTag': 'Add tag:',
+			'edit': 'Edit',
+			'setToday': 'Do today',
+			'addAndContinue': 'Add and continue',
+			'addAndClose': 'Add and close'
+		},
+		'tags': {
+			'done': 'Done',
+			'today': 'Today'
+		},
+		'popouts': //
+		{
+			'reset': 'Reset',
+			'ok': 'Ok',
+			'reallyDelete': 'Really delete',
+			'andAllChildren': 'And all children',
+			'overtime': 'overtime',
+			'total': 'Total'
+		},
+		'popups': //
+		{
+			'journalNotes': 'Journal notes',
+			'completed': 'Completed',
+			'completedB': '',
+			'usedTime': 'Used time',
+			'reset': 'Reset'
+		},
+		'guide': //
+		{
+			'action': 'Action',
+			'key': 'Key',
+			'keybindings': [//
+			{ 'key': 'T', 'note': 'Do <u>T</u>oday' }, { 'key': 'S', 'note': '<u>S</u>topwatch / Timer' }, { 'key': 'tab', 'note': 'Indent item' }, { 'key': 'enter', 'note': 'Add item' }, { 'key': 'cmd/ctrl + enter', 'note': 'Edit item' }, { 'key': 'shift + T', 'note': 'Edit tags' }, { 'key': 'alt + click on tag', 'note': 'Hide tag' }, { 'key': 'cmd/ctrl + ↑↓', 'note': 'Move item up/down' }],
+			'hints': { //
+				'addItemHint': 'Add some items!'
+			}
+		}
+	},
+	'ja': {
+		'global': //
+		{
+			'min': '分',
+			'hour': '時',
+			'm': '分',
+			'h': '時',
+			'cancel': 'キャンセル',
+			'delete': '削除',
+			'save': '保存'
+		},
+		'menu': //
+		{
+			'all': '全て',
+			'today': '今日',
+			'journal': '日報',
+			'?': '？',
+			'usedTime': '使用時間',
+			'timeLeft': '残時間',
+			'items': 'アイテム',
+			'done': '完了',
+			'total': '合計'
+		},
+		'card': //
+		{
+			'duration': '使用時間:',
+			'addTag': 'タグを追加:',
+			'edit': '編集',
+			'setToday': '今日やる',
+			'addAndContinue': '複数追加',
+			'addAndClose': '追加して閉じる'
+		},
+		'tags': {
+			'done': '完了',
+			'today': '今日'
+		},
+		'popouts': //
+		{
+			'reset': 'リセット',
+			'ok': 'Ok',
+			'reallyDelete': '本当に削除しますか？',
+			'andAllChildren': 'とその中の全てのアイテム',
+			'overtime': 'オーバータイム',
+			'total': '合計'
+		},
+		'popups': //
+		{
+			'journalNotes': '日報メモ',
+			'completed': '',
+			'completedB': 'を完了致しました',
+			'usedTime': '使用時間',
+			'reset': 'リセット'
+		},
+		'guide': //
+		{
+			'action': 'アクション',
+			'key': 'ショートカットキー',
+			'keybindings': [{ 'key': 'T', 'note': '今日のタスクとして設定' }, { 'key': 'S', 'note': 'ストップウォッチ / タイマー' }, { 'key': 'tab', 'note': 'アイテムを右へ' }, { 'key': 'enter', 'note': 'アイテムを追加' }, { 'key': 'cmd/ctrl + enter', 'note': 'アイテムを編集' }, { 'key': 'shift + T', 'note': 'タグを編集' }, { 'key': 'alt + click on tag', 'note': 'タグのアイテムを非表示' }, { 'key': 'cmd/ctrl + ↑↓', 'note': 'アイテムを上下へ移動' }],
+			'hints': {
+				'addItemHint': 'アイテムを追加しよう！'
+			}
+		}
+	}
+
+};
+
+
+
+
+
+
+
+
+window.selection = new __WEBPACK_IMPORTED_MODULE_4__vue_components_Selection_js__["a" /* default */]();
+
+/* harmony default export */ __webpack_exports__["a"] = {
+	el: '#items-app',
+	data: {
+		doneData: null,
+		// FILTER REWRITE
+		// allData: {
+		// 	"body":"ALL",
+		// 	"children":[],
+		// 	"children_order":[],
+		// 	"depth":0,
+		// 	"done":false,
+		// 	"done_date":"0000-00-00 00:00:00",
+		// 	"due_date":"0000-00-00 00:00:00",
+		// 	"id":"x",
+		// 	"show_children":1,
+		// 	"tagged":[],
+		// 	"used_time":0
+		// },
+		nodes: {},
+		selection: selection,
+		addingNewUnder: null,
+		// addingNewEmptyList: false,
+		addingNewAsChild: false,
+		addingNewAsFirstChild: false,
+		editingItem: null,
+		editingItemTags: null,
+		editingDoneDateItem: null,
+		loading: true,
+		patching: true,
+		popups: [],
+		popouts: { 'delete': [], 'timer': [], 'edit': [], 'guide': false },
+		timerItems: [],
+		beforeEditCache_body: null,
+		beforeEditCache_planned_time: null,
+		fetchedDone: false,
+		cancelThroughKeydown: false,
+		manualMobile: false,
+		newItem: {
+			body: '',
+			planned_time: 0,
+			preparedTags: [],
+			due_date: '0000-00-00 00:00:00',
+			children: ''
+		},
+		newTag: null,
+		setLanguage: null,
+		langContentsItems: langContentsItems
+	},
+	components: {
+		Card: __WEBPACK_IMPORTED_MODULE_0__vue_components_Card_vue___default.a,
+		Popups: __WEBPACK_IMPORTED_MODULE_1__vue_components_Popups_vue___default.a,
+		Popouts: __WEBPACK_IMPORTED_MODULE_2__vue_components_Popouts_vue___default.a
+	},
+	mounted: function mounted() {
+		eventHub.$on('confirm-ok', function (id) {
+			console.log('computer says "ok"...');
+			console.log(id);
+			allItems.deleteItem(id);
+		});
+		eventHub.$on('confirm-cancel', function (id) {
+			console.log('computer says "no"...');
+			console.log(id);
+			return;
+		});
+		// window.addEventListener( "scroll", function( event ) {
+		//     console.log(vm.mobile); return;
+		// });
+		// window.addEventListener( "onscroll", function( event ) {
+		//     console.log(vm.mobile); return;
+		// });
+		//      window.onscroll = function(e) {
+		// console.log(vm.mobile); return; };
+		// 	if(vm.mobile){ return; }
+		// 	let el = document.getElementsByClassName('line');
+		// 	// let el = $('.navigation');
+		// 	if (!isElementInViewport(el[0]))
+		// 	{
+		//     	console.log('a');
+		//     	document.querySelector("body").className += " scrolled-down";
+		// 	}
+		// 	else
+		// 	{
+		//     	let a = document.querySelector("body");
+		//     	document.querySelector("body").className = a.className.replace('scrolled-down','');
+		//     	console.log(a.className);
+		// 	}
+		// }.bind(this);
+	},
+
+	computed: {
+		language: function language() {
+			if (this.setLanguage) {
+				return this.setLanguage;
+			} else if (defaultLanguage) {
+				return defaultLanguage;
+			} else {
+				return 'en';
+			}
+		},
+		text: function text() {
+			if (this.language == 'en') {
+				return this.langContentsItems.en;
+			}
+			if (this.language == 'ja') {
+				return this.langContentsItems.ja;
+			}
+		},
+		allData: function allData() {
+			if (!allItems || !allItems.root) {
+				return {
+					"body": "ALL",
+					"children": [],
+					"children_order": [],
+					"depth": 0,
+					"done": false,
+					"done_date": "0000-00-00 00:00:00",
+					"due_date": "0000-00-00 00:00:00",
+					"id": "x",
+					"show_children": 1,
+					"tagged": [],
+					"used_time": 0
+				};
+			}
+			return {
+				"body": "ALL",
+				"children": this.filteredItems,
+				"children_order": this.nodes[allItems.root.id].children_order,
+				"id": this.nodes[allItems.root.id].id,
+				"depth": 0,
+				"done": false,
+				"done_date": "0000-00-00 00:00:00",
+				"due_date": "0000-00-00 00:00:00",
+				"show_children": 1,
+				"tagged": [],
+				"used_time": 0
+			};
+		},
+		mobile: function mobile() {
+			if (this.manualMobile) {
+				return true;
+			}
+			return __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_3__components_globalFunctions_js__["d" /* mobilecheck */])();
+		},
+		mobileSmall: function mobileSmall() {
+			if (window.innerWidth < 385) {
+				return true;
+			}
+		},
+		noItems: function noItems() {
+			if (!this.allData.children.length) {
+				return true;
+			}
+			return false;
+			// if(!allItems || !allItems.root || !allItems.root.children.length){
+			// 	return true;
+			// } return false;
+		},
+
+		// doneItems() // Flat
+		// {
+		// 	return this.filteredItemsFlat.filter(child => child.done);
+		// },
+		filteredItems: function filteredItems() {
+			// if(this.noItems){ return []; }
+			if (this.selection.view == 'tree') {
+				return this.filteredItemsTree;
+			} else if (this.selection.view == 'journal') {
+				return this.filteredItemsFlat;
+			}
+		},
+		filteredItemsFlat: function filteredItemsFlat() {
+			var ar = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_3__components_globalFunctions_js__["e" /* objectToArray */])(this.nodes).filter(function (item) {
+				var target = this.selection.tags.every(function (tag) {
+					return allItems.hasTag(item.id, tag);
+				});
+				var targetHidden = this.selection.hiddenTags.some(function (tag) {
+					return allItems.hasTag(item.id, tag);
+				});
+				var targetDone = selection.view == 'journal' ? item.done : true;
+				var targetToday = true;
+				if (selection.filter.includes('today')) {
+					targetToday = false;
+					var diff = moment(item.due_date).diff(moment(), 'days');
+					if (diff <= 0 || allItems.hasParentDueToday(item.id)) {
+						targetToday = true;
+					}
+					var doneDateDiff = moment(item.done_date).diff(moment(), 'days');
+					if (doneDateDiff <= 1) {
+						targetToday = false;
+					}
+				}
+				if (target && !targetHidden && targetDone && targetToday) {
+					return true;
+				}
+			}.bind(this));
+			if (selection.view == 'journal') {
+				ar = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_3__components_globalFunctions_js__["f" /* sortObjectArrayByTwoProperties */])(ar, 'done_date', 'parents_bodies', 'desc', 'asc');
+			}
+			return ar;
+		},
+		filteredItemsTree: function filteredItemsTree() {
+			console.log('update filteredItemsTree');
+			//Go through ALL ITEMS and return those that have the tag AND no parent with the tag.
+			var children = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_3__components_globalFunctions_js__["e" /* objectToArray */])(this.nodes).filter(function (item) {
+				var target = void 0;
+				var hasParentWithTag = void 0;
+				var targetToday = void 0;
+				var topLvlItem = void 0;
+				if (this.selection.noFilterOrTag()) {
+					topLvlItem = item.depth == 1 ? true : false;
+					// console.log(`topLvlItem = ${topLvlItem} for ${item.body}`);
+					if (topLvlItem) {
+						return true;
+					} else {
+						return false;
+					}
+				}
+
+				if (this.selection.tags.length > 1) {
+					hasParentWithTag = this.selection.tags.every(function (tag) {
+						return allItems.hasParentWithTag(item.id, tag);
+					});
+				} else {
+					hasParentWithTag = this.selection.tags.some(function (tag) {
+						return allItems.hasParentWithTag(item.id, tag);
+					});
+				}
+				target = this.selection.tags.every(function (tag) {
+					return allItems.hasTag(item.id, tag);
+				});
+
+				if (!selection.filter.includes('today') && target && !hasParentWithTag) {
+					return true;
+				}
+
+				if (selection.filter.includes('today')) {
+					var doneDateDiff = moment(item.done_date).diff(moment(), 'days');
+					if (doneDateDiff <= 1) {
+						return false;
+					}
+					var hasParentDueToday = allItems.hasParentDueToday(item.id);
+					var isDue = allItems.isDueToday(item.id);
+					if (!selection.tags.length && isDue) {
+						console.log('(!selection.tags.length && isDue)');
+						return true;
+					} else if (selection.tags.length && target && (isDue || hasParentDueToday) && !(hasParentWithTag && hasParentDueToday)) {
+						return true;
+					}
+				}
+				return false;
+			}.bind(this));
+			// Sort on root children_order when no filter:
+			if (this.selection.noFilterOrTag()) {
+				var order = allItems.root.children_order;
+				if (order instanceof Array && order.length) {
+					// order = order.filter(id => this.$refs.root.childrenOrder.includes(id));
+					children = order.map(function (id) {
+						return children.find(function (t) {
+							return t.id === id;
+						});
+					});
+				}
+			}
+			if (selection.filter.includes('today')) {
+				children = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_3__components_globalFunctions_js__["g" /* sortObjectArrayByProperty */])(children, 'done_date');
+			}
+			return children;
+		},
+		hiddenItemIds: function hiddenItemIds() {
+			return __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_3__components_globalFunctions_js__["e" /* objectToArray */])(this.nodes).filter(function (item) {
+				var targetHidden = this.selection.hiddenTags.some(function (tag) {
+					return allItems.hasTag(item.id, tag);
+				});
+				if (targetHidden) {
+					return true;
+				}
+			}.bind(this)).map(function (item) {
+				return item.id;
+			});
+		},
+		selectionFilter: function selectionFilter() // For list title
+		{
+			return selection.filter.map(function (val, i) {
+				if (selection.filter.length == i + 1) {
+					val = allItems.tagSlugToName(val);
+				} else {
+					val = allItems.tagSlugToName(val) + ', ';
+				}
+				return val;
+			});
+		},
+		selectionTags: function selectionTags() // For list title
+		{
+			return selection.tags.map(function (val, i) {
+				if (selection.tags.length == i + 1) {
+					val = allItems.tagSlugToName(val);
+				} else {
+					val = allItems.tagSlugToName(val) + ', ';
+				}
+				return val;
+			});
+		},
+		selectionHiddenTags: function selectionHiddenTags() // For list title
+		{
+			return selection.hiddenTags.map(function (val, i) {
+				if (selection.hiddenTags.length == i + 1) {
+					val = allItems.tagSlugToName(val);
+				} else {
+					val = allItems.tagSlugToName(val) + ', ';
+				}
+				return val;
+			});
+		},
+
+		// allVisibleItems()
+		// {
+		// 	if(!this.allData){ return []; }
+		// 	return filteredItemsFlat;
+		// 	// let items = allItems.flattenTree(allItems.root.children);
+		// 	// return items.filter(function(item)
+		// 	// {
+		// 	// 	return !selection.hiddenItems.includes(item.id);
+		// 	// });
+		// },
+		allTagsComputed: function allTagsComputed() {
+			var t0 = performance.now();
+			if (this.noItems) {
+				return [];
+			}
+			var allTagsArray = [];
+			// let items = allItems.flattenTree(allItems.root.children);
+			// FILTER REWRITE
+			// let items = this.allVisibleItems;
+			// let items = (this.$refs.root) ? this.$refs.root.allVisibleChildItems : [] ;
+			var items = this.filteredItemsFlat.length ? this.filteredItemsFlat : [];
+			if (!items.length) {
+				return [];
+			}
+			items.forEach(function (item) {
+				item.tagged.forEach(function (taggedObj) {
+					if (!taggedObj.tag || !taggedObj.tag.name) {
+						return; // solves bugs with broken tags
+					}
+					var tagAlreadyPushed = allTagsArray.find(function (pushedTag) {
+						return pushedTag.name == taggedObj.tag.name;
+					}.bind(taggedObj));
+
+					if (!tagAlreadyPushed) {
+						allTagsArray.push(taggedObj.tag);
+					}
+				}.bind(allTagsArray));
+			}.bind(allTagsArray));
+			allTagsArray = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_3__components_globalFunctions_js__["g" /* sortObjectArrayByProperty */])(allTagsArray, 'name');
+			var t1 = performance.now();
+			console.log("Call to allTagsComputed took " + (t1 - t0) + " milliseconds.");
+			return allTagsArray;
+		},
+		allTagsComputed_2: function allTagsComputed_2() {
+			var t2_0 = performance.now();
+			if (this.noItems) {
+				return [];
+			}
+			var allTagsArray = [];
+			// let items = allItems.flattenTree(allItems.root.children);
+			// FILTER REWRITE
+			// let items = this.allVisibleItems;
+			// let items = (this.$refs.root) ? this.$refs.root.allVisibleChildItems : [] ;
+			var items = this.filteredItemsFlat.length ? this.filteredItemsFlat : [];
+			console.log('allTagsComputed_2');
+			// console.log('this.$refs.root.allVisibleChildItems');
+			// console.log(this.$refs.root.allVisibleChildItems);
+			if (!items.length) {
+				return [];
+			}
+			allTagsArray = items.reduce(function (a, item) {
+				var tags = item.tagged.map(function (taggedObj) {
+					return taggedObj.tag;
+				});
+				return a.concat(tags);
+			}, []);
+			allTagsArray = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_3__components_globalFunctions_js__["h" /* uniqBy */])(allTagsArray);
+			allTagsArray = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_3__components_globalFunctions_js__["g" /* sortObjectArrayByProperty */])(allTagsArray, 'name');
+			var t2_1 = performance.now();
+			console.log("Call to allTagsComputed_2 took " + (t2_1 - t2_0) + " milliseconds.");
+			return allTagsArray;
+		},
+		allTagsComputed_3: function allTagsComputed_3() {
+			var t3_0 = performance.now();
+			if (this.noItems) {
+				return [];
+			}
+			var allTagsArray = new Set();
+			// let items = allItems.flattenTree(allItems.root.children);
+			// FILTER REWRITE
+			// let items = this.allVisibleItems;
+			// let items = (this.$refs.root) ? this.$refs.root.allVisibleChildItems : [] ;
+			var items = this.filteredItemsFlat.length ? this.filteredItemsFlat : [];
+			if (!items.length) {
+				return [];
+			}
+			items.forEach(function (item) {
+				if (item.tagged.length) {
+					item.tagged.forEach(function (taggedObj) {
+						return allTagsArray.add(taggedObj.tag);
+					});
+				}
+			}.bind(allTagsArray));
+			allTagsArray = [].concat(_toConsumableArray(allTagsArray));
+			allTagsArray = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_3__components_globalFunctions_js__["h" /* uniqBy */])(allTagsArray);
+			allTagsArray = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_3__components_globalFunctions_js__["g" /* sortObjectArrayByProperty */])(allTagsArray, 'name');
+			var t3_1 = performance.now();
+			console.log("Call to allTagsComputed_3 took " + (t3_1 - t3_0) + " milliseconds.");
+			return allTagsArray;
+		},
+		allTagsComputed_1b: function allTagsComputed_1b() {
+			var t0 = performance.now();
+			if (this.noItems) {
+				return [];
+			}
+			var allTagsArray = [];
+			// let items = allItems.flattenTree(allItems.root.children);
+			// FILTER REWRITE
+			// let items = this.allVisibleItems;
+			// let items = (this.$refs.root) ? this.$refs.root.allVisibleChildItems : [] ;
+			var items = this.filteredItemsFlat.length ? this.filteredItemsFlat : [];
+			if (!items.length) {
+				return [];
+			}
+			items.forEach(function (item) {
+				item.tagged.forEach(function (taggedObj) {
+					if (!taggedObj.tag || !taggedObj.tag.name) {
+						return; // solves bugs with broken tags
+					}
+					var tagAlreadyPushed = allTagsArray.find(function (pushedTag) {
+						return pushedTag.name == taggedObj.tag.name;
+					}.bind(taggedObj));
+
+					if (!tagAlreadyPushed) {
+						allTagsArray.push(taggedObj.tag);
+					}
+				}.bind(allTagsArray));
+			}.bind(allTagsArray));
+			allTagsArray = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_3__components_globalFunctions_js__["g" /* sortObjectArrayByProperty */])(allTagsArray, 'name');
+			var t1 = performance.now();
+			console.log("Call to allTagsComputed took " + (t1 - t0) + " milliseconds.");
+			return allTagsArray;
+		},
+		itemAmount: function itemAmount() {
+			if (this.noItems) {
+				return 0;
+			}
+			// let x = this.countChildren(this.allData);
+			// let x = this.$refs.root.allVisibleChildItems.length;
+			var items = this.filteredItemsFlat.length ? this.filteredItemsFlat : [];
+			return items.length - 1;
+		},
+		doneItemAmount: function doneItemAmount() {
+			if (this.noItems) {
+				return 0;
+			}
+			// let doneChildren = this.$refs.root.allVisibleChildItems.filter(child => child.done).length;
+			var items = this.filteredItemsFlat.length ? this.filteredItemsFlat : [];
+			var doneChildren = items.filter(function (child) {
+				return child.done;
+			}).length;
+			return doneChildren;
+		},
+		totalPlannedMin: function totalPlannedMin() {
+			if (this.noItems) {
+				return 0;
+			}
+			var selfValue = 0;
+			var childrenArray = this.filteredItemsFlat;
+			if (!childrenArray || !childrenArray.length) {
+				return selfValue;
+			}
+			var x = childrenArray.reduce(function (prevVal, child) {
+				return prevVal + parseFloat(child.planned_time);
+			}, selfValue);
+			return x ? parseFloat(x) : 0;
+		},
+		totalPlannedSec: function totalPlannedSec() {
+			return this.totalPlannedMin * 60;
+		},
+		totalUsedSec: function totalUsedSec() {
+			if (this.noItems) {
+				return 0;
+			}
+			var selfValue = 0;
+			var childrenArray = this.filteredItemsFlat;
+			if (!childrenArray || !childrenArray.length) {
+				return selfValue;
+			}
+			var x = childrenArray.reduce(function (prevVal, child) {
+				return prevVal + parseFloat(child.used_time);
+			}, selfValue);
+			return x ? x : 0;
+		},
+		totalSecLeft: function totalSecLeft() {
+			if (this.noItems) {
+				return 0;
+			}
+			return this.totalPlannedSec - this.totalUsedSec;
+		},
+		totalUsedHourMin: function totalUsedHourMin() {
+			return __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_3__components_globalFunctions_js__["i" /* sec_to_hourmin */])(this.totalUsedSec);
+		},
+		totalHourMinLeft: function totalHourMinLeft() {
+			return __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_3__components_globalFunctions_js__["i" /* sec_to_hourmin */])(this.totalSecLeft);
+		},
+		lastItems: function lastItems() {
+			if (this.noItems) {
+				return [];
+			}
+			var lastChild = this.topLvlItems[this.topLvlItems.length - 1];
+			var deepestChild = this.findDeepestVisibleChild(lastChild);
+			return [lastChild, deepestChild];
+		},
+		firstItem: function firstItem() {
+			if (this.noItems) {
+				return null;
+			}
+			return this.topLvlItems[0];
+		},
+		topLvlItems: function topLvlItems() {
+			if (this.noItems) {
+				return [];
+			}
+			return this.filteredItemsTree.map(function (i) {
+				return i.id;
+			});
+		}
+	},
+	watch: {
+		// allTagsComputed()
+		// {
+		// 	alert('allTagsComputed changed');
+		// 	console.log('allTagsComputed changed');
+		// },
+		// selection:
+		// {
+		// 	handler() {
+		// try 2
+		// Vue.nextTick(() => {
+		// 	this.allTagsComputed.forEach(t => {
+		// 		let el = document.querySelector("a[value='"+t.slug+"']");
+		// 		if(selection.tags.includes(t.slug))
+		// 		{
+		// 			el.className += ' active';
+		// 		} else {
+		// 			el.className = el.className.replace('active','');
+		// 		}
+		// 	})				
+		// });
+		// Vue.nextTick(()=> console.log('a'));
+
+		// try 3
+		// setTimeout(() => {
+		// 	document.querySelectorAll(".tag-menu a").forEach(el => el.className = el.className.replace('active',''));
+		// 	this.allTagsComputed.forEach(t => {
+		// 		let el = document.querySelector("a[value='"+t.slug+"']");
+		// 		if(selection.tags.includes(t.slug))
+		// 		{
+		// 			el.className += ' active';
+		// 		} else {
+		// 			el.className = el.className.replace('active','');
+		// 		}
+		// 	})
+		// },1000);
+		// },
+		// deep: true
+		// },
+	},
+	methods: {
+		startEdit: function startEdit(item, event) {
+			// debugger;
+			if (event && (event.srcElement.hasClass('done') || event.srcElement.hasClass('custom-tag'))) {
+				return;
+			}
+			console.log('startEdit');
+			item = item ? item : allItems.nodes[selection.selectedId];
+			this.beforeEditCache_body = item.body;
+			this.beforeEditCache_planned_time = item.planned_time;
+			// if( this.mobile )
+			// {
+			// 	this.popouts.edit.push(item);
+			// 	return;
+			// }
+			this.editingItem = item.id;
+		},
+		scrollToItemIfNeeded: function scrollToItemIfNeeded(id) {
+			var el = document.getElementById('item-body-' + id);
+			if (!__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_3__components_globalFunctions_js__["a" /* isElementInViewport */])(el)) {
+				el.scrollIntoView();
+			}
+		},
+		doneEdit: function doneEdit(item) {
+			console.log('Done edit!');
+			item = item ? item : allItems.nodes[selection.selectedId];
+			// if (!this.editingItem)
+			// {
+			// 	return;
+			// }
+			this.editingItem = null;
+			vm.popouts.edit = [];
+			if (this.editingItemTags) {
+				this.editingItemTags = null;
+				return;
+			}
+			if (!item.body) {
+				item.body = this.beforeEditCache_body;
+			}
+			// item.body = item.body.trim();
+
+			if (typeof item.planned_time != 'number' || Number.isNaN(item.planned_time)) {
+				item.planned_time = 0;
+			}
+			if (item.planned_time != this.beforeEditCache_planned_time) {
+				this.patch(item.id, 'planned_time');
+			}
+			if (item.body != this.beforeEditCache_body) {
+				this.patch(item.id, 'body');
+				allItems.copyParentBodyToAllChildren(item.id);
+			}
+			this.beforeEditCache_body = null;
+			this.beforeEditCache_planned_time = null;
+			// setTimeout(() => this.convertbodyURLtoHTML(),1000);
+		},
+		cancelEdit: function cancelEdit(item) {
+			item = item ? item : allItems.nodes[selection.selectedId];
+			if (this.editingItem || this.popouts.edit.length) {
+				console.log("cancel edit. Reverting to:");
+				console.log(this.beforeEditCache_body);
+				item.body = this.beforeEditCache_body;
+				item.planned_time = this.beforeEditCache_planned_time;
+			}
+			this.editingItem = null;
+			this.editingItemTags = null;
+			this.popouts.edit = [];
+		},
+		cancelAddNew: function cancelAddNew() {
+			console.log('cancelAddNew');
+			this.addingNewUnder = null;
+			// this.addingNewEmptyList = false;
+			selection.selectedId = selection.lastSelectedId;
+			// Reset newItem to sibling stance.
+			this.addingNewAsChild = false;
+			// $(':focus').blur();
+		},
+		addNew: function addNew(addNextItemAs, newItem, olderSibling, addTags) {
+			newItem = newItem ? newItem : this.newItem;
+			if (!newItem.body) {
+				return;
+			}
+			addTags = addTags ? addTags : [];
+			if (olderSibling) {
+				olderSibling = olderSibling;
+			} else if (selection.selectedId) {
+				olderSibling = allItems.nodes[selection.selectedId];
+			} else {
+				olderSibling = false;
+			}
+			// Set parent ID and depth & protect against bugs when olderSibling is the root:
+			newItem.parent_id = olderSibling.parent_id ? olderSibling.parent_id : allItems.root.id;
+			newItem.depth = olderSibling.depth == 0 ? 1 : olderSibling.depth;
+
+			var OlderSiblingIndex = allItems.siblingIndex(olderSibling.id);
+			var index = isNaN(OlderSiblingIndex) ? 0 : OlderSiblingIndex + 1;
+			console.log('\n\t\t\t\tadding new item[' + newItem.body + ']\n\t\t\t\twith parent id = ' + newItem.parent_id + '\n\t\t\t\tdepth = ' + newItem.depth + '\n\t\t\t\tindex = ' + index);
+			if (this.addingNewAsChild) {
+				newItem.depth = olderSibling.depth + 1;
+				newItem.parent_id = olderSibling.id;
+				index = 0;
+			}
+			if (selection.view == "journal") {
+				newItem.done = 1;
+				var doneDate = !olderSibling || olderSibling.depth == 0 ? moment().format() : olderSibling.done_date;
+				newItem.done_date = doneDate;
+			}
+			if (selection.filter.includes('today') && allItems.isTopLvlItemInFilteredRoot(olderSibling.id) && !this.addingNewAsChild) {
+				newItem.due_date = moment().format();
+				addTags = addTags.filter(function (val) {
+					return val != 'Today';
+				});
+			}
+			console.log('sending newItem:');
+			console.log(newItem);
+			console.log('sending tags:');
+			console.log(addTags);
+			// Send to Root for Ajax call.
+			allItems.addTempNewItem(newItem, index, addNextItemAs, addTags);
+			this.postNewItem(newItem, index, addNextItemAs, addTags);
+		},
+		itIsADeepestChild: function itIsADeepestChild(id) {
+			if (!id) {
+				console.log('you need an ID');return;
+			}
+			if (this.$refs.root.childrensDeepestChildren.map(function (item) {
+				return item.deepestChild;
+			}).includes(id)) {
+				return true;
+			}return false;
+		},
+		checkFilteredItemsTree: function checkFilteredItemsTree() {
+			//Go through ALL ITEMS and return those that have the tag AND no parent with the tag.
+			__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_3__components_globalFunctions_js__["e" /* objectToArray */])(this.nodes).forEach(function (item) {
+				var target = void 0;
+				var targetHidden = void 0;
+				var hasParentWithTag = void 0;
+				var targetToday = void 0;
+				var topLvlItem = void 0;
+				if (this.selection.nothingSelected()) {
+					topLvlItem = item.depth == 1 ? true : false;
+					if (topLvlItem) {
+						return true;
+					}
+				} else {
+					target = this.selection.tags.every(function (tag) {
+						return allItems.hasTag(item.id, tag);
+					});
+					targetHidden = this.selection.hiddenTags.some(function (tag) {
+						return allItems.hasTag(item.id, tag);
+					});
+					hasParentWithTag = this.selection.tags.some(function (tag) {
+						return allItems.hasParentWithTag(item.id, tag);
+					});
+					targetToday = true;
+					if (selection.filter.includes('today')) {
+						targetToday = false;
+						var diff = moment(item.due_date).diff(moment(), 'days');
+						if (diff <= 0) {
+							targetToday = true;
+						}
+					}
+				}
+				if (target) {
+					console.log('target = [' + item.body + ']\n\t\t\t\t\thidden: ' + targetHidden + '\n\t\t\t\t\tparentwithTag: ' + hasParentWithTag + '\n\t\t\t\t\ttargetToday: ' + targetToday);
+				}
+				// if ( target && !targetHidden && !hasParentWithTag && targetToday )
+				// {
+				// 	return true;
+				// }
+			}.bind(this));
+		},
+
+		// resetDoneData()
+		// {
+		// 	let dd = objectToArray(this.nodes).filter(item => item.done);
+		// 	dd = sortObjectArrayByTwoProperties(dd,'done_date','parents_bodies','desc','asc');
+		// 	this.doneData = dd;
+		// },
+		tagSlugToName: function tagSlugToName(tagslug) {
+			return allItems.tagSlugToName(tagslug);
+		},
+		countChildren: function countChildren(item) {
+			if (!item || !item.children) {
+				return 0;
+			}
+			var children = allItems.flattenTree(item.children);
+			var x = children.length;
+			return x;
+		},
+		countDoneChildren: function countDoneChildren(item) {
+			if (!item.children) {
+				return 0;
+			}
+			var children = allItems.flattenTree(item.children);
+			var doneChildren = children.filter(function (child) {
+				return child.done;
+			});
+			var x = doneChildren.length;
+			return x;
+		},
+
+		// returnDoneChildrenAmount(item){
+		// 	let x = item.children.reduce(function(prevChild, currChild) {
+		// 		let y = (currChild.done) ? 1 : 0;
+		// 		return prevChild + y;
+		// 	}, 0);
+		// 	return x;
+		// },
+		showChildren: function showChildren(id, show_or_hide) {
+			id = id ? id : selection.selectedId;
+			var item = allItems.nodes[id];
+			if (!item.children || !item.children.length) {
+				return;
+			}
+			if (show_or_hide == 'show') {
+				if (item.show_children) {
+					return;
+				}
+				item.show_children = true;
+			} else if (show_or_hide == 'hide') {
+				if (!item.show_children) {
+					return;
+				}
+				item.show_children = false;
+			} else {
+				item.show_children = !item.show_children;
+			}
+			this.patch(id, 'show_children');
+		},
+		markDone: function markDone(id, markAs) {
+			id = id ? id : selection.selectedId;
+			var item = allItems.nodes[id];
+			if (markAs == 'notDone') {
+				item.done = false;
+				allItems.prepareDonePatch(id);
+				return;
+			}
+			if (item.children.length && !allItems.allChildrenDone(id)) {
+				return;
+			}
+			if (markAs == 'done') {
+				item.done = true;
+			} else {
+				item.done = !item.done;
+			}
+			allItems.prepareDonePatch(id);
+		},
+		moveItem: function moveItem(direction) {
+			var id = selection.selectedId;
+			if (!id) {
+				return;
+			}
+			allItems.moveItem(id, direction);
+		},
+		indent: function indent(id) {
+			id = id ? id : selection.selectedId;
+			// if(!allItems.isTopLvlItemInFilteredRoot(id)){ 
+			// 	console.log("can't indent a topLvlItem in filtered list");
+			// 	return;
+			// }
+			var new_parent_id = allItems.olderSiblingId(id);
+			if (new_parent_id == allItems.nodes[id].parent_id) {
+				console.log('bump! ceiling!');return;
+			}
+			console.log('new_parent_id / olderSiblingId: ' + new_parent_id);
+			allItems.giveNewParent(id, new_parent_id);
+		},
+		unindent: function unindent(id) {
+			id = id ? id : selection.selectedId;
+			// if(!allItems.isTopLvlItemInFilteredRoot(id)){ 
+			// 	console.log("can't unindent a topLvlItem in filtered list");
+			// 	return;
+			// }
+			var depth = allItems.nodes[id].depth;
+			var olderSiblingId = allItems.olderSiblingId(id);
+			var olderSiblingDepth = allItems.nodes[olderSiblingId].depth;
+
+			while (olderSiblingDepth != depth - 1) {
+				olderSiblingId = allItems.olderSiblingId(olderSiblingId);
+				olderSiblingDepth = allItems.nodes[olderSiblingId].depth;
+			}
+			var new_parent_id = olderSiblingId;
+			var new_parent_depth = olderSiblingDepth;
+			console.log('new_parent: ' + new_parent_id);
+
+			if (!new_parent_id) {
+				console.log('crash! floor!');return;
+			}
+			if (new_parent_depth == 0 && depth == 1) {
+				console.log('crash! floor!');return;
+			}
+			if (new_parent_id == allItems.nodes[id].parent_id) {
+				new_parent_id = allItems.nodes[new_parent_id].parent_id;
+			}
+			allItems.giveNewParent(id, new_parent_id);
+		},
+		selectItem: function selectItem(direction) {
+			var id = selection.selectedId;
+			var item = allItems.nodes[id];
+			var sel = void 0;
+			if (direction == 'next') {
+				if (!id || id == allItems.root.id) {
+					sel = this.$refs.root.childrenOrder[0];
+				} else {
+					sel = allItems.nextItemId(id);
+				}
+			} else if (direction == 'prev') {
+				if (!id || id == allItems.root.id) {
+					var l = this.$refs.root.childrenOrder.length;
+					sel = this.$refs.root.childrenOrder[l - 1];
+				} else {
+					sel = allItems.prevItemId(id);
+				}
+			}
+			selection.selectedId = sel;
+			this.scrollToItemIfNeeded(sel);
+		},
+		findDeepestVisibleChild: function findDeepestVisibleChild(id) {
+			var _this = this;
+
+			id = id ? id : selection.selectedId;
+			var item = allItems.nodes[id];
+			var children = item.children.filter(function (child) {
+				return !_this.hiddenItemIds.includes(child.id);
+			});
+			if (!children.length) {
+				return id;
+			}
+			var deepestId = children[children.length - 1].id;
+			return this.findDeepestVisibleChild(deepestId);
+		},
+		setToday: function setToday(id) {
+			id = id ? id : selection.selectedId;
+			if (!id) {
+				return;
+			}
+			if (allItems.hasParentDueToday(id)) {
+				console.log('parent is already due');return;
+			}
+			allItems.setDueDate(id);
+		},
+		showAddNewItem: function showAddNewItem(id, addAs) {
+			id = id ? id : selection.selectedId ? selection.selectedId : allItems.root.id;
+			if (!id) {
+				return;
+			}
+			console.log('showAddNewItem for [' + allItems.nodes[id].body + ']');
+			this.addingNewUnder = id;
+			selection.lastSelectedId = id;
+			selection.selectedId = null;
+			this.addingNewAsFirstChild = addAs == 'child' ? true : false;
+			this.addingNewAsChild = addAs == 'child' ? true : false;
+		},
+		startEditTags: function startEditTags(id) {
+			id = id ? id : selection.selectedId;
+			if (!id) {
+				return;
+			}
+			this.editingItemTags = id;
+		},
+		stopPatching: function stopPatching() {
+			if (window.stopPatchingIcon) {
+				clearTimeout(window.stopPatchingIcon);
+			}
+			window.stopPatchingIcon = setTimeout(function () {
+				this.patching = false;
+			}.bind(this), 300);
+		},
+		startPatching: function startPatching() {
+			if (window.stopPatchingIcon) {
+				clearTimeout(window.stopPatchingIcon);
+			}
+			this.patching = true;
+		},
+		patchRootChildrenOrderWithFilter: function patchRootChildrenOrderWithFilter(id) {
+			this.$http.get('api/items/' + allItems.root.id).then(function (response) {
+				var rootChildrenOrder = response.data.children_order;
+				rootChildrenOrder = rootChildrenOrder + ',' + id;
+				this.$http.patch('api/items/' + allItems.root.id, { 'children_order': rootChildrenOrder }).then(function (response) {
+					var newRootChildrenOrder = response.data.children_order;
+					console.log('newRootChildrenOrder = ' + newRootChildrenOrder);
+				});
+			});
+		},
+		patch: function patch(id, arg, value) {
+			var _this2 = this;
+
+			// if(allItems.isTopLvlItemInFilteredRoot(id)){ 
+			// 	if(arg == 'children_order' || arg == 'parent_id'){
+			// 		console.log("you can't sync a toplvlItem when filtering");
+			// 		return;
+			// 	}
+			// }
+			this.startPatching();
+			var patchObj = {};
+			var patchVal = value ? value : allItems.nodes[id][arg];
+			if (arg == 'children_order') {
+				patchVal = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_3__components_globalFunctions_js__["j" /* arrayToString */])(patchVal);
+			}
+			patchObj[arg] = patchVal;
+			this.$http.patch('/api/items/' + id, patchObj, { method: 'PATCH' }).then(function (response) {
+				console.log('patched [' + allItems.nodes[id].body + '].' + arg + ' = ' + patchObj[arg] + ';');
+				this.stopPatching();
+			}, function (response) {
+				_this2.patching = 'error';
+			});
+		},
+		patchTag: function patchTag(id, tags, requestType) {
+			/* requestType can be:
+   	'tag': tag item  (default if null)
+   	'untag': untag item with certain tag
+   	'retag': delete all tags and retag new ones
+   */
+			if (!tags) {
+				return;
+			}
+			allItems.updateItemTagsDom(id, tags, requestType);
+			if (Array.isArray(tags)) {
+				tags = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_3__components_globalFunctions_js__["k" /* removeEmptyValuesFromArray */])(tags);
+				if (!tags.length) {
+					return;
+				}
+			} else {
+				if (!tags.replace(/\s/g, "").length) {
+					return;
+				}
+			}
+			this.startPatching();
+			var patchObj = {};
+			patchObj['tags'] = tags;
+			patchObj['type'] = requestType;
+			this.$http.patch('/api/itemtags/' + id, patchObj, { method: 'PATCH' }).then(function (tagResponse) {
+				var syncedTags = tagResponse.data.tags;
+				console.log('tagged [' + allItems.nodes[id].body + '] with: ' + tagResponse.data.tags + ';');
+				console.log(tagResponse);
+				// Re-Add tags of item
+				this.$http.get('/api/itemtags/' + id, { type: 'tags' })
+				// Codementor: Request type doesn't work......
+				.then(function (updatedTagList) {
+					allItems.nodes[id].tagged = updatedTagList.data;
+					console.log('updatedTagList of [' + allItems.nodes[id].body + '] with: ' + updatedTagList.data.map(function (t) {
+						return t.tag_name;
+					}) + ';');
+				});
+				this.stopPatching();
+			});
+		},
+		patchDueDate: function patchDueDate(id, duedate) {
+			this.startPatching();
+			if (duedate == '0000-00-00 00:00:00') {
+				this.$http.patch('/api/items/' + id, { 'due_date': duedate }).then(function (response) {
+					this.stopPatching();
+				});
+				return;
+			}
+			duedate = moment(duedate).format();
+			console.log('PatchDueDate: ' + duedate);
+			this.$http.patch('/api/items/' + id, { 'due_date': duedate }).then(function (response) {
+				this.stopPatching();
+			});
+		},
+		patchDone: function patchDone(id) {
+			this.startPatching();
+			var done_date = void 0;
+			var doneValue = allItems.nodes[id].done;
+			if (doneValue) {
+				done_date = moment().format();
+			} else {
+				done_date = '0000-00-00 00:00:00';
+			}
+			this.$http.patch('/api/items/' + id, { 'done': doneValue, 'done_date': done_date }).then(function (response) {
+				this.stopPatching();
+			});
+		},
+		deleteItem: function deleteItem(id) {
+			id = !id ? selection.selectedId : id;
+			// if (confirm("Do you really want to delete: "+allItems.nodes[id].body+"?") == false) {
+			//        return;
+			//    }
+			this.popout(id, 'confirm-delete');
+		},
+		deleteItemApi: function deleteItemApi(idOrArray) {
+			var _this3 = this;
+
+			this.startPatching();
+			if (Array.isArray(idOrArray) && idOrArray.length) {
+				var array = idOrArray; // It's an array!
+				array.forEach(function (id) {
+					_this3.deleteItemApi(id);
+				});
+			} else {
+				var id = idOrArray; // It's an ID!
+				if (!id) {
+					return;
+				}
+				var item = allItems.nodes[id];
+				this.$http.delete('/api/items/' + id).then(function (response) {
+					console.log('deleted: ' + id + '[' + item.body + ']');
+					this.stopPatching();
+				});
+			}
+		},
+		popup: function popup(id, type) {
+			id = !id ? selection.selectedId : id;
+			var item = allItems.nodes[id];
+			var popupExists = this.popups.filter(function (popup) {
+				return popup.item.id === id;
+			})[0];
+			if (popupExists) {
+				return;
+			}
+			this.popups.push({
+				item: item,
+				type: type,
+				timeout: true, // not yet fully integrated
+				time: 10 });
+			//         if (type == 'afterDone') {
+			// Vue.nextTick(function() {
+			// 	let fpId = "#done-date-edit-"+id;
+			// 	let fpEl = document.querySelector(fpId);
+			// 	fpEl.flatpickrify();
+			// 	let fpId_b = "#done-date-edit-"+id+"-popup";
+			// 	let fpEl_b = document.querySelector(fpId_b);
+			// 	fpEl_b.flatpickrify();
+			// });
+			//         }
+		},
+		popout: function popout(id, type) {
+			id = !id ? selection.selectedId : id;
+			if (!id) {
+				return;
+			}
+			var item = allItems.nodes[id];
+			// let popoutExists = this.popouts.filter(function (popout) { return popout.item.id === id; })[0];
+			// if(!popoutExists){
+			// console.log("poppy doesn't exist");
+			if (type == 'timer') {
+				this.popouts.timer.push(item);
+				Vue.nextTick(function () {
+					eventHub.$emit('playTimer', item);
+					console.log('emitted playTimer');
+				});
+			}
+			if (type == 'confirm-delete') {
+				this.popouts.delete.push(item);
+			}
+			// }
+		},
+		addTimer: function addTimer(id) {
+			id = !id ? selection.selectedId : id;
+			this.popout(id, 'timer');
+			return;
+		},
+		fetchDone: function fetchDone(tags, operator) {
+			this.loading = true;
+			this.$http.get('/api/items/fetchdone').then(function (response) {
+				// debugger;
+				this.fetchedDone = true;
+				console.log('fetched Done');
+				var data = response.data;
+				console.log(data);
+				if (!data.length) {
+					console.log('no done items...');
+					this.loading = false;
+					return;
+				}
+				// clean up and add as nodes
+				data.forEach(function (item) {
+					item = allItems.setDefaultItemValues(item);
+					if (!allItems.nodes[item.id]) {
+						allItems.nodes[item.id] = item;
+					}
+				});
+				// Codementor
+				this.selection.view = null;
+				this.selection.view = 'journal';
+				this.loading = false;
+			});
+		},
+
+
+		// fetchTagged(tags, requestType){
+		// 	/* requestType can be:
+		// 		'withAnyTag': fetch articles with any tag listed
+		// 		'withAllTags': only fetch articles with all the tags
+		// 		'tagNames': fetch all existing tags
+		// 	*/
+		// 	this.loading = true;
+		// 	let request = {};
+		// 	requestType = (!requestType) ? 'withAnyTag' : requestType;
+		// 	request['tags'] = tags;
+		// 	request['type'] = requestType;
+		// 	console.log('request');
+		// 	console.log(request);
+		// 	this.$http.post('/api/itemtags/fetchTagged', request).then(function(response){
+		// 		let aaa = response.data;
+		// 		aaa = json(aaa);
+		// 		console.log('fetched tagged items!');
+		// 		console.log(response);
+		// 		console.log(response.json());
+		// 		console.log(aaa);
+		// 		allItems.filteredTagItems = aaa;
+		// 		allItems.nodes = aaa;
+		// 		allItems.root = aaa;
+		// 		this.allData = aaa;
+		// 		this.loading = false;
+		// 	});
+		// },
+		filterItems: function filterItems(keyword, value, event) {
+			// debugger;
+			var operator = null;
+			if (event) {
+				event.preventDefault();
+				if (event.ctrlKey || event.metaKey) {
+					operator = 'AND';
+				} else if (event.altKey) {
+					operator = 'NOT';
+				}
+			}
+			if (!operator) {
+				selection.clear();
+			}
+			if (keyword == 'journal' && !this.fetchedDone) {
+				this.fetchDone(null, operator);
+			}
+			selection.addKeywords(keyword, value, operator);
+			// FILTER REWRITE
+			// allItems.filterItems(keyword,value,operator);
+			// setTimeout(()=>{ 
+			// 	let a = selection.tags;
+			// 	selection.tags = [];
+			// 	selection.tags = a;
+			// 	console.log(selection.tags);
+			// },500);
+			// console.log(selection.tags);
+			// setTimeout(()=>{ vm.test() },1000);
+		},
+		removeFilter: function removeFilter(tag) {
+			selection.hiddenTags = selection.hiddenTags.filter(function (x) {
+				return x !== tag;
+			});
+		},
+		duplicate: function duplicate(id) {
+			id = !id ? selection.selectedId : id;
+			allItems.duplicate(id);
+		},
+		postNewItem: function postNewItem(newItem, index, addNextItemAs, addTags, duplication) {
+			var _this4 = this;
+
+			this.startPatching();
+			// Prepare children_order for sending to DB.
+			if (newItem.children_order) {
+				newItem.children_order = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_3__components_globalFunctions_js__["j" /* arrayToString */])(newItem.children_order);
+			}
+			// let data = {
+			// 	newItemArray: [newItem, newItem]
+			// }
+			var data = newItem;
+			// newItem.id = 99999999;
+			// index = 0;
+			// allItems.addItem(newItem, index);
+			// return;
+
+			// let data = newItem;
+			// data = JSON.stringify(data);
+			this.$http.post('/api/items', data) //SEND
+			// this.$http.post('/api/items',newItem) //SEND
+			.then(function (response) {
+				//response
+				var storedItem = response.data;
+				// Revert old item's children_order back to string.
+				// storedItem.children_order = (!newItem.children_order) ? [] : newItem.children_order.split(',').map(Number);
+				// if(storedItem.constructor === Array){
+				// 	console.log(storedItem);
+				// 	console.log('storedItem ARRAY');
+				// 	storedItem.forEach(item => allItems.addItem(item));
+				// 	return;
+				// }
+				console.log('starting dom update...');
+				console.log('Index: ');
+				console.log(index);
+				allItems.addItem(storedItem, index, addNextItemAs, addTags, duplication);
+				this.stopPatching();
+			}, function (response) {
+				_this4.patching = 'error';
+			});
+		},
+		isFirstItem: function isFirstItem(id) {
+			if (this.noItems) {
+				return false;
+			}
+			return allItems.siblingIndex(id) == 0;
+		},
+		test: function test(id) {
+			document.querySelectorAll(".tag-menu a").forEach(function (el) {
+				return alert(JSON.stringify(el.style.color));
+			});
+			// id = (!id) ? selection.selectedId : id ;
+			// id = selection.selectedId;
+			// let item = allItems.nodes[id];
+			// this.patchTag(id, 'bloem', 'tag');
+		},
+		alert: function (_alert) {
+			function alert(_x) {
+				return _alert.apply(this, arguments);
+			}
+
+			alert.toString = function () {
+				return _alert.toString();
+			};
+
+			return alert;
+		}(function (value) {
+			alert(value);
+		})
+	},
+	http: {
+		headers: {
+			'X-CSRF-TOKEN': document.querySelector('#csrf-token').getAttribute('content')
+		}
+	}
+};
 
 /***/ })
 /******/ ]);

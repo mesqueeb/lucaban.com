@@ -1,11 +1,12 @@
 <div id="bottom-hint"
 	v-show="!itemAmount"
-	v-if="mobile && !selection.filter.includes('today') && selection.view != 'journal'"
+	v-if="mobile"
 >@{{ text.guide.hints.addItemHint }}<br>➘</div>
 
 <div id="mobile-item-nav" v-if="mobile">
 	<div class="playstation-controller"
-		v-show="itemAmount && selection.selectedId && selection.view != 'journal'"
+		v-if="selection.view != 'journal'"
+		v-show="itemAmount && selection.selectedId"
 	>
 		<button id=""
 			@click="unindent()"
@@ -38,7 +39,7 @@
 			<i class="zmdi zmdi-caret-right-circle"></i>
 		</button>
 	</div>
-	<button id="floating-add-btn" @click="showAddNewItem()" v-if="!selection.filter.includes('today') && selection.view != 'journal'">
+	<button id="floating-add-btn" @click="showAddNewItem()">
 		<i class="zmdi zmdi-plus-circle"></i>
 	</button>
 </div>

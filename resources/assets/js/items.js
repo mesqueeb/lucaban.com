@@ -46,7 +46,7 @@
 	import VueFilters from './vue-components/vueFilters.js';
 	VueFilters(Vue);
 	// Vue Components
-	import VueListMaster from './vue-components/VueListMaster.js'
+	import ListApp from './items/app.js'
 
 // JS Classes
 	import Tree from './vue-components/dataTree.js';
@@ -66,7 +66,7 @@ $.getJSON('/api/items',function(fetchedData){
 	window.allItems = new Tree(fetchedData);
 	console.log(allItems);
 
-	window.vm = new Vue(VueListMaster);
+	window.vm = new Vue(ListApp);
 	new ListAppKeyBindings();
 	// vm.allData = allItems.root;
 	// vm.doneData = allItems.doneitems;

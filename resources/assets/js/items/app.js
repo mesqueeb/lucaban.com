@@ -151,12 +151,12 @@ window.langContentsItems = {
 };
 
 
-import Card from './Card.vue';
-import Popups from './Popups.vue';
-import Popouts from './Popouts.vue';
+import Card from '../vue-components/Card.vue';
+import Popups from '../vue-components/Popups.vue';
+import Popouts from '../vue-components/Popouts.vue';
 import { hasClass, mobilecheck, isElementInViewport, objectToArray, uniqBy, uniq, arrayToString, sec_to_hourmin, sortObjectArrayByProperty, sortObjectArrayByTwoProperties, removeEmptyValuesFromArray } from '../components/globalFunctions.js';
-import Selection from './Selection.js';
-import Tree from './dataTree.js';
+import Selection from '../vue-components/Selection.js';
+import Tree from '../vue-components/dataTree.js';
 
 window.selection = new Selection();
 
@@ -196,7 +196,7 @@ export default {
 		beforeEditCache_planned_time: null,
 		fetchedDone: false,
 		cancelThroughKeydown: false,
-		manualMobile: true,
+		manualMobile: false,
 		newItem: {
 			body: '',
 			planned_time:0,
@@ -358,6 +358,7 @@ export default {
 		},
 		filteredItemsTree()
 		{
+			console.log('update filteredItemsTree');
 			//Go through ALL ITEMS and return those that have the tag AND no parent with the tag.
 			let children = objectToArray(this.nodes).filter(function(item){
 				let target;
@@ -852,7 +853,8 @@ export default {
 			if(selection.view == "journal")
 			{
 				newItem.done = 1;
-				newItem.done_date = olderSibling.done_date;
+				let doneDate = (!olderSibling || olderSibling.depth == 0) ? moment().format() : olderSibling.done_date;
+				newItem.done_date = doneDate;
 			}
 			if ( selection.filter.includes('today')
 			   && allItems.isTopLvlItemInFilteredRoot(olderSibling.id)

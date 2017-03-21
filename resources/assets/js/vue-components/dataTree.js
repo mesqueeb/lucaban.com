@@ -139,6 +139,19 @@ addItem(item, index, addNextItemAs, addTags, duplication)
     if(addTags){ this.tagItem(item.id, addTags); }
 	this.attachParentBody(item.id);
 	this.autoCalculateDoneState(item.parent_id);
+	
+	if (selection.view == 'journal')
+	{
+		selection.view = null;
+		selection.view = 'journal';
+	}
+	if (selection.filter.includes('today'))
+	{
+		selection.filter = selection.filter.filter(f => f != 'today');
+		selection.filter.push('today');
+	}
+	
+    
     if (duplication || addNextItemAs == 'stop')
     {
     	vm.addingNewUnder = null;
