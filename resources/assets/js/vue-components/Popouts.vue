@@ -128,16 +128,18 @@
 					class="forward btn btn-dipclick"
 					@click="timerNav('forward', item, 1)"
 				>
-				<span v-if="item.planned_time && item.used_time<item.planned_time*60"
-				>-</span><span v-else>+</span>
+					<i class="zmdi zmdi-fast-forward"></i>
+					<span v-if="false && item.planned_time && item.used_time<item.planned_time*60"
+					>-</span><span v-else></span>
 				1 {{ basis.text.global.min }}
 				</button>
 				<button
 					class="forward btn btn-dipclick"
 					@click="timerNav('forward', item, 5)"
 				>
-				<span v-if="item.planned_time && item.used_time<item.planned_time*60"
-				>-</span><span v-else>+</span>
+					<i class="zmdi zmdi-fast-forward"></i>
+					<span v-if="false && item.planned_time && item.used_time<item.planned_time*60"
+					>-</span><span v-else></span>
 				5 {{ basis.text.global.min }}
 				</button>
 				<button

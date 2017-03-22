@@ -39129,7 +39129,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 			}
 			// TAB
 			if (e.keyCode === 9 && !e.shiftKey) {
-				if (field == 'addTag') {
+				if (field == 'add-tag') {
 					// e.preventDefault(); return;
 					// commented out because we want to be able to focus tag-delete buttons.
 				}
@@ -39156,7 +39156,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 					this.setPlannedTime(item, event);
 					return;
 				}
-				if (field == 'addTag' && this.newTag) {
+				if (field == 'add-tag' && this.newTag) {
 					this.addTag(item);
 					return;
 				}
@@ -39174,7 +39174,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 					document.querySelector(plsFocus).focus();
 					return;
 				}
-				if (field == 'addTag') {
+				if (field == 'add-tag') {
 					e.preventDefault();
 					if (vm.editingItemTags) {
 						vm.editingItemTags = null;return;
@@ -39195,7 +39195,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 					document.querySelector(_plsFocus5).focus();
 					return;
 				}
-				if (field == 'addTag') {
+				if (field == 'add-tag') {
 					if (vm.editingItemTags) {
 						vm.editingItemTags = null;
 					}
@@ -39211,8 +39211,13 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 				}.bind(this), 100);
 			}
 		},
-		blurOnEdit: function blurOnEdit(item) {
+		blurOnEdit: function blurOnEdit(item, field) {
+			console.log('Blur on Edit');
 			if (this.$root.cancelThroughKeydown) {
+				return;
+			}
+			if (this.$root.mobile && field == 'add-tag') {
+				this.addTag(item);
 				return;
 			}
 			var self = this;
@@ -39229,11 +39234,15 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 			}, 50);
 			// Codementor: is there any better way than this?
 		},
-		blurOnAddNew: function blurOnAddNew(item) {
+		blurOnAddNew: function blurOnAddNew(item, field) {
 			if (this.$root.cancelThroughKeydown) {
 				return;
 			}
 			console.log('Blur on Add New');
+			if (this.$root.mobile && field == 'prepare-tag') {
+				this.prepareTag(item);
+				return;
+			}
 			if (vm.mobile) {
 				return;
 			}
@@ -39350,6 +39359,8 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__components_valueMorphers2_js__ = __webpack_require__(11);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_autosize__ = __webpack_require__(14);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_autosize___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_autosize__);
+//
+//
 //
 //
 //
@@ -44541,10 +44552,10 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     },
     on: {
       "blur": function($event) {
-        _vm.blurOnEdit(_vm.item)
+        _vm.blurOnEdit(_vm.item, 'add-tag')
       },
       "keydown": function($event) {
-        _vm.keydownOnEdit(_vm.item, $event, 'addTag')
+        _vm.keydownOnEdit(_vm.item, $event, 'add-tag')
       },
       "input": function($event) {
         if ($event.target.composing) { return; }
@@ -44617,11 +44628,11 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
       "value": (_vm.newTag)
     },
     on: {
-      "blur": function($event) {
-        _vm.blurOnEdit(_vm.item)
-      },
       "keydown": function($event) {
-        _vm.keydownOnEdit(_vm.item, $event, 'addTag')
+        _vm.keydownOnEdit(_vm.item, $event, 'add-tag')
+      },
+      "blur": function($event) {
+        _vm.blurOnEdit(_vm.item, 'add-tag')
       },
       "input": function($event) {
         if ($event.target.composing) { return; }
@@ -44746,7 +44757,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     }
   }, [_c('i', {
     staticClass: "zmdi zmdi-more"
-  })]) : _vm._e(), _vm._v(" "), (_vm.item.children_order.length == 0) ? _c('button', {
+  })]) : _vm._e(), _vm._v(" "), ( true) ? _c('button', {
     staticClass: "delete",
     on: {
       "click": function($event) {
@@ -44985,7 +44996,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
         _vm.keydownOnNew(_vm.item, $event, 'prepare-tag')
       },
       "blur": function($event) {
-        _vm.blurOnAddNew(_vm.item)
+        _vm.blurOnAddNew(_vm.item, 'prepare-tag')
       },
       "input": function($event) {
         if ($event.target.composing) { return; }
@@ -45205,14 +45216,18 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
           _vm.timerNav('forward', item, 1)
         }
       }
-    }, [(item.planned_time && item.used_time < item.planned_time * 60) ? _c('span', [_vm._v("-")]) : _c('span', [_vm._v("+")]), _vm._v("\n\t\t\t\t1 " + _vm._s(_vm.basis.text.global.min) + "\n\t\t\t\t")]), _vm._v(" "), _c('button', {
+    }, [_c('i', {
+      staticClass: "zmdi zmdi-fast-forward"
+    }), _vm._v(" "), ( false) ? _c('span', [_vm._v("-")]) : _c('span'), _vm._v("\n\t\t\t\t1 " + _vm._s(_vm.basis.text.global.min) + "\n\t\t\t\t")]), _vm._v(" "), _c('button', {
       staticClass: "forward btn btn-dipclick",
       on: {
         "click": function($event) {
           _vm.timerNav('forward', item, 5)
         }
       }
-    }, [(item.planned_time && item.used_time < item.planned_time * 60) ? _c('span', [_vm._v("-")]) : _c('span', [_vm._v("+")]), _vm._v("\n\t\t\t\t5 " + _vm._s(_vm.basis.text.global.min) + "\n\t\t\t\t")]), _vm._v(" "), _c('button', {
+    }, [_c('i', {
+      staticClass: "zmdi zmdi-fast-forward"
+    }), _vm._v(" "), ( false) ? _c('span', [_vm._v("-")]) : _c('span'), _vm._v("\n\t\t\t\t5 " + _vm._s(_vm.basis.text.global.min) + "\n\t\t\t\t")]), _vm._v(" "), _c('button', {
       staticClass: "reset btn btn-dipclick",
       on: {
         "click": function($event) {

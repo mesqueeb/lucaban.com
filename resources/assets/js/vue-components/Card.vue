@@ -181,8 +181,8 @@
 									v-model="newTag"
 									v-autowidth
 									v-focus
-									@blur="blurOnEdit(item)"
-									@keydown="keydownOnEdit(item, $event, 'addTag')"
+									@blur="blurOnEdit(item, 'add-tag')"
+									@keydown="keydownOnEdit(item, $event, 'add-tag')"
 									placeholder="..."
 								>
 							</label>
@@ -230,8 +230,8 @@
 							v-model="newTag"
 							v-autowidth
 							v-focus
-							@blur="blurOnEdit(item)"
-							@keydown="keydownOnEdit(item, $event, 'addTag')"
+							@keydown="keydownOnEdit(item, $event, 'add-tag')"
+							@blur="blurOnEdit(item, 'add-tag')"
 							placeholder="..."
 						>
 					</label>
@@ -354,7 +354,7 @@
 				-->
 				<button
 					class="delete" 
-					v-if="item.children_order.length==0"
+					v-if="true || item.children_order.length==0"
 					@click="deleteItem(item)"
 				>
 					<i class="zmdi zmdi-delete"></i>
@@ -461,7 +461,7 @@
 						<input type="text"
 							class="prepare-tag"
 							@keydown="keydownOnNew(item, $event, 'prepare-tag')"
-							@blur="blurOnAddNew(item)"
+							@blur="blurOnAddNew(item, 'prepare-tag')"
 							v-model="newTag"
 							v-autowidth
 							placeholder="..."
@@ -1019,7 +1019,7 @@ export default {
 			// TAB
 			if (e.keyCode === 9 && !e.shiftKey)
 			{
-	        	if(field == 'addTag')
+	        	if(field == 'add-tag')
 	        	{
 	        		// e.preventDefault(); return;
 	        		// commented out because we want to be able to focus tag-delete buttons.
@@ -1050,7 +1050,7 @@ export default {
 					this.setPlannedTime(item, event);
 					return;
 				}
-				if(field == 'addTag' && this.newTag)
+				if(field == 'add-tag' && this.newTag)
 				{
 					this.addTag(item);
 					return;
@@ -1072,7 +1072,7 @@ export default {
 					document.querySelector(plsFocus).focus();
 					return;
 				}
-				if(field == 'addTag')
+				if(field == 'add-tag')
 				{
 					e.preventDefault();
 		        	if(vm.editingItemTags){ vm.editingItemTags = null; return; }
@@ -1095,7 +1095,7 @@ export default {
 					document.querySelector(plsFocus).focus();
 					return;
 				}
-				if(field == 'addTag')
+				if(field == 'add-tag')
 				{
 		        	if(vm.editingItemTags){ vm.editingItemTags = null; }
 		        	return;
@@ -1112,9 +1112,15 @@ export default {
 		    	}.bind(this),100);
 			}
 	    },
-	    blurOnEdit(item)
+	    blurOnEdit(item, field)
 	    {
+	    	console.log('Blur on Edit');
 	    	if(this.$root.cancelThroughKeydown){ return; }
+	    	if (this.$root.mobile && field == 'add-tag')
+	    	{
+				this.addTag(item);
+				return;
+	    	}
 	    	let self = this;
 	    	setTimeout(function()
 	    	{
@@ -1132,10 +1138,15 @@ export default {
 	    	},50);
 	    	// Codementor: is there any better way than this?
 	    },
-	    blurOnAddNew(item)
+	    blurOnAddNew(item, field)
 	    {
 	    	if(this.$root.cancelThroughKeydown){ return; }
 	    	console.log('Blur on Add New');
+	    	if (this.$root.mobile && field == 'prepare-tag')
+	    	{
+				this.prepareTag(item);
+				return;
+	    	}
 	    	if(vm.mobile){ return; }
 	    	let self = this;
 	    	setTimeout(function()
