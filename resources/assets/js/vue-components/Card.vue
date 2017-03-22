@@ -35,9 +35,9 @@
 		:id="'item-body-'+item.id"
 		:class="{
 			'item-card': true,
-			done: item.done,
-			show_children: item.show_children,
-			editing: item.id == basis.editingItem,
+			'done': item.done,
+			'show_children': item.show_children,
+			'editing': (!basis.mobile && item.id == basis.editingItem),
 		}"
 	>
 		<div
@@ -82,7 +82,7 @@
 		>
 			<div
 				class="bodybox"
-				v-show="item.id != basis.editingItem"
+				v-show="item.id != basis.editingItem || basis.mobile"
 			>
 				<div :class="{'lightgray':item.temp}"
 				>{{ linkify(item.body) }}</div>
@@ -220,7 +220,7 @@
 				<div
 					class="add-tag-wrapper"
 					:id="'add-tag-'+item.id"
-					v-if="item.id == basis.editingItem || item.id == basis.editingItemTags"
+					v-if="!basis.mobile && (item.id == basis.editingItem || item.id == basis.editingItemTags)"
 				>
 					<label>
 						{{ basis.text.card.addTag }}

@@ -44234,9 +44234,9 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
   }, [_c('div', [_vm._v("\n\t\t\t" + _vm._s(_vm.journalParentString) + "\n\t\t")])]) : _vm._e(), _vm._v(" "), (_vm.item.depth != 0) ? _c('div', {
     class: {
       'item-card': true,
-      done: _vm.item.done,
-        show_children: _vm.item.show_children,
-        editing: _vm.item.id == _vm.basis.editingItem,
+      'done': _vm.item.done,
+        'show_children': _vm.item.show_children,
+        'editing': (!_vm.basis.mobile && _vm.item.id == _vm.basis.editingItem),
     },
     attrs: {
       "id": 'item-body-' + _vm.item.id
@@ -44342,8 +44342,8 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     directives: [{
       name: "show",
       rawName: "v-show",
-      value: (_vm.item.id != _vm.basis.editingItem),
-      expression: "item.id != basis.editingItem"
+      value: (_vm.item.id != _vm.basis.editingItem || _vm.basis.mobile),
+      expression: "item.id != basis.editingItem || basis.mobile"
     }],
     staticClass: "bodybox"
   }, [_c('div', {
@@ -44601,7 +44601,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     })]) : _vm._e()]) : _vm._e()
   })], 2) : _vm._e()])]) : _vm._e(), _vm._v(" "), _c('div', {
     staticClass: "item-tags"
-  }, [(_vm.item.id == _vm.basis.editingItem || _vm.item.id == _vm.basis.editingItemTags) ? _c('div', {
+  }, [(!_vm.basis.mobile && (_vm.item.id == _vm.basis.editingItem || _vm.item.id == _vm.basis.editingItemTags)) ? _c('div', {
     staticClass: "add-tag-wrapper",
     attrs: {
       "id": 'add-tag-' + _vm.item.id
