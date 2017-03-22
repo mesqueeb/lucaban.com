@@ -1199,6 +1199,8 @@ export default {
 			// Reset stuff
 			this.newItem.body = '';
 			this.newItem.due_date = '0000-00-00 00:00:00';
+			this.newItem.done_date = '0000-00-00 00:00:00';
+			this.newItem.done = false;
 			this.newItem.planned_time = '';
 			this.newItem.preparedTags = [];
 		},

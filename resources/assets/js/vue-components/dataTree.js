@@ -659,6 +659,16 @@ deleteItem(id)
 	vm.patch(parent_id, 'children_order');
     vm.deleteItemApi(id);
 	this.autoCalculateDoneState(parent_id);
+	if (selection.view == 'journal')
+	{
+		selection.view = null;
+		selection.view = 'journal';
+	}
+	if (selection.filter.includes('today'))
+	{
+		selection.filter = selection.filter.filter(f => f != 'today');
+		selection.filter.push('today');
+	}
 	console.log(`new selected ID is: ${newSelectedId}`);
     selection.selectedId = newSelectedId;
 	delete this.nodes[id];

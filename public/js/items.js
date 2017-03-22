@@ -25795,6 +25795,16 @@ var _class = function () {
 			vm.patch(parent_id, 'children_order');
 			vm.deleteItemApi(id);
 			this.autoCalculateDoneState(parent_id);
+			if (selection.view == 'journal') {
+				selection.view = null;
+				selection.view = 'journal';
+			}
+			if (selection.filter.includes('today')) {
+				selection.filter = selection.filter.filter(function (f) {
+					return f != 'today';
+				});
+				selection.filter.push('today');
+			}
 			console.log('new selected ID is: ' + newSelectedId);
 			selection.selectedId = newSelectedId;
 			delete this.nodes[id];
@@ -39277,6 +39287,8 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 			// Reset stuff
 			this.newItem.body = '';
 			this.newItem.due_date = '0000-00-00 00:00:00';
+			this.newItem.done_date = '0000-00-00 00:00:00';
+			this.newItem.done = false;
 			this.newItem.planned_time = '';
 			this.newItem.preparedTags = [];
 		},
@@ -47812,12 +47824,18 @@ window.selection = new __WEBPACK_IMPORTED_MODULE_4__vue_components_Selection_js_
 				});
 			}
 			console.log('sending newItem:');
-			console.log(newItem);
+			console.log(JSON.parse(JSON.stringify(newItem)));
 			console.log('sending tags:');
 			console.log(addTags);
 			// Send to Root for Ajax call.
 			allItems.addTempNewItem(newItem, index, addNextItemAs, addTags);
 			this.postNewItem(newItem, index, addNextItemAs, addTags);
+			this.newItem.body = '';
+			this.newItem.due_date = '0000-00-00 00:00:00';
+			this.newItem.done_date = '0000-00-00 00:00:00';
+			this.newItem.done = false;
+			this.newItem.planned_time = '';
+			this.newItem.preparedTags = [];
 		},
 		itIsADeepestChild: function itIsADeepestChild(id) {
 			if (!id) {

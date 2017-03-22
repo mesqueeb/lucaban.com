@@ -866,12 +866,18 @@ export default {
 				});
 			}
 			console.log('sending newItem:');
-			console.log(newItem);
+			console.log(JSON.parse(JSON.stringify(newItem)));
 			console.log('sending tags:');
 			console.log(addTags);
 			// Send to Root for Ajax call.
 			allItems.addTempNewItem(newItem, index, addNextItemAs, addTags);
 			this.postNewItem(newItem, index, addNextItemAs, addTags);
+			this.newItem.body = '';
+			this.newItem.due_date = '0000-00-00 00:00:00';
+			this.newItem.done_date = '0000-00-00 00:00:00';
+			this.newItem.done = false;
+			this.newItem.planned_time = '';
+			this.newItem.preparedTags = [];
 		},
 		itIsADeepestChild(id)
 		{
