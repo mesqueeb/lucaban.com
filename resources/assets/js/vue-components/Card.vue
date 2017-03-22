@@ -11,7 +11,6 @@
 	class="item-card-wrapper"
 	v-if="!isHidden || listIsEmpty"
 >
-
 	<div
 		class="title"
 		v-if="journalDate"
@@ -318,6 +317,13 @@
 					&& basis.selection.selectedId == item.id"
 			>
 				<button
+					class="copy-contents-button btn btn-dipclick"
+					:id="'card-'+item.id+'-copy'"
+					v-if="!basis.mobile"
+				>
+					{{ basis.text.card.copy }}
+				</button>
+				<button
 					v-if="basis.mobile"
 					class="edit"
 					@click="startEdit(item)"
@@ -502,12 +508,35 @@ import flatPickConfig from '../components/flatPickrOptions.js';
 import autosize from 'autosize';
 import autosizeInput from 'autosize-input';
 import { uniq } from '../components/globalFunctions.js';
+import Clipboard from 'clipboard';
 
 export default {
 	name: 'Card',
 	template:'#items-card-template',
 	mounted()
 	{
+		let copyElPath = "#card-"+this.item.id+"-copy";
+		let self = this;
+		new Clipboard(copyElPath, {
+		    text: function(trigger) {
+		    	console.log(trigger);
+		    	let spaceVariable = parseFloat(self.item.depth);
+		        let allChildren = self.allVisibleChildItems.reduce(function(all, val){
+					let spacesVal = parseFloat(val.depth)-spaceVariable;
+					let spaces = '　　'.repeat(spacesVal);
+					return `${all}
+${spaces}・${val.body}`;
+				}, `${self.item.body}`);
+		        return allChildren;
+		        return trigger.nextElementSibling;
+		    }
+
+		}).on('success', function(e) {
+		    // console.info('Action:', e.action);
+		    // console.info('Text:', e.text);
+		    // console.info('Trigger:', e.trigger);
+		    e.clearSelection();
+		});
 		// this.newItem.preparedTags = JSON.parse(JSON.stringify(this.parentTags));
 		this.convertbodyURLtoHTML();
 		if(this.listIsEmpty){ this.$root.addingNewEmptyList = true; }

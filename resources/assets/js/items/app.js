@@ -28,6 +28,7 @@ window.langContentsItems = {
 			'duration':'Duration:',
 			'addTag':'Add tag:',
 			'edit':'Edit',
+			'copy':'Copy',
 			'setToday':'Do today',
 			'addAndContinue':'Add and continue',
 			'addAndClose':'Add and close',
@@ -102,6 +103,7 @@ window.langContentsItems = {
 			'duration':'使用時間:',
 			'addTag':'タグを追加:',
 			'edit':'編集',
+			'copy':'コピー',
 			'setToday':'今日やる',
 			'addAndContinue':'複数追加',
 			'addAndClose':'追加して閉じる',
@@ -930,6 +932,22 @@ export default {
 		// 	dd = sortObjectArrayByTwoProperties(dd,'done_date','parents_bodies','desc','asc');
 		// 	this.doneData = dd;
 		// },
+		// getItemWithVisibleChildren(id)
+		// {
+		// 	id = (id) ? id : selection.selectedId;
+		// 	if (!id){ return; }
+		// 	let item = allItems.nodes[id];
+		// 	if (!item){ return; }
+		// 	let visibleChildren = [];
+		// 	item.children.forEach(function(child){
+		// 		if(!this.hiddenItemIds.includes(child.id))
+		// 		{
+		// 			visibleChildren.push(this.getItemWithVisibleChildren(child.id));
+		// 		}
+		// 	}.bind(this));
+		// 	item.children = visibleChildren;
+		// 	return item;
+		// },
 		tagSlugToName(tagslug)
 		{
 			return allItems.tagSlugToName(tagslug);
@@ -971,7 +989,9 @@ export default {
 		},
 		markDone(id, markAs){
 			id = (id) ? id : selection.selectedId;
+			if (!id){ return; }
 			let item = allItems.nodes[id];
+			if (!item){ return; }
 			if (markAs == 'notDone'){
 				item.done = false;
 				allItems.prepareDonePatch(id);

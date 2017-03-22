@@ -19,6 +19,7 @@
     "autosize-input": "^0.4.0",
     "bootstrap": "^4.0.0-alpha.6",
     "bootstrap-sass": "^3.3.7",
+    "clipboard": "^1.6.1",
     "countdown": "^2.6.0",
     "flatpickr": "^2.4.3",
     "linkifyjs": "^2.1.4",
