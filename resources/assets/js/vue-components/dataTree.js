@@ -923,11 +923,15 @@ flushDoneItems() // Do not use yet. Not sure how to best implement this...
 }
 setDueDate(id, duedate)
 {
-	let dd = (!duedate) ? moment().format() : duedate;
+	let dd = (duedate) ? duedate : moment().format();
 	let oriDueDate = this.nodes[id].due_date;
 	let diff = moment(oriDueDate).diff(dd, 'days');
 	if (diff == 0){ dd = '0000-00-00 00:00:00'; }
 	this.nodes[id].due_date = dd;
+	if (diff == 0 && selection.filter.includes('today'))
+	{
+		selection.selectedId = this.nextItemId(id);
+	}
 	vm.patchDueDate(id, dd);
 	this.updateChildrenDueDate(id);
 }

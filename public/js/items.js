@@ -26104,13 +26104,16 @@ var _class = function () {
 	}, {
 		key: 'setDueDate',
 		value: function setDueDate(id, duedate) {
-			var dd = !duedate ? moment().format() : duedate;
+			var dd = duedate ? duedate : moment().format();
 			var oriDueDate = this.nodes[id].due_date;
 			var diff = moment(oriDueDate).diff(dd, 'days');
 			if (diff == 0) {
 				dd = '0000-00-00 00:00:00';
 			}
 			this.nodes[id].due_date = dd;
+			if (diff == 0 && selection.filter.includes('today')) {
+				selection.selectedId = this.nextItemId(id);
+			}
 			vm.patchDueDate(id, dd);
 			this.updateChildrenDueDate(id);
 		}
