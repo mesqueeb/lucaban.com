@@ -68,6 +68,7 @@ window.langContentsItems = {
 				{'key':'shift + T','note':'Edit tags'},
 				{'key':'alt + click on tag','note':'Hide tag'},
 				{'key':'cmd/ctrl + ↑↓','note':'Move item up/down'},
+				{'key':'ctrl + shift + D','note':'Duplicate item'},
 			],
 			'hints': {//
 				'addItemHint':'Add some items!',
@@ -143,6 +144,7 @@ window.langContentsItems = {
 				{'key':'shift + T','note':'タグを編集'},
 				{'key':'alt + click on tag','note':'タグのアイテムを非表示'},
 				{'key':'cmd/ctrl + ↑↓','note':'アイテムを上下へ移動'},
+				{'key':'ctrl + shift + D','note':'アイテムを複製'},
 			],
 			'hints': {
 				'addItemHint':'アイテムを追加しよう！',
@@ -360,9 +362,13 @@ export default {
 		},
 		filteredItemsTree()
 		{
-			console.log('update filteredItemsTree');
+			console.log(`update filteredItemsTree (nodes length: ${objectToArray(this.nodes).length})`);
 			//Go through ALL ITEMS and return those that have the tag AND no parent with the tag.
 			let children = objectToArray(this.nodes).filter(function(item){
+				// if(item.body.includes('1252')){
+					// console.log(`(${item.id}) ${item.body}...`);
+				// }
+				// console.log(`${item.body}`);
 				let target;
 				let hasParentWithTag;
 				let targetToday;
@@ -389,13 +395,26 @@ export default {
 
 				if ( selection.filter.includes('today') )
 				{
+					// if(item.body.includes('1252')){
+						// console.log(`#2 (${item.id}) ${item.body}...`);
+					// }
 					let doneDateDiff = moment(item.done_date).diff(moment(), 'days');
-					if (doneDateDiff <= 1) { return false; }
+					if (doneDateDiff >= 1) { return false; }
 					let hasParentDueToday = allItems.hasParentDueToday(item.id);
 					let isDue = allItems.isDueToday(item.id);
+					// console.log(`(${item.id}) ${item.body}:
+					// 	( selection.tags.length = ${(selection.tags.length)}
+					// 	&& 	target = ${(target)}
+					// 	&& 	(isDue = ${(isDue)}
+					// 		|| hasParentDueToday = ${(hasParentDueToday)}
+					// 		)
+					// 	&& 	!(hasParentWithTag = ${(hasParentWithTag)}
+					// 		&& hasParentDueToday = ${(hasParentDueToday)}
+					// 		)
+					// 	)`);
 					if(!selection.tags.length && isDue)
 					{
-						console.log('(!selection.tags.length && isDue)');
+						// console.log(`${item.body}: (!selection.tags.length && isDue) = true`);
 						return true;
 					}
 					else if ( 	selection.tags.length
@@ -406,6 +425,9 @@ export default {
 						return true;
 					}
 				}
+				// if(item.body.includes('1252')){
+					// console.log(`#3 (${item.id}) ${item.body}...`);
+				// }
 				return false;
 			}.bind(this));
 			// Sort on root children_order when no filter:

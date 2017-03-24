@@ -47111,7 +47111,7 @@ window.langContentsItems = {
 			'action': 'Action',
 			'key': 'Key',
 			'keybindings': [//
-			{ 'key': 'T', 'note': 'Do <u>T</u>oday' }, { 'key': 'S', 'note': '<u>S</u>topwatch / Timer' }, { 'key': 'tab', 'note': 'Indent item' }, { 'key': 'enter', 'note': 'Add item' }, { 'key': 'cmd/ctrl + enter', 'note': 'Edit item' }, { 'key': 'shift + T', 'note': 'Edit tags' }, { 'key': 'alt + click on tag', 'note': 'Hide tag' }, { 'key': 'cmd/ctrl + ↑↓', 'note': 'Move item up/down' }],
+			{ 'key': 'T', 'note': 'Do <u>T</u>oday' }, { 'key': 'S', 'note': '<u>S</u>topwatch / Timer' }, { 'key': 'tab', 'note': 'Indent item' }, { 'key': 'enter', 'note': 'Add item' }, { 'key': 'cmd/ctrl + enter', 'note': 'Edit item' }, { 'key': 'shift + T', 'note': 'Edit tags' }, { 'key': 'alt + click on tag', 'note': 'Hide tag' }, { 'key': 'cmd/ctrl + ↑↓', 'note': 'Move item up/down' }, { 'key': 'ctrl + shift + D', 'note': 'Duplicate item' }],
 			'hints': { //
 				'addItemHint': 'Add some items!'
 			}
@@ -47175,7 +47175,7 @@ window.langContentsItems = {
 		{
 			'action': 'アクション',
 			'key': 'ショートカットキー',
-			'keybindings': [{ 'key': 'T', 'note': '今日のタスクとして設定' }, { 'key': 'S', 'note': 'ストップウォッチ / タイマー' }, { 'key': 'tab', 'note': 'アイテムを右へ' }, { 'key': 'enter', 'note': 'アイテムを追加' }, { 'key': 'cmd/ctrl + enter', 'note': 'アイテムを編集' }, { 'key': 'shift + T', 'note': 'タグを編集' }, { 'key': 'alt + click on tag', 'note': 'タグのアイテムを非表示' }, { 'key': 'cmd/ctrl + ↑↓', 'note': 'アイテムを上下へ移動' }],
+			'keybindings': [{ 'key': 'T', 'note': '今日のタスクとして設定' }, { 'key': 'S', 'note': 'ストップウォッチ / タイマー' }, { 'key': 'tab', 'note': 'アイテムを右へ' }, { 'key': 'enter', 'note': 'アイテムを追加' }, { 'key': 'cmd/ctrl + enter', 'note': 'アイテムを編集' }, { 'key': 'shift + T', 'note': 'タグを編集' }, { 'key': 'alt + click on tag', 'note': 'タグのアイテムを非表示' }, { 'key': 'cmd/ctrl + ↑↓', 'note': 'アイテムを上下へ移動' }, { 'key': 'ctrl + shift + D', 'note': 'アイテムを複製' }],
 			'hints': {
 				'addItemHint': 'アイテムを追加しよう！'
 			}
@@ -47394,9 +47394,13 @@ window.selection = new __WEBPACK_IMPORTED_MODULE_4__vue_components_Selection_js_
 			return ar;
 		},
 		filteredItemsTree: function filteredItemsTree() {
-			console.log('update filteredItemsTree');
+			console.log('update filteredItemsTree (nodes length: ' + __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_3__components_globalFunctions_js__["e" /* objectToArray */])(this.nodes).length + ')');
 			//Go through ALL ITEMS and return those that have the tag AND no parent with the tag.
 			var children = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_3__components_globalFunctions_js__["e" /* objectToArray */])(this.nodes).filter(function (item) {
+				// if(item.body.includes('1252')){
+				// console.log(`(${item.id}) ${item.body}...`);
+				// }
+				// console.log(`${item.body}`);
 				var target = void 0;
 				var hasParentWithTag = void 0;
 				var targetToday = void 0;
@@ -47429,19 +47433,35 @@ window.selection = new __WEBPACK_IMPORTED_MODULE_4__vue_components_Selection_js_
 				}
 
 				if (selection.filter.includes('today')) {
+					// if(item.body.includes('1252')){
+					// console.log(`#2 (${item.id}) ${item.body}...`);
+					// }
 					var doneDateDiff = moment(item.done_date).diff(moment(), 'days');
-					if (doneDateDiff <= 1) {
+					if (doneDateDiff >= 1) {
 						return false;
 					}
 					var hasParentDueToday = allItems.hasParentDueToday(item.id);
 					var isDue = allItems.isDueToday(item.id);
+					// console.log(`(${item.id}) ${item.body}:
+					// 	( selection.tags.length = ${(selection.tags.length)}
+					// 	&& 	target = ${(target)}
+					// 	&& 	(isDue = ${(isDue)}
+					// 		|| hasParentDueToday = ${(hasParentDueToday)}
+					// 		)
+					// 	&& 	!(hasParentWithTag = ${(hasParentWithTag)}
+					// 		&& hasParentDueToday = ${(hasParentDueToday)}
+					// 		)
+					// 	)`);
 					if (!selection.tags.length && isDue) {
-						console.log('(!selection.tags.length && isDue)');
+						// console.log(`${item.body}: (!selection.tags.length && isDue) = true`);
 						return true;
 					} else if (selection.tags.length && target && (isDue || hasParentDueToday) && !(hasParentWithTag && hasParentDueToday)) {
 						return true;
 					}
 				}
+				// if(item.body.includes('1252')){
+				// console.log(`#3 (${item.id}) ${item.body}...`);
+				// }
 				return false;
 			}.bind(this));
 			// Sort on root children_order when no filter:
