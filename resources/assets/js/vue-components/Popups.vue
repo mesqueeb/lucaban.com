@@ -44,23 +44,33 @@
                 <div>
                   <button class="forward"
                     @click="incrementUsedTime(popup.item, 60)"
+                    @keydown="keydownInPopup(popup, $event, 'forward')"
                   >+1 {{ basis.text.global.min }}</button>
                   <button class="forward"
                     @click="incrementUsedTime(popup.item, 300)"
+                    @keydown="keydownInPopup(popup, $event, 'forward')"
                   >+5 {{ basis.text.global.min }}</button>
                   <button class="forward"
                     @click="incrementUsedTime(popup.item, 600)"
+                    @keydown="keydownInPopup(popup, $event, 'forward')"
                   >+10 {{ basis.text.global.min }}</button>
                 </div><div>
                   <button class="forward"
                     @click="incrementUsedTime(popup.item, 1800)"
+                    @keydown="keydownInPopup(popup, $event, 'forward')"
                   >+30 {{ basis.text.global.min }}</button>
                   <!-- <button class="forward"
                     @click="incrementUsedTime(popup.item, 3600)"
+                    @keydown="keydownInPopup(popup, $event, 'forward')"
                   >+1 hour</button> -->
                   <button class="reset"
                     @click="resetUsedTime(popup.item)"
+                    @keydown="keydownInPopup(popup, $event, 'reset')"
                   >{{ basis.text.popups.reset }}</button>
+                  <button class="undo-completion"
+                    @click="setNotDone(popup)"
+                    @keydown="keydownInPopup(popup, $event, 'setNotDone')"
+                  >{{ basis.text.popups.setNotDone }}</button>
                 </div>
               </div>
             </div>
@@ -125,27 +135,38 @@ export default {
                 item.used_time = parseFloat(item.used_time)+amount;
             }
         },
+        setNotDone(popup)
+        {
+            this.$root.markDone(popup.item.id, 'notDone');
+            this.removePopup(popup);
+        },
         resetUsedTime(item){
             item.used_time = 0;
         },
         keydownInCompletionMemo(popup, e){
             if ( // ESCape
-                (e.keyCode == 13 && (e.ctrlKey || e.metaKey))
-                || e.keyCode == 27
+                (e.keyCode == 13 && (e.ctrlKey || e.metaKey)) // Enter
+                || e.keyCode == 27 // Escape
             ){
                 this.removePopup(popup);
             }
         },
         keydownInPopup(popup, e, field){
             if(field == 'flatPickr'){
-                if(e.keyCode == '9' && e.shiftKey){
+                if(e.keyCode == '9' && e.shiftKey){ // Tab
+                    preventKeydownListener();
                     e.preventDefault();
                 }
             }
             if(field == 'closeButton'){
-                if(e.keyCode == '9' && !e.shiftKey){
+                if(e.keyCode == '9' && !e.shiftKey){ // Tab
+                    preventKeydownListener();
                     e.preventDefault();
                 }
+            }
+            if(e.keyCode == 27) // Escape
+            {
+                this.removePopup(popup);
             }
         },
     },

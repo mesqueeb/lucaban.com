@@ -54,6 +54,7 @@ window.langContentsItems = {
 			'completedB':'',
 			'usedTime':'Used time',
 			'reset':'Reset',
+			'setNotDone':'Undo completion',
 		},
 		'guide'://
 		{
@@ -73,6 +74,11 @@ window.langContentsItems = {
 			'hints': {//
 				'addItemHint':'Add some items!',
 			},
+		},
+		'flashes'://
+		{
+			'moveTopLvlItem':'You cannot move this item when there is a filter.',
+			'cannotDoThisInJournal':'You cannot do this in the Journal.',
 		},
 	},
 	'ja':
@@ -130,6 +136,7 @@ window.langContentsItems = {
 			'completedB':'を完了致しました',
 			'usedTime':'使用時間',
 			'reset':'リセット',
+			'setNotDone':'完了取り消し',
 		},
 		'guide'://
 		{
@@ -150,11 +157,17 @@ window.langContentsItems = {
 				'addItemHint':'アイテムを追加しよう！',
 			},
 		},
+		'flashes'://
+		{
+			'moveTopLvlItem':'フィルタをかけた際、このアイテムは動かせません。',
+			'cannotDoThisInJournal':'日報では機能しません。',
+		},
 	},
 
 };
 
 
+import Flashes from '../vue-components/Flashes.vue';
 import Card from '../vue-components/Card.vue';
 import Popups from '../vue-components/Popups.vue';
 import Popouts from '../vue-components/Popouts.vue';
@@ -195,6 +208,7 @@ export default {
 		patching: true,
 		popups: [],
 		popouts: {'delete':[], 'timer':[], 'edit':[], 'guide':false },
+		flashes: [], // e.g. {'type':'','msg':''}
 		timerItems: [],
 		beforeEditCache_body: null,
 		beforeEditCache_planned_time: null,
@@ -217,6 +231,7 @@ export default {
 		Card,
 		Popups,
 		Popouts,
+		Flashes
 	},
 	mounted() {
         eventHub.$on('confirm-ok', function(id) {
@@ -834,12 +849,16 @@ export default {
 			this.editingItemTags = null;
 			this.popouts.edit = [];
 		},
-		cancelAddNew()
+		cancelAddNew(cancelUnderId)
 		{
+			preventKeydownListener();
 			console.log('cancelAddNew');
 			this.addingNewUnder = null;
 			// this.addingNewEmptyList = false;
-			selection.selectedId = selection.lastSelectedId;
+			if(selection.selectedId == cancelUnderId || selection.selectedId == null)
+			{ // This is to prevent item being reselected when cancelAddNew through blur because of clicking on another item.
+				selection.selectedId = selection.lastSelectedId;
+			}
 			// Reset newItem to sibling stance.
 			this.addingNewAsChild = false;
 			// $(':focus').blur();
@@ -1275,6 +1294,10 @@ export default {
 				// 	fpEl_b.flatpickrify();
 				// });
     //         }
+		},
+		sendFlash(type,msg)
+		{
+			this.flashes.push({type,msg});
 		},
 		popout(id, type){
 			id = (!id) ? selection.selectedId : id ;

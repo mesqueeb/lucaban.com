@@ -2,6 +2,7 @@
 {{-- LOADER --}}
 @include('items.loading')
 <Popups :popups="popups"></Popups>
+<Flashes :flashes="flashes"></Flashes>
 <Popouts :popouts="popouts"></Popouts>
 <div class="panel-body" v-cloak>
 	{{-- NAV --}}
@@ -15,6 +16,8 @@
 	>
 		<Card :item="allData"
 			ref="root"
+			:parentsChildrenOrder="[]"
+			:parentTags="[]"
 			{{-- :alltags="allTags" --}}
 		></Card>
 	</div>

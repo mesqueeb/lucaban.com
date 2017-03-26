@@ -7,21 +7,24 @@ constructor()
 }
 keystroke(k)
 {
-	if(selection.view == 'journal' && (
+	if(selection.view == 'journal' &&
 		// Disable keystrokes when in the journal.
-		k == 'arrowRight' ||
-		k == 'arrowLeft' ||
-		k == 'meta_arrowUp' ||
-		k == 'meta_arrowDown' ||
-		k == 'meta_arrowRight' ||
-		k == 'meta_arrowLeft' ||
-		k == 'spaceBar' ||
-		k == 'tab' ||
-		k == 'shift_tab' ||
-		k == 't' ||
-		k == 's' ))
+		(  k == 'arrowRight'
+		|| k == 'arrowLeft'
+		|| k == 'meta_arrowUp'
+		|| k == 'meta_arrowDown'
+		|| k == 'meta_arrowRight'
+		|| k == 'meta_arrowLeft'
+		|| k == 'spaceBar'
+		|| k == 'tab'
+		|| k == 'shift_tab'
+		|| k == 't'
+		|| k == 's' ))
 	{
 		console.log('cannot use '+k+' in journal mode');
+		let errMsg = vm.text.flashes.cannotDoThisInJournal;
+		console.log(errMsg);
+		vm.sendFlash('warning',errMsg);
 		return;
 	}
 	console.log(k);
@@ -70,7 +73,7 @@ invokeKeyBindingListener()
        	if(document.activeElement.className == "flatpickr-days")
        	{
 			if(x == 9)
-			{
+			{ // Tab
 				console.log('hiya!');
 				e.preventDefault();
 				return;

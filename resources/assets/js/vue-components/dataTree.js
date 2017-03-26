@@ -512,7 +512,9 @@ giveNewParent(id, new_parent_id, specificNewIndex)
 {	
 	if(this.isTopLvlItemInFilteredRoot(id))
 	{ 
-		console.log("can't give new parent to topLvlItem in filtered list");
+		let errMsg = vm.text.flashes.moveTopLvlItem;
+		console.log(errMsg);
+		vm.sendFlash('warning',errMsg);
 		return;
 	}
 	console.log('giving new parent');
@@ -869,7 +871,9 @@ moveItem(id, direction)
 {
 	if(this.isTopLvlItemInFilteredRoot(id))
 	{ 
-		console.log("can't move a TopLvlItemInFilteredRoot");
+		let errMsg = vm.text.flashes.moveTopLvlItem;
+		console.log(errMsg);
+		vm.sendFlash('warning',errMsg);
 		return; 
 	}
 	clearTimeout(window.patchDelay);

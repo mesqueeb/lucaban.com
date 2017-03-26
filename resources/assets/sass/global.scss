@@ -50,3 +50,53 @@ textarea {
 	  font-size: 16px !important;
 	}
 }
+
+
+
+/**********
+* Grow in *
+***********/
+// .animated { 
+//     -webkit-animation-duration: 1s; 
+//     animation-duration: 1s; 
+//     -webkit-animation-fill-mode: both; 
+//     animation-fill-mode: both; 
+// }
+
+// @-webkit-keyframes growIn { 
+//     0% { 
+//         -webkit-transform: scale(0.2); 
+//         opacity:0;
+//     } 
+//     50% { 
+//         -webkit-transform: scale(1.2); 
+        
+//     } 
+//     100% { 
+//         -webkit-transform: scale(1); 
+//         opacity:1;
+//     } 
+// } 
+// @keyframes growIn { 
+//     0% { 
+//         transform: scale(0.2); 
+//         opacity:0;
+//     } 
+//     50% { 
+//         transform: scale(1.2); 
+        
+//     } 
+//     100% { 
+//         transform: scale(1); 
+//         opacity:1;
+//     } 
+// } 
+// .growIn { 
+//     -webkit-transform: scale(0.2);
+//     transform: scale(0.2);
+//     opacity:0;
+// }
+// .growIn.go{
+//     -webkit-animation-name: growIn; 
+//     animation-name: growIn; 
+// }

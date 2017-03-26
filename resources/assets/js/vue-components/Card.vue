@@ -380,6 +380,7 @@
 			:item="childCard"
 			:key="childCard.id"
 			:parentsChildrenOrder="childrenOrder"
+			:parentTags="tagsArray"
 		></Card>
 	</div>
 <!-- / CHILDREN -->
@@ -541,7 +542,7 @@ ${spaces}・${val.body}`;
 		this.convertbodyURLtoHTML();
 		if(this.listIsEmpty){ this.$root.addingNewEmptyList = true; }
 	},
-	props: ['item','parentsChildrenOrder'],
+	props: ['item','parentsChildrenOrder', 'parentTags'],
 	data()
 	{
 		return {
@@ -589,6 +590,14 @@ ${spaces}・${val.body}`;
 			{
 				let tagz = allItems.returnTagsAsArray(this.item.id);
 				alltags = alltags.concat(tagz);
+			}
+			if (allItems.isTopLvlItemInFilteredRoot(this.item.id))
+			{
+				if(allItems.nodes[this.item.parent_id])
+				{
+					let tagzies = allItems.returnTagsAsArray(this.item.parent_id);
+					alltags = alltags.concat(tagzies);
+				}
 			}
 			alltags = uniq(alltags);
 			return alltags.sort();
@@ -798,9 +807,9 @@ ${spaces}・${val.body}`;
 			if(!this.item.parent_id){ return true; }
 			return this.totalPlannedSec != this.$parent.totalPlannedSec;
 		},
-		parentTags()
-		{ if(!this.item || !allItems || !this.item.parent_id || !this.$parent.item){ return []; }
-			return this.$parent.item.tagged.map(obj => obj.tag_name);
+		tagsArray()
+		{ if(!this.item || !allItems){ return true; }
+			return this.item.tagged.map(obj => obj.tag_name);
 		},
 		isHidden()
 		{ if(!this.item || !allItems){ return true; }
@@ -1247,7 +1256,8 @@ ${spaces}・${val.body}`;
 		cancelAddNew()
 		{
 			this.newItem.body = '';
-			this.$root.cancelAddNew();
+			let cancelUnderId = this.item.id;
+			this.$root.cancelAddNew(cancelUnderId);
 		},
 		addTag(item)
 		{
