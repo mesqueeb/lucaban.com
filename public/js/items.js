@@ -38535,6 +38535,9 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
+//
+//
 
 // import Morph from '../components/valueMorphers.js'
 // window.Morph = new Morph();
@@ -40295,7 +40298,7 @@ window.langContentsItems = {
 			'h': 'h',
 			'cancel': 'Cancel',
 			'delete': 'Delete',
-			'save': 'save'
+			'save': 'Save'
 		},
 		'menu': //
 		{
@@ -40354,7 +40357,8 @@ window.langContentsItems = {
 		'flashes': //
 		{
 			'moveTopLvlItem': 'You cannot move this item when there is a filter.',
-			'cannotDoThisInJournal': 'You cannot do this in the Journal.'
+			'cannotDoThisInJournal': 'You cannot do this in the Journal.',
+			'ajaxError': 'Error with connection. Reloading in '
 		}
 	},
 	'ja': {
@@ -40424,7 +40428,8 @@ window.langContentsItems = {
 		'flashes': //
 		{
 			'moveTopLvlItem': 'フィルタをかけた際、このアイテムは動かせません。',
-			'cannotDoThisInJournal': '日報では機能しません。'
+			'cannotDoThisInJournal': '日報では機能しません。',
+			'ajaxError': '接続エラー。再読込まで '
 		}
 	}
 
@@ -41472,6 +41477,10 @@ window.selection = new __WEBPACK_IMPORTED_MODULE_5__vue_components_Selection_js_
 				this.stopPatching();
 			}, function (response) {
 				_this2.patching = 'error';
+				var errMsg = vm.text.flashes.ajaxError;
+				console.log(errMsg);
+				vm.sendFlash('ajaxError', errMsg);
+				return;
 			});
 		},
 		patchTag: function patchTag(id, tags, requestType) {
@@ -41679,6 +41688,9 @@ window.selection = new __WEBPACK_IMPORTED_MODULE_5__vue_components_Selection_js_
 		// 	});
 		// },
 		filterItems: function filterItems(keyword, value, event) {
+			if (this.editingItem) {
+				return;
+			}
 			// debugger;
 			var operator = null;
 			if (event) {
@@ -41755,6 +41767,9 @@ window.selection = new __WEBPACK_IMPORTED_MODULE_5__vue_components_Selection_js_
 				this.stopPatching();
 			}, function (response) {
 				_this4.patching = 'error';
+				var errMsg = vm.text.flashes.ajaxError;
+				console.log(errMsg);
+				vm.sendFlash('ajaxError', errMsg);
 			});
 		},
 		isFirstItem: function isFirstItem(id) {
@@ -47028,7 +47043,14 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     }, [_c('i', {
       staticClass: "zmdi zmdi-close-circle"
     })]) : _vm._e()]) : _vm._e()
-  })], 2) : _vm._e()])]) : _vm._e(), _vm._v(" "), _c('div', {
+  }), _vm._v(" "), (_vm.basis.mobile) ? _c('button', {
+    staticClass: "mobile-edit-save",
+    on: {
+      "click": function($event) {
+        _vm.doneEdit(_vm.item)
+      }
+    }
+  }, [_vm._v("\n\t\t\t\t\t\t\t" + _vm._s(_vm.basis.text.global.save) + "\n\t\t\t\t\t\t")]) : _vm._e()], 2) : _vm._e()])]) : _vm._e(), _vm._v(" "), _c('div', {
     staticClass: "item-tags"
   }, [(!_vm.basis.mobile && (_vm.item.id == _vm.basis.editingItem || _vm.item.id == _vm.basis.editingItemTags)) ? _c('div', {
     staticClass: "add-tag-wrapper",
@@ -49577,6 +49599,11 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
+//
+//
+//
+//
 
 /* harmony default export */ __webpack_exports__["default"] = {
 	name: 'Flashes',
@@ -49584,10 +49611,29 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 	props: ['flashes'],
 	components: {
 		'Flash': {
-			template: '\n\t\t\t\t<div\n\t\t\t\t\tclass="flash"\n\t\t\t\t\t:class="flash.type"\n\t\t\t\t>\n\t\t\t\t\t\t<div class="bodybox">{{ flash.msg }}</div>\n\t\t\t\t\t\t<button class="close" @click="close">\u2717</button>\n\t\t\t\t</div>\n    \t\t',
-			props: ['flash'],
+			template: '\n\t\t\t\t<div\n\t\t\t\t\tclass="flash"\n\t\t\t\t\t:class="flash.type"\n\t\t\t\t>\n\t\t\t\t\t\t<div class="bodybox">{{ flash.msg }}\n\t\t\t\t\t\t\t<span v-if="flash.type==\'ajaxError\'">{{ countDown }}</span>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t\t<button class="close" @click="close">\u2717</button>\n\t\t\t\t</div>\n    \t\t',
+			props: ['flash', 'index'],
+			data: function data() {
+				return { countDown: 4 };
+			},
+
+			// computed: {
+			// 	countDown()
+			// 	{
+			// 		return this.countDownIni;
+			// 	},
+			// },
 			mounted: function mounted() {
-				setTimeout(function () {
+				if (this.flash.type == 'ajaxError') {
+					window.timers['flash-' + this.index] = window.setInterval(function () {
+						this.countDown--;
+						if (this.countDown == 0) {
+							location.reload();
+						}
+					}.bind(this), 1000);
+					return;
+				}
+				window.timers['flash-' + this.index] = setTimeout(function () {
 					this.close();
 				}.bind(this), 2000);
 			},
@@ -49596,6 +49642,10 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 				close: function close() {
 					var _this = this;
 
+					if (window.timers['flash-' + this.index]) {
+						clearInterval(window.timers['flash-' + this.index]);
+						delete window.timers['flash-' + this.index];
+					}
 					this.$root.flashes = this.$root.flashes.filter(function (f) {
 						return f != _this.flash;
 					});
@@ -49609,7 +49659,9 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 		};
 	},
 	mounted: function mounted() {
-		console.log('DDD');
+		if (!window.timers) {
+			window.timers = {};
+		}
 		eventHub.$on('playTimer', this.playTimer);
 		eventHub.$on('clearAll', this.clearAll);
 	},
@@ -49650,7 +49702,8 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     return _c('Flash', {
       key: 'flash-' + index,
       attrs: {
-        "flash": flash
+        "flash": flash,
+        "index": index
       }
     })
   }))], 1)
@@ -49944,7 +49997,7 @@ module.exports = function listToStyles (parentId, list) {
 /***/ (function(module, exports, __webpack_require__) {
 
 exports = module.exports = __webpack_require__(211)();
-exports.push([module.i, "\n.fade-enter-active, .fade-leave-active {\n  -webkit-transition: opacity .5s;\n  transition: opacity .5s;\n}\n.fade-enter, .fade-leave-to {\n  opacity: 0;\n}\n#flashes-mask {\n  position: fixed;\n  width: 100%;\n  top: 0;\n  z-index: 10;\n}\n.flash {\n  margin: 0.5rem;\n  background-color: white;\n  box-shadow: 0px 2px 4px 0px rgba(136, 136, 136, 0.5);\n  display: -webkit-box;\n  display: -ms-flexbox;\n  display: flex;\n  -webkit-box-pack: justify;\n      -ms-flex-pack: justify;\n          justify-content: space-between;\n  -webkit-transition: all 0.35s;\n  transition: all 0.35s;\n}\n.flash button {\n    padding: 0 0.5rem;\n}\n", ""]);
+exports.push([module.i, "\n.fade-enter-active, .fade-leave-active {\n  -webkit-transition: opacity .5s;\n  transition: opacity .5s;\n}\n.fade-enter, .fade-leave-to {\n  opacity: 0;\n}\n#flashes-mask {\n  position: fixed;\n  width: 100%;\n  top: 0;\n  z-index: 10;\n}\n.flash {\n  margin: 0.5rem;\n  background-color: white;\n  box-shadow: 0px 2px 4px 0px rgba(136, 136, 136, 0.5);\n  display: -webkit-box;\n  display: -ms-flexbox;\n  display: flex;\n  -webkit-box-pack: justify;\n      -ms-flex-pack: justify;\n          justify-content: space-between;\n  -webkit-transition: all 0.35s;\n  transition: all 0.35s;\n}\n.flash button {\n    padding: 0 0.5rem;\n}\n.flash .bodybox {\n    display: -webkit-box;\n    display: -ms-flexbox;\n    display: flex;\n    -webkit-box-orient: horizontal;\n    -webkit-box-direction: normal;\n        -ms-flex-direction: row;\n            flex-direction: row;\n}\n", ""]);
 
 /***/ }),
 /* 242 */

@@ -588,4 +588,13 @@ input.add-tag::-webkit-input-placeholder {
             font-size:15px;
         }
     }
+    .mobile-edit-save{
+        position: absolute;
+        margin-top: 3.5rem;
+        align-self: flex-end;
+        right: 2rem;
+        color: white;
+        font-weight: 600;
+        font-size: 1rem;
+    }
 }

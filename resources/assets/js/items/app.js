@@ -9,7 +9,7 @@ window.langContentsItems = {
 			'h':'h',
 			'cancel':'Cancel',
 			'delete':'Delete',
-			'save':'save',
+			'save':'Save',
 		},
 		'menu'://
 		{
@@ -79,6 +79,7 @@ window.langContentsItems = {
 		{
 			'moveTopLvlItem':'You cannot move this item when there is a filter.',
 			'cannotDoThisInJournal':'You cannot do this in the Journal.',
+			'ajaxError':'Error with connection. Reloading in ',
 		},
 	},
 	'ja':
@@ -161,6 +162,7 @@ window.langContentsItems = {
 		{
 			'moveTopLvlItem':'フィルタをかけた際、このアイテムは動かせません。',
 			'cannotDoThisInJournal':'日報では機能しません。',
+			'ajaxError':'接続エラー。再読込まで ',
 		},
 	},
 
@@ -1183,6 +1185,10 @@ export default {
 				this.stopPatching();
 			}, (response) => {
 				this.patching = 'error';
+				let errMsg = vm.text.flashes.ajaxError;
+				console.log(errMsg);
+				vm.sendFlash('ajaxError',errMsg);
+				return;
 			});
 		},
 		patchTag(id, tags, requestType){
@@ -1377,6 +1383,7 @@ export default {
 		// },
 		filterItems(keyword, value, event)
 		{
+			if(this.editingItem){ return; }
 			// debugger;
 			let operator = null;
 			if (event){
@@ -1452,6 +1459,9 @@ export default {
 				this.stopPatching();
 			}, (response) => {
 				this.patching = 'error';
+				let errMsg = vm.text.flashes.ajaxError;
+				console.log(errMsg);
+				vm.sendFlash('ajaxError',errMsg);
 			});
 
 		},

@@ -4,6 +4,7 @@
 	<Flash
 		v-for="(flash, index) in flashes"
 		:flash="flash"
+		:index="index"
 		:key="'flash-'+index"
 	>
 	</Flash>
@@ -35,6 +36,10 @@
 	button {
 	    padding: 0 0.5rem;
 	}
+	.bodybox {
+		display: flex;
+		flex-direction: row;
+	}
 }
 </style>
 <script>
@@ -49,19 +54,43 @@ export default {
 					class="flash"
 					:class="flash.type"
 				>
-						<div class="bodybox">{{ flash.msg }}</div>
+						<div class="bodybox">{{ flash.msg }}
+							<span v-if="flash.type=='ajaxError'">{{ countDown }}</span>
+						</div>
 						<button class="close" @click="close">✗</button>
 				</div>
     		`,
-		    props: ['flash'],
+		    props: ['flash', 'index'],
+		    data(){
+		    	return { countDown: 4, }
+		    },
+		    // computed: {
+		    // 	countDown()
+		    // 	{
+		    // 		return this.countDownIni;
+		    // 	},
+		    // },
     		mounted(){
-    			setTimeout(function() {
+    			if(this.flash.type=='ajaxError')
+    			{
+		    		window.timers['flash-'+this.index] = window.setInterval(function(){
+			    		this.countDown--;
+			    		if(this.countDown == 0){ location.reload(); }
+		    		}.bind(this), 1000);
+    				return;
+    			}
+    			window.timers['flash-'+this.index] = setTimeout(function() {
 	    			this.close();
     			}.bind(this), 2000);
     		},
     		methods:{
 		        close()
 		        {
+		        	if(window.timers['flash-'+this.index])
+		        	{
+		        		clearInterval(window.timers['flash-'+this.index]);
+		        		delete window.timers['flash-'+this.index];
+			        }
 		        	this.$root.flashes = this.$root.flashes.filter(f => f != this.flash);
 		        },
     		},
@@ -74,7 +103,7 @@ export default {
 	},
 	mounted()
 	{
-		console.log('DDD');
+		if(!window.timers){ window.timers = {}; }
 		eventHub.$on('playTimer', this.playTimer);
 		eventHub.$on('clearAll', this.clearAll);
 	},

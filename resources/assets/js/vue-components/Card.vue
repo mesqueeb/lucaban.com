@@ -209,6 +209,9 @@
 								<i class="zmdi zmdi-close-circle"></i>
 							</button>
 						</span>
+						<button v-if="basis.mobile" class="mobile-edit-save" @click="doneEdit(item)">
+							{{ basis.text.global.save }}
+						</button>
 					</div>
 				</div>
 			</form>
