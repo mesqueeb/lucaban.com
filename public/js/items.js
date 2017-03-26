@@ -14821,7 +14821,7 @@ module.exports = g;
 
 "use strict";
 /* WEBPACK VAR INJECTION */(function($) {/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "d", function() { return mobilecheck; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "e", function() { return objectToArray; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "f", function() { return objectToArray; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "h", function() { return uniqBy; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "l", function() { return uniq; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "j", function() { return arrayToString; });
@@ -14829,8 +14829,8 @@ module.exports = g;
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "c", function() { return hasClass; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return btnEffect; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return isElementInViewport; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "g", function() { return sortObjectArrayByProperty; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "f", function() { return sortObjectArrayByTwoProperties; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "e", function() { return sortObjectArrayByProperty; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "g", function() { return sortObjectArrayByTwoProperties; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "k", function() { return removeEmptyValuesFromArray; });
 function mobilecheck() {
 	var check = false;
@@ -25503,6 +25503,9 @@ var _class = function () {
 			// Select next item on top level.
 			if (this.isTopLvlItemInFilteredRoot(id) && !item.show_children || selection.view == 'journal') {
 				var ind = vm.$refs.root.childrenOrder.indexOf(id);
+				if (ind + 1 == vm.$refs.root.childrenOrder.length) {
+					return vm.$refs.root.childrenOrder[0];
+				}
 				return vm.$refs.root.childrenOrder[ind + 1];
 			}
 			// Select first child if any.
@@ -25585,17 +25588,26 @@ var _class = function () {
 			var prevItemId = void 0;
 			var index = void 0;
 			// Select next item on top level.
+			var childrenIds = vm.$refs.root.childrenOrder;
 			if (this.isTopLvlItemInFilteredRoot(id) || selection.view == 'journal') {
-				var childrenIds = vm.$refs.root.childrenOrder;
 				index = childrenIds.indexOf(id);
 				if (index == 0) {
-					return this.deepestChild(childrenIds[childrenIds.length - 1]);
+					if (selection.view == 'journal') {
+						prevItemId = childrenIds[childrenIds.length - 1];
+					} else {
+						prevItemId = this.deepestChild(childrenIds[childrenIds.length - 1]);
+					}
+				} else {
+					prevItemId = childrenIds[index - 1];
+					if (selection.view != 'journal') {
+						prevItemId = this.deepestChild(prevItemId);
+					}
 				}
-				prevItemId = childrenIds[index - 1];
-				prevItemId = this.deepestChild(prevItemId);
 			} else {
 				index = this.siblingIndex(id);
-				if (index == 0) {
+				if (childrenIds[0] == id) {
+					prevItemId = this.deepestChild(childrenIds[childrenIds.length - 1]);
+				} else if (index == 0) {
 					prevItemId = parent_id;
 				} else {
 					prevItemId = this.nodes[parent_id].children_order[index - 1];
@@ -25891,13 +25903,15 @@ var _class = function () {
 			// Delete items attached to previous parent
 			var parent_id = item.parent_id;
 			var prevParent = this.nodes[parent_id];
-			var siblingIndex = this.siblingIndex(id);
-			prevParent.children.splice(siblingIndex, 1);
-			prevParent.children_order.splice(siblingIndex, 1);
-			// Patch and recalculate
-			vm.patch(parent_id, 'children_order');
+			if (prevParent) {
+				var siblingIndex = this.siblingIndex(id);
+				prevParent.children.splice(siblingIndex, 1);
+				prevParent.children_order.splice(siblingIndex, 1);
+				// Patch and recalculate
+				vm.patch(parent_id, 'children_order');
+			}
 			vm.deleteItemApi(id);
-			this.autoCalculateDoneState(parent_id);
+			// this.autoCalculateDoneState(parent_id);
 			if (selection.view == 'journal') {
 				selection.view = null;
 				selection.view = 'journal';
@@ -38538,6 +38552,15 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 // import Morph from '../components/valueMorphers.js'
 // window.Morph = new Morph();
@@ -38564,15 +38587,30 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 					return all + '\n' + spaces + '\u30FB' + val.body;
 				}, '' + self.item.body);
 				return allChildren;
-				return trigger.nextElementSibling;
 			}
-
 		}).on('success', function (e) {
 			// console.info('Action:', e.action);
 			// console.info('Text:', e.text);
 			// console.info('Trigger:', e.trigger);
 			e.clearSelection();
 		});
+		if (this.journalView && this.item.journalDate) {
+			var copyElPath_Journal = "#journal-card-" + this.item.done_date + "-copy";
+			new __WEBPACK_IMPORTED_MODULE_5_clipboard___default.a(copyElPath_Journal, {
+				text: function text(trigger) {
+					console.log(trigger);
+					var allChildren = self.allVisibleChildItems.reduce(function (all, val) {
+						return all + '\n\u3010' + val.parents_bodies + '\u3011\n\u30FB' + val.body;
+					}, self.journalDate + '\n==========');
+					return allChildren;
+				}
+			}).on('success', function (e) {
+				// console.info('Action:', e.action);
+				// console.info('Text:', e.text);
+				// console.info('Trigger:', e.trigger);
+				e.clearSelection();
+			});
+		}
 		// this.newItem.preparedTags = JSON.parse(JSON.stringify(this.parentTags));
 		this.convertbodyURLtoHTML();
 		if (this.listIsEmpty) {
@@ -38720,22 +38758,19 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 				return;
 			}
 			// console.log('run on '+this.item.id+' - '+this.item.body);
-			if (this.$root.selection.view != 'journal') {
+			if (this.$root.selection.view != 'journal' || !this.journalView || !this.item.journalDate) {
 				return false;
 			}
-			if (this.journalView) {
-				if (this.item.depth == 0) {
-					return;
-				}
-				var prevId = this.visiblePrevItemId;
-				var prevDoneDate = allItems.nodes[prevId].done_date;
-				prevDoneDate = moment(prevDoneDate).format('YYYY/MM/DD');
-				var thisDoneDate = moment(this.item.done_date).format('YYYY/MM/DD');
-				if (thisDoneDate != prevDoneDate) {
-					return thisDoneDate;
-				}
-			}
-			return false;
+			return moment(this.item.done_date, 'YYYYMMDD').format('YYYY/MM/DD');
+			// JOURNAL REWRITE. original:
+			// if(this.item.depth == 0){ return; }
+			// let prevId = this.visiblePrevItemId;
+			// let prevDoneDate = allItems.nodes[prevId].done_date;
+			// prevDoneDate = moment(prevDoneDate).format('YYYY/MM/DD');
+			// let thisDoneDate = moment(this.item.done_date).format('YYYY/MM/DD');
+			// if (thisDoneDate != prevDoneDate){
+			// 	return thisDoneDate;
+			// }
 		},
 		journalParentString: function journalParentString() {
 			if (!this.item || !allItems) {
@@ -38813,6 +38848,13 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 			if (!this.item || !allItems) {
 				return 0;
 			}
+			if (this.$root.selection.view == 'journal' && this.item.id == allItems.root.id) {
+				return this.item.children.reduce(function (a, c) {
+					return a.concat(c.children);
+				}, []).map(function (child) {
+					return child.id;
+				});
+			}
 			return this.visibleChildren.map(function (child) {
 				return child.id;
 			});
@@ -38843,6 +38885,9 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 		showAddNewBox: function showAddNewBox() {
 			if (!this.item || !allItems) {
 				return;
+			}
+			if (!this.$root.addingNewUnder) {
+				return false;
 			}
 			if (this.$root.addingNewUnder == this.item.id) {
 				return true;
@@ -40614,11 +40659,47 @@ window.selection = new __WEBPACK_IMPORTED_MODULE_5__vue_components_Selection_js_
 			if (this.selection.view == 'tree') {
 				return this.filteredItemsTree;
 			} else if (this.selection.view == 'journal') {
-				return this.filteredItemsFlat;
+				return this.filteredItemsJournal;
 			}
 		},
+		filteredItemsJournal: function filteredItemsJournal() {
+			if (this.selection.view != 'journal') {
+				return [];
+			}
+			var dates = {};
+			this.filteredItemsFlat.forEach(function (item) {
+				if (!item.done) {
+					return;
+				}
+				var dd = moment(item.done_date).format('YYYY-MM-DD');
+				if (!dates[dd]) {
+					dates[dd] = [];
+				}
+				dates[dd].push(item);
+			}.bind(this));
+			var datesArray = [];
+			Object.keys(dates).forEach(function (dd) {
+				var journalItem = {
+					'done_date': moment(dd).format('YYYY-MM-DD'),
+					'children': dates[dd],
+					'depth': 0,
+					'journalDate': true
+				};
+				journalItem = allItems.setDefaultItemValues(journalItem);
+				datesArray.push(journalItem);
+			});
+			// if (selection.view == 'journal')
+			// {
+			datesArray = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_4__components_globalFunctions_js__["e" /* sortObjectArrayByProperty */])(datesArray, 'done_date', 'desc');
+			// ar = sortObjectArrayByTwoProperties(ar,'done_date','parents_bodies','desc','asc');
+			// }
+			return datesArray;
+		},
+		journalDates: function journalDates() {
+			return Object.keys(this.filteredItemsJournal);
+		},
 		filteredItemsFlat: function filteredItemsFlat() {
-			var ar = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_4__components_globalFunctions_js__["e" /* objectToArray */])(this.nodes).filter(function (item) {
+			var ar = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_4__components_globalFunctions_js__["f" /* objectToArray */])(this.nodes).filter(function (item) {
 				var target = this.selection.tags.every(function (tag) {
 					return allItems.hasTag(item.id, tag);
 				});
@@ -40643,14 +40724,14 @@ window.selection = new __WEBPACK_IMPORTED_MODULE_5__vue_components_Selection_js_
 				}
 			}.bind(this));
 			if (selection.view == 'journal') {
-				ar = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_4__components_globalFunctions_js__["f" /* sortObjectArrayByTwoProperties */])(ar, 'done_date', 'parents_bodies', 'desc', 'asc');
+				ar = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_4__components_globalFunctions_js__["g" /* sortObjectArrayByTwoProperties */])(ar, 'done_date', 'parents_bodies', 'desc', 'asc');
 			}
 			return ar;
 		},
 		filteredItemsTree: function filteredItemsTree() {
-			console.log('update filteredItemsTree (nodes length: ' + __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_4__components_globalFunctions_js__["e" /* objectToArray */])(this.nodes).length + ')');
+			console.log('update filteredItemsTree (nodes length: ' + __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_4__components_globalFunctions_js__["f" /* objectToArray */])(this.nodes).length + ')');
 			//Go through ALL ITEMS and return those that have the tag AND no parent with the tag.
-			var children = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_4__components_globalFunctions_js__["e" /* objectToArray */])(this.nodes).filter(function (item) {
+			var children = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_4__components_globalFunctions_js__["f" /* objectToArray */])(this.nodes).filter(function (item) {
 				// if(item.body.includes('1252')){
 				// console.log(`(${item.id}) ${item.body}...`);
 				// }
@@ -40731,12 +40812,12 @@ window.selection = new __WEBPACK_IMPORTED_MODULE_5__vue_components_Selection_js_
 				}
 			}
 			if (selection.filter.includes('today')) {
-				children = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_4__components_globalFunctions_js__["g" /* sortObjectArrayByProperty */])(children, 'done_date');
+				children = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_4__components_globalFunctions_js__["e" /* sortObjectArrayByProperty */])(children, 'done_date');
 			}
 			return children;
 		},
 		hiddenItemIds: function hiddenItemIds() {
-			return __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_4__components_globalFunctions_js__["e" /* objectToArray */])(this.nodes).filter(function (item) {
+			return __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_4__components_globalFunctions_js__["f" /* objectToArray */])(this.nodes).filter(function (item) {
 				var targetHidden = this.selection.hiddenTags.some(function (tag) {
 					return allItems.hasTag(item.id, tag);
 				});
@@ -40819,7 +40900,7 @@ window.selection = new __WEBPACK_IMPORTED_MODULE_5__vue_components_Selection_js_
 					}
 				}.bind(allTagsArray));
 			}.bind(allTagsArray));
-			allTagsArray = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_4__components_globalFunctions_js__["g" /* sortObjectArrayByProperty */])(allTagsArray, 'name');
+			allTagsArray = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_4__components_globalFunctions_js__["e" /* sortObjectArrayByProperty */])(allTagsArray, 'name');
 			var t1 = performance.now();
 			console.log("Call to allTagsComputed took " + (t1 - t0) + " milliseconds.");
 			return allTagsArray;
@@ -40848,7 +40929,7 @@ window.selection = new __WEBPACK_IMPORTED_MODULE_5__vue_components_Selection_js_
 				return a.concat(tags);
 			}, []);
 			allTagsArray = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_4__components_globalFunctions_js__["h" /* uniqBy */])(allTagsArray);
-			allTagsArray = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_4__components_globalFunctions_js__["g" /* sortObjectArrayByProperty */])(allTagsArray, 'name');
+			allTagsArray = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_4__components_globalFunctions_js__["e" /* sortObjectArrayByProperty */])(allTagsArray, 'name');
 			var t2_1 = performance.now();
 			console.log("Call to allTagsComputed_2 took " + (t2_1 - t2_0) + " milliseconds.");
 			return allTagsArray;
@@ -40876,7 +40957,7 @@ window.selection = new __WEBPACK_IMPORTED_MODULE_5__vue_components_Selection_js_
 			}.bind(allTagsArray));
 			allTagsArray = [].concat(_toConsumableArray(allTagsArray));
 			allTagsArray = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_4__components_globalFunctions_js__["h" /* uniqBy */])(allTagsArray);
-			allTagsArray = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_4__components_globalFunctions_js__["g" /* sortObjectArrayByProperty */])(allTagsArray, 'name');
+			allTagsArray = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_4__components_globalFunctions_js__["e" /* sortObjectArrayByProperty */])(allTagsArray, 'name');
 			var t3_1 = performance.now();
 			console.log("Call to allTagsComputed_3 took " + (t3_1 - t3_0) + " milliseconds.");
 			return allTagsArray;
@@ -40909,7 +40990,7 @@ window.selection = new __WEBPACK_IMPORTED_MODULE_5__vue_components_Selection_js_
 					}
 				}.bind(allTagsArray));
 			}.bind(allTagsArray));
-			allTagsArray = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_4__components_globalFunctions_js__["g" /* sortObjectArrayByProperty */])(allTagsArray, 'name');
+			allTagsArray = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_4__components_globalFunctions_js__["e" /* sortObjectArrayByProperty */])(allTagsArray, 'name');
 			var t1 = performance.now();
 			console.log("Call to allTagsComputed took " + (t1 - t0) + " milliseconds.");
 			return allTagsArray;
@@ -41182,7 +41263,7 @@ window.selection = new __WEBPACK_IMPORTED_MODULE_5__vue_components_Selection_js_
 		},
 		checkFilteredItemsTree: function checkFilteredItemsTree() {
 			//Go through ALL ITEMS and return those that have the tag AND no parent with the tag.
-			__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_4__components_globalFunctions_js__["e" /* objectToArray */])(this.nodes).forEach(function (item) {
+			__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_4__components_globalFunctions_js__["f" /* objectToArray */])(this.nodes).forEach(function (item) {
 				var target = void 0;
 				var targetHidden = void 0;
 				var hasParentWithTag = void 0;
@@ -41473,7 +41554,7 @@ window.selection = new __WEBPACK_IMPORTED_MODULE_5__vue_components_Selection_js_
 			}
 			patchObj[arg] = patchVal;
 			this.$http.patch('/api/items/' + id, patchObj, { method: 'PATCH' }).then(function (response) {
-				console.log('patched [' + allItems.nodes[id].body + '].' + arg + ' = ' + patchObj[arg] + ';');
+				console.log('patched ' + id + '[' + allItems.nodes[id].body + '].' + arg + ' = ' + patchObj[arg]);
 				this.stopPatching();
 			}, function (response) {
 				_this2.patching = 'error';
@@ -46664,18 +46745,23 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     }
   }, [(!_vm.isHidden || _vm.listIsEmpty) ? _c('div', {
     staticClass: "item-card-wrapper"
-  }, [(_vm.journalDate) ? _c('div', {
+  }, [(_vm.journalDate && _vm.item.journalDate) ? _c('div', {
     staticClass: "title"
-  }, [_c('span', [_vm._v(_vm._s(_vm.momentCalendar(_vm.journalDate)))]), _vm._v(" "), _c('span', {
+  }, [_c('span', [_vm._v(_vm._s(_vm.momentCalendar(_vm.journalDate)))]), _vm._v(" "), (_vm.journalDate != _vm.momentCalendar(_vm.journalDate)) ? _c('span', {
     staticClass: "journal-date-small"
-  }, [_vm._v(_vm._s(_vm.journalDate))])]) : _vm._e(), _vm._v(" "), (_vm.journalParentString) ? _c('div', {
+  }, [_vm._v("\n\t\t\t" + _vm._s(_vm.journalDate) + "\n\t\t")]) : _vm._e(), _vm._v(" "), (!_vm.basis.mobile) ? _c('button', {
+    staticClass: "copy-contents-button btn btn-dipclick copy-contents-button-journal",
+    attrs: {
+      "id": 'journal-card-' + _vm.item.done_date + '-copy'
+    }
+  }, [_vm._v("\n\t\t\t" + _vm._s(_vm.basis.text.card.copy) + "\n\t\t")]) : _vm._e()]) : _vm._e(), _vm._v(" "), (_vm.journalParentString) ? _c('div', {
     staticClass: "parent-string",
     on: {
       "click": function($event) {
         _vm.selectItem(_vm.item)
       }
     }
-  }, [_c('div', [_vm._v("\n\t\t\t" + _vm._s(_vm.journalParentString) + "\n\t\t")])]) : _vm._e(), _vm._v(" "), (_vm.item.depth != 0) ? _c('div', {
+  }, [_c('div', [_vm._v("\n\t\t\t" + _vm._s(_vm.journalParentString) + "\n\t\t")])]) : _vm._e(), _vm._v(" "), (_vm.item.depth != 0 && !(_vm.journalView && _vm.journalDate)) ? _c('div', {
     class: {
       'item-card': true,
       'done': _vm.item.done,
@@ -47176,7 +47262,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     _vm.basis.editingItemTags != _vm.item.id &&
     _vm.basis.selection.selectedId == _vm.item.id) ? _c('div', {
     staticClass: "item-nav"
-  }, [(!_vm.basis.mobile) ? _c('button', {
+  }, [(!_vm.basis.mobile && _vm.basis.selection.view != 'journal') ? _c('button', {
     staticClass: "copy-contents-button btn btn-dipclick",
     attrs: {
       "id": 'card-' + _vm.item.id + '-copy'

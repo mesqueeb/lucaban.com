@@ -20,7 +20,15 @@
 			:parentTags="[]"
 			{{-- :alltags="allTags" --}}
 		></Card>
-	</div>
+{{-- 
+	<div v-for="date in journalDates">
+			<div>@{{ date }}</div>
+			<Card
+				v-for=""
+			></Card>
+		</div>
+ --}}
+ 	</div>
 </div>
 {{-- Mobile NAV --}}
 @include('items.mobileNav')

@@ -3,6 +3,12 @@
         border-top: none;
         margin-top: 0;
     }
+    .copy-contents-button-journal{
+        margin-left: auto;
+    }
+    .children {
+        margin-left: 0;
+    }
     .title {
         border-top: 1px solid #ededed;
         color: #46c5b6;
@@ -10,6 +16,13 @@
         text-align: left;
         padding: 0.5em 0;
         margin-top: 0.7em;
+        display: flex;
+        align-items: baseline;
+        .journal-date-small {
+            color: #dadada;
+            font-size: 0.8em;
+            margin-left: 0.5em;
+        }
     }
     .item-card {
         align-items: baseline;
@@ -22,10 +35,6 @@
     }
     .body-div{
         border-bottom:none;
-    }
-    .journal-date-small {
-        color: #dadada;
-        font-size: 0.8em;
     }
     .parent-string>div{
         border: 1px solid;

@@ -345,8 +345,43 @@ export default {
 			}
 			else if (this.selection.view == 'journal')
 			{
-				return this.filteredItemsFlat;
+				return this.filteredItemsJournal;
 			}
+		},
+		filteredItemsJournal()
+		{
+			if (this.selection.view != 'journal'){ return []; }
+			let dates = {};
+			this.filteredItemsFlat.forEach(function(item){
+				if (!item.done){ return; }
+				let dd = moment(item.done_date).format('YYYY-MM-DD');
+				if (!dates[dd])
+				{
+					dates[dd] = [];
+				}
+				dates[dd].push(item);
+			}.bind(this));
+			let datesArray = [];
+			Object.keys(dates).forEach(function(dd){
+				let journalItem = {
+					'done_date':moment(dd).format('YYYY-MM-DD'),
+					'children':dates[dd],
+					'depth':0,
+					'journalDate':true,
+				};
+				journalItem = allItems.setDefaultItemValues(journalItem);
+				datesArray.push(journalItem);
+			});
+			// if (selection.view == 'journal')
+			// {
+			datesArray = sortObjectArrayByProperty(datesArray, 'done_date', 'desc');
+			// ar = sortObjectArrayByTwoProperties(ar,'done_date','parents_bodies','desc','asc');
+			// }
+			return datesArray;
+		},
+		journalDates()
+		{
+			return Object.keys(this.filteredItemsJournal);
 		},
 		filteredItemsFlat()
 		{
@@ -1181,7 +1216,7 @@ export default {
 			patchObj[arg] = patchVal;
 			this.$http.patch('/api/items/' + id, patchObj, { method: 'PATCH'})
 			.then(function(response){
-				console.log('patched ['+allItems.nodes[id].body+'].'+arg+' = '+patchObj[arg]+';');
+				console.log(`patched ${id}[${allItems.nodes[id].body}].${arg} = ${patchObj[arg]}`);
 				this.stopPatching();
 			}, (response) => {
 				this.patching = 'error';

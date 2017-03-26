@@ -13,11 +13,20 @@
 >
 	<div
 		class="title"
-		v-if="journalDate"
+		v-if="journalDate && item.journalDate"
 	>
 		<!-- Codementor: Is this the correct way to format something like this? -->
 		<span>{{ momentCalendar(journalDate) }}</span>
-		<span class="journal-date-small">{{ journalDate }}</span>
+		<span class="journal-date-small" v-if="journalDate != momentCalendar(journalDate)">
+			{{ journalDate }}
+		</span>
+		<button
+			class="copy-contents-button btn btn-dipclick copy-contents-button-journal"
+			:id="'journal-card-'+item.done_date+'-copy'"
+			v-if="!basis.mobile"
+		>
+			{{ basis.text.card.copy }}
+		</button>
 	</div>
 		<!-- v-if="journalView && item.depth != 0 && item.parents_bodies" -->
 	<div
@@ -30,7 +39,7 @@
 		</div>
 	</div>
 	<div 
-		v-if="item.depth != 0"
+		v-if="item.depth != 0 && !(journalView && journalDate)"
 		:id="'item-body-'+item.id"
 		:class="{
 			'item-card': true,
@@ -322,7 +331,7 @@
 				<button
 					class="copy-contents-button btn btn-dipclick"
 					:id="'card-'+item.id+'-copy'"
-					v-if="!basis.mobile"
+					v-if="!basis.mobile && basis.selection.view != 'journal'"
 				>
 					{{ basis.text.card.copy }}
 				</button>
@@ -532,15 +541,34 @@ export default {
 ${spaces}・${val.body}`;
 				}, `${self.item.body}`);
 		        return allChildren;
-		        return trigger.nextElementSibling;
 		    }
-
 		}).on('success', function(e) {
 		    // console.info('Action:', e.action);
 		    // console.info('Text:', e.text);
 		    // console.info('Trigger:', e.trigger);
 		    e.clearSelection();
 		});
+		if (this.journalView && this.item.journalDate)
+		{
+			let copyElPath_Journal = "#journal-card-"+this.item.done_date+"-copy";
+			new Clipboard(copyElPath_Journal, {
+			    text: function(trigger) {
+			    	console.log(trigger);
+			        let allChildren = self.allVisibleChildItems.reduce(function(all, val){
+return `${all}
+【${val.parents_bodies}】
+・${val.body}`;
+}, `${self.journalDate}
+==========`);
+			        return allChildren;
+			    }
+			}).on('success', function(e) {
+			    // console.info('Action:', e.action);
+			    // console.info('Text:', e.text);
+			    // console.info('Trigger:', e.trigger);
+			    e.clearSelection();
+			});
+		}
 		// this.newItem.preparedTags = JSON.parse(JSON.stringify(this.parentTags));
 		this.convertbodyURLtoHTML();
 		if(this.listIsEmpty){ this.$root.addingNewEmptyList = true; }
@@ -650,18 +678,23 @@ ${spaces}・${val.body}`;
 		journalDate()
 		{ if(!this.item || !allItems){ return; }
 			// console.log('run on '+this.item.id+' - '+this.item.body);
-			if(this.$root.selection.view != 'journal'){ return false; }
-			if(this.journalView){
-				if(this.item.depth == 0){ return; }
-				let prevId = this.visiblePrevItemId;
-				let prevDoneDate = allItems.nodes[prevId].done_date;
-				prevDoneDate = moment(prevDoneDate).format('YYYY/MM/DD');
-				let thisDoneDate = moment(this.item.done_date).format('YYYY/MM/DD');
-				if (thisDoneDate != prevDoneDate){
-					return thisDoneDate;
-				}
+			if ( this.$root.selection.view != 'journal'
+			  || !this.journalView
+			  || !this.item.journalDate )
+			{
+				return false;
 			}
-			return false;
+			return moment(this.item.done_date,'YYYYMMDD').format('YYYY/MM/DD');
+			// JOURNAL REWRITE. original:
+			// if(this.item.depth == 0){ return; }
+			// let prevId = this.visiblePrevItemId;
+			// let prevDoneDate = allItems.nodes[prevId].done_date;
+			// prevDoneDate = moment(prevDoneDate).format('YYYY/MM/DD');
+			// let thisDoneDate = moment(this.item.done_date).format('YYYY/MM/DD');
+			// if (thisDoneDate != prevDoneDate){
+			// 	return thisDoneDate;
+			// }
+
 		},
 		journalParentString()
 		{ if(!this.item || !allItems){ return; }
@@ -719,6 +752,10 @@ ${spaces}・${val.body}`;
 		},
 		childrenOrder()
 		{ if(!this.item || !allItems){ return 0; }
+			if (this.$root.selection.view == 'journal' && this.item.id == allItems.root.id)
+			{
+				return this.item.children.reduce((a, c) => a.concat(c.children), []).map(child => child.id);
+			}
 			return this.visibleChildren.map(child => child.id);
 		},
 		// deepestChild()
@@ -743,6 +780,7 @@ ${spaces}・${val.body}`;
 		},
 		showAddNewBox()
 		{ if(!this.item || !allItems){ return; }
+			if(!this.$root.addingNewUnder){ return false; }
 			if(this.$root.addingNewUnder == this.item.id)
 			{ return true; }
 			return false;

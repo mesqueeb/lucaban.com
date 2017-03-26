@@ -313,6 +313,10 @@ nextItemId(id, debug)
 	  || selection.view == 'journal' )
 	{
 		let ind = vm.$refs.root.childrenOrder.indexOf(id);
+		if (ind+1 == vm.$refs.root.childrenOrder.length)
+		{
+			return vm.$refs.root.childrenOrder[0];
+		}
 		return vm.$refs.root.childrenOrder[ind+1];
 	}
 	// Select first child if any.
@@ -379,18 +383,30 @@ prevItemId(id, debug)
 	let prevItemId;
 	let index;
 	// Select next item on top level.
+	let childrenIds = vm.$refs.root.childrenOrder;
 	if (this.isTopLvlItemInFilteredRoot(id) || selection.view == 'journal')
 	{
-		let childrenIds = vm.$refs.root.childrenOrder;
 		index = childrenIds.indexOf(id);
 		if (index == 0) {
-			return this.deepestChild(childrenIds[childrenIds.length-1]);
+			if(selection.view == 'journal')
+			{
+				prevItemId = childrenIds[childrenIds.length-1];
+			} else {
+				prevItemId = this.deepestChild(childrenIds[childrenIds.length-1]);
+			}
+		} else {
+			prevItemId = childrenIds[index-1];
+			if(selection.view != 'journal')
+			{
+				prevItemId = this.deepestChild(prevItemId);
+			}
 		}
-		prevItemId = childrenIds[index-1];
-		prevItemId = this.deepestChild(prevItemId);
 	} else {
 		index = this.siblingIndex(id);
-		if (index == 0) {
+		if (childrenIds[0] == id)
+		{
+			prevItemId = this.deepestChild(childrenIds[childrenIds.length-1]);
+		} else if (index == 0) {
 			prevItemId = parent_id;
 		} else {
 			prevItemId = this.nodes[parent_id].children_order[index-1];
@@ -654,13 +670,16 @@ deleteItem(id)
 	// Delete items attached to previous parent
 	let parent_id = item.parent_id;
 	let prevParent = this.nodes[parent_id];
-	let siblingIndex = this.siblingIndex(id);
-	prevParent.children.splice(siblingIndex,1);
-	prevParent.children_order.splice(siblingIndex,1);
-	// Patch and recalculate
-	vm.patch(parent_id, 'children_order');
+	if (prevParent)
+	{
+		let siblingIndex = this.siblingIndex(id);
+		prevParent.children.splice(siblingIndex,1);
+		prevParent.children_order.splice(siblingIndex,1);
+		// Patch and recalculate
+		vm.patch(parent_id, 'children_order');
+	}
     vm.deleteItemApi(id);
-	this.autoCalculateDoneState(parent_id);
+	// this.autoCalculateDoneState(parent_id);
 	if (selection.view == 'journal')
 	{
 		selection.view = null;
