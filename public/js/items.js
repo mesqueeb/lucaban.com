@@ -25318,8 +25318,8 @@ var _class = function () {
 			//Actually ADD the item!
 			parent.children.splice(index, 0, item);
 			parent.children_order.splice(index, 0, item.id);
+			vm.addingNewUnder = item.id;
 			if (addNextItemAs == 'stop') {
-				vm.addingNewUnder = null;
 				Vue.nextTick(function () {
 					return vm.scrollToItemIfNeeded(item.id);
 				});
@@ -38599,6 +38599,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 			new __WEBPACK_IMPORTED_MODULE_5_clipboard___default.a(copyElPath_Journal, {
 				text: function text(trigger) {
 					console.log(trigger);
+					console.log(self);
 					var allChildren = self.allVisibleChildItems.reduce(function (all, val) {
 						var pb = !all.includes('\u3010' + val.parents_bodies + '\u3011') ? '\n\u3010' + val.parents_bodies + '\u3011' : '';
 						return '' + all + pb + '\n\u30FB' + val.body;
@@ -38665,7 +38666,10 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 		},
 		preparedPlusComputedTags: function preparedPlusComputedTags() {
 			if (!this.item || !allItems) {
-				return 0;
+				return [];
+			}
+			if (this.item.id == allItems.root.id) {
+				return [];
 			}
 			var alltags = this.newItem.preparedTags;
 			if (selection.tags.length) {

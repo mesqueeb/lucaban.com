@@ -554,6 +554,7 @@ ${spaces}・${val.body}`;
 			new Clipboard(copyElPath_Journal, {
 			    text: function(trigger) {
 			    	console.log(trigger);
+			    	console.log(self);
 			        let allChildren = self.allVisibleChildItems.reduce(function(all, val){
 			        	let pb = (!all.includes(`【${val.parents_bodies}】`)) ? `
 【${val.parents_bodies}】` :`` ;
@@ -608,7 +609,8 @@ return `${all}${pb}
 			return visibleChildren;
 		},
 		preparedPlusComputedTags()
-		{ if(!this.item || !allItems){ return 0; }
+		{ if(!this.item || !allItems){ return []; }
+			if(this.item.id == allItems.root.id){ return []; }
 			let alltags = this.newItem.preparedTags;
 			if (selection.tags.length)
 			{

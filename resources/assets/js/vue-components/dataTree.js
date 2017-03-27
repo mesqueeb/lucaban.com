@@ -174,9 +174,9 @@ addTempNewItem(item, index, addNextItemAs, addTags)
 	//Actually ADD the item!
 	parent.children.splice(index, 0, item);
 	parent.children_order.splice(index, 0, item.id);
+	vm.addingNewUnder = item.id;
     if (addNextItemAs == 'stop')
     {
-    	vm.addingNewUnder = null;
     	Vue.nextTick(()=> vm.scrollToItemIfNeeded(item.id));
 	}
 }
