@@ -365,7 +365,7 @@ export default {
 			Object.keys(dates).forEach(function(dd){
 				let journalItem = {
 					'done_date':moment(dd).format('YYYY-MM-DD'),
-					'children':dates[dd],
+					'children':sortObjectArrayByProperty(dates[dd], 'parents_bodies'),
 					'depth':0,
 					'journalDate':true,
 				};

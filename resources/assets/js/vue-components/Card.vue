@@ -23,7 +23,7 @@
 		<button
 			class="copy-contents-button btn btn-dipclick copy-contents-button-journal"
 			:id="'journal-card-'+item.done_date+'-copy'"
-			v-if="!basis.mobile"
+			v-if="true || !basis.mobile"
 		>
 			{{ basis.text.card.copy }}
 		</button>
@@ -343,7 +343,7 @@
 					{{ basis.text.card.edit }}
 				</button>
 				<button
-					v-if="basis.mobile"
+					v-if="basis.mobile && basis.selection.view != 'journal'"
 					class="setToday"
 					@click="setToday(item.id)"
 				>
@@ -555,8 +555,9 @@ ${spaces}・${val.body}`;
 			    text: function(trigger) {
 			    	console.log(trigger);
 			        let allChildren = self.allVisibleChildItems.reduce(function(all, val){
-return `${all}
-【${val.parents_bodies}】
+			        	let pb = (!all.includes(`【${val.parents_bodies}】`)) ? `
+【${val.parents_bodies}】` :`` ;
+return `${all}${pb}
 ・${val.body}`;
 }, `${self.journalDate}
 ==========`);

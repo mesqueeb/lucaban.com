@@ -38600,7 +38600,8 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 				text: function text(trigger) {
 					console.log(trigger);
 					var allChildren = self.allVisibleChildItems.reduce(function (all, val) {
-						return all + '\n\u3010' + val.parents_bodies + '\u3011\n\u30FB' + val.body;
+						var pb = !all.includes('\u3010' + val.parents_bodies + '\u3011') ? '\n\u3010' + val.parents_bodies + '\u3011' : '';
+						return '' + all + pb + '\n\u30FB' + val.body;
 					}, self.journalDate + '\n==========');
 					return allChildren;
 				}
@@ -40681,7 +40682,7 @@ window.selection = new __WEBPACK_IMPORTED_MODULE_5__vue_components_Selection_js_
 			Object.keys(dates).forEach(function (dd) {
 				var journalItem = {
 					'done_date': moment(dd).format('YYYY-MM-DD'),
-					'children': dates[dd],
+					'children': __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_4__components_globalFunctions_js__["e" /* sortObjectArrayByProperty */])(dates[dd], 'parents_bodies'),
 					'depth': 0,
 					'journalDate': true
 				};
@@ -46749,7 +46750,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     staticClass: "title"
   }, [_c('span', [_vm._v(_vm._s(_vm.momentCalendar(_vm.journalDate)))]), _vm._v(" "), (_vm.journalDate != _vm.momentCalendar(_vm.journalDate)) ? _c('span', {
     staticClass: "journal-date-small"
-  }, [_vm._v("\n\t\t\t" + _vm._s(_vm.journalDate) + "\n\t\t")]) : _vm._e(), _vm._v(" "), (!_vm.basis.mobile) ? _c('button', {
+  }, [_vm._v("\n\t\t\t" + _vm._s(_vm.journalDate) + "\n\t\t")]) : _vm._e(), _vm._v(" "), ( true) ? _c('button', {
     staticClass: "copy-contents-button btn btn-dipclick copy-contents-button-journal",
     attrs: {
       "id": 'journal-card-' + _vm.item.done_date + '-copy'
@@ -47274,7 +47275,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
         _vm.startEdit(_vm.item)
       }
     }
-  }, [_vm._v("\n\t\t\t\t\t" + _vm._s(_vm.basis.text.card.edit) + "\n\t\t\t\t")]) : _vm._e(), _vm._v(" "), (_vm.basis.mobile) ? _c('button', {
+  }, [_vm._v("\n\t\t\t\t\t" + _vm._s(_vm.basis.text.card.edit) + "\n\t\t\t\t")]) : _vm._e(), _vm._v(" "), (_vm.basis.mobile && _vm.basis.selection.view != 'journal') ? _c('button', {
     staticClass: "setToday",
     on: {
       "click": function($event) {
