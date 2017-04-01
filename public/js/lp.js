@@ -63,7 +63,7 @@
 /******/ 	__webpack_require__.p = "./";
 
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 207);
+/******/ 	return __webpack_require__(__webpack_require__.s = 215);
 /******/ })
 /************************************************************************/
 /******/ ({
@@ -75,7 +75,7 @@
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_jquery__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_jquery___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_jquery__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_marked__ = __webpack_require__(191);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_marked__ = __webpack_require__(194);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_marked___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_marked__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_vue__ = __webpack_require__(7);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_vue___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_vue__);
@@ -280,7 +280,7 @@ window.vm = new __WEBPACK_IMPORTED_MODULE_2_vue___default.a(VueLpMaster);
 
 /***/ }),
 
-/***/ 191:
+/***/ 194:
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(global) {/**
@@ -11802,7 +11802,7 @@ return jQuery;
 
 /***/ }),
 
-/***/ 207:
+/***/ 215:
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = __webpack_require__(139);
@@ -12030,7 +12030,7 @@ module.exports = g;
 
 "use strict";
 /* WEBPACK VAR INJECTION */(function($) {/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "d", function() { return mobilecheck; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "e", function() { return objectToArray; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "f", function() { return objectToArray; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "h", function() { return uniqBy; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "l", function() { return uniq; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "j", function() { return arrayToString; });
@@ -12038,8 +12038,8 @@ module.exports = g;
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "c", function() { return hasClass; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return btnEffect; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return isElementInViewport; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "g", function() { return sortObjectArrayByProperty; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "f", function() { return sortObjectArrayByTwoProperties; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "e", function() { return sortObjectArrayByProperty; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "g", function() { return sortObjectArrayByTwoProperties; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "k", function() { return removeEmptyValuesFromArray; });
 function mobilecheck() {
 	var check = false;
@@ -12063,37 +12063,6 @@ function objectToArray(obj) {
 	return Object.keys(obj).map(function (key) {
 		return obj[key];
 	});
-}
-
-function sec_to_hourmin(val) {
-	function pad(num, unit) {
-		if (num > 0) {
-			return num + " " + unit;
-		}return '';
-	}
-	var seconds = val % 60;
-	var minutes = Math.floor(val / 60);
-	var hours = Math.floor(minutes / 60);
-	minutes = minutes % 60;
-	if (hours > 0) {
-		return pad(hours, 'hour ') + pad(minutes, 'min');
-	} else {
-		return pad(minutes, 'min');
-	}
-}
-function min_to_hourmin(val) {
-	function pad(num, unit) {
-		if (num > 0) {
-			return num + " " + unit;
-		}return '';
-	}
-	var minutes = val % 60;
-	var hours = Math.floor(val / 60);
-	if (hours > 0) {
-		return pad(hours, 'hour ') + pad(minutes, 'min');
-	} else {
-		return pad(minutes, 'min');
-	}
 }
 
 function hasClass(element, cls) {

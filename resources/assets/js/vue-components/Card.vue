@@ -12,7 +12,7 @@
 	v-if="!isHidden || listIsEmpty"
 >
 	<div
-		class="title"
+		class="title flex-wrap"
 		v-if="journalDate && item.journalDate"
 	>
 		<!-- Codementor: Is this the correct way to format something like this? -->
@@ -27,6 +27,9 @@
 		>
 			{{ basis.text.card.copy }}
 		</button>
+		<div class="fullWidth used-time" v-if="totalUsedMin">
+			{{ basis.text.menu.usedTime }}: <span class="pill-small">{{ sec_to_hourmin(totalUsedSec) }}</span>
+		</div>
 	</div>
 		<!-- v-if="journalView && item.depth != 0 && item.parents_bodies" -->
 	<div
@@ -516,7 +519,7 @@
 <script>
 // import Morph from '../components/valueMorphers.js'
 // window.Morph = new Morph();
-import { linkify, momentCalendar, sec_to_hourminsec } from '../components/valueMorphers2.js';
+import { linkify, momentCalendar, sec_to_hourminsec, sec_to_hourmin } from '../components/valueMorphers2.js';
 import flatPickConfig from '../components/flatPickrOptions.js';
 import autosize from 'autosize';
 import autosizeInput from 'autosize-input';
@@ -555,13 +558,16 @@ ${spaces}・${val.body}`;
 			    text: function(trigger) {
 			    	console.log(trigger);
 			    	console.log(self);
+			    	let usedT = (self.totalUsedMin) ? `
+${self.basis.text.menu.usedTime}: ${self.sec_to_hourmin(self.totalUsedSec)}` : '';
+			    	let journalDateTxt = `${self.journalDate}
+==========${usedT}` ;
 			        let allChildren = self.allVisibleChildItems.reduce(function(all, val){
 			        	let pb = (!all.includes(`【${val.parents_bodies}】`)) ? `
 【${val.parents_bodies}】` :`` ;
 return `${all}${pb}
 ・${val.body}`;
-}, `${self.journalDate}
-==========`);
+}, journalDateTxt);
 			        return allChildren;
 			    }
 			}).on('success', function(e) {
@@ -710,6 +716,9 @@ return `${all}${pb}
 				let prevParentString = allItems.nodes[prevId].parents_bodies;
 
 				let prevDoneDate = allItems.nodes[prevId].done_date;
+				// console.log('moment dates');
+				// console.log(prevDoneDate);
+				// console.log(this.item.done_date);
 				prevDoneDate = moment(prevDoneDate).format('YYYY/MM/DD');
 				let thisDoneDate = moment(this.item.done_date).format('YYYY/MM/DD');
 
@@ -725,7 +734,7 @@ return `${all}${pb}
 		},
 		totalUsedMin()
 		{ if(!this.item || !allItems){ return 0; }
-			return this.totalUsedSec/60;
+			return Math.floor(this.totalUsedSec/60);
 		},
 		totalPlannedSec()
 		{ if(!this.item || !allItems){ return 0; }
@@ -869,6 +878,7 @@ return `${all}${pb}
 		linkify,
 		momentCalendar,
 		sec_to_hourminsec,
+		sec_to_hourmin,
 		convertbodyURLtoHTML()
 		{
 			// console.log('converting');

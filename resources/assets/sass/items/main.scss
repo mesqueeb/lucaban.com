@@ -39,12 +39,6 @@ label{
     font-weight: 300;
     margin: 0;
 }
-.flex{
-    display: flex;
-}
-.flex-wrap{
-    flex-wrap: wrap;
-}
 .languagePicker{
     width: 100%;
     text-align: end;
@@ -261,16 +255,16 @@ label{
         font-size: 0.9em;
     }
     .used-time{
-        background: $used-time-color;
+        background-color: $used-time-color;
     }
     .time-left{
-        background: $duration-color-dark;
+        background-color: $duration-color-dark;
     }
     .children-amount{
-        background: $theme-color;
+        background-color: $theme-color;
     }
     .done-children-amount{
-        background: $done-color;
+        background-color: $done-color;
     }
 }
 .scrolled-down .stats{

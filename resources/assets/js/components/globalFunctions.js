@@ -20,37 +20,6 @@ function objectToArray(obj) {
 	return Object.keys(obj).map(function (key) { return obj[key]; });
 }
 
-function sec_to_hourmin(val){
-	function pad(num, unit){
-	    if (num>0){
-	    	return num+" "+unit;
-	    } return '';
-	}
-	let seconds = val%60;
-	let minutes = Math.floor(val/60);
-	let hours = Math.floor(minutes/60);
-	minutes = minutes%60;
-	if (hours>0){
-		return pad(hours,'hour ')+pad(minutes, 'min');
-	} else {
-		return pad(minutes,'min');
-	}
-}
-function min_to_hourmin(val){
-	function pad(num, unit){
-	    if (num>0){
-	    	return num+" "+unit;
-	    } return '';
-	}
-	let minutes = val%60;
-	let hours = Math.floor(val/60)
-	if (hours>0){
-		return pad(hours,'hour ')+pad(minutes, 'min');
-	} else {
-		return pad(minutes,'min');
-	}
-}
-
 function hasClass(element, cls) {
     return (' ' + element.className + ' ').indexOf(' ' + cls + ' ') > -1;
 }

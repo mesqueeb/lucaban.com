@@ -3,10 +3,12 @@ window.langContentsItems = {
 	{
 		'global'://
 		{
+			'sec':'sec',
 			'min':'min',
 			'hour':'hour',
 			'm':'m',
 			'h':'h',
+			's':'s',
 			'cancel':'Cancel',
 			'delete':'Delete',
 			'save':'Save',
@@ -86,10 +88,12 @@ window.langContentsItems = {
 	{
 		'global'://
 		{
+			'sec':'秒',
 			'min':'分',
 			'hour':'時',
 			'm':'分',
 			'h':'時',
+			's':'秒',
 			'cancel':'キャンセル',
 			'delete':'削除',
 			'save':'保存',
@@ -168,12 +172,12 @@ window.langContentsItems = {
 
 };
 
-
+import { sec_to_hourmin } from '../components/valueMorphers2.js';
 import Flashes from '../vue-components/Flashes.vue';
 import Card from '../vue-components/Card.vue';
 import Popups from '../vue-components/Popups.vue';
 import Popouts from '../vue-components/Popouts.vue';
-import { hasClass, mobilecheck, isElementInViewport, objectToArray, uniqBy, uniq, arrayToString, sec_to_hourmin, sortObjectArrayByProperty, sortObjectArrayByTwoProperties, removeEmptyValuesFromArray } from '../components/globalFunctions.js';
+import { hasClass, mobilecheck, isElementInViewport, objectToArray, uniqBy, uniq, arrayToString, sortObjectArrayByProperty, sortObjectArrayByTwoProperties, removeEmptyValuesFromArray } from '../components/globalFunctions.js';
 import Selection from '../vue-components/Selection.js';
 import Tree from '../vue-components/dataTree.js';
 
@@ -372,11 +376,7 @@ export default {
 				journalItem = allItems.setDefaultItemValues(journalItem);
 				datesArray.push(journalItem);
 			});
-			// if (selection.view == 'journal')
-			// {
 			datesArray = sortObjectArrayByProperty(datesArray, 'done_date', 'desc');
-			// ar = sortObjectArrayByTwoProperties(ar,'done_date','parents_bodies','desc','asc');
-			// }
 			return datesArray;
 		},
 		journalDates()
@@ -417,10 +417,6 @@ export default {
 			console.log(`update filteredItemsTree (nodes length: ${objectToArray(this.nodes).length})`);
 			//Go through ALL ITEMS and return those that have the tag AND no parent with the tag.
 			let children = objectToArray(this.nodes).filter(function(item){
-				// if(item.body.includes('1252')){
-					// console.log(`(${item.id}) ${item.body}...`);
-				// }
-				// console.log(`${item.body}`);
 				let target;
 				let hasParentWithTag;
 				let targetToday;
@@ -428,7 +424,6 @@ export default {
 				if (this.selection.noFilterOrTag())
 				{
 					topLvlItem = (item.depth == 1) ? true : false;
-					// console.log(`topLvlItem = ${topLvlItem} for ${item.body}`);
 					if (topLvlItem){ return true; } else { return false; }
 				}
 
@@ -447,26 +442,12 @@ export default {
 
 				if ( selection.filter.includes('today') )
 				{
-					// if(item.body.includes('1252')){
-						// console.log(`#2 (${item.id}) ${item.body}...`);
-					// }
 					let doneDateDiff = moment(item.done_date).diff(moment(), 'days');
-					if (doneDateDiff >= 1) { return false; }
+					if (item.done && doneDateDiff <= -1) { return false; }
 					let hasParentDueToday = allItems.hasParentDueToday(item.id);
 					let isDue = allItems.isDueToday(item.id);
-					// console.log(`(${item.id}) ${item.body}:
-					// 	( selection.tags.length = ${(selection.tags.length)}
-					// 	&& 	target = ${(target)}
-					// 	&& 	(isDue = ${(isDue)}
-					// 		|| hasParentDueToday = ${(hasParentDueToday)}
-					// 		)
-					// 	&& 	!(hasParentWithTag = ${(hasParentWithTag)}
-					// 		&& hasParentDueToday = ${(hasParentDueToday)}
-					// 		)
-					// 	)`);
 					if(!selection.tags.length && isDue)
 					{
-						// console.log(`${item.body}: (!selection.tags.length && isDue) = true`);
 						return true;
 					}
 					else if ( 	selection.tags.length
@@ -477,9 +458,6 @@ export default {
 						return true;
 					}
 				}
-				// if(item.body.includes('1252')){
-					// console.log(`#3 (${item.id}) ${item.body}...`);
-				// }
 				return false;
 			}.bind(this));
 			// Sort on root children_order when no filter:
@@ -1350,8 +1328,8 @@ export default {
 				if(type=='timer'){
 					this.popouts.timer.push(item);
 					Vue.nextTick(function () {
-						eventHub.$emit('playTimer', item);
 						console.log('emitted playTimer');
+						eventHub.$emit('playTimer');
 					});
 				}
 				if(type=='confirm-delete'){

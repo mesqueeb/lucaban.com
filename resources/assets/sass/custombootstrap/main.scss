@@ -1,0 +1,20 @@
+[class|="pill"] {
+	padding: 0.2rem 0.5rem;
+    border-radius: 0.3rem;
+    color: white;
+    font-size: 0.9rem;
+    background-color: black;
+    background-color: $used-time-color;
+}
+[class*="-small"] {
+	font-size: 0.7rem;
+}
+[class|="flex"]{
+    display: flex;
+}
+[class*="-wrap"]{
+    flex-wrap: wrap;
+}
+.fullWidth{
+    width: 100%;
+}

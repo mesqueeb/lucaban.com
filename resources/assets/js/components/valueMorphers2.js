@@ -61,11 +61,11 @@ function sec_to_hourminsec(val)
 	let hours = Math.floor(minutes/60)
 	minutes = minutes%60;
 	if (hours>0){
-		return pad(hours,'hour ')+pad(minutes, 'min');
+		return pad(hours,vm.text.global.hour+' ')+pad(minutes, vm.text.global.min);
 	} else if (minutes>0) {
-		return pad(minutes,'min ')+pad(secs,'sec');
+		return pad(minutes,vm.text.global.min+' ')+pad(secs,vm.text.global.sec);
 	} else {
-		return pad(secs,'sec');
+		return pad(secs,vm.text.global.sec);
 	}
 }
 function hourmin(val)
@@ -78,9 +78,9 @@ function hourmin(val)
 	let minutes = val%60;
 	let hours = Math.floor(val/60)
 	if (hours>0){
-		return pad(hours,'hour ')+pad(minutes, 'min');
+		return pad(hours,vm.text.global.hour+' ')+pad(minutes, vm.text.global.min);
 	} else {
-		return pad(minutes,'min')
+		return pad(minutes,vm.text.global.min)
 	}
 }
 function sec_to_hourmin(val)
@@ -96,9 +96,9 @@ function sec_to_hourmin(val)
 	let hours = Math.floor(minutes/60)
 	minutes = minutes%60;
 	if (hours>0){
-		return pad(hours,'hour ')+pad(minutes, 'min');
+		return pad(hours,vm.text.global.hour+' ')+pad(minutes, vm.text.global.min);
 	} else {
-		return pad(minutes,'min')
+		return pad(minutes,vm.text.global.min)
 	}
 }
 function momentRelative(val)
