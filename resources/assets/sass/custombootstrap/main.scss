@@ -1,4 +1,4 @@
-[class|="pill"] {
+[class*="pill"] {
 	padding: 0.2rem 0.5rem;
     border-radius: 0.3rem;
     color: white;
@@ -9,7 +9,7 @@
 [class*="-small"] {
 	font-size: 0.7rem;
 }
-[class|="flex"]{
+[class*="flex"]{
     display: flex;
 }
 [class*="-wrap"]{

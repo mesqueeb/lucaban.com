@@ -4,7 +4,7 @@
 <div class="container">
     <div class="row">
         <div class="col-md-8 col-md-offset-2">
-            Don't have an account yet?<a class="btn btn-link" href="{{ url('/register') }}">Click here to register</a>
+            @lang('auth.loginpage.donthaveacc')<a class="btn btn-link" href="{{ url('/register') }}">Click here to register</a>
         </div>
     </div>
     <div class="row">

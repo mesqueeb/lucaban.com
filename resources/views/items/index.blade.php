@@ -6,6 +6,8 @@
 	<meta charset="UTF-8">
 	<meta name="csrf-token" id="csrf-token" content="{{ csrf_token() }}">
 	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no">
+	<meta name="google" value="notranslate">
+	
 	<link rel="stylesheet" href="/css/items.css">
 	{{-- <link rel="stylesheet" href="/css/fonts/material-design-iconic-font.min.css"> --}}
 
