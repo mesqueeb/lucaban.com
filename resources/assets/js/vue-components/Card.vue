@@ -12,7 +12,7 @@
 	v-if="!isHidden || listIsEmpty"
 >
 	<div
-		class="title flex-wrap"
+		class="title flex--wrap"
 		v-if="journalDate && item.journalDate"
 	>
 		<!-- Codementor: Is this the correct way to format something like this? -->
@@ -411,7 +411,7 @@
 		@submit.prevent
 		@click="clickOnAddNewCurtain($event)"
 	>
-		<div class="flex flex-wrap">
+		<div class="flex flex--wrap">
 			<div class="languagePicker" v-if="listIsEmpty && basis.mobile">
 				<a href="#"
 					@click="basis.setLanguage = 'ja'"

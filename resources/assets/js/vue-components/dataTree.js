@@ -156,7 +156,7 @@ addItem(item, index, addNextItemAs, addTags, duplication)
     {
     	vm.addingNewUnder = null;
     	Vue.nextTick(()=> vm.scrollToItemIfNeeded(item.id));
-    } else {
+    } else if(vm.addingNewUnder == 'x') {
 	    vm.showAddNewItem(item.id, addNextItemAs);
     }
 }

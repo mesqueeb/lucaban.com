@@ -24514,60 +24514,6 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
 
 /***/ }),
 /* 9 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-exports.__esModule = true;
-exports.inherits = inherits;
-function inherits(parent, child) {
-	var props = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
-
-	var extended = Object.create(parent.prototype);
-	for (var p in props) {
-		extended[p] = props[p];
-	}
-	extended.constructor = child;
-	child.prototype = extended;
-	return child;
-}
-
-/***/ }),
-/* 10 */,
-/* 11 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-
-/* harmony default export */ __webpack_exports__["a"] = {
-	dateFormat: 'Y-m-d H:i:S',
-	maxDate: 'today',
-	// enableTime: true,
-	time_24hr: true,
-	onOpen: function onOpen(dateObj, dateStr, instance) {
-		// console.log(instance);
-		var id = instance.element.name;
-		if (!vm.$root.beforeEditCache_doneDate) {
-			vm.$root.beforeEditCache_doneDate = {};
-		}
-		console.log('flatPickr[onOpen] id: ' + id + '.    dateStr: ' + dateStr);
-		vm.$root.beforeEditCache_doneDate[id] = dateStr;
-	},
-	onClose: function onClose(dateObj, dateStr, instance) {
-		var id = instance.element.name;
-		console.log('flatPickr[onClose] id: ' + id + '.    dateStr: ' + dateStr);
-		console.log('vm.$root.beforeEditCache_doneDate[id] = ' + vm.$root.beforeEditCache_doneDate[id]);
-		if (vm.$root.beforeEditCache_doneDate[id] == dateStr) {
-			return;
-		}
-		vm.patch(id, 'done_date', dateStr);
-		delete vm.$root.beforeEditCache_doneDate[id];
-	}
-};
-
-/***/ }),
-/* 12 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -24715,6 +24661,60 @@ function linkify(val) {
 
 
 /***/ }),
+/* 10 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+exports.__esModule = true;
+exports.inherits = inherits;
+function inherits(parent, child) {
+	var props = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+
+	var extended = Object.create(parent.prototype);
+	for (var p in props) {
+		extended[p] = props[p];
+	}
+	extended.constructor = child;
+	child.prototype = extended;
+	return child;
+}
+
+/***/ }),
+/* 11 */,
+/* 12 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+
+/* harmony default export */ __webpack_exports__["a"] = {
+	dateFormat: 'Y-m-d H:i:S',
+	maxDate: 'today',
+	// enableTime: true,
+	time_24hr: true,
+	onOpen: function onOpen(dateObj, dateStr, instance) {
+		// console.log(instance);
+		var id = instance.element.name;
+		if (!vm.$root.beforeEditCache_doneDate) {
+			vm.$root.beforeEditCache_doneDate = {};
+		}
+		console.log('flatPickr[onOpen] id: ' + id + '.    dateStr: ' + dateStr);
+		vm.$root.beforeEditCache_doneDate[id] = dateStr;
+	},
+	onClose: function onClose(dateObj, dateStr, instance) {
+		var id = instance.element.name;
+		console.log('flatPickr[onClose] id: ' + id + '.    dateStr: ' + dateStr);
+		console.log('vm.$root.beforeEditCache_doneDate[id] = ' + vm.$root.beforeEditCache_doneDate[id]);
+		if (vm.$root.beforeEditCache_doneDate[id] == dateStr) {
+			return;
+		}
+		vm.patch(id, 'done_date', dateStr);
+		delete vm.$root.beforeEditCache_doneDate[id];
+	}
+};
+
+/***/ }),
 /* 13 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -24726,7 +24726,7 @@ exports.AMPERSAND = exports.CLOSEPAREN = exports.CLOSEANGLEBRACKET = exports.CLO
 
 var _createTokenClass = __webpack_require__(24);
 
-var _class = __webpack_require__(9);
+var _class = __webpack_require__(10);
 
 /******************************************************************************
 	Text Tokens
@@ -25266,7 +25266,7 @@ var _class = function () {
 				Vue.nextTick(function () {
 					return vm.scrollToItemIfNeeded(item.id);
 				});
-			} else {
+			} else if (vm.addingNewUnder == 'x') {
 				vm.showAddNewItem(item.id, addNextItemAs);
 			}
 		}
@@ -26460,7 +26460,7 @@ var _class = function () {
 exports.__esModule = true;
 exports.tokenize = exports.test = exports.scanner = exports.parser = exports.options = exports.inherits = exports.find = undefined;
 
-var _class = __webpack_require__(9);
+var _class = __webpack_require__(10);
 
 var _options = __webpack_require__(188);
 
@@ -26551,7 +26551,7 @@ exports.tokenize = tokenize;
 exports.__esModule = true;
 exports.stateify = exports.TokenState = exports.CharacterState = undefined;
 
-var _class = __webpack_require__(9);
+var _class = __webpack_require__(10);
 
 function createStateClass() {
 	return function (tClass) {
@@ -37827,7 +37827,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_7_moment___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_7_moment__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_8_flatpickr__ = __webpack_require__(178);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_8_flatpickr___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_8_flatpickr__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__components_flatPickrOptions_js__ = __webpack_require__(11);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__components_flatPickrOptions_js__ = __webpack_require__(12);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_10_vue__ = __webpack_require__(7);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_10_vue___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_10_vue__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_11_vue_resource__ = __webpack_require__(208);
@@ -38006,8 +38006,8 @@ __WEBPACK_IMPORTED_MODULE_0_jquery___default.a.getJSON('/api/items', function (f
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__components_valueMorphers2_js__ = __webpack_require__(12);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__components_flatPickrOptions_js__ = __webpack_require__(11);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__components_valueMorphers2_js__ = __webpack_require__(9);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__components_flatPickrOptions_js__ = __webpack_require__(12);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_autosize__ = __webpack_require__(8);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_autosize___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_autosize__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_autosize_input__ = __webpack_require__(15);
@@ -39563,7 +39563,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__components_valueMorphers2_js__ = __webpack_require__(12);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__components_valueMorphers2_js__ = __webpack_require__(9);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_autosize__ = __webpack_require__(8);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_autosize___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_autosize__);
 //
@@ -39961,10 +39961,10 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__components_valueMorphers2_js__ = __webpack_require__(12);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__components_valueMorphers2_js__ = __webpack_require__(9);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_autosize__ = __webpack_require__(8);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_autosize___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_autosize__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__components_flatPickrOptions_js__ = __webpack_require__(11);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__components_flatPickrOptions_js__ = __webpack_require__(12);
 //
 //
 //
@@ -40434,7 +40434,7 @@ var _class = function () {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__components_valueMorphers2_js__ = __webpack_require__(12);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__components_valueMorphers2_js__ = __webpack_require__(9);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__vue_components_Flashes_vue__ = __webpack_require__(200);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__vue_components_Flashes_vue___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1__vue_components_Flashes_vue__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__vue_components_Card_vue__ = __webpack_require__(199);
@@ -45774,7 +45774,7 @@ exports.URL = exports.TEXT = exports.NL = exports.EMAIL = exports.MAILTOEMAIL = 
 
 var _createTokenClass = __webpack_require__(24);
 
-var _class = __webpack_require__(9);
+var _class = __webpack_require__(10);
 
 var _text = __webpack_require__(13);
 
@@ -46972,7 +46972,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
   }, [(!_vm.isHidden || _vm.listIsEmpty) ? _c('div', {
     staticClass: "item-card-wrapper"
   }, [(_vm.journalDate && _vm.item.journalDate) ? _c('div', {
-    staticClass: "title flex-wrap"
+    staticClass: "title flex--wrap"
   }, [_c('span', [_vm._v(_vm._s(_vm.momentCalendar(_vm.journalDate)))]), _vm._v(" "), (_vm.journalDate != _vm.momentCalendar(_vm.journalDate)) ? _c('span', {
     staticClass: "journal-date-small"
   }, [_vm._v("\n\t\t\t" + _vm._s(_vm.journalDate) + "\n\t\t")]) : _vm._e(), _vm._v(" "), ( true) ? _c('button', {
@@ -47575,7 +47575,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
       }
     }
   }, [_c('div', {
-    staticClass: "flex flex-wrap"
+    staticClass: "flex flex--wrap"
   }, [(_vm.listIsEmpty && _vm.basis.mobile) ? _c('div', {
     staticClass: "languagePicker"
   }, [(_vm.basis.language != 'ja') ? _c('a', {

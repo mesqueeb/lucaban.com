@@ -375,7 +375,7 @@ module.exports = {
 
 /***/ }),
 
-/***/ 10:
+/***/ 11:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -548,7 +548,7 @@ module.exports = __webpack_require__(144);
 var utils = __webpack_require__(1);
 var bind = __webpack_require__(20);
 var Axios = __webpack_require__(146);
-var defaults = __webpack_require__(10);
+var defaults = __webpack_require__(11);
 
 /**
  * Create an instance of Axios
@@ -670,7 +670,7 @@ module.exports = CancelToken;
 "use strict";
 
 
-var defaults = __webpack_require__(10);
+var defaults = __webpack_require__(11);
 var utils = __webpack_require__(1);
 var InterceptorManager = __webpack_require__(147);
 var dispatchRequest = __webpack_require__(148);
@@ -826,7 +826,7 @@ module.exports = InterceptorManager;
 var utils = __webpack_require__(1);
 var transformData = __webpack_require__(151);
 var isCancel = __webpack_require__(18);
-var defaults = __webpack_require__(10);
+var defaults = __webpack_require__(11);
 
 /**
  * Throws a `Cancel` if cancellation has been requested.

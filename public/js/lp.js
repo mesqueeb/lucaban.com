@@ -12032,15 +12032,15 @@ module.exports = g;
 /* WEBPACK VAR INJECTION */(function($) {/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "d", function() { return mobilecheck; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "f", function() { return objectToArray; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "h", function() { return uniqBy; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "l", function() { return uniq; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "j", function() { return arrayToString; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "i", function() { return sec_to_hourmin; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "k", function() { return uniq; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "i", function() { return arrayToString; });
+/* unused harmony export sec_to_hourmin */
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "c", function() { return hasClass; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return btnEffect; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return isElementInViewport; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "e", function() { return sortObjectArrayByProperty; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "g", function() { return sortObjectArrayByTwoProperties; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "k", function() { return removeEmptyValuesFromArray; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "j", function() { return removeEmptyValuesFromArray; });
 function mobilecheck() {
 	var check = false;
 	(function (a) {
