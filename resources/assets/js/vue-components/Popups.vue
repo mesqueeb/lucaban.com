@@ -42,32 +42,32 @@
               </div>
               <div class="buttons">
                 <div>
-                  <button class="forward"
+                  <button class="o-btn forward"
                     @click="incrementUsedTime(popup.item, 60)"
                     @keydown="keydownInPopup(popup, $event, 'forward')"
                   >+1 {{ basis.text.global.min }}</button>
-                  <button class="forward"
+                  <button class="o-btn forward"
                     @click="incrementUsedTime(popup.item, 300)"
                     @keydown="keydownInPopup(popup, $event, 'forward')"
                   >+5 {{ basis.text.global.min }}</button>
-                  <button class="forward"
+                  <button class="o-btn forward"
                     @click="incrementUsedTime(popup.item, 600)"
                     @keydown="keydownInPopup(popup, $event, 'forward')"
                   >+10 {{ basis.text.global.min }}</button>
                 </div><div>
-                  <button class="forward"
+                  <button class="o-btn forward"
                     @click="incrementUsedTime(popup.item, 1800)"
                     @keydown="keydownInPopup(popup, $event, 'forward')"
                   >+30 {{ basis.text.global.min }}</button>
-                  <!-- <button class="forward"
+                  <!-- <button class="o-btn forward"
                     @click="incrementUsedTime(popup.item, 3600)"
                     @keydown="keydownInPopup(popup, $event, 'forward')"
                   >+1 hour</button> -->
-                  <button class="reset"
+                  <button class="o-btn reset"
                     @click="resetUsedTime(popup.item)"
                     @keydown="keydownInPopup(popup, $event, 'reset')"
                   >{{ basis.text.popups.reset }}</button>
-                  <button class="undo-completion"
+                  <button class="o-btn undo-completion"
                     @click="setNotDone(popup)"
                     @keydown="keydownInPopup(popup, $event, 'setNotDone')"
                   >{{ basis.text.popups.setNotDone }}</button>
@@ -78,7 +78,7 @@
         <button
           @click="removePopup(popup)"
           @keydown="keydownInPopup(popup, $event, 'closeButton')"
-          class="close-button"
+          class="o-btn close-button"
           aria-label="Close alert"
           type="button"
         >

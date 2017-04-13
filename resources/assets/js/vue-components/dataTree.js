@@ -660,7 +660,7 @@ isProject(id)
 deleteItem(id)
 {
 	let item = this.nodes[id];
-	let newSelectedId = (this.nextItemId(id)) ? this.nextItemId(id) : null;
+	let previousItemId = (this.prevItemId(id)) ? this.prevItemId(id) : null;
 	// Delete all children as well!
 	if (Array.isArray(item.children) && item.children.length)
 	{
@@ -690,6 +690,7 @@ deleteItem(id)
 		selection.filter = selection.filter.filter(f => f != 'today');
 		selection.filter.push('today');
 	}
+	let newSelectedId = (this.nextItemId(previousItemId)) ? this.nextItemId(previousItemId) : null;
 	console.log(`new selected ID is: ${newSelectedId}`);
     selection.selectedId = newSelectedId;
 	delete this.nodes[id];

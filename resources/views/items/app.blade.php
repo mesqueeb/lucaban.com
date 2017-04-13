@@ -7,7 +7,7 @@
 <div class="panel-body" v-cloak>
 	{{-- NAV --}}
 	@include('items.navigation')
-	<div class="line"></div>
+	<div class="u-line"></div>
 	@include('items.panelTitle')
 	{{-- STATS --}}
 	@include('items.stats')

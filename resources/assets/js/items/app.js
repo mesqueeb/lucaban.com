@@ -589,6 +589,8 @@ export default {
 				return a.concat(tags);
 			}, []);
 			allTagsArray = uniqBy(allTagsArray);
+			// console.log('allTagsArray in allTagsComputed_2');
+			// console.log(allTagsArray);
 			allTagsArray = sortObjectArrayByProperty(allTagsArray, 'name');
 			let t2_1 = performance.now();
 			console.log("Call to allTagsComputed_2 took " + (t2_1 - t2_0) + " milliseconds.")

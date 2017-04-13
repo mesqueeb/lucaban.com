@@ -1,4 +1,4 @@
-#popouts-mask, .turnofflights {
+.c-popouts-mask, .turnofflights {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -12,6 +12,13 @@
     left: -100px;
     box-sizing: content-box;
     padding: 100px;
+}
+.c-guide__table tr>td:first-child {
+    border-right: thin solid lightgrey;
+}
+.c-guide__table td, th {
+    border-bottom: thin lightgrey solid;
+    padding: 0.2rem 0.3rem;
 }
 .popout {
     box-sizing: border-box;
@@ -76,8 +83,5 @@
     }
     button.play, button.pause {
         font-size: 1.3em;
-    }
-    .btn-warning{
-        color: $duedate-color;
     }
 }

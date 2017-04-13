@@ -21,13 +21,13 @@
 			{{ journalDate }}
 		</span>
 		<button
-			class="copy-contents-button btn btn-dipclick copy-contents-button-journal"
+			class="o-btn copy-contents-button btn btn-dipclick copy-contents-button-journal"
 			:id="'journal-card-'+item.done_date+'-copy'"
 			v-if="true || !basis.mobile"
 		>
 			{{ basis.text.card.copy }}
 		</button>
-		<div class="fullWidth used-time" v-if="totalUsedMin">
+		<div class="l-fullwidth used-time" v-if="totalUsedMin">
 			{{ basis.text.menu.usedTime }}: <span class="pill-small">{{ sec_to_hourmin(totalUsedSec) }}</span>
 		</div>
 	</div>
@@ -95,7 +95,7 @@
 				class="bodybox"
 				v-show="item.id != basis.editingItem || basis.mobile"
 			>
-				<div :class="{'lightgray':item.temp}"
+				<div :class="{'u-lightgray':item.temp}"
 				>{{ linkify(item.body) }}</div>
 				<div class="completion-notes bodybox"
 					v-if="item.completion_memo"
@@ -140,7 +140,7 @@
 					>
 						{{ basis.text.card.duration }}
 						<button
-							:class="{ currentDuration: item.planned_time == 10, 'planned-time': true }"
+							:class="{ currentDuration: item.planned_time == 10, 'planned-time': true, 'o-btn':true }"
 							@click.prevent="setPlannedTime(item, $event)"
 							@keydown="keydownOnEdit(item, $event, 'planned-time')"
 							@blur="blurOnEdit(item)"
@@ -148,21 +148,21 @@
 						>10{{ (basis.mobileSmall) ? basis.text.global.m : basis.text.global.min }}</button>
 						<button
 							v-if="!basis.mobileSmall"
-							:class="{ currentDuration: item.planned_time == 15, 'planned-time': true }"
+							:class="{ currentDuration: item.planned_time == 15, 'planned-time': true, 'o-btn':true }"
 							@click.prevent="setPlannedTime(item, $event)"
 							@keydown="keydownOnEdit(item, $event, 'planned-time')"
 							@blur="blurOnEdit(item)"
 							value="15"
 						>15{{ (basis.mobileSmall) ? basis.text.global.m : basis.text.global.min }}</button>
 						<button
-							:class="{ currentDuration: item.planned_time == 30, 'planned-time': true }"
+							:class="{ currentDuration: item.planned_time == 30, 'planned-time': true, 'o-btn':true }"
 							@click.prevent="setPlannedTime(item, $event)"
 							@keydown="keydownOnEdit(item, $event, 'planned-time')"
 							@blur="blurOnEdit(item)"
 							value="30"
 						>30{{ (basis.mobileSmall) ? basis.text.global.m : basis.text.global.min }}</button>
 						<button
-							:class="{ currentDuration: item.planned_time == 60, 'planned-time': true }"
+							:class="{ currentDuration: item.planned_time == 60, 'planned-time': true, 'o-btn':true }"
 							@click.prevent="setPlannedTime(item, $event)"
 							@keydown="keydownOnEdit(item, $event, 'planned-time')"
 							@blur="blurOnEdit(item)"
@@ -209,7 +209,7 @@
 						>
 							{{ tag.tag_name }}
 							<button
-								class="delete-tag"
+								class="delete-tag o-btn"
 								v-if="
 									(item.id == basis.editingItem
 									|| item.id == basis.editingItemTags)
@@ -221,7 +221,7 @@
 								<i class="zmdi zmdi-close-circle"></i>
 							</button>
 						</span>
-						<button v-if="basis.mobile" class="mobile-edit-save" @click="doneEdit(item)">
+						<button v-if="basis.mobile" class="mobile-edit-save o-btn" @click="doneEdit(item)">
 							{{ basis.text.global.save }}
 						</button>
 					</div>
@@ -308,7 +308,7 @@
 				>
 					{{ tag.tag_name }}
 					<button
-						class="delete-tag"
+						class="delete-tag o-btn"
 						v-if="
 							(item.id == basis.editingItem
 							|| item.id == basis.editingItemTags)
@@ -332,7 +332,7 @@
 					&& basis.selection.selectedId == item.id"
 			>
 				<button
-					class="copy-contents-button btn btn-dipclick"
+					class="o-btn copy-contents-button btn btn-dipclick"
 					:id="'card-'+item.id+'-copy'"
 					v-if="!basis.mobile && basis.selection.view != 'journal'"
 				>
@@ -340,28 +340,28 @@
 				</button>
 				<button
 					v-if="basis.mobile"
-					class="edit"
+					class="o-btn edit"
 					@click="startEdit(item)"
 				>
 					{{ basis.text.card.edit }}
 				</button>
 				<button
 					v-if="basis.mobile && basis.selection.view != 'journal'"
-					class="setToday"
+					class="o-btn setToday"
 					@click="setToday(item.id)"
 				>
 					{{ basis.text.card.setToday }}
 				</button>
 				<button
 					v-if="!item.done"
-					class="timer"
+					class="o-btn timer"
 					@click="addTimer(item)"
 				>
 					<i class="zmdi zmdi-timer"></i>
 				</button>
 				<button
 					v-if="item.done"
-					class="more"
+					class="o-btn more"
 					@click="basis.popup(item.id, 'afterDone')"
 				>
 					<i class="zmdi zmdi-more"></i>
@@ -374,7 +374,7 @@
 				- svg tag -> add as pattern
 				-->
 				<button
-					class="delete" 
+					class="o-btn delete" 
 					v-if="true || item.children_order.length==0"
 					@click="deleteItem(item)"
 				>
@@ -412,12 +412,14 @@
 		@click="clickOnAddNewCurtain($event)"
 	>
 		<div class="flex flex--wrap">
-			<div class="languagePicker" v-if="listIsEmpty && basis.mobile">
+			<div class="c-language-picker l-w100" v-if="listIsEmpty && basis.mobile">
 				<a href="#"
+					class="c-language-picker__a" 
 					@click="basis.setLanguage = 'ja'"
 					v-if="basis.language != 'ja'"
 				>日本語</a>
 				<a href="#"
+					class="c-language-picker__a" 
 					@click="basis.setLanguage = 'en'"
 					v-if="basis.language != 'en'"
 				>English</a>
@@ -438,7 +440,7 @@
 			<div class="update-planned-time">
 				{{ basis.text.card.duration }}
 				<button
-					:class="{ currentDuration: newItem.planned_time == 10, 'planned-time': true }"
+					:class="{ 'o-btn':true, currentDuration: newItem.planned_time == 10, 'planned-time': true }"
 					@click.prevent="setPlannedTimeNewItem(item, $event)"
 					@keydown="keydownOnNew(item, $event, 'planned-time')"
 					@blur="blurOnAddNew(item)"
@@ -446,14 +448,14 @@
 				>10{{ (basis.mobileSmall) ? basis.text.global.m : basis.text.global.min }}</button>
 				<button
 					v-if="!basis.mobileSmall"
-					:class="{ currentDuration: newItem.planned_time == 15, 'planned-time': true }"
+					:class="{ 'o-btn':true, currentDuration: newItem.planned_time == 15, 'planned-time': true }"
 					@click.prevent="setPlannedTimeNewItem(item, $event)"
 					@keydown="keydownOnNew(item, $event, 'planned-time')"
 					@blur="blurOnAddNew(item)"
 					value="15"
 				>15{{ (basis.mobileSmall) ? basis.text.global.m : basis.text.global.min }}</button>
 				<button
-					:class="{ currentDuration: newItem.planned_time == 30, 'planned-time': true }"
+					:class="{ 'o-btn':true, currentDuration: newItem.planned_time == 30, 'planned-time': true }"
 					@click.prevent="setPlannedTimeNewItem(item, $event)"
 
 					@keydown="keydownOnNew(item, $event, 'planned-time')"
@@ -461,7 +463,7 @@
 					value="30"
 				>30{{ (basis.mobileSmall) ? basis.text.global.m : basis.text.global.min }}</button>
 				<button
-					:class="{ currentDuration: newItem.planned_time == 60, 'planned-time': true }"
+					:class="{ 'o-btn':true, currentDuration: newItem.planned_time == 60, 'planned-time': true }"
 					@click.prevent="setPlannedTimeNewItem(item, $event)"
 					@keydown="keydownOnNew(item, $event, 'planned-time')"
 					@blur="blurOnAddNew(item)"
@@ -494,7 +496,7 @@
 					v-for="tag in preparedPlusComputedTags"
 					:class="(tag=='Today') ? 'duedate' : 'custom-tag'"
 				>{{ tag }}
-					<button class="delete-tag"
+					<button class="o-btn delete-tag"
 						v-if="newItem.preparedTags.includes(tag)"
 						@click.prevent="deletePreparedTag(tag, item)"
 						@keydown="keydownOnNew(item, $event, 'delete-tag')"
@@ -505,9 +507,9 @@
 				</span>
 			</div>
 			<div class="buttonrow" v-if="basis.mobile">
-				<button @click="cancelAddNew" v-if="!listIsEmpty">{{ basis.text.global.cancel }}</button>
-				<button @click="addNew">{{ basis.text.card.addAndContinue }}</button>
-				<button @click="addNew('stop')">{{ basis.text.card.addAndClose }}</button>
+				<button class="o-btn" @click="cancelAddNew" v-if="!listIsEmpty">{{ basis.text.global.cancel }}</button>
+				<button class="o-btn" @click="addNew">{{ basis.text.card.addAndContinue }}</button>
+				<button class="o-btn" @click="addNew('stop')">{{ basis.text.card.addAndClose }}</button>
 			</div>
 		</div>
 	</form>

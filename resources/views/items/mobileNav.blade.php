@@ -10,7 +10,9 @@
 	>
 		<button id=""
 			@click="unindent()"
-			:class="{'disabled':(topLvlItems.includes(selection.selectedId))}"
+			:class="{
+				'o-btn':true,
+				'u-disabled':(topLvlItems.includes(selection.selectedId))}"
 			:disabled="topLvlItems.includes(selection.selectedId)"
 		>
 			<i class="zmdi zmdi-caret-left-circle"></i>
@@ -18,14 +20,18 @@
 		<div>
 			<button id=""
 				@click="moveItem('up')"
-				:class="{'disabled':(firstItem == selection.selectedId)}"
+				:class="{
+					'o-btn':true,
+					'u-disabled':(firstItem == selection.selectedId)}"
 				:disabled="firstItem == selection.selectedId"
 			>
 				<i class="zmdi zmdi-caret-up-circle"></i>
 			</button>
 			<button id=""
 				@click="moveItem('down')"
-				:class="{'disabled':(lastItems.includes(selection.selectedId))}"
+				:class="{
+					'o-btn':true,
+					'u-disabled':(lastItems.includes(selection.selectedId))}"
 				:disabled="lastItems.includes(selection.selectedId)"
 			>
 				<i class="zmdi zmdi-caret-down-circle"></i>
@@ -33,13 +39,15 @@
 		</div>
 		<button id=""
 			@click="indent()"
-			:class="{'disabled':(isFirstItem(selection.selectedId))}"
+			:class="{
+				'o-btn':true,
+				'u-disabled':(isFirstItem(selection.selectedId))}"
 			:disabled="isFirstItem(selection.selectedId)"
 		>
 			<i class="zmdi zmdi-caret-right-circle"></i>
 		</button>
 	</div>
-	<button id="floating-add-btn" @click="showAddNewItem()">
+	<button class="o-btn" id="floating-add-btn" @click="showAddNewItem()">
 		<i class="zmdi zmdi-plus-circle"></i>
 	</button>
 </div>

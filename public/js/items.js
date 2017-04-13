@@ -25863,7 +25863,7 @@ var _class = function () {
 		key: 'deleteItem',
 		value: function deleteItem(id) {
 			var item = this.nodes[id];
-			var newSelectedId = this.nextItemId(id) ? this.nextItemId(id) : null;
+			var previousItemId = this.prevItemId(id) ? this.prevItemId(id) : null;
 			// Delete all children as well!
 			if (Array.isArray(item.children) && item.children.length) {
 				var allChildrenIds = this.getAllChildrenIds(id);
@@ -25891,6 +25891,7 @@ var _class = function () {
 				});
 				selection.filter.push('today');
 			}
+			var newSelectedId = this.nextItemId(previousItemId) ? this.nextItemId(previousItemId) : null;
 			console.log('new selected ID is: ' + newSelectedId);
 			selection.selectedId = newSelectedId;
 			delete this.nodes[id];
@@ -38533,6 +38534,8 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
+//
 
 // import Morph from '../components/valueMorphers.js'
 // window.Morph = new Morph();
@@ -39733,79 +39736,6 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
 
 // import PopoutConfirmation from './PopoutConfirmation.vue';
 
@@ -39861,7 +39791,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 			this.removePopout(item);
 		},
 		maskClick: function maskClick(event) {
-			if (event.target.id == 'popouts-mask') {
+			if (event.target.id == 'js-popouts-mask') {
 				this.clearAll();
 			}
 		},
@@ -41023,6 +40953,8 @@ window.selection = new __WEBPACK_IMPORTED_MODULE_6__vue_components_Selection_js_
 				return a.concat(tags);
 			}, []);
 			allTagsArray = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_5__components_globalFunctions_js__["h" /* uniqBy */])(allTagsArray);
+			// console.log('allTagsArray in allTagsComputed_2');
+			// console.log(allTagsArray);
 			allTagsArray = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_5__components_globalFunctions_js__["e" /* sortObjectArrayByProperty */])(allTagsArray, 'name');
 			var t2_1 = performance.now();
 			console.log("Call to allTagsComputed_2 took " + (t2_1 - t2_0) + " milliseconds.");
@@ -46836,7 +46768,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     }, [_c('div', [_c('label', {}, [_vm._v(_vm._s(_vm.basis.text.popups.usedTime))]), _vm._v(" "), _c('span', {}, [_vm._v(_vm._s(_vm.sec_to_hhmmss(popup.item.used_time)))])]), _vm._v(" "), _c('div', {
       staticClass: "buttons"
     }, [_c('div', [_c('button', {
-      staticClass: "forward",
+      staticClass: "o-btn forward",
       on: {
         "click": function($event) {
           _vm.incrementUsedTime(popup.item, 60)
@@ -46846,7 +46778,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
         }
       }
     }, [_vm._v("+1 " + _vm._s(_vm.basis.text.global.min))]), _vm._v(" "), _c('button', {
-      staticClass: "forward",
+      staticClass: "o-btn forward",
       on: {
         "click": function($event) {
           _vm.incrementUsedTime(popup.item, 300)
@@ -46856,7 +46788,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
         }
       }
     }, [_vm._v("+5 " + _vm._s(_vm.basis.text.global.min))]), _vm._v(" "), _c('button', {
-      staticClass: "forward",
+      staticClass: "o-btn forward",
       on: {
         "click": function($event) {
           _vm.incrementUsedTime(popup.item, 600)
@@ -46866,7 +46798,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
         }
       }
     }, [_vm._v("+10 " + _vm._s(_vm.basis.text.global.min))])]), _c('div', [_c('button', {
-      staticClass: "forward",
+      staticClass: "o-btn forward",
       on: {
         "click": function($event) {
           _vm.incrementUsedTime(popup.item, 1800)
@@ -46876,7 +46808,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
         }
       }
     }, [_vm._v("+30 " + _vm._s(_vm.basis.text.global.min))]), _vm._v(" "), _c('button', {
-      staticClass: "reset",
+      staticClass: "o-btn reset",
       on: {
         "click": function($event) {
           _vm.resetUsedTime(popup.item)
@@ -46886,7 +46818,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
         }
       }
     }, [_vm._v(_vm._s(_vm.basis.text.popups.reset))]), _vm._v(" "), _c('button', {
-      staticClass: "undo-completion",
+      staticClass: "o-btn undo-completion",
       on: {
         "click": function($event) {
           _vm.setNotDone(popup)
@@ -46896,7 +46828,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
         }
       }
     }, [_vm._v(_vm._s(_vm.basis.text.popups.setNotDone))])])])])]), _vm._v(" "), _c('button', {
-      staticClass: "close-button",
+      staticClass: "o-btn close-button",
       attrs: {
         "aria-label": "Close alert",
         "type": "button"
@@ -46976,12 +46908,12 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
   }, [_c('span', [_vm._v(_vm._s(_vm.momentCalendar(_vm.journalDate)))]), _vm._v(" "), (_vm.journalDate != _vm.momentCalendar(_vm.journalDate)) ? _c('span', {
     staticClass: "journal-date-small"
   }, [_vm._v("\n\t\t\t" + _vm._s(_vm.journalDate) + "\n\t\t")]) : _vm._e(), _vm._v(" "), ( true) ? _c('button', {
-    staticClass: "copy-contents-button btn btn-dipclick copy-contents-button-journal",
+    staticClass: "o-btn copy-contents-button btn btn-dipclick copy-contents-button-journal",
     attrs: {
       "id": 'journal-card-' + _vm.item.done_date + '-copy'
     }
   }, [_vm._v("\n\t\t\t" + _vm._s(_vm.basis.text.card.copy) + "\n\t\t")]) : _vm._e(), _vm._v(" "), (_vm.totalUsedMin) ? _c('div', {
-    staticClass: "fullWidth used-time"
+    staticClass: "l-fullwidth used-time"
   }, [_vm._v("\n\t\t\t" + _vm._s(_vm.basis.text.menu.usedTime) + ": "), _c('span', {
     staticClass: "pill-small"
   }, [_vm._v(_vm._s(_vm.sec_to_hourmin(_vm.totalUsedSec)))])]) : _vm._e()]) : _vm._e(), _vm._v(" "), (_vm.journalParentString) ? _c('div', {
@@ -47108,7 +47040,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     staticClass: "bodybox"
   }, [_c('div', {
     class: {
-      'lightgray': _vm.item.temp
+      'u-lightgray': _vm.item.temp
     }
   }, [_vm._v(_vm._s(_vm.linkify(_vm.item.body)))]), _vm._v(" "), (_vm.item.completion_memo) ? _c('div', {
     staticClass: "completion-notes bodybox",
@@ -47175,7 +47107,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     staticClass: "update-planned-time"
   }, [_vm._v("\n\t\t\t\t\t\t" + _vm._s(_vm.basis.text.card.duration) + "\n\t\t\t\t\t\t"), _c('button', {
     class: {
-      currentDuration: _vm.item.planned_time == 10, 'planned-time': true
+      currentDuration: _vm.item.planned_time == 10, 'planned-time': true, 'o-btn': true
     },
     attrs: {
       "value": "10"
@@ -47194,7 +47126,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     }
   }, [_vm._v("10" + _vm._s((_vm.basis.mobileSmall) ? _vm.basis.text.global.m : _vm.basis.text.global.min))]), _vm._v(" "), (!_vm.basis.mobileSmall) ? _c('button', {
     class: {
-      currentDuration: _vm.item.planned_time == 15, 'planned-time': true
+      currentDuration: _vm.item.planned_time == 15, 'planned-time': true, 'o-btn': true
     },
     attrs: {
       "value": "15"
@@ -47213,7 +47145,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     }
   }, [_vm._v("15" + _vm._s((_vm.basis.mobileSmall) ? _vm.basis.text.global.m : _vm.basis.text.global.min))]) : _vm._e(), _vm._v(" "), _c('button', {
     class: {
-      currentDuration: _vm.item.planned_time == 30, 'planned-time': true
+      currentDuration: _vm.item.planned_time == 30, 'planned-time': true, 'o-btn': true
     },
     attrs: {
       "value": "30"
@@ -47232,7 +47164,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     }
   }, [_vm._v("30" + _vm._s((_vm.basis.mobileSmall) ? _vm.basis.text.global.m : _vm.basis.text.global.min))]), _vm._v(" "), _c('button', {
     class: {
-      currentDuration: _vm.item.planned_time == 60, 'planned-time': true
+      currentDuration: _vm.item.planned_time == 60, 'planned-time': true, 'o-btn': true
     },
     attrs: {
       "value": "60"
@@ -47343,7 +47275,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
       (_vm.item.id == _vm.basis.editingItem ||
         _vm.item.id == _vm.basis.editingItemTags) &&
       !_vm.parentTags.includes(tag.tag_name)) ? _c('button', {
-      staticClass: "delete-tag",
+      staticClass: "delete-tag o-btn",
       attrs: {
         "value": tag.tag_name
       },
@@ -47360,7 +47292,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
       staticClass: "zmdi zmdi-close-circle"
     })]) : _vm._e()]) : _vm._e()
   }), _vm._v(" "), (_vm.basis.mobile) ? _c('button', {
-    staticClass: "mobile-edit-save",
+    staticClass: "mobile-edit-save o-btn",
     on: {
       "click": function($event) {
         _vm.doneEdit(_vm.item)
@@ -47471,7 +47403,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
       (_vm.item.id == _vm.basis.editingItem ||
         _vm.item.id == _vm.basis.editingItemTags) &&
       !_vm.parentTags.includes(tag.tag_name)) ? _c('button', {
-      staticClass: "delete-tag",
+      staticClass: "delete-tag o-btn",
       attrs: {
         "value": tag.tag_name
       },
@@ -47493,26 +47425,26 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     _vm.basis.selection.selectedId == _vm.item.id) ? _c('div', {
     staticClass: "item-nav"
   }, [(!_vm.basis.mobile && _vm.basis.selection.view != 'journal') ? _c('button', {
-    staticClass: "copy-contents-button btn btn-dipclick",
+    staticClass: "o-btn copy-contents-button btn btn-dipclick",
     attrs: {
       "id": 'card-' + _vm.item.id + '-copy'
     }
   }, [_vm._v("\n\t\t\t\t\t" + _vm._s(_vm.basis.text.card.copy) + "\n\t\t\t\t")]) : _vm._e(), _vm._v(" "), (_vm.basis.mobile) ? _c('button', {
-    staticClass: "edit",
+    staticClass: "o-btn edit",
     on: {
       "click": function($event) {
         _vm.startEdit(_vm.item)
       }
     }
   }, [_vm._v("\n\t\t\t\t\t" + _vm._s(_vm.basis.text.card.edit) + "\n\t\t\t\t")]) : _vm._e(), _vm._v(" "), (_vm.basis.mobile && _vm.basis.selection.view != 'journal') ? _c('button', {
-    staticClass: "setToday",
+    staticClass: "o-btn setToday",
     on: {
       "click": function($event) {
         _vm.setToday(_vm.item.id)
       }
     }
   }, [_vm._v("\n\t\t\t\t\t" + _vm._s(_vm.basis.text.card.setToday) + "\n\t\t\t\t")]) : _vm._e(), _vm._v(" "), (!_vm.item.done) ? _c('button', {
-    staticClass: "timer",
+    staticClass: "o-btn timer",
     on: {
       "click": function($event) {
         _vm.addTimer(_vm.item)
@@ -47521,7 +47453,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
   }, [_c('i', {
     staticClass: "zmdi zmdi-timer"
   })]) : _vm._e(), _vm._v(" "), (_vm.item.done) ? _c('button', {
-    staticClass: "more",
+    staticClass: "o-btn more",
     on: {
       "click": function($event) {
         _vm.basis.popup(_vm.item.id, 'afterDone')
@@ -47530,7 +47462,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
   }, [_c('i', {
     staticClass: "zmdi zmdi-more"
   })]) : _vm._e(), _vm._v(" "), ( true) ? _c('button', {
-    staticClass: "delete",
+    staticClass: "o-btn delete",
     on: {
       "click": function($event) {
         _vm.deleteItem(_vm.item)
@@ -47577,8 +47509,9 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
   }, [_c('div', {
     staticClass: "flex flex--wrap"
   }, [(_vm.listIsEmpty && _vm.basis.mobile) ? _c('div', {
-    staticClass: "languagePicker"
+    staticClass: "c-language-picker l-w100"
   }, [(_vm.basis.language != 'ja') ? _c('a', {
+    staticClass: "c-language-picker__a",
     attrs: {
       "href": "#"
     },
@@ -47588,6 +47521,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
       }
     }
   }, [_vm._v("日本語")]) : _vm._e(), _vm._v(" "), (_vm.basis.language != 'en') ? _c('a', {
+    staticClass: "c-language-picker__a",
     attrs: {
       "href": "#"
     },
@@ -47640,7 +47574,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     staticClass: "update-planned-time"
   }, [_vm._v("\n\t\t\t\t" + _vm._s(_vm.basis.text.card.duration) + "\n\t\t\t\t"), _c('button', {
     class: {
-      currentDuration: _vm.newItem.planned_time == 10, 'planned-time': true
+      'o-btn': true, currentDuration: _vm.newItem.planned_time == 10, 'planned-time': true
     },
     attrs: {
       "value": "10"
@@ -47659,7 +47593,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     }
   }, [_vm._v("10" + _vm._s((_vm.basis.mobileSmall) ? _vm.basis.text.global.m : _vm.basis.text.global.min))]), _vm._v(" "), (!_vm.basis.mobileSmall) ? _c('button', {
     class: {
-      currentDuration: _vm.newItem.planned_time == 15, 'planned-time': true
+      'o-btn': true, currentDuration: _vm.newItem.planned_time == 15, 'planned-time': true
     },
     attrs: {
       "value": "15"
@@ -47678,7 +47612,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     }
   }, [_vm._v("15" + _vm._s((_vm.basis.mobileSmall) ? _vm.basis.text.global.m : _vm.basis.text.global.min))]) : _vm._e(), _vm._v(" "), _c('button', {
     class: {
-      currentDuration: _vm.newItem.planned_time == 30, 'planned-time': true
+      'o-btn': true, currentDuration: _vm.newItem.planned_time == 30, 'planned-time': true
     },
     attrs: {
       "value": "30"
@@ -47697,7 +47631,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     }
   }, [_vm._v("30" + _vm._s((_vm.basis.mobileSmall) ? _vm.basis.text.global.m : _vm.basis.text.global.min))]), _vm._v(" "), _c('button', {
     class: {
-      currentDuration: _vm.newItem.planned_time == 60, 'planned-time': true
+      'o-btn': true, currentDuration: _vm.newItem.planned_time == 60, 'planned-time': true
     },
     attrs: {
       "value": "60"
@@ -47780,7 +47714,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     return (_vm.preparedPlusComputedTags.length) ? _c('span', {
       class: (tag == 'Today') ? 'duedate' : 'custom-tag'
     }, [_vm._v(_vm._s(tag) + "\n\t\t\t\t\t"), (_vm.newItem.preparedTags.includes(tag)) ? _c('button', {
-      staticClass: "delete-tag",
+      staticClass: "o-btn delete-tag",
       attrs: {
         "value": tag
       },
@@ -47799,14 +47733,17 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
   })], 2), _vm._v(" "), (_vm.basis.mobile) ? _c('div', {
     staticClass: "buttonrow"
   }, [(!_vm.listIsEmpty) ? _c('button', {
+    staticClass: "o-btn",
     on: {
       "click": _vm.cancelAddNew
     }
   }, [_vm._v(_vm._s(_vm.basis.text.global.cancel))]) : _vm._e(), _vm._v(" "), _c('button', {
+    staticClass: "o-btn",
     on: {
       "click": _vm.addNew
     }
   }, [_vm._v(_vm._s(_vm.basis.text.card.addAndContinue))]), _vm._v(" "), _c('button', {
+    staticClass: "o-btn",
     on: {
       "click": function($event) {
         _vm.addNew('stop')
@@ -47828,8 +47765,9 @@ if (false) {
 
 module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
   return (_vm.popoutExists) ? _c('div', {
+    staticClass: "c-popouts-mask",
     attrs: {
-      "id": "popouts-mask"
+      "id": "js-popouts-mask"
     },
     on: {
       "click": function($event) {
@@ -47850,7 +47788,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     }, [_vm._v(" " + _vm._s(_vm.basis.text.popouts.andAllChildren))]) : _vm._e(), _vm._v("?\n\t\t\t")]), _vm._v(" "), _c('div', {
       staticClass: "nav"
     }, [_c('button', {
-      staticClass: "btn-cancel",
+      staticClass: "o-btn btn-cancel",
       on: {
         "click": function($event) {
           _vm.popoutCall('confirm-cancel', item)
@@ -47861,7 +47799,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
         name: "focus",
         rawName: "v-focus"
       }],
-      staticClass: "btn-ok btn-warning",
+      staticClass: "o-btn o-btn--warning btn-ok",
       on: {
         "click": function($event) {
           _vm.popoutCall('confirm-ok', item)
@@ -47871,10 +47809,12 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
   }), _vm._v(" "), (_vm.popouts.guide) ? _c('div', {
     staticClass: "popout"
   }, [_c('div', {
-    staticClass: "guide"
+    staticClass: "c-guide"
   }, [_c('div', {
     staticClass: "bodybox"
-  }, [_c('table', [_c('tr', [_c('th', [_vm._v(_vm._s(_vm.basis.text.guide.action))]), _c('th', [_vm._v(_vm._s(_vm.basis.text.guide.key))])]), _vm._v(" "), _vm._l((_vm.basis.text.guide.keybindings), function(row) {
+  }, [_c('table', {
+    staticClass: "c-guide__table"
+  }, [_c('tr', [_c('th', [_vm._v(_vm._s(_vm.basis.text.guide.action))]), _c('th', [_vm._v(_vm._s(_vm.basis.text.guide.key))])]), _vm._v(" "), _vm._l((_vm.basis.text.guide.keybindings), function(row) {
     return _c('tr', [_c('td', {
       domProps: {
         "innerHTML": _vm._s(row.note)
@@ -47887,7 +47827,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
       name: "focus",
       rawName: "v-focus"
     }],
-    staticClass: "btn-ok",
+    staticClass: "o-btn btn-ok",
     on: {
       "click": this.clearAll
     }
@@ -47959,7 +47899,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
         value: (!_vm.timerRunning),
         expression: "!timerRunning"
       }],
-      staticClass: "play btn btn-dipclick",
+      staticClass: "o-btn play btn btn-dipclick",
       on: {
         "click": function($event) {
           _vm.timerNav('play', item)
@@ -47974,7 +47914,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
         value: (_vm.timerRunning),
         expression: "timerRunning"
       }],
-      staticClass: "pause btn btn-dipclick",
+      staticClass: "o-btn pause btn btn-dipclick",
       on: {
         "click": function($event) {
           _vm.timerNav('pause', item)
@@ -47983,7 +47923,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     }, [_c('i', {
       staticClass: "zmdi zmdi-pause"
     })]), _vm._v(" "), _c('button', {
-      staticClass: "forward btn btn-dipclick",
+      staticClass: "o-btn forward btn btn-dipclick",
       on: {
         "click": function($event) {
           _vm.timerNav('forward', item, 1)
@@ -47992,7 +47932,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     }, [_c('i', {
       staticClass: "zmdi zmdi-fast-forward"
     }), _vm._v(" "), ( false) ? _c('span', [_vm._v("-")]) : _c('span'), _vm._v("\n\t\t\t\t1 " + _vm._s(_vm.basis.text.global.min) + "\n\t\t\t\t")]), _vm._v(" "), _c('button', {
-      staticClass: "forward btn btn-dipclick",
+      staticClass: "o-btn forward btn btn-dipclick",
       on: {
         "click": function($event) {
           _vm.timerNav('forward', item, 5)
@@ -48001,198 +47941,20 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     }, [_c('i', {
       staticClass: "zmdi zmdi-fast-forward"
     }), _vm._v(" "), ( false) ? _c('span', [_vm._v("-")]) : _c('span'), _vm._v("\n\t\t\t\t5 " + _vm._s(_vm.basis.text.global.min) + "\n\t\t\t\t")]), _vm._v(" "), _c('button', {
-      staticClass: "reset btn btn-dipclick",
+      staticClass: "o-btn reset btn btn-dipclick",
       on: {
         "click": function($event) {
           _vm.timerNav('reset', item)
         }
       }
     }, [_vm._v(_vm._s(_vm.basis.text.popouts.reset))]), _vm._v(" "), _c('button', {
-      staticClass: "btn-ok",
+      staticClass: "o-btn btn-ok",
       on: {
         "click": function($event) {
           _vm.timerNav('close', item)
         }
       }
     }, [_vm._v(_vm._s(_vm.basis.text.popouts.ok))])])])]) : _vm._e()
-  }), _vm._v(" "), _vm._l((_vm.popouts.edit), function(item) {
-    return (_vm.popouts.edit.length) ? _c('div', {
-      staticClass: "popout"
-    }, [_c('div', [_c('div', {
-      staticClass: "body"
-    }, [_c('form', {
-      staticClass: "updatebox",
-      attrs: {
-        "action": "update",
-        "id": 'updatebox-' + item.id
-      },
-      on: {
-        "submit": function($event) {
-          $event.preventDefault();
-          _vm.card.doneEdit(item)
-        }
-      }
-    }, [_c('div', {
-      staticClass: "update-body"
-    }, [_c('textarea', {
-      directives: [{
-        name: "focus",
-        rawName: "v-focus"
-      }, {
-        name: "autoheight",
-        rawName: "v-autoheight"
-      }, {
-        name: "model",
-        rawName: "v-model",
-        value: (item.body),
-        expression: "item.body"
-      }],
-      staticClass: "edititem-body",
-      domProps: {
-        "value": (item.body)
-      },
-      on: {
-        "blur": function($event) {
-          _vm.card.blurOnEdit(item)
-        },
-        "keydown": function($event) {
-          _vm.card.keydownOnEdit(item, $event, 'body')
-        },
-        "input": function($event) {
-          if ($event.target.composing) { return; }
-          item.body = $event.target.value
-        }
-      }
-    })]), _vm._v(" "), _c('div', {
-      staticClass: "update-tags"
-    }, [_c('div', {
-      staticClass: "update-planned-time"
-    }, [_c('span', [_vm._v(_vm._s(_vm.basis.text.card.duration))]), _vm._v(" "), _c('button', {
-      class: {
-        currentDuration: item.planned_time == 10, 'planned-time': true
-      },
-      attrs: {
-        "value": "10"
-      },
-      on: {
-        "click": function($event) {
-          $event.preventDefault();
-          _vm.card.setPlannedTime(item, $event)
-        },
-        "keydown": function($event) {
-          _vm.card.keydownOnEdit(item, $event, 'planned-time')
-        },
-        "blur": function($event) {
-          _vm.card.blurOnEdit(item)
-        }
-      }
-    }, [_vm._v("10 " + _vm._s(_vm.basis.text.global.min))]), _vm._v(" "), _c('button', {
-      class: {
-        currentDuration: item.planned_time == 15, 'planned-time': true
-      },
-      attrs: {
-        "value": "15"
-      },
-      on: {
-        "click": function($event) {
-          $event.preventDefault();
-          _vm.card.setPlannedTime(item, $event)
-        },
-        "keydown": function($event) {
-          _vm.card.keydownOnEdit(item, $event, 'planned-time')
-        },
-        "blur": function($event) {
-          _vm.card.blurOnEdit(item)
-        }
-      }
-    }, [_vm._v("15 " + _vm._s(_vm.basis.text.global.min))]), _vm._v(" "), _c('button', {
-      class: {
-        currentDuration: item.planned_time == 30, 'planned-time': true
-      },
-      attrs: {
-        "value": "30"
-      },
-      on: {
-        "click": function($event) {
-          $event.preventDefault();
-          _vm.card.setPlannedTime(item, $event)
-        },
-        "keydown": function($event) {
-          _vm.card.keydownOnEdit(item, $event, 'planned-time')
-        },
-        "blur": function($event) {
-          _vm.card.blurOnEdit(item)
-        }
-      }
-    }, [_vm._v("30 " + _vm._s(_vm.basis.text.global.min))]), _vm._v(" "), _c('button', {
-      class: {
-        currentDuration: item.planned_time == 60, 'planned-time': true
-      },
-      attrs: {
-        "value": "60"
-      },
-      on: {
-        "click": function($event) {
-          $event.preventDefault();
-          _vm.card.setPlannedTime(item, $event)
-        },
-        "keydown": function($event) {
-          _vm.card.keydownOnEdit(item, $event, 'planned-time')
-        },
-        "blur": function($event) {
-          _vm.card.blurOnEdit(item)
-        }
-      }
-    }, [_vm._v("1 " + _vm._s(_vm.basis.text.global.hour))]), _vm._v(" "), _c('div', [_c('input', {
-      directives: [{
-        name: "show",
-        rawName: "v-show",
-        value: (true),
-        expression: "true"
-      }, {
-        name: "model",
-        rawName: "v-model",
-        value: (item.planned_time),
-        expression: "item.planned_time"
-      }],
-      staticClass: "planned-time",
-      attrs: {
-        "type": "number"
-      },
-      domProps: {
-        "value": (item.planned_time)
-      },
-      on: {
-        "blur": [function($event) {
-          _vm.card.blurOnEdit(item)
-        }, function($event) {
-          _vm.$forceUpdate()
-        }],
-        "keydown": function($event) {
-          _vm.card.keydownOnEdit(item, $event, 'planned-time')
-        },
-        "input": function($event) {
-          if ($event.target.composing) { return; }
-          item.planned_time = $event.target.value
-        }
-      }
-    }), _vm._v(_vm._s(_vm.basis.text.global.min))])])])])]), _vm._v(" "), _c('div', {
-      staticClass: "nav"
-    }, [_c('button', {
-      staticClass: "btn",
-      on: {
-        "click": function($event) {
-          _vm.card.cancelEdit(item)
-        }
-      }
-    }, [_vm._v(_vm._s(_vm.basis.text.global.cancel))]), _vm._v(" "), _c('button', {
-      staticClass: "btn",
-      on: {
-        "click": function($event) {
-          _vm.card.doneEdit(item)
-        }
-      }
-    }, [_vm._v(_vm._s(_vm.basis.text.global.save))])])])]) : _vm._e()
   })], 2) : _vm._e()
 },staticRenderFns: []}
 module.exports.render._withStripped = true

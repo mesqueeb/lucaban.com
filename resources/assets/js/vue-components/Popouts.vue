@@ -1,5 +1,6 @@
 <template id="popouts-template">
-<div id="popouts-mask"
+<div id="js-popouts-mask"
+	class="c-popouts-mask" 
 	v-if="popoutExists"
 	@click="maskClick($event)"
 >
@@ -20,11 +21,11 @@
 			<div class="bodybox">{{ basis.text.popouts.reallyDelete }}「{{ item.body }}」<strong v-if="item.children.length" style="padding-left:0 0.3em;"> {{ basis.text.popouts.andAllChildren }}</strong>?
 			</div>
 			<div class="nav">
-				<button class="btn-cancel" 
+				<button class="o-btn btn-cancel" 
 					@click="popoutCall('confirm-cancel', item)"
 				>{{ basis.text.global.cancel }}</button>
 				<button
-					class="btn-ok btn-warning"
+					class="o-btn o-btn--warning btn-ok"
 					v-focus
 					@click="popoutCall('confirm-ok', item)"
 				>{{ basis.text.global.delete }}</button>
@@ -37,10 +38,10 @@
 		class="popout"
 	>
 		<div 
-			class="guide"
+			class="c-guide"
 		>
 			<div class="bodybox">
-				<table>
+				<table class="c-guide__table">
 					<tr>
 						<th>{{ basis.text.guide.action }}</th><th>{{ basis.text.guide.key }}</th>
 					</tr>
@@ -51,7 +52,7 @@
 			</div>
 			<div class="nav">
 				<button
-					class="btn-ok"
+					class="o-btn btn-ok"
 					v-focus
 					@click="this.clearAll"
 				>{{ basis.text.popouts.ok }}</button>
@@ -113,19 +114,19 @@
 			</div>
 			<div class="nav">
 				<button
-					class="play btn btn-dipclick"
+					class="o-btn play btn btn-dipclick"
 					v-show="!timerRunning"
 					@click="timerNav('play', item)"
 				><i class="zmdi zmdi-play"></i>
 				</button>
 				<button
-					class="pause btn btn-dipclick"
+					class="o-btn pause btn btn-dipclick"
 					v-show="timerRunning"
 					@click="timerNav('pause', item)"
 				><i class="zmdi zmdi-pause"></i>
 				</button>
 				<button
-					class="forward btn btn-dipclick"
+					class="o-btn forward btn btn-dipclick"
 					@click="timerNav('forward', item, 1)"
 				>
 					<i class="zmdi zmdi-fast-forward"></i>
@@ -134,7 +135,7 @@
 				1 {{ basis.text.global.min }}
 				</button>
 				<button
-					class="forward btn btn-dipclick"
+					class="o-btn forward btn btn-dipclick"
 					@click="timerNav('forward', item, 5)"
 				>
 					<i class="zmdi zmdi-fast-forward"></i>
@@ -143,11 +144,11 @@
 				5 {{ basis.text.global.min }}
 				</button>
 				<button
-					class="reset btn btn-dipclick"
+					class="o-btn reset btn btn-dipclick"
 					@click="timerNav('reset', item)"
 				>{{ basis.text.popouts.reset }}</button>
 				<button
-					class="btn-ok"
+					class="o-btn btn-ok"
 					@click="timerNav('close', item)"
 				>{{ basis.text.popouts.ok }}</button>
 			</div>
@@ -155,86 +156,12 @@
 	</div>
 <!-- Popout /TIMER -->
 <!-- Popout EDIT -->
-	<div v-if="popouts.edit.length"
+	<!-- <div v-if="popouts.edit.length"
 		v-for="item in popouts.edit"
 		class="popout"
 	>
-		<div>
-			<div class="body">
-				<form
-					action="update"
-					class="updatebox"
-					:id="'updatebox-'+item.id"
-					
-					@submit.prevent="card.doneEdit(item)"
-				>
-					<div class="update-body">
-						<textarea
-							v-focus
-							v-autoheight
-							class="edititem-body"
-							v-model="item.body"
-							@blur="card.blurOnEdit(item)"
-							@keydown="card.keydownOnEdit(item, $event, 'body')"
-						></textarea>
-					</div>
-					<div class="update-tags">
-						<div
-							class="update-planned-time"
-						>
-							<span>{{ basis.text.card.duration }}</span>
-							<button
-								:class="{ currentDuration: item.planned_time == 10, 'planned-time': true }"
-								@click.prevent="card.setPlannedTime(item, $event)"
-								@keydown="card.keydownOnEdit(item, $event, 'planned-time')"
-								@blur="card.blurOnEdit(item)"
-								value="10"
-							>10 {{ basis.text.global.min }}</button>
-							<button
-								:class="{ currentDuration: item.planned_time == 15, 'planned-time': true }"
-								@click.prevent="card.setPlannedTime(item, $event)"
-								@keydown="card.keydownOnEdit(item, $event, 'planned-time')"
-								@blur="card.blurOnEdit(item)"
-								value="15"
-							>15 {{ basis.text.global.min }}</button>
-							<button
-								:class="{ currentDuration: item.planned_time == 30, 'planned-time': true }"
-								@click.prevent="card.setPlannedTime(item, $event)"
-								@keydown="card.keydownOnEdit(item, $event, 'planned-time')"
-								@blur="card.blurOnEdit(item)"
-								value="30"
-							>30 {{ basis.text.global.min }}</button>
-							<button
-								:class="{ currentDuration: item.planned_time == 60, 'planned-time': true }"
-								@click.prevent="card.setPlannedTime(item, $event)"
-								@keydown="card.keydownOnEdit(item, $event, 'planned-time')"
-								@blur="card.blurOnEdit(item)"
-								value="60"
-							>1 {{ basis.text.global.hour }}</button>
-							<div><input
-								class="planned-time" 
-								type="number"
-								v-show="true"
-								v-model="item.planned_time"
-								@blur="card.blurOnEdit(item)"
-								@keydown="card.keydownOnEdit(item, $event, 'planned-time')"
-							/>{{ basis.text.global.min }}</div>
-						</div>
-					</div>
-				</form>
-			</div>
-			<div class="nav">
-				<button
-					class="btn"
-					@click="card.cancelEdit(item)"
-				>{{ basis.text.global.cancel }}</button>
-				<button
-					class="btn"
-					@click="card.doneEdit(item)"
-				>{{ basis.text.global.save }}</button>
-			</div>
-		</div>
-	</div>
+Deleted
+	</div> -->
 <!-- Popout /EDIT -->
 </div>
 </template>
@@ -303,7 +230,7 @@ export default {
         },
         maskClick(event)
         {
-        	if(event.target.id == 'popouts-mask')
+        	if(event.target.id == 'js-popouts-mask')
         	{
         		this.clearAll();
         	}
