@@ -585,7 +585,7 @@ export default {
 			if(!items.length){ return []; }
 			allTagsArray = items.reduce(function(a, item)
 			{
-				let tags = item.tagged.map(taggedObj => taggedObj.tag);
+				let tags = item.tagged.map(taggedObj => taggedObj.tag).filter(tag => tag);
 				return a.concat(tags);
 			}, []);
 			allTagsArray = uniqBy(allTagsArray);
@@ -610,7 +610,7 @@ export default {
 			items.forEach(function(item)
 			{
 				if(item.tagged.length){
-					item.tagged.forEach(taggedObj => allTagsArray.add(taggedObj.tag));
+					item.tagged.forEach(taggedObj => { if(taggedObj){ allTagsArray.add(taggedObj.tag) } });
 				}
 			}.bind(allTagsArray));
 			allTagsArray = [...allTagsArray];
@@ -651,7 +651,7 @@ export default {
 			}.bind(allTagsArray));
 			allTagsArray = sortObjectArrayByProperty(allTagsArray, 'name');
 			var t1 = performance.now();
-			console.log("Call to allTagsComputed took " + (t1 - t0) + " milliseconds.")
+			console.log("Call to allTagsComputed 1b took " + (t1 - t0) + " milliseconds.")
 			return allTagsArray;
 		},
 		itemAmount()

@@ -109,6 +109,7 @@ function uniqBy(a, key) {
     let seen = {};
     return a.filter(function(item) {
         let k = key(item);
+        if(!k || k == "null"){ return false; }
         return seen.hasOwnProperty(k) ? false : (seen[k] = true);
     })
 }
