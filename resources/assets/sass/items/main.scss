@@ -117,7 +117,7 @@ label{
     background-color: transparent !important;
 }
 .toggle:after{
-    content: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="-2 -2 104 104" ><circle cx="50" cy="50" r="50" fill="none" stroke="#e6e6e6" stroke-width="3"/></svg>');
+    content: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="-2 -2 104 104" ><circle cx="50" cy="50" r="50" fill="none" stroke="#ababab" stroke-width="3"/></svg>');
 }
 .toggle:checked:after{
     content: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="-2 -2 104 104"><circle cx="50" cy="50" r="50" fill="none" stroke="#bddad5" stroke-width="3"/><path fill="#5dc2af" d="M72 25L42 71 27 56l-4 4 20 20 34-52z"/></svg>');
@@ -707,7 +707,7 @@ label{
     background-color: transparent !important;
 }
 .toggle:after{
-    content: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="-2 -2 104 104" ><circle cx="50" cy="50" r="50" fill="none" stroke="#e6e6e6" stroke-width="3"/></svg>');
+    content: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="-2 -2 104 104" ><circle cx="50" cy="50" r="50" fill="none" stroke="#ababab" stroke-width="3"/></svg>');
 }
 .toggle:checked:after{
     content: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="-2 -2 104 104"><circle cx="50" cy="50" r="50" fill="none" stroke="#bddad5" stroke-width="3"/><path fill="#5dc2af" d="M72 25L42 71 27 56l-4 4 20 20 34-52z"/></svg>');
