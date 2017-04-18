@@ -12158,6 +12158,9 @@ function uniqBy(a, key) {
 	var seen = {};
 	return a.filter(function (item) {
 		var k = key(item);
+		if (!k || k == "null") {
+			return false;
+		}
 		return seen.hasOwnProperty(k) ? false : seen[k] = true;
 	});
 }

@@ -14949,6 +14949,9 @@ function uniqBy(a, key) {
 	var seen = {};
 	return a.filter(function (item) {
 		var k = key(item);
+		if (!k || k == "null") {
+			return false;
+		}
 		return seen.hasOwnProperty(k) ? false : seen[k] = true;
 	});
 }
@@ -40949,6 +40952,8 @@ window.selection = new __WEBPACK_IMPORTED_MODULE_6__vue_components_Selection_js_
 			allTagsArray = items.reduce(function (a, item) {
 				var tags = item.tagged.map(function (taggedObj) {
 					return taggedObj.tag;
+				}).filter(function (tag) {
+					return tag;
 				});
 				return a.concat(tags);
 			}, []);
@@ -40977,7 +40982,9 @@ window.selection = new __WEBPACK_IMPORTED_MODULE_6__vue_components_Selection_js_
 			items.forEach(function (item) {
 				if (item.tagged.length) {
 					item.tagged.forEach(function (taggedObj) {
-						return allTagsArray.add(taggedObj.tag);
+						if (taggedObj) {
+							allTagsArray.add(taggedObj.tag);
+						}
 					});
 				}
 			}.bind(allTagsArray));
@@ -41018,7 +41025,7 @@ window.selection = new __WEBPACK_IMPORTED_MODULE_6__vue_components_Selection_js_
 			}.bind(allTagsArray));
 			allTagsArray = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_5__components_globalFunctions_js__["e" /* sortObjectArrayByProperty */])(allTagsArray, 'name');
 			var t1 = performance.now();
-			console.log("Call to allTagsComputed took " + (t1 - t0) + " milliseconds.");
+			console.log("Call to allTagsComputed 1b took " + (t1 - t0) + " milliseconds.");
 			return allTagsArray;
 		},
 		itemAmount: function itemAmount() {
