@@ -99,11 +99,17 @@ label{
         margin: 0; // reset margins
         height: auto;
         width: 1.6em;
+        margin-top: -0.3em;
     }
     &.both{
-        margin-left: -0.3em;
-        input {
+        margin-left: -1.5em;
+        input{
             margin-left: 0.4em;
+        }
+        >label{
+            margin-top: 0.1em;
+            margin-left: 0.1em;
+            margin-right: -0.5em;
         }
     }
 }
@@ -689,11 +695,17 @@ label{
         margin: 0; // reset margins
         height: auto;
         width: 1.6em;
+        margin-top: -0.3em;
     }
     &.both{
-        margin-left: -0.3em;
-        input {
+        margin-left: -1.5em;
+        input{
             margin-left: 0.4em;
+        }
+        >label{
+            margin-top: 0.1em;
+            margin-left: 0.1em;
+            margin-right: -0.5em;
         }
     }
 }

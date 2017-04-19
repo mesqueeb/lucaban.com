@@ -66,7 +66,6 @@
 			<label
 				class="arrow"
 				:for="'show_children_'+item.id"
-				:style="(allChildrenDone) ? 'margin-left: 0.1em; margin-right: -0.5em;':''"
 				v-if="item.children_order.length>0"
 			></label>
 			<input

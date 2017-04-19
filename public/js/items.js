@@ -39541,7 +39541,6 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
-//
 
 // import Morph from '../components/valueMorphers.js'
 // window.Morph = new Morph();
@@ -48024,7 +48023,6 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     }
   }), _vm._v(" "), (_vm.item.children_order.length > 0) ? _c('label', {
     staticClass: "arrow",
-    style: ((_vm.allChildrenDone) ? 'margin-left: 0.1em; margin-right: -0.5em;' : ''),
     attrs: {
       "for": 'show_children_' + _vm.item.id
     }
