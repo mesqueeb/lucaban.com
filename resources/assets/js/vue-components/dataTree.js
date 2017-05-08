@@ -150,6 +150,12 @@ addItem(item, index, addNextItemAs, addTags, duplication)
 		selection.filter = selection.filter.filter(f => f != 'today');
 		selection.filter.push('today');
 	}
+	if (selection.tags.length)
+	{
+		let tags = selection.tags;
+		selection.tags = [];
+		selection.tags = tags;
+	}
 	
     
     if (duplication || addNextItemAs == 'stop')

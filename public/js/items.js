@@ -25526,6 +25526,11 @@ var _class = function () {
 				});
 				selection.filter.push('today');
 			}
+			if (selection.tags.length) {
+				var tags = selection.tags;
+				selection.tags = [];
+				selection.tags = tags;
+			}
 
 			if (duplication || addNextItemAs == 'stop') {
 				vm.addingNewUnder = null;
@@ -39676,7 +39681,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 			return alltags.sort();
 		},
 		listIsEmpty: function listIsEmpty() {
-			if (!this.item || !allItems) {
+			if (!this.item || !allItems || !allItems.root) {
 				return false;
 			}
 			if (this.item.id != allItems.root.id) {
@@ -48531,8 +48536,8 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
       key: childCard.id,
       attrs: {
         "item": childCard,
-        "parentsChildrenOrder": _vm.childrenOrder,
-        "parentTags": _vm.tagsArray
+        "parents-children-order": _vm.childrenOrder,
+        "parent-tags": _vm.tagsArray
       }
     })
   })) : _vm._e(), _vm._v(" "), (_vm.showAddNewBox ||

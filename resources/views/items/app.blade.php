@@ -16,8 +16,8 @@
 	>
 		<Card :item="allData"
 			ref="root"
-			:parentsChildrenOrder="[]"
-			:parentTags="[]"
+			:parents-children-order="[]"
+			:parent-tags="[]"
 			{{-- :alltags="allTags" --}}
 		></Card>
 {{-- 

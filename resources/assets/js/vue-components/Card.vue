@@ -393,8 +393,8 @@
 		<Card v-for="childCard in visibleChildren"
 			:item="childCard"
 			:key="childCard.id"
-			:parentsChildrenOrder="childrenOrder"
-			:parentTags="tagsArray"
+			:parents-children-order="childrenOrder"
+			:parent-tags="tagsArray"
 		></Card>
 	</div>
 <!-- / CHILDREN -->
@@ -645,7 +645,7 @@ return `${all}${pb}
 		},
 		listIsEmpty()
 		{
-			if(!this.item || !allItems){ return false; }
+			if(!this.item || !allItems || !allItems.root){ return false; }
 			if(this.item.id != allItems.root.id){ return false; }
 			if(!this.visibleChildren.length){ return true; }
 		},

@@ -47,6 +47,7 @@ class CardController extends Controller
         }
         return Item::UserItems()
             ->where('done',0)
+            ->orWhere('done',NULL)
             ->orWhere(function($query)
             {
                 $query->UserItems()
