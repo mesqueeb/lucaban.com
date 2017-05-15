@@ -1,16 +1,16 @@
 <template id="popups-template">
-<div id="popups">
+<div id="c-popups">
 <div
     v-for="popup in popups"
     :class="popup.type ? popup.type : 'secondary'"
     transition="fade"
 >
     <div
-        class="popup callout animated"
+        class="c-popup callout animated"
         v-if="popup.type=='afterDone'"
     >
-        <div class="top">
-            <div class="title">{{ basis.text.popups.completed }} {{popup.item.body}} {{ basis.text.popups.completedB }}
+        <div class="c-popup__top">
+            <div class="c-popup__title">{{ basis.text.popups.completed }} {{popup.item.body}} {{ basis.text.popups.completedB }}
             <label class="done-after-done"
                 @keydown="keydownInPopup(popup, $event, 'flatPicker')"
             >{{ momentCalendar(popup.item.done_date) }}
@@ -24,17 +24,17 @@
             </label></div>
         </div>
         
-        <div class="body">
-            <div class="completion-memo">
+        <div class="c-popup__body">
+            <div class="c-popup__completion-memo">
               <label>{{ basis.text.popups.journalNotes }}</label>
-              <textarea name="completion_memo"
+              <textarea name="c-popup__completion_memo__txtarea"
                 v-model="popup.item.completion_memo"
                 @keydown="keydownInCompletionMemo(popup, $event)"
                 v-focus
                 v-autoheight
               ></textarea>
             </div>
-            <div class="used-time">
+            <div class="c-popup__used-time">
               <div>
                 <label class="">{{ basis.text.popups.usedTime }}</label>
                 <!-- <input v-model="popup.item.used_time" type="number"/> -->
@@ -78,7 +78,7 @@
         <button
           @click="removePopup(popup)"
           @keydown="keydownInPopup(popup, $event, 'closeButton')"
-          class="o-btn close-button"
+          class="o-btn c-popup__close-button"
           aria-label="Close alert"
           type="button"
         >
@@ -123,7 +123,7 @@ export default {
             this.$root.popups.splice(index, 1);
             Vue.nextTick(function () {
                 if(vm.popups.length){
-                    document.querySelector('#popups>div:first-child textarea').focus();
+                    document.querySelector('#c-popups>div:first-child textarea').focus();
                 }
             });
 

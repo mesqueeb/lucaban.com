@@ -26,7 +26,8 @@ $sepia-grey:#c0b2b4;
     resize: none;
 }
 
-@mixin tag($colour) {
+@mixin pill($colour) {
+    font-size: 0.6rem;
     align-items: center;
     display: flex;
     position:relative;
@@ -36,5 +37,4 @@ $sepia-grey:#c0b2b4;
     color: white;
     background-color: $colour;
     min-height: 2.1em;
-    font-size: 0.7em;
 }

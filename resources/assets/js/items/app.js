@@ -786,6 +786,14 @@ export default {
 	},
 	methods:
 	{
+		setCancelThroughKeydown()
+		{
+    		this.cancelThroughKeydown = true;
+	    	setTimeout(function()
+	    	{
+	    		this.cancelThroughKeydown = false;
+	    	}.bind(this),100);
+		},
 		startEdit(item, event)
 		{
 			// debugger;

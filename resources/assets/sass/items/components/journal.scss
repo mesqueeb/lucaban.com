@@ -1,75 +1,24 @@
+
 .journal-wrapper {
-    >div>.children>div:first-child .title {
+    >div>.l-children>div:first-child .c-section-head {
         border-top: none;
         margin-top: 0;
     }
-    .copy-contents-button-journal{
-        margin-left: auto;
-    }
-    .children {
+    .l-children {
         margin-left: 0;
     }
-    .title {
-        border-top: 1px solid #ededed;
-        color: #46c5b6;
-        font-size: 1.2em;
-        text-align: left;
-        padding: 0.5em 0;
-        margin-top: 0.7em;
-        display: flex;
-        align-items: baseline;
-        .journal-date-small {
-            color: #dadada;
-            font-size: 0.8em;
-            margin-left: 0.5em;
-        }
-    }
-    .item-card {
+    .c-item-card {
         align-items: baseline;
     }
-    .bodybox {
+    .c-body-text--done{
         color: inherit;
-        >div:first-child{
-            text-decoration: none;
-        }
+        text-decoration: none;
     }
-    .body-div{
+    .c-body-div{
         border-bottom:none;
     }
-    .parent-string>div{
-        border: 1px solid;
-        display: initial;
-        padding: 0em 0.5em;
-        border-top: none;
-        border-left: none;
-    }
-    .parent-string{
-        margin-bottom: 1px;
-    }
-    .completion-notes {
+    .c-completion-notes {
         color: #a2999a;
         padding: 2px 0 0 2em;
     }
-    .used-time{
-        @include text-settings();
-    }
-    // .done-card {
-    //     margin: 0.5em 0;
-    //     border-bottom: 1px #ededed solid;
-    //     padding-bottom: 0.6em;
-    // }
-    // .item {
-    //     display: flex;
-    //     flex-direction: column;
-    //     align-items: flex-start;
-    // }
-
-    // .main {
-    //     display: flex;
-    //     align-items: center;
-    // }
-
-    // .item-tags {
-    //     margin-left: 1em;
-    // }
 }

@@ -4,7 +4,7 @@
 <Popups :popups="popups"></Popups>
 <Flashes :flashes="flashes"></Flashes>
 <Popouts :popouts="popouts"></Popouts>
-<div class="panel-body" v-cloak>
+<div class="c-panel" v-cloak>
 	{{-- NAV --}}
 	@include('items.navigation')
 	<div class="u-line"></div>
@@ -12,7 +12,7 @@
 	{{-- STATS --}}
 	@include('items.stats')
 	{{-- DATA --}}
-	<div class="items-wrapper"
+	<div class="c-items-wrapper"
 	>
 		<Card :item="allData"
 			ref="root"

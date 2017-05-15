@@ -1,4 +1,4 @@
-#popups{
+#c-popups{
     top: 0;
     position: fixed;
     width: 100%;
@@ -8,26 +8,28 @@
 	background: rgba(248,248,248,0.95);
 	box-shadow: 0 1px 0 rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.1);
 }
-.popup {
+.c-popup {
     padding: 0.6em;
     width: 100%;
     display: flex;
     flex-wrap: wrap;
     justify-content: flex-end;
-	.top{
-	    width: 100%;
-		display: flex;
-	    align-items: center;
-	    margin-bottom: 0.5em;
-	}
-    .title{
-	    font-weight: 600;
-        margin: 0 auto;
-    }
-    .body{
-    	display: flex;
-    	flex-grow: 1;
-    }
+}
+.c-popup__top{
+    width: 100%;
+	display: flex;
+    align-items: center;
+    margin-bottom: 0.5em;
+}
+.c-popup__title{
+    font-weight: 600;
+    margin: 0 auto;
+}
+.c-popup__body{
+	display: flex;
+	flex-grow: 1;
+}
+.c-popup{
 	input, textarea{
 		@include text-settings();
 		padding: 0.3em;
@@ -44,24 +46,25 @@
 		    border: none;
 		}
 	}
-	.completion-memo{
-		display: flex;
-		flex-direction: column;
-		flex-grow: 2;
-		margin-right: 0.3em;
-	}
+}
+.c-popup__completion-memo,
+.c-popup__completion-memo__txtarea{
+	display: flex;
+	flex-direction: column;
+	flex-grow: 2;
+	margin-right: 0.3em;
 }
 .mobile .popup{
 	.completion-memo{
 		font-size: 16px;
 	}
 }
-.close-button {
+.c-popup__close-button {
     padding-left: 0.5em;
     font-size:2em;
 	color:black;
 }
-.popup .used-time{
+.c-popup__used-time{
 	display: flex;
 	flex-direction: column;
 	flex-grow: 0;
@@ -77,8 +80,4 @@
 	button{
 	    padding: 0.3em 0.3em 0;
 	}
-
-	// input{
-	// 	width: 60px;
-	// }
 }

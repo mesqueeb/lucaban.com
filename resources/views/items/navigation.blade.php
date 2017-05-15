@@ -1,5 +1,5 @@
-<div class="navigation">
-	<div class="menu">
+<div class="c-panel__navigation">
+	<div class="c-navigation__menu">
 		<a href="#"
 			:class="{active: selection.filter.includes('all')}"
 			@click="filterItems('all', 'all')"
@@ -30,7 +30,7 @@
 			v-if="false"
 		>TEST</a>
 	</div>
-	<div class="tag-menu">
+	<div class="c-navigation__tag-menu">
 		<a v-for="tag in allTagsComputed"
 			href="#"
 			:class="{active: selection.tags.includes(tag.slug)}"

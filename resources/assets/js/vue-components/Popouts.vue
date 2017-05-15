@@ -13,19 +13,19 @@
 <!-- Popout DELETE -->
 	<div v-if="popouts.delete.length"
 		v-for="item in popouts.delete"
-		class="popout"
+		class="c-popout"
 	>
 		<div 
-			class="delete"
+			class="c-popout__delete"
 		>
-			<div class="bodybox">{{ basis.text.popouts.reallyDelete }}「{{ item.body }}」<strong v-if="item.children.length" style="padding-left:0 0.3em;"> {{ basis.text.popouts.andAllChildren }}</strong>?
+			<div class="c-popout__bodybox">{{ basis.text.popouts.reallyDelete }}「{{ item.body }}」<strong v-if="item.children.length" style="padding-left:0 0.3em;"> {{ basis.text.popouts.andAllChildren }}</strong>?
 			</div>
-			<div class="nav">
+			<div class="c-popout__nav">
 				<button class="o-btn btn-cancel" 
 					@click="popoutCall('confirm-cancel', item)"
 				>{{ basis.text.global.cancel }}</button>
 				<button
-					class="o-btn o-btn--warning btn-ok"
+					class="o-btn o-btn--warning btn-ok js-btn-ok"
 					v-focus
 					@click="popoutCall('confirm-ok', item)"
 				>{{ basis.text.global.delete }}</button>
@@ -35,12 +35,12 @@
 <!-- Popout /DELETE -->
 <!-- Popout GUIDE -->
 	<div v-if="popouts.guide"
-		class="popout"
+		class="c-popout"
 	>
 		<div 
 			class="c-guide"
 		>
-			<div class="bodybox">
+			<div class="c-popout__bodybox">
 				<table class="c-guide__table">
 					<tr>
 						<th>{{ basis.text.guide.action }}</th><th>{{ basis.text.guide.key }}</th>
@@ -50,9 +50,9 @@
 					</tr>
 				</table>
 			</div>
-			<div class="nav">
+			<div class="c-popout__nav">
 				<button
-					class="o-btn btn-ok"
+					class="o-btn btn-ok js-btn-ok"
 					v-focus
 					@click="this.clearAll"
 				>{{ basis.text.popouts.ok }}</button>
@@ -63,18 +63,20 @@
 <!-- Popout TIMER -->
 	<div v-if="popouts.timer.length"
 		v-for="item in popouts.timer"
-		class="popout"
+		class="c-popout"
 	>
 		<div 
 			:class="{
-				done: item.done,
-				timer: true,
+				'c-timer': true,
 			}"
 		>
-			<div class="body">
-				<div class="bodybox">
-					<div class="toggle-div">
-						<input class="toggle"
+			<div class="c-timer__body">
+				<div :class="{'c-popout__bodybox':true,
+					'c-popout--done': item.done
+					}"
+				>
+					<div class="l-toggle-div--popout o-toggle-div">
+						<input class="o-toggle"
 							type="checkbox"
 							v-if="item.children_order.length==0 || item.done == true"
 							v-model="item.done"
@@ -83,21 +85,21 @@
 					</div>{{ item.body }}
 				</div>
 				<div v-if="!item.planned_time"
-					 class="timer-time" 
+					 class="c-timer__time" 
 				>
 					{{ sec_to_hhmmss(item.used_time) }}
 				</div>
 				<div
 					v-if="item.planned_time"
 					:class="{
-						'timer-time':true,
+						'c-timer__time':true,
 						'countdown':true,
-						'overtime':item.used_time>item.planned_time*60,
+						'c-timer__time--overtime':item.used_time>item.planned_time*60,
 					}"
 				>
 					<div
 						v-if="item.used_time>item.planned_time*60"
-						class="overtime-notice"
+						class="c-timer__overtime-notice"
 					>
 						{{ basis.text.popouts.overtime }}
 					</div>
@@ -112,7 +114,7 @@
 				</div>
 				<!-- {{ item.used_time }}</div> -->
 			</div>
-			<div class="nav">
+			<div class="c-popout__nav">
 				<button
 					class="o-btn play btn btn-dipclick"
 					v-show="!timerRunning"
@@ -148,7 +150,7 @@
 					@click="timerNav('reset', item)"
 				>{{ basis.text.popouts.reset }}</button>
 				<button
-					class="o-btn btn-ok"
+					class="o-btn btn-ok js-btn-ok"
 					@click="timerNav('close', item)"
 				>{{ basis.text.popouts.ok }}</button>
 			</div>
@@ -247,7 +249,7 @@ export default {
         {
         	this.pauseTimer(item);
         	allItems.prepareDonePatch(item.id);
-        	document.querySelector('.btn-ok').focus();
+        	document.querySelector('.js-btn-ok').focus();
         },
         timerNav(button, item, value)
         {

@@ -1,572 +1,3 @@
-
-[v-cloak] {
-    display: none;
-}
-
-body {
-    @include text-settings();
-    background: #f5f5f5;
-    margin: 0;
-}
-form {
-    margin-bottom: 0;
-}
-input::-webkit-outer-spin-button,
-input::-webkit-inner-spin-button {
-    /* display: none; <- Crashes Chrome on hover */
-    -webkit-appearance: none;
-    margin: 0; /* <-- Apparently some margin are still there even though it's hidden */
-}
-input, textarea{
-    @include text-settings();
-    outline: none;
-    border-style: none;
-}
-label{
-    font-weight: 300;
-    margin: 0;
-}
-.lightgray{
-    color: #d0d0d0 !important; 
-}
-#loading-icon{
-    .loader{
-        svg path,
-        svg rect{
-          fill: $theme-color !important;
-        }
-    }
-    z-index: 6;
-    position: fixed;
-    right: 1em;
-    top: 1em;
-    .patching-error{
-        color: rgba(230, 94, 77, 1);
-        font-weight: 600;
-    }
-}
-#bottom-hint{
-    position: fixed;
-    right: 4rem;
-    bottom: 3rem;
-    z-index: -1;
-    text-align: right;
-    font-size: 1.4rem;
-    color: #acacac;
-}
-#mobile-item-nav{
-    >div:first-child{    
-        position: fixed;
-        left: 1rem;
-        bottom: 1rem;
-        z-index: 4;
-    }
-    >button:last-child{
-        position: fixed;
-        right: 1rem;
-        bottom: 1rem;
-        z-index: 4;
-    }
-    color: $theme-color;
-    button{
-        background-color: white;
-        font-size: 3em;
-        height: 0.8em;
-        border-radius: 1em !important;
-        i{
-            position: relative;
-            top: -0.1em;
-        }
-    }
-}
-.playstation-controller{
-    display: flex;
-    align-items: center;
-    button{
-        margin: 2px 0;
-    }
-    >div{
-        display: flex;
-        flex-wrap: wrap;
-        width: 2.5em;
-    }
-}
-
-.toggle-div{
-    margin-right: 0.3em;
-    display: flex;
-    div, input, label{
-        margin: 0; // reset margins
-        height: auto;
-        width: 1.6em;
-        margin-top: -0.3em;
-    }
-    &.both{
-        margin-left: -1.5em;
-        input{
-            margin-left: 0.4em;
-        }
-        >label{
-            margin-top: 0.1em;
-            margin-left: 0.1em;
-            margin-right: -0.5em;
-        }
-    }
-}
-.toggle{
-    cursor: pointer;
-    text-align: center;
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    appearance: none;
-    outline: none !important;
-    background-color: transparent !important;
-}
-.toggle:after{
-    content: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="-2 -2 104 104" ><circle cx="50" cy="50" r="50" fill="none" stroke="#ababab" stroke-width="3"/></svg>');
-}
-.toggle:checked:after{
-    content: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="-2 -2 104 104"><circle cx="50" cy="50" r="50" fill="none" stroke="#bddad5" stroke-width="3"/><path fill="#5dc2af" d="M72 25L42 71 27 56l-4 4 20 20 34-52z"/></svg>');
-}
-
-.styled-check{
-    display: none; 
-    cursor: pointer;
-}
-.styled-check + .arrow:before{
-    position: absolute;
-    content: "";
-    display: block;
-    top: 25%;
-    left: 30%;
-    border-left: black 1px solid;
-    border-bottom: black 1px solid;
-    transform: rotateZ(-135deg);
-    width: 0.5em;
-    height: 0.5em;
-    transition: transform 0.3s ease-in-out;
-}
-.styled-check:checked + .arrow:before{
-    transform: rotateZ(-45deg);
-}
-.arrow{
-  display: block;
-  position: relative;
-  height: 20px;
-  width: 20px;
-}
-.project{
-    >.bodybox{
-        font-weight: 600;
-    }
-}
-.bodybox{
-    padding: 0.5em;
-    display: inline-block;
-    white-space: pre-line;
-    word-break: break-word;
-    display: flex;
-    flex-direction: column;
-}
-.selected{
-    background: $selection-color;
-}
-.navigation{
-    display: flex;
-    margin-bottom: 0.2em;
-    a{
-        transition: all 0.35s;
-        text-decoration: none;
-        color: #4d4d4d !important;
-        margin: 0em 0.2em;
-        padding: 0.3em;
-        &:hover{
-            color:$theme-color;
-        }
-    }
-    .active{
-        color: $theme-color !important;
-    }
-    .filtered-out{
-        text-decoration: line-through;
-        color: $duedate-color;
-    }
-    .menu{
-        display: flex;
-    }
-    .tag-menu{
-        margin-left: auto;
-        display: flex;
-        align-items: center;
-        flex-wrap: wrap;
-        justify-content: flex-end;
-    }
-}
-.card{
-    margin: 0.5em;
-}
-.u-line{
-    width: 100%;
-    height: 1px;
-    border-top: 1px $border-gray solid;
-}
-.stats{
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    border-bottom: 1px $border-gray solid;
-    padding: 0.4em;
-    >div{
-        margin: 0.2em;
-    }
-    >div>div{
-        position: relative;
-        padding: 0.2em 0.5em;
-        border-radius: 0.3em;
-        color: white;
-        font-size: 0.9em;
-    }
-    .used-time{
-        background-color: $used-time-color;
-    }
-    .time-left{
-        background-color: $duration-color-dark;
-    }
-    .children-amount{
-        background-color: $theme-color;
-    }
-    .done-children-amount{
-        background-color: $done-color;
-    }
-}
-.scrolled-down .stats{
-    margin-top: 26px;
-}
-.panel-title{
-    text-align: center;
-    font-size: 1.2em;
-    padding: 6px 0 0;
-}
-.hidden-tags{
-    text-decoration: line-through;
-}
-.scrolled-down .panel-title{
-    position: fixed;
-    top: 0;
-    left: 0;
-    background: rgba(255, 255, 255, 0.9);
-    width: 100vw;
-    align-content: inherit;
-    z-index: 4;
-}
-.item-nav{
-    margin-left: auto;
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    button{
-        background: none;
-        border: none;
-        font-size: 1.5em;
-        color: $theme-color;
-        margin: 0.3rem 0.5rem;
-    }
-    .delete{
-        color: rgba(231, 76, 60, 0.3);
-    }
-    .edit, .setToday, .copy-contents-button{
-        font-size: 1em;
-    }
-}
-.panel-body{
-    background: white;
-    padding: 1rem;
-    margin-bottom: 6.5rem;
-}
-.children .children{
-    margin-left: 2em;
-}
-.item-card{
-    margin: 0 0 0 0;
-    display: flex;
-    align-items: center;
-}
-
-.item-tags{
-    white-space: nowrap;
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    .done{
-        @include tag(#e6e6e6);
-        cursor: pointer;
-        color: #5a5a5a;
-    }
-    .duration, .currentDuration{
-        @include tag($duration-color);
-    }
-    .duedate{
-        @include tag($duedate-color);
-    }
-    .duedate-parent{
-        @include tag($duedate-parent-color);
-    }
-    .total-duration{
-        @include tag($duration-color-dark);
-    }
-    .custom-tag{
-        @include tag($theme-color);
-        cursor: pointer;
-    }
-    button{
-        color: white;
-        margin-left: 0.5em;
-        padding: 0;
-    }
-
-}
-.done .bodybox{
-    color: #d9d9d9;
-    >div:first-child{
-        text-decoration: line-through;
-    }
-}
-.completion-notes{
-    color: #a2999a;
-    padding: 2px 0 0 2em;
-    width: 100%;
-    background: none !important;
-}
-form.addnewbox{
-    margin-left: 1.9em;
-    border-bottom: thin solid rgba(245, 215, 110, 0.7);
-}
-form.addnewbox.child{
-    margin-left: 3.8em;  
-}
-// form.addnewbox.first-child{
-//     order:2;
-// }
-// CODEMENTOR why doesn't this work?
-.item-card-wrapper{
-    display: flex;
-    flex-wrap: wrap;
-    >form, >div{
-        width: 100%;
-    }
-}
-.body-div{
-    border-bottom: 1px solid $border-gray;
-    width: 100%;
-    display: flex;
-    align-items: center;
-    >span{
-        display:inline-flex;
-    }
-}
-
-.updatebox{
-    width: 100%;
-}
-.updatebox, .addnewbox{
-    >div:first-child{
-        display: flex;
-        align-items: center;
-        border: $selection-color solid thin;
-    }
-    textarea, input{
-        outline: 0px !important;
-        padding: 0.5em;
-        resize: none;
-    }
-    textarea{
-        width: 100%;
-    }
-    .tag{
-        color: black;
-        background: #eaeaea;
-    }
-
-}
-.update-tags{
-    font-size: 0.8em;
-    display: flex;
-    flex-direction: column;
-    align-items: baseline;
-    >div{
-        margin: 0.3em;
-    }
-    input{
-        font-size: 1em;
-        padding: 0.1em;
-        margin-right: 0.3em;
-    }
-    .update-planned-time{
-        display: flex;
-        align-items: baseline;
-        label:after {content: 'min';position: absolute;margin-left: -2em;}
-        input{
-            border-bottom: 1px solid $duration-color;
-            width: 2em;
-            text-align: center;
-            padding: 0;
-        }
-        button{
-            color: $duration-color;
-            font-size: 1em;
-            padding: 0 0.2em;
-            min-height: 2.1em;
-        }
-        .currentDuration{
-            background: $duration-color;
-            padding: 0.1em 0.5em;
-            margin: 0.1em;
-            border-radius: 0.3em;
-            color: white;
-        }
-        >div:last-child{
-            margin-left: 0.2em;
-        }
-    }
-    // .update-custom-tags input{
-    //     border-bottom: 1px solid $theme-color;
-    // }
-}
-.editing{
-    .selected{
-        background: none;
-    }
-    .body-div{
-        flex-direction: column;
-        align-items:flex-start;
-        padding-bottom: 0.4em;
-        border-bottom: thin solid rgba(245, 215, 110, 0.7);
-    }
-}
-.body-div.updating-tags{
-    flex-direction: column;
-    flex-wrap: wrap;
-    align-items:flex-start;
-    padding-bottom: 0.4em;
-    background: none;
-    border-bottom: thin solid rgba(245, 215, 110, 0.7);
-    .updatebox{
-        margin: 0 auto;
-        background: white;
-        border: thin solid rgba(245, 215, 110, 0.7);
-    }
-    .bodybox{
-        width: 100%;
-        background: $selection-color;
-    }
-    .item-tags{
-        margin-top: 0.3em;
-    }
-}
-.add-prepared-tag-wrapper>label,
-.add-tag-wrapper>label {
-    display: flex;
-    align-items: baseline;
-}
-.add-tag-wrapper>label {
-    font-size: 0.85em;
-    margin-left: 0.3em;
-}
-input.add-tag, input.prepare-tag{
-    @include tag($theme-color);
-    margin-left: 0.3em;
-    min-width: 3em;
-}
-input.prepare-tag::-webkit-input-placeholder,
-input.add-tag::-webkit-input-placeholder {
-    color: white;
-}
-
-.mobile{
-    .update-planned-time{
-        font-size: 14px;
-    }
-    .prepared-tags {
-        font-size: 14px;
-    }
-    .prepared-tags span{
-        font-size: 16px;
-    }
-    .updatebox .item-tags{
-        span{
-            font-size: 16px;
-        }
-        .add-tag-wrapper label:first-child{
-            margin: 0;
-            font-size: 14px;
-        }
-    }
-}
-.mobile form.addnewbox,
-.mobile form.updatebox{
-    display: flex;
-    flex-direction: column;
-    // align-items: flex-start;
-    // justify-content: center;
-    z-index: 10;
-    position: fixed;
-    width: 100vw;
-    height: 100vh;
-    background-color: rgba(0, 0, 0, .5);
-    transition: opacity .3s ease;   
-    top: 0;
-    left: 0;
-    margin: 0;
-    flex-wrap: wrap;
-    font-size: 16px;
-
-    textarea{
-        font-size: 16px;
-    }
-
-    >div{
-        background-color: white;
-        padding: 1rem;
-        margin: 0 1rem;
-        &:first-child{
-            border-top-left-radius: 0.3em;
-            border-top-right-radius: 0.3em;
-            margin-top: 1rem;
-            padding-bottom: 0.7rem;
-            border: none;
-            textarea{
-                border: rgba(245, 215, 110, 0.5) solid thin;
-            }
-        }
-        &:last-child{
-            border-bottom-left-radius: 0.3em;
-            border-bottom-right-radius: 0.3em;
-            padding-top: 0;
-            margin-bottom: auto;
-        }
-    }
-    .buttonrow{
-        display: flex;
-        justify-content: space-between;
-        width: 100%;
-        margin-top:0.4em;
-        button{
-            font-size:15px;
-        }
-    }
-    .mobile-edit-save{
-        position: absolute;
-        margin-top: 3.5rem;
-        align-self: flex-end;
-        right: 2rem;
-        color: white;
-        font-weight: 600;
-        font-size: 1rem;
-    }
-}
-
-
-
 [v-cloak] {
     display: none;
 }
@@ -688,8 +119,10 @@ label{
     }
 }
 
-.toggle-div{
+.l-toggle-div{
     margin-right: 0.3em;
+}
+.o-toggle-div{
     display: flex;
     div, input, label{
         margin: 0; // reset margins
@@ -697,19 +130,19 @@ label{
         width: 1.6em;
         margin-top: -0.3em;
     }
-    &.both{
-        margin-left: -1.5em;
-        input{
-            margin-left: 0.4em;
-        }
-        >label{
-            margin-top: 0.1em;
-            margin-left: 0.1em;
-            margin-right: -0.5em;
-        }
+}
+.o-toggle-div--both{
+    margin-left: -1.5em;
+    input{
+        margin-left: 0.4em;
+    }
+    >label{
+        margin-top: 0.1em;
+        margin-left: 0.1em;
+        margin-right: -0.5em;
     }
 }
-.toggle{
+.o-toggle{
     cursor: pointer;
     text-align: center;
     -webkit-appearance: none;
@@ -718,10 +151,10 @@ label{
     outline: none !important;
     background-color: transparent !important;
 }
-.toggle:after{
+.o-toggle:after{
     content: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="-2 -2 104 104" ><circle cx="50" cy="50" r="50" fill="none" stroke="#ababab" stroke-width="3"/></svg>');
 }
-.toggle:checked:after{
+.o-toggle:checked:after{
     content: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="-2 -2 104 104"><circle cx="50" cy="50" r="50" fill="none" stroke="#bddad5" stroke-width="3"/><path fill="#5dc2af" d="M72 25L42 71 27 56l-4 4 20 20 34-52z"/></svg>');
 }
 
@@ -751,12 +184,10 @@ label{
   height: 20px;
   width: 20px;
 }
-.project{
-    >.bodybox{
-        font-weight: 600;
-    }
+.c-body-text--project{
+    font-weight: 600;
 }
-.bodybox{
+.c-body-text{
     padding: 0.5em;
     display: inline-block;
     white-space: pre-line;
@@ -764,12 +195,32 @@ label{
     display: flex;
     flex-direction: column;
 }
-.selected{
+.u-selected{
     background: $selection-color;
 }
-.navigation{
+.u-selected--editing{
+    background: none;
+}
+.c-panel{
+    background: white;
+    padding: 1rem;
+    margin-bottom: 6.5rem;
+}
+.c-panel__navigation{
     display: flex;
     margin-bottom: 0.2em;
+}
+.c-navigation__menu{
+    display: flex;
+}
+.c-navigation__tag-menu{
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+}
+.c-panel__navigation{
     a{
         transition: all 0.35s;
         text-decoration: none;
@@ -787,26 +238,13 @@ label{
         text-decoration: line-through;
         color: $duedate-color;
     }
-    .menu{
-        display: flex;
-    }
-    .tag-menu{
-        margin-left: auto;
-        display: flex;
-        align-items: center;
-        flex-wrap: wrap;
-        justify-content: flex-end;
-    }
-}
-.card{
-    margin: 0.5em;
 }
 .u-line{
     width: 100%;
     height: 1px;
     border-top: 1px $border-gray solid;
 }
-.stats{
+.c-panel__stats{
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
@@ -822,31 +260,31 @@ label{
         color: white;
         font-size: 0.9em;
     }
-    .used-time{
-        background-color: $used-time-color;
-    }
-    .time-left{
-        background-color: $duration-color-dark;
-    }
-    .children-amount{
-        background-color: $theme-color;
-    }
-    .done-children-amount{
-        background-color: $done-color;
-    }
 }
-.scrolled-down .stats{
+.c-stats__used-time{
+    background-color: $used-time-color;
+}
+.c-stats__time-left{
+    background-color: $duration-color-dark;
+}
+.c-stats__children-amount{
+    background-color: $theme-color;
+}
+.c-stats__done-children-amount{
+    background-color: $done-color;
+}
+.c-panel__stats--scrolled-down{
     margin-top: 26px;
 }
-.panel-title{
+.c-panel__title{
     text-align: center;
     font-size: 1.2em;
     padding: 6px 0 0;
 }
-.hidden-tags{
+.c-panel__title__hidden-tags{
     text-decoration: line-through;
 }
-.scrolled-down .panel-title{
+.c-panel__title--scrolled-down{
     position: fixed;
     top: 0;
     left: 0;
@@ -855,85 +293,93 @@ label{
     align-content: inherit;
     z-index: 4;
 }
-.item-nav{
+.c-item-nav{
     margin-left: auto;
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
-    button{
-        background: none;
-        border: none;
-        font-size: 1.5em;
-        color: $theme-color;
-        margin: 0.3rem 0.5rem;
-    }
-    .delete{
-        color: rgba(231, 76, 60, 0.3);
-    }
-    .edit, .setToday, .copy-contents-button{
-        font-size: 1em;
-    }
 }
-.panel-body{
-    background: white;
-    padding: 1rem;
-    margin-bottom: 6.5rem;
+.c-item-nav button{
+    background: none;
+    border: none;
+    font-size: 1.5em;
+    color: $theme-color;
+    margin: 0.3rem 0.5rem;
 }
-.children .children{
+.c-item-nav__edit,
+.c-item-nav__set-today,
+.c-item-nav__copy{
+    font-size: 1em !important;
+}
+.c-item-nav__delete{
+    color: rgba(231, 76, 60, 0.3);
+}
+
+.l-children{
+    width: 100%;
+}
+.l-children .l-children{
     margin-left: 2em;
 }
-.item-card{
+.c-item-card{
+    width: 100%;
     margin: 0 0 0 0;
     display: flex;
     align-items: center;
 }
 
-.item-tags{
+.o-pill{
+    @include pill($theme-color);
+}
+.o-pill--custom-tag{
+    @include pill($theme-color);
+    cursor: pointer;
+}
+.o-pill--done{
+    @include pill(#e6e6e6);
+    cursor: pointer;
+    color: #5a5a5a;
+}
+.o-pill--duration, .o-pill--currentDuration{
+    @include pill($duration-color);
+}
+.o-pill--duedate{
+    @include pill($duedate-color);
+}
+.o-pill--duedate-parent{
+    @include pill($duedate-parent-color);
+}
+.o-pill--total-duration{
+    @include pill($duration-color-dark);
+}
+.o-pill--used-time{
+    @include pill($used-time-color);
+}
+.c-item-tags{
     white-space: nowrap;
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    .done{
-        @include tag(#e6e6e6);
-        cursor: pointer;
-        color: #5a5a5a;
-    }
-    .duration, .currentDuration{
-        @include tag($duration-color);
-    }
-    .duedate{
-        @include tag($duedate-color);
-    }
-    .duedate-parent{
-        @include tag($duedate-parent-color);
-    }
-    .total-duration{
-        @include tag($duration-color-dark);
-    }
-    .custom-tag{
-        @include tag($theme-color);
-        cursor: pointer;
-    }
     button{
         color: white;
         margin-left: 0.5em;
         padding: 0;
     }
-
 }
-.done .bodybox{
+.c-popout--done,
+.c-body-text--done{
     color: #d9d9d9;
-    >div:first-child{
-        text-decoration: line-through;
-    }
+    text-decoration: line-through;
 }
-.completion-notes{
-    color: #a2999a;
+.l-completion-notes{
     padding: 2px 0 0 2em;
     width: 100%;
+}
+.c-completion-notes{
+    color: #a2999a;
     background: none !important;
 }
-form.addnewbox{
+.c-addnewbox{
     margin-left: 1.9em;
     border-bottom: thin solid rgba(245, 215, 110, 0.7);
 }
@@ -944,162 +390,184 @@ form.addnewbox.child{
 //     order:2;
 // }
 // CODEMENTOR why doesn't this work?
-.item-card-wrapper{
-    display: flex;
-    flex-wrap: wrap;
-    >form, >div{
-        width: 100%;
-    }
-}
-.body-div{
+
+
+.c-body-div{
     border-bottom: 1px solid $border-gray;
     width: 100%;
     display: flex;
     align-items: center;
-    >span{
-        display:inline-flex;
-    }
+}
+.c-body-div--editing{
+    flex-direction: column;
+    align-items:flex-start;
+    padding-bottom: 0.4em;
+    border-bottom: thin solid rgba(245, 215, 110, 0.7);
 }
 
-.updatebox{
+.c-updatebox, .c-addnewbox{
     width: 100%;
 }
-.updatebox, .addnewbox{
-    >div:first-child{
-        display: flex;
-        align-items: center;
-        border: $selection-color solid thin;
-    }
-    textarea, input{
-        outline: 0px !important;
-        padding: 0.5em;
-        resize: none;
-    }
-    textarea{
-        width: 100%;
-    }
-    .tag{
-        color: black;
-        background: #eaeaea;
-    }
-
+.c-updatebox__body,
+.c-addnewbox__body{
+    display: flex;
+    align-items: center;
+    border: $selection-color solid thin;    
 }
-.update-tags{
+.c-updatebox__textarea,
+.c-addnewbox__textarea{
+    width: 100%;
+    outline: 0px !important;
+    padding: 0.5em;
+    resize: none;
+}
+.c-updatebox__input,
+.c-addnewbox__input{
+    outline: 0px !important;
+    padding: 0.5em;
+}
+
+.c-update-tags{
     font-size: 0.8em;
     display: flex;
     flex-direction: column;
-    align-items: baseline;
+    align-items: baseline;    
     >div{
         margin: 0.3em;
     }
     input{
-        font-size: 1em;
-        padding: 0.1em;
-        margin-right: 0.3em;
-    }
-    .update-planned-time{
-        display: flex;
-        align-items: baseline;
-        label:after {content: 'min';position: absolute;margin-left: -2em;}
-        input{
-            border-bottom: 1px solid $duration-color;
-            width: 2em;
-            text-align: center;
-            padding: 0;
-        }
-        button{
-            color: $duration-color;
-            font-size: 1em;
-            padding: 0 0.2em;
-            min-height: 2.1em;
-        }
-        .currentDuration{
-            background: $duration-color;
-            padding: 0.1em 0.5em;
-            margin: 0.1em;
-            border-radius: 0.3em;
-            color: white;
-        }
-        >div:last-child{
-            margin-left: 0.2em;
-        }
-    }
-    // .update-custom-tags input{
-    //     border-bottom: 1px solid $theme-color;
-    // }
-}
-.editing{
-    .selected{
-        background: none;
-    }
-    .body-div{
-        flex-direction: column;
-        align-items:flex-start;
-        padding-bottom: 0.4em;
-        border-bottom: thin solid rgba(245, 215, 110, 0.7);
+        // font-size: 1em;
+        // padding: 0.1em;
+        // margin-right: 0.3em;
     }
 }
-.body-div.updating-tags{
+.c-update-planned-time{
+    display: flex;
+    align-items: baseline;
+    >div:last-child{
+        margin-left: 0.2em;
+    }
+}
+.c-update-planned-time__input{
+    outline: 0px !important;
+    border-bottom: 1px solid $duration-color;
+    width: 2em;
+    text-align: center;
+    padding: 0;
+}
+.c-update-planned-time__label:after {
+    content: 'min';
+    position: absolute;
+    margin-left: -2em;
+}
+.c-update-planned-time__button{
+    color: $duration-color;
+    font-size: 1em;
+    padding: 0 0.2em;
+    min-height: 2.1em;
+}
+.c-update-planned-time__currentDuration{
+    background: $duration-color;
+    padding: 0.1em 0.5em;
+    margin: 0.1em;
+    border-radius: 0.3em;
+    color: white;
+}
+
+
+.c-body-div--updating-tags{
     flex-direction: column;
     flex-wrap: wrap;
     align-items:flex-start;
     padding-bottom: 0.4em;
     background: none;
     border-bottom: thin solid rgba(245, 215, 110, 0.7);
-    .updatebox{
-        margin: 0 auto;
-        background: white;
-        border: thin solid rgba(245, 215, 110, 0.7);
-    }
-    .bodybox{
-        width: 100%;
-        background: $selection-color;
-    }
-    .item-tags{
-        margin-top: 0.3em;
-    }
 }
-.add-prepared-tag-wrapper>label,
-.add-tag-wrapper>label {
+.c-updatebox--updating-tags{
+    margin: 0 auto;
+    background: white;
+    border: thin solid rgba(245, 215, 110, 0.7);
+}
+.c-body-text--updating-tags{
+    width: 100%;
+    background: $selection-color;
+}
+.c-item-tags--updating-tags{
+    margin-top: 0.3em;
+}
+.c-prepare-tag__wrapper>label,
+.c-add-tag__wrapper>label {
     display: flex;
     align-items: baseline;
 }
-.add-tag-wrapper>label {
+.c-add-tag__wrapper>label {
     font-size: 0.85em;
     margin-left: 0.3em;
 }
-input.add-tag, input.prepare-tag{
-    @include tag($theme-color);
+.c-add-tag__input, .c-prepare-tag__input{
+    @include pill($theme-color);
     margin-left: 0.3em;
     min-width: 3em;
+    outline: 0px !important;
+    font-size: 0.6rem !important;
+    padding: 0.5em;
 }
-input.prepare-tag::-webkit-input-placeholder,
-input.add-tag::-webkit-input-placeholder {
+.c-prepare-tag__input::-webkit-input-placeholder,
+.c-add-tag__input::-webkit-input-placeholder {
     color: white;
 }
 
-.mobile{
-    .update-planned-time{
-        font-size: 14px;
-    }
-    .prepared-tags {
-        font-size: 14px;
-    }
-    .prepared-tags span{
+.c-prepared-tags--mobile {
+    font-size: 14px;
+}
+.c-prepared-tags--mobile span{
+    font-size: 16px;
+}
+.c-update-planned-time--mobile{
+    font-size: 14px;
+}
+.c-updatebox__item-tags--mobile{
+    span{
         font-size: 16px;
     }
-    .updatebox .item-tags{
-        span{
-            font-size: 16px;
-        }
-        .add-tag-wrapper label:first-child{
-            margin: 0;
-            font-size: 14px;
-        }
+    .c-add-tag__wrapper label:first-child{
+        margin: 0;
+        font-size: 14px;
     }
 }
-.mobile form.addnewbox,
-.mobile form.updatebox{
+.c-section-head{
+    border-top: 1px solid #ededed;
+    color: #46c5b6;
+    font-size: 1.2em;
+    text-align: left;
+    padding: 0.5em 0;
+    margin-top: 0.7em;
+    display: flex;
+    flex-wrap: wrap;
+    width: 100%;
+    align-items: baseline;
+}
+.c-section-head__subtitle{
+    color: #dadada;
+    font-size: 0.8em;
+    margin-left: 0.5em;
+}
+.c-subsection-head{
+    margin-bottom: 1px;
+}
+.c-subsection-head__text{
+    border: 1px solid;
+    display: initial;
+    padding: 0em 0.5em;
+    border-top: none;
+    border-left: none;
+}
+.c-journal-used-time{
+    @include text-settings();
+    margin-right: 0.3em;
+}
+.c-addnewbox--mobile,
+.c-updatebox--mobile{
     display: flex;
     flex-direction: column;
     // align-items: flex-start;
@@ -1119,45 +587,49 @@ input.add-tag::-webkit-input-placeholder {
     textarea{
         font-size: 16px;
     }
-
-    >div{
-        background-color: white;
-        padding: 1rem;
-        margin: 0 1rem;
-        &:first-child{
-            border-top-left-radius: 0.3em;
-            border-top-right-radius: 0.3em;
-            margin-top: 1rem;
-            padding-bottom: 0.7rem;
-            border: none;
-            textarea{
-                border: rgba(245, 215, 110, 0.5) solid thin;
-            }
-        }
-        &:last-child{
-            border-bottom-left-radius: 0.3em;
-            border-bottom-right-radius: 0.3em;
-            padding-top: 0;
-            margin-bottom: auto;
-        }
+}
+.c-updatebox__body--mobile,
+.c-updatebox__lower-body--mobile,
+.c-addnewbox__body--mobile,
+.c-addnewbox__lower-body--mobile{
+    background-color: white;
+    padding: 1rem;
+    margin: 0 1rem;
+}
+.c-updatebox__body--mobile,
+.c-addnewbox__body--mobile{
+    border-top-left-radius: 0.3em;
+    border-top-right-radius: 0.3em;
+    margin-top: 1rem;
+    padding-bottom: 0.7rem;
+    border: none;
+    textarea{
+        border: rgba(245, 215, 110, 0.5) solid thin;
     }
-    .buttonrow{
-        display: flex;
-        justify-content: space-between;
-        width: 100%;
-        margin-top:0.4em;
-        button{
-            font-size:15px;
-        }
-    }
-    .mobile-edit-save{
-        position: absolute;
-        margin-top: 3.5rem;
-        align-self: flex-end;
-        right: 2rem;
-        color: white;
-        font-weight: 600;
-        font-size: 1rem;
+}
+.c-addnewbox__lower-body--mobile,
+.c-updatebox__lower-body--mobile{
+    border-bottom-left-radius: 0.3em;
+    border-bottom-right-radius: 0.3em;
+    padding-top: 0;
+    margin-bottom: auto;
+}
+.c-mobile-edit-save-btns{
+    position: absolute;
+    margin-top: 3.5rem;
+    align-self: flex-end;
+    right: 2rem;
+    color: white;
+    font-weight: 600;
+    font-size: 1rem;
+}
+.c-mobile-buttonrow{
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    margin-top:0.4em;
+    button{
+        font-size:15px;
     }
 }
 

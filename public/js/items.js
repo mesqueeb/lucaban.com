@@ -6,9 +6,9 @@
 /******/ 	function __webpack_require__(moduleId) {
 /******/
 /******/ 		// Check if module is in cache
-/******/ 		if(installedModules[moduleId])
+/******/ 		if(installedModules[moduleId]) {
 /******/ 			return installedModules[moduleId].exports;
-/******/
+/******/ 		}
 /******/ 		// Create a new module (and put it into the cache)
 /******/ 		var module = installedModules[moduleId] = {
 /******/ 			i: moduleId,
@@ -14971,6 +14971,10 @@ process.off = noop;
 process.removeListener = noop;
 process.removeAllListeners = noop;
 process.emit = noop;
+process.prependListener = noop;
+process.prependOnceListener = noop;
+
+process.listeners = function (name) { return [] }
 
 process.binding = function (name) {
     throw new Error('process.binding is not supported');
@@ -15233,7 +15237,7 @@ module.exports = function normalizeComponent (
 
 "use strict";
 /* WEBPACK VAR INJECTION */(function(process, global) {/*!
- * Vue.js v2.2.4
+ * Vue.js v2.3.2
  * (c) 2014-2017 Evan You
  * Released under the MIT License.
  */
@@ -15241,10 +15245,54 @@ module.exports = function normalizeComponent (
 
 /*  */
 
+// these helpers produces better vm code in JS engines due to their
+// explicitness and function inlining
+function isUndef (v) {
+  return v === undefined || v === null
+}
+
+function isDef (v) {
+  return v !== undefined && v !== null
+}
+
+function isTrue (v) {
+  return v === true
+}
+
+/**
+ * Check if value is primitive
+ */
+function isPrimitive (value) {
+  return typeof value === 'string' || typeof value === 'number'
+}
+
+/**
+ * Quick object check - this is primarily used to tell
+ * Objects from primitive values when we know the value
+ * is a JSON-compliant type.
+ */
+function isObject (obj) {
+  return obj !== null && typeof obj === 'object'
+}
+
+var _toString = Object.prototype.toString;
+
+/**
+ * Strict object type check. Only returns true
+ * for plain JavaScript objects.
+ */
+function isPlainObject (obj) {
+  return _toString.call(obj) === '[object Object]'
+}
+
+function isRegExp (v) {
+  return _toString.call(v) === '[object RegExp]'
+}
+
 /**
  * Convert a value to a string that is actually rendered.
  */
-function _toString (val) {
+function toString (val) {
   return val == null
     ? ''
     : typeof val === 'object'
@@ -15302,13 +15350,6 @@ function remove (arr, item) {
 var hasOwnProperty = Object.prototype.hasOwnProperty;
 function hasOwn (obj, key) {
   return hasOwnProperty.call(obj, key)
-}
-
-/**
- * Check if value is primitive
- */
-function isPrimitive (value) {
-  return typeof value === 'string' || typeof value === 'number'
 }
 
 /**
@@ -15389,25 +15430,6 @@ function extend (to, _from) {
 }
 
 /**
- * Quick object check - this is primarily used to tell
- * Objects from primitive values when we know the value
- * is a JSON-compliant type.
- */
-function isObject (obj) {
-  return obj !== null && typeof obj === 'object'
-}
-
-/**
- * Strict object type check. Only returns true
- * for plain JavaScript objects.
- */
-var toString = Object.prototype.toString;
-var OBJECT_STRING = '[object Object]';
-function isPlainObject (obj) {
-  return toString.call(obj) === OBJECT_STRING
-}
-
-/**
  * Merge an Array of Objects into a single Object.
  */
 function toObject (arr) {
@@ -15480,14 +15502,35 @@ function once (fn) {
   return function () {
     if (!called) {
       called = true;
-      fn();
+      fn.apply(this, arguments);
     }
   }
 }
 
+var SSR_ATTR = 'data-server-rendered';
+
+var ASSET_TYPES = [
+  'component',
+  'directive',
+  'filter'
+];
+
+var LIFECYCLE_HOOKS = [
+  'beforeCreate',
+  'created',
+  'beforeMount',
+  'mounted',
+  'beforeUpdate',
+  'updated',
+  'beforeDestroy',
+  'destroyed',
+  'activated',
+  'deactivated'
+];
+
 /*  */
 
-var config = {
+var config = ({
   /**
    * Option merge strategies (used in core/util/options)
    */
@@ -15535,6 +15578,12 @@ var config = {
   isReservedTag: no,
 
   /**
+   * Check if an attribute is reserved so that it cannot be used as a component
+   * prop. This is platform-dependent and may be overwritten.
+   */
+  isReservedAttr: no,
+
+  /**
    * Check if a tag is an unknown element.
    * Platform-dependent.
    */
@@ -15557,35 +15606,10 @@ var config = {
   mustUseProp: no,
 
   /**
-   * List of asset types that a component can own.
+   * Exposed for legacy reasons
    */
-  _assetTypes: [
-    'component',
-    'directive',
-    'filter'
-  ],
-
-  /**
-   * List of lifecycle hooks.
-   */
-  _lifecycleHooks: [
-    'beforeCreate',
-    'created',
-    'beforeMount',
-    'mounted',
-    'beforeUpdate',
-    'updated',
-    'beforeDestroy',
-    'destroyed',
-    'activated',
-    'deactivated'
-  ],
-
-  /**
-   * Max circular updates allowed in a scheduler flush cycle.
-   */
-  _maxUpdateCount: 100
-};
+  _lifecycleHooks: LIFECYCLE_HOOKS
+});
 
 /*  */
 
@@ -15630,6 +15654,117 @@ function parsePath (path) {
 }
 
 /*  */
+
+var warn = noop;
+var tip = noop;
+var formatComponentName = (null); // work around flow check
+
+if (process.env.NODE_ENV !== 'production') {
+  var hasConsole = typeof console !== 'undefined';
+  var classifyRE = /(?:^|[-_])(\w)/g;
+  var classify = function (str) { return str
+    .replace(classifyRE, function (c) { return c.toUpperCase(); })
+    .replace(/[-_]/g, ''); };
+
+  warn = function (msg, vm) {
+    if (hasConsole && (!config.silent)) {
+      console.error("[Vue warn]: " + msg + (
+        vm ? generateComponentTrace(vm) : ''
+      ));
+    }
+  };
+
+  tip = function (msg, vm) {
+    if (hasConsole && (!config.silent)) {
+      console.warn("[Vue tip]: " + msg + (
+        vm ? generateComponentTrace(vm) : ''
+      ));
+    }
+  };
+
+  formatComponentName = function (vm, includeFile) {
+    if (vm.$root === vm) {
+      return '<Root>'
+    }
+    var name = typeof vm === 'string'
+      ? vm
+      : typeof vm === 'function' && vm.options
+        ? vm.options.name
+        : vm._isVue
+          ? vm.$options.name || vm.$options._componentTag
+          : vm.name;
+
+    var file = vm._isVue && vm.$options.__file;
+    if (!name && file) {
+      var match = file.match(/([^/\\]+)\.vue$/);
+      name = match && match[1];
+    }
+
+    return (
+      (name ? ("<" + (classify(name)) + ">") : "<Anonymous>") +
+      (file && includeFile !== false ? (" at " + file) : '')
+    )
+  };
+
+  var repeat = function (str, n) {
+    var res = '';
+    while (n) {
+      if (n % 2 === 1) { res += str; }
+      if (n > 1) { str += str; }
+      n >>= 1;
+    }
+    return res
+  };
+
+  var generateComponentTrace = function (vm) {
+    if (vm._isVue && vm.$parent) {
+      var tree = [];
+      var currentRecursiveSequence = 0;
+      while (vm) {
+        if (tree.length > 0) {
+          var last = tree[tree.length - 1];
+          if (last.constructor === vm.constructor) {
+            currentRecursiveSequence++;
+            vm = vm.$parent;
+            continue
+          } else if (currentRecursiveSequence > 0) {
+            tree[tree.length - 1] = [last, currentRecursiveSequence];
+            currentRecursiveSequence = 0;
+          }
+        }
+        tree.push(vm);
+        vm = vm.$parent;
+      }
+      return '\n\nfound in\n\n' + tree
+        .map(function (vm, i) { return ("" + (i === 0 ? '---> ' : repeat(' ', 5 + i * 2)) + (Array.isArray(vm)
+            ? ((formatComponentName(vm[0])) + "... (" + (vm[1]) + " recursive calls)")
+            : formatComponentName(vm))); })
+        .join('\n')
+    } else {
+      return ("\n\n(found in " + (formatComponentName(vm)) + ")")
+    }
+  };
+}
+
+/*  */
+
+function handleError (err, vm, info) {
+  if (config.errorHandler) {
+    config.errorHandler.call(null, err, vm, info);
+  } else {
+    if (process.env.NODE_ENV !== 'production') {
+      warn(("Error in " + info + ": \"" + (err.toString()) + "\""), vm);
+    }
+    /* istanbul ignore else */
+    if (inBrowser && typeof console !== 'undefined') {
+      console.error(err);
+    } else {
+      throw err
+    }
+  }
+}
+
+/*  */
 /* globals MutationObserver */
 
 // can we use __proto__?
@@ -15644,6 +15779,20 @@ var isEdge = UA && UA.indexOf('edge/') > 0;
 var isAndroid = UA && UA.indexOf('android') > 0;
 var isIOS = UA && /iphone|ipad|ipod|ios/.test(UA);
 var isChrome = UA && /chrome\/\d+/.test(UA) && !isEdge;
+
+var supportsPassive = false;
+if (inBrowser) {
+  try {
+    var opts = {};
+    Object.defineProperty(opts, 'passive', ({
+      get: function get () {
+        /* istanbul ignore next */
+        supportsPassive = true;
+      }
+    } )); // https://github.com/facebook/flow/issues/285
+    window.addEventListener('test-passive', null, opts);
+  } catch (e) {}
+}
 
 // this needs to be lazy-evaled because vue may be required before
 // vue-server-renderer can set VUE_ENV
@@ -15667,7 +15816,7 @@ var devtools = inBrowser && window.__VUE_DEVTOOLS_GLOBAL_HOOK__;
 
 /* istanbul ignore next */
 function isNative (Ctor) {
-  return /native code/.test(Ctor.toString())
+  return typeof Ctor === 'function' && /native code/.test(Ctor.toString())
 }
 
 var hasSymbol =
@@ -15738,15 +15887,22 @@ var nextTick = (function () {
   return function queueNextTick (cb, ctx) {
     var _resolve;
     callbacks.push(function () {
-      if (cb) { cb.call(ctx); }
-      if (_resolve) { _resolve(ctx); }
+      if (cb) {
+        try {
+          cb.call(ctx);
+        } catch (e) {
+          handleError(e, ctx, 'nextTick');
+        }
+      } else if (_resolve) {
+        _resolve(ctx);
+      }
     });
     if (!pending) {
       pending = true;
       timerFunc();
     }
     if (!cb && typeof Promise !== 'undefined') {
-      return new Promise(function (resolve) {
+      return new Promise(function (resolve, reject) {
         _resolve = resolve;
       })
     }
@@ -15778,74 +15934,17 @@ if (typeof Set !== 'undefined' && isNative(Set)) {
   }());
 }
 
-var warn = noop;
-var tip = noop;
-var formatComponentName;
-
-if (process.env.NODE_ENV !== 'production') {
-  var hasConsole = typeof console !== 'undefined';
-  var classifyRE = /(?:^|[-_])(\w)/g;
-  var classify = function (str) { return str
-    .replace(classifyRE, function (c) { return c.toUpperCase(); })
-    .replace(/[-_]/g, ''); };
-
-  warn = function (msg, vm) {
-    if (hasConsole && (!config.silent)) {
-      console.error("[Vue warn]: " + msg + " " + (
-        vm ? formatLocation(formatComponentName(vm)) : ''
-      ));
-    }
-  };
-
-  tip = function (msg, vm) {
-    if (hasConsole && (!config.silent)) {
-      console.warn("[Vue tip]: " + msg + " " + (
-        vm ? formatLocation(formatComponentName(vm)) : ''
-      ));
-    }
-  };
-
-  formatComponentName = function (vm, includeFile) {
-    if (vm.$root === vm) {
-      return '<Root>'
-    }
-    var name = typeof vm === 'function' && vm.options
-      ? vm.options.name
-      : vm._isVue
-        ? vm.$options.name || vm.$options._componentTag
-        : vm.name;
-
-    var file = vm._isVue && vm.$options.__file;
-    if (!name && file) {
-      var match = file.match(/([^/\\]+)\.vue$/);
-      name = match && match[1];
-    }
-
-    return (
-      (name ? ("<" + (classify(name)) + ">") : "<Anonymous>") +
-      (file && includeFile !== false ? (" at " + file) : '')
-    )
-  };
-
-  var formatLocation = function (str) {
-    if (str === "<Anonymous>") {
-      str += " - use the \"name\" option for better debugging messages.";
-    }
-    return ("\n(found in " + str + ")")
-  };
-}
-
 /*  */
 
 
-var uid$1 = 0;
+var uid = 0;
 
 /**
  * A dep is an observable that can have multiple
  * directives subscribing to it.
  */
 var Dep = function Dep () {
-  this.id = uid$1++;
+  this.id = uid++;
   this.subs = [];
 };
 
@@ -16108,7 +16207,7 @@ function defineReactive$$1 (
  * already exist.
  */
 function set (target, key, val) {
-  if (Array.isArray(target)) {
+  if (Array.isArray(target) && typeof key === 'number') {
     target.length = Math.max(target.length, key);
     target.splice(key, 1, val);
     return val
@@ -16117,7 +16216,7 @@ function set (target, key, val) {
     target[key] = val;
     return val
   }
-  var ob = target.__ob__;
+  var ob = (target ).__ob__;
   if (target._isVue || (ob && ob.vmCount)) {
     process.env.NODE_ENV !== 'production' && warn(
       'Avoid adding reactive properties to a Vue instance or its root $data ' +
@@ -16138,11 +16237,11 @@ function set (target, key, val) {
  * Delete a property and trigger change if necessary.
  */
 function del (target, key) {
-  if (Array.isArray(target)) {
+  if (Array.isArray(target) && typeof key === 'number') {
     target.splice(key, 1);
     return
   }
-  var ob = target.__ob__;
+  var ob = (target ).__ob__;
   if (target._isVue || (ob && ob.vmCount)) {
     process.env.NODE_ENV !== 'production' && warn(
       'Avoid deleting properties on a Vue instance or its root $data ' +
@@ -16288,7 +16387,7 @@ function mergeHook (
     : parentVal
 }
 
-config._lifecycleHooks.forEach(function (hook) {
+LIFECYCLE_HOOKS.forEach(function (hook) {
   strats[hook] = mergeHook;
 });
 
@@ -16306,7 +16405,7 @@ function mergeAssets (parentVal, childVal) {
     : res
 }
 
-config._assetTypes.forEach(function (type) {
+ASSET_TYPES.forEach(function (type) {
   strats[type + 's'] = mergeAssets;
 });
 
@@ -16432,21 +16531,20 @@ function mergeOptions (
   if (process.env.NODE_ENV !== 'production') {
     checkComponents(child);
   }
+
+  if (typeof child === 'function') {
+    child = child.options;
+  }
+
   normalizeProps(child);
   normalizeDirectives(child);
   var extendsFrom = child.extends;
   if (extendsFrom) {
-    parent = typeof extendsFrom === 'function'
-      ? mergeOptions(parent, extendsFrom.options, vm)
-      : mergeOptions(parent, extendsFrom, vm);
+    parent = mergeOptions(parent, extendsFrom, vm);
   }
   if (child.mixins) {
     for (var i = 0, l = child.mixins.length; i < l; i++) {
-      var mixin = child.mixins[i];
-      if (mixin.prototype instanceof Vue$3) {
-        mixin = mixin.options;
-      }
-      parent = mergeOptions(parent, mixin, vm);
+      parent = mergeOptions(parent, child.mixins[i], vm);
     }
   }
   var options = {};
@@ -16619,20 +16717,13 @@ function assertProp (
   }
 }
 
-/**
- * Assert the type of a value
- */
+var simpleCheckRE = /^(String|Number|Boolean|Function|Symbol)$/;
+
 function assertType (value, type) {
   var valid;
   var expectedType = getType(type);
-  if (expectedType === 'String') {
-    valid = typeof value === (expectedType = 'string');
-  } else if (expectedType === 'Number') {
-    valid = typeof value === (expectedType = 'number');
-  } else if (expectedType === 'Boolean') {
-    valid = typeof value === (expectedType = 'boolean');
-  } else if (expectedType === 'Function') {
-    valid = typeof value === (expectedType = 'function');
+  if (simpleCheckRE.test(expectedType)) {
+    valid = typeof value === expectedType.toLowerCase();
   } else if (expectedType === 'Object') {
     valid = isPlainObject(value);
   } else if (expectedType === 'Array') {
@@ -16653,7 +16744,7 @@ function assertType (value, type) {
  */
 function getType (fn) {
   var match = fn && fn.toString().match(/^\s*function (\w+)/);
-  return match && match[1]
+  return match ? match[1] : ''
 }
 
 function isType (type, fn) {
@@ -16669,19 +16760,28 @@ function isType (type, fn) {
   return false
 }
 
-function handleError (err, vm, info) {
-  if (config.errorHandler) {
-    config.errorHandler.call(null, err, vm, info);
-  } else {
-    if (process.env.NODE_ENV !== 'production') {
-      warn(("Error in " + info + ":"), vm);
-    }
-    /* istanbul ignore else */
-    if (inBrowser && typeof console !== 'undefined') {
-      console.error(err);
-    } else {
-      throw err
-    }
+/*  */
+
+var mark;
+var measure;
+
+if (process.env.NODE_ENV !== 'production') {
+  var perf = inBrowser && window.performance;
+  /* istanbul ignore if */
+  if (
+    perf &&
+    perf.mark &&
+    perf.measure &&
+    perf.clearMarks &&
+    perf.clearMeasures
+  ) {
+    mark = function (tag) { return perf.mark(tag); };
+    measure = function (name, startTag, endTag) {
+      perf.measure(name, startTag, endTag);
+      perf.clearMarks(startTag);
+      perf.clearMarks(endTag);
+      perf.clearMeasures(name);
+    };
   }
 }
 
@@ -16757,29 +16857,6 @@ if (process.env.NODE_ENV !== 'production') {
       vm._renderProxy = vm;
     }
   };
-}
-
-var mark;
-var measure;
-
-if (process.env.NODE_ENV !== 'production') {
-  var perf = inBrowser && window.performance;
-  /* istanbul ignore if */
-  if (
-    perf &&
-    perf.mark &&
-    perf.measure &&
-    perf.clearMarks &&
-    perf.clearMeasures
-  ) {
-    mark = function (tag) { return perf.mark(tag); };
-    measure = function (name, startTag, endTag) {
-      perf.measure(name, startTag, endTag);
-      perf.clearMarks(startTag);
-      perf.clearMarks(endTag);
-      perf.clearMeasures(name);
-    };
-  }
 }
 
 /*  */
@@ -16867,6 +16944,8 @@ function cloneVNodes (vnodes) {
 /*  */
 
 var normalizeEvent = cached(function (name) {
+  var passive = name.charAt(0) === '&';
+  name = passive ? name.slice(1) : name;
   var once$$1 = name.charAt(0) === '~'; // Prefixed last, checked first
   name = once$$1 ? name.slice(1) : name;
   var capture = name.charAt(0) === '!';
@@ -16874,7 +16953,8 @@ var normalizeEvent = cached(function (name) {
   return {
     name: name,
     once: once$$1,
-    capture: capture
+    capture: capture,
+    passive: passive
   }
 });
 
@@ -16908,23 +16988,23 @@ function updateListeners (
     cur = on[name];
     old = oldOn[name];
     event = normalizeEvent(name);
-    if (!cur) {
+    if (isUndef(cur)) {
       process.env.NODE_ENV !== 'production' && warn(
         "Invalid handler for event \"" + (event.name) + "\": got " + String(cur),
         vm
       );
-    } else if (!old) {
-      if (!cur.fns) {
+    } else if (isUndef(old)) {
+      if (isUndef(cur.fns)) {
         cur = on[name] = createFnInvoker(cur);
       }
-      add(event.name, cur, event.once, event.capture);
+      add(event.name, cur, event.once, event.capture, event.passive);
     } else if (cur !== old) {
       old.fns = cur;
       on[name] = old;
     }
   }
   for (name in oldOn) {
-    if (!on[name]) {
+    if (isUndef(on[name])) {
       event = normalizeEvent(name);
       remove$$1(event.name, oldOn[name], event.capture);
     }
@@ -16944,12 +17024,12 @@ function mergeVNodeHook (def, hookKey, hook) {
     remove(invoker.fns, wrappedHook);
   }
 
-  if (!oldHook) {
+  if (isUndef(oldHook)) {
     // no existing hook
     invoker = createFnInvoker([wrappedHook]);
   } else {
     /* istanbul ignore if */
-    if (oldHook.fns && oldHook.merged) {
+    if (isDef(oldHook.fns) && isTrue(oldHook.merged)) {
       // already a merged invoker
       invoker = oldHook;
       invoker.fns.push(wrappedHook);
@@ -16961,6 +17041,74 @@ function mergeVNodeHook (def, hookKey, hook) {
 
   invoker.merged = true;
   def[hookKey] = invoker;
+}
+
+/*  */
+
+function extractPropsFromVNodeData (
+  data,
+  Ctor,
+  tag
+) {
+  // we are only extracting raw values here.
+  // validation and default values are handled in the child
+  // component itself.
+  var propOptions = Ctor.options.props;
+  if (isUndef(propOptions)) {
+    return
+  }
+  var res = {};
+  var attrs = data.attrs;
+  var props = data.props;
+  if (isDef(attrs) || isDef(props)) {
+    for (var key in propOptions) {
+      var altKey = hyphenate(key);
+      if (process.env.NODE_ENV !== 'production') {
+        var keyInLowerCase = key.toLowerCase();
+        if (
+          key !== keyInLowerCase &&
+          attrs && hasOwn(attrs, keyInLowerCase)
+        ) {
+          tip(
+            "Prop \"" + keyInLowerCase + "\" is passed to component " +
+            (formatComponentName(tag || Ctor)) + ", but the declared prop name is" +
+            " \"" + key + "\". " +
+            "Note that HTML attributes are case-insensitive and camelCased " +
+            "props need to use their kebab-case equivalents when using in-DOM " +
+            "templates. You should probably use \"" + altKey + "\" instead of \"" + key + "\"."
+          );
+        }
+      }
+      checkProp(res, props, key, altKey, true) ||
+      checkProp(res, attrs, key, altKey, false);
+    }
+  }
+  return res
+}
+
+function checkProp (
+  res,
+  hash,
+  key,
+  altKey,
+  preserve
+) {
+  if (isDef(hash)) {
+    if (hasOwn(hash, key)) {
+      res[key] = hash[key];
+      if (!preserve) {
+        delete hash[key];
+      }
+      return true
+    } else if (hasOwn(hash, altKey)) {
+      res[key] = hash[altKey];
+      if (!preserve) {
+        delete hash[altKey];
+      }
+      return true
+    }
+  }
+  return false
 }
 
 /*  */
@@ -17003,24 +17151,24 @@ function normalizeArrayChildren (children, nestedIndex) {
   var i, c, last;
   for (i = 0; i < children.length; i++) {
     c = children[i];
-    if (c == null || typeof c === 'boolean') { continue }
+    if (isUndef(c) || typeof c === 'boolean') { continue }
     last = res[res.length - 1];
     //  nested
     if (Array.isArray(c)) {
       res.push.apply(res, normalizeArrayChildren(c, ((nestedIndex || '') + "_" + i)));
     } else if (isPrimitive(c)) {
-      if (last && last.text) {
+      if (isDef(last) && isDef(last.text)) {
         last.text += String(c);
       } else if (c !== '') {
         // convert primitive to vnode
         res.push(createTextVNode(c));
       }
     } else {
-      if (c.text && last && last.text) {
+      if (isDef(c.text) && isDef(last) && isDef(last.text)) {
         res[res.length - 1] = createTextVNode(last.text + c.text);
       } else {
         // default key for nested array children (likely generated by v-for)
-        if (c.tag && c.key == null && nestedIndex != null) {
+        if (isDef(c.tag) && isUndef(c.key) && isDef(nestedIndex)) {
           c.key = "__vlist" + nestedIndex + "_" + i + "__";
         }
         res.push(c);
@@ -17032,9 +17180,126 @@ function normalizeArrayChildren (children, nestedIndex) {
 
 /*  */
 
-function getFirstComponentChild (children) {
-  return children && children.filter(function (c) { return c && c.componentOptions; })[0]
+function ensureCtor (comp, base) {
+  return isObject(comp)
+    ? base.extend(comp)
+    : comp
 }
+
+function resolveAsyncComponent (
+  factory,
+  baseCtor,
+  context
+) {
+  if (isTrue(factory.error) && isDef(factory.errorComp)) {
+    return factory.errorComp
+  }
+
+  if (isDef(factory.resolved)) {
+    return factory.resolved
+  }
+
+  if (isTrue(factory.loading) && isDef(factory.loadingComp)) {
+    return factory.loadingComp
+  }
+
+  if (isDef(factory.contexts)) {
+    // already pending
+    factory.contexts.push(context);
+  } else {
+    var contexts = factory.contexts = [context];
+    var sync = true;
+
+    var forceRender = function () {
+      for (var i = 0, l = contexts.length; i < l; i++) {
+        contexts[i].$forceUpdate();
+      }
+    };
+
+    var resolve = once(function (res) {
+      // cache resolved
+      factory.resolved = ensureCtor(res, baseCtor);
+      // invoke callbacks only if this is not a synchronous resolve
+      // (async resolves are shimmed as synchronous during SSR)
+      if (!sync) {
+        forceRender();
+      }
+    });
+
+    var reject = once(function (reason) {
+      process.env.NODE_ENV !== 'production' && warn(
+        "Failed to resolve async component: " + (String(factory)) +
+        (reason ? ("\nReason: " + reason) : '')
+      );
+      if (isDef(factory.errorComp)) {
+        factory.error = true;
+        forceRender();
+      }
+    });
+
+    var res = factory(resolve, reject);
+
+    if (isObject(res)) {
+      if (typeof res.then === 'function') {
+        // () => Promise
+        if (isUndef(factory.resolved)) {
+          res.then(resolve, reject);
+        }
+      } else if (isDef(res.component) && typeof res.component.then === 'function') {
+        res.component.then(resolve, reject);
+
+        if (isDef(res.error)) {
+          factory.errorComp = ensureCtor(res.error, baseCtor);
+        }
+
+        if (isDef(res.loading)) {
+          factory.loadingComp = ensureCtor(res.loading, baseCtor);
+          if (res.delay === 0) {
+            factory.loading = true;
+          } else {
+            setTimeout(function () {
+              if (isUndef(factory.resolved) && isUndef(factory.error)) {
+                factory.loading = true;
+                forceRender();
+              }
+            }, res.delay || 200);
+          }
+        }
+
+        if (isDef(res.timeout)) {
+          setTimeout(function () {
+            reject(
+              process.env.NODE_ENV !== 'production'
+                ? ("timeout (" + (res.timeout) + "ms)")
+                : null
+            );
+          }, res.timeout);
+        }
+      }
+    }
+
+    sync = false;
+    // return in case resolved synchronously
+    return factory.loading
+      ? factory.loadingComp
+      : factory.resolved
+  }
+}
+
+/*  */
+
+function getFirstComponentChild (children) {
+  if (Array.isArray(children)) {
+    for (var i = 0; i < children.length; i++) {
+      var c = children[i];
+      if (isDef(c) && isDef(c.componentOptions)) {
+        return c
+      }
+    }
+  }
+}
+
+/*  */
 
 /*  */
 
@@ -17143,6 +17408,18 @@ function eventsMixin (Vue) {
 
   Vue.prototype.$emit = function (event) {
     var vm = this;
+    if (process.env.NODE_ENV !== 'production') {
+      var lowerCaseEvent = event.toLowerCase();
+      if (lowerCaseEvent !== event && vm._events[lowerCaseEvent]) {
+        tip(
+          "Event \"" + lowerCaseEvent + "\" is emitted in component " +
+          (formatComponentName(vm)) + " but the handler is registered for \"" + event + "\". " +
+          "Note that HTML attributes are case-insensitive and you cannot use " +
+          "v-on to listen to camelCase events when using in-DOM templates. " +
+          "You should probably use \"" + (hyphenate(event)) + "\" instead of \"" + event + "\"."
+        );
+      }
+    }
     var cbs = vm._events[event];
     if (cbs) {
       cbs = cbs.length > 1 ? toArray(cbs) : cbs;
@@ -17169,13 +17446,13 @@ function resolveSlots (
     return slots
   }
   var defaultSlot = [];
-  var name, child;
   for (var i = 0, l = children.length; i < l; i++) {
-    child = children[i];
+    var child = children[i];
     // named slots should only be respected if the vnode was rendered in the
     // same context.
     if ((child.context === context || child.functionalContext === context) &&
-        child.data && (name = child.data.slot)) {
+        child.data && child.data.slot != null) {
+      var name = child.data.slot;
       var slot = (slots[name] || (slots[name] = []));
       if (child.tag === 'template') {
         slot.push.apply(slot, child.children);
@@ -17311,6 +17588,9 @@ function lifecycleMixin (Vue) {
     }
     // call the last hook...
     vm._isDestroyed = true;
+    // invoke destroy hooks on current rendered tree
+    vm.__patch__(vm._vnode, null);
+    // fire destroyed hook
     callHook(vm, 'destroyed');
     // turn off all instance listeners.
     vm.$off();
@@ -17318,8 +17598,8 @@ function lifecycleMixin (Vue) {
     if (vm.$el) {
       vm.$el.__vue__ = null;
     }
-    // invoke destroy hooks on current rendered tree
-    vm.__patch__(vm._vnode, null);
+    // remove reference to DOM nodes (prevents leak)
+    vm.$options._parentElm = vm.$options._refElm = null;
   };
 }
 
@@ -17459,7 +17739,7 @@ function activateChildComponent (vm, direct) {
   } else if (vm._directInactive) {
     return
   }
-  if (vm._inactive || vm._inactive == null) {
+  if (vm._inactive || vm._inactive === null) {
     vm._inactive = false;
     for (var i = 0; i < vm.$children.length; i++) {
       activateChildComponent(vm.$children[i]);
@@ -17503,7 +17783,10 @@ function callHook (vm, hook) {
 /*  */
 
 
+var MAX_UPDATE_COUNT = 100;
+
 var queue = [];
+var activatedChildren = [];
 var has = {};
 var circular = {};
 var waiting = false;
@@ -17514,7 +17797,7 @@ var index = 0;
  * Reset the scheduler's state.
  */
 function resetSchedulerState () {
-  queue.length = 0;
+  queue.length = activatedChildren.length = 0;
   has = {};
   if (process.env.NODE_ENV !== 'production') {
     circular = {};
@@ -17527,7 +17810,7 @@ function resetSchedulerState () {
  */
 function flushSchedulerQueue () {
   flushing = true;
-  var watcher, id, vm;
+  var watcher, id;
 
   // Sort queue before flush.
   // This ensures that:
@@ -17549,7 +17832,7 @@ function flushSchedulerQueue () {
     // in dev build, check and stop circular updates.
     if (process.env.NODE_ENV !== 'production' && has[id] != null) {
       circular[id] = (circular[id] || 0) + 1;
-      if (circular[id] > config._maxUpdateCount) {
+      if (circular[id] > MAX_UPDATE_COUNT) {
         warn(
           'You may have an infinite update loop ' + (
             watcher.user
@@ -17563,23 +17846,50 @@ function flushSchedulerQueue () {
     }
   }
 
-  // call updated hooks
-  index = queue.length;
-  while (index--) {
-    watcher = queue[index];
-    vm = watcher.vm;
-    if (vm._watcher === watcher && vm._isMounted) {
-      callHook(vm, 'updated');
-    }
-  }
+  // keep copies of post queues before resetting state
+  var activatedQueue = activatedChildren.slice();
+  var updatedQueue = queue.slice();
+
+  resetSchedulerState();
+
+  // call component updated and activated hooks
+  callActivatedHooks(activatedQueue);
+  callUpdateHooks(updatedQueue);
 
   // devtool hook
   /* istanbul ignore if */
   if (devtools && config.devtools) {
     devtools.emit('flush');
   }
+}
 
-  resetSchedulerState();
+function callUpdateHooks (queue) {
+  var i = queue.length;
+  while (i--) {
+    var watcher = queue[i];
+    var vm = watcher.vm;
+    if (vm._watcher === watcher && vm._isMounted) {
+      callHook(vm, 'updated');
+    }
+  }
+}
+
+/**
+ * Queue a kept-alive component that was activated during patch.
+ * The queue will be processed after the entire tree has been patched.
+ */
+function queueActivatedComponent (vm) {
+  // setting _inactive to false here so that a render function can
+  // rely on checking whether it's in an inactive tree (e.g. router-view)
+  vm._inactive = false;
+  activatedChildren.push(vm);
+}
+
+function callActivatedHooks (queue) {
+  for (var i = 0; i < queue.length; i++) {
+    queue[i]._inactive = true;
+    activateChildComponent(queue[i], true /* true */);
+  }
 }
 
 /**
@@ -17885,7 +18195,11 @@ function initState (vm) {
   if (opts.watch) { initWatch(vm, opts.watch); }
 }
 
-var isReservedProp = { key: 1, ref: 1, slot: 1 };
+var isReservedProp = {
+  key: 1,
+  ref: 1,
+  slot: 1
+};
 
 function initProps (vm, propsOptions) {
   var propsData = vm.$options.propsData || {};
@@ -17901,7 +18215,7 @@ function initProps (vm, propsOptions) {
     var value = validateProp(key, propsOptions, propsData, vm);
     /* istanbul ignore else */
     if (process.env.NODE_ENV !== 'production') {
-      if (isReservedProp[key]) {
+      if (isReservedProp[key] || config.isReservedAttr(key)) {
         warn(
           ("\"" + key + "\" is a reserved attribute and cannot be used as component prop."),
           vm
@@ -17936,7 +18250,7 @@ function initProps (vm, propsOptions) {
 function initData (vm) {
   var data = vm.$options.data;
   data = vm._data = typeof data === 'function'
-    ? data.call(vm)
+    ? getData(data, vm)
     : data || {};
   if (!isPlainObject(data)) {
     data = {};
@@ -17965,6 +18279,15 @@ function initData (vm) {
   observe(data, true /* asRootData */);
 }
 
+function getData (data, vm) {
+  try {
+    return data.call(vm)
+  } catch (e) {
+    handleError(e, vm, "data()");
+    return {}
+  }
+}
+
 var computedWatcherOptions = { lazy: true };
 
 function initComputed (vm, computed) {
@@ -17973,6 +18296,15 @@ function initComputed (vm, computed) {
   for (var key in computed) {
     var userDef = computed[key];
     var getter = typeof userDef === 'function' ? userDef : userDef.get;
+    if (process.env.NODE_ENV !== 'production') {
+      if (getter === undefined) {
+        warn(
+          ("No getter function has been defined for computed property \"" + key + "\"."),
+          vm
+        );
+        getter = noop;
+      }
+    }
     // create internal watcher for the computed property.
     watchers[key] = new Watcher(vm, getter, noop, computedWatcherOptions);
 
@@ -17981,6 +18313,12 @@ function initComputed (vm, computed) {
     // at instantiation here.
     if (!(key in vm)) {
       defineComputed(vm, key, userDef);
+    } else if (process.env.NODE_ENV !== 'production') {
+      if (key in vm.$data) {
+        warn(("The computed property \"" + key + "\" is already defined in data."), vm);
+      } else if (vm.$options.props && key in vm.$options.props) {
+        warn(("The computed property \"" + key + "\" is already defined as a prop."), vm);
+      }
     }
   }
 }
@@ -18110,6 +18448,114 @@ function stateMixin (Vue) {
 
 /*  */
 
+function initProvide (vm) {
+  var provide = vm.$options.provide;
+  if (provide) {
+    vm._provided = typeof provide === 'function'
+      ? provide.call(vm)
+      : provide;
+  }
+}
+
+function initInjections (vm) {
+  var result = resolveInject(vm.$options.inject, vm);
+  if (result) {
+    Object.keys(result).forEach(function (key) {
+      /* istanbul ignore else */
+      if (process.env.NODE_ENV !== 'production') {
+        defineReactive$$1(vm, key, result[key], function () {
+          warn(
+            "Avoid mutating an injected value directly since the changes will be " +
+            "overwritten whenever the provided component re-renders. " +
+            "injection being mutated: \"" + key + "\"",
+            vm
+          );
+        });
+      } else {
+        defineReactive$$1(vm, key, result[key]);
+      }
+    });
+  }
+}
+
+function resolveInject (inject, vm) {
+  if (inject) {
+    // inject is :any because flow is not smart enough to figure out cached
+    // isArray here
+    var isArray = Array.isArray(inject);
+    var result = Object.create(null);
+    var keys = isArray
+      ? inject
+      : hasSymbol
+        ? Reflect.ownKeys(inject)
+        : Object.keys(inject);
+
+    for (var i = 0; i < keys.length; i++) {
+      var key = keys[i];
+      var provideKey = isArray ? key : inject[key];
+      var source = vm;
+      while (source) {
+        if (source._provided && provideKey in source._provided) {
+          result[key] = source._provided[provideKey];
+          break
+        }
+        source = source.$parent;
+      }
+    }
+    return result
+  }
+}
+
+/*  */
+
+function createFunctionalComponent (
+  Ctor,
+  propsData,
+  data,
+  context,
+  children
+) {
+  var props = {};
+  var propOptions = Ctor.options.props;
+  if (isDef(propOptions)) {
+    for (var key in propOptions) {
+      props[key] = validateProp(key, propOptions, propsData || {});
+    }
+  } else {
+    if (isDef(data.attrs)) { mergeProps(props, data.attrs); }
+    if (isDef(data.props)) { mergeProps(props, data.props); }
+  }
+  // ensure the createElement function in functional components
+  // gets a unique context - this is necessary for correct named slot check
+  var _context = Object.create(context);
+  var h = function (a, b, c, d) { return createElement(_context, a, b, c, d, true); };
+  var vnode = Ctor.options.render.call(null, h, {
+    data: data,
+    props: props,
+    children: children,
+    parent: context,
+    listeners: data.on || {},
+    injections: resolveInject(Ctor.options.inject, context),
+    slots: function () { return resolveSlots(children, context); }
+  });
+  if (vnode instanceof VNode) {
+    vnode.functionalContext = context;
+    vnode.functionalOptions = Ctor.options;
+    if (data.slot) {
+      (vnode.data || (vnode.data = {})).slot = data.slot;
+    }
+  }
+  return vnode
+}
+
+function mergeProps (to, from) {
+  for (var key in from) {
+    to[camelize(key)] = from[key];
+  }
+}
+
+/*  */
+
 // hooks to be invoked on component VNodes during patch
 var componentVNodeHooks = {
   init: function init (
@@ -18146,21 +18592,33 @@ var componentVNodeHooks = {
   },
 
   insert: function insert (vnode) {
-    if (!vnode.componentInstance._isMounted) {
-      vnode.componentInstance._isMounted = true;
-      callHook(vnode.componentInstance, 'mounted');
+    var context = vnode.context;
+    var componentInstance = vnode.componentInstance;
+    if (!componentInstance._isMounted) {
+      componentInstance._isMounted = true;
+      callHook(componentInstance, 'mounted');
     }
     if (vnode.data.keepAlive) {
-      activateChildComponent(vnode.componentInstance, true /* direct */);
+      if (context._isMounted) {
+        // vue-router#1212
+        // During updates, a kept-alive component's child components may
+        // change, so directly walking the tree here may call activated hooks
+        // on incorrect children. Instead we push them into a queue which will
+        // be processed after the whole patch process ended.
+        queueActivatedComponent(componentInstance);
+      } else {
+        activateChildComponent(componentInstance, true /* direct */);
+      }
     }
   },
 
   destroy: function destroy (vnode) {
-    if (!vnode.componentInstance._isDestroyed) {
+    var componentInstance = vnode.componentInstance;
+    if (!componentInstance._isDestroyed) {
       if (!vnode.data.keepAlive) {
-        vnode.componentInstance.$destroy();
+        componentInstance.$destroy();
       } else {
-        deactivateChildComponent(vnode.componentInstance, true /* direct */);
+        deactivateChildComponent(componentInstance, true /* direct */);
       }
     }
   }
@@ -18175,15 +18633,19 @@ function createComponent (
   children,
   tag
 ) {
-  if (!Ctor) {
+  if (isUndef(Ctor)) {
     return
   }
 
   var baseCtor = context.$options._base;
+
+  // plain options object: turn it into a constructor
   if (isObject(Ctor)) {
     Ctor = baseCtor.extend(Ctor);
   }
 
+  // if at this stage it's not a constructor or an async component factory,
+  // reject.
   if (typeof Ctor !== 'function') {
     if (process.env.NODE_ENV !== 'production') {
       warn(("Invalid Component definition: " + (String(Ctor))), context);
@@ -18192,20 +18654,12 @@ function createComponent (
   }
 
   // async component
-  if (!Ctor.cid) {
-    if (Ctor.resolved) {
-      Ctor = Ctor.resolved;
-    } else {
-      Ctor = resolveAsyncComponent(Ctor, baseCtor, function () {
-        // it's ok to queue this on every render because
-        // $forceUpdate is buffered by the scheduler.
-        context.$forceUpdate();
-      });
-      if (!Ctor) {
-        // return nothing if this is indeed an async component
-        // wait for the callback to trigger parent update.
-        return
-      }
+  if (isUndef(Ctor.cid)) {
+    Ctor = resolveAsyncComponent(Ctor, baseCtor, context);
+    if (Ctor === undefined) {
+      // return nothing if this is indeed an async component
+      // wait for the callback to trigger parent update.
+      return
     }
   }
 
@@ -18216,15 +18670,15 @@ function createComponent (
   data = data || {};
 
   // transform component v-model data into props & events
-  if (data.model) {
+  if (isDef(data.model)) {
     transformModel(Ctor.options, data);
   }
 
   // extract props
-  var propsData = extractProps(data, Ctor);
+  var propsData = extractPropsFromVNodeData(data, Ctor, tag);
 
   // functional component
-  if (Ctor.options.functional) {
+  if (isTrue(Ctor.options.functional)) {
     return createFunctionalComponent(Ctor, propsData, data, context, children)
   }
 
@@ -18234,7 +18688,7 @@ function createComponent (
   // replace with listeners with .native modifier
   data.on = data.nativeOn;
 
-  if (Ctor.options.abstract) {
+  if (isTrue(Ctor.options.abstract)) {
     // abstract components do not keep anything
     // other than props & listeners
     data = {};
@@ -18250,40 +18704,6 @@ function createComponent (
     data, undefined, undefined, undefined, context,
     { Ctor: Ctor, propsData: propsData, listeners: listeners, tag: tag, children: children }
   );
-  return vnode
-}
-
-function createFunctionalComponent (
-  Ctor,
-  propsData,
-  data,
-  context,
-  children
-) {
-  var props = {};
-  var propOptions = Ctor.options.props;
-  if (propOptions) {
-    for (var key in propOptions) {
-      props[key] = validateProp(key, propOptions, propsData);
-    }
-  }
-  // ensure the createElement function in functional components
-  // gets a unique context - this is necessary for correct named slot check
-  var _context = Object.create(context);
-  var h = function (a, b, c, d) { return createElement(_context, a, b, c, d, true); };
-  var vnode = Ctor.options.render.call(null, h, {
-    props: props,
-    data: data,
-    parent: context,
-    children: children,
-    slots: function () { return resolveSlots(children, context); }
-  });
-  if (vnode instanceof VNode) {
-    vnode.functionalContext = context;
-    if (data.slot) {
-      (vnode.data || (vnode.data = {})).slot = data.slot;
-    }
-  }
   return vnode
 }
 
@@ -18307,122 +18727,11 @@ function createComponentInstanceForVnode (
   };
   // check inline-template render functions
   var inlineTemplate = vnode.data.inlineTemplate;
-  if (inlineTemplate) {
+  if (isDef(inlineTemplate)) {
     options.render = inlineTemplate.render;
     options.staticRenderFns = inlineTemplate.staticRenderFns;
   }
   return new vnodeComponentOptions.Ctor(options)
-}
-
-function resolveAsyncComponent (
-  factory,
-  baseCtor,
-  cb
-) {
-  if (factory.requested) {
-    // pool callbacks
-    factory.pendingCallbacks.push(cb);
-  } else {
-    factory.requested = true;
-    var cbs = factory.pendingCallbacks = [cb];
-    var sync = true;
-
-    var resolve = function (res) {
-      if (isObject(res)) {
-        res = baseCtor.extend(res);
-      }
-      // cache resolved
-      factory.resolved = res;
-      // invoke callbacks only if this is not a synchronous resolve
-      // (async resolves are shimmed as synchronous during SSR)
-      if (!sync) {
-        for (var i = 0, l = cbs.length; i < l; i++) {
-          cbs[i](res);
-        }
-      }
-    };
-
-    var reject = function (reason) {
-      process.env.NODE_ENV !== 'production' && warn(
-        "Failed to resolve async component: " + (String(factory)) +
-        (reason ? ("\nReason: " + reason) : '')
-      );
-    };
-
-    var res = factory(resolve, reject);
-
-    // handle promise
-    if (res && typeof res.then === 'function' && !factory.resolved) {
-      res.then(resolve, reject);
-    }
-
-    sync = false;
-    // return in case resolved synchronously
-    return factory.resolved
-  }
-}
-
-function extractProps (data, Ctor) {
-  // we are only extracting raw values here.
-  // validation and default values are handled in the child
-  // component itself.
-  var propOptions = Ctor.options.props;
-  if (!propOptions) {
-    return
-  }
-  var res = {};
-  var attrs = data.attrs;
-  var props = data.props;
-  var domProps = data.domProps;
-  if (attrs || props || domProps) {
-    for (var key in propOptions) {
-      var altKey = hyphenate(key);
-      if (process.env.NODE_ENV !== 'production') {
-        var keyInLowerCase = key.toLowerCase();
-        if (
-          key !== keyInLowerCase &&
-          attrs && attrs.hasOwnProperty(keyInLowerCase)
-        ) {
-          warn(
-            "Prop \"" + keyInLowerCase + "\" is not declared in component " +
-            (formatComponentName(Ctor)) + ". Note that HTML attributes are " +
-            "case-insensitive and camelCased props need to use their kebab-case " +
-            "equivalents when using in-DOM templates. You should probably use " +
-            "\"" + altKey + "\" instead of \"" + key + "\"."
-          );
-        }
-      }
-      checkProp(res, props, key, altKey, true) ||
-      checkProp(res, attrs, key, altKey) ||
-      checkProp(res, domProps, key, altKey);
-    }
-  }
-  return res
-}
-
-function checkProp (
-  res,
-  hash,
-  key,
-  altKey,
-  preserve
-) {
-  if (hash) {
-    if (hasOwn(hash, key)) {
-      res[key] = hash[key];
-      if (!preserve) {
-        delete hash[key];
-      }
-      return true
-    } else if (hasOwn(hash, altKey)) {
-      res[key] = hash[altKey];
-      if (!preserve) {
-        delete hash[altKey];
-      }
-      return true
-    }
-  }
-  return false
 }
 
 function mergeHooks (data) {
@@ -18450,7 +18759,7 @@ function transformModel (options, data) {
   var prop = (options.model && options.model.prop) || 'value';
   var event = (options.model && options.model.event) || 'input';(data.props || (data.props = {}))[prop] = data.model.value;
   var on = data.on || (data.on = {});
-  if (on[event]) {
+  if (isDef(on[event])) {
     on[event] = [data.model.callback].concat(on[event]);
   } else {
     on[event] = data.model.callback;
@@ -18477,7 +18786,9 @@ function createElement (
     children = data;
     data = undefined;
   }
-  if (alwaysNormalize) { normalizationType = ALWAYS_NORMALIZE; }
+  if (isTrue(alwaysNormalize)) {
+    normalizationType = ALWAYS_NORMALIZE;
+  }
   return _createElement(context, tag, data, children, normalizationType)
 }
 
@@ -18488,7 +18799,7 @@ function _createElement (
   children,
   normalizationType
 ) {
-  if (data && data.__ob__) {
+  if (isDef(data) && isDef((data).__ob__)) {
     process.env.NODE_ENV !== 'production' && warn(
       "Avoid using observed data object as vnode data: " + (JSON.stringify(data)) + "\n" +
       'Always create fresh vnode data objects in each render!',
@@ -18522,7 +18833,7 @@ function _createElement (
         config.parsePlatformTagName(tag), data, children,
         undefined, undefined, context
       );
-    } else if ((Ctor = resolveAsset(context.$options, 'components', tag))) {
+    } else if (isDef(Ctor = resolveAsset(context.$options, 'components', tag))) {
       // component
       vnode = createComponent(Ctor, data, context, children, tag);
     } else {
@@ -18538,7 +18849,7 @@ function _createElement (
     // direct component options / constructor
     vnode = createComponent(tag, data, context, children);
   }
-  if (vnode) {
+  if (isDef(vnode)) {
     if (ns) { applyNS(vnode, ns); }
     return vnode
   } else {
@@ -18552,10 +18863,10 @@ function applyNS (vnode, ns) {
     // use default namespace inside foreignObject
     return
   }
-  if (vnode.children) {
+  if (isDef(vnode.children)) {
     for (var i = 0, l = vnode.children.length; i < l; i++) {
       var child = vnode.children[i];
-      if (child.tag && !child.ns) {
+      if (isDef(child.tag) && isUndef(child.ns)) {
         applyNS(child, ns);
       }
     }
@@ -18755,10 +19066,9 @@ function markStaticNode (node, key, isOnce) {
 /*  */
 
 function initRender (vm) {
-  vm.$vnode = null; // the placeholder node in parent tree
   vm._vnode = null; // the root of the child tree
   vm._staticTrees = null;
-  var parentVnode = vm.$options._parentVnode;
+  var parentVnode = vm.$vnode = vm.$options._parentVnode; // the placeholder node in parent tree
   var renderContext = parentVnode && parentVnode.context;
   vm.$slots = resolveSlots(vm.$options._renderChildren, renderContext);
   vm.$scopedSlots = emptyObject;
@@ -18837,7 +19147,7 @@ function renderMixin (Vue) {
   // code size.
   Vue.prototype._o = markOnce;
   Vue.prototype._n = toNumber;
-  Vue.prototype._s = _toString;
+  Vue.prototype._s = toString;
   Vue.prototype._l = renderList;
   Vue.prototype._t = renderSlot;
   Vue.prototype._q = looseEqual;
@@ -18853,56 +19163,22 @@ function renderMixin (Vue) {
 
 /*  */
 
-function initProvide (vm) {
-  var provide = vm.$options.provide;
-  if (provide) {
-    vm._provided = typeof provide === 'function'
-      ? provide.call(vm)
-      : provide;
-  }
-}
-
-function initInjections (vm) {
-  var inject = vm.$options.inject;
-  if (inject) {
-    // inject is :any because flow is not smart enough to figure out cached
-    // isArray here
-    var isArray = Array.isArray(inject);
-    var keys = isArray
-      ? inject
-      : hasSymbol
-        ? Reflect.ownKeys(inject)
-        : Object.keys(inject);
-
-    for (var i = 0; i < keys.length; i++) {
-      var key = keys[i];
-      var provideKey = isArray ? key : inject[key];
-      var source = vm;
-      while (source) {
-        if (source._provided && provideKey in source._provided) {
-          vm[key] = source._provided[provideKey];
-          break
-        }
-        source = source.$parent;
-      }
-    }
-  }
-}
-
-/*  */
-
-var uid = 0;
+var uid$1 = 0;
 
 function initMixin (Vue) {
   Vue.prototype._init = function (options) {
-    /* istanbul ignore if */
-    if (process.env.NODE_ENV !== 'production' && config.performance && mark) {
-      mark('vue-perf-init');
-    }
-
     var vm = this;
     // a uid
-    vm._uid = uid++;
+    vm._uid = uid$1++;
+
+    var startTag, endTag;
+    /* istanbul ignore if */
+    if (process.env.NODE_ENV !== 'production' && config.performance && mark) {
+      startTag = "vue-perf-init:" + (vm._uid);
+      endTag = "vue-perf-end:" + (vm._uid);
+      mark(startTag);
+    }
+
     // a flag to avoid this being observed
     vm._isVue = true;
     // merge options
@@ -18938,8 +19214,8 @@ function initMixin (Vue) {
     /* istanbul ignore if */
     if (process.env.NODE_ENV !== 'production' && config.performance && mark) {
       vm._name = formatComponentName(vm, false);
-      mark('vue-perf-init-end');
-      measure(((vm._name) + " init"), 'vue-perf-init', 'vue-perf-init-end');
+      mark(endTag);
+      measure(((vm._name) + " init"), startTag, endTag);
     }
 
     if (vm.$options.el) {
@@ -18992,24 +19268,27 @@ function resolveConstructorOptions (Ctor) {
 function resolveModifiedOptions (Ctor) {
   var modified;
   var latest = Ctor.options;
+  var extended = Ctor.extendOptions;
   var sealed = Ctor.sealedOptions;
   for (var key in latest) {
     if (latest[key] !== sealed[key]) {
       if (!modified) { modified = {}; }
-      modified[key] = dedupe(latest[key], sealed[key]);
+      modified[key] = dedupe(latest[key], extended[key], sealed[key]);
     }
   }
   return modified
 }
 
-function dedupe (latest, sealed) {
+function dedupe (latest, extended, sealed) {
   // compare latest and sealed to ensure lifecycle hooks won't be duplicated
   // between merges
   if (Array.isArray(latest)) {
     var res = [];
     sealed = Array.isArray(sealed) ? sealed : [sealed];
+    extended = Array.isArray(extended) ? extended : [extended];
     for (var i = 0; i < latest.length; i++) {
-      if (sealed.indexOf(latest[i]) < 0) {
+      // push original options and not sealed options to exclude duplicated options
+      if (extended.indexOf(latest[i]) >= 0 || sealed.indexOf(latest[i]) < 0) {
         res.push(latest[i]);
       }
     }
@@ -19125,7 +19404,7 @@ function initExtend (Vue) {
 
     // create asset registers, so extended classes
     // can have their private assets too.
-    config._assetTypes.forEach(function (type) {
+    ASSET_TYPES.forEach(function (type) {
       Sub[type] = Super[type];
     });
     // enable recursive self-lookup
@@ -19166,7 +19445,7 @@ function initAssetRegisters (Vue) {
   /**
    * Create asset registration methods.
    */
-  config._assetTypes.forEach(function (type) {
+  ASSET_TYPES.forEach(function (type) {
     Vue[type] = function (
       id,
       definition
@@ -19208,20 +19487,22 @@ function getComponentName (opts) {
 function matches (pattern, name) {
   if (typeof pattern === 'string') {
     return pattern.split(',').indexOf(name) > -1
-  } else if (pattern instanceof RegExp) {
+  } else if (isRegExp(pattern)) {
     return pattern.test(name)
   }
   /* istanbul ignore next */
   return false
 }
 
-function pruneCache (cache, filter) {
+function pruneCache (cache, current, filter) {
   for (var key in cache) {
     var cachedNode = cache[key];
     if (cachedNode) {
       var name = getComponentName(cachedNode.componentOptions);
       if (name && !filter(name)) {
-        pruneCacheEntry(cachedNode);
+        if (cachedNode !== current) {
+          pruneCacheEntry(cachedNode);
+        }
         cache[key] = null;
       }
     }
@@ -19230,9 +19511,6 @@ function pruneCache (cache, filter) {
 
 function pruneCacheEntry (vnode) {
   if (vnode) {
-    if (!vnode.componentInstance._inactive) {
-      callHook(vnode.componentInstance, 'deactivated');
-    }
     vnode.componentInstance.$destroy();
   }
 }
@@ -19260,10 +19538,10 @@ var KeepAlive = {
 
   watch: {
     include: function include (val) {
-      pruneCache(this.cache, function (name) { return matches(val, name); });
+      pruneCache(this.cache, this._vnode, function (name) { return matches(val, name); });
     },
     exclude: function exclude (val) {
-      pruneCache(this.cache, function (name) { return !matches(val, name); });
+      pruneCache(this.cache, this._vnode, function (name) { return !matches(val, name); });
     }
   },
 
@@ -19329,7 +19607,7 @@ function initGlobalAPI (Vue) {
   Vue.nextTick = nextTick;
 
   Vue.options = Object.create(null);
-  config._assetTypes.forEach(function (type) {
+  ASSET_TYPES.forEach(function (type) {
     Vue.options[type + 's'] = Object.create(null);
   });
 
@@ -19351,9 +19629,19 @@ Object.defineProperty(Vue$3.prototype, '$isServer', {
   get: isServerRendering
 });
 
-Vue$3.version = '2.2.4';
+Object.defineProperty(Vue$3.prototype, '$ssrContext', {
+  get: function get () {
+    return this.$vnode.ssrContext
+  }
+});
+
+Vue$3.version = '2.3.2';
 
 /*  */
+
+// these are reserved for web because they are directly compiled away
+// during template compilation
+var isReservedAttr = makeMap('style,class');
 
 // attributes that should be using props for binding
 var acceptValue = makeMap('input,textarea,option,select');
@@ -19397,13 +19685,13 @@ function genClassForVnode (vnode) {
   var data = vnode.data;
   var parentNode = vnode;
   var childNode = vnode;
-  while (childNode.componentInstance) {
+  while (isDef(childNode.componentInstance)) {
     childNode = childNode.componentInstance._vnode;
     if (childNode.data) {
       data = mergeClassData(childNode.data, data);
     }
   }
-  while ((parentNode = parentNode.parent)) {
+  while (isDef(parentNode = parentNode.parent)) {
     if (parentNode.data) {
       data = mergeClassData(data, parentNode.data);
     }
@@ -19414,7 +19702,7 @@ function genClassForVnode (vnode) {
 function mergeClassData (child, parent) {
   return {
     staticClass: concat(child.staticClass, parent.staticClass),
-    class: child.class
+    class: isDef(child.class)
       ? [child.class, parent.class]
       : parent.class
   }
@@ -19423,7 +19711,7 @@ function mergeClassData (child, parent) {
 function genClassFromData (data) {
   var dynamicClass = data.class;
   var staticClass = data.staticClass;
-  if (staticClass || dynamicClass) {
+  if (isDef(staticClass) || isDef(dynamicClass)) {
     return concat(staticClass, stringifyClass(dynamicClass))
   }
   /* istanbul ignore next */
@@ -19435,18 +19723,18 @@ function concat (a, b) {
 }
 
 function stringifyClass (value) {
-  var res = '';
-  if (!value) {
-    return res
+  if (isUndef(value)) {
+    return ''
   }
   if (typeof value === 'string') {
     return value
   }
+  var res = '';
   if (Array.isArray(value)) {
     var stringified;
     for (var i = 0, l = value.length; i < l; i++) {
-      if (value[i]) {
-        if ((stringified = stringifyClass(value[i]))) {
+      if (isDef(value[i])) {
+        if (isDef(stringified = stringifyClass(value[i])) && stringified !== '') {
           res += stringified + ' ';
         }
       }
@@ -19691,21 +19979,24 @@ var emptyNode = new VNode('', {}, []);
 
 var hooks = ['create', 'activate', 'update', 'remove', 'destroy'];
 
-function isUndef (s) {
-  return s == null
-}
-
-function isDef (s) {
-  return s != null
-}
-
-function sameVnode (vnode1, vnode2) {
+function sameVnode (a, b) {
   return (
-    vnode1.key === vnode2.key &&
-    vnode1.tag === vnode2.tag &&
-    vnode1.isComment === vnode2.isComment &&
-    !vnode1.data === !vnode2.data
+    a.key === b.key &&
+    a.tag === b.tag &&
+    a.isComment === b.isComment &&
+    isDef(a.data) === isDef(b.data) &&
+    sameInputType(a, b)
   )
+}
+
+// Some browsers do not support dynamically changing type for <input>
+// so they need to be treated as different nodes
+function sameInputType (a, b) {
+  if (a.tag !== 'input') { return true }
+  var i;
+  var typeA = isDef(i = a.data) && isDef(i = i.attrs) && i.type;
+  var typeB = isDef(i = b.data) && isDef(i = i.attrs) && i.type;
+  return typeA === typeB
 }
 
 function createKeyToOldIdx (children, beginIdx, endIdx) {
@@ -19728,7 +20019,9 @@ function createPatchFunction (backend) {
   for (i = 0; i < hooks.length; ++i) {
     cbs[hooks[i]] = [];
     for (j = 0; j < modules.length; ++j) {
-      if (modules[j][hooks[i]] !== undefined) { cbs[hooks[i]].push(modules[j][hooks[i]]); }
+      if (isDef(modules[j][hooks[i]])) {
+        cbs[hooks[i]].push(modules[j][hooks[i]]);
+      }
     }
   }
 
@@ -19749,7 +20042,7 @@ function createPatchFunction (backend) {
   function removeNode (el) {
     var parent = nodeOps.parentNode(el);
     // element may have already been removed due to v-html / v-text
-    if (parent) {
+    if (isDef(parent)) {
       nodeOps.removeChild(parent, el);
     }
   }
@@ -19800,7 +20093,7 @@ function createPatchFunction (backend) {
       if (process.env.NODE_ENV !== 'production' && data && data.pre) {
         inPre--;
       }
-    } else if (vnode.isComment) {
+    } else if (isTrue(vnode.isComment)) {
       vnode.elm = nodeOps.createComment(vnode.text);
       insert(parentElm, vnode.elm, refElm);
     } else {
@@ -19822,7 +20115,7 @@ function createPatchFunction (backend) {
       // in that case we can just return the element and be done.
       if (isDef(vnode.componentInstance)) {
         initComponent(vnode, insertedVnodeQueue);
-        if (isReactivated) {
+        if (isTrue(isReactivated)) {
           reactivateComponent(vnode, insertedVnodeQueue, parentElm, refElm);
         }
         return true
@@ -19831,7 +20124,7 @@ function createPatchFunction (backend) {
   }
 
   function initComponent (vnode, insertedVnodeQueue) {
-    if (vnode.data.pendingInsert) {
+    if (isDef(vnode.data.pendingInsert)) {
       insertedVnodeQueue.push.apply(insertedVnodeQueue, vnode.data.pendingInsert);
     }
     vnode.elm = vnode.componentInstance.$el;
@@ -19870,9 +20163,11 @@ function createPatchFunction (backend) {
   }
 
   function insert (parent, elm, ref) {
-    if (parent) {
-      if (ref) {
-        nodeOps.insertBefore(parent, elm, ref);
+    if (isDef(parent)) {
+      if (isDef(ref)) {
+        if (ref.parentNode === parent) {
+          nodeOps.insertBefore(parent, elm, ref);
+        }
       } else {
         nodeOps.appendChild(parent, elm);
       }
@@ -19902,8 +20197,8 @@ function createPatchFunction (backend) {
     }
     i = vnode.data.hook; // Reuse variable
     if (isDef(i)) {
-      if (i.create) { i.create(emptyNode, vnode); }
-      if (i.insert) { insertedVnodeQueue.push(vnode); }
+      if (isDef(i.create)) { i.create(emptyNode, vnode); }
+      if (isDef(i.insert)) { insertedVnodeQueue.push(vnode); }
     }
   }
 
@@ -19962,15 +20257,16 @@ function createPatchFunction (backend) {
   }
 
   function removeAndInvokeRemoveHook (vnode, rm) {
-    if (rm || isDef(vnode.data)) {
+    if (isDef(rm) || isDef(vnode.data)) {
+      var i;
       var listeners = cbs.remove.length + 1;
-      if (!rm) {
-        // directly removing
-        rm = createRmCb(vnode.elm, listeners);
-      } else {
+      if (isDef(rm)) {
         // we have a recursively passed down rm callback
         // increase the listeners count
         rm.listeners += listeners;
+      } else {
+        // directly removing
+        rm = createRmCb(vnode.elm, listeners);
       }
       // recursively invoke hooks on child component root node
       if (isDef(i = vnode.componentInstance) && isDef(i = i._vnode) && isDef(i.data)) {
@@ -20072,24 +20368,23 @@ function createPatchFunction (backend) {
     // note we only do this if the vnode is cloned -
     // if the new node is not cloned it means the render functions have been
     // reset by the hot-reload-api and we need to do a proper re-render.
-    if (vnode.isStatic &&
-        oldVnode.isStatic &&
+    if (isTrue(vnode.isStatic) &&
+        isTrue(oldVnode.isStatic) &&
         vnode.key === oldVnode.key &&
-        (vnode.isCloned || vnode.isOnce)) {
+        (isTrue(vnode.isCloned) || isTrue(vnode.isOnce))) {
       vnode.elm = oldVnode.elm;
       vnode.componentInstance = oldVnode.componentInstance;
       return
     }
     var i;
     var data = vnode.data;
-    var hasData = isDef(data);
-    if (hasData && isDef(i = data.hook) && isDef(i = i.prepatch)) {
+    if (isDef(data) && isDef(i = data.hook) && isDef(i = i.prepatch)) {
       i(oldVnode, vnode);
     }
     var elm = vnode.elm = oldVnode.elm;
     var oldCh = oldVnode.children;
     var ch = vnode.children;
-    if (hasData && isPatchable(vnode)) {
+    if (isDef(data) && isPatchable(vnode)) {
       for (i = 0; i < cbs.update.length; ++i) { cbs.update[i](oldVnode, vnode); }
       if (isDef(i = data.hook) && isDef(i = i.update)) { i(oldVnode, vnode); }
     }
@@ -20107,7 +20402,7 @@ function createPatchFunction (backend) {
     } else if (oldVnode.text !== vnode.text) {
       nodeOps.setTextContent(elm, vnode.text);
     }
-    if (hasData) {
+    if (isDef(data)) {
       if (isDef(i = data.hook) && isDef(i = i.postpatch)) { i(oldVnode, vnode); }
     }
   }
@@ -20115,7 +20410,7 @@ function createPatchFunction (backend) {
   function invokeInsertHook (vnode, queue, initial) {
     // delay insert hooks for component root nodes, invoke them after the
     // element is really inserted
-    if (initial && vnode.parent) {
+    if (isTrue(initial) && isDef(vnode.parent)) {
       vnode.parent.data.pendingInsert = queue;
     } else {
       for (var i = 0; i < queue.length; ++i) {
@@ -20192,7 +20487,7 @@ function createPatchFunction (backend) {
   }
 
   function assertNodeMatch (node, vnode) {
-    if (vnode.tag) {
+    if (isDef(vnode.tag)) {
       return (
         vnode.tag.indexOf('vue-component') === 0 ||
         vnode.tag.toLowerCase() === (node.tagName && node.tagName.toLowerCase())
@@ -20203,15 +20498,15 @@ function createPatchFunction (backend) {
   }
 
   return function patch (oldVnode, vnode, hydrating, removeOnly, parentElm, refElm) {
-    if (!vnode) {
-      if (oldVnode) { invokeDestroyHook(oldVnode); }
+    if (isUndef(vnode)) {
+      if (isDef(oldVnode)) { invokeDestroyHook(oldVnode); }
       return
     }
 
     var isInitialPatch = false;
     var insertedVnodeQueue = [];
 
-    if (!oldVnode) {
+    if (isUndef(oldVnode)) {
       // empty mount (likely as component), create new root element
       isInitialPatch = true;
       createElm(vnode, insertedVnodeQueue, parentElm, refElm);
@@ -20225,11 +20520,11 @@ function createPatchFunction (backend) {
           // mounting to a real element
           // check if this is server-rendered content and if we can perform
           // a successful hydration.
-          if (oldVnode.nodeType === 1 && oldVnode.hasAttribute('server-rendered')) {
-            oldVnode.removeAttribute('server-rendered');
+          if (oldVnode.nodeType === 1 && oldVnode.hasAttribute(SSR_ATTR)) {
+            oldVnode.removeAttribute(SSR_ATTR);
             hydrating = true;
           }
-          if (hydrating) {
+          if (isTrue(hydrating)) {
             if (hydrate(oldVnode, vnode, insertedVnodeQueue)) {
               invokeInsertHook(vnode, insertedVnodeQueue, true);
               return oldVnode
@@ -20260,7 +20555,7 @@ function createPatchFunction (backend) {
           nodeOps.nextSibling(oldElm)
         );
 
-        if (vnode.parent) {
+        if (isDef(vnode.parent)) {
           // component root element replaced.
           // update parent placeholder node element, recursively
           var ancestor = vnode.parent;
@@ -20275,7 +20570,7 @@ function createPatchFunction (backend) {
           }
         }
 
-        if (parentElm$1 !== null) {
+        if (isDef(parentElm$1)) {
           removeVnodes(parentElm$1, [oldVnode], 0, 0);
         } else if (isDef(oldVnode.tag)) {
           invokeDestroyHook(oldVnode);
@@ -20393,7 +20688,11 @@ function getRawDirName (dir) {
 function callHook$1 (dir, hook, vnode, oldVnode, isDestroy) {
   var fn = dir.def && dir.def[hook];
   if (fn) {
-    fn(vnode.elm, dir, vnode, oldVnode, isDestroy);
+    try {
+      fn(vnode.elm, dir, vnode, oldVnode, isDestroy);
+    } catch (e) {
+      handleError(e, vnode.context, ("directive " + (dir.name) + " " + hook + " hook"));
+    }
   }
 }
 
@@ -20405,7 +20704,7 @@ var baseModules = [
 /*  */
 
 function updateAttrs (oldVnode, vnode) {
-  if (!oldVnode.data.attrs && !vnode.data.attrs) {
+  if (isUndef(oldVnode.data.attrs) && isUndef(vnode.data.attrs)) {
     return
   }
   var key, cur, old;
@@ -20413,7 +20712,7 @@ function updateAttrs (oldVnode, vnode) {
   var oldAttrs = oldVnode.data.attrs || {};
   var attrs = vnode.data.attrs || {};
   // clone observed objects, as the user probably wants to mutate it
-  if (attrs.__ob__) {
+  if (isDef(attrs.__ob__)) {
     attrs = vnode.data.attrs = extend({}, attrs);
   }
 
@@ -20430,7 +20729,7 @@ function updateAttrs (oldVnode, vnode) {
     setAttr(elm, 'value', attrs.value);
   }
   for (key in oldAttrs) {
-    if (attrs[key] == null) {
+    if (isUndef(attrs[key])) {
       if (isXlink(key)) {
         elm.removeAttributeNS(xlinkNS, getXlinkProp(key));
       } else if (!isEnumeratedAttr(key)) {
@@ -20477,8 +20776,15 @@ function updateClass (oldVnode, vnode) {
   var el = vnode.elm;
   var data = vnode.data;
   var oldData = oldVnode.data;
-  if (!data.staticClass && !data.class &&
-      (!oldData || (!oldData.staticClass && !oldData.class))) {
+  if (
+    isUndef(data.staticClass) &&
+    isUndef(data.class) && (
+      isUndef(oldData) || (
+        isUndef(oldData.staticClass) &&
+        isUndef(oldData.class)
+      )
+    )
+  ) {
     return
   }
 
@@ -20486,7 +20792,7 @@ function updateClass (oldVnode, vnode) {
 
   // handle transition classes
   var transitionClass = el._transitionClasses;
-  if (transitionClass) {
+  if (isDef(transitionClass)) {
     cls = concat(cls, stringifyClass(transitionClass));
   }
 
@@ -20639,8 +20945,20 @@ function addHandler (
   name,
   value,
   modifiers,
-  important
+  important,
+  warn
 ) {
+  // warn prevent and passive modifier
+  /* istanbul ignore if */
+  if (
+    process.env.NODE_ENV !== 'production' && warn &&
+    modifiers && modifiers.prevent && modifiers.passive
+  ) {
+    warn(
+      'passive and prevent can\'t be used together. ' +
+      'Passive handler can\'t prevent default event.'
+    );
+  }
   // check capture modifier
   if (modifiers && modifiers.capture) {
     delete modifiers.capture;
@@ -20649,6 +20967,11 @@ function addHandler (
   if (modifiers && modifiers.once) {
     delete modifiers.once;
     name = '~' + name; // mark the event as once
+  }
+  /* istanbul ignore if */
+  if (modifiers && modifiers.passive) {
+    delete modifiers.passive;
+    name = '&' + name; // mark the event as passive
   }
   var events;
   if (modifiers && modifiers.native) {
@@ -20931,7 +21254,7 @@ function genCheckboxModel (
           '$$i=_i($$a,$$v);' +
       "if($$c){$$i<0&&(" + value + "=$$a.concat($$v))}" +
       "else{$$i>-1&&(" + value + "=$$a.slice(0,$$i).concat($$a.slice($$i+1)))}" +
-    "}else{" + value + "=$$c}",
+    "}else{" + (genAssignmentCode(value, '$$c')) + "}",
     null, true
   );
 }
@@ -21011,13 +21334,13 @@ function genDefaultModel (
 function normalizeEvents (on) {
   var event;
   /* istanbul ignore if */
-  if (on[RANGE_TOKEN]) {
+  if (isDef(on[RANGE_TOKEN])) {
     // IE input[type=range] only supports `change` event
     event = isIE ? 'change' : 'input';
     on[event] = [].concat(on[RANGE_TOKEN], on[event] || []);
     delete on[RANGE_TOKEN];
   }
-  if (on[CHECKBOX_RADIO_TOKEN]) {
+  if (isDef(on[CHECKBOX_RADIO_TOKEN])) {
     // Chrome fires microtasks in between click/change, leads to #4521
     event = isChrome ? 'click' : 'change';
     on[event] = [].concat(on[CHECKBOX_RADIO_TOKEN], on[event] || []);
@@ -21030,10 +21353,11 @@ var target$1;
 function add$1 (
   event,
   handler,
-  once,
-  capture
+  once$$1,
+  capture,
+  passive
 ) {
-  if (once) {
+  if (once$$1) {
     var oldHandler = handler;
     var _target = target$1; // save current target element in closure
     handler = function (ev) {
@@ -21045,7 +21369,13 @@ function add$1 (
       }
     };
   }
-  target$1.addEventListener(event, handler, capture);
+  target$1.addEventListener(
+    event,
+    handler,
+    supportsPassive
+      ? { capture: capture, passive: passive }
+      : capture
+  );
 }
 
 function remove$2 (
@@ -21058,7 +21388,7 @@ function remove$2 (
 }
 
 function updateDOMListeners (oldVnode, vnode) {
-  if (!oldVnode.data.on && !vnode.data.on) {
+  if (isUndef(oldVnode.data.on) && isUndef(vnode.data.on)) {
     return
   }
   var on = vnode.data.on || {};
@@ -21076,7 +21406,7 @@ var events = {
 /*  */
 
 function updateDOMProps (oldVnode, vnode) {
-  if (!oldVnode.data.domProps && !vnode.data.domProps) {
+  if (isUndef(oldVnode.data.domProps) && isUndef(vnode.data.domProps)) {
     return
   }
   var key, cur;
@@ -21084,12 +21414,12 @@ function updateDOMProps (oldVnode, vnode) {
   var oldProps = oldVnode.data.domProps || {};
   var props = vnode.data.domProps || {};
   // clone observed objects, as the user probably wants to mutate it
-  if (props.__ob__) {
+  if (isDef(props.__ob__)) {
     props = vnode.data.domProps = extend({}, props);
   }
 
   for (key in oldProps) {
-    if (props[key] == null) {
+    if (isUndef(props[key])) {
       elm[key] = '';
     }
   }
@@ -21108,7 +21438,7 @@ function updateDOMProps (oldVnode, vnode) {
       // non-string values will be stringified
       elm._value = cur;
       // avoid resetting cursor position when value is the same
-      var strCur = cur == null ? '' : String(cur);
+      var strCur = isUndef(cur) ? '' : String(cur);
       if (shouldUpdateValue(elm, vnode, strCur)) {
         elm.value = strCur;
       }
@@ -21141,10 +21471,10 @@ function isDirty (elm, checkVal) {
 function isInputChanged (elm, newVal) {
   var value = elm.value;
   var modifiers = elm._vModifiers; // injected by v-model runtime
-  if ((modifiers && modifiers.number) || elm.type === 'number') {
+  if ((isDef(modifiers) && modifiers.number) || elm.type === 'number') {
     return toNumber(value) !== toNumber(newVal)
   }
-  if (modifiers && modifiers.trim) {
+  if (isDef(modifiers) && modifiers.trim) {
     return value.trim() !== newVal.trim()
   }
   return value !== newVal
@@ -21233,7 +21563,17 @@ var setProp = function (el, name, val) {
   } else if (importantRE.test(val)) {
     el.style.setProperty(name, val.replace(importantRE, ''), 'important');
   } else {
-    el.style[normalize(name)] = val;
+    var normalizedName = normalize(name);
+    if (Array.isArray(val)) {
+      // Support values array created by autoprefixer, e.g.
+      // {display: ["-webkit-box", "-ms-flexbox", "flex"]}
+      // Set them one by one, and the browser will only set those it can recognize
+      for (var i = 0, len = val.length; i < len; i++) {
+        el.style[normalizedName] = val[i];
+      }
+    } else {
+      el.style[normalizedName] = val;
+    }
   }
 };
 
@@ -21259,27 +21599,32 @@ function updateStyle (oldVnode, vnode) {
   var data = vnode.data;
   var oldData = oldVnode.data;
 
-  if (!data.staticStyle && !data.style &&
-      !oldData.staticStyle && !oldData.style) {
+  if (isUndef(data.staticStyle) && isUndef(data.style) &&
+      isUndef(oldData.staticStyle) && isUndef(oldData.style)) {
     return
   }
 
   var cur, name;
   var el = vnode.elm;
-  var oldStaticStyle = oldVnode.data.staticStyle;
-  var oldStyleBinding = oldVnode.data.style || {};
+  var oldStaticStyle = oldData.staticStyle;
+  var oldStyleBinding = oldData.normalizedStyle || oldData.style || {};
 
   // if static style exists, stylebinding already merged into it when doing normalizeStyleData
   var oldStyle = oldStaticStyle || oldStyleBinding;
 
   var style = normalizeStyleBinding(vnode.data.style) || {};
 
-  vnode.data.style = style.__ob__ ? extend({}, style) : style;
+  // store normalized style under a different key for next diff
+  // make sure to clone it if it's reactive, since the user likley wants
+  // to mutate it.
+  vnode.data.normalizedStyle = isDef(style.__ob__)
+    ? extend({}, style)
+    : style;
 
   var newStyle = getStyle(vnode, true);
 
   for (name in oldStyle) {
-    if (newStyle[name] == null) {
+    if (isUndef(newStyle[name])) {
       setProp(el, name, '');
     }
   }
@@ -21530,18 +21875,18 @@ function enter (vnode, toggleDisplay) {
   var el = vnode.elm;
 
   // call leave callback now
-  if (el._leaveCb) {
+  if (isDef(el._leaveCb)) {
     el._leaveCb.cancelled = true;
     el._leaveCb();
   }
 
   var data = resolveTransition(vnode.data.transition);
-  if (!data) {
+  if (isUndef(data)) {
     return
   }
 
   /* istanbul ignore if */
-  if (el._enterCb || el.nodeType !== 1) {
+  if (isDef(el._enterCb) || el.nodeType !== 1) {
     return
   }
 
@@ -21678,18 +22023,18 @@ function leave (vnode, rm) {
   var el = vnode.elm;
 
   // call enter callback now
-  if (el._enterCb) {
+  if (isDef(el._enterCb)) {
     el._enterCb.cancelled = true;
     el._enterCb();
   }
 
   var data = resolveTransition(vnode.data.transition);
-  if (!data) {
+  if (isUndef(data)) {
     return rm()
   }
 
   /* istanbul ignore if */
-  if (el._leaveCb || el.nodeType !== 1) {
+  if (isDef(el._leaveCb) || el.nodeType !== 1) {
     return
   }
 
@@ -21714,7 +22059,7 @@ function leave (vnode, rm) {
       : duration
   );
 
-  if (process.env.NODE_ENV !== 'production' && explicitLeaveDuration != null) {
+  if (process.env.NODE_ENV !== 'production' && isDef(explicitLeaveDuration)) {
     checkDuration(explicitLeaveDuration, 'leave', vnode);
   }
 
@@ -21751,7 +22096,7 @@ function leave (vnode, rm) {
     }
     // record leaving element
     if (!vnode.data.show) {
-      (el.parentNode._pending || (el.parentNode._pending = {}))[vnode.key] = vnode;
+      (el.parentNode._pending || (el.parentNode._pending = {}))[(vnode.key)] = vnode;
     }
     beforeLeave && beforeLeave(el);
     if (expectsCSS) {
@@ -21804,9 +22149,11 @@ function isValidDuration (val) {
  * - a plain function (.length)
  */
 function getHookArgumentsLength (fn) {
-  if (!fn) { return false }
+  if (isUndef(fn)) {
+    return false
+  }
   var invokerFns = fn.fns;
-  if (invokerFns) {
+  if (isDef(invokerFns)) {
     // invoker
     return getHookArgumentsLength(
       Array.isArray(invokerFns)
@@ -21819,7 +22166,7 @@ function getHookArgumentsLength (fn) {
 }
 
 function _enter (_, vnode) {
-  if (!vnode.data.show) {
+  if (vnode.data.show !== true) {
     enter(vnode);
   }
 }
@@ -21829,7 +22176,7 @@ var transition = inBrowser ? {
   activate: _enter,
   remove: function remove$$1 (vnode, rm) {
     /* istanbul ignore else */
-    if (!vnode.data.show) {
+    if (vnode.data.show !== true) {
       leave(vnode, rm);
     } else {
       rm();
@@ -21881,9 +22228,14 @@ var model$1 = {
       if (isIE || isEdge) {
         setTimeout(cb, 0);
       }
-    } else if (vnode.tag === 'textarea' || el.type === 'text') {
+    } else if (vnode.tag === 'textarea' || el.type === 'text' || el.type === 'password') {
       el._vModifiers = binding.modifiers;
       if (!binding.modifiers.lazy) {
+        // Safari < 10.2 & UIWebView doesn't fire compositionend when
+        // switching focus before confirming composition choice
+        // this also fixes the issue where some browsers e.g. iOS Chrome
+        // fires "change" instead of "input" on autocomplete.
+        el.addEventListener('change', onCompositionEnd);
         if (!isAndroid) {
           el.addEventListener('compositionstart', onCompositionStart);
           el.addEventListener('compositionend', onCompositionEnd);
@@ -22095,9 +22447,11 @@ function extractTransitionData (comp) {
 }
 
 function placeholder (h, rawChild) {
-  return /\d-keep-alive$/.test(rawChild.tag)
-    ? h('keep-alive')
-    : null
+  if (/\d-keep-alive$/.test(rawChild.tag)) {
+    return h('keep-alive', {
+      props: rawChild.componentOptions.propsData
+    })
+  }
 }
 
 function hasParentTransition (vnode) {
@@ -22395,6 +22749,7 @@ var platformComponents = {
 // install platform specific utils
 Vue$3.config.mustUseProp = mustUseProp;
 Vue$3.config.isReservedTag = isReservedTag;
+Vue$3.config.isReservedAttr = isReservedAttr;
 Vue$3.config.getTagNamespace = getTagNamespace;
 Vue$3.config.isUnknownElement = isUnknownElement;
 
@@ -22551,6 +22906,7 @@ function parseHTML (html, options) {
   var stack = [];
   var expectHTML = options.expectHTML;
   var isUnaryTag$$1 = options.isUnaryTag || no;
+  var canBeLeftOpenTag$$1 = options.canBeLeftOpenTag || no;
   var index = 0;
   var last, lastTag;
   while (html) {
@@ -22699,7 +23055,7 @@ function parseHTML (html, options) {
       if (lastTag === 'p' && isNonPhrasingTag(tagName)) {
         parseEndTag(lastTag);
       }
-      if (canBeLeftOpenTag(tagName) && lastTag === tagName) {
+      if (canBeLeftOpenTag$$1(tagName) && lastTag === tagName) {
         parseEndTag(tagName);
       }
     }
@@ -22897,6 +23253,7 @@ function parse (
     warn: warn$2,
     expectHTML: options.expectHTML,
     isUnaryTag: options.isUnaryTag,
+    canBeLeftOpenTag: options.canBeLeftOpenTag,
     shouldDecodeNewlines: options.shouldDecodeNewlines,
     start: function start (tag, attrs, unary) {
       // check namespace.
@@ -23062,7 +23419,7 @@ function parse (
       }
       var children = currentParent.children;
       text = inPre || text.trim()
-        ? decodeHTMLCached(text)
+        ? isTextTag(currentParent) ? text : decodeHTMLCached(text)
         // only preserve whitespace if its not right after a starting tag
         : preserveWhitespace && children.length ? ' ' : '';
       if (text) {
@@ -23273,6 +23630,13 @@ function processAttrs (el) {
           if (modifiers.camel) {
             name = camelize(name);
           }
+          if (modifiers.sync) {
+            addHandler(
+              el,
+              ("update:" + (camelize(name))),
+              genAssignmentCode(value, "$event")
+            );
+          }
         }
         if (isProp || platformMustUseProp(el.tag, el.attrsMap.type, name)) {
           addProp(el, name, value);
@@ -23281,7 +23645,7 @@ function processAttrs (el) {
         }
       } else if (onRE.test(name)) { // v-on
         name = name.replace(onRE, '');
-        addHandler(el, name, value, modifiers);
+        addHandler(el, name, value, modifiers, false, warn$2);
       } else { // normal directives
         name = name.replace(dirRE, '');
         // parse arg
@@ -23336,12 +23700,20 @@ function parseModifiers (name) {
 function makeAttrsMap (attrs) {
   var map = {};
   for (var i = 0, l = attrs.length; i < l; i++) {
-    if (process.env.NODE_ENV !== 'production' && map[attrs[i].name] && !isIE) {
+    if (
+      process.env.NODE_ENV !== 'production' &&
+      map[attrs[i].name] && !isIE && !isEdge
+    ) {
       warn$2('duplicate attribute: ' + attrs[i].name);
     }
     map[attrs[i].name] = attrs[i].value;
   }
   return map
+}
+
+// for script (e.g. type="x/template") or style, do not decode content
+function isTextTag (el) {
+  return el.tag === 'script' || el.tag === 'style'
 }
 
 function isForbiddenTag (el) {
@@ -23544,10 +23916,25 @@ var modifierCode = {
   right: genGuard("'button' in $event && $event.button !== 2")
 };
 
-function genHandlers (events, native) {
+function genHandlers (
+  events,
+  native,
+  warn
+) {
   var res = native ? 'nativeOn:{' : 'on:{';
   for (var name in events) {
-    res += "\"" + name + "\":" + (genHandler(name, events[name])) + ",";
+    var handler = events[name];
+    // #5330: warn click.right, since right clicks do not actually fire click events.
+    if (process.env.NODE_ENV !== 'production' &&
+        name === 'click' &&
+        handler && handler.modifiers && handler.modifiers.right
+      ) {
+      warn(
+        "Use \"contextmenu\" instead of \"click.right\" since right clicks " +
+        "do not actually fire \"click\" events."
+      );
+    }
+    res += "\"" + name + "\":" + (genHandler(name, handler)) + ",";
   }
   return res.slice(0, -1) + '}'
 }
@@ -23821,10 +24208,10 @@ function genData (el) {
   }
   // event handlers
   if (el.events) {
-    data += (genHandlers(el.events)) + ",";
+    data += (genHandlers(el.events, false, warn$3)) + ",";
   }
   if (el.nativeEvents) {
-    data += (genHandlers(el.nativeEvents, true)) + ",";
+    data += (genHandlers(el.nativeEvents, true, warn$3)) + ",";
   }
   // slot target
   if (el.slotTarget) {
@@ -24061,8 +24448,9 @@ function checkNode (node, errors) {
 }
 
 function checkEvent (exp, text, errors) {
-  var keywordMatch = exp.replace(stripStringRE, '').match(unaryOperatorsRE);
-  if (keywordMatch) {
+  var stipped = exp.replace(stripStringRE, '');
+  var keywordMatch = stipped.match(unaryOperatorsRE);
+  if (keywordMatch && stipped.charAt(keywordMatch.index - 1) !== '$') {
     errors.push(
       "avoid using JavaScript unary operator as property name: " +
       "\"" + (keywordMatch[0]) + "\" in expression " + (text.trim())
@@ -24378,6 +24766,7 @@ var baseOptions = {
   isPreTag: isPreTag,
   isUnaryTag: isUnaryTag,
   mustUseProp: mustUseProp,
+  canBeLeftOpenTag: canBeLeftOpenTag,
   isReservedTag: isReservedTag,
   getTagNamespace: getTagNamespace,
   staticKeys: genStaticKeys(modules$1)
@@ -38843,7 +39232,6 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_10_vue__ = __webpack_require__(7);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_10_vue___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_10_vue__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_11_vue_resource__ = __webpack_require__(215);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_11_vue_resource___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_11_vue_resource__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_12__vue_components_vueFilters_js__ = __webpack_require__(177);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_13__items_app_js__ = __webpack_require__(175);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_14__vue_components_dataTree_js__ = __webpack_require__(21);
@@ -38892,7 +39280,7 @@ window.Flatpickr = __WEBPACK_IMPORTED_MODULE_8_flatpickr___default.a;
 
 window.Vue = __WEBPACK_IMPORTED_MODULE_10_vue___default.a;
 
-__WEBPACK_IMPORTED_MODULE_10_vue___default.a.use(__WEBPACK_IMPORTED_MODULE_11_vue_resource___default.a);
+__WEBPACK_IMPORTED_MODULE_10_vue___default.a.use(__WEBPACK_IMPORTED_MODULE_11_vue_resource__["a" /* default */]);
 
 
 __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_12__vue_components_vueFilters_js__["a" /* default */])(__WEBPACK_IMPORTED_MODULE_10_vue___default.a);
@@ -39027,6 +39415,71 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__components_globalFunctions_js__ = __webpack_require__(5);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_5_clipboard__ = __webpack_require__(180);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_5_clipboard___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_5_clipboard__);
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 //
 //
 //
@@ -40010,7 +40463,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 			if (!this.item || this.item.depth == 0) {
 				return;
 			}
-			var bodyboxQS = '#' + this.$el.id + ' .bodybox';
+			var bodyboxQS = '#' + this.$el.id + ' .js-body-text';
 			var a = document.querySelector(bodyboxQS);
 			if (!a || !a.innerHTML.includes('a href')) {
 				return;
@@ -40157,13 +40610,13 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 				}
 				if (field == 'planned-time') {
 					e.preventDefault();
-					var plsFocus = '#new-under-' + this.item.id + ' .newitem-body';
+					var plsFocus = '#new-under-' + this.item.id + ' .js-newitem-body';
 					document.querySelector(plsFocus).focus();
 					return;
 				}
 				if (field == 'prepare-tag') {
 					e.preventDefault();
-					var _plsFocus = '#new-under-' + this.item.id + ' .update-planned-time>button';
+					var _plsFocus = '#new-under-' + this.item.id + ' .js-update-planned-time__button';
 					document.querySelector(_plsFocus).focus();
 					return;
 				}
@@ -40173,13 +40626,13 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 				// If body is empty!
 				if (field == 'body' && !this.newItem.body) {
 					e.preventDefault();
-					var _plsFocus2 = '#new-under-' + this.item.id + ' .update-planned-time>button';
+					var _plsFocus2 = '#new-under-' + this.item.id + ' .js-update-planned-time__button';
 					document.querySelector(_plsFocus2).focus();
 					return;
 				}
 				if (field == 'planned-time') {
 					e.preventDefault();
-					var _plsFocus3 = '#new-under-' + this.item.id + ' .prepare-tag';
+					var _plsFocus3 = '#new-under-' + this.item.id + ' .js-prepare-tag';
 					document.querySelector(_plsFocus3).focus();
 					return;
 				}
@@ -40193,10 +40646,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 			if (e.keyCode === 27) {
 				e.preventDefault();
 				this.cancelAddNew();
-				this.$root.cancelThroughKeydown = true;
-				setTimeout(function () {
-					this.$root.cancelThroughKeydown = false;
-				}.bind(this), 100);
+				this.$root.setCancelThroughKeydown();
 			}
 		},
 		keydownOnEdit: function keydownOnEdit(item, e, field) {
@@ -40258,7 +40708,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 				}
 				if (field == 'planned-time') {
 					e.preventDefault();
-					var plsFocus = '#updatebox-' + item.id + ' .edititem-body';
+					var plsFocus = '#updatebox-' + item.id + ' .js-edititem-body';
 					document.querySelector(plsFocus).focus();
 					return;
 				}
@@ -40267,7 +40717,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 					if (vm.editingItemTags) {
 						vm.editingItemTags = null;return;
 					}
-					var _plsFocus4 = '#updatebox-' + item.id + ' .update-planned-time>button';
+					var _plsFocus4 = '#updatebox-' + item.id + ' .js-update-planned-time__button';
 					document.querySelector(_plsFocus4).focus();
 					return;
 				}
@@ -40279,7 +40729,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 				}
 				e.preventDefault();
 				if (field == 'planned-time') {
-					var _plsFocus5 = '#add-tag-' + item.id + ' .add-tag';
+					var _plsFocus5 = '#add-tag-' + item.id + ' .js-add-tag';
 					document.querySelector(_plsFocus5).focus();
 					return;
 				}
@@ -40292,11 +40742,8 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 			}
 			// ESC
 			if (e.keyCode === 27) {
+				this.$root.setCancelThroughKeydown();
 				this.cancelEdit(item);
-				this.$root.cancelThroughKeydown = true;
-				setTimeout(function () {
-					this.$root.cancelThroughKeydown = false;
-				}.bind(this), 100);
 			}
 		},
 		blurOnEdit: function blurOnEdit(item, field) {
@@ -40410,19 +40857,19 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 			this.newTag = null;
 		},
 		deleteTag: function deleteTag(id, tagName, event) {
-			var plsFocus = '#add-tag-' + id + ' .add-tag';
+			var plsFocus = '#add-tag-' + id + ' .js-add-tag';
 			document.querySelector(plsFocus).focus();
 			this.$root.patchTag(id, tagName, 'untag');
 		},
 		deletePreparedTag: function deletePreparedTag(tag, item) {
-			var plsFocus = '#new-under-' + this.item.id + ' .prepare-tag';
+			var plsFocus = '#new-under-' + this.item.id + ' .js-prepare-tag';
 			document.querySelector(plsFocus).focus();
 			var tagIndex = this.newItem.preparedTags.indexOf(tagIndex);
 			this.newItem.preparedTags.splice(tagIndex, 1);
 		},
 		setPlannedTime: function setPlannedTime(item, event) {
 			item.planned_time = event.srcElement.value ? parseFloat(event.srcElement.value) : 0;
-			var plsFocus = '#add-tag-' + item.id + ' .add-tag';
+			var plsFocus = '#add-tag-' + item.id + ' .js-add-tag';
 			Vue.nextTick(function () {
 				console.log('returning to editting: ' + plsFocus);
 				document.querySelector(plsFocus).focus();
@@ -40430,7 +40877,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 		},
 		setPlannedTimeNewItem: function setPlannedTimeNewItem(item, event) {
 			this.newItem.planned_time = event.srcElement.value ? parseFloat(event.srcElement.value) : 0;
-			var plsFocus = "#new-under-" + item.id + " .prepare-tag";
+			var plsFocus = "#new-under-" + item.id + " .js-prepare-tag";
 			Vue.nextTick(function () {
 				console.log('returning to : ' + plsFocus);
 				document.querySelector(plsFocus).focus();
@@ -40746,6 +41193,8 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
+//
 
 // import PopoutConfirmation from './PopoutConfirmation.vue';
 
@@ -40821,7 +41270,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 		updateDone: function updateDone(item) {
 			this.pauseTimer(item);
 			allItems.prepareDonePatch(item.id);
-			document.querySelector('.btn-ok').focus();
+			document.querySelector('.js-btn-ok').focus();
 		},
 		timerNav: function timerNav(button, item, value) {
 			if (button == 'play') {
@@ -41032,7 +41481,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
             this.$root.popups.splice(index, 1);
             Vue.nextTick(function () {
                 if (vm.popups.length) {
-                    document.querySelector('#popups>div:first-child textarea').focus();
+                    document.querySelector('#c-popups>div:first-child textarea').focus();
                 }
             });
         },
@@ -42162,6 +42611,12 @@ window.selection = new __WEBPACK_IMPORTED_MODULE_6__vue_components_Selection_js_
 		// },
 	},
 	methods: {
+		setCancelThroughKeydown: function setCancelThroughKeydown() {
+			this.cancelThroughKeydown = true;
+			setTimeout(function () {
+				this.cancelThroughKeydown = false;
+			}.bind(this), 100);
+		},
 		startEdit: function startEdit(item, event) {
 			// debugger;
 			if (event && (event.srcElement.hasClass('done') || event.srcElement.hasClass('custom-tag'))) {
@@ -43676,7 +44131,7 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
 /***/ (function(module, exports, __webpack_require__) {
 
 exports = module.exports = __webpack_require__(182)();
-exports.push([module.i, "\n.fade-enter-active, .fade-leave-active {\n  -webkit-transition: opacity .5s;\n  transition: opacity .5s;\n}\n.fade-enter, .fade-leave-to {\n  opacity: 0;\n}\n#flashes-mask {\n  position: fixed;\n  width: 100%;\n  top: 0;\n  z-index: 10;\n}\n.flash {\n  margin: 0.5rem;\n  background-color: white;\n  box-shadow: 0px 2px 4px 0px rgba(136, 136, 136, 0.5);\n  display: -webkit-box;\n  display: -ms-flexbox;\n  display: flex;\n  -webkit-box-pack: justify;\n      -ms-flex-pack: justify;\n          justify-content: space-between;\n  -webkit-transition: all 0.35s;\n  transition: all 0.35s;\n}\n.flash button {\n    padding: 0 0.5rem;\n}\n.flash .bodybox {\n    display: -webkit-box;\n    display: -ms-flexbox;\n    display: flex;\n    -webkit-box-orient: horizontal;\n    -webkit-box-direction: normal;\n        -ms-flex-direction: row;\n            flex-direction: row;\n}\n", ""]);
+exports.push([module.i, "\n.fade-enter-active, .fade-leave-active {\n  transition: opacity .5s;\n}\n.fade-enter, .fade-leave-to {\n  opacity: 0;\n}\n#flashes-mask {\n  position: fixed;\n  width: 100%;\n  top: 0;\n  z-index: 10;\n}\n.flash {\n  margin: 0.5rem;\n  background-color: white;\n  box-shadow: 0px 2px 4px 0px rgba(136, 136, 136, 0.5);\n  display: -webkit-box;\n  display: -ms-flexbox;\n  display: flex;\n  -webkit-box-pack: justify;\n      -ms-flex-pack: justify;\n          justify-content: space-between;\n  transition: all 0.35s;\n}\n.flash button {\n    padding: 0 0.5rem;\n}\n.flash .bodybox {\n    display: -webkit-box;\n    display: -ms-flexbox;\n    display: flex;\n    -webkit-box-orient: horizontal;\n    -webkit-box-direction: normal;\n        -ms-flex-direction: row;\n            flex-direction: row;\n}\n", ""]);
 
 /***/ }),
 /* 182 */
@@ -43828,17 +44283,18 @@ module.exports = delegate;
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
-/*! flatpickr v2.4.7, @license MIT */
+/*! flatpickr v2.6.1, @license MIT */
 function Flatpickr(element, config) {
 	var self = this;
 
+	self._ = {};
+	self._.afterDayAnim = afterDayAnim;
 	self.changeMonth = changeMonth;
 	self.changeYear = changeYear;
 	self.clear = clear;
 	self.close = close;
 	self._createElement = createElement;
 	self.destroy = destroy;
-	self.formatDate = formatDate;
 	self.isEnabled = isEnabled;
 	self.jumpToDate = jumpToDate;
 	self.open = open;
@@ -43848,13 +44304,14 @@ function Flatpickr(element, config) {
 	self.toggle = toggle;
 
 	function init() {
-		if (element._flatpickr) destroy(element._flatpickr);
+		if (element._flatpickr) element._flatpickr.destroy();
 
 		element._flatpickr = self;
 
 		self.element = element;
 		self.instanceConfig = config || {};
 		self.parseDate = Flatpickr.prototype.parseDate.bind(self);
+		self.formatDate = Flatpickr.prototype.formatDate.bind(self);
 
 		setupFormats();
 		parseConfig();
@@ -43863,34 +44320,45 @@ function Flatpickr(element, config) {
 		setupDates();
 		setupHelperFunctions();
 
-		self.isOpen = self.config.inline;
+		self.isOpen = false;
 
 		self.isMobile = !self.config.disableMobile && !self.config.inline && self.config.mode === "single" && !self.config.disable.length && !self.config.enable.length && !self.config.weekNumbers && /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 
 		if (!self.isMobile) build();
 
-		bind();
+		bindEvents();
 
 		if (self.selectedDates.length || self.config.noCalendar) {
-			if (self.config.enableTime) setHoursFromDate(self.config.noCalendar ? self.config.minDate : null);
+			if (self.config.enableTime) {
+				setHoursFromDate(self.config.noCalendar ? self.latestSelectedDateObj || self.config.minDate : null);
+			}
 			updateValue();
 		}
 
 		if (self.config.weekNumbers) {
-			self.calendarContainer.style.width = self.days.clientWidth + self.weekWrapper.clientWidth + "px";
+			self.calendarContainer.style.width = self.daysContainer.offsetWidth + self.weekWrapper.offsetWidth + "px";
 		}
 
 		self.showTimeInput = self.selectedDates.length > 0 || self.config.noCalendar;
 
 		if (!self.isMobile) positionCalendar();
+
 		triggerEvent("Ready");
 	}
 
+	/**
+  * Binds a function to the current flatpickr instance
+  * @param {Function} fn the function
+  * @return {Function} the function bound to the instance
+  */
 	function bindToInstance(fn) {
-		if (fn && fn.bind) return fn.bind(self);
-		return fn;
+		return fn.bind(self);
 	}
 
+	/**
+  * The handler for all events targeting the time inputs
+  * @param {Event} e the event - "input", "wheel", "increment", etc
+  */
 	function updateTime(e) {
 		if (self.config.noCalendar && !self.selectedDates.length)
 			// picking time only
@@ -43911,14 +44379,17 @@ function Flatpickr(element, config) {
 		}
 	}
 
+	/**
+  * Syncs the selected date object time with user's time input
+  */
 	function setHoursFromInputs() {
 		if (!self.config.enableTime) return;
 
-		var hours = parseInt(self.hourElement.value, 10) || 0,
-		    minutes = parseInt(self.minuteElement.value, 10) || 0,
+		var hours = (parseInt(self.hourElement.value, 10) || 0) % (self.amPM ? 12 : 24),
+		    minutes = (parseInt(self.minuteElement.value, 10) || 0) % 60,
 		    seconds = self.config.enableSeconds ? parseInt(self.secondElement.value, 10) || 0 : 0;
 
-		if (self.amPM) hours = hours % 12 + 12 * (self.amPM.textContent === "PM");
+		if (self.amPM !== undefined) hours = hours % 12 + 12 * (self.amPM.textContent === "PM");
 
 		if (self.minDateHasTime && compareDates(self.latestSelectedDateObj, self.config.minDate) === 0) {
 
@@ -43934,12 +44405,25 @@ function Flatpickr(element, config) {
 		setHours(hours, minutes, seconds);
 	}
 
+	/**
+  * Syncs time input values with a date
+  * @param {Date} dateObj the date to sync with
+  */
 	function setHoursFromDate(dateObj) {
 		var date = dateObj || self.latestSelectedDateObj;
 
 		if (date) setHours(date.getHours(), date.getMinutes(), date.getSeconds());
 	}
 
+	/**
+  * Sets the hours, minutes, and optionally seconds
+  * of the latest selected date object and the
+  * corresponding time inputs
+  * @param {Number} hours the hour. whether its military
+  *                 or am-pm gets inferred from config
+  * @param {Number} minutes the minutes
+  * @param {Number} seconds the seconds (optional)
+  */
 	function setHours(hours, minutes, seconds) {
 		if (self.selectedDates.length) {
 			self.latestSelectedDateObj.setHours(hours % 24, minutes, seconds || 0, 0);
@@ -43953,37 +44437,66 @@ function Flatpickr(element, config) {
 
 		if (!self.config.time_24hr) self.amPM.textContent = hours >= 12 ? "PM" : "AM";
 
-		if (self.config.enableSeconds) self.secondElement.value = self.pad(seconds);
+		if (self.config.enableSeconds === true) self.secondElement.value = self.pad(seconds);
 	}
 
+	/**
+  * Handles the year input and incrementing events
+  * @param {Event} event the keyup or increment event
+  */
 	function onYearInput(event) {
 		var year = event.target.value;
 		if (event.delta) year = (parseInt(year) + event.delta).toString();
 
-		if (year.length === 4) {
+		if (year.length === 4 || event.key === "Enter") {
 			self.currentYearElement.blur();
 			if (!/[^\d]/.test(year)) changeYear(year);
 		}
 	}
 
-	function onMonthScroll(e) {
-		e.preventDefault();
-		self.changeMonth(Math.max(-1, Math.min(1, e.wheelDelta || -e.deltaY)));
+	/**
+  * Essentially addEventListener + tracking
+  * @param {Element} element the element to addEventListener to
+  * @param {String} event the event name
+  * @param {Function} handler the event handler
+  */
+	function bind(element, event, handler) {
+		if (event instanceof Array) return event.forEach(function (ev) {
+			return bind(element, ev, handler);
+		});
+
+		if (element instanceof Array) return element.forEach(function (el) {
+			return bind(el, event, handler);
+		});
+
+		element.addEventListener(event, handler);
+		self._handlers.push({ element: element, event: event, handler: handler });
 	}
 
-	function bind() {
-		if (self.config.wrap) {
-			["open", "close", "toggle", "clear"].forEach(function (el) {
-				var toggles = self.element.querySelectorAll("[data-" + el + "]");
-				for (var i = 0; i < toggles.length; i++) {
-					toggles[i].addEventListener("click", self[el]);
-				}
-			});
-		}
+	/**
+  * A mousedown handler which mimics click.
+  * Minimizes latency, since we don't need to wait for mouseup in most cases.
+  * Also, avoids handling right clicks.
+  *
+  * @param {Function} handler the event handler
+  */
+	function onClick(handler) {
+		return function (evt) {
+			return evt.which === 1 && handler(evt);
+		};
+	}
 
-		if (window.document.createEvent !== undefined) {
-			self.changeEvent = window.document.createEvent("HTMLEvents");
-			self.changeEvent.initEvent("change", false, true);
+	/**
+  * Adds all the necessary event listeners
+  */
+	function bindEvents() {
+		self._handlers = [];
+		if (self.config.wrap) {
+			["open", "close", "toggle", "clear"].forEach(function (evt) {
+				Array.prototype.forEach.call(self.element.querySelectorAll("[data-" + evt + "]"), function (el) {
+					return bind(el, "mousedown", onClick(self[evt]));
+				});
+			});
 		}
 
 		if (self.isMobile) return setupMobile();
@@ -43994,79 +44507,116 @@ function Flatpickr(element, config) {
 		};
 		self.debouncedChange = debounce(self.triggerChange, 300);
 
-		if (self.config.mode === "range" && self.days) self.days.addEventListener("mouseover", onMouseOver);
+		if (self.config.mode === "range" && self.daysContainer) bind(self.daysContainer, "mouseover", function (e) {
+			return onMouseOver(e.target);
+		});
 
-		self.calendarContainer.addEventListener("keydown", onKeyDown);
+		bind(window.document.body, "keydown", onKeyDown);
 
-		if (!self.config.static) (self.altInput || self.input).addEventListener("keydown", onKeyDown);
+		if (!self.config.static) bind(self._input, "keydown", onKeyDown);
 
-		if (!self.config.inline && !self.config.static) window.addEventListener("resize", self.debouncedResize);
+		if (!self.config.inline && !self.config.static) bind(window, "resize", self.debouncedResize);
 
-		if (window.ontouchstart) window.document.addEventListener("touchstart", documentClick);
+		if (window.ontouchstart !== undefined) bind(window.document, "touchstart", documentClick);
 
-		window.document.addEventListener("click", documentClick);
-		(self.altInput || self.input).addEventListener("blur", documentClick);
+		bind(window.document, "mousedown", onClick(documentClick));
+		bind(self._input, "blur", documentClick);
 
-		if (self.config.clickOpens) (self.altInput || self.input).addEventListener("focus", open);
+		if (self.config.clickOpens === true) bind(self._input, "focus", self.open);
 
 		if (!self.config.noCalendar) {
-			self.prevMonthNav.addEventListener("click", function () {
-				return changeMonth(-1);
+			self.monthNav.addEventListener("wheel", function (e) {
+				return e.preventDefault();
 			});
-			self.nextMonthNav.addEventListener("click", function () {
-				return changeMonth(1);
-			});
+			bind(self.monthNav, "wheel", debounce(onMonthNavScroll, 10));
+			bind(self.monthNav, "mousedown", onClick(onMonthNavClick));
 
-			self.currentMonthElement.addEventListener("wheel", function (e) {
-				return debounce(onMonthScroll(e), 50);
-			});
-			self.currentYearElement.addEventListener("wheel", function (e) {
-				return debounce(yearScroll(e), 50);
-			});
-			self.currentYearElement.addEventListener("focus", function () {
-				self.currentYearElement.select();
-			});
+			bind(self.monthNav, ["keyup", "increment"], onYearInput);
+			bind(self.daysContainer, "mousedown", onClick(selectDate));
 
-			self.currentYearElement.addEventListener("input", onYearInput);
-			self.currentYearElement.addEventListener("increment", onYearInput);
-
-			self.days.addEventListener("click", selectDate);
+			if (self.config.animate) {
+				bind(self.daysContainer, ["webkitAnimationEnd", "animationend"], animateDays);
+				bind(self.monthNav, ["webkitAnimationEnd", "animationend"], animateMonths);
+			}
 		}
 
 		if (self.config.enableTime) {
-			self.timeContainer.addEventListener("transitionend", positionCalendar);
-			self.timeContainer.addEventListener("wheel", function (e) {
-				return debounce(updateTime(e), 5);
-			});
-			self.timeContainer.addEventListener("input", updateTime);
-			self.timeContainer.addEventListener("increment", updateTime);
-			self.timeContainer.addEventListener("increment", self.debouncedChange);
+			var selText = function selText(e) {
+				return e.target.select();
+			};
+			bind(self.timeContainer, ["wheel", "input", "increment"], updateTime);
+			bind(self.timeContainer, "mousedown", onClick(timeIncrement));
 
-			self.timeContainer.addEventListener("wheel", self.debouncedChange);
-			self.timeContainer.addEventListener("input", self.triggerChange);
+			bind(self.timeContainer, ["wheel", "increment"], self.debouncedChange);
+			bind(self.timeContainer, "input", self.triggerChange);
 
-			self.hourElement.addEventListener("focus", function () {
-				self.hourElement.select();
-			});
-			self.minuteElement.addEventListener("focus", function () {
-				self.minuteElement.select();
+			bind([self.hourElement, self.minuteElement], "focus", selText);
+
+			if (self.secondElement !== undefined) bind(self.secondElement, "focus", function () {
+				return self.secondElement.select();
 			});
 
-			if (self.secondElement) {
-				self.secondElement.addEventListener("focus", function () {
-					self.secondElement.select();
-				});
-			}
-
-			if (self.amPM) {
-				self.amPM.addEventListener("click", function (e) {
+			if (self.amPM !== undefined) {
+				bind(self.amPM, "mousedown", onClick(function (e) {
 					updateTime(e);
 					self.triggerChange(e);
-				});
+				}));
 			}
 		}
 	}
 
+	/**
+  * Removes the day container that slided out of view
+  * @param {Event} e the animation event
+  */
+	function animateDays(e) {
+		if (self.daysContainer.childNodes.length > 1) {
+			switch (e.animationName) {
+				case "fpSlideLeft":
+					self.daysContainer.lastChild.classList.remove("slideLeftNew");
+					self.daysContainer.removeChild(self.daysContainer.firstChild);
+					self.days = self.daysContainer.firstChild;
+
+					break;
+
+				case "fpSlideRight":
+					self.daysContainer.firstChild.classList.remove("slideRightNew");
+					self.daysContainer.removeChild(self.daysContainer.lastChild);
+					self.days = self.daysContainer.firstChild;
+
+					break;
+
+				default:
+					break;
+			}
+		}
+	}
+
+	/**
+  * Removes the month element that animated out of view
+  * @param {Event} e the animation event
+  */
+	function animateMonths(e) {
+		switch (e.animationName) {
+			case "fpSlideLeftNew":
+			case "fpSlideRightNew":
+				self.navigationCurrentMonth.classList.remove("slideLeftNew");
+				self.navigationCurrentMonth.classList.remove("slideRightNew");
+				var nav = self.navigationCurrentMonth;
+
+				while (nav.nextSibling && /curr/.test(nav.nextSibling.className)) {
+					self.monthNav.removeChild(nav.nextSibling);
+				}while (nav.previousSibling && /curr/.test(nav.previousSibling.className)) {
+					self.monthNav.removeChild(nav.previousSibling);
+				}self.oldCurMonth = null;
+				break;
+		}
+	}
+
+	/**
+  * Set the calendar view to a particular date.
+  * @param {Date} jumpDate the date to set the view to
+  */
 	function jumpToDate(jumpDate) {
 		jumpDate = jumpDate ? self.parseDate(jumpDate) : self.latestSelectedDateObj || (self.config.minDate > self.now ? self.config.minDate : self.config.maxDate && self.config.maxDate < self.now ? self.config.maxDate : self.now);
 
@@ -44083,19 +44633,28 @@ function Flatpickr(element, config) {
 		self.redraw();
 	}
 
+	/**
+  * The up/down arrow handler for time inputs
+  * @param {Event} e the click event
+  */
+	function timeIncrement(e) {
+		if (~e.target.className.indexOf("arrow")) incrementNumInput(e, e.target.classList.contains("arrowUp") ? 1 : -1);
+	}
+
+	/**
+  * Increments/decrements the value of input associ-
+  * ated with the up/down arrow by dispatching an
+  * "increment" event on the input.
+  *
+  * @param {Event} e the click event
+  * @param {Number} delta the diff (usually 1 or -1)
+  * @param {Element} inputElem the input element
+  */
 	function incrementNumInput(e, delta, inputElem) {
 		var input = inputElem || e.target.parentNode.childNodes[0];
-		var ev = void 0;
-
-		try {
-			ev = new Event("increment", { "bubbles": true });
-		} catch (err) {
-			ev = window.document.createEvent("CustomEvent");
-			ev.initCustomEvent("increment", true, true, {});
-		}
-
-		ev.delta = delta;
-		input.dispatchEvent(ev);
+		var event = createEvent("increment");
+		event.delta = delta;
+		input.dispatchEvent(event);
 	}
 
 	function createNumberInput(inputClassName) {
@@ -44106,23 +44665,18 @@ function Flatpickr(element, config) {
 
 		numInput.type = "text";
 		numInput.pattern = "\\d*";
+
 		wrapper.appendChild(numInput);
 		wrapper.appendChild(arrowUp);
 		wrapper.appendChild(arrowDown);
 
-		arrowUp.addEventListener("click", function (e) {
-			return incrementNumInput(e, 1);
-		});
-		arrowDown.addEventListener("click", function (e) {
-			return incrementNumInput(e, -1);
-		});
 		return wrapper;
 	}
 
 	function build() {
 		var fragment = window.document.createDocumentFragment();
 		self.calendarContainer = createElement("div", "flatpickr-calendar");
-		self.numInputType = navigator.userAgent.indexOf("MSIE 9.0") > 0 ? "text" : "number";
+		self.calendarContainer.tabIndex = -1;
 
 		if (!self.config.noCalendar) {
 			fragment.appendChild(buildMonthNav());
@@ -44133,13 +44687,13 @@ function Flatpickr(element, config) {
 			self.rContainer = createElement("div", "flatpickr-rContainer");
 			self.rContainer.appendChild(buildWeekdays());
 
-			if (!self.days) {
-				self.days = createElement("div", "flatpickr-days");
-				self.days.tabIndex = -1;
+			if (!self.daysContainer) {
+				self.daysContainer = createElement("div", "flatpickr-days");
+				self.daysContainer.tabIndex = -1;
 			}
 
 			buildDays();
-			self.rContainer.appendChild(self.days);
+			self.rContainer.appendChild(self.daysContainer);
 
 			self.innerContainer.appendChild(self.rContainer);
 			fragment.appendChild(self.innerContainer);
@@ -44147,7 +44701,8 @@ function Flatpickr(element, config) {
 
 		if (self.config.enableTime) fragment.appendChild(buildTime());
 
-		if (self.config.mode === "range") self.calendarContainer.classList.add("rangeMode");
+		toggleClass(self.calendarContainer, "rangeMode", self.config.mode === "range");
+		toggleClass(self.calendarContainer, "animate", self.config.animate);
 
 		self.calendarContainer.appendChild(fragment);
 
@@ -44157,7 +44712,7 @@ function Flatpickr(element, config) {
 			self.calendarContainer.classList.add(self.config.inline ? "inline" : "static");
 
 			if (self.config.inline && !customAppend) {
-				return self.element.parentNode.insertBefore(self.calendarContainer, (self.altInput || self.input).nextSibling);
+				return self.element.parentNode.insertBefore(self.calendarContainer, self._input.nextSibling);
 			}
 
 			if (self.config.static) {
@@ -44175,16 +44730,21 @@ function Flatpickr(element, config) {
 		(customAppend ? self.config.appendTo : window.document.body).appendChild(self.calendarContainer);
 	}
 
-	function createDay(className, date, dayNumber) {
+	function createDay(className, date, dayNumber, i) {
 		var dateIsEnabled = isEnabled(date, true),
 		    dayElement = createElement("span", "flatpickr-day " + className, date.getDate());
 
 		dayElement.dateObj = date;
+		dayElement.$i = i;
+		dayElement.setAttribute("aria-label", self.formatDate(date, "F j, Y"));
 
-		toggleClass(dayElement, "today", compareDates(date, self.now) === 0);
+		if (compareDates(date, self.now) === 0) {
+			self.todayDateElem = dayElement;
+			dayElement.classList.add("today");
+		}
 
 		if (dateIsEnabled) {
-
+			dayElement.tabIndex = -1;
 			if (isDateSelected(date)) {
 				dayElement.classList.add("selected");
 				self.selectedDateElem = dayElement;
@@ -44214,16 +44774,49 @@ function Flatpickr(element, config) {
 		return dayElement;
 	}
 
-	function buildDays(year, month) {
+	function focusOnDay(currentIndex, offset) {
+		var newIndex = currentIndex + offset || 0,
+		    targetNode = currentIndex !== undefined ? self.days.childNodes[newIndex] : self.selectedDateElem || self.todayDateElem || self.days.childNodes[0],
+		    focus = function focus() {
+			targetNode = targetNode || self.days.childNodes[newIndex];
+			targetNode.focus();
+
+			if (self.config.mode === "range") onMouseOver(targetNode);
+		};
+
+		if (targetNode === undefined && offset !== 0) {
+			if (offset > 0) {
+				self.changeMonth(1);
+				newIndex = newIndex % 42;
+			} else if (offset < 0) {
+				self.changeMonth(-1);
+				newIndex += 42;
+			}
+
+			return afterDayAnim(focus);
+		}
+
+		focus();
+	}
+
+	function afterDayAnim(fn) {
+		if (self.config.animate) return setTimeout(fn, self._.daysAnimDuration + 1);
+		fn();
+	}
+
+	function buildDays(delta) {
 		var firstOfMonth = (new Date(self.currentYear, self.currentMonth, 1).getDay() - self.l10n.firstDayOfWeek + 7) % 7,
 		    isRangeMode = self.config.mode === "range";
 
 		self.prevMonthDays = self.utils.getDaysinMonth((self.currentMonth - 1 + 12) % 12);
+		self.selectedDateElem = undefined;
+		self.todayDateElem = undefined;
 
 		var daysInMonth = self.utils.getDaysinMonth(),
 		    days = window.document.createDocumentFragment();
 
-		var dayNumber = self.prevMonthDays + 1 - firstOfMonth;
+		var dayNumber = self.prevMonthDays + 1 - firstOfMonth,
+		    dayIndex = 0;
 
 		if (self.config.weekNumbers && self.weekNumbers.firstChild) self.weekNumbers.textContent = "";
 
@@ -44233,21 +44826,19 @@ function Flatpickr(element, config) {
 			self.maxRangeDate = new Date(self.currentYear, self.currentMonth + 1, (42 - firstOfMonth) % daysInMonth);
 		}
 
-		if (self.days.firstChild) self.days.textContent = "";
-
 		// prepend days from the ending of previous month
-		for (; dayNumber <= self.prevMonthDays; dayNumber++) {
-			days.appendChild(createDay("prevMonthDay", new Date(self.currentYear, self.currentMonth - 1, dayNumber), dayNumber));
+		for (; dayNumber <= self.prevMonthDays; dayNumber++, dayIndex++) {
+			days.appendChild(createDay("prevMonthDay", new Date(self.currentYear, self.currentMonth - 1, dayNumber), dayNumber, dayIndex));
 		}
 
 		// Start at 1 since there is no 0th day
-		for (dayNumber = 1; dayNumber <= daysInMonth; dayNumber++) {
-			days.appendChild(createDay("", new Date(self.currentYear, self.currentMonth, dayNumber), dayNumber));
+		for (dayNumber = 1; dayNumber <= daysInMonth; dayNumber++, dayIndex++) {
+			days.appendChild(createDay("", new Date(self.currentYear, self.currentMonth, dayNumber), dayNumber, dayIndex));
 		}
 
 		// append days from the next month
-		for (var dayNum = daysInMonth + 1; dayNum <= 42 - firstOfMonth; dayNum++) {
-			days.appendChild(createDay("nextMonthDay", new Date(self.currentYear, self.currentMonth + 1, dayNum % daysInMonth), dayNum));
+		for (var dayNum = daysInMonth + 1; dayNum <= 42 - firstOfMonth; dayNum++, dayIndex++) {
+			days.appendChild(createDay("nextMonthDay", new Date(self.currentYear, self.currentMonth + 1, dayNum % daysInMonth), dayNum, dayIndex));
 		}
 
 		if (isRangeMode && self.selectedDates.length === 1 && days.childNodes[0]) {
@@ -44256,8 +44847,25 @@ function Flatpickr(element, config) {
 			self._hideNextMonthArrow = self._hideNextMonthArrow || self.maxRangeDate < new Date(self.currentYear, self.currentMonth + 1, 1);
 		} else updateNavigationCurrentMonth();
 
-		self.days.appendChild(days);
-		return self.days;
+		var dayContainer = createElement("div", "dayContainer");
+		dayContainer.appendChild(days);
+
+		if (!self.config.animate || delta === undefined) clearNode(self.daysContainer);else {
+			while (self.daysContainer.childNodes.length > 1) {
+				self.daysContainer.removeChild(self.daysContainer.firstChild);
+			}
+		}
+
+		if (delta >= 0) self.daysContainer.appendChild(dayContainer);else self.daysContainer.insertBefore(dayContainer, self.daysContainer.firstChild);
+
+		self.days = self.daysContainer.firstChild;
+		return self.daysContainer;
+	}
+
+	function clearNode(node) {
+		while (node.firstChild) {
+			node.removeChild(node.firstChild);
+		}
 	}
 
 	function buildMonthNav() {
@@ -44408,9 +45016,10 @@ function Flatpickr(element, config) {
 		return self.weekWrapper;
 	}
 
-	function changeMonth(value, is_offset) {
-		is_offset = typeof is_offset === "undefined" || is_offset;
+	function changeMonth(value, is_offset, animate) {
+		is_offset = is_offset === undefined || is_offset;
 		var delta = is_offset ? value : value - self.currentMonth;
+		var skipAnimations = !self.config.animate || animate === false;
 
 		if (delta < 0 && self._hidePrevMonthArrow || delta > 0 && self._hideNextMonthArrow) return;
 
@@ -44423,12 +45032,58 @@ function Flatpickr(element, config) {
 			triggerEvent("YearChange");
 		}
 
-		updateNavigationCurrentMonth();
-		buildDays();
+		buildDays(!skipAnimations ? delta : undefined);
 
-		if (!self.config.noCalendar) self.days.focus();
+		if (skipAnimations) {
+			triggerEvent("MonthChange");
+			return updateNavigationCurrentMonth();
+		}
+
+		// remove possible remnants from clicking too fast
+		var nav = self.navigationCurrentMonth;
+		if (delta < 0) {
+			while (nav.nextSibling && /curr/.test(nav.nextSibling.className)) {
+				self.monthNav.removeChild(nav.nextSibling);
+			}
+		} else if (delta > 0) {
+			while (nav.previousSibling && /curr/.test(nav.previousSibling.className)) {
+				self.monthNav.removeChild(nav.previousSibling);
+			}
+		}
+
+		self.oldCurMonth = self.navigationCurrentMonth;
+
+		self.navigationCurrentMonth = self.monthNav.insertBefore(self.oldCurMonth.cloneNode(true), delta > 0 ? self.oldCurMonth.nextSibling : self.oldCurMonth);
+
+		if (delta > 0) {
+			self.daysContainer.firstChild.classList.add("slideLeft");
+			self.daysContainer.lastChild.classList.add("slideLeftNew");
+
+			self.oldCurMonth.classList.add("slideLeft");
+			self.navigationCurrentMonth.classList.add("slideLeftNew");
+		} else if (delta < 0) {
+			self.daysContainer.firstChild.classList.add("slideRightNew");
+			self.daysContainer.lastChild.classList.add("slideRight");
+
+			self.oldCurMonth.classList.add("slideRight");
+			self.navigationCurrentMonth.classList.add("slideRightNew");
+		}
+
+		self.currentMonthElement = self.navigationCurrentMonth.firstChild;
+		self.currentYearElement = self.navigationCurrentMonth.lastChild.childNodes[0];
+
+		updateNavigationCurrentMonth();
+		self.oldCurMonth.firstChild.textContent = self.utils.monthToStr(self.currentMonth - delta);
 
 		triggerEvent("MonthChange");
+
+		if (self._.daysAnimDuration === undefined) {
+			var compStyle = window.getComputedStyle(self.daysContainer.lastChild);
+
+			var duration = compStyle.getPropertyValue("animation-duration") || compStyle.getPropertyValue("-webkit-animation-duration");
+
+			self._.daysAnimDuration = parseInt(/(\d+)s/.exec(duration)[1]);
+		}
 	}
 
 	function clear(triggerChangeEvent) {
@@ -44439,7 +45094,7 @@ function Flatpickr(element, config) {
 		if (self.mobileInput) self.mobileInput.value = "";
 
 		self.selectedDates = [];
-		self.latestSelectedDateObj = null;
+		self.latestSelectedDateObj = undefined;
 		self.showTimeInput = false;
 
 		self.redraw();
@@ -44454,7 +45109,7 @@ function Flatpickr(element, config) {
 
 		if (!self.isMobile) {
 			self.calendarContainer.classList.remove("open");
-			(self.altInput || self.input).classList.remove("active");
+			self._input.classList.remove("active");
 		}
 
 		triggerEvent("Close");
@@ -44462,46 +45117,40 @@ function Flatpickr(element, config) {
 
 	function destroy(instance) {
 		instance = instance || self;
-		instance.clear(false);
 
-		window.removeEventListener("resize", instance.debouncedResize);
+		for (var i = instance._handlers.length; i--;) {
+			var h = instance._handlers[i];
+			h.element.removeEventListener(h.event, h.handler);
+		}
 
-		window.document.removeEventListener("click", documentClick);
-		window.document.removeEventListener("touchstart", documentClick);
-		window.document.removeEventListener("blur", documentClick);
-
-		if (instance.timeContainer) instance.timeContainer.removeEventListener("transitionend", positionCalendar);
+		instance._handlers = [];
 
 		if (instance.mobileInput) {
 			if (instance.mobileInput.parentNode) instance.mobileInput.parentNode.removeChild(instance.mobileInput);
-			delete instance.mobileInput;
+			instance.mobileInput = undefined;
 		} else if (instance.calendarContainer && instance.calendarContainer.parentNode) instance.calendarContainer.parentNode.removeChild(instance.calendarContainer);
 
 		if (instance.altInput) {
 			instance.input.type = "text";
 			if (instance.altInput.parentNode) instance.altInput.parentNode.removeChild(instance.altInput);
-			delete instance.altInput;
+			instance.altInput = undefined;
 		}
 
-		instance.input.type = instance.input._type;
-		instance.input.classList.remove("flatpickr-input");
-		instance.input.removeEventListener("focus", open);
-		instance.input.removeAttribute("readonly");
+		if (instance.input) {
+			instance.input.type = instance.input._type;
+			instance.input.classList.remove("flatpickr-input");
+			instance.input.removeAttribute("readonly");
+			instance.input.value = "";
+		}
 
-		delete instance.input._flatpickr;
+		instance.config = undefined;
+		instance.input._flatpickr = undefined;
 	}
 
 	function isCalendarElem(elem) {
 		if (self.config.appendTo && self.config.appendTo.contains(elem)) return true;
 
-		var e = elem;
-		while (e) {
-
-			if (e === self.calendarContainer) return true;
-			e = e.parentNode;
-		}
-
-		return false;
+		return self.calendarContainer.contains(elem);
 	}
 
 	function documentClick(e) {
@@ -44516,22 +45165,14 @@ function Flatpickr(element, config) {
 			if (lostFocus) {
 				e.preventDefault();
 				self.close();
+				self._input.blur();
 
 				if (self.config.mode === "range" && self.selectedDates.length === 1) {
-					self.clear();
+					self.clear(false);
 					self.redraw();
 				}
 			}
 		}
-	}
-
-	function formatDate(frmt, dateObj) {
-		if (self.config.formatDate) return self.config.formatDate(frmt, dateObj);
-
-		var chars = frmt.split("");
-		return chars.map(function (c, i) {
-			return self.formats[c] && chars[i - 1] !== "\\" ? self.formats[c](dateObj) : c !== "\\" ? c : "";
-		}).join("");
 	}
 
 	function changeYear(newYear) {
@@ -44555,14 +45196,11 @@ function Flatpickr(element, config) {
 	}
 
 	function isEnabled(date, timeless) {
-		var ltmin = compareDates(date, self.config.minDate, typeof timeless !== "undefined" ? timeless : !self.minDateHasTime) < 0;
-		var gtmax = compareDates(date, self.config.maxDate, typeof timeless !== "undefined" ? timeless : !self.maxDateHasTime) > 0;
-
-		if (ltmin || gtmax) return false;
+		if (self.config.minDate && compareDates(date, self.config.minDate, timeless !== undefined ? timeless : !self.minDateHasTime) < 0 || self.config.maxDate && compareDates(date, self.config.maxDate, timeless !== undefined ? timeless : !self.maxDateHasTime) > 0) return false;
 
 		if (!self.config.enable.length && !self.config.disable.length) return true;
 
-		var dateToCheck = self.parseDate(date, true); // timeless
+		var dateToCheck = self.parseDate(date, null, true); // timeless
 
 		var bool = self.config.enable.length > 0,
 		    array = bool ? self.config.enable : self.config.disable;
@@ -44573,7 +45211,7 @@ function Flatpickr(element, config) {
 			if (d instanceof Function && d(dateToCheck)) // disabled by function
 				return bool;else if (d instanceof Date && d.getTime() === dateToCheck.getTime())
 				// disabled by date
-				return bool;else if (typeof d === "string" && self.parseDate(d, true).getTime() === dateToCheck.getTime())
+				return bool;else if (typeof d === "string" && self.parseDate(d, null, true).getTime() === dateToCheck.getTime())
 				// disabled by date string
 				return bool;else if ( // disabled by range
 			(typeof d === "undefined" ? "undefined" : _typeof(d)) === "object" && d.from && d.to && dateToCheck >= d.from && dateToCheck <= d.to) return bool;
@@ -44583,50 +45221,60 @@ function Flatpickr(element, config) {
 	}
 
 	function onKeyDown(e) {
+		var isInput = e.target === self._input;
+		var calendarElem = isCalendarElem(e.target);
+		var allowInput = self.config.allowInput;
+		var allowKeydown = self.isOpen && (!allowInput || !isInput);
+		var allowInlineKeydown = self.config.inline && isInput && !allowInput;
 
-		if (e.target === (self.altInput || self.input) && e.which === 13) selectDate(e);else if (self.isOpen || self.config.inline) {
+		if (e.key === "Enter" && allowInput && isInput) {
+			self.setDate(self._input.value, true, e.target === self.altInput ? self.config.altFormat : self.config.dateFormat);
+			return e.target.blur();
+		} else if (calendarElem || allowKeydown || allowInlineKeydown) {
+			var isTimeObj = self.timeContainer && self.timeContainer.contains(e.target);
 			switch (e.key) {
 				case "Enter":
-					if (self.timeContainer && self.timeContainer.contains(e.target)) updateValue();else selectDate(e);
+					if (isTimeObj) updateValue();else selectDate(e);
 
 					break;
 
 				case "Escape":
 					// escape
+					e.preventDefault();
 					self.close();
 					break;
 
 				case "ArrowLeft":
-					if (e.target !== self.input & e.target !== self.altInput) {
-						e.preventDefault();
-						changeMonth(-1);
-						self.currentMonthElement.focus();
-					}
+				case "ArrowRight":
+					e.preventDefault();
+
+					if (self.daysContainer) {
+						var _delta = e.key === "ArrowRight" ? 1 : -1;
+
+						if (!e.ctrlKey) focusOnDay(e.target.$i, _delta);else {
+							changeMonth(_delta, true);
+							afterDayAnim(function () {
+								focusOnDay(e.target.$i, 0);
+							});
+						}
+					} else if (self.config.enableTime && !isTimeObj) self.hourElement.focus();
+
 					break;
 
 				case "ArrowUp":
-					if (!self.timeContainer || !self.timeContainer.contains(e.target)) {
-						e.preventDefault();
-						self.currentYear++;
-						self.redraw();
-					} else updateTime(e);
-
-					break;
-
-				case "ArrowRight":
-					if (e.target !== self.input & e.target !== self.altInput) {
-						e.preventDefault();
-						changeMonth(1);
-						self.currentMonthElement.focus();
-					}
-					break;
-
 				case "ArrowDown":
-					if (!self.timeContainer || !self.timeContainer.contains(e.target)) {
-						e.preventDefault();
-						self.currentYear--;
-						self.redraw();
-					} else updateTime(e);
+					e.preventDefault();
+					var delta = e.key === "ArrowDown" ? 1 : -1;
+
+					if (self.daysContainer) {
+						if (e.ctrlKey) {
+							changeYear(self.currentYear - delta);
+							focusOnDay(e.target.$i, 0);
+						} else if (!isTimeObj) focusOnDay(e.target.$i, delta * 7);
+					} else if (self.config.enableTime) {
+						if (!isTimeObj) self.hourElement.focus();
+						updateTime(e);
+					}
 
 					break;
 
@@ -44641,6 +45289,22 @@ function Flatpickr(element, config) {
 
 					break;
 
+				case "a":
+					if (e.target === self.amPM) {
+						self.amPM.textContent = "AM";
+						setHoursFromInputs();
+						updateValue();
+					}
+					break;
+
+				case "p":
+					if (e.target === self.amPM) {
+						self.amPM.textContent = "PM";
+						setHoursFromInputs();
+						updateValue();
+					}
+					break;
+
 				default:
 					break;
 
@@ -44650,11 +45314,11 @@ function Flatpickr(element, config) {
 		}
 	}
 
-	function onMouseOver(e) {
-		if (self.selectedDates.length !== 1 || !e.target.classList.contains("flatpickr-day")) return;
+	function onMouseOver(elem) {
+		if (self.selectedDates.length !== 1 || !elem.classList.contains("flatpickr-day")) return;
 
-		var hoverDate = e.target.dateObj,
-		    initialDate = self.parseDate(self.selectedDates[0], true),
+		var hoverDate = elem.dateObj,
+		    initialDate = self.parseDate(self.selectedDates[0], null, true),
 		    rangeStartDate = Math.min(hoverDate.getTime(), self.selectedDates[0].getTime()),
 		    rangeEndDate = Math.max(hoverDate.getTime(), self.selectedDates[0].getTime()),
 		    containsDisabled = false;
@@ -44667,26 +45331,29 @@ function Flatpickr(element, config) {
 		}
 
 		var _loop = function _loop(timestamp, i) {
-			var outOfRange = timestamp < self.minRangeDate.getTime() || timestamp > self.maxRangeDate.getTime();
+			var outOfRange = timestamp < self.minRangeDate.getTime() || timestamp > self.maxRangeDate.getTime(),
+			    dayElem = self.days.childNodes[i];
 
 			if (outOfRange) {
 				self.days.childNodes[i].classList.add("notAllowed");
 				["inRange", "startRange", "endRange"].forEach(function (c) {
-					self.days.childNodes[i].classList.remove(c);
+					dayElem.classList.remove(c);
 				});
 				return "continue";
 			} else if (containsDisabled && !outOfRange) return "continue";
 
 			["startRange", "inRange", "endRange", "notAllowed"].forEach(function (c) {
-				self.days.childNodes[i].classList.remove(c);
+				dayElem.classList.remove(c);
 			});
 
 			var minRangeDate = Math.max(self.minRangeDate.getTime(), rangeStartDate),
 			    maxRangeDate = Math.min(self.maxRangeDate.getTime(), rangeEndDate);
 
-			e.target.classList.add(hoverDate < self.selectedDates[0] ? "startRange" : "endRange");
+			elem.classList.add(hoverDate < self.selectedDates[0] ? "startRange" : "endRange");
 
-			if (initialDate > hoverDate && timestamp === initialDate.getTime()) self.days.childNodes[i].classList.add("endRange");else if (initialDate < hoverDate && timestamp === initialDate.getTime()) self.days.childNodes[i].classList.add("startRange");else if (timestamp >= minRangeDate && timestamp <= maxRangeDate) self.days.childNodes[i].classList.add("inRange");
+			if (initialDate < hoverDate && timestamp === initialDate.getTime()) dayElem.classList.add("startRange");else if (initialDate > hoverDate && timestamp === initialDate.getTime()) dayElem.classList.add("endRange");
+
+			if (timestamp >= minRangeDate && timestamp <= maxRangeDate) dayElem.classList.add("inRange");
 		};
 
 		for (var timestamp = self.days.childNodes[0].dateObj.getTime(), i = 0; i < 42; i++, timestamp += self.utils.duration.DAY) {
@@ -44715,12 +45382,12 @@ function Flatpickr(element, config) {
 			return;
 		}
 
-		if (self.isOpen || (self.altInput || self.input).disabled || self.config.inline) return;
+		if (self.isOpen || self._input.disabled || self.config.inline) return;
 
 		self.isOpen = true;
 		self.calendarContainer.classList.add("open");
 		positionCalendar();
-		(self.altInput || self.input).classList.add("active");
+		self._input.classList.add("active");
 
 		triggerEvent("Open");
 	}
@@ -44744,7 +45411,7 @@ function Flatpickr(element, config) {
 				updateValue();
 			}
 
-			if (self.days) {
+			if (self.daysContainer) {
 				redraw();
 
 				if (isValidDate) self.currentYearElement[type] = dateObj.getFullYear();else self.currentYearElement.removeAttribute(type);
@@ -44795,13 +45462,19 @@ function Flatpickr(element, config) {
 
 		for (var i = 0; i < boolOpts.length; i++) {
 			self.config[boolOpts[i]] = self.config[boolOpts[i]] === true || self.config[boolOpts[i]] === "true";
-		}for (var _i = 0; _i < hooks.length; _i++) {
-			self.config[hooks[_i]] = arrayify(self.config[hooks[_i]] || []).map(bindToInstance);
-		}for (var _i2 = 0; _i2 < self.config.plugins.length; _i2++) {
+		}for (var _i = hooks.length; _i--;) {
+			if (self.config[hooks[_i]] !== undefined) {
+				self.config[hooks[_i]] = arrayify(self.config[hooks[_i]] || []).map(bindToInstance);
+			}
+		}
+
+		for (var _i2 = 0; _i2 < self.config.plugins.length; _i2++) {
 			var pluginConf = self.config.plugins[_i2](self) || {};
 			for (var key in pluginConf) {
 
-				if (Array.isArray(self.config[key]) || ~hooks.indexOf(key)) self.config[key] = arrayify(pluginConf[key]).map(bindToInstance).concat(self.config[key]);else if (typeof userConfig[key] === "undefined") self.config[key] = pluginConf[key];
+				if (self.config[key] instanceof Array || ~hooks.indexOf(key)) {
+					self.config[key] = arrayify(pluginConf[key]).map(bindToInstance).concat(self.config[key]);
+				} else if (typeof userConfig[key] === "undefined") self.config[key] = pluginConf[key];
 			}
 		}
 
@@ -44814,18 +45487,17 @@ function Flatpickr(element, config) {
 		self.l10n = _extends(Object.create(Flatpickr.l10ns.default), _typeof(self.config.locale) === "object" ? self.config.locale : self.config.locale !== "default" ? Flatpickr.l10ns[self.config.locale] || {} : {});
 	}
 
-	function positionCalendar(e) {
-		if (e && e.target !== self.timeContainer) return;
+	function positionCalendar() {
+		if (self.calendarContainer === undefined) return;
 
 		var calendarHeight = self.calendarContainer.offsetHeight,
 		    calendarWidth = self.calendarContainer.offsetWidth,
 		    configPos = self.config.position,
-		    input = self.altInput || self.input,
-		    inputBounds = input.getBoundingClientRect(),
-		    distanceFromBottom = window.innerHeight - inputBounds.bottom + input.offsetHeight,
+		    inputBounds = self._positionElement.getBoundingClientRect(),
+		    distanceFromBottom = window.innerHeight - inputBounds.bottom,
 		    showOnTop = configPos === "above" || configPos !== "below" && distanceFromBottom < calendarHeight && inputBounds.top > calendarHeight;
 
-		var top = window.pageYOffset + inputBounds.top + (!showOnTop ? input.offsetHeight + 2 : -calendarHeight - 2);
+		var top = window.pageYOffset + inputBounds.top + (!showOnTop ? self._positionElement.offsetHeight + 2 : -calendarHeight - 2);
 
 		toggleClass(self.calendarContainer, "arrowTop", !showOnTop);
 		toggleClass(self.calendarContainer, "arrowBottom", showOnTop);
@@ -44863,14 +45535,11 @@ function Flatpickr(element, config) {
 		e.preventDefault();
 		e.stopPropagation();
 
-		if (self.config.allowInput && e.key === "Enter" && e.target === (self.altInput || self.input)) {
-			self.setDate((self.altInput || self.input).value, true, e.target === self.altInput ? self.config.altFormat : self.config.dateFormat);
-			return e.target.blur();
-		}
-
 		if (!e.target.classList.contains("flatpickr-day") || e.target.classList.contains("disabled") || e.target.classList.contains("notAllowed")) return;
 
 		var selectedDate = self.latestSelectedDateObj = new Date(e.target.dateObj.getTime());
+
+		var shouldChangeMonth = selectedDate.getMonth() !== self.currentMonth && self.config.mode !== "range";
 
 		self.selectedDateElem = e.target;
 
@@ -44890,7 +45559,7 @@ function Flatpickr(element, config) {
 
 		setHoursFromInputs();
 
-		if (selectedDate.getMonth() !== self.currentMonth && self.config.mode !== "range") {
+		if (shouldChangeMonth) {
 			var isNewYear = self.currentYear !== selectedDate.getFullYear();
 			self.currentYear = selectedDate.getFullYear();
 			self.currentMonth = selectedDate.getMonth();
@@ -44906,13 +45575,13 @@ function Flatpickr(element, config) {
 
 		updateValue();
 
-		setTimeout(function () {
+		if (self.config.enableTime) setTimeout(function () {
 			return self.showTimeInput = true;
 		}, 50);
 
 		if (self.config.mode === "range") {
 			if (self.selectedDates.length === 1) {
-				onMouseOver(e);
+				onMouseOver(e.target);
 
 				self._hidePrevMonthArrow = self._hidePrevMonthArrow || self.minRangeDate > self.days.childNodes[0].dateObj;
 
@@ -44923,13 +45592,18 @@ function Flatpickr(element, config) {
 			}
 		}
 
+		triggerEvent("Change");
+
+		// maintain focus
+		if (!shouldChangeMonth) focusOnDay(e.target.$i, 0);else afterDayAnim(function () {
+			return self.selectedDateElem.focus();
+		});
+
 		if (self.config.enableTime) setTimeout(function () {
-			self.hourElement.select();
+			return self.hourElement.select();
 		}, 451);
 
 		if (self.config.mode === "single" && !self.config.enableTime) self.close();
-
-		triggerEvent("Change");
 	}
 
 	function set(option, value) {
@@ -44939,23 +45613,23 @@ function Flatpickr(element, config) {
 	}
 
 	function setSelectedDate(inputDate, format) {
-		if (Array.isArray(inputDate)) self.selectedDates = inputDate.map(function (d) {
-			return self.parseDate(d, false, format);
-		});else if (inputDate instanceof Date || !isNaN(inputDate)) self.selectedDates = [self.parseDate(inputDate)];else if (inputDate && inputDate.substring) {
+		if (inputDate instanceof Array) self.selectedDates = inputDate.map(function (d) {
+			return self.parseDate(d, format);
+		});else if (inputDate instanceof Date || !isNaN(inputDate)) self.selectedDates = [self.parseDate(inputDate, format)];else if (inputDate && inputDate.substring) {
 			switch (self.config.mode) {
 				case "single":
-					self.selectedDates = [self.parseDate(inputDate, false, format)];
+					self.selectedDates = [self.parseDate(inputDate, format)];
 					break;
 
 				case "multiple":
 					self.selectedDates = inputDate.split("; ").map(function (date) {
-						return self.parseDate(date, false, format);
+						return self.parseDate(date, format);
 					});
 					break;
 
 				case "range":
 					self.selectedDates = inputDate.split(self.l10n.rangeSeparator).map(function (date) {
-						return self.parseDate(date, false, format);
+						return self.parseDate(date, format);
 					});
 
 					break;
@@ -44975,7 +45649,7 @@ function Flatpickr(element, config) {
 	}
 
 	function setDate(date, triggerChange, format) {
-		if (!date) return self.clear();
+		if (!date) return self.clear(triggerChange);
 
 		setSelectedDate(date, format);
 
@@ -44986,7 +45660,7 @@ function Flatpickr(element, config) {
 		jumpToDate();
 
 		setHoursFromDate();
-		updateValue();
+		updateValue(triggerChange);
 
 		if (triggerChange) triggerEvent("Change");
 	}
@@ -44994,7 +45668,7 @@ function Flatpickr(element, config) {
 	function setupDates() {
 		function parseDateRules(arr) {
 			for (var i = arr.length; i--;) {
-				if (typeof arr[i] === "string" || +arr[i]) arr[i] = self.parseDate(arr[i], true);else if (arr[i] && arr[i].from && arr[i].to) {
+				if (typeof arr[i] === "string" || +arr[i]) arr[i] = self.parseDate(arr[i], null, true);else if (arr[i] && arr[i].from && arr[i].to) {
 					arr[i].from = self.parseDate(arr[i].from);
 					arr[i].to = self.parseDate(arr[i].to);
 				}
@@ -45012,7 +45686,8 @@ function Flatpickr(element, config) {
 
 		if (self.config.enable.length) self.config.enable = parseDateRules(self.config.enable);
 
-		setSelectedDate(self.config.defaultDate || self.input.value);
+		var preloadedDate = self.config.defaultDate || self.input.value;
+		if (preloadedDate) setSelectedDate(preloadedDate, self.config.dateFormat);
 
 		var initialDate = self.selectedDates.length ? self.selectedDates[0] : self.config.minDate && self.config.minDate.getTime() > self.now ? self.config.minDate : self.config.maxDate && self.config.maxDate.getTime() < self.now ? self.config.maxDate : self.now;
 
@@ -45027,7 +45702,7 @@ function Flatpickr(element, config) {
 
 		Object.defineProperty(self, "latestSelectedDateObj", {
 			get: function get() {
-				return self._selectedDateObj || self.selectedDates[self.selectedDates.length - 1] || null;
+				return self._selectedDateObj || self.selectedDates[self.selectedDates.length - 1];
 			},
 			set: function set(date) {
 				self._selectedDateObj = date;
@@ -45042,6 +45717,7 @@ function Flatpickr(element, config) {
 				set: function set(bool) {
 					self._showTimeInput = bool;
 					if (self.calendarContainer) toggleClass(self.calendarContainer, "showTimeInput", bool);
+					positionCalendar();
 				}
 			});
 		}
@@ -45087,11 +45763,14 @@ function Flatpickr(element, config) {
 
 		self.input._type = self.input.type;
 		self.input.type = "text";
+
 		self.input.classList.add("flatpickr-input");
+		self._input = self.input;
 
 		if (self.config.altInput) {
 			// replicate self.element
 			self.altInput = createElement(self.input.nodeName, self.input.className + " " + self.config.altInputClass);
+			self._input = self.altInput;
 			self.altInput.placeholder = self.input.placeholder;
 			self.altInput.type = "text";
 			self.input.type = "hidden";
@@ -45099,7 +45778,9 @@ function Flatpickr(element, config) {
 			if (!self.config.static && self.input.parentNode) self.input.parentNode.insertBefore(self.altInput, self.input.nextSibling);
 		}
 
-		if (!self.config.allowInput) (self.altInput || self.input).setAttribute("readonly", "readonly");
+		if (!self.config.allowInput) self._input.setAttribute("readonly", "readonly");
+
+		self._positionElement = self.config.positionElement || self._input;
 	}
 
 	function setupMobile() {
@@ -45115,12 +45796,12 @@ function Flatpickr(element, config) {
 		self.mobileFormatStr = inputType === "datetime-local" ? "Y-m-d\\TH:i:S" : inputType === "date" ? "Y-m-d" : "H:i:S";
 
 		if (self.selectedDates.length) {
-			self.mobileInput.defaultValue = self.mobileInput.value = formatDate(self.mobileFormatStr, self.selectedDates[0]);
+			self.mobileInput.defaultValue = self.mobileInput.value = self.formatDate(self.selectedDates[0], self.mobileFormatStr);
 		}
 
-		if (self.config.minDate) self.mobileInput.min = formatDate("Y-m-d", self.config.minDate);
+		if (self.config.minDate) self.mobileInput.min = self.formatDate(self.config.minDate, "Y-m-d");
 
-		if (self.config.maxDate) self.mobileInput.max = formatDate("Y-m-d", self.config.maxDate);
+		if (self.config.maxDate) self.mobileInput.max = self.formatDate(self.config.maxDate, "Y-m-d");
 
 		self.input.type = "hidden";
 		if (self.config.altInput) self.altInput.type = "hidden";
@@ -45132,41 +45813,45 @@ function Flatpickr(element, config) {
 		}
 
 		self.mobileInput.addEventListener("change", function (e) {
-			self.latestSelectedDateObj = self.parseDate(e.target.value);
-			self.setDate(self.latestSelectedDateObj);
+			self.setDate(e.target.value, false, self.mobileFormatStr);
 			triggerEvent("Change");
 			triggerEvent("Close");
 		});
 	}
 
 	function toggle() {
-		if (self.isOpen) self.close();else self.open();
+		if (self.isOpen) return self.close();
+		self.open();
 	}
 
 	function triggerEvent(event, data) {
 		var hooks = self.config["on" + event];
 
-		if (hooks) {
+		if (hooks !== undefined && hooks.length > 0) {
 			for (var i = 0; hooks[i] && i < hooks.length; i++) {
-				hooks[i](self.selectedDates, self.input && self.input.value, self, data);
+				hooks[i](self.selectedDates, self._input.value, self, data);
 			}
 		}
 
 		if (event === "Change") {
-			if (typeof Event === "function" && Event.constructor) {
-				self.input.dispatchEvent(new Event("change", { "bubbles": true }));
+			self.input.dispatchEvent(createEvent("change"));
 
-				// many front-end frameworks bind to the input event
-				self.input.dispatchEvent(new Event("input", { "bubbles": true }));
-			}
-
-			/* istanbul ignore next */
-			else {
-					if (window.document.createEvent !== undefined) return self.input.dispatchEvent(self.changeEvent);
-
-					self.input.fireEvent("onchange");
-				}
+			// many front-end frameworks bind to the input event
+			self.input.dispatchEvent(createEvent("input"));
 		}
+	}
+
+	/**
+  * Creates an Event, normalized across browsers
+  * @param {String} name the event name, e.g. "click"
+  * @return {Event} the created event
+  */
+	function createEvent(name) {
+		if (self._supportsEvents) return new Event(name, { bubbles: true });
+
+		self._[name + "Event"] = document.createEvent("Event");
+		self._[name + "Event"].initEvent(name, true, true);
+		return self._[name + "Event"];
 	}
 
 	function isDateSelected(date) {
@@ -45193,38 +45878,67 @@ function Flatpickr(element, config) {
 		self._hideNextMonthArrow = self.config.maxDate && (self.currentYear === self.config.maxDate.getFullYear() ? self.currentMonth + 1 > self.config.maxDate.getMonth() : self.currentYear > self.config.maxDate.getFullYear());
 	}
 
-	function updateValue() {
-		if (!self.selectedDates.length) return self.clear();
+	/**
+  * Updates the values of inputs associated with the calendar
+  * @return {void}
+  */
+	function updateValue(triggerChange) {
+		if (!self.selectedDates.length) return self.clear(triggerChange);
 
 		if (self.isMobile) {
-			self.mobileInput.value = self.selectedDates.length ? formatDate(self.mobileFormatStr, self.latestSelectedDateObj) : "";
+			self.mobileInput.value = self.selectedDates.length ? self.formatDate(self.latestSelectedDateObj, self.mobileFormatStr) : "";
 		}
 
 		var joinChar = self.config.mode !== "range" ? "; " : self.l10n.rangeSeparator;
 
 		self.input.value = self.selectedDates.map(function (dObj) {
-			return formatDate(self.config.dateFormat, dObj);
+			return self.formatDate(dObj, self.config.dateFormat);
 		}).join(joinChar);
 
 		if (self.config.altInput) {
 			self.altInput.value = self.selectedDates.map(function (dObj) {
-				return formatDate(self.config.altFormat, dObj);
+				return self.formatDate(dObj, self.config.altFormat);
 			}).join(joinChar);
 		}
-
 		triggerEvent("ValueUpdate");
 	}
 
-	function yearScroll(e) {
-		e.preventDefault();
-
-		var delta = Math.max(-1, Math.min(1, e.wheelDelta || -e.deltaY)),
-		    newYear = parseInt(e.target.value, 10) + delta;
-
-		changeYear(newYear);
-		e.target.value = self.currentYear;
+	function mouseDelta(e) {
+		return Math.max(-1, Math.min(1, e.wheelDelta || -e.deltaY));
 	}
 
+	function onMonthNavScroll(e) {
+		e.preventDefault();
+		var isYear = self.currentYearElement.parentNode.contains(e.target);
+
+		if (e.target === self.currentMonthElement || isYear) {
+
+			var delta = mouseDelta(e);
+
+			if (isYear) {
+				changeYear(self.currentYear + delta);
+				e.target.value = self.currentYear;
+			} else self.changeMonth(delta, true, false);
+		}
+	}
+
+	function onMonthNavClick(e) {
+		var isPrevMonth = self.prevMonthNav.contains(e.target);
+		var isNextMonth = self.nextMonthNav.contains(e.target);
+
+		if (isPrevMonth || isNextMonth) changeMonth(isPrevMonth ? -1 : 1);else if (e.target === self.currentYearElement) {
+			e.preventDefault();
+			self.currentYearElement.select();
+		} else if (e.target.className === "arrowUp") self.changeYear(self.currentYear + 1);else if (e.target.className === "arrowDown") self.changeYear(self.currentYear - 1);
+	}
+
+	/**
+  * Creates an HTMLElement with given tag, class, and textual content
+  * @param {String} tag the HTML tag
+  * @param {String} className the new element's class name
+  * @param {String} content The new element's text content
+  * @return {HTMLElement} the created HTML element
+  */
 	function createElement(tag, className, content) {
 		var e = window.document.createElement(tag);
 		className = className || "";
@@ -45232,13 +45946,13 @@ function Flatpickr(element, config) {
 
 		e.className = className;
 
-		if (content) e.textContent = content;
+		if (content !== undefined) e.textContent = content;
 
 		return e;
 	}
 
 	function arrayify(obj) {
-		if (Array.isArray(obj)) return obj;
+		if (obj instanceof Array) return obj;
 		return [obj];
 	}
 
@@ -45262,6 +45976,13 @@ function Flatpickr(element, config) {
 		};
 	}
 
+	/**
+  * Compute the difference in dates, measured in ms
+  * @param {Date} date1
+  * @param {Date} date2
+  * @param {Boolean} timeless whether to reset times of both dates to 00:00
+  * @return {Number} the difference in ms
+  */
 	function compareDates(date1, date2, timeless) {
 		if (!(date1 instanceof Date) || !(date2 instanceof Date)) return false;
 
@@ -45279,12 +46000,6 @@ function Flatpickr(element, config) {
 		    isWheel = e.type === "wheel",
 		    isIncrement = e.type === "increment",
 		    input = e.target;
-
-		if (e.type !== "input" && !isKeyDown && (e.target.value || e.target.textContent).length >= 2 // typed two digits
-		) {
-				e.target.focus();
-				e.target.blur();
-			}
 
 		if (self.amPM && e.target === self.amPM) return e.target.textContent = ["AM", "PM"][e.target.textContent === "AM" | 0];
 
@@ -45322,16 +46037,17 @@ function Flatpickr(element, config) {
 
 /* istanbul ignore next */
 Flatpickr.defaultConfig = {
-
 	mode: "single",
 
-	position: "top",
+	position: "auto",
+
+	animate: window.navigator.userAgent.indexOf("MSIE") === -1,
 
 	/* if true, dates will be parsed, formatted, and displayed in UTC.
  preloading date strings w/ timezones is recommended but not necessary */
 	utc: false,
 
-	// wrap: see https://chmln.github.io/flatpickr/#strap
+	// wrap: see https://chmln.github.io/flatpickr/examples/#flatpickr-external-elements
 	wrap: false,
 
 	// enables week numbers
@@ -45362,7 +46078,7 @@ Flatpickr.defaultConfig = {
 	altInput: false,
 
 	// the created altInput element will have this class.
-	altInputClass: "flatpickr-input form-control input",
+	altInputClass: "form-control input",
 
 	// same as dateFormat, but for altInput
 	altFormat: "F j, Y", // defaults to e.g. June 10, 2016
@@ -45384,15 +46100,10 @@ Flatpickr.defaultConfig = {
 
 	getWeek: function getWeek(givenDate) {
 		var date = new Date(givenDate.getTime());
-		date.setHours(0, 0, 0, 0);
-
-		// Thursday in current week decides the year.
-		date.setDate(date.getDate() + 3 - (date.getDay() + 6) % 7);
-		// January 4 is always in week 1.
-		var week1 = new Date(date.getFullYear(), 0, 4);
-		// Adjust to Thursday in week 1 and count number of weeks from date to week1.
-		return 1 + Math.round(((date.getTime() - week1.getTime()) / 86400000 - 3 + (week1.getDay() + 6) % 7) / 7);
+		var onejan = new Date(date.getFullYear(), 0, 1);
+		return Math.ceil(((date - onejan) / 86400000 + onejan.getDay() + 1) / 7);
 	},
+
 
 	// see https://chmln.github.io/flatpickr/#disable
 	enable: [],
@@ -45408,7 +46119,7 @@ Flatpickr.defaultConfig = {
 
 	// position calendar inside wrapper and next to the input element
 	// leave at false unless you know what you"re doing
-	static: false,
+	"static": false,
 
 	// DOM node to append the calendar to in *static* mode
 	appendTo: null,
@@ -45441,33 +46152,33 @@ Flatpickr.defaultConfig = {
 	plugins: [],
 
 	// called every time calendar is closed
-	onClose: [], // function (dateObj, dateStr) {}
+	onClose: undefined, // function (dateObj, dateStr) {}
 
 	// onChange callback when user selects a date or time
-	onChange: [], // function (dateObj, dateStr) {}
+	onChange: undefined, // function (dateObj, dateStr) {}
 
 	// called for every day element
-	onDayCreate: [],
+	onDayCreate: undefined,
 
 	// called every time the month is changed
-	onMonthChange: [],
+	onMonthChange: undefined,
 
 	// called every time calendar is opened
-	onOpen: [], // function (dateObj, dateStr) {}
+	onOpen: undefined, // function (dateObj, dateStr) {}
 
 	// called after the configuration has been parsed
-	onParseConfig: [],
+	onParseConfig: undefined,
 
 	// called after calendar is ready
-	onReady: [], // function (dateObj, dateStr) {}
+	onReady: undefined, // function (dateObj, dateStr) {}
 
 	// called after input value updated
-	onValueUpdate: [],
+	onValueUpdate: undefined,
 
 	// called every time the year is changed
-	onYearChange: [],
+	onYearChange: undefined,
 
-	onKeyDown: []
+	onKeyDown: undefined
 };
 
 /* istanbul ignore next */
@@ -45619,16 +46330,33 @@ Flatpickr.prototype = {
 		}
 	},
 
+	/**
+  * Formats a given Date object into a string based on supplied format
+  * @param {Date} dateObj the date object
+  * @param {String} frmt a string composed of formatting tokens e.g. "Y-m-d"
+  * @return {String} The textual representation of the date e.g. 2017-02-03
+  */
+	formatDate: function formatDate(dateObj, frmt) {
+		var _this = this;
+
+		if (this.config !== undefined && this.config.formatDate !== undefined) return this.config.formatDate(dateObj, frmt);
+
+		return frmt.split("").map(function (c, i, arr) {
+			return _this.formats[c] && arr[i - 1] !== "\\" ? _this.formats[c](dateObj) : c !== "\\" ? c : "";
+		}).join("");
+	},
+
+
 	revFormat: {
 		D: function D() {},
 		F: function F(dateObj, monthName) {
 			dateObj.setMonth(this.l10n.months.longhand.indexOf(monthName));
 		},
 		H: function H(dateObj, hour) {
-			return dateObj.setHours(parseFloat(hour));
+			dateObj.setHours(parseFloat(hour));
 		},
 		J: function J(dateObj, day) {
-			return dateObj.setDate(parseFloat(day));
+			dateObj.setDate(parseFloat(day));
 		},
 		K: function K(dateObj, amPM) {
 			var hours = dateObj.getHours();
@@ -45639,41 +46367,48 @@ Flatpickr.prototype = {
 			dateObj.setMonth(this.l10n.months.shorthand.indexOf(shortMonth));
 		},
 		S: function S(dateObj, seconds) {
-			return dateObj.setSeconds(seconds);
+			dateObj.setSeconds(seconds);
 		},
-		W: function W() {},
+		U: function U(dateObj, unixSeconds) {
+			return new Date(parseFloat(unixSeconds) * 1000);
+		},
+
+		W: function W(dateObj, weekNumber) {
+			weekNumber = parseInt(weekNumber);
+			return new Date(dateObj.getFullYear(), 0, 2 + (weekNumber - 1) * 7, 0, 0, 0, 0, 0);
+		},
 		Y: function Y(dateObj, year) {
-			return dateObj.setFullYear(year);
+			dateObj.setFullYear(year);
 		},
 		Z: function Z(dateObj, ISODate) {
-			return dateObj = new Date(ISODate);
+			return new Date(ISODate);
 		},
 
 		d: function d(dateObj, day) {
-			return dateObj.setDate(parseFloat(day));
+			dateObj.setDate(parseFloat(day));
 		},
 		h: function h(dateObj, hour) {
-			return dateObj.setHours(parseFloat(hour));
+			dateObj.setHours(parseFloat(hour));
 		},
 		i: function i(dateObj, minutes) {
-			return dateObj.setMinutes(parseFloat(minutes));
+			dateObj.setMinutes(parseFloat(minutes));
 		},
 		j: function j(dateObj, day) {
-			return dateObj.setDate(parseFloat(day));
+			dateObj.setDate(parseFloat(day));
 		},
 		l: function l() {},
 		m: function m(dateObj, month) {
-			return dateObj.setMonth(parseFloat(month) - 1);
+			dateObj.setMonth(parseFloat(month) - 1);
 		},
 		n: function n(dateObj, month) {
-			return dateObj.setMonth(parseFloat(month) - 1);
+			dateObj.setMonth(parseFloat(month) - 1);
 		},
 		s: function s(dateObj, seconds) {
-			return dateObj.setSeconds(parseFloat(seconds));
+			dateObj.setSeconds(parseFloat(seconds));
 		},
 		w: function w() {},
 		y: function y(dateObj, year) {
-			return dateObj.setFullYear(2000 + parseFloat(year));
+			dateObj.setFullYear(2000 + parseFloat(year));
 		}
 	},
 
@@ -45685,6 +46420,8 @@ Flatpickr.prototype = {
 		K: "(\\w+)",
 		M: "(\\w+)",
 		S: "(\\d\\d|\\d)",
+		U: "(.+)",
+		W: "(\\d\\d|\\d)",
 		Y: "(\\d{4})",
 		Z: "(.+)",
 		d: "(\\d\\d|\\d)",
@@ -45703,39 +46440,53 @@ Flatpickr.prototype = {
 		return ("0" + number).slice(-2);
 	},
 
-	parseDate: function parseDate(date, timeless, givenFormat) {
+	/**
+  * Parses a date(+time) string into a Date object
+  * @param {String} date the date string, e.g. 2017-02-03 14:45
+  * @param {String} givenFormat the date format, e.g. Y-m-d H:i
+  * @param {Boolean} timeless whether to reset the time of Date object
+  * @return {Date} the parsed Date object
+  */
+	parseDate: function parseDate(date, givenFormat, timeless) {
 		if (!date) return null;
 
 		var date_orig = date;
 
-		if (date.toFixed) // timestamp
-			date = new Date(date);else if (typeof date === "string") {
-			var format = typeof givenFormat === "string" ? givenFormat : this.config.dateFormat;
-			date = date.trim();
+		if (date instanceof Date) {
+			date = new Date(date.getTime()); // create a copy
+			date.fp_isUTC = date_orig.fp_isUTC;
+		} else if (date.toFixed !== undefined) // timestamp
+			date = new Date(date);else {
+			// date string
+			var format = givenFormat || (this.config || Flatpickr.defaultConfig).dateFormat;
+			date = String(date).trim();
 
 			if (date === "today") {
 				date = new Date();
 				timeless = true;
-			} else if (this.config && this.config.parseDate) date = this.config.parseDate(date);else if (/Z$/.test(date) || /GMT$/.test(date)) // datestrings w/ timezone
-				date = new Date(date);else {
-				var parsedDate = this.config.noCalendar ? new Date(new Date().setHours(0, 0, 0, 0)) : new Date(new Date().getFullYear(), 0, 1, 0, 0, 0, 0);
+			} else if (/Z$/.test(date) || /GMT$/.test(date)) // datestrings w/ timezone
+				date = new Date(date);else if (this.config && this.config.parseDate) date = this.config.parseDate(date, format);else {
+				var parsedDate = !this.config || !this.config.noCalendar ? new Date(new Date().getFullYear(), 0, 1, 0, 0, 0, 0) : new Date(new Date().setHours(0, 0, 0, 0));
 
-				var matched = false;
+				var matched = void 0;
 
 				for (var i = 0, matchIndex = 0, regexStr = ""; i < format.length; i++) {
 					var token = format[i];
 					var isBackSlash = token === "\\";
 					var escaped = format[i - 1] === "\\" || isBackSlash;
+
 					if (this.tokenRegex[token] && !escaped) {
 						regexStr += this.tokenRegex[token];
 						var match = new RegExp(regexStr).exec(date);
-						if (match && (matched = true)) this.revFormat[token](parsedDate, match[++matchIndex]);
+						if (match && (matched = true)) {
+							parsedDate = this.revFormat[token](parsedDate, match[++matchIndex]) || parsedDate;
+						}
 					} else if (!isBackSlash) regexStr += "."; // don't really care
 				}
 
 				date = matched ? parsedDate : null;
 			}
-		} else if (date instanceof Date) date = new Date(date.getTime()); // create a copy
+		}
 
 		/* istanbul ignore next */
 		if (!(date instanceof Date)) {
@@ -45804,57 +46555,7 @@ Date.prototype.fp_toUTC = function () {
 	return newDate;
 };
 
-// IE9 classList polyfill
-/* istanbul ignore next */
-if (!window.document.documentElement.classList && Object.defineProperty && typeof HTMLElement !== "undefined") {
-	Object.defineProperty(HTMLElement.prototype, "classList", {
-		get: function get() {
-			var self = this;
-			function update(fn) {
-				return function (value) {
-					var classes = self.className.split(/\s+/),
-					    index = classes.indexOf(value);
-
-					fn(classes, index, value);
-					self.className = classes.join(" ");
-				};
-			}
-
-			var ret = {
-				add: update(function (classes, index, value) {
-					if (!~index) classes.push(value);
-				}),
-
-				remove: update(function (classes, index) {
-					if (~index) classes.splice(index, 1);
-				}),
-
-				toggle: update(function (classes, index, value) {
-					if (~index) classes.splice(index, 1);else classes.push(value);
-				}),
-
-				contains: function contains(value) {
-					return !!~self.className.split(/\s+/).indexOf(value);
-				},
-
-				item: function item(i) {
-					return self.className.split(/\s+/)[i] || null;
-				}
-			};
-
-			Object.defineProperty(ret, "length", {
-				get: function get() {
-					return self.className.split(/\s+/).length;
-				}
-			});
-
-			return ret;
-		}
-	});
-}
-
 if (true) module.exports = Flatpickr;
-
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(2)))
 
 /***/ }),
@@ -47739,7 +48440,7 @@ module.exports = Component.exports
 module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
   return _c('div', {
     attrs: {
-      "id": "popups"
+      "id": "c-popups"
     }
   }, _vm._l((_vm.popups), function(popup) {
     return _c('div', {
@@ -47748,11 +48449,11 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
         "transition": "fade"
       }
     }, [(popup.type == 'afterDone') ? _c('div', {
-      staticClass: "popup callout animated"
+      staticClass: "c-popup callout animated"
     }, [_c('div', {
-      staticClass: "top"
+      staticClass: "c-popup__top"
     }, [_c('div', {
-      staticClass: "title"
+      staticClass: "c-popup__title"
     }, [_vm._v(_vm._s(_vm.basis.text.popups.completed) + " " + _vm._s(popup.item.body) + " " + _vm._s(_vm.basis.text.popups.completedB) + "\n            "), _c('label', {
       staticClass: "done-after-done",
       on: {
@@ -47785,9 +48486,9 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
         }
       }
     })])])]), _vm._v(" "), _c('div', {
-      staticClass: "body"
+      staticClass: "c-popup__body"
     }, [_c('div', {
-      staticClass: "completion-memo"
+      staticClass: "c-popup__completion-memo"
     }, [_c('label', [_vm._v(_vm._s(_vm.basis.text.popups.journalNotes))]), _vm._v(" "), _c('textarea', {
       directives: [{
         name: "model",
@@ -47802,7 +48503,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
         rawName: "v-autoheight"
       }],
       attrs: {
-        "name": "completion_memo"
+        "name": "c-popup__completion_memo__txtarea"
       },
       domProps: {
         "value": (popup.item.completion_memo)
@@ -47817,7 +48518,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
         }
       }
     })]), _vm._v(" "), _c('div', {
-      staticClass: "used-time"
+      staticClass: "c-popup__used-time"
     }, [_c('div', [_c('label', {}, [_vm._v(_vm._s(_vm.basis.text.popups.usedTime))]), _vm._v(" "), _c('span', {}, [_vm._v(_vm._s(_vm.sec_to_hhmmss(popup.item.used_time)))])]), _vm._v(" "), _c('div', {
       staticClass: "buttons"
     }, [_c('div', [_c('button', {
@@ -47881,7 +48582,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
         }
       }
     }, [_vm._v(_vm._s(_vm.basis.text.popups.setNotDone))])])])])]), _vm._v(" "), _c('button', {
-      staticClass: "o-btn close-button",
+      staticClass: "o-btn c-popup__close-button",
       attrs: {
         "aria-label": "Close alert",
         "type": "button"
@@ -47955,40 +48656,44 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
       "id": 'card-' + _vm.item.id
     }
   }, [(!_vm.isHidden || _vm.listIsEmpty) ? _c('div', {
-    staticClass: "item-card-wrapper"
+    staticClass: "d-flex flex-wrap"
   }, [(_vm.journalDate && _vm.item.journalDate) ? _c('div', {
-    staticClass: "title flex--wrap"
+    staticClass: "c-section-head"
   }, [_c('span', [_vm._v(_vm._s(_vm.momentCalendar(_vm.journalDate)))]), _vm._v(" "), (_vm.journalDate != _vm.momentCalendar(_vm.journalDate)) ? _c('span', {
-    staticClass: "journal-date-small"
+    staticClass: "c-section-head__subtitle"
   }, [_vm._v("\n\t\t\t" + _vm._s(_vm.journalDate) + "\n\t\t")]) : _vm._e(), _vm._v(" "), ( true) ? _c('button', {
-    staticClass: "o-btn copy-contents-button btn btn-dipclick copy-contents-button-journal",
+    staticClass: "o-btn btn btn-dipclick ml-auto",
     attrs: {
       "id": 'journal-card-' + _vm.item.done_date + '-copy'
     }
   }, [_vm._v("\n\t\t\t" + _vm._s(_vm.basis.text.card.copy) + "\n\t\t")]) : _vm._e(), _vm._v(" "), (_vm.totalUsedMin) ? _c('div', {
-    staticClass: "l-fullwidth used-time"
-  }, [_vm._v("\n\t\t\t" + _vm._s(_vm.basis.text.menu.usedTime) + ": "), _c('span', {
-    staticClass: "pill-small"
+    staticClass: "w-100 d-flex"
+  }, [_c('span', {
+    staticClass: "c-journal-used-time"
+  }, [_vm._v(_vm._s(_vm.basis.text.menu.usedTime) + ": ")]), _vm._v(" "), _c('span', {
+    staticClass: "o-pill--used-time"
   }, [_vm._v(_vm._s(_vm.sec_to_hourmin(_vm.totalUsedSec)))])]) : _vm._e()]) : _vm._e(), _vm._v(" "), (_vm.journalParentString) ? _c('div', {
-    staticClass: "parent-string",
+    staticClass: "c-subsection-head",
     on: {
       "click": function($event) {
         _vm.selectItem(_vm.item)
       }
     }
-  }, [_c('div', [_vm._v("\n\t\t\t" + _vm._s(_vm.journalParentString) + "\n\t\t")])]) : _vm._e(), _vm._v(" "), (_vm.item.depth != 0 && !(_vm.journalView && _vm.journalDate)) ? _c('div', {
+  }, [_c('div', {
+    staticClass: "c-subsection-head__text"
+  }, [_vm._v("\n\t\t\t" + _vm._s(_vm.journalParentString) + "\n\t\t")])]) : _vm._e(), _vm._v(" "), (_vm.item.depth != 0 && !(_vm.journalView && _vm.journalDate)) ? _c('div', {
     class: {
-      'item-card': true,
-      'done': _vm.item.done,
-        'show_children': _vm.item.show_children,
-        'editing': (!_vm.basis.mobile && _vm.item.id == _vm.basis.editingItem),
+      'c-item-card': true,
+      'show_children': _vm.item.show_children,
     },
     attrs: {
       "id": 'item-body-' + _vm.item.id
     }
   }, [(!_vm.journalView) ? _c('div', {
     class: {
-      'toggle-div': true, 'both': _vm.item.children_order.length > 0 && (_vm.item.done == true || _vm.allChildrenDone)
+      'o-toggle-div': true,
+      'l-toggle-div': true,
+      'o-toggle-div--both': _vm.item.children_order.length > 0 && (_vm.item.done == true || _vm.allChildrenDone)
     }
   }, [_c('input', {
     directives: [{
@@ -48038,7 +48743,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
       value: (_vm.item.done),
       expression: "item.done"
     }],
-    staticClass: "toggle",
+    staticClass: "o-toggle",
     attrs: {
       "type": "checkbox"
     },
@@ -48068,11 +48773,12 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     }
   }) : _vm._e()]) : _vm._e(), _vm._v(" "), (_vm.journalView) ? _c('div', {}, [_vm._v("・")]) : _vm._e(), _vm._v(" "), _c('div', {
     class: {
-      'body-div': true,
+      'c-body-div': true,
+      'c-body-div--editing': (!_vm.basis.mobile && _vm.item.id == _vm.basis.editingItem),
       'textarea-wrap': true,
-      'selected': _vm.item.id == _vm.basis.selection.selectedId,
-        'project': _vm.isProject,
-        'updating-tags': _vm.item.id == _vm.basis.editingItemTags
+      'u-selected': _vm.item.id == _vm.basis.selection.selectedId,
+        'u-selected--editing': (!_vm.basis.mobile && _vm.item.id == _vm.basis.editingItem),
+        'c-body-div--updating-tags': _vm.item.id == _vm.basis.editingItemTags
     },
     on: {
       "dblclick": function($event) {
@@ -48089,20 +48795,33 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
       value: (_vm.item.id != _vm.basis.editingItem || _vm.basis.mobile),
       expression: "item.id != basis.editingItem || basis.mobile"
     }],
-    staticClass: "bodybox"
+    class: {
+      'c-body-text': true,
+      'js-body-text': true,
+      'c-body-text--project': _vm.isProject,
+      'c-body-text--updating-tags': _vm.item.id == _vm.basis.editingItemTags
+    }
   }, [_c('div', {
     class: {
-      'u-lightgray': _vm.item.temp
+      'u-lightgray': _vm.item.temp,
+        'c-body-text--done': _vm.item.done
     }
   }, [_vm._v(_vm._s(_vm.linkify(_vm.item.body)))]), _vm._v(" "), (_vm.item.completion_memo) ? _c('div', {
-    staticClass: "completion-notes bodybox",
+    staticClass: "l-completion-notes c-completion-notes bodybox",
     on: {
       "click": function($event) {
         _vm.selectItem(_vm.item)
       }
     }
-  }, [_vm._v(_vm._s(_vm.item.completion_memo))]) : _vm._e()]), _vm._v(" "), (false) ? _c('span', [_vm._v("\n\t\t\t\t(" + _vm._s(_vm.item.id) + ") D-" + _vm._s(_vm.item.depth) + ")\n\t\t\t\t"), (_vm.item.children_order.length) ? _c('span', [_vm._v("\n\t\t\t\t\t[" + _vm._s(_vm.item.children_order) + "]\n\t\t\t\t")]) : _vm._e(), _vm._v(" "), _c('span')]) : _vm._e(), _vm._v(" "), (_vm.item.id == _vm.basis.editingItem) ? _c('form', {
-    staticClass: "updatebox",
+  }, [_vm._v(_vm._s(_vm.item.completion_memo))]) : _vm._e()]), _vm._v(" "), (false) ? _c('span', {
+    staticClass: "d-inline-flex"
+  }, [_vm._v("\n\t\t\t\t(" + _vm._s(_vm.item.id) + ") D-" + _vm._s(_vm.item.depth) + ")\n\t\t\t\t"), (_vm.item.children_order.length) ? _c('span', [_vm._v("\n\t\t\t\t\t[" + _vm._s(_vm.item.children_order) + "]\n\t\t\t\t")]) : _vm._e(), _vm._v(" "), _c('span')]) : _vm._e(), _vm._v(" "), (_vm.item.id == _vm.basis.editingItem) ? _c('form', {
+    class: {
+      'updatebox': true,
+      'c-updatebox': true,
+      'c-updatebox--mobile': (_vm.basis.mobile),
+      'c-updatebox--updating-tags': _vm.item.id == _vm.basis.editingItemTags
+    },
     attrs: {
       "action": "update",
       "id": 'updatebox-' + _vm.item.id
@@ -48117,7 +48836,10 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
       }
     }
   }, [_c('div', {
-    staticClass: "update-body"
+    class: {
+      'c-updatebox__body': true,
+      'c-updatebox__body--mobile': (_vm.basis.mobile)
+    }
   }, [_c('textarea', {
     directives: [{
       name: "focus",
@@ -48131,7 +48853,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
       value: (_vm.item.body),
       expression: "item.body"
     }],
-    staticClass: "edititem-body",
+    staticClass: "js-edititem-body c-updatebox__textarea",
     domProps: {
       "value": (_vm.item.body)
     },
@@ -48148,7 +48870,10 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
       }
     }
   })]), _vm._v(" "), _c('div', {
-    staticClass: "update-tags"
+    class: {
+      'c-update-tags': true,
+      'c-updatebox__lower-body--mobile': (_vm.basis.mobile)
+    }
   }, [_c('div', {
     directives: [{
       name: "show",
@@ -48156,10 +48881,16 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
       value: (_vm.basis.selection.view != 'journal'),
       expression: "basis.selection.view != 'journal'"
     }],
-    staticClass: "update-planned-time"
+    class: {
+      'c-update-planned-time': true,
+      'c-update-planned-time--mobile': (_vm.basis.mobile)
+    }
   }, [_vm._v("\n\t\t\t\t\t\t" + _vm._s(_vm.basis.text.card.duration) + "\n\t\t\t\t\t\t"), _c('button', {
     class: {
-      currentDuration: _vm.item.planned_time == 10, 'planned-time': true, 'o-btn': true
+      'o-btn': true,
+      'c-update-planned-time__button': true,
+      'js-update-planned-time__button': true,
+      'c-update-planned-time__currentDuration': _vm.item.planned_time == 10
     },
     attrs: {
       "value": "10"
@@ -48178,7 +48909,9 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     }
   }, [_vm._v("10" + _vm._s((_vm.basis.mobileSmall) ? _vm.basis.text.global.m : _vm.basis.text.global.min))]), _vm._v(" "), (!_vm.basis.mobileSmall) ? _c('button', {
     class: {
-      currentDuration: _vm.item.planned_time == 15, 'planned-time': true, 'o-btn': true
+      'o-btn': true,
+      'c-update-planned-time__button': true,
+      'c-update-planned-time__currentDuration': _vm.item.planned_time == 15
     },
     attrs: {
       "value": "15"
@@ -48197,7 +48930,9 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     }
   }, [_vm._v("15" + _vm._s((_vm.basis.mobileSmall) ? _vm.basis.text.global.m : _vm.basis.text.global.min))]) : _vm._e(), _vm._v(" "), _c('button', {
     class: {
-      currentDuration: _vm.item.planned_time == 30, 'planned-time': true, 'o-btn': true
+      'o-btn': true,
+      'c-update-planned-time__button': true,
+      'c-update-planned-time__currentDuration': _vm.item.planned_time == 30
     },
     attrs: {
       "value": "30"
@@ -48216,7 +48951,9 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     }
   }, [_vm._v("30" + _vm._s((_vm.basis.mobileSmall) ? _vm.basis.text.global.m : _vm.basis.text.global.min))]), _vm._v(" "), _c('button', {
     class: {
-      currentDuration: _vm.item.planned_time == 60, 'planned-time': true, 'o-btn': true
+      'o-btn': true,
+      'c-update-planned-time__button': true,
+      'c-update-planned-time__currentDuration': _vm.item.planned_time == 60
     },
     attrs: {
       "value": "60"
@@ -48245,7 +48982,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
       value: (_vm.item.planned_time),
       expression: "item.planned_time"
     }],
-    staticClass: "planned-time",
+    staticClass: "c-update-planned-time__input",
     attrs: {
       "type": "number"
     },
@@ -48267,9 +49004,13 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
       }
     }
   }), _vm._v(_vm._s(_vm.basis.text.global.min))])]), _vm._v(" "), (_vm.basis.mobile && (_vm.item.id == _vm.basis.editingItem || _vm.item.id == _vm.basis.editingItemTags)) ? _c('div', {
-    staticClass: "item-tags"
+    class: {
+      'c-item-tags': true,
+      'c-updatebox__item-tags': true,
+      'c-updatebox__item-tags--mobile': (_vm.basis.mobile)
+    }
   }, [_c('div', {
-    staticClass: "add-tag-wrapper",
+    staticClass: "c-add-tag__wrapper",
     attrs: {
       "id": 'add-tag-' + _vm.item.id
     }
@@ -48286,7 +49027,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
       name: "focus",
       rawName: "v-focus"
     }],
-    staticClass: "add-tag",
+    staticClass: "c-add-tag__input js-add-tag",
     attrs: {
       "type": "text",
       "placeholder": "..."
@@ -48316,7 +49057,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
           _vm.item.id == _vm.basis.editingItemTags),
         expression: "!parentTags.includes(tag.tag_name)\n\t\t\t\t\t\t\t\t|| item.id == basis.editingItem\n\t\t\t\t\t\t\t\t|| item.id == basis.editingItemTags"
       }],
-      staticClass: "custom-tag",
+      staticClass: "o-pill--custom-tag",
       on: {
         "dblclick": function($event) {
           $event.preventDefault();
@@ -48344,16 +49085,20 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
       staticClass: "zmdi zmdi-close-circle"
     })]) : _vm._e()]) : _vm._e()
   }), _vm._v(" "), (_vm.basis.mobile) ? _c('button', {
-    staticClass: "mobile-edit-save o-btn",
+    staticClass: "c-mobile-edit-save-btns o-btn",
     on: {
       "click": function($event) {
         _vm.doneEdit(_vm.item)
       }
     }
   }, [_vm._v("\n\t\t\t\t\t\t\t" + _vm._s(_vm.basis.text.global.save) + "\n\t\t\t\t\t\t")]) : _vm._e()], 2) : _vm._e()])]) : _vm._e(), _vm._v(" "), _c('div', {
-    staticClass: "item-tags"
+    class: {
+      'c-item-tags': true,
+      'c-item-card__item-tags': true,
+      'c-item-tags--updating-tags': _vm.item.id == _vm.basis.editingItemTags
+    }
   }, [(!_vm.basis.mobile && (_vm.item.id == _vm.basis.editingItem || _vm.item.id == _vm.basis.editingItemTags)) ? _c('div', {
-    staticClass: "add-tag-wrapper",
+    staticClass: "c-add-tag__wrapper",
     attrs: {
       "id": 'add-tag-' + _vm.item.id
     }
@@ -48370,7 +49115,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
       name: "focus",
       rawName: "v-focus"
     }],
-    staticClass: "add-tag",
+    staticClass: "c-add-tag__input js-add-tag",
     attrs: {
       "type": "text",
       "placeholder": "..."
@@ -48393,7 +49138,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
   })])]) : _vm._e(), _vm._v(" "), (_vm.item.done &&
     _vm.item.id != _vm.basis.editingDoneDateItem &&
     !_vm.journalView) ? _c('label', {
-    staticClass: "done"
+    staticClass: "o-pill--done"
   }, [_vm._v("\n\t\t\t\t\t" + _vm._s(_vm.basis.text.tags.done) + " " + _vm._s(_vm.momentCalendar(_vm.item.done_date)) + "\n\t\t\t\t\t"), _c('input', {
     directives: [{
       name: "flatpicky",
@@ -48422,18 +49167,18 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     _vm.totalSecLeft > _vm.secLeft &&
     _vm.totalTimeDifferentFromParent &&
     !_vm.item.done) ? _c('span', {
-    staticClass: "total-duration"
+    staticClass: "o-pill--total-duration"
   }, [_vm._v("\n\t\t\t\t\t" + _vm._s(_vm.sec_to_hourminsec(_vm.totalSecLeft)) + "\n\t\t\t\t")]) : _vm._e(), _vm._v(" "), (_vm.item.id != _vm.basis.editingItem &&
     _vm.secLeft > 0 &&
     !_vm.item.done &&
     _vm.item.id != _vm.basis.editingItemTags) ? _c('span', {
-    staticClass: "duration"
+    staticClass: "o-pill--duration"
   }, [_vm._v("\n\t\t\t\t\t" + _vm._s(_vm.sec_to_hourminsec(_vm.secLeft)) + "\n\t\t\t\t")]) : _vm._e(), _vm._v(" "), (_vm.hasDueDate && !_vm.item.done &&
     _vm.item.id != _vm.basis.editingItemTags) ? _c('span', {
-    staticClass: "duedate"
+    staticClass: "o-pill--duedate"
   }, [_vm._v("\n\t\t\t\t\t" + _vm._s(_vm.momentCalendar(_vm.item.due_date)) + "\n\t\t\t\t")]) : _vm._e(), _vm._v(" "), (_vm.item.dueDateParent && !_vm.item.done &&
     _vm.item.id != _vm.basis.editingItemTags) ? _c('span', {
-    staticClass: "duedate-parent"
+    staticClass: "o-pill--duedate-parent"
   }, [_vm._v("\n\t\t\t\t\t" + _vm._s(_vm.momentCalendar(_vm.item.dueDateParent)) + "\n\t\t\t\t")]) : _vm._e(), _vm._v(" "), _vm._l((_vm.item.tagged), function(tag) {
     return (_vm.item.tagged.length) ? _c('span', {
       directives: [{
@@ -48444,7 +49189,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
           _vm.item.id == _vm.basis.editingItemTags),
         expression: "!parentTags.includes(tag.tag_name)\n\t\t\t\t\t\t|| item.id == basis.editingItem\n\t\t\t\t\t\t|| item.id == basis.editingItemTags"
       }],
-      staticClass: "custom-tag",
+      staticClass: "o-pill--custom-tag",
       on: {
         "dblclick": function($event) {
           $event.preventDefault();
@@ -48475,21 +49220,21 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     _vm.basis.editingItem != _vm.item.id &&
     _vm.basis.editingItemTags != _vm.item.id &&
     _vm.basis.selection.selectedId == _vm.item.id) ? _c('div', {
-    staticClass: "item-nav"
+    staticClass: "c-item-nav"
   }, [(!_vm.basis.mobile && _vm.basis.selection.view != 'journal') ? _c('button', {
-    staticClass: "o-btn copy-contents-button btn btn-dipclick",
+    staticClass: "o-btn c-item-nav__copy btn btn-dipclick",
     attrs: {
       "id": 'card-' + _vm.item.id + '-copy'
     }
   }, [_vm._v("\n\t\t\t\t\t" + _vm._s(_vm.basis.text.card.copy) + "\n\t\t\t\t")]) : _vm._e(), _vm._v(" "), (_vm.basis.mobile) ? _c('button', {
-    staticClass: "o-btn edit",
+    staticClass: "o-btn c-item-nav__edit",
     on: {
       "click": function($event) {
         _vm.startEdit(_vm.item)
       }
     }
   }, [_vm._v("\n\t\t\t\t\t" + _vm._s(_vm.basis.text.card.edit) + "\n\t\t\t\t")]) : _vm._e(), _vm._v(" "), (_vm.basis.mobile && _vm.basis.selection.view != 'journal') ? _c('button', {
-    staticClass: "o-btn setToday",
+    staticClass: "o-btn c-item-nav__set-today",
     on: {
       "click": function($event) {
         _vm.setToday(_vm.item.id)
@@ -48514,7 +49259,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
   }, [_c('i', {
     staticClass: "zmdi zmdi-more"
   })]) : _vm._e(), _vm._v(" "), ( true) ? _c('button', {
-    staticClass: "o-btn delete",
+    staticClass: "o-btn c-item-nav__delete",
     on: {
       "click": function($event) {
         _vm.deleteItem(_vm.item)
@@ -48529,7 +49274,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
       value: (_vm.item.show_children),
       expression: "item.show_children"
     }],
-    staticClass: "children",
+    staticClass: "l-children",
     style: ((_vm.addingNewAsFirstChild) ? 'order:3;' : '')
   }, _vm._l((_vm.visibleChildren), function(childCard) {
     return _c('Card', {
@@ -48544,6 +49289,8 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     (_vm.listIsEmpty && !_vm.basis.mobile && _vm.basis.selection.view != 'journal')) ? _c('form', {
     class: {
       'addnewbox': true,
+      'c-addnewbox': true,
+      'c-addnewbox--mobile': (_vm.basis.mobile),
       'child': _vm.addingNewAsChild,
       'first-child': _vm.addingNewAsFirstChild,
     },
@@ -48559,9 +49306,13 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
       }
     }
   }, [_c('div', {
-    staticClass: "flex flex--wrap"
+    class: {
+      'c-addnewbox__body': true,
+      'c-addnewbox__body--mobile': (_vm.basis.mobile),
+      'flex-wrap': true,
+    }
   }, [(_vm.listIsEmpty && _vm.basis.mobile) ? _c('div', {
-    staticClass: "c-language-picker l-w100"
+    staticClass: "c-language-picker w-100"
   }, [(_vm.basis.language != 'ja') ? _c('a', {
     staticClass: "c-language-picker__a",
     attrs: {
@@ -48598,7 +49349,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
       value: (_vm.newItem.body),
       expression: "newItem.body"
     }],
-    staticClass: "newitem-body",
+    staticClass: "js-newitem-body c-addnewbox__textarea",
     attrs: {
       "type": "text",
       "placeholder": "...　　",
@@ -48621,12 +49372,18 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
       }
     }
   })]), _vm._v(" "), _c('div', {
-    staticClass: "update-tags"
+    class: {
+      'c-update-tags': true,
+      'c-addnewbox__lower-body--mobile': (_vm.basis.mobile),
+    }
   }, [_c('div', {
-    staticClass: "update-planned-time"
+    staticClass: "c-update-planned-time"
   }, [_vm._v("\n\t\t\t\t" + _vm._s(_vm.basis.text.card.duration) + "\n\t\t\t\t"), _c('button', {
     class: {
-      'o-btn': true, currentDuration: _vm.newItem.planned_time == 10, 'planned-time': true
+      'o-btn': true,
+      'c-update-planned-time__button': true,
+      'js-update-planned-time__button': true,
+      'c-update-planned-time__currentDuration': _vm.newItem.planned_time == 10
     },
     attrs: {
       "value": "10"
@@ -48645,7 +49402,9 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     }
   }, [_vm._v("10" + _vm._s((_vm.basis.mobileSmall) ? _vm.basis.text.global.m : _vm.basis.text.global.min))]), _vm._v(" "), (!_vm.basis.mobileSmall) ? _c('button', {
     class: {
-      'o-btn': true, currentDuration: _vm.newItem.planned_time == 15, 'planned-time': true
+      'o-btn': true,
+      'c-update-planned-time__button': true,
+      'c-update-planned-time__currentDuration': _vm.newItem.planned_time == 15
     },
     attrs: {
       "value": "15"
@@ -48664,7 +49423,9 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     }
   }, [_vm._v("15" + _vm._s((_vm.basis.mobileSmall) ? _vm.basis.text.global.m : _vm.basis.text.global.min))]) : _vm._e(), _vm._v(" "), _c('button', {
     class: {
-      'o-btn': true, currentDuration: _vm.newItem.planned_time == 30, 'planned-time': true
+      'o-btn': true,
+      'c-update-planned-time__button': true,
+      'c-update-planned-time__currentDuration': _vm.newItem.planned_time == 30
     },
     attrs: {
       "value": "30"
@@ -48683,7 +49444,9 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     }
   }, [_vm._v("30" + _vm._s((_vm.basis.mobileSmall) ? _vm.basis.text.global.m : _vm.basis.text.global.min))]), _vm._v(" "), _c('button', {
     class: {
-      'o-btn': true, currentDuration: _vm.newItem.planned_time == 60, 'planned-time': true
+      'o-btn': true,
+      'c-update-planned-time__button': true,
+      'c-update-planned-time__currentDuration': _vm.newItem.planned_time == 60
     },
     attrs: {
       "value": "60"
@@ -48707,7 +49470,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
       value: (_vm.newItem.planned_time),
       expression: "newItem.planned_time"
     }],
-    staticClass: "planned-time",
+    staticClass: "c-update-planned-time__input",
     attrs: {
       "type": "number"
     },
@@ -48729,9 +49492,13 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
       }
     }
   }) : _vm._e(), _vm._v(_vm._s(_vm.basis.text.global.min))])]), _vm._v(" "), _c('div', {
-    staticClass: "item-tags prepared-tags"
+    class: {
+      'c-item-tags': true,
+      'c-addnewbox__item-tags': true,
+      'c-prepared-tags--mobile': (_vm.basis.mobile)
+    }
   }, [_c('div', {
-    staticClass: "add-prepared-tag-wrapper"
+    staticClass: "c-prepare-tag__wrapper"
   }, [_c('label', [_vm._v("\n\t\t\t\t\t\t" + _vm._s(_vm.basis.text.card.addTag) + "\n\t\t\t\t\t\t"), _c('input', {
     directives: [{
       name: "model",
@@ -48742,7 +49509,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
       name: "autowidth",
       rawName: "v-autowidth"
     }],
-    staticClass: "prepare-tag",
+    staticClass: "js-prepare-tag c-prepare-tag__input",
     attrs: {
       "type": "text",
       "placeholder": "..."
@@ -48764,7 +49531,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     }
   })])]), _vm._v(" "), _vm._l((_vm.preparedPlusComputedTags), function(tag) {
     return (_vm.preparedPlusComputedTags.length) ? _c('span', {
-      class: (tag == 'Today') ? 'duedate' : 'custom-tag'
+      class: (tag == 'Today') ? 'o-pill--duedate' : 'o-pill--custom-tag'
     }, [_vm._v(_vm._s(tag) + "\n\t\t\t\t\t"), (_vm.newItem.preparedTags.includes(tag)) ? _c('button', {
       staticClass: "o-btn delete-tag",
       attrs: {
@@ -48783,7 +49550,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
       staticClass: "zmdi zmdi-close-circle"
     })]) : _vm._e()]) : _vm._e()
   })], 2), _vm._v(" "), (_vm.basis.mobile) ? _c('div', {
-    staticClass: "buttonrow"
+    staticClass: "c-mobile-buttonrow"
   }, [(!_vm.listIsEmpty) ? _c('button', {
     staticClass: "o-btn",
     on: {
@@ -48828,17 +49595,17 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     }
   }, [_vm._l((_vm.popouts.delete), function(item) {
     return (_vm.popouts.delete.length) ? _c('div', {
-      staticClass: "popout"
+      staticClass: "c-popout"
     }, [_c('div', {
-      staticClass: "delete"
+      staticClass: "c-popout__delete"
     }, [_c('div', {
-      staticClass: "bodybox"
+      staticClass: "c-popout__bodybox"
     }, [_vm._v(_vm._s(_vm.basis.text.popouts.reallyDelete) + "「" + _vm._s(item.body) + "」"), (item.children.length) ? _c('strong', {
       staticStyle: {
         "padding-left": "0 0.3em"
       }
     }, [_vm._v(" " + _vm._s(_vm.basis.text.popouts.andAllChildren))]) : _vm._e(), _vm._v("?\n\t\t\t")]), _vm._v(" "), _c('div', {
-      staticClass: "nav"
+      staticClass: "c-popout__nav"
     }, [_c('button', {
       staticClass: "o-btn btn-cancel",
       on: {
@@ -48851,7 +49618,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
         name: "focus",
         rawName: "v-focus"
       }],
-      staticClass: "o-btn o-btn--warning btn-ok",
+      staticClass: "o-btn o-btn--warning btn-ok js-btn-ok",
       on: {
         "click": function($event) {
           _vm.popoutCall('confirm-ok', item)
@@ -48859,11 +49626,11 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
       }
     }, [_vm._v(_vm._s(_vm.basis.text.global.delete))])])])]) : _vm._e()
   }), _vm._v(" "), (_vm.popouts.guide) ? _c('div', {
-    staticClass: "popout"
+    staticClass: "c-popout"
   }, [_c('div', {
     staticClass: "c-guide"
   }, [_c('div', {
-    staticClass: "bodybox"
+    staticClass: "c-popout__bodybox"
   }, [_c('table', {
     staticClass: "c-guide__table"
   }, [_c('tr', [_c('th', [_vm._v(_vm._s(_vm.basis.text.guide.action))]), _c('th', [_vm._v(_vm._s(_vm.basis.text.guide.key))])]), _vm._v(" "), _vm._l((_vm.basis.text.guide.keybindings), function(row) {
@@ -48873,30 +49640,32 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
       }
     }), _c('td', [_vm._v(_vm._s(row.key))])])
   })], 2)]), _vm._v(" "), _c('div', {
-    staticClass: "nav"
+    staticClass: "c-popout__nav"
   }, [_c('button', {
     directives: [{
       name: "focus",
       rawName: "v-focus"
     }],
-    staticClass: "o-btn btn-ok",
+    staticClass: "o-btn btn-ok js-btn-ok",
     on: {
       "click": this.clearAll
     }
   }, [_vm._v(_vm._s(_vm.basis.text.popouts.ok))])])])]) : _vm._e(), _vm._v(" "), _vm._l((_vm.popouts.timer), function(item) {
     return (_vm.popouts.timer.length) ? _c('div', {
-      staticClass: "popout"
+      staticClass: "c-popout"
     }, [_c('div', {
       class: {
-        done: item.done,
-          timer: true,
+        'c-timer': true,
       }
     }, [_c('div', {
-      staticClass: "body"
+      staticClass: "c-timer__body"
     }, [_c('div', {
-      staticClass: "bodybox"
+      class: {
+        'c-popout__bodybox': true,
+        'c-popout--done': item.done
+      }
     }, [_c('div', {
-      staticClass: "toggle-div"
+      staticClass: "l-toggle-div--popout o-toggle-div"
     }, [(item.children_order.length == 0 || item.done == true) ? _c('input', {
       directives: [{
         name: "model",
@@ -48904,7 +49673,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
         value: (item.done),
         expression: "item.done"
       }],
-      staticClass: "toggle",
+      staticClass: "o-toggle",
       attrs: {
         "type": "checkbox"
       },
@@ -48933,17 +49702,17 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
         }
       }
     }) : _vm._e()]), _vm._v(_vm._s(item.body) + "\n\t\t\t\t")]), _vm._v(" "), (!item.planned_time) ? _c('div', {
-      staticClass: "timer-time"
+      staticClass: "c-timer__time"
     }, [_vm._v("\n\t\t\t\t\t" + _vm._s(_vm.sec_to_hhmmss(item.used_time)) + "\n\t\t\t\t")]) : _vm._e(), _vm._v(" "), (item.planned_time) ? _c('div', {
       class: {
-        'timer-time': true,
+        'c-timer__time': true,
         'countdown': true,
-        'overtime': item.used_time > item.planned_time * 60,
+        'c-timer__time--overtime': item.used_time > item.planned_time * 60,
       }
     }, [(item.used_time > item.planned_time * 60) ? _c('div', {
-      staticClass: "overtime-notice"
+      staticClass: "c-timer__overtime-notice"
     }, [_vm._v("\n\t\t\t\t\t\t" + _vm._s(_vm.basis.text.popouts.overtime) + "\n\t\t\t\t\t")]) : _vm._e(), _vm._v(" "), _c('div', [_vm._v("\n\t\t\t\t\t\t" + _vm._s(_vm.countdownTimer(item.used_time, item.planned_time)) + "\n\t\t\t\t\t")])]) : _vm._e(), _vm._v(" "), (item.used_time > item.planned_time * 60 && item.planned_time) ? _c('div', [_vm._v("\n\t\t\t\t\t" + _vm._s(_vm.basis.text.popouts.total) + "  " + _vm._s(_vm.sec_to_hhmmss(item.used_time)) + "\n\t\t\t\t")]) : _vm._e()]), _vm._v(" "), _c('div', {
-      staticClass: "nav"
+      staticClass: "c-popout__nav"
     }, [_c('button', {
       directives: [{
         name: "show",
@@ -49000,7 +49769,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
         }
       }
     }, [_vm._v(_vm._s(_vm.basis.text.popouts.reset))]), _vm._v(" "), _c('button', {
-      staticClass: "o-btn btn-ok",
+      staticClass: "o-btn btn-ok js-btn-ok",
       on: {
         "click": function($event) {
           _vm.timerNav('close', item)
@@ -49019,16 +49788,17 @@ if (false) {
 
 /***/ }),
 /* 215 */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
+/* unused harmony export Url */
+/* unused harmony export Http */
+/* unused harmony export Resource */
 /*!
- * vue-resource v1.2.1
+ * vue-resource v1.3.1
  * https://github.com/pagekit/vue-resource
  * Released under the MIT License.
  */
-
-
 
 /**
  * Promises/A+ polyfill v1.1.4 (https://github.com/bramstein/promis)
@@ -49677,7 +50447,15 @@ function Url(url, params) {
     options$$1 = merge({}, Url.options, self.$options, options$$1);
 
     Url.transforms.forEach(function (handler) {
-        transform = factory(handler, transform, self.$vm);
+
+        if (isString(handler)) {
+            handler = Url.transform[handler];
+        }
+
+        if (isFunction(handler)) {
+            transform = factory(handler, transform, self.$vm);
+        }
+
     });
 
     return transform(options$$1);
@@ -49697,7 +50475,8 @@ Url.options = {
  * Url transforms.
  */
 
-Url.transforms = [template, query, root];
+Url.transform = {template: template, query: query, root: root};
+Url.transforms = ['template', 'query', 'root'];
 
 /**
  * Encodes a Url parameter string.
@@ -50032,8 +50811,6 @@ var header = function (request, next) {
  * XMLHttp client (Browser).
  */
 
-var SUPPORTS_BLOB = typeof Blob !== 'undefined' && typeof FileReader !== 'undefined';
-
 var xhrClient = function (request) {
     return new PromiseObj(function (resolve) {
 
@@ -50069,16 +50846,16 @@ var xhrClient = function (request) {
             xhr.timeout = request.timeout;
         }
 
-        if (request.credentials === true) {
+        if (request.responseType && 'responseType' in xhr) {
+            xhr.responseType = request.responseType;
+        }
+
+        if (request.withCredentials || request.credentials) {
             xhr.withCredentials = true;
         }
 
         if (!request.crossOrigin) {
             request.headers.set('X-Requested-With', 'XMLHttpRequest');
-        }
-
-        if ('responseType' in xhr && SUPPORTS_BLOB) {
-            xhr.responseType = 'blob';
         }
 
         request.headers.forEach(function (value, name) {
@@ -50377,7 +51154,15 @@ function Http(options$$1) {
     defaults(options$$1 || {}, self.$options, Http.options);
 
     Http.interceptors.forEach(function (handler) {
-        client.use(handler);
+
+        if (isString(handler)) {
+            handler = Http.interceptor[handler];
+        }
+
+        if (isFunction(handler)) {
+            client.use(handler);
+        }
+
     });
 
     return client(new Request(options$$1)).then(function (response) {
@@ -50405,7 +51190,8 @@ Http.headers = {
     custom: {}
 };
 
-Http.interceptors = [before, method, body, jsonp, header, cors];
+Http.interceptor = {before: before, method: method, body: body, jsonp: jsonp, header: header, cors: cors};
+Http.interceptors = ['before', 'method', 'body', 'jsonp', 'header', 'cors'];
 
 ['get', 'delete', 'head', 'jsonp'].forEach(function (method$$1) {
 
@@ -50549,7 +51335,8 @@ if (typeof window !== 'undefined' && window.Vue) {
     window.Vue.use(plugin);
 }
 
-module.exports = plugin;
+/* harmony default export */ __webpack_exports__["a"] = (plugin);
+
 
 
 /***/ }),
