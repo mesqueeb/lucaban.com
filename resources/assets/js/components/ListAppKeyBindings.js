@@ -22,34 +22,34 @@ keystroke(k)
 		|| k == 's' ))
 	{
 		console.log('cannot use '+k+' in journal mode');
-		let errMsg = vm.text.flashes.cannotDoThisInJournal;
+		let errMsg = store.getters.text.flashes.cannotDoThisInJournal;
 		console.log(errMsg);
-		vm.sendFlash('warning',errMsg);
+		store.dispatch('sendFlash', { type:'warning', msg:errMsg });
 		return;
 	}
 	console.log(k);
-	if(k == 'arrowUp'){ vm.selectItem('prev')} else
-	if(k == 'arrowDown'){ vm.selectItem('next')} else
-	if(k == 'arrowRight'){ vm.showChildren(null, 'show')} else
-	if(k == 'arrowLeft'){ vm.showChildren(null, 'hide')} else
-	if(k == 'meta_arrowUp'){ vm.moveItem('up')} else
-	if(k == 'meta_arrowDown'){ vm.moveItem('down')} else
-	if(k == 'meta_arrowRight'){ vm.indent()} else
-	if(k == 'meta_arrowLeft'){ vm.unindent()} else
-	if(k == 'spaceBar'){ vm.markDone()} else
-	if(k == 'tab'){ vm.indent()} else
-	if(k == 'shift_tab'){ vm.unindent()} else
-	if(k == 'enter'){ vm.showAddNewItem()} else
-	if(k == 'shift_enter'){ vm.showAddNewItem(null, 'child')} else
-	if(k == 'meta_enter'){ vm.startEdit()} else
-	if(k == 'ctrl_u'){ vm.startEdit()} else
-	if(k == 't'){ vm.setToday()} else
-	if(k == 'shift_t'){ vm.startEditTags()} else
-	if(k == 's'){ vm.addTimer()} else
-	if(k == 'meta_shift_d'){ vm.duplicate()} else
-	if(k == 'meta_backspace'){ vm.deleteItem()} else
-	if(k == 'backspace'){ vm.deleteItem()} else
-	if(k == 'delete'){ vm.deleteItem()}
+	if(k == 'arrowUp'){ store.dispatch('selectItem', { direction:'prev' }) } else
+	if(k == 'arrowDown'){ store.dispatch('selectItem', { direction:'next' }) } else
+	if(k == 'arrowRight'){ store.dispatch('showChildren', { action:'show' }) } else
+	if(k == 'arrowLeft'){ store.dispatch('showChildren', { action:'hide' }) } else
+	if(k == 'meta_arrowUp'){ store.dispatch('moveItem', { direction:'up' }) } else
+	if(k == 'meta_arrowDown'){ store.dispatch('moveItem', { direction:'down' }) } else
+	if(k == 'meta_arrowRight'){ store.dispatch('indent') } else
+	if(k == 'meta_arrowLeft'){ store.dispatch('unindent') } else
+	if(k == 'spaceBar'){ store.dispatch('markDone') } else
+	if(k == 'tab'){ store.dispatch('indent') } else
+	if(k == 'shift_tab'){ store.dispatch('unindent') } else
+	if(k == 'enter'){ store.dispatch('showAddNewItem') } else
+	if(k == 'shift_enter'){ store.dispatch('showAddNewItem', { addAs:'child' }) } else
+	if(k == 'meta_enter'){ store.dispatch('startEdit') } else
+	if(k == 'ctrl_u'){ store.dispatch('startEdit') } else
+	if(k == 't'){ store.dispatch('setToday') } else
+	if(k == 'shift_t'){ store.dispatch('startEditTags') } else
+	if(k == 's'){ store.dispatch('addTimer') } else
+	if(k == 'meta_shift_d'){ store.dispatch('duplicate') } else
+	if(k == 'meta_backspace'){ store.dispatch('deleteItem') } else
+	if(k == 'backspace'){ store.dispatch('deleteItem') } else
+	if(k == 'delete'){ store.dispatch('deleteItem') }
 }
 invokeKeydownListenerPause()
 {
@@ -80,7 +80,7 @@ invokeKeyBindingListener()
 				// This stops the event listener when a flatpickr dialogue is open.
 			}
 		}
-    	if (vm.popouts.delete.length || vm.popouts.timer.length)
+    	if (store.state.popouts.delete.length || store.state.popouts.timer.length)
     	{
     		if(x == 27)
     		{ // escape

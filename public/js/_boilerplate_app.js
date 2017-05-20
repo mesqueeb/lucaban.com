@@ -63,7 +63,7 @@
 /******/ 	__webpack_require__.p = "./";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 220);
+/******/ 	return __webpack_require__(__webpack_require__.s = 228);
 /******/ })
 /************************************************************************/
 /******/ ({
@@ -524,9 +524,9 @@ __webpack_require__(173);
  * or customize the JavaScript scaffolding to fit your unique needs.
  */
 
-Vue.component('example', __webpack_require__(205));
+Vue.component('example', __webpack_require__(213));
 
-var app = new Vue({
+const app = new Vue({
   el: '#app'
 });
 
@@ -1600,7 +1600,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 
 /* harmony default export */ __webpack_exports__["default"] = ({
-    mounted: function mounted() {
+    mounted() {
         console.log('Component mounted.');
     }
 });
@@ -1638,7 +1638,7 @@ module.exports = Cancel;
 /***/ (function(module, exports, __webpack_require__) {
 
 
-window._ = __webpack_require__(200);
+window._ = __webpack_require__(208);
 
 /**
  * We'll load jQuery and the Bootstrap jQuery plugin which provides support
@@ -1648,7 +1648,7 @@ window._ = __webpack_require__(200);
 
 window.$ = window.jQuery = __webpack_require__(2);
 
-__webpack_require__(178);
+__webpack_require__(186);
 
 /**
  * Vue is a modern JavaScript library for building interactive web interfaces
@@ -1685,7 +1685,20 @@ window.axios.defaults.headers.common = {
 
 /***/ }),
 
-/***/ 178:
+/***/ 18:
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+module.exports = function isCancel(value) {
+  return !!(value && value.__CANCEL__);
+};
+
+
+/***/ }),
+
+/***/ 186:
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(jQuery) {/*!
@@ -4067,19 +4080,6 @@ if (typeof jQuery === 'undefined') {
 }(jQuery);
 
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(2)))
-
-/***/ }),
-
-/***/ 18:
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-module.exports = function isCancel(value) {
-  return !!(value && value.__CANCEL__);
-};
-
 
 /***/ }),
 
@@ -14388,7 +14388,7 @@ module.exports = function bind(fn, thisArg) {
 
 /***/ }),
 
-/***/ 200:
+/***/ 208:
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(global, module) {var __WEBPACK_AMD_DEFINE_RESULT__;/**
@@ -31481,14 +31481,14 @@ module.exports = function bind(fn, thisArg) {
 
 /***/ }),
 
-/***/ 205:
+/***/ 213:
 /***/ (function(module, exports, __webpack_require__) {
 
 var Component = __webpack_require__(6)(
   /* script */
   __webpack_require__(168),
   /* template */
-  __webpack_require__(211),
+  __webpack_require__(219),
   /* scopeId */
   null,
   /* cssModules */
@@ -31516,7 +31516,7 @@ module.exports = Component.exports
 
 /***/ }),
 
-/***/ 211:
+/***/ 219:
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
@@ -31546,7 +31546,7 @@ if (false) {
 
 /***/ }),
 
-/***/ 220:
+/***/ 228:
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = __webpack_require__(144);

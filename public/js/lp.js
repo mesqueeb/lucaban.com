@@ -63,7 +63,7 @@
 /******/ 	__webpack_require__.p = "./";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 222);
+/******/ 	return __webpack_require__(__webpack_require__.s = 230);
 /******/ })
 /************************************************************************/
 /******/ ({
@@ -75,12 +75,12 @@
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_jquery__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_jquery___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_jquery__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_marked__ = __webpack_require__(201);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_marked__ = __webpack_require__(209);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_marked___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_marked__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_vue__ = __webpack_require__(7);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_vue___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_vue__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__components_globalFunctions_js__ = __webpack_require__(5);
-var langContentsLP = {
+let langContentsLP = {
 	"EN": {
 		"menu": {
 			"myList": "My LIST",
@@ -193,24 +193,24 @@ window.Vue = __WEBPACK_IMPORTED_MODULE_2_vue___default.a;
 // import lang from './lang/lp.js'
 
 
-var VueLpMaster = {
+const VueLpMaster = {
 	el: '.lp-wrapper',
 	data: {
 		'setLanguage': null,
-		langContentsLP: langContentsLP
+		langContentsLP
 	},
 	filters: {
-		marked: function marked(text) {
+		marked(text) {
 			return __WEBPACK_IMPORTED_MODULE_1_marked___default()(text);
 		}
 	},
 	methods: {
-		marked: function marked(text) {
+		marked(text) {
 			return __WEBPACK_IMPORTED_MODULE_1_marked___default()(text);
 		}
 	},
 	computed: {
-		language: function language() {
+		language() {
 			if (this.setLanguage) {
 				return this.setLanguage;
 			} else if (defaultLanguage) {
@@ -219,7 +219,7 @@ var VueLpMaster = {
 				return 'en';
 			};
 		},
-		contents: function contents() {
+		contents() {
 			if (this.language == 'en') {
 				return this.langContentsLP.EN;
 			}
@@ -227,13 +227,13 @@ var VueLpMaster = {
 				return this.langContentsLP.JA;
 			}
 		},
-		aboutMe: function aboutMe() {
+		aboutMe() {
 			return __WEBPACK_IMPORTED_MODULE_1_marked___default()(this.aboutMeTxt);
 		}
 	},
-	mounted: function mounted() {
+	mounted() {
 		window.onscroll = function () {
-			var el = document.getElementsByClassName('line');
+			let el = document.getElementsByClassName('line');
 			if (!__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_3__components_globalFunctions_js__["a" /* isElementInViewport */])(el[0])) {
 				__WEBPACK_IMPORTED_MODULE_0_jquery___default()("nav").addClass("scrolled-down");
 			} else {
@@ -10541,7 +10541,7 @@ return jQuery;
 
 /***/ }),
 
-/***/ 201:
+/***/ 209:
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(global) {/**
@@ -11835,7 +11835,7 @@ if (true) {
 
 /***/ }),
 
-/***/ 222:
+/***/ 230:
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = __webpack_require__(146);
@@ -12066,20 +12066,21 @@ module.exports = g;
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* WEBPACK VAR INJECTION */(function($) {/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "d", function() { return mobilecheck; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "f", function() { return objectToArray; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "h", function() { return uniqBy; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "k", function() { return uniq; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "i", function() { return arrayToString; });
+/* WEBPACK VAR INJECTION */(function($) {/* unused harmony export mobilecheck */
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "g", function() { return objectToArray; });
+/* unused harmony export uniqBy */
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "e", function() { return uniq; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "h", function() { return arrayToString; });
 /* unused harmony export sec_to_hourmin */
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "c", function() { return hasClass; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return btnEffect; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return isElementInViewport; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "e", function() { return sortObjectArrayByProperty; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "g", function() { return sortObjectArrayByTwoProperties; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "j", function() { return removeEmptyValuesFromArray; });
+/* unused harmony export sortObjectArrayByProperty */
+/* unused harmony export sortObjectArrayByTwoProperties */
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "f", function() { return removeEmptyValuesFromArray; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "d", function() { return Utilities; });
 function mobilecheck() {
-	var check = false;
+	let check = false;
 	(function (a) {
 		if (/(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec|hiptop|iemobile|ip(hone|od)|iris|kindle|lge |maemo|midp|mmp|mobile.+firefox|netfront|opera m(ob|in)i|palm( os)?|phone|p(ixi|re)\/|plucker|pocket|psp|series(4|6)0|symbian|treo|up\.(browser|link)|vodafone|wap|windows ce|xda|xiino/i.test(a) || /1207|6310|6590|3gso|4thp|50[1-6]i|770s|802s|a wa|abac|ac(er|oo|s\-)|ai(ko|rn)|al(av|ca|co)|amoi|an(ex|ny|yw)|aptu|ar(ch|go)|as(te|us)|attw|au(di|\-m|r |s )|avan|be(ck|ll|nq)|bi(lb|rd)|bl(ac|az)|br(e|v)w|bumb|bw\-(n|u)|c55\/|capi|ccwa|cdm\-|cell|chtm|cldc|cmd\-|co(mp|nd)|craw|da(it|ll|ng)|dbte|dc\-s|devi|dica|dmob|do(c|p)o|ds(12|\-d)|el(49|ai)|em(l2|ul)|er(ic|k0)|esl8|ez([4-7]0|os|wa|ze)|fetc|fly(\-|_)|g1 u|g560|gene|gf\-5|g\-mo|go(\.w|od)|gr(ad|un)|haie|hcit|hd\-(m|p|t)|hei\-|hi(pt|ta)|hp( i|ip)|hs\-c|ht(c(\-| |_|a|g|p|s|t)|tp)|hu(aw|tc)|i\-(20|go|ma)|i230|iac( |\-|\/)|ibro|idea|ig01|ikom|im1k|inno|ipaq|iris|ja(t|v)a|jbro|jemu|jigs|kddi|keji|kgt( |\/)|klon|kpt |kwc\-|kyo(c|k)|le(no|xi)|lg( g|\/(k|l|u)|50|54|\-[a-w])|libw|lynx|m1\-w|m3ga|m50\/|ma(te|ui|xo)|mc(01|21|ca)|m\-cr|me(rc|ri)|mi(o8|oa|ts)|mmef|mo(01|02|bi|de|do|t(\-| |o|v)|zz)|mt(50|p1|v )|mwbp|mywa|n10[0-2]|n20[2-3]|n30(0|2)|n50(0|2|5)|n7(0(0|1)|10)|ne((c|m)\-|on|tf|wf|wg|wt)|nok(6|i)|nzph|o2im|op(ti|wv)|oran|owg1|p800|pan(a|d|t)|pdxg|pg(13|\-([1-8]|c))|phil|pire|pl(ay|uc)|pn\-2|po(ck|rt|se)|prox|psio|pt\-g|qa\-a|qc(07|12|21|32|60|\-[2-7]|i\-)|qtek|r380|r600|raks|rim9|ro(ve|zo)|s55\/|sa(ge|ma|mm|ms|ny|va)|sc(01|h\-|oo|p\-)|sdk\/|se(c(\-|0|1)|47|mc|nd|ri)|sgh\-|shar|sie(\-|m)|sk\-0|sl(45|id)|sm(al|ar|b3|it|t5)|so(ft|ny)|sp(01|h\-|v\-|v )|sy(01|mb)|t2(18|50)|t6(00|10|18)|ta(gt|lk)|tcl\-|tdg\-|tel(i|m)|tim\-|t\-mo|to(pl|sh)|ts(70|m\-|m3|m5)|tx\-9|up(\.b|g1|si)|utst|v400|v750|veri|vi(rg|te)|vk(40|5[0-3]|\-v)|vm40|voda|vulc|vx(52|53|60|61|70|80|81|83|85|98)|w3c(\-| )|webc|whit|wi(g |nc|nw)|wmlb|wonu|x700|yas\-|your|zeto|zte\-/i.test(a.substr(0, 4))) check = true;
 	})(navigator.userAgent || navigator.vendor || window.opera);
@@ -12090,7 +12091,7 @@ function arrayToString(arr) {
 	if (!Array.isArray(arr) || !arr.length) {
 		return '';
 	}
-	var c_o = '';
+	let c_o = '';
 	arr.forEach(function (entry) {
 		c_o = c_o + ',' + entry;
 	});
@@ -12107,7 +12108,7 @@ function hasClass(element, cls) {
 }
 
 function removeEmptyValuesFromArray(array) {
-	var cleanArray = [];
+	let cleanArray = [];
 	array.forEach(function (val) {
 		if (val.replace(/\s/g, "").length) {
 			cleanArray.push(val);
@@ -12118,8 +12119,8 @@ function removeEmptyValuesFromArray(array) {
 
 function sortObjectArrayByProperty(array, propertyName, order) {
 	return array.sort(function (a, b) {
-		var textA = a[propertyName].toUpperCase();
-		var textB = b[propertyName].toUpperCase();
+		let textA = a[propertyName].toUpperCase();
+		let textB = b[propertyName].toUpperCase();
 		if (!order || order == 'asc') {
 			return textA < textB ? -1 : textA > textB ? 1 : 0;
 		} else if (order == 'desc') {
@@ -12128,12 +12129,12 @@ function sortObjectArrayByProperty(array, propertyName, order) {
 	}.bind(propertyName));
 }
 function sortObjectArrayByTwoProperties(array, prop1, prop2, order, order2) {
-	var props = { prop1: prop1, prop2: prop2 };
+	let props = { prop1, prop2 };
 	return array.sort(function (a, b) {
 		prop1 = props['prop1'];
 		prop2 = props['prop2'];
-		var textA = a[prop1].toUpperCase();
-		var textB = b[prop1].toUpperCase();
+		let textA = a[prop1].toUpperCase();
+		let textB = b[prop1].toUpperCase();
 
 		if (!order || order == 'asc') {
 			if (textA < textB) {
@@ -12144,8 +12145,8 @@ function sortObjectArrayByTwoProperties(array, prop1, prop2, order, order2) {
 				if (!a[prop2] || !b[prop2]) {
 					return 0;
 				}
-				var text2A = a[prop2].toUpperCase();
-				var text2B = b[prop2].toUpperCase();
+				let text2A = a[prop2].toUpperCase();
+				let text2B = b[prop2].toUpperCase();
 				if (!order2 || order2 == 'asc') {
 					return text2A > text2B ? -1 : text2A < text2B ? 1 : 0;
 				} else if (order2 == 'desc') {
@@ -12161,13 +12162,13 @@ function sortObjectArrayByTwoProperties(array, prop1, prop2, order, order2) {
 				if (!a[prop2] || !b[prop2]) {
 					return 0;
 				}
-				var _text2A = a[prop2].toUpperCase();
-				var _text2B = b[prop2].toUpperCase();
-				console.log('text2A: ' + _text2A + ' | text2B: ' + _text2B);
+				let text2A = a[prop2].toUpperCase();
+				let text2B = b[prop2].toUpperCase();
+				console.log('text2A: ' + text2A + ' | text2B: ' + text2B);
 				if (!order2 || order2 == 'asc') {
-					return _text2A > _text2B ? -1 : _text2A < _text2B ? 1 : 0;
+					return text2A > text2B ? -1 : text2A < text2B ? 1 : 0;
 				} else if (order2 == 'desc') {
-					return _text2A < _text2B ? -1 : _text2A > _text2B ? 1 : 0;
+					return text2A < text2B ? -1 : text2A > text2B ? 1 : 0;
 				}
 			}
 		}
@@ -12176,7 +12177,7 @@ function sortObjectArrayByTwoProperties(array, prop1, prop2, order, order2) {
 
 function btnEffect(event) {
 	console.log(event);
-	var $el = void 0;
+	let $el;
 	if (event.target.nodeName == 'I') {
 		$el = $(event.target.offsetParent);
 	} else {
@@ -12192,9 +12193,9 @@ function btnEffect(event) {
 }
 function uniqBy(a, key) {
 	key = key ? key : JSON.stringify;
-	var seen = {};
+	let seen = {};
 	return a.filter(function (item) {
-		var k = key(item);
+		let k = key(item);
 		if (!k || k == "null") {
 			return false;
 		}
@@ -12215,12 +12216,28 @@ function isElementInViewport(el) {
 	//     el = el[0];
 	// }
 
-	var rect = el.getBoundingClientRect();
+	let rect = el.getBoundingClientRect();
 
 	return rect.top >= 0 && rect.left >= 0 && rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) && /*or $(window).height() */
 	rect.right <= (window.innerWidth || document.documentElement.clientWidth) /*or $(window).width() */
 	;
 }
+const Utilities = {
+	tagNameToSlug(tag) {
+		if (!tag || typeof tag != 'string') {
+			return;
+		}
+		return tag.split(' ').join('-').toLowerCase();
+	},
+	tagSlugToName(tag) {
+		tag = tag.replace(/-/g, ' ');
+		tag = tag.split(' ').map(([h, ...t]) => h.toUpperCase() + t.join('').toLowerCase()).join(' ');
+		return tag;
+	},
+	AplusB(a, b) {
+		return parseFloat(a) + parseFloat(b);
+	}
+};
 
 
 /* WEBPACK VAR INJECTION */}.call(__webpack_exports__, __webpack_require__(2)))

@@ -589,7 +589,7 @@ import { linkify, momentCalendar, sec_to_hourminsec, sec_to_hourmin } from '../c
 import flatPickConfig from '../components/flatPickrOptions.js';
 import autosize from 'autosize';
 import autosizeInput from 'autosize-input';
-import { uniq } from '../components/globalFunctions.js';
+import { uniq, Utilities } from '../components/globalFunctions.js';
 import Clipboard from 'clipboard';
 
 export default {
@@ -686,7 +686,7 @@ return `${all}${pb}
 			let alltags = this.newItem.preparedTags;
 			if (selection.tags.length)
 			{
-				alltags = alltags.concat(selection.tags.map(tag => allItems.tagSlugToName(tag)));
+				alltags = alltags.concat(selection.tags.map(tag => Utilities.tagSlugToName(tag)));
 			}
 			if (this.parentTags.length)
 			{
@@ -965,13 +965,13 @@ return `${all}${pb}
 		},
 		clickOnAddNewCurtain(event)
 		{
-			if(!vm.mobile){ return; }
+			if(!this.$root.mobile){ return; }
 			if(event && event.srcElement.nodeName != 'FORM'){ return; }
 			this.$root.cancelAddNew();
 		},
 		clickOnEditCurtain(item, event)
 		{
-			if(!vm.mobile){ return; }
+			if(!this.$root.mobile){ return; }
 			if(event && event.srcElement.nodeName != 'FORM'){ return; }
 			this.doneEdit(item);
 		},
@@ -983,7 +983,7 @@ return `${all}${pb}
 				return;
 			}
 			let lastChildId = allItems.getLastChildId(this.item.id);
-    		vm.showAddNewItem(lastChildId);
+    		this.$root.showAddNewItem(lastChildId);
 		},
 		newItemUnindent()
 		{
@@ -997,7 +997,7 @@ return `${all}${pb}
 			{
 				return;
 			}
-			vm.showAddNewItem(this.item.parent_id);
+			this.$root.showAddNewItem(this.item.parent_id);
 		},
 		keydownOnNew(item, e, field)
 		{
@@ -1040,7 +1040,7 @@ return `${all}${pb}
 			// ENTER
 			if (e.keyCode === 13 && !e.shiftKey && !e.altKey && !e.metaKey && !e.ctrlKey)
 			{
-			  	if(vm.mobile && field == 'body'){ return; }
+			  	if(this.$root.mobile && field == 'body'){ return; }
 				e.preventDefault();
 				if(field == 'planned-time')
 				{
@@ -1191,7 +1191,7 @@ return `${all}${pb}
 			// ENTER
 			if (e.keyCode === 13 && !e.shiftKey && !e.altKey)
 			{
-				if(vm.mobile && field == 'body'){ return; }
+				if(this.$root.mobile && field == 'body'){ return; }
 				e.preventDefault();
 	        	if(field == 'delete-tag')
 	        	{
@@ -1229,7 +1229,7 @@ return `${all}${pb}
 				if(field == 'add-tag')
 				{
 					e.preventDefault();
-		        	if(vm.editingItemTags){ vm.editingItemTags = null; return; }
+		        	if(this.$root.editingItemTags){ this.$root.editingItemTags = null; return; }
 					let plsFocus = '#updatebox-'+item.id+' .js-update-planned-time__button';
 					document.querySelector(plsFocus).focus();
 					return;
@@ -1251,7 +1251,7 @@ return `${all}${pb}
 				}
 				if(field == 'add-tag')
 				{
-		        	if(vm.editingItemTags){ vm.editingItemTags = null; }
+		        	if(this.$root.editingItemTags){ this.$root.editingItemTags = null; }
 		        	return;
 				}
 			}
@@ -1281,7 +1281,7 @@ return `${all}${pb}
 		    	{
 	        		return;
 				}　else {
-    				if(vm.mobile){ return; }
+    				if(this.$root.mobile){ return; }
 			    	console.log('blurring on edit');
 					self.doneEdit(item);
 				}
@@ -1297,7 +1297,7 @@ return `${all}${pb}
 				this.prepareTag(item);
 				return;
 	    	}
-	    	if(vm.mobile){ return; }
+	    	if(this.$root.mobile){ return; }
 	    	let self = this;
 	    	setTimeout(function()
 	    	{
@@ -1308,8 +1308,8 @@ return `${all}${pb}
 		    	{
 	        		return;
 				}　else {
-			    	// if(vm.mobile){ self.addNew('stop'); return; }
-			    	if(vm.mobile){ return; }
+			    	// if(this.$root.mobile){ self.addNew('stop'); return; }
+			    	if(this.$root.mobile){ return; }
 					self.cancelAddNew();
 				}
 	    	},50);

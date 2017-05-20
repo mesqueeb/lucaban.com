@@ -136,5 +136,22 @@ function isElementInViewport (el) {
         rect.right <= (window.innerWidth || document.documentElement.clientWidth) /*or $(window).width() */
     );
 }
+const Utilities = {
+	tagNameToSlug (tag)
+	{
+		if(!tag || typeof tag != 'string'){ return; }
+		return tag.split(' ').join('-').toLowerCase();
+	},
+	tagSlugToName (tag)
+	{
+		tag = tag.replace(/-/g, ' ');
+		tag = tag.split(' ').map ( ([h, ...t]) => h.toUpperCase() + t.join('').toLowerCase() ).join(' ');
+		return tag;
+	},
+	AplusB (a, b)
+	{
+	    return parseFloat(a) + parseFloat(b);
+	},
+};
 
-export { mobilecheck, objectToArray, uniqBy, uniq, arrayToString, sec_to_hourmin, hasClass, btnEffect, isElementInViewport, sortObjectArrayByProperty, sortObjectArrayByTwoProperties, removeEmptyValuesFromArray }
+export { mobilecheck, objectToArray, uniqBy, uniq, arrayToString, sec_to_hourmin, hasClass, btnEffect, isElementInViewport, sortObjectArrayByProperty, sortObjectArrayByTwoProperties, removeEmptyValuesFromArray, Utilities }
