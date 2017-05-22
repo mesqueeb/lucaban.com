@@ -31,7 +31,7 @@ let a = {
     setLanguage: null,
     langContentsItems,
 };
-let b = initializeState(window.fetchedData);
+
 // console.log(Object.assign(data, ););
 // Object.assign(data, initializeState(window.fetchedData));
-export default Object.assign(a,b);
+export default () => Object.assign(a, initializeState(window.fetchedData));

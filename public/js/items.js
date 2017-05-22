@@ -39438,28 +39438,28 @@ ${self.basis.text.menu.usedTime}: ${self.sec_to_hourmin(self.totalUsedSec)}` : '
 	// },
 	computed: {
 		visibleChildren() {
-			if (!this.item || !this.item.children.length || !allItems) {
+			if (!this.item || !this.item.children.length) {
 				return [];
 			}
 			if (typeof parseFloat(this.item.id) != 'number' || this.item.id == 'x') {}
 			// return [];
 
 			// console.log(this.item);
-			return this.item.children.filter(child => !this.$root.hiddenItemIds.includes(child.id));
+			return this.item.children.filter(child => !this.$root.$store.getters.hiddenItemIds.includes(child.id));
 		},
 		allVisibleChildItems() {
-			if (!this.item || !this.item.children.length || !allItems) {
+			if (!this.item || !this.item.children.length) {
 				return [];
 			}
-			let flattenedTree = allItems.flattenTree(this.item.children);
-			let visibleChildren = flattenedTree.filter(item => !this.$root.hiddenItemIds.includes(item.id));
+			let flattenedTree = this.$root.$store.getters.flattenTree(this.item.children);
+			let visibleChildren = flattenedTree.filter(item => !this.$root.$store.getters.hiddenItemIds.includes(item.id));
 			return visibleChildren;
 		},
 		preparedPlusComputedTags() {
-			if (!this.item || !allItems) {
+			if (!this.item) {
 				return [];
 			}
-			if (this.item.id == allItems.root.id) {
+			if (this.item.id == this.$root.$store.getters.root.id) {
 				return [];
 			}
 			let alltags = this.newItem.preparedTags;
@@ -39469,13 +39469,13 @@ ${self.basis.text.menu.usedTime}: ${self.sec_to_hourmin(self.totalUsedSec)}` : '
 			if (this.parentTags.length) {
 				alltags = alltags.concat(this.parentTags);
 			}
-			if (this.$root.addingNewAsChild) {
-				let tagz = allItems.returnTagsAsArray(this.item.id);
+			if (this.$root.$store.state.addingNewAsChild) {
+				let tagz = this.$root.$store.getters.returnTagsAsArray(this.item.id);
 				alltags = alltags.concat(tagz);
 			}
-			if (allItems.isTopLvlItemInFilteredRoot(this.item.id)) {
-				if (allItems.nodes[this.item.parent_id]) {
-					let tagzies = allItems.returnTagsAsArray(this.item.parent_id);
+			if (this.$root.$store.getters.isTopLvlItemInFilteredRoot(this.item.id)) {
+				if (this.$root.$store.state.nodes[this.item.parent_id]) {
+					let tagzies = this.$root.$store.getters.returnTagsAsArray(this.item.parent_id);
 					alltags = alltags.concat(tagzies);
 				}
 			}
@@ -39483,10 +39483,10 @@ ${self.basis.text.menu.usedTime}: ${self.sec_to_hourmin(self.totalUsedSec)}` : '
 			return alltags.sort();
 		},
 		listIsEmpty() {
-			if (!this.item || !allItems || !allItems.root) {
+			if (!this.item || !allItems || !this.$root.$store.getters.root) {
 				return false;
 			}
-			if (this.item.id != allItems.root.id) {
+			if (this.item.id != this.$root.$store.getters.root.id) {
 				return false;
 			}
 			if (!this.visibleChildren.length) {
@@ -39494,13 +39494,13 @@ ${self.basis.text.menu.usedTime}: ${self.sec_to_hourmin(self.totalUsedSec)}` : '
 			}
 		},
 		basis() {
-			if (!this.item || !allItems) {
+			if (!this.item) {
 				return 0;
 			}
 			return this.$root;
 		},
 		totalPlannedMin() {
-			if (!this.item || !allItems) {
+			if (!this.item) {
 				return 0;
 			}
 			let selfValue = this.item.planned_time ? parseFloat(this.item.planned_time) : 0;
@@ -39514,7 +39514,7 @@ ${self.basis.text.menu.usedTime}: ${self.sec_to_hourmin(self.totalUsedSec)}` : '
 			return x ? parseFloat(x) : 0;
 		},
 		totalUsedSec() {
-			if (!this.item || !allItems) {
+			if (!this.item) {
 				return 0;
 			}
 			let selfValue = this.item.used_time ? parseFloat(this.item.used_time) : 0;
@@ -39528,7 +39528,7 @@ ${self.basis.text.menu.usedTime}: ${self.sec_to_hourmin(self.totalUsedSec)}` : '
 			return x ? x : 0;
 		},
 		journalView() {
-			if (!this.item || !allItems) {
+			if (!this.item) {
 				return;
 			}
 			if (this.$root.selection.view == 'journal') {
@@ -39538,17 +39538,17 @@ ${self.basis.text.menu.usedTime}: ${self.sec_to_hourmin(self.totalUsedSec)}` : '
 			}
 		},
 		visiblePrevItemId() {
-			if (!this.item || !allItems) {
+			if (!this.item) {
 				return;
 			}
 			let index = this.parentsChildrenOrder.indexOf(this.item.id);
 			if (index == 0) {
-				return allItems.root.id;
+				return this.$root.$store.getters.root.id;
 			}
 			return this.parentsChildrenOrder[index - 1];
 		},
 		journalDate() {
-			if (!this.item || !allItems) {
+			if (!this.item) {
 				return;
 			}
 			// console.log('run on '+this.item.id+' - '+this.item.body);
@@ -39559,7 +39559,7 @@ ${self.basis.text.menu.usedTime}: ${self.sec_to_hourmin(self.totalUsedSec)}` : '
 			// JOURNAL REWRITE. original:
 			// if(this.item.depth == 0){ return; }
 			// let prevId = this.visiblePrevItemId;
-			// let prevDoneDate = allItems.nodes[prevId].done_date;
+			// let prevDoneDate = this.$root.$store.state.nodes[prevId].done_date;
 			// prevDoneDate = moment(prevDoneDate).format('YYYY/MM/DD');
 			// let thisDoneDate = moment(this.item.done_date).format('YYYY/MM/DD');
 			// if (thisDoneDate != prevDoneDate){
@@ -39567,7 +39567,7 @@ ${self.basis.text.menu.usedTime}: ${self.sec_to_hourmin(self.totalUsedSec)}` : '
 			// }
 		},
 		journalParentString() {
-			if (!this.item || !allItems) {
+			if (!this.item) {
 				return;
 			}
 			// console.log('run on '+this.item.id+' - '+this.item.body);
@@ -39580,9 +39580,9 @@ ${self.basis.text.menu.usedTime}: ${self.sec_to_hourmin(self.totalUsedSec)}` : '
 				}
 				let prevId = this.visiblePrevItemId;
 				let parentString = this.item.parents_bodies;
-				let prevParentString = allItems.nodes[prevId].parents_bodies;
+				let prevParentString = this.$root.$store.state.nodes[prevId].parents_bodies;
 
-				let prevDoneDate = allItems.nodes[prevId].done_date;
+				let prevDoneDate = this.$root.$store.state.nodes[prevId].done_date;
 				// console.log('moment dates');
 				// console.log(prevDoneDate);
 				// console.log(this.item.done_date);
@@ -39596,62 +39596,62 @@ ${self.basis.text.menu.usedTime}: ${self.sec_to_hourmin(self.totalUsedSec)}` : '
 			return false;
 		},
 		totalUsedMin() {
-			if (!this.item || !allItems) {
+			if (!this.item) {
 				return 0;
 			}
 			return Math.floor(this.totalUsedSec / 60);
 		},
 		totalPlannedSec() {
-			if (!this.item || !allItems) {
+			if (!this.item) {
 				return 0;
 			}
 			return this.totalPlannedMin * 60;
 		},
 		totalPlannedHour() {
-			if (!this.item || !allItems) {
+			if (!this.item) {
 				return 0;
 			}
 			return this.totalPlannedMin / 60;
 		},
 		isProject() {
-			if (!this.item || !allItems) {
+			if (!this.item) {
 				return;
 			}
 			// console.log('checking isProject');
-			return allItems.isProject(this.item.id);
+			return this.$root.$store.getters.isProject(this.item.id);
 		},
 		siblingIndex() {
-			if (!this.item || !allItems) {
+			if (!this.item) {
 				return;
 			}
-			return allItems.siblingIndex(this.item.id);
+			return this.$root.$store.getters.siblingIndex(this.item.id);
 		},
 		olderSiblingId() {
-			if (!this.item || !allItems) {
+			if (!this.item) {
 				return;
 			}
-			return allItems.olderSiblingId(this.item.id);
+			return this.$root.$store.getters.olderSiblingId(this.item.id);
 		},
 		parentsChildren_order() {
-			if (!this.item || !allItems) {
+			if (!this.item) {
 				return;
 			}
 			if (this.item.depth == 0) {
-				return allItems.nodes[this.item.id].children_order;
+				return this.$root.$store.state.nodes[this.item.id].children_order;
 			}
 			return this.$parent.item.children_order;
 		},
 		childrenOrder() {
-			if (!this.item || !allItems) {
+			if (!this.item) {
 				return 0;
 			}
-			if (this.$root.selection.view == 'journal' && this.item.id == allItems.root.id) {
+			if (this.$root.selection.view == 'journal' && this.item.id == this.$root.$store.getters.root.id) {
 				return this.item.children.reduce((a, c) => a.concat(c.children), []).map(child => child.id);
 			}
 			return this.visibleChildren.map(child => child.id);
 		},
 		// deepestChild()
-		// { if(!this.item || !allItems){ return; }
+		// { if(!this.item){ return; }
 		// 	let dc;
 		// 	if (!this.childrenOrder.length)
 		// 	{
@@ -39662,108 +39662,106 @@ ${self.basis.text.menu.usedTime}: ${self.sec_to_hourmin(self.totalUsedSec)}` : '
 		// 	}
 		// },
 		childrensDeepestChildren() {
-			if (!this.item || !allItems) {
+			if (!this.item) {
 				return;
 			}
 			return this.visibleChildren.map(function (item) {
 				return {
 					'id': item.id,
-					'deepestChild': this.$root.findDeepestVisibleChild(item.id)
+					'deepestChild': this.$root.$store.getters.findDeepestVisibleChild(item.id)
 				};
 			}.bind(this));
 		},
 		showAddNewBox() {
-			if (!this.item || !allItems) {
+			if (!this.item) {
 				return;
 			}
-			if (!this.$root.addingNewUnder) {
+			if (!this.$root.$store.state.addingNewUnder) {
 				return false;
 			}
-			if (this.$root.addingNewUnder == this.item.id) {
+			if (this.$root.$store.state.addingNewUnder == this.item.id) {
 				return true;
 			}
 			return false;
 		},
 		addingNewAsFirstChild() {
-			if (!this.item || !allItems) {
+			if (!this.item) {
 				return;
 			}
-			return this.$root.addingNewAsFirstChild;
+			return this.$root.$store.state.addingNewAsFirstChild;
 		},
 		addingNewAsChild() {
-			if (!this.item || !allItems) {
+			if (!this.item) {
 				return;
 			}
-			return this.$root.addingNewAsChild;
+			return this.$root.$store.state.addingNewAsChild;
 		},
 		hasDueDate() {
-			if (!this.item || !allItems) {
+			if (!this.item) {
 				return;
 			}
 			return this.item.due_date && this.item.due_date != '0000-00-00 00:00:00';
 		},
 		hasDoneDate() {
-			if (!this.item || !allItems) {
+			if (!this.item) {
 				return;
 			}
 			return this.item.done_date && this.item.done_date != '0000-00-00 00:00:00';
 		},
 		hastotalUsedSec() {
-			if (!this.item || !allItems) {
+			if (!this.item) {
 				return;
 			}
 			return this.item.children_order.length && this.item.totalUsedSec && this.item.totalUsedSec != '0' && this.item.used_time != this.item.totalUsedSec;
 		},
 		hasTotalPlannedMin() {
-			if (!this.item || !allItems) {
+			if (!this.item) {
 				return;
 			}
 			return this.item.children_order.length && this.totalPlannedMin && this.totalPlannedMin != '0' && this.item.planned_time != this.totalPlannedMin;
 		},
 		hasPlannedTime() {
-			if (!this.item || !allItems) {
+			if (!this.item) {
 				return;
 			}
 			return this.item.planned_time && this.item.planned_time != '0';
 		},
 		hasUsedTime() {
-			if (!this.item || !allItems) {
+			if (!this.item) {
 				return;
 			}
 			return this.item.used_time && this.item.used_time != '0';
 		},
-		allTags_c() {
-			if (!this.item || !allItems) {
-				return;
-			}
-			return this.$root.allTags;
-		},
+		// allTags_c()
+		// { if(!this.item){ return; }
+		// 	return this.$root.allTags;
+		// },
 		totalMinLeft() {
-			if (!this.item || !allItems) {
+			if (!this.item) {
 				return 0;
 			}
 			return this.totalPlannedMin - this.totalUsedMin;
 		},
 		totalSecLeft() {
-			if (!this.item || !allItems) {
+			if (!this.item) {
 				return 0;
 			}
 			return this.totalPlannedSec - this.totalUsedSec;
 		},
 		secLeft() {
-			if (!this.item || !allItems) {
+			if (!this.item) {
 				return 0;
 			}
 			return this.item.planned_time * 60 - this.item.used_time;
 		},
 		minLeft() {
-			if (!this.item || !allItems) {
+			if (!this.item) {
 				return 0;
 			}
 			return this.secLeft / 60;
 		},
 		totalTimeDifferentFromParent() {
-			if (!this.item || !allItems) {
+			if (!this.item) {
 				return 0;
 			}
 			if (!this.item.parent_id) {
@@ -39772,22 +39770,22 @@ ${self.basis.text.menu.usedTime}: ${self.sec_to_hourmin(self.totalUsedSec)}` : '
 			return this.totalPlannedSec != this.$parent.totalPlannedSec;
 		},
 		tagsArray() {
-			if (!this.item || !allItems) {
+			if (!this.item) {
 				return true;
 			}
 			return this.item.tagged.map(obj => obj.tag_name);
 		},
 		isHidden() {
-			if (!this.item || !allItems) {
+			if (!this.item) {
 				return true;
 			}
-			return this.$root.hiddenItemIds.includes(this.item.id);
+			return this.$root.$store.getters.hiddenItemIds.includes(this.item.id);
 		},
 		allChildrenDone() {
-			if (!this.item || !allItems) {
+			if (!this.item) {
 				return true;
 			}
-			return allItems.allChildrenDone(this.item.id);
+			return this.$root.$store.getters.allChildrenDone(this.item.id);
 		},
 		thebody() {
 			return this.item.body;
@@ -39812,13 +39810,13 @@ ${self.basis.text.menu.usedTime}: ${self.sec_to_hourmin(self.totalUsedSec)}` : '
 		},
 		addTimer(item) {
 			//Codementor
-			this.$root.addTimer(item.id);
+			this.$root.$store.dispatch('addTimer', { id: item.id });
 		},
 		selectItem(item) {
 			selection.selectedId = item.id;
 		},
 		clickOnAddNewCurtain(event) {
-			if (!this.$root.mobile) {
+			if (!this.$root.$store.getters.mobile) {
 				return;
 			}
 			if (event && event.srcElement.nodeName != 'FORM') {
@@ -39827,7 +39825,7 @@ ${self.basis.text.menu.usedTime}: ${self.sec_to_hourmin(self.totalUsedSec)}` : '
 			this.$root.cancelAddNew();
 		},
 		clickOnEditCurtain(item, event) {
-			if (!this.$root.mobile) {
+			if (!this.$root.$store.getters.mobile) {
 				return;
 			}
 			if (event && event.srcElement.nodeName != 'FORM') {
@@ -39838,16 +39836,16 @@ ${self.basis.text.menu.usedTime}: ${self.sec_to_hourmin(self.totalUsedSec)}` : '
 		newItemIndent() {
 			if (!this.item.children.length || !this.item.show_children) {
 				// If item has no children yet / no visible children
-				this.$root.addingNewAsChild = true;
+				this.$root.$store.state.addingNewAsChild = true;
 				return;
 			}
-			let lastChildId = allItems.getLastChildId(this.item.id);
+			let lastChildId = this.$root.$store.getters.getLastChildId(this.item.id);
 			this.$root.showAddNewItem(lastChildId);
 		},
 		newItemUnindent() {
-			if (this.$root.addingNewAsChild) {
-				this.$root.addingNewAsChild = false;
-				this.$root.addingNewAsFirstChild = false;
+			if (this.$root.$store.state.addingNewAsChild) {
+				this.$root.$store.state.addingNewAsChild = false;
+				this.$root.$store.state.addingNewAsFirstChild = false;
 				return;
 			}
 			if (selection.view == 'journal') {
@@ -40135,7 +40133,7 @@ ${self.basis.text.menu.usedTime}: ${self.sec_to_hourmin(self.totalUsedSec)}` : '
 			}, 50);
 		},
 		updateDone(id) {
-			allItems.prepareDonePatch(id);
+			this.$root.$store.dispatch('prepareDonePatch', { id });
 		},
 		updateShowChildren(id) {
 			this.$root.patch(id, 'show_children');
@@ -40151,7 +40149,7 @@ ${self.basis.text.menu.usedTime}: ${self.sec_to_hourmin(self.totalUsedSec)}` : '
 		},
 		startEditDoneDate(item, event) {
 			console.log('startEditDoneDate');
-			item = item ? item : allItems.nodes[selection.selectedId];
+			item = item ? item : this.$root.$store.state.nodes[selection.selectedId];
 			this.$root.beforeEditCache_done_date = item.done_date;
 			this.$root.editingDoneDateItem = item.id;
 		},
@@ -40184,7 +40182,7 @@ ${self.basis.text.menu.usedTime}: ${self.sec_to_hourmin(self.totalUsedSec)}` : '
 		addTag(item) {
 			let id = item ? item.id : selection.selectedId;
 			let tag = this.newTag;
-			allItems.tagItem(id, tag);
+			this.$root.$store.dispatch('tagItem', { id }, { tags: tag });
 			this.newTag = null;
 		},
 		prepareTag(item) {
@@ -41145,9 +41143,9 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_vuex__ = __webpack_require__(143);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_vue_resource__ = __webpack_require__(223);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__vue_components_vueFilters_js__ = __webpack_require__(185);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__vm_js__ = __webpack_require__(183);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__components_ListAppKeyBindings_js__ = __webpack_require__(174);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__store_store_js__ = __webpack_require__(182);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__components_ListAppKeyBindings_js__ = __webpack_require__(174);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__store_store_js__ = __webpack_require__(182);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__vm_js__ = __webpack_require__(183);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__vue_components_Selection_js__ = __webpack_require__(184);
 
 
@@ -41156,24 +41154,30 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
 
 //Start List App:
-
 // JS Classes
 
 
 
 
 
+
 /* harmony default export */ __webpack_exports__["a"] = (function (fetchedData) {
+	console.log('fetchedData = ↓');
+	console.log(fetchedData);
+	if (!fetchedData) {
+		console.log('no fetchedData');return;
+	}
+
 	window.fetchedData = fetchedData;
 	window.Vue = __WEBPACK_IMPORTED_MODULE_0_vue___default.a;
 	__WEBPACK_IMPORTED_MODULE_0_vue___default.a.use(__WEBPACK_IMPORTED_MODULE_1_vuex__["a" /* default */]);
 	__WEBPACK_IMPORTED_MODULE_0_vue___default.a.use(__WEBPACK_IMPORTED_MODULE_2_vue_resource__["a" /* default */]);
 	__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_3__vue_components_vueFilters_js__["a" /* default */])(__WEBPACK_IMPORTED_MODULE_0_vue___default.a);
-	new __WEBPACK_IMPORTED_MODULE_5__components_ListAppKeyBindings_js__["a" /* default */]();
+	new __WEBPACK_IMPORTED_MODULE_4__components_ListAppKeyBindings_js__["a" /* default */]();
 	window.selection = new __WEBPACK_IMPORTED_MODULE_7__vue_components_Selection_js__["a" /* default */]();
 	window.eventHub = new __WEBPACK_IMPORTED_MODULE_0_vue___default.a();
-	window.store = new __WEBPACK_IMPORTED_MODULE_1_vuex__["a" /* default */].Store(__WEBPACK_IMPORTED_MODULE_6__store_store_js__["a" /* default */]);
-	window.vm = new __WEBPACK_IMPORTED_MODULE_0_vue___default.a(__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_4__vm_js__["a" /* default */])());
+	window.store = new __WEBPACK_IMPORTED_MODULE_1_vuex__["a" /* default */].Store(__WEBPACK_IMPORTED_MODULE_5__store_store_js__["a" /* default */]);
+	window.vm = new __WEBPACK_IMPORTED_MODULE_0_vue___default.a(__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_6__vm_js__["a" /* default */])());
 
 	__WEBPACK_IMPORTED_MODULE_0_vue___default.a.directive('flatpicky', {
 		inserted(el) {
@@ -42531,7 +42535,7 @@ var _this = this;
 		// Select first child if any.
 		if (item.show_children && item.children.length) {
 			nextItemId = item.children_order[0];
-			if (vm.hiddenItemIds.includes(nextItemId)) {
+			if (getters.hiddenItemIds.includes(nextItemId)) {
 				nextItemId = getters.nextItemRecursion(nextItemId);
 			}
 		} else {
@@ -42603,7 +42607,7 @@ var _this = this;
 				prevItemId = getters.getDeepestLastChildId(prevItemId);
 			}
 		}
-		if (vm.hiddenItemIds.includes(prevItemId)) {
+		if (getters.hiddenItemIds.includes(prevItemId)) {
 			return getters.prevItemId(prevItemId);
 		} else {
 			return prevItemId;
@@ -42616,7 +42620,7 @@ var _this = this;
 		let parent_id = item.parent_id;
 		// let tagsSelected = selection.tags.length;
 
-		if (vm.itIsADeepestChild(id)) {
+		if (getters.itIsADeepestChild(id)) {
 			let topLvlItemId = getters.topLvlParentOfDeepestChild(id);
 			let topLvlChildrenIds = vm.$refs.root.childrenOrder;
 			let ind = topLvlChildrenIds.indexOf(topLvlItemId);
@@ -42638,12 +42642,13 @@ var _this = this;
 			return getters.nextItemRecursion(parent_id);
 		}
 		let nextItemId = state.nodes[parent_id].children_order[nextIndex];
-		if (vm.hiddenItemIds.includes(nextItemId)) {
+		if (getters.hiddenItemIds.includes(nextItemId)) {
 			return getters.nextItemRecursion(nextItemId);
 		}
 		return nextItemId;
 	},
 	isTopLvlItemInFilteredRoot: (state, getters) => id => {
+		console.log('running isTopLvlItemInFilteredRoot');
 		let s = selection;
 		if (selection.nothingSelected() && selection.view == 'tree') {
 			// console.log('the root is not filtered');
@@ -42851,6 +42856,7 @@ var _this = this;
 	},
 	// Original VM
 	itIsADeepestChild: (state, getters) => id => {
+		console.log('running itIsADeepestChild');
 		if (!id) {
 			console.log('you need an ID');return;
 		}
@@ -42876,6 +42882,7 @@ var _this = this;
 		return x;
 	},
 	findDeepestVisibleChild: (state, getters) => id => {
+		console.log('running findDeepestVisibleChild');
 		id = id ? id : selection.selectedId;
 		let item = state.nodes[id];
 		let children = item.children.filter(child => !getters.hiddenItemIds.includes(child.id));
@@ -43004,7 +43011,7 @@ var _this = this;
 		return Object.keys(getters.filteredItemsJournal);
 	},
 	filteredItemsFlat: (state, getters) => () => {
-		let ar = objectToArray(getters.nodes).filter(function (item) {
+		let ar = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__components_globalFunctions_js__["g" /* objectToArray */])(getters.nodes).filter(function (item) {
 			let target = selection.tags.every(tag => getters.hasTag(item.id, tag));
 			let targetHidden = selection.hiddenTags.some(tag => getters.hasTag(item.id, tag));
 			let targetDone = selection.view == 'journal' ? item.done : true;
@@ -43030,9 +43037,9 @@ var _this = this;
 		return ar;
 	},
 	filteredItemsTree: (state, getters) => () => {
-		console.log(`update filteredItemsTree (nodes length: ${objectToArray(getters.nodes).length})`);
+		console.log(`update filteredItemsTree (nodes length: ${__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__components_globalFunctions_js__["g" /* objectToArray */])(getters.nodes).length})`);
 		//Go through ALL ITEMS and return those that have the tag AND no parent with the tag.
-		let children = objectToArray(getters.nodes).filter(function (item) {
+		let children = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__components_globalFunctions_js__["g" /* objectToArray */])(getters.nodes).filter(function (item) {
 			let target;
 			let hasParentWithTag;
 			let targetToday;
@@ -43086,7 +43093,8 @@ var _this = this;
 		return children;
 	},
 	hiddenItemIds: (state, getters) => () => {
-		return objectToArray(getters.nodes).filter(function (item) {
+		console.log('running hiddenItemIds');
+		return __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__components_globalFunctions_js__["g" /* objectToArray */])(getters.nodes).filter(function (item) {
 			let targetHidden = selection.hiddenTags.some(tag => getters.hasTag(item.id, tag));
 			if (targetHidden) {
 				return true;
@@ -43571,10 +43579,10 @@ let a = {
     setLanguage: null,
     langContentsItems: __WEBPACK_IMPORTED_MODULE_0__lang_js__["a" /* default */]
 };
-let b = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__stateInitializer_js__["a" /* initializeState */])(window.fetchedData);
+
 // console.log(Object.assign(data, ););
 // Object.assign(data, initializeState(window.fetchedData));
-/* harmony default export */ __webpack_exports__["a"] = (Object.assign(a, b));
+/* harmony default export */ __webpack_exports__["a"] = (() => Object.assign(a, __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__stateInitializer_js__["a" /* initializeState */])(window.fetchedData)));
 
 /***/ }),
 /* 181 */
@@ -43638,7 +43646,9 @@ function makeNode(item) {
 	returnedObject.nodes[node.id] = node;
 }
 function initializeState(fetchedData) {
-	console.log(`returnedObject: nthnhtthnhnthnthnhnhh`);
+	console.log(`initializeState`);
+	console.log(`fetchedData ↓`);
+	console.log(fetchedData);
 	if (!fetchedData) {
 		return;
 	}
@@ -43670,12 +43680,12 @@ function initializeState(fetchedData) {
 
 
 
-/* harmony default export */ __webpack_exports__["a"] = ({
-  state: __WEBPACK_IMPORTED_MODULE_0__state_js__["a" /* default */],
+/* harmony default export */ __webpack_exports__["a"] = (() => ({
+  state: __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__state_js__["a" /* default */])(),
   getters: __WEBPACK_IMPORTED_MODULE_1__getters_js__["a" /* default */],
   mutations: __WEBPACK_IMPORTED_MODULE_2__mutations_js__["a" /* default */],
   actions: __WEBPACK_IMPORTED_MODULE_3__actions_js__["a" /* default */]
-});
+}));
 
 /***/ }),
 /* 183 */

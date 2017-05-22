@@ -1,4 +1,4 @@
-import {Utilities} from '../../components/globalFunctions.js';
+import { Utilities,objectToArray } from '../../components/globalFunctions.js';
 
 export default {
 hasTag: (state, getters) =>
@@ -103,7 +103,7 @@ nextItemId: (state, getters) =>
 	if (item.show_children && item.children.length)
 	{
 		nextItemId = item.children_order[0];
-		if(vm.hiddenItemIds.includes(nextItemId))
+		if(getters.hiddenItemIds.includes(nextItemId))
 	 	{
 	 		nextItemId = getters.nextItemRecursion(nextItemId);
 	 	}
@@ -175,7 +175,7 @@ prevItemId: (state, getters) =>
 			prevItemId = getters.getDeepestLastChildId(prevItemId);
 		}
 	}
- 	if (vm.hiddenItemIds.includes(prevItemId))
+ 	if (getters.hiddenItemIds.includes(prevItemId))
  	{
 	 	return getters.prevItemId(prevItemId);
  	} else {
@@ -190,7 +190,7 @@ nextItemRecursion: (state, getters) =>
 	let parent_id = item.parent_id;
 	// let tagsSelected = selection.tags.length;
 
-	if (vm.itIsADeepestChild(id))
+	if (getters.itIsADeepestChild(id))
 	{
 		let topLvlItemId = getters.topLvlParentOfDeepestChild(id);
 		let topLvlChildrenIds = vm.$refs.root.childrenOrder;
@@ -211,7 +211,7 @@ nextItemRecursion: (state, getters) =>
 		return getters.nextItemRecursion(parent_id);
 	}
 	let nextItemId = state.nodes[parent_id].children_order[nextIndex];
-	if (vm.hiddenItemIds.includes(nextItemId))
+	if (getters.hiddenItemIds.includes(nextItemId))
 	{
 		return getters.nextItemRecursion(nextItemId);
 	}
@@ -219,6 +219,7 @@ nextItemRecursion: (state, getters) =>
 },
 isTopLvlItemInFilteredRoot: (state, getters) =>
 (id) => {
+	console.log('running isTopLvlItemInFilteredRoot');
 	let s = selection;
 	if (selection.nothingSelected() && selection.view == 'tree')
 	{
@@ -423,6 +424,7 @@ flattenTree: (state, getters) =>
 // Original VM
 itIsADeepestChild: (state, getters) =>
 (id) => {
+	console.log('running itIsADeepestChild');
 	if (!id){ console.log('you need an ID'); return; }
 	if (vm.$refs.root.childrensDeepestChildren.map(item => item.deepestChild).includes(id))
 	{
@@ -446,6 +448,7 @@ countDoneChildren: (state, getters) =>
 },
 findDeepestVisibleChild: (state, getters) =>
 (id) => {
+	console.log('running findDeepestVisibleChild');
 	id = (id) ? id : selection.selectedId;
 	let item = state.nodes[id];
 	let children = item.children.filter(child => !getters.hiddenItemIds.includes(child.id));
@@ -663,6 +666,7 @@ filteredItemsTree: (state, getters) =>
 },
 hiddenItemIds: (state, getters) =>
 () => {
+	console.log('running hiddenItemIds');
 	return objectToArray(getters.nodes).filter(function(item){
 		let targetHidden = selection.hiddenTags.some(tag => getters.hasTag(item.id, tag));
 		if(targetHidden){ return true; }

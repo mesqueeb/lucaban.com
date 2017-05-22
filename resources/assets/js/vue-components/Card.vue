@@ -666,23 +666,23 @@ return `${all}${pb}
 	// },
 	computed: {
 		visibleChildren()
-		{ if(!this.item || !this.item.children.length || !allItems){ return []; }
+		{ if(!this.item || !this.item.children.length){ return []; }
 			if(typeof parseFloat(this.item.id) != 'number' || this.item.id == 'x')
 			{
 				// return [];
 			}
 			// console.log(this.item);
-			return this.item.children.filter(child => !this.$root.hiddenItemIds.includes(child.id));
+			return this.item.children.filter(child => !this.$root.$store.getters.hiddenItemIds.includes(child.id));
 		},
 		allVisibleChildItems()
-		{ if(!this.item || !this.item.children.length || !allItems){ return []; }
-			let flattenedTree = allItems.flattenTree(this.item.children);
-			let visibleChildren = flattenedTree.filter(item => !this.$root.hiddenItemIds.includes(item.id));
+		{ if(!this.item || !this.item.children.length){ return []; }
+			let flattenedTree = this.$root.$store.getters.flattenTree(this.item.children);
+			let visibleChildren = flattenedTree.filter(item => !this.$root.$store.getters.hiddenItemIds.includes(item.id));
 			return visibleChildren;
 		},
 		preparedPlusComputedTags()
-		{ if(!this.item || !allItems){ return []; }
-			if(this.item.id == allItems.root.id){ return []; }
+		{ if(!this.item){ return []; }
+			if(this.item.id == this.$root.$store.getters.root.id){ return []; }
 			let alltags = this.newItem.preparedTags;
 			if (selection.tags.length)
 			{
@@ -692,16 +692,16 @@ return `${all}${pb}
 			{
 				alltags = alltags.concat(this.parentTags);
 			}
-			if (this.$root.addingNewAsChild)
+			if (this.$root.$store.state.addingNewAsChild)
 			{
-				let tagz = allItems.returnTagsAsArray(this.item.id);
+				let tagz = this.$root.$store.getters.returnTagsAsArray(this.item.id);
 				alltags = alltags.concat(tagz);
 			}
-			if (allItems.isTopLvlItemInFilteredRoot(this.item.id))
+			if (this.$root.$store.getters.isTopLvlItemInFilteredRoot(this.item.id))
 			{
-				if(allItems.nodes[this.item.parent_id])
+				if(this.$root.$store.state.nodes[this.item.parent_id])
 				{
-					let tagzies = allItems.returnTagsAsArray(this.item.parent_id);
+					let tagzies = this.$root.$store.getters.returnTagsAsArray(this.item.parent_id);
 					alltags = alltags.concat(tagzies);
 				}
 			}
@@ -710,16 +710,16 @@ return `${all}${pb}
 		},
 		listIsEmpty()
 		{
-			if(!this.item || !allItems || !allItems.root){ return false; }
-			if(this.item.id != allItems.root.id){ return false; }
+			if(!this.item || !allItems || !this.$root.$store.getters.root){ return false; }
+			if(this.item.id != this.$root.$store.getters.root.id){ return false; }
 			if(!this.visibleChildren.length){ return true; }
 		},
 		basis()
-		{ if(!this.item || !allItems){ return 0; }
+		{ if(!this.item){ return 0; }
 			return this.$root;
 		},
 		totalPlannedMin()
-		{ if(!this.item || !allItems){ return 0; }
+		{ if(!this.item){ return 0; }
 			let selfValue = (this.item.planned_time) ? parseFloat(this.item.planned_time) : 0;
 			let childrenArray = this.allVisibleChildItems;
 			if (!childrenArray || !childrenArray.length) { return selfValue; }
@@ -729,7 +729,7 @@ return `${all}${pb}
 		    return (x) ? parseFloat(x) : 0;
 		},
 		totalUsedSec()
-		{ if(!this.item || !allItems){ return 0; }
+		{ if(!this.item){ return 0; }
 			let selfValue = (this.item.used_time) ? parseFloat(this.item.used_time) : 0;
 			let childrenArray = this.allVisibleChildItems;
 			if (!childrenArray || !childrenArray.length) { return selfValue; }
@@ -739,19 +739,19 @@ return `${all}${pb}
 		    return (x) ? x : 0;
 		},
 		journalView()
-		{ if(!this.item || !allItems){ return; }
+		{ if(!this.item){ return; }
 			if(this.$root.selection.view == 'journal'){
 				return true;
 			} else { return false; }
 		},
 		visiblePrevItemId()
-		{ if(!this.item || !allItems){ return; }
+		{ if(!this.item){ return; }
 			let index = this.parentsChildrenOrder.indexOf(this.item.id);
-			if (index == 0){ return allItems.root.id; }
+			if (index == 0){ return this.$root.$store.getters.root.id; }
 			return this.parentsChildrenOrder[index-1];
 		},
 		journalDate()
-		{ if(!this.item || !allItems){ return; }
+		{ if(!this.item){ return; }
 			// console.log('run on '+this.item.id+' - '+this.item.body);
 			if ( this.$root.selection.view != 'journal'
 			  || !this.journalView
@@ -763,7 +763,7 @@ return `${all}${pb}
 			// JOURNAL REWRITE. original:
 			// if(this.item.depth == 0){ return; }
 			// let prevId = this.visiblePrevItemId;
-			// let prevDoneDate = allItems.nodes[prevId].done_date;
+			// let prevDoneDate = this.$root.$store.state.nodes[prevId].done_date;
 			// prevDoneDate = moment(prevDoneDate).format('YYYY/MM/DD');
 			// let thisDoneDate = moment(this.item.done_date).format('YYYY/MM/DD');
 			// if (thisDoneDate != prevDoneDate){
@@ -772,16 +772,16 @@ return `${all}${pb}
 
 		},
 		journalParentString()
-		{ if(!this.item || !allItems){ return; }
+		{ if(!this.item){ return; }
 			// console.log('run on '+this.item.id+' - '+this.item.body);
 			if(this.$root.selection.view != 'journal'){ return false; }
 			if(this.journalView){
 				if(this.item.depth == 0){ return; }
 				let prevId = this.visiblePrevItemId;
 				let parentString = this.item.parents_bodies;
-				let prevParentString = allItems.nodes[prevId].parents_bodies;
+				let prevParentString = this.$root.$store.state.nodes[prevId].parents_bodies;
 
-				let prevDoneDate = allItems.nodes[prevId].done_date;
+				let prevDoneDate = this.$root.$store.state.nodes[prevId].done_date;
 				// console.log('moment dates');
 				// console.log(prevDoneDate);
 				// console.log(this.item.done_date);
@@ -799,45 +799,45 @@ return `${all}${pb}
 			return false;
 		},
 		totalUsedMin()
-		{ if(!this.item || !allItems){ return 0; }
+		{ if(!this.item){ return 0; }
 			return Math.floor(this.totalUsedSec/60);
 		},
 		totalPlannedSec()
-		{ if(!this.item || !allItems){ return 0; }
+		{ if(!this.item){ return 0; }
 			return this.totalPlannedMin*60;
 		},
 		totalPlannedHour()
-		{ if(!this.item || !allItems){ return 0; }
+		{ if(!this.item){ return 0; }
 			return this.totalPlannedMin/60;
 		},
 		isProject()
-		{ if(!this.item || !allItems){ return; }
+		{ if(!this.item){ return; }
 			// console.log('checking isProject');
-			return allItems.isProject(this.item.id);	
+			return this.$root.$store.getters.isProject(this.item.id);	
 		},
 		siblingIndex()
-		{ if(!this.item || !allItems){ return; }
-			return allItems.siblingIndex(this.item.id);
+		{ if(!this.item){ return; }
+			return this.$root.$store.getters.siblingIndex(this.item.id);
 		},
 		olderSiblingId()
-		{ if(!this.item || !allItems){ return; }
-			return allItems.olderSiblingId(this.item.id); 
+		{ if(!this.item){ return; }
+			return this.$root.$store.getters.olderSiblingId(this.item.id); 
 		},
 		parentsChildren_order()
-		{ if(!this.item || !allItems){ return; }
-			if(this.item.depth == 0){ return allItems.nodes[this.item.id].children_order; }
+		{ if(!this.item){ return; }
+			if(this.item.depth == 0){ return this.$root.$store.state.nodes[this.item.id].children_order; }
 			return this.$parent.item.children_order;
 		},
 		childrenOrder()
-		{ if(!this.item || !allItems){ return 0; }
-			if (this.$root.selection.view == 'journal' && this.item.id == allItems.root.id)
+		{ if(!this.item){ return 0; }
+			if (this.$root.selection.view == 'journal' && this.item.id == this.$root.$store.getters.root.id)
 			{
 				return this.item.children.reduce((a, c) => a.concat(c.children), []).map(child => child.id);
 			}
 			return this.visibleChildren.map(child => child.id);
 		},
 		// deepestChild()
-		// { if(!this.item || !allItems){ return; }
+		// { if(!this.item){ return; }
 		// 	let dc;
 		// 	if (!this.childrenOrder.length)
 		// 	{
@@ -848,95 +848,95 @@ return `${all}${pb}
 		// 	}
 		// },
 		childrensDeepestChildren()
-		{ if(!this.item || !allItems){ return; }
+		{ if(!this.item){ return; }
 			return this.visibleChildren.map(function(item){
 				return {
 					'id':item.id,
-					'deepestChild':this.$root.findDeepestVisibleChild(item.id)
+					'deepestChild':this.$root.$store.getters.findDeepestVisibleChild(item.id)
 				};
 			}.bind(this));
 		},
 		showAddNewBox()
-		{ if(!this.item || !allItems){ return; }
-			if(!this.$root.addingNewUnder){ return false; }
-			if(this.$root.addingNewUnder == this.item.id)
+		{ if(!this.item){ return; }
+			if(!this.$root.$store.state.addingNewUnder){ return false; }
+			if(this.$root.$store.state.addingNewUnder == this.item.id)
 			{ return true; }
 			return false;
 		},
 		addingNewAsFirstChild()
-		{ if(!this.item || !allItems){ return; }
-			return this.$root.addingNewAsFirstChild;
+		{ if(!this.item){ return; }
+			return this.$root.$store.state.addingNewAsFirstChild;
 		},
 		addingNewAsChild()
-		{ if(!this.item || !allItems){ return; }
-			return this.$root.addingNewAsChild;
+		{ if(!this.item){ return; }
+			return this.$root.$store.state.addingNewAsChild;
 		},
 		hasDueDate()
-		{ if(!this.item || !allItems){ return; }
+		{ if(!this.item){ return; }
 		    return (this.item.due_date && this.item.due_date != '0000-00-00 00:00:00');
 		},
 		hasDoneDate()
-		{ if(!this.item || !allItems){ return; }
+		{ if(!this.item){ return; }
 		    return (this.item.done_date && this.item.done_date != '0000-00-00 00:00:00');
 		},
 		hastotalUsedSec()
-		{ if(!this.item || !allItems){ return; }
+		{ if(!this.item){ return; }
 		    return (this.item.children_order.length
 		    	&& this.item.totalUsedSec
 		    	&& this.item.totalUsedSec != '0'
 		    	&& this.item.used_time != this.item.totalUsedSec);
 		},
 		hasTotalPlannedMin()
-		{ if(!this.item || !allItems){ return; }
+		{ if(!this.item){ return; }
 		    return (this.item.children_order.length
 		    	&& this.totalPlannedMin
 		    	&& this.totalPlannedMin != '0'
 		    	&& this.item.planned_time != this.totalPlannedMin);
 		},
 		hasPlannedTime()
-		{ if(!this.item || !allItems){ return; }
+		{ if(!this.item){ return; }
 		    return (this.item.planned_time && this.item.planned_time != '0');
 		},
 		hasUsedTime()
-		{ if(!this.item || !allItems){ return; }
+		{ if(!this.item){ return; }
 		    return (this.item.used_time && this.item.used_time != '0');
 		},
-		allTags_c()
-		{ if(!this.item || !allItems){ return; }
-			return this.$root.allTags;
-		},
+		// allTags_c()
+		// { if(!this.item){ return; }
+		// 	return this.$root.allTags;
+		// },
 		totalMinLeft()
-		{ if(!this.item || !allItems){ return 0; }
+		{ if(!this.item){ return 0; }
 			return this.totalPlannedMin-this.totalUsedMin;
 		},
 		totalSecLeft()
-		{ if(!this.item || !allItems){ return 0; }
+		{ if(!this.item){ return 0; }
 			return this.totalPlannedSec-this.totalUsedSec;
 		},
 		secLeft()
-		{ if(!this.item || !allItems){ return 0; }
+		{ if(!this.item){ return 0; }
 			return this.item.planned_time*60-this.item.used_time;
 		},
 		minLeft()
-		{ if(!this.item || !allItems){ return 0; }
+		{ if(!this.item){ return 0; }
 			return this.secLeft/60;
 		},
 		totalTimeDifferentFromParent()
-		{ if(!this.item || !allItems){ return 0; }
+		{ if(!this.item){ return 0; }
 			if(!this.item.parent_id){ return true; }
 			return this.totalPlannedSec != this.$parent.totalPlannedSec;
 		},
 		tagsArray()
-		{ if(!this.item || !allItems){ return true; }
+		{ if(!this.item){ return true; }
 			return this.item.tagged.map(obj => obj.tag_name);
 		},
 		isHidden()
-		{ if(!this.item || !allItems){ return true; }
-			return this.$root.hiddenItemIds.includes(this.item.id)
+		{ if(!this.item){ return true; }
+			return this.$root.$store.getters.hiddenItemIds.includes(this.item.id)
 		},
 		allChildrenDone()
-		{ if(!this.item || !allItems){ return true; }
-			return allItems.allChildrenDone(this.item.id);
+		{ if(!this.item){ return true; }
+			return this.$root.$store.getters.allChildrenDone(this.item.id);
 		},
 		thebody(){ return this.item.body },
 	},
@@ -957,7 +957,7 @@ return `${all}${pb}
 		addTimer(item)
 		{
 			//Codementor
-			this.$root.addTimer(item.id);
+			this.$root.$store.dispatch('addTimer', { id:item.id });
 		},
 		selectItem(item)
 		{
@@ -965,13 +965,13 @@ return `${all}${pb}
 		},
 		clickOnAddNewCurtain(event)
 		{
-			if(!this.$root.mobile){ return; }
+			if(!this.$root.$store.getters.mobile){ return; }
 			if(event && event.srcElement.nodeName != 'FORM'){ return; }
 			this.$root.cancelAddNew();
 		},
 		clickOnEditCurtain(item, event)
 		{
-			if(!this.$root.mobile){ return; }
+			if(!this.$root.$store.getters.mobile){ return; }
 			if(event && event.srcElement.nodeName != 'FORM'){ return; }
 			this.doneEdit(item);
 		},
@@ -979,18 +979,18 @@ return `${all}${pb}
 		{
 			if(!this.item.children.length || !this.item.show_children)
 			{ // If item has no children yet / no visible children
-				this.$root.addingNewAsChild = true;
+				this.$root.$store.state.addingNewAsChild = true;
 				return;
 			}
-			let lastChildId = allItems.getLastChildId(this.item.id);
+			let lastChildId = this.$root.$store.getters.getLastChildId(this.item.id);
     		this.$root.showAddNewItem(lastChildId);
 		},
 		newItemUnindent()
 		{
-			if(this.$root.addingNewAsChild)
+			if(this.$root.$store.state.addingNewAsChild)
 			{
-				this.$root.addingNewAsChild = false;
-				this.$root.addingNewAsFirstChild = false;
+				this.$root.$store.state.addingNewAsChild = false;
+				this.$root.$store.state.addingNewAsFirstChild = false;
 				return;
 			}
 			if(selection.view == 'journal')
@@ -1316,7 +1316,7 @@ return `${all}${pb}
 	    },
 		updateDone(id)
 		{
-			allItems.prepareDonePatch(id);
+			this.$root.$store.dispatch('prepareDonePatch',{id});
 		},
 		updateShowChildren(id)
 		{
@@ -1337,7 +1337,7 @@ return `${all}${pb}
 		startEditDoneDate(item, event)
 		{
 			console.log('startEditDoneDate');
-			item = (item) ? item : allItems.nodes[selection.selectedId];
+			item = (item) ? item : this.$root.$store.state.nodes[selection.selectedId];
 			this.$root.beforeEditCache_done_date = item.done_date;
 			this.$root.editingDoneDateItem = item.id;
 		},
@@ -1375,7 +1375,7 @@ return `${all}${pb}
 		{
 			let id = (item) ? item.id : selection.selectedId;
 			let tag = this.newTag;
-			allItems.tagItem(id, tag);
+			this.$root.$store.dispatch('tagItem', {id}, {tags:tag});
 			this.newTag = null;
 		},
 		prepareTag(item)

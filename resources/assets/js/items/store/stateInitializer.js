@@ -40,7 +40,9 @@ function makeNode (item)
 }
 function initializeState (fetchedData)
 {
-		console.log(`returnedObject: nthnhtthnhnthnthnhnhh`);
+	console.log(`initializeState`);
+	console.log(`fetchedData ↓`);
+	console.log(fetchedData);
 	if (!fetchedData){ return; }
 
 	let returnedObject = {}

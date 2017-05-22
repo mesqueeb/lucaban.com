@@ -5,19 +5,16 @@
 	import VueFilters from '../vue-components/vueFilters.js';
 
 	//Start List App:
+	import ListApp from './vm.js'
 	// JS Classes
 	import ListAppKeyBindings from '../components/ListAppKeyBindings.js';
 	import ListStore from './store/store.js';
-	import ListApp from './vm.js'
 
 	import Selection from '../vue-components/Selection.js';
 
 export default function(fetchedData)
 {
-	console.log('fetchedData = ↓');
-	console.log(fetchedData);
 	if (!fetchedData){ console.log('no fetchedData'); return; }
-
 	window.fetchedData = fetchedData;
 	window.Vue = Vue;
 	Vue.use(Vuex);
