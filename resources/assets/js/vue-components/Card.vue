@@ -114,7 +114,7 @@
 			</div>
 
 			<!-- For debugging: -->
-			<span v-if="false" class="d-inline-flex">
+			<span v-if="basis.debug" class="d-inline-flex">
 				({{item.id}}) D-{{item.depth}})
 				<span v-if="item.children_order.length">
 					[{{item.children_order}}]
@@ -586,9 +586,9 @@
 // import Morph from '../components/valueMorphers.js'
 // window.Morph = new Morph();
 import { linkify, momentCalendar, sec_to_hourminsec, sec_to_hourmin } from '../components/valueMorphers2.js';
-import flatPickConfig from '../components/flatPickrOptions.js';
-import autosize from 'autosize';
-import autosizeInput from 'autosize-input';
+// import flatPickConfig from '../components/flatPickrOptions.js';
+// import autosize from 'autosize';
+// import autosizeInput from 'autosize-input';
 import { uniq, Utilities } from '../components/globalFunctions.js';
 import Clipboard from 'clipboard';
 
@@ -667,6 +667,7 @@ return `${all}${pb}
 	computed: {
 		visibleChildren()
 		{ if(!this.item || !this.item.children.length){ return []; }
+			// console.log('visibleChildren');
 			if(typeof parseFloat(this.item.id) != 'number' || this.item.id == 'x')
 			{
 				// return [];
@@ -676,6 +677,7 @@ return `${all}${pb}
 		},
 		allVisibleChildItems()
 		{ if(!this.item || !this.item.children.length){ return []; }
+			// console.log('allVisibleChildItems');
 			let flattenedTree = this.$root.$store.getters.flattenTree(this.item.children);
 			let visibleChildren = flattenedTree.filter(item => !this.$root.$store.getters.hiddenItemIds.includes(item.id));
 			return visibleChildren;
@@ -710,7 +712,7 @@ return `${all}${pb}
 		},
 		listIsEmpty()
 		{
-			if(!this.item || !allItems || !this.$root.$store.getters.root){ return false; }
+			if(!this.item || !this.$root.$store.getters.root){ return false; }
 			if(this.item.id != this.$root.$store.getters.root.id){ return false; }
 			if(!this.visibleChildren.length){ return true; }
 		},
@@ -932,6 +934,7 @@ return `${all}${pb}
 		},
 		isHidden()
 		{ if(!this.item){ return true; }
+			// console.log('allVisibleChildItems');
 			return this.$root.$store.getters.hiddenItemIds.includes(this.item.id)
 		},
 		allChildrenDone()
@@ -961,7 +964,7 @@ return `${all}${pb}
 		},
 		selectItem(item)
 		{
-			selection.selectedId = item.id;
+			this.$root.$store.dispatch('selectItem', { id:item.id });
 		},
 		clickOnAddNewCurtain(event)
 		{
@@ -1320,7 +1323,7 @@ return `${all}${pb}
 		},
 		updateShowChildren(id)
 		{
-			this.$root.patch(id,'show_children');
+			this.$root.$store.dispatch('patch',{id,field:'show_children'});
 		},
 		cancelEdit(item)
 		{

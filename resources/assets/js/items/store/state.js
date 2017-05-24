@@ -1,8 +1,13 @@
-import langContentsItems from './lang.js';
+import languageContents from './lang.js';
 import { initializeState } from './stateInitializer.js';
+// import Selection from '../../vue-components/Selection.js';
+// window.selection = new Selection();
+
 let a = {
+    // selection,
+    languageContents,
+    debug: false,
     doneData: null,
-    selection: window.selection,
     addingNewUnder: null,
     addingNewAsChild: false,
     addingNewAsFirstChild: false,
@@ -29,9 +34,6 @@ let a = {
     },
     newTag: null,
     setLanguage: null,
-    langContentsItems,
 };
 
-// console.log(Object.assign(data, ););
-// Object.assign(data, initializeState(window.fetchedData));
 export default () => Object.assign(a, initializeState(window.fetchedData));

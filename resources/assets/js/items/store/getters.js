@@ -1,4 +1,5 @@
-import { Utilities,objectToArray } from '../../components/globalFunctions.js';
+import { mobilecheck,Utilities,objectToArray,uniqBy,sortObjectArrayByProperty,sortObjectArrayByTwoProperties } from '../../components/globalFunctions.js';
+import { sec_to_hourmin } from '../../components/valueMorphers2.js';
 
 export default {
 hasTag: (state, getters) =>
@@ -219,7 +220,7 @@ nextItemRecursion: (state, getters) =>
 },
 isTopLvlItemInFilteredRoot: (state, getters) =>
 (id) => {
-	console.log('running isTopLvlItemInFilteredRoot');
+	// console.log('running isTopLvlItemInFilteredRoot');
 	let s = selection;
 	if (selection.nothingSelected() && selection.view == 'tree')
 	{
@@ -424,7 +425,7 @@ flattenTree: (state, getters) =>
 // Original VM
 itIsADeepestChild: (state, getters) =>
 (id) => {
-	console.log('running itIsADeepestChild');
+	// console.log('running itIsADeepestChild');
 	if (!id){ console.log('you need an ID'); return; }
 	if (vm.$refs.root.childrensDeepestChildren.map(item => item.deepestChild).includes(id))
 	{
@@ -448,7 +449,7 @@ countDoneChildren: (state, getters) =>
 },
 findDeepestVisibleChild: (state, getters) =>
 (id) => {
-	console.log('running findDeepestVisibleChild');
+	// console.log('running findDeepestVisibleChild');
 	id = (id) ? id : selection.selectedId;
 	let item = state.nodes[id];
 	let children = item.children.filter(child => !getters.hiddenItemIds.includes(child.id));
@@ -462,20 +463,16 @@ isFirstItem: (state, getters) =>
 	return (getters.siblingIndex(id) == 0);
 },
 // Computed properties
-language: (state, getters) =>
-() => {
+language: (state, getters) => {
 	if(state.setLanguage){ return state.setLanguage; }
 	else if (defaultLanguage) { return defaultLanguage; }
 	else { return 'en'; }
 },
-text: (state, getters) =>
-() => {
-	if(getters.language == 'en'){ return state.langContentsItems.en; }
-	if(getters.language == 'ja'){ return state.langContentsItems.ja; }
+text: (state, getters) => {
+	return state.languageContents[getters.language];
 },
-allData: (state, getters) =>
-() => {
-	if(!allItems || !allItems.root)
+allData: (state, getters) => {
+	if(!window.fetchedData)
 	{
 		return {
 			"body":"ALL",
@@ -505,19 +502,16 @@ allData: (state, getters) =>
 		"used_time":0
 	}
 },
-mobile: (state, getters) =>
-() => {
+mobile: (state, getters) => {
 	if(state.manualMobile){
 		return true;
 	}
-	return mobilecheck( );
+	return mobilecheck();
 },
-mobileSmall: (state, getters) =>
-() => {
+mobileSmall: (state, getters) => {
 	if (window.innerWidth < 385){ return true; }
 },
-noItems: (state, getters) =>
-() => {
+noItems: (state, getters) => {
 	if(!getters.allData.children.length){ return true; }
 	return false;
 	// if(!state || !state.root || !state.root.children.length){
@@ -528,8 +522,7 @@ noItems: (state, getters) =>
 // () => { // Flat
 // 	return getters.filteredItemsFlat.filter(child => child.done);
 // },
-filteredItems: (state, getters) =>
-() => {
+filteredItems: (state, getters) => {
 	// if(getters.noItems){ return []; }
 	if (selection.view == 'tree')
 	{
@@ -540,8 +533,7 @@ filteredItems: (state, getters) =>
 		return getters.filteredItemsJournal;
 	}
 },
-filteredItemsJournal: (state, getters) =>
-() => {
+filteredItemsJournal: (state, getters) => {
 	if (selection.view != 'journal'){ return []; }
 	let dates = {};
 	getters.filteredItemsFlat.forEach(function(item){
@@ -567,13 +559,11 @@ filteredItemsJournal: (state, getters) =>
 	datesArray = sortObjectArrayByProperty(datesArray, 'done_date', 'desc');
 	return datesArray;
 },
-journalDates: (state, getters) =>
-() => {
+journalDates: (state, getters) => {
 	return Object.keys(getters.filteredItemsJournal);
 },
-filteredItemsFlat: (state, getters) =>
-() => {
-	let ar = objectToArray(getters.nodes).filter(function(item){
+filteredItemsFlat: (state, getters) => {
+	let ar = objectToArray(state.nodes).filter(function(item){
 		let target = selection.tags.every(tag => getters.hasTag(item.id, tag));
 		let targetHidden = selection.hiddenTags.some(tag => getters.hasTag(item.id, tag));
 		let targetDone = (selection.view == 'journal') ? item.done : true;
@@ -600,11 +590,10 @@ filteredItemsFlat: (state, getters) =>
 	}
 	return ar;
 },
-filteredItemsTree: (state, getters) =>
-() => {
-	console.log(`update filteredItemsTree (nodes length: ${objectToArray(getters.nodes).length})`);
+filteredItemsTree: (state, getters) => {
+	console.log(`update filteredItemsTree (nodes length: ${objectToArray(state.nodes).length})`);
 	//Go through ALL ITEMS and return those that have the tag AND no parent with the tag.
-	let children = objectToArray(getters.nodes).filter(function(item){
+	let children = objectToArray(state.nodes).filter(function(item){
 		let target;
 		let hasParentWithTag;
 		let targetToday;
@@ -664,16 +653,14 @@ filteredItemsTree: (state, getters) =>
 	}
 	return children;
 },
-hiddenItemIds: (state, getters) =>
-() => {
-	console.log('running hiddenItemIds');
-	return objectToArray(getters.nodes).filter(function(item){
+hiddenItemIds: (state, getters) => {
+	// console.log('running hiddenItemIds');
+	return objectToArray(state.nodes).filter(function(item){
 		let targetHidden = selection.hiddenTags.some(tag => getters.hasTag(item.id, tag));
 		if(targetHidden){ return true; }
 	}.bind(this)).map(item => item.id);
 },
-selectionFilter: (state, getters) =>
-() => { // For list title
+selectionFilter: (state, getters) => { // For list title
 	return selection.filter.map(function (val, i) {
 		if(selection.filter.length == i+1)
 		{
@@ -686,8 +673,7 @@ selectionFilter: (state, getters) =>
 		return val;
 	});
 },
-selectionTags: (state, getters) =>
-() => { // For list title
+selectionTags: (state, getters) => { // For list title
 	return selection.tags.map(function (val, i) {
 		if(selection.tags.length == i+1)
 		{
@@ -700,8 +686,7 @@ selectionTags: (state, getters) =>
 		return val;
 	});
 },
-selectionHiddenTags: (state, getters) =>
-() => { // For list title
+selectionHiddenTags: (state, getters) => { // For list title
 	return selection.hiddenTags.map(function (val, i) {
 		if(selection.hiddenTags.length == i+1)
 		{
@@ -725,8 +710,7 @@ selectionHiddenTags: (state, getters) =>
 // 	// 	return !selection.hiddenItems.includes(item.id);
 // 	// });
 // },
-allTagsComputed: (state, getters) =>
-() => {
+allTagsComputed: (state, getters) => {
 	var t0 = performance.now( );
 	if(getters.noItems){ return []; }
 	let allTagsArray = [];
@@ -759,8 +743,7 @@ allTagsComputed: (state, getters) =>
 	console.log("Call to allTagsComputed took " + (t1 - t0) + " milliseconds.")
 	return allTagsArray;
 },
-allTagsComputed_2: (state, getters) =>
-() => {
+allTagsComputed_2: (state, getters) => {
 	let t2_0 = performance.now( );
 	if(getters.noItems){ return []; }
 	let allTagsArray = [];
@@ -786,8 +769,7 @@ allTagsComputed_2: (state, getters) =>
 	console.log("Call to allTagsComputed_2 took " + (t2_1 - t2_0) + " milliseconds.")
 	return allTagsArray;
 },
-allTagsComputed_3: (state, getters) =>
-() => {
+allTagsComputed_3: (state, getters) => {
 	let t3_0 = performance.now( );
 	if(getters.noItems){ return []; }
 	let allTagsArray = new Set( );
@@ -810,8 +792,7 @@ allTagsComputed_3: (state, getters) =>
 	console.log("Call to allTagsComputed_3 took " + (t3_1 - t3_0) + " milliseconds.")
 	return allTagsArray;
 },
-allTagsComputed_1b: (state, getters) =>
-() => {
+allTagsComputed_1b: (state, getters) => {
 	var t0 = performance.now( );
 	if(getters.noItems){ return []; }
 	let allTagsArray = [];
@@ -844,24 +825,21 @@ allTagsComputed_1b: (state, getters) =>
 	console.log("Call to allTagsComputed 1b took " + (t1 - t0) + " milliseconds.")
 	return allTagsArray;
 },
-itemAmount: (state, getters) =>
-() => {
+itemAmount: (state, getters) => {
 	if(getters.noItems){ return 0; }
 	// let x = getters.countChildren(getters.allData);
 	// let x = vm.$refs.root.allVisibleChildItems.length;
 	let items = (getters.filteredItemsFlat.length) ? getters.filteredItemsFlat : [] ;
 	return items.length-1;
 },
-doneItemAmount: (state, getters) =>
-() => {
+doneItemAmount: (state, getters) => {
 	if(getters.noItems){ return 0; }
 	// let doneChildren = vm.$refs.root.allVisibleChildItems.filter(child => child.done).length;
 	let items = (getters.filteredItemsFlat.length) ? getters.filteredItemsFlat : [] ;
 	let doneChildren = items.filter(child => child.done).length;
 	return doneChildren;
 },
-totalPlannedMin: (state, getters) =>
-() => {
+totalPlannedMin: (state, getters) => {
 	let selfValue = 0;
 	let childrenArray = getters.filteredItemsFlat;
 	if (!childrenArray || !childrenArray.length) { return selfValue; }
@@ -870,12 +848,10 @@ totalPlannedMin: (state, getters) =>
 	}, selfValue);
     return (x) ? parseFloat(x) : 0;
 },
-totalPlannedSec: (state, getters) =>
-() => {
+totalPlannedSec: (state, getters) => {
 	return getters.totalPlannedMin*60;
 },
-totalUsedSec: (state, getters) =>
-() => {
+totalUsedSec: (state, getters) => {
 	let selfValue = 0;
 	let childrenArray = getters.filteredItemsFlat;
 	if (!childrenArray || !childrenArray.length) { return selfValue; }
@@ -884,33 +860,27 @@ totalUsedSec: (state, getters) =>
 	}, selfValue);
     return (x) ? x : 0;
 },
-totalSecLeft: (state, getters) =>
-() => {
+totalSecLeft: (state, getters) => {
 	if(getters.noItems){ return 0; }
 	return getters.totalPlannedSec-getters.totalUsedSec;
 },
-totalUsedHourMin: (state, getters) =>
-() => {
+totalUsedHourMin: (state, getters) => {
 	return sec_to_hourmin(getters.totalUsedSec);
 },
-totalHourMinLeft: (state, getters) =>
-() => {
+totalHourMinLeft: (state, getters) => {
 	return sec_to_hourmin(getters.totalSecLeft);
 },
-lastItems: (state, getters) =>
-() => {
+lastItems: (state, getters) => {
 	if(getters.noItems ){ return []; }
 	let lastChild = getters.topLvlItems[getters.topLvlItems.length-1];
 	let deepestChild = getters.findDeepestVisibleChild(lastChild);
 	return [lastChild, deepestChild];
 },
-firstItem: (state, getters) =>
-() => {
+firstItem: (state, getters) => {
 	if(getters.noItems){ return null; }
 	return getters.topLvlItems[0];
 },
-topLvlItems: (state, getters) =>
-() => {
+topLvlItems: (state, getters) => {
 	if(getters.noItems){ return []; }
 	return getters.filteredItemsTree.map(i => i.id);
 },

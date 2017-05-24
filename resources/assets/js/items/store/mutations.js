@@ -1,5 +1,5 @@
 export default {
-patch (state, { id, field, value })
+updateState (state, { id, field, value })
 {
 	if (!id)
 	{
@@ -21,8 +21,8 @@ addChild (state, { newParentId, index, item })
 {
 	if (!index)
 	{
- 		state.nodes[newParentId].children.push(targetItem);
-		state.nodes[newParentId].children_order.push(id)
+ 		state.nodes[newParentId].children.push(item);
+		state.nodes[newParentId].children_order.push(item.id)
 		return;
 	}
 	state.nodes[newParentId].children.splice(index,0,item);

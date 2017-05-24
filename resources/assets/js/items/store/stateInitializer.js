@@ -1,9 +1,9 @@
 
 
-function organizeAfterInitialization()
+function organizeAfterInitialization(returnedObject)
 {
 	console.log('run organizeAfterInitialization');
-	Object.keys(store.nodes).forEach(function (id) {
+	Object.keys(returnedObject.nodes).forEach(function (id) {
 	    store.dispatch('sortChildren', {id});
 	    store.dispatch('updateChildrenDueDate', {id});
 	}.bind(this));
@@ -26,7 +26,7 @@ function setDefaultItemValues(item)
 	}
 	return item;
 }
-function makeNode (item)
+function makeNode (item, returnedObject)
 {
 	let node = JSON.parse(JSON.stringify(item));
 	let parent = returnedObject.nodes[node.parent_id];
@@ -40,8 +40,7 @@ function makeNode (item)
 }
 function initializeState (fetchedData)
 {
-	console.log(`initializeState`);
-	console.log(`fetchedData ↓`);
+	console.log(`initializeState() with fetchedData ↓`);
 	console.log(fetchedData);
 	if (!fetchedData){ return; }
 
@@ -50,10 +49,9 @@ function initializeState (fetchedData)
 	returnedObject.orphans = [];
 	returnedObject.nodes = {};
 	returnedObject.root = {};
-	fetchedData.forEach(item => makeNode(item));	
+	fetchedData.forEach(item => makeNode(item, returnedObject));	
 
-	// organizeAfterInitialization();
-	console.log(`returnedObject: ${returnedObject}`);
+	// organizeAfterInitialization(returnedObject);
 	return returnedObject;
 }
 export { initializeState };

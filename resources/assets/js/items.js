@@ -7,9 +7,6 @@
 
 // IMPORT Own jQuery replacement functions
 	import { arrayToString, hasClass, btnEffect, isElementInViewport } from './components/globalFunctions.js';
-	import autosize from 'autosize';
-	import autosizeInput from 'autosize-input';
-
 	window.btnEffect = btnEffect;
 	// Make hasClass(el) available as el.hasClass();
 	window.Element.prototype.hasClass = function(config){ return hasClass(this,config)};
@@ -36,6 +33,7 @@
 	import Flatpickr from 'flatpickr';
 	window.Flatpickr = Flatpickr;
 	import flatPickConfig from './components/flatPickrOptions.js';
+	window.flatPickConfig = flatPickConfig;
 
 
 $('body').on('click', 'button', function(e){

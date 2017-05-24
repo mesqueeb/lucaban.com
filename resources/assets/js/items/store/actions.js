@@ -1,5 +1,5 @@
 import { Utilities, hasClass, mobilecheck, isElementInViewport, objectToArray, uniqBy, uniq, arrayToString, sortObjectArrayByProperty, sortObjectArrayByTwoProperties, removeEmptyValuesFromArray } from '../../components/globalFunctions.js';
-import { sec_to_hourmin } from '../../components/valueMorphers2.js';
+// import { sec_to_hourmin } from '../../components/valueMorphers2.js';
 
 export default {
 
@@ -24,16 +24,16 @@ giveNewParent ({state, commit, dispatch, getters},
 		console.log(prevParent);
 	let siblingIndex = getters.siblingIndex(id);
 	// targetItem.parent_id = new_parent_id;
-	commit('patch', { id: id, field: 'parent_id', value: new_parent_id });
+	commit('updateState', { id: id, field: 'parent_id', value: new_parent_id });
 	// targetItem.depth = newParent.depth+1;
-	commit('patch', { id: id, field: 'depth', value: newParent.depth+1 });
+	commit('updateState', { id: id, field: 'depth', value: newParent.depth+1 });
 	// e.g. VUEX
 
 	
 	if (!newParent.children_order)
 	{
 		// newParent.children_order = [];
-		commit('patch', { id: new_parent_id, field: 'children_order', value: [] });
+		commit('updateState', { id: new_parent_id, field: 'children_order', value: [] });
 	}
 	if (specificNewIndex || specificNewIndex == 0)
 	{
@@ -56,7 +56,7 @@ giveNewParent ({state, commit, dispatch, getters},
 	}
 	// Open newParent show_children if closed
 	// newParent.show_children = 1;
-	commit('patch',{'field':'show_children','id':new_parent_id, 'value':1 });
+	commit('updateState',{'field':'show_children','id':new_parent_id, 'value':1 });
 
 	// Delete items attached to previous parent
 	// prevParent.children.splice(siblingIndex,1);
@@ -65,7 +65,7 @@ giveNewParent ({state, commit, dispatch, getters},
 	// Fix bug where item would still show if it prevParent has an array of 0 and the moved child was originally the last child...
 	if(prevParent.children.length == 0){ 
 		// prevParent.children = [];
-		commit('patch',{'field':'children','id':prevParent.id, 'value':[] });
+		commit('updateState',{'field':'children','id':prevParent.id, 'value':[] });
 	}
 
 	// Patches etc.
@@ -208,8 +208,7 @@ hideTaggedNodes ({state, commit, dispatch, getters},
 		}
 	}.bind(this));
 },
-hideDoneNodes ({state, commit, dispatch, getters},
-	{})
+hideDoneNodes ({state, commit, dispatch, getters})
 {
 	Object.keys(state.nodes).forEach(function(id) {
 		id = parseFloat(id);
@@ -218,6 +217,14 @@ hideDoneNodes ({state, commit, dispatch, getters},
 				selection.hiddenItems.push(id);
 			}
 		}
+	}.bind(this));
+},
+sortAllChildren ({state, commit, dispatch, getters})
+{
+	console.log('sorting all children');
+	Object.keys(state.nodes).forEach(function (id) {
+	    dispatch('sortChildren', {id});
+	    dispatch('updateChildrenDueDate', {id});
 	}.bind(this));
 },
 sortChildren ({state, commit, dispatch, getters},
@@ -466,9 +473,8 @@ moveItem ({state, commit, dispatch, getters},
 	}
 	Vue.nextTick(()=> dispatch('scrollToItemIfNeeded', { id:id }));
 },
-flushDoneItems ({state, commit, dispatch, getters},
-	{}) // Do not use yet. Not sure how to best implement the below...
-{
+flushDoneItems ({state, commit, dispatch, getters})
+{ // Do not use yet. Not sure how to best implement the below...
 	let nodes = state.nodes;
 	let keys = Object.keys(nodes);
 	let doneItemsObject = keys.reduce((prev,id) => {
@@ -539,8 +545,7 @@ formatDone ({state, commit, dispatch, getters},
 	});
 },
 // Original VM
-setCancelThroughKeydown ({state, commit, dispatch, getters},
-	{})
+setCancelThroughKeydown ({state, commit, dispatch, getters})
 {
 	state.cancelThroughKeydown = true;
 	setTimeout(function()
@@ -572,6 +577,7 @@ startEdit ({state, commit, dispatch, getters},
 scrollToItemIfNeeded ({state, commit, dispatch, getters},
 	{id})
 {
+	if (!id){ return };
 	let el = document.getElementById('item-body-'+id);
 	if(!isElementInViewport(el))
 	{
@@ -702,8 +708,7 @@ addNew ({state, commit, dispatch, getters},
 	dispatch('postNewItem', { newItem, index, addNextItemAs, addTags, duplication:null });
 	commit('resetNewItem');
 },
-checkFilteredItemsTree ({state, commit, dispatch, getters},
-	{})
+checkFilteredItemsTree ({state, commit, dispatch, getters})
 {
 	//Go through ALL ITEMS and return those that have the tag AND no parent with the tag.
 	objectToArray(state.nodes).forEach(function(item){
@@ -849,30 +854,34 @@ unindent ({state, commit, dispatch, getters},
 	dispatch('giveNewParent', { id, new_parent_id });
 },
 selectItem ({state, commit, dispatch, getters},
-	{direction})
+	{id, direction})
 {
-	let id = selection.selectedId;
-	let item = state.nodes[id];
-	let sel;
-	if(direction == 'next')
+	id = (id) ? id : selection.selectedId;
+	let nextSelectedId;
+	if (!direction)
+	{
+		nextSelectedId = id;
+	} else
+	if (direction == 'next')
 	{
 		if (!id || id == state.root.id)
 		{
-			sel = vm.$refs.root.childrenOrder[0];
+			nextSelectedId = vm.$refs.root.childrenOrder[0];
 		} else {
-			sel = getters.nextItemId(id);
+			nextSelectedId = getters.nextItemId(id);
 		}
-	} else if (direction == 'prev') {
+	} else
+	if (direction == 'prev') {
 		if (!id || id == state.root.id)
 		{
 			let l = vm.$refs.root.childrenOrder.length;
-			sel = vm.$refs.root.childrenOrder[l-1];
+			nextSelectedId = vm.$refs.root.childrenOrder[l-1];
 		} else {
-			sel = getters.prevItemId(id);
+			nextSelectedId = getters.prevItemId(id);
 		}
 	}
-	selection.selectedId = sel;
-	dispatch('scrollToItemIfNeeded', { id:sel });
+	selection.selectedId = nextSelectedId;
+	dispatch('scrollToItemIfNeeded', { id:nextSelectedId });
 },
 setToday ({state, commit, dispatch, getters},
 	{id})
@@ -901,14 +910,12 @@ startEditTags ({state, commit, dispatch, getters},
 	if(!id){ return; }
 	state.editingItemTags = id;
 },
-stopPatching ({state, commit, dispatch, getters},
-	{})
+stopPatching ({state, commit, dispatch, getters})
 {
 	if(window.stopPatchingIcon){ clearTimeout(window.stopPatchingIcon); }
     window.stopPatchingIcon = setTimeout(function(){ state.patching = false; }.bind(state), 300);
 },
-startPatching ({state, commit, dispatch, getters},
-	{})
+startPatching ({state, commit, dispatch, getters})
 {
     if(window.stopPatchingIcon){ clearTimeout(window.stopPatchingIcon); }
 	state.patching = true;
@@ -926,24 +933,24 @@ patchRootChildrenOrderWithFilter ({state, commit, dispatch, getters},
 	});
 },
 patch ({state, commit, dispatch, getters},
-	{id, arg, value})
+	{id, field, value})
 {
 	// if(getters.isTopLvlItemInFilteredRoot(id)){ 
-	// 	if(arg == 'children_order' || arg == 'parent_id'){
+	// 	if(field == 'children_order' || field == 'parent_id'){
 	// 		console.log("you can't sync a toplvlItem when filtering");
 	// 		return;
 	// 	}
 	// }
 	dispatch('startPatching');
 	let patchObj = {};
-	let patchVal = (value) ? value : state.nodes[id][arg];
-	if(arg == 'children_order'){
+	let patchVal = (value) ? value : state.nodes[id][field];
+	if(field == 'children_order'){
 		patchVal = arrayToString(patchVal);
 	}
-	patchObj[arg] = patchVal;
+	patchObj[field] = patchVal;
 	vm.$http.patch('/api/items/' + id, patchObj, { method: 'PATCH'})
 	.then(function(response){
-		console.log(`patched ${id}[${state.nodes[id].body}].${arg} = ${patchObj[arg]}`);
+		console.log(`patched ${id}[${state.nodes[id].body}].${field} = ${patchObj[field]}`);
 		dispatch('stopPatching');
 	}, (response) => {
 		state.patching = 'error';

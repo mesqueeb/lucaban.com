@@ -1,31 +1,8 @@
-	import Vue from 'vue';
-	import Vuex from 'vuex';
-	import VueResource from 'vue-resource';
+import autosize from 'autosize';
+import autosizeInput from 'autosize-input';
 
-	import VueFilters from '../vue-components/vueFilters.js';
-
-	//Start List App:
-	import ListApp from './vm.js'
-	// JS Classes
-	import ListAppKeyBindings from '../components/ListAppKeyBindings.js';
-	import ListStore from './store/store.js';
-
-	import Selection from '../vue-components/Selection.js';
-
-export default function(fetchedData)
-{
-	if (!fetchedData){ console.log('no fetchedData'); return; }
-	window.fetchedData = fetchedData;
-	window.Vue = Vue;
-	Vue.use(Vuex);
-	Vue.use(VueResource);
-	VueFilters(Vue);
-	new ListAppKeyBindings();
-	window.selection = new Selection();
-	window.eventHub = new Vue();
-	window.store = new Vuex.Store(ListStore);
-	window.vm = new Vue(ListApp());
-
+export default {
+install(Vue){
 	Vue.directive('flatpicky', {
 		inserted(el)
 		{
@@ -74,6 +51,5 @@ export default function(fetchedData)
 			// }
 		}
 	});
-	store.commit('patch', { id:null, field:'patching', value:false } );
-	store.commit('patch', { id:null, field:'loading', value:false } );
+}
 }
