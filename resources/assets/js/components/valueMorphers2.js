@@ -1,3 +1,6 @@
+import languageContents from '../items/store/lang.js';
+let text = (window.store) ? store.getters.text : languageContents.en;
+
 function MD(val) {
   // model -> view
   // formats the value when updating the input element.
@@ -61,11 +64,11 @@ function sec_to_hourminsec(val)
 	let hours = Math.floor(minutes/60)
 	minutes = minutes%60;
 	if (hours>0){
-		return pad(hours,vm.text.global.hour+' ')+pad(minutes, vm.text.global.min);
+		return pad(hours,text.global.hour+' ')+pad(minutes, text.global.min);
 	} else if (minutes>0) {
-		return pad(minutes,vm.text.global.min+' ')+pad(secs,vm.text.global.sec);
+		return pad(minutes,text.global.min+' ')+pad(secs,text.global.sec);
 	} else {
-		return pad(secs,vm.text.global.sec);
+		return pad(secs,text.global.sec);
 	}
 }
 function hourmin(val)
@@ -78,9 +81,9 @@ function hourmin(val)
 	let minutes = val%60;
 	let hours = Math.floor(val/60)
 	if (hours>0){
-		return pad(hours,vm.text.global.hour+' ')+pad(minutes, vm.text.global.min);
+		return pad(hours,text.global.hour+' ')+pad(minutes, text.global.min);
 	} else {
-		return pad(minutes,vm.text.global.min)
+		return pad(minutes,text.global.min)
 	}
 }
 function sec_to_hourmin(val)
@@ -96,9 +99,9 @@ function sec_to_hourmin(val)
 	let hours = Math.floor(minutes/60)
 	minutes = minutes%60;
 	if (hours>0){
-		return pad(hours,vm.text.global.hour+' ')+pad(minutes, vm.text.global.min);
+		return pad(hours,text.global.hour+' ')+pad(minutes, text.global.min);
 	} else {
-		return pad(minutes,vm.text.global.min)
+		return pad(minutes,text.global.min)
 	}
 }
 function momentRelative(val)

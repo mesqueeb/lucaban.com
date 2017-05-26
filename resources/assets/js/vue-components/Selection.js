@@ -96,7 +96,7 @@ export default class Selection {
 	{
 		if(!this.hiddenItems.length){ return 0; }
 		return this.hiddenItems.reduce(function(a,id){
-			let b = allItems.nodes[id].used_time;
+			let b = store.state.nodes[id].used_time;
 			console.log(b);
 			return a + b;
 		}, 0);
@@ -105,7 +105,7 @@ export default class Selection {
 	{
 		if(!this.hiddenItems.length){ return 0; }		
 		return this.hiddenItems.reduce(function(a,id){
-			let b = allItems.nodes[id].planned_time;
+			let b = store.state.nodes[id].planned_time;
 			console.log(b);
 			return a + b;
 		}, 0);

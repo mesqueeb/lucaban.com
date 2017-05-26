@@ -181,10 +181,10 @@ export default {
 			timerRunning: true,
 		};
 	},
-	mounted()
+	created()
 	{
-		eventHub.$on('playTimer', this.playTimer);
-		eventHub.$on('clearAll', this.clearAll);
+		this.$bus.$on('playTimer', this.playTimer);
+		this.$bus.$on('clearAll', this.clearAll);
 	},
 	computed: {
 		card()
@@ -227,7 +227,7 @@ export default {
         },
         popoutCall(msg, item)
         {
-        	eventHub.$emit(msg, item.id);
+        	Vue.bus.$emit(msg, item.id);
         	this.removePopout(item);
         },
         maskClick(event)
@@ -239,16 +239,16 @@ export default {
         },
         clearAll(event)
         {
-        	vm.popouts.delete = [];
-        	vm.popouts.timer.forEach(item => this.closeTimer(item));
-        	vm.popouts.edit.forEach(item => vm.cancelEdit(item));
-        	vm.popouts.guide = false;
+        	this.$root.popouts.delete = [];
+        	this.$root.popouts.timer.forEach(item => this.closeTimer(item));
+        	// vm.popouts.edit.forEach(item => vm.cancelEdit(item));
+        	this.$root.popouts.guide = false;
         	window.timers = {};
         },
         updateDone(item)
         {
         	this.pauseTimer(item);
-        	allItems.prepareDonePatch(item.id);
+        	this.$root.prepareDonePatch({id:item.id});
         	document.querySelector('.js-btn-ok').focus();
         },
         timerNav(button, item, value)
@@ -261,6 +261,8 @@ export default {
         },
         playTimer(item)
         {
+        	item = (item) ? item : (this.timer[0]) ? this.timer[0] : null ;
+        	if(!item){ console.log('no timer item'); return; }
         	// console.log(item);
         	console.log("timer started: "+moment().format('HH:mm:ss'));
         	this.timerRunning = true;
@@ -284,7 +286,7 @@ export default {
 			if (!window.timers[item.id]) { return; }
 			clearInterval(window.timers[item.id]);
 			delete window.timers[item.id];
-			vm.patch(item.id, 'used_time');
+			this.$root.patch({id:item.id, field:'used_time'});
 		},
 		forwardTimer(item, time)
 		{
@@ -295,7 +297,7 @@ export default {
 		{
         	console.log("timer reset: "+moment().format('HH:mm:ss'));
 			item.used_time = 0;
-			vm.patch(item.id, 'used_time');
+			this.$root.patch({id:item.id, field:'used_time'});
 		},
 		closeTimer(item)
 		{
@@ -309,7 +311,7 @@ export default {
 			{
 				item.used_time = 0;
 			} else {
-				vm.patch(item.id, 'used_time');
+				this.$root.patch({id:item.id, field:'used_time'});
 			}
 			this.removePopout(item);
 		},

@@ -7,9 +7,6 @@
 
 // IMPORT Own jQuery replacement functions
 	import { arrayToString, hasClass, btnEffect, isElementInViewport } from './components/globalFunctions.js';
-	import autosize from 'autosize';
-	import autosizeInput from 'autosize-input';
-
 	window.btnEffect = btnEffect;
 	// Make hasClass(el) available as el.hasClass();
 	window.Element.prototype.hasClass = function(config){ return hasClass(this,config)};
@@ -36,95 +33,21 @@
 	import Flatpickr from 'flatpickr';
 	window.Flatpickr = Flatpickr;
 	import flatPickConfig from './components/flatPickrOptions.js';
+	window.flatPickConfig = flatPickConfig;
 
-// Vue Basics
-	import Vue from 'vue';
-	window.Vue = Vue;
-	import VueResource from 'vue-resource';
-	Vue.use(VueResource);
-
-	import VueFilters from './vue-components/vueFilters.js';
-	VueFilters(Vue);
-	// Vue Components
-	import ListApp from './items/app.js'
-
-// JS Classes
-	import Tree from './vue-components/dataTree.js';
-	import ListAppKeyBindings from './components/ListAppKeyBindings.js';
 
 $('body').on('click', 'button', function(e){
 	console.log(e);
 	btnEffect(e);
 });
 
+	import initialize from './items/initialize.js';
+
 	console.log('start fetching all items');
-$.getJSON('/api/items',function(fetchedData){
+/*/ ～～～～～～～～～～～～～～～～～～～～～～～　\*\		*/
+$.getJSON('/api/items',function(fetchedData){ 			/*
+\*\ ～～～～～～～～～～～～～～～～～～～～～～～　/*/
 	console.log('fetched all items');
-	
-	//response
-	window.eventHub = new Vue();
-	window.allItems = new Tree(fetchedData);
-	console.log(allItems);
+	initialize(fetchedData);
 
-	window.vm = new Vue(ListApp);
-	new ListAppKeyBindings();
-	// vm.allData = allItems.root;
-	// vm.doneData = allItems.doneitems;
-	vm.nodes = allItems.nodes;
-
-	console.log('allItems ↓');
-	console.log(allItems);
-
-	Vue.directive('flatpicky', {
-		inserted(el)
-		{
-			new Flatpickr(el,flatPickConfig);
-		},
-	});
-	Vue.directive('focus', {
-		inserted(el, binding)
-		{
-			if(vm.mobile && !binding.modifiers.mobile){ return; }
-			el.focus()
-		}
-	});
-	Vue.directive('autoheight', {
-		inserted(el, binding)
-		{
-			Vue.nextTick(function ()
-			{
-				autosize(el);
-			});
-		}
-	});
-	Vue.directive('autowidth', {
-		inserted(el, binding)
-		{
-			Vue.nextTick(function ()
-			{
-				autosizeInput(el);
-			});
-		}
-	});
-	Vue.directive('ios-dblclick', {
-		inserted(el, binding)
-		{
-			// TODO create ios Double click directive
-			// clicks++;
-			// if (clicks == 1) {
-			//     setTimeout(function(){
-			//         if(clicks == 1) {
-			//             single_click_callback.call(self, event);
-			//         } else {
-			//             double_click_callback.call(self, event);
-			//         }
-			//     clicks = 0;
-			//     }, timeout || 300);
-			// }
-		}
-	});
-
-
-	vm.patching = false;
-	vm.loading = false;
 }); // end ajax - get data

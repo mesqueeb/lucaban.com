@@ -106,7 +106,7 @@
 					'u-lightgray':item.temp,
 					'c-body-text--done': item.done
 					}"
-				>{{ linkify(item.body) }}</div>
+				>{{ item.body }}</div>
 				<div class="l-completion-notes c-completion-notes bodybox"
 					v-if="item.completion_memo"
 					@click="selectItem(item)"
@@ -114,7 +114,7 @@
 			</div>
 
 			<!-- For debugging: -->
-			<span v-if="false" class="d-inline-flex">
+			<span v-if="basis.debug" class="d-inline-flex">
 				({{item.id}}) D-{{item.depth}})
 				<span v-if="item.children_order.length">
 					[{{item.children_order}}]
@@ -238,7 +238,7 @@
 								|| item.id == basis.editingItem
 								|| item.id == basis.editingItemTags"
 							class="o-pill--custom-tag"
-							@dblclick.prevent="basis.filterItems('tag', tag.tag_slug, $event)"
+							@dblclick.prevent="basis.filterItems({keyword:'tag', value:tag.tag_slug, event:$event})"
 						>
 							{{ tag.tag_name }}
 							<button
@@ -343,7 +343,7 @@
 						|| item.id == basis.editingItem
 						|| item.id == basis.editingItemTags"
 					class="o-pill--custom-tag"
-					@dblclick.prevent="basis.filterItems('tag', tag.tag_slug, $event)"
+					@dblclick.prevent="basis.filterItems({keyword:'tag', value:tag.tag_slug, event:$event})"
 				>
 					{{ tag.tag_name }}
 					<button
@@ -371,7 +371,7 @@
 					&& basis.selection.selectedId == item.id"
 			>
 				<button
-					class="o-btn c-item-nav__copy btn btn-dipclick"
+					class="o-btn c-item-nav__text btn btn-dipclick"
 					:id="'card-'+item.id+'-copy'"
 					v-if="!basis.mobile && basis.selection.view != 'journal'"
 				>
@@ -379,14 +379,14 @@
 				</button>
 				<button
 					v-if="basis.mobile"
-					class="o-btn c-item-nav__edit"
+					class="o-btn c-item-nav__text"
 					@click="startEdit(item)"
 				>
 					{{ basis.text.card.edit }}
 				</button>
 				<button
 					v-if="basis.mobile && basis.selection.view != 'journal'"
-					class="o-btn c-item-nav__set-today"
+					class="o-btn c-item-nav__text"
 					@click="setToday(item.id)"
 				>
 					{{ basis.text.card.setToday }}
@@ -400,11 +400,23 @@
 				</button>
 				<button
 					v-if="item.done"
+					class="o-btn c-item-nav__text"
+					@click="basis.popup({ id:item.id, type:'afterDone' })"
+				>
+					{{ basis.text.popups.journalNotes }}
+				</button>
+				<button
+					v-if="false"
 					class="o-btn more"
-					@click="basis.popup(item.id, 'afterDone')"
+					@click="showItemMenu = true"
 				>
 					<i class="zmdi zmdi-more"></i>
 				</button>
+				<item-menu
+					v-if="false"
+					v-show="showItemMenu"
+					:item="item"
+				></item-menu>
 				<!--
 				- font icon / woff format [font awesome]
 				  material design iconic fonts
@@ -415,9 +427,9 @@
 				<button
 					class="o-btn c-item-nav__delete" 
 					v-if="true || item.children_order.length==0"
-					@click="deleteItem(item)"
+					@click="deleteItemDialogue(item.id)"
 				>
-					<i class="zmdi zmdi-delete"></i>
+					<i class="zmdi zmdi-delete c-item-nav__delete"></i>
 				</button>
 			</div>
 <!-- / .ITEM-NAV -->
@@ -463,12 +475,12 @@
 			<div class="c-language-picker w-100" v-if="listIsEmpty && basis.mobile">
 				<a href="#"
 					class="c-language-picker__a" 
-					@click="basis.setLanguage = 'ja'"
+					@click="basis.$store.commit('updateState',{setLanguage:'ja'})"
 					v-if="basis.language != 'ja'"
 				>日本語</a>
 				<a href="#"
 					class="c-language-picker__a" 
-					@click="basis.setLanguage = 'en'"
+					@click="basis.$store.commit('updateState',{setLanguage:'en'})"
 					v-if="basis.language != 'en'"
 				>English</a>
 			</div>
@@ -586,15 +598,17 @@
 // import Morph from '../components/valueMorphers.js'
 // window.Morph = new Morph();
 import { linkify, momentCalendar, sec_to_hourminsec, sec_to_hourmin } from '../components/valueMorphers2.js';
-import flatPickConfig from '../components/flatPickrOptions.js';
-import autosize from 'autosize';
-import autosizeInput from 'autosize-input';
-import { uniq } from '../components/globalFunctions.js';
+// import flatPickConfig from '../components/flatPickrOptions.js';
+// import autosize from 'autosize';
+// import autosizeInput from 'autosize-input';
+import { uniq, Utilities } from '../components/globalFunctions.js';
 import Clipboard from 'clipboard';
+import itemMenu from './itemMenu.vue';
 
 export default {
 	name: 'Card',
 	template:'#items-card-template',
+	components: { itemMenu },
 	mounted()
 	{
 		let copyElPath = "#card-"+this.item.id+"-copy";
@@ -658,6 +672,7 @@ return `${all}${pb}
 				due_date: '0000-00-00 00:00:00',
 				children: '',
 			},
+			showItemMenu: false,
 			newTag: null,
 		};
 	},
@@ -666,42 +681,44 @@ return `${all}${pb}
 	// },
 	computed: {
 		visibleChildren()
-		{ if(!this.item || !this.item.children.length || !allItems){ return []; }
+		{ if(!this.item || !this.item.children.length){ return []; }
+			// console.log('visibleChildren');
 			if(typeof parseFloat(this.item.id) != 'number' || this.item.id == 'x')
 			{
 				// return [];
 			}
 			// console.log(this.item);
-			return this.item.children.filter(child => !this.$root.hiddenItemIds.includes(child.id));
+			return this.item.children.filter(child => !this.$root.$store.getters.hiddenItemIds.includes(child.id));
 		},
 		allVisibleChildItems()
-		{ if(!this.item || !this.item.children.length || !allItems){ return []; }
-			let flattenedTree = allItems.flattenTree(this.item.children);
-			let visibleChildren = flattenedTree.filter(item => !this.$root.hiddenItemIds.includes(item.id));
+		{ if(!this.item || !this.item.children.length){ return []; }
+			// console.log('allVisibleChildItems');
+			let flattenedTree = this.$root.$store.getters.flattenTree(this.item.children);
+			let visibleChildren = flattenedTree.filter(item => !this.$root.$store.getters.hiddenItemIds.includes(item.id));
 			return visibleChildren;
 		},
 		preparedPlusComputedTags()
-		{ if(!this.item || !allItems){ return []; }
-			if(this.item.id == allItems.root.id){ return []; }
+		{ if(!this.item){ return []; }
+			if(this.item.id == this.$root.$store.getters.root.id){ return []; }
 			let alltags = this.newItem.preparedTags;
 			if (selection.tags.length)
 			{
-				alltags = alltags.concat(selection.tags.map(tag => allItems.tagSlugToName(tag)));
+				alltags = alltags.concat(selection.tags.map(tag => Utilities.tagSlugToName(tag)));
 			}
 			if (this.parentTags.length)
 			{
 				alltags = alltags.concat(this.parentTags);
 			}
-			if (this.$root.addingNewAsChild)
+			if (this.$root.$store.state.addingNewAsChild)
 			{
-				let tagz = allItems.returnTagsAsArray(this.item.id);
+				let tagz = this.$root.$store.getters.returnTagsAsArray(this.item.id);
 				alltags = alltags.concat(tagz);
 			}
-			if (allItems.isTopLvlItemInFilteredRoot(this.item.id))
+			if (this.$root.$store.getters.isTopLvlItemInFilteredRoot(this.item.id))
 			{
-				if(allItems.nodes[this.item.parent_id])
+				if(this.$root.$store.state.nodes[this.item.parent_id])
 				{
-					let tagzies = allItems.returnTagsAsArray(this.item.parent_id);
+					let tagzies = this.$root.$store.getters.returnTagsAsArray(this.item.parent_id);
 					alltags = alltags.concat(tagzies);
 				}
 			}
@@ -710,16 +727,16 @@ return `${all}${pb}
 		},
 		listIsEmpty()
 		{
-			if(!this.item || !allItems || !allItems.root){ return false; }
-			if(this.item.id != allItems.root.id){ return false; }
+			if(!this.item || !this.$root.$store.getters.root){ return false; }
+			if(this.item.id != this.$root.$store.getters.root.id){ return false; }
 			if(!this.visibleChildren.length){ return true; }
 		},
 		basis()
-		{ if(!this.item || !allItems){ return 0; }
+		{ if(!this.item){ return 0; }
 			return this.$root;
 		},
 		totalPlannedMin()
-		{ if(!this.item || !allItems){ return 0; }
+		{ if(!this.item){ return 0; }
 			let selfValue = (this.item.planned_time) ? parseFloat(this.item.planned_time) : 0;
 			let childrenArray = this.allVisibleChildItems;
 			if (!childrenArray || !childrenArray.length) { return selfValue; }
@@ -729,7 +746,7 @@ return `${all}${pb}
 		    return (x) ? parseFloat(x) : 0;
 		},
 		totalUsedSec()
-		{ if(!this.item || !allItems){ return 0; }
+		{ if(!this.item){ return 0; }
 			let selfValue = (this.item.used_time) ? parseFloat(this.item.used_time) : 0;
 			let childrenArray = this.allVisibleChildItems;
 			if (!childrenArray || !childrenArray.length) { return selfValue; }
@@ -739,19 +756,19 @@ return `${all}${pb}
 		    return (x) ? x : 0;
 		},
 		journalView()
-		{ if(!this.item || !allItems){ return; }
+		{ if(!this.item){ return; }
 			if(this.$root.selection.view == 'journal'){
 				return true;
 			} else { return false; }
 		},
 		visiblePrevItemId()
-		{ if(!this.item || !allItems){ return; }
+		{ if(!this.item){ return; }
 			let index = this.parentsChildrenOrder.indexOf(this.item.id);
-			if (index == 0){ return allItems.root.id; }
+			if (index == 0){ return this.root.id; }
 			return this.parentsChildrenOrder[index-1];
 		},
 		journalDate()
-		{ if(!this.item || !allItems){ return; }
+		{ if(!this.item){ return; }
 			// console.log('run on '+this.item.id+' - '+this.item.body);
 			if ( this.$root.selection.view != 'journal'
 			  || !this.journalView
@@ -763,7 +780,7 @@ return `${all}${pb}
 			// JOURNAL REWRITE. original:
 			// if(this.item.depth == 0){ return; }
 			// let prevId = this.visiblePrevItemId;
-			// let prevDoneDate = allItems.nodes[prevId].done_date;
+			// let prevDoneDate = this.$root.$store.state.nodes[prevId].done_date;
 			// prevDoneDate = moment(prevDoneDate).format('YYYY/MM/DD');
 			// let thisDoneDate = moment(this.item.done_date).format('YYYY/MM/DD');
 			// if (thisDoneDate != prevDoneDate){
@@ -772,16 +789,16 @@ return `${all}${pb}
 
 		},
 		journalParentString()
-		{ if(!this.item || !allItems){ return; }
+		{ if(!this.item){ return; }
 			// console.log('run on '+this.item.id+' - '+this.item.body);
 			if(this.$root.selection.view != 'journal'){ return false; }
 			if(this.journalView){
 				if(this.item.depth == 0){ return; }
 				let prevId = this.visiblePrevItemId;
 				let parentString = this.item.parents_bodies;
-				let prevParentString = allItems.nodes[prevId].parents_bodies;
+				let prevParentString = this.$root.$store.state.nodes[prevId].parents_bodies;
 
-				let prevDoneDate = allItems.nodes[prevId].done_date;
+				let prevDoneDate = this.$root.$store.state.nodes[prevId].done_date;
 				// console.log('moment dates');
 				// console.log(prevDoneDate);
 				// console.log(this.item.done_date);
@@ -799,45 +816,45 @@ return `${all}${pb}
 			return false;
 		},
 		totalUsedMin()
-		{ if(!this.item || !allItems){ return 0; }
+		{ if(!this.item){ return 0; }
 			return Math.floor(this.totalUsedSec/60);
 		},
 		totalPlannedSec()
-		{ if(!this.item || !allItems){ return 0; }
+		{ if(!this.item){ return 0; }
 			return this.totalPlannedMin*60;
 		},
 		totalPlannedHour()
-		{ if(!this.item || !allItems){ return 0; }
+		{ if(!this.item){ return 0; }
 			return this.totalPlannedMin/60;
 		},
 		isProject()
-		{ if(!this.item || !allItems){ return; }
+		{ if(!this.item){ return; }
 			// console.log('checking isProject');
-			return allItems.isProject(this.item.id);	
+			return this.$root.$store.getters.isProject(this.item.id);	
 		},
 		siblingIndex()
-		{ if(!this.item || !allItems){ return; }
-			return allItems.siblingIndex(this.item.id);
+		{ if(!this.item){ return; }
+			return this.$root.$store.getters.siblingIndex(this.item.id);
 		},
 		olderSiblingId()
-		{ if(!this.item || !allItems){ return; }
-			return allItems.olderSiblingId(this.item.id); 
+		{ if(!this.item){ return; }
+			return this.$root.$store.getters.olderSiblingId(this.item.id); 
 		},
 		parentsChildren_order()
-		{ if(!this.item || !allItems){ return; }
-			if(this.item.depth == 0){ return allItems.nodes[this.item.id].children_order; }
+		{ if(!this.item){ return; }
+			if(this.item.depth == 0){ return this.$root.$store.state.nodes[this.item.id].children_order; }
 			return this.$parent.item.children_order;
 		},
 		childrenOrder()
-		{ if(!this.item || !allItems){ return 0; }
-			if (this.$root.selection.view == 'journal' && this.item.id == allItems.root.id)
+		{ if(!this.item){ return 0; }
+			if (this.$root.selection.view == 'journal' && this.item.id == this.$root.$store.getters.root.id)
 			{
 				return this.item.children.reduce((a, c) => a.concat(c.children), []).map(child => child.id);
 			}
 			return this.visibleChildren.map(child => child.id);
 		},
 		// deepestChild()
-		// { if(!this.item || !allItems){ return; }
+		// { if(!this.item){ return; }
 		// 	let dc;
 		// 	if (!this.childrenOrder.length)
 		// 	{
@@ -848,95 +865,96 @@ return `${all}${pb}
 		// 	}
 		// },
 		childrensDeepestChildren()
-		{ if(!this.item || !allItems){ return; }
+		{ if(!this.item){ return; }
 			return this.visibleChildren.map(function(item){
 				return {
 					'id':item.id,
-					'deepestChild':this.$root.findDeepestVisibleChild(item.id)
+					'deepestChild':this.$root.$store.getters.findDeepestVisibleChild(item.id)
 				};
 			}.bind(this));
 		},
 		showAddNewBox()
-		{ if(!this.item || !allItems){ return; }
-			if(!this.$root.addingNewUnder){ return false; }
-			if(this.$root.addingNewUnder == this.item.id)
+		{ if(!this.item){ return; }
+			if(!this.$root.$store.state.addingNewUnder){ return false; }
+			if(this.$root.$store.state.addingNewUnder == this.item.id)
 			{ return true; }
 			return false;
 		},
 		addingNewAsFirstChild()
-		{ if(!this.item || !allItems){ return; }
-			return this.$root.addingNewAsFirstChild;
+		{ if(!this.item){ return; }
+			return this.$root.$store.state.addingNewAsFirstChild;
 		},
 		addingNewAsChild()
-		{ if(!this.item || !allItems){ return; }
-			return this.$root.addingNewAsChild;
+		{ if(!this.item){ return; }
+			return this.$root.$store.state.addingNewAsChild;
 		},
 		hasDueDate()
-		{ if(!this.item || !allItems){ return; }
+		{ if(!this.item){ return; }
 		    return (this.item.due_date && this.item.due_date != '0000-00-00 00:00:00');
 		},
 		hasDoneDate()
-		{ if(!this.item || !allItems){ return; }
+		{ if(!this.item){ return; }
 		    return (this.item.done_date && this.item.done_date != '0000-00-00 00:00:00');
 		},
 		hastotalUsedSec()
-		{ if(!this.item || !allItems){ return; }
+		{ if(!this.item){ return; }
 		    return (this.item.children_order.length
 		    	&& this.item.totalUsedSec
 		    	&& this.item.totalUsedSec != '0'
 		    	&& this.item.used_time != this.item.totalUsedSec);
 		},
 		hasTotalPlannedMin()
-		{ if(!this.item || !allItems){ return; }
+		{ if(!this.item){ return; }
 		    return (this.item.children_order.length
 		    	&& this.totalPlannedMin
 		    	&& this.totalPlannedMin != '0'
 		    	&& this.item.planned_time != this.totalPlannedMin);
 		},
 		hasPlannedTime()
-		{ if(!this.item || !allItems){ return; }
+		{ if(!this.item){ return; }
 		    return (this.item.planned_time && this.item.planned_time != '0');
 		},
 		hasUsedTime()
-		{ if(!this.item || !allItems){ return; }
+		{ if(!this.item){ return; }
 		    return (this.item.used_time && this.item.used_time != '0');
 		},
-		allTags_c()
-		{ if(!this.item || !allItems){ return; }
-			return this.$root.allTags;
-		},
+		// allTags_c()
+		// { if(!this.item){ return; }
+		// 	return this.$root.allTags;
+		// },
 		totalMinLeft()
-		{ if(!this.item || !allItems){ return 0; }
+		{ if(!this.item){ return 0; }
 			return this.totalPlannedMin-this.totalUsedMin;
 		},
 		totalSecLeft()
-		{ if(!this.item || !allItems){ return 0; }
+		{ if(!this.item){ return 0; }
 			return this.totalPlannedSec-this.totalUsedSec;
 		},
 		secLeft()
-		{ if(!this.item || !allItems){ return 0; }
+		{ if(!this.item){ return 0; }
 			return this.item.planned_time*60-this.item.used_time;
 		},
 		minLeft()
-		{ if(!this.item || !allItems){ return 0; }
+		{ if(!this.item){ return 0; }
 			return this.secLeft/60;
 		},
 		totalTimeDifferentFromParent()
-		{ if(!this.item || !allItems){ return 0; }
+		{ if(!this.item){ return 0; }
 			if(!this.item.parent_id){ return true; }
 			return this.totalPlannedSec != this.$parent.totalPlannedSec;
 		},
 		tagsArray()
-		{ if(!this.item || !allItems){ return true; }
+		{ if(!this.item){ return true; }
 			return this.item.tagged.map(obj => obj.tag_name);
 		},
 		isHidden()
-		{ if(!this.item || !allItems){ return true; }
-			return this.$root.hiddenItemIds.includes(this.item.id)
+		{ if(!this.item){ return true; }
+			// console.log('allVisibleChildItems');
+			return this.$root.$store.getters.hiddenItemIds.includes(this.item.id)
 		},
 		allChildrenDone()
-		{ if(!this.item || !allItems){ return true; }
-			return allItems.allChildrenDone(this.item.id);
+		{ if(!this.item){ return true; }
+			return this.$root.$store.getters.allChildrenDone(this.item.id);
 		},
 		thebody(){ return this.item.body },
 	},
@@ -957,21 +975,21 @@ return `${all}${pb}
 		addTimer(item)
 		{
 			//Codementor
-			this.$root.addTimer(item.id);
+			this.$root.$store.dispatch('addTimer', { id:item.id });
 		},
 		selectItem(item)
 		{
-			selection.selectedId = item.id;
+			this.$root.$store.dispatch('selectItem', { id:item.id });
 		},
 		clickOnAddNewCurtain(event)
 		{
-			if(!vm.mobile){ return; }
+			if(!this.$root.$store.getters.mobile){ return; }
 			if(event && event.srcElement.nodeName != 'FORM'){ return; }
 			this.$root.cancelAddNew();
 		},
 		clickOnEditCurtain(item, event)
 		{
-			if(!vm.mobile){ return; }
+			if(!this.$root.$store.getters.mobile){ return; }
 			if(event && event.srcElement.nodeName != 'FORM'){ return; }
 			this.doneEdit(item);
 		},
@@ -979,25 +997,25 @@ return `${all}${pb}
 		{
 			if(!this.item.children.length || !this.item.show_children)
 			{ // If item has no children yet / no visible children
-				this.$root.addingNewAsChild = true;
+				this.$root.$store.state.addingNewAsChild = true;
 				return;
 			}
-			let lastChildId = allItems.getLastChildId(this.item.id);
-    		vm.showAddNewItem(lastChildId);
+			let lastChildId = this.$root.$store.getters.getLastChildId(this.item.id);
+    		this.$root.showAddNewItem(lastChildId);
 		},
 		newItemUnindent()
 		{
-			if(this.$root.addingNewAsChild)
+			if(this.$root.$store.state.addingNewAsChild)
 			{
-				this.$root.addingNewAsChild = false;
-				this.$root.addingNewAsFirstChild = false;
+				this.$root.$store.state.addingNewAsChild = false;
+				this.$root.$store.state.addingNewAsFirstChild = false;
 				return;
 			}
 			if(selection.view == 'journal')
 			{
 				return;
 			}
-			vm.showAddNewItem(this.item.parent_id);
+			this.$root.showAddNewItem({ id:this.item.parent_id });
 		},
 		keydownOnNew(item, e, field)
 		{
@@ -1040,7 +1058,7 @@ return `${all}${pb}
 			// ENTER
 			if (e.keyCode === 13 && !e.shiftKey && !e.altKey && !e.metaKey && !e.ctrlKey)
 			{
-			  	if(vm.mobile && field == 'body'){ return; }
+			  	if(this.$root.mobile && field == 'body'){ return; }
 				e.preventDefault();
 				if(field == 'planned-time')
 				{
@@ -1191,7 +1209,8 @@ return `${all}${pb}
 			// ENTER
 			if (e.keyCode === 13 && !e.shiftKey && !e.altKey)
 			{
-				if(vm.mobile && field == 'body'){ return; }
+				console.log(`Keydown on edit: ${field} - ${e.keyCode}`);
+				if(this.$root.mobile && field == 'body'){ return; }
 				e.preventDefault();
 	        	if(field == 'delete-tag')
 	        	{
@@ -1229,7 +1248,7 @@ return `${all}${pb}
 				if(field == 'add-tag')
 				{
 					e.preventDefault();
-		        	if(vm.editingItemTags){ vm.editingItemTags = null; return; }
+		        	if(this.$root.editingItemTags){ this.$root.editingItemTags = null; return; }
 					let plsFocus = '#updatebox-'+item.id+' .js-update-planned-time__button';
 					document.querySelector(plsFocus).focus();
 					return;
@@ -1251,7 +1270,7 @@ return `${all}${pb}
 				}
 				if(field == 'add-tag')
 				{
-		        	if(vm.editingItemTags){ vm.editingItemTags = null; }
+		        	if(this.$root.editingItemTags){ this.$root.editingItemTags = null; }
 		        	return;
 				}
 			}
@@ -1259,12 +1278,11 @@ return `${all}${pb}
 			if (e.keyCode === 27)
 			{
 	    		this.$root.setCancelThroughKeydown();
-				this.cancelEdit(item);
+				this.cancelEdit(item.id);
 			}
 	    },
 	    blurOnEdit(item, field)
 	    {
-	    	console.log('Blur on Edit');
 	    	if(this.$root.cancelThroughKeydown){ return; }
 	    	if (this.$root.mobile && field == 'add-tag')
 	    	{
@@ -1281,7 +1299,7 @@ return `${all}${pb}
 		    	{
 	        		return;
 				}　else {
-    				if(vm.mobile){ return; }
+    				if(self.$root.mobile){ return; }
 			    	console.log('blurring on edit');
 					self.doneEdit(item);
 				}
@@ -1291,13 +1309,12 @@ return `${all}${pb}
 	    blurOnAddNew(item, field)
 	    {
 	    	if(this.$root.cancelThroughKeydown){ return; }
-	    	console.log('Blur on Add New');
 	    	if (this.$root.mobile && field == 'prepare-tag')
 	    	{
 				this.prepareTag(item);
 				return;
 	    	}
-	    	if(vm.mobile){ return; }
+	    	if(this.$root.mobile){ return; }
 	    	let self = this;
 	    	setTimeout(function()
 	    	{
@@ -1308,47 +1325,47 @@ return `${all}${pb}
 		    	{
 	        		return;
 				}　else {
-			    	// if(vm.mobile){ self.addNew('stop'); return; }
-			    	if(vm.mobile){ return; }
+			    	// if(self.$root.mobile){ self.addNew('stop'); return; }
+			    	console.log('bluring on Add New');
+			    	if(self.$root.mobile){ return; }
 					self.cancelAddNew();
 				}
 	    	},50);
 	    },
 		updateDone(id)
 		{
-			allItems.prepareDonePatch(id);
+			this.$root.$store.dispatch('prepareDonePatch',{id});
 		},
 		updateShowChildren(id)
 		{
-			this.$root.patch(id,'show_children');
+			this.$root.$store.dispatch('patch',{id,field:'show_children'});
 		},
-		cancelEdit(item)
+		cancelEdit(id)
 		{
-			this.$root.cancelEdit(item);
+			this.$root.cancelEdit({id});
 		},
 		startEdit(item, event)
 		{
-			this.$root.startEdit(item, event);
+			this.$root.startEdit({item, event});
 		},
 		doneEdit(item)
 		{
-			this.$root.doneEdit(item);
+			this.$root.doneEdit({item});
 		},
 		startEditDoneDate(item, event)
 		{
 			console.log('startEditDoneDate');
-			item = (item) ? item : allItems.nodes[selection.selectedId];
+			item = (item) ? item : this.$root.$store.state.nodes[selection.selectedId];
 			this.$root.beforeEditCache_done_date = item.done_date;
 			this.$root.editingDoneDateItem = item.id;
 		},
 		setToday(id)
 		{
-			this.$root.setToday(id);
+			this.$root.setToday({id});
 		},
-		deleteItem(item)
+		deleteItemDialogue(id)
 		{
-			let id = item.id;
-			this.$root.deleteItem(id);
+			this.$root.deleteItemDialogue({id});
 		},
 		addNew(addNextItemAs)
 		{
@@ -1356,7 +1373,7 @@ return `${all}${pb}
 			let olderSibling = this.item;
 			let newItem = this.newItem;
 			// debugger;
-			this.$root.addNew(addNextItemAs, newItem, olderSibling, addTags)
+			this.$root.addNew({addNextItemAs, newItem, olderSibling, addTags});
 			// Reset stuff
 			this.newItem.body = '';
 			this.newItem.due_date = '0000-00-00 00:00:00';
@@ -1369,13 +1386,13 @@ return `${all}${pb}
 		{
 			this.newItem.body = '';
 			let cancelUnderId = this.item.id;
-			this.$root.cancelAddNew(cancelUnderId);
+			this.$root.cancelAddNew({cancelUnderId});
 		},
 		addTag(item)
 		{
 			let id = (item) ? item.id : selection.selectedId;
 			let tag = this.newTag;
-			allItems.tagItem(id, tag);
+			this.$root.$store.dispatch('tagItem', {id, tags:tag});
 			this.newTag = null;
 		},
 		prepareTag(item)
@@ -1393,7 +1410,7 @@ return `${all}${pb}
 		{
 			let plsFocus = '#add-tag-'+id+' .js-add-tag';
 			document.querySelector(plsFocus).focus();			
-			this.$root.patchTag(id, tagName, 'untag');
+			this.$root.patchTag({id:id, tags:tagName, requestType:'untag'});
 		},
 		deletePreparedTag(tag, item)
 		{

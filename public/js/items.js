@@ -63,7 +63,7 @@
 /******/ 	__webpack_require__.p = "./";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 221);
+/******/ 	return __webpack_require__(__webpack_require__.s = 229);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -1899,7 +1899,7 @@ function loadLocale(name) {
             module && module.exports) {
         try {
             oldLocale = globalLocale._abbr;
-            __webpack_require__(202)("./" + name);
+            __webpack_require__(210)("./" + name);
             // because defineLocale currently also sets the global locale, we
             // want to undo that for lazy loaded locales
             getSetGlobalLocale(oldLocale);
@@ -15019,20 +15019,21 @@ module.exports = g;
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* WEBPACK VAR INJECTION */(function($) {/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "d", function() { return mobilecheck; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "f", function() { return objectToArray; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "h", function() { return uniqBy; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "k", function() { return uniq; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "i", function() { return arrayToString; });
+/* WEBPACK VAR INJECTION */(function($) {/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "i", function() { return mobilecheck; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "g", function() { return objectToArray; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "l", function() { return uniqBy; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "e", function() { return uniq; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "h", function() { return arrayToString; });
 /* unused harmony export sec_to_hourmin */
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "c", function() { return hasClass; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return btnEffect; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return isElementInViewport; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "e", function() { return sortObjectArrayByProperty; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "g", function() { return sortObjectArrayByTwoProperties; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "j", function() { return removeEmptyValuesFromArray; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "j", function() { return sortObjectArrayByProperty; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "k", function() { return sortObjectArrayByTwoProperties; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "f", function() { return removeEmptyValuesFromArray; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "d", function() { return Utilities; });
 function mobilecheck() {
-	var check = false;
+	let check = false;
 	(function (a) {
 		if (/(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec|hiptop|iemobile|ip(hone|od)|iris|kindle|lge |maemo|midp|mmp|mobile.+firefox|netfront|opera m(ob|in)i|palm( os)?|phone|p(ixi|re)\/|plucker|pocket|psp|series(4|6)0|symbian|treo|up\.(browser|link)|vodafone|wap|windows ce|xda|xiino/i.test(a) || /1207|6310|6590|3gso|4thp|50[1-6]i|770s|802s|a wa|abac|ac(er|oo|s\-)|ai(ko|rn)|al(av|ca|co)|amoi|an(ex|ny|yw)|aptu|ar(ch|go)|as(te|us)|attw|au(di|\-m|r |s )|avan|be(ck|ll|nq)|bi(lb|rd)|bl(ac|az)|br(e|v)w|bumb|bw\-(n|u)|c55\/|capi|ccwa|cdm\-|cell|chtm|cldc|cmd\-|co(mp|nd)|craw|da(it|ll|ng)|dbte|dc\-s|devi|dica|dmob|do(c|p)o|ds(12|\-d)|el(49|ai)|em(l2|ul)|er(ic|k0)|esl8|ez([4-7]0|os|wa|ze)|fetc|fly(\-|_)|g1 u|g560|gene|gf\-5|g\-mo|go(\.w|od)|gr(ad|un)|haie|hcit|hd\-(m|p|t)|hei\-|hi(pt|ta)|hp( i|ip)|hs\-c|ht(c(\-| |_|a|g|p|s|t)|tp)|hu(aw|tc)|i\-(20|go|ma)|i230|iac( |\-|\/)|ibro|idea|ig01|ikom|im1k|inno|ipaq|iris|ja(t|v)a|jbro|jemu|jigs|kddi|keji|kgt( |\/)|klon|kpt |kwc\-|kyo(c|k)|le(no|xi)|lg( g|\/(k|l|u)|50|54|\-[a-w])|libw|lynx|m1\-w|m3ga|m50\/|ma(te|ui|xo)|mc(01|21|ca)|m\-cr|me(rc|ri)|mi(o8|oa|ts)|mmef|mo(01|02|bi|de|do|t(\-| |o|v)|zz)|mt(50|p1|v )|mwbp|mywa|n10[0-2]|n20[2-3]|n30(0|2)|n50(0|2|5)|n7(0(0|1)|10)|ne((c|m)\-|on|tf|wf|wg|wt)|nok(6|i)|nzph|o2im|op(ti|wv)|oran|owg1|p800|pan(a|d|t)|pdxg|pg(13|\-([1-8]|c))|phil|pire|pl(ay|uc)|pn\-2|po(ck|rt|se)|prox|psio|pt\-g|qa\-a|qc(07|12|21|32|60|\-[2-7]|i\-)|qtek|r380|r600|raks|rim9|ro(ve|zo)|s55\/|sa(ge|ma|mm|ms|ny|va)|sc(01|h\-|oo|p\-)|sdk\/|se(c(\-|0|1)|47|mc|nd|ri)|sgh\-|shar|sie(\-|m)|sk\-0|sl(45|id)|sm(al|ar|b3|it|t5)|so(ft|ny)|sp(01|h\-|v\-|v )|sy(01|mb)|t2(18|50)|t6(00|10|18)|ta(gt|lk)|tcl\-|tdg\-|tel(i|m)|tim\-|t\-mo|to(pl|sh)|ts(70|m\-|m3|m5)|tx\-9|up(\.b|g1|si)|utst|v400|v750|veri|vi(rg|te)|vk(40|5[0-3]|\-v)|vm40|voda|vulc|vx(52|53|60|61|70|80|81|83|85|98)|w3c(\-| )|webc|whit|wi(g |nc|nw)|wmlb|wonu|x700|yas\-|your|zeto|zte\-/i.test(a.substr(0, 4))) check = true;
 	})(navigator.userAgent || navigator.vendor || window.opera);
@@ -15043,7 +15044,7 @@ function arrayToString(arr) {
 	if (!Array.isArray(arr) || !arr.length) {
 		return '';
 	}
-	var c_o = '';
+	let c_o = '';
 	arr.forEach(function (entry) {
 		c_o = c_o + ',' + entry;
 	});
@@ -15060,7 +15061,7 @@ function hasClass(element, cls) {
 }
 
 function removeEmptyValuesFromArray(array) {
-	var cleanArray = [];
+	let cleanArray = [];
 	array.forEach(function (val) {
 		if (val.replace(/\s/g, "").length) {
 			cleanArray.push(val);
@@ -15071,8 +15072,8 @@ function removeEmptyValuesFromArray(array) {
 
 function sortObjectArrayByProperty(array, propertyName, order) {
 	return array.sort(function (a, b) {
-		var textA = a[propertyName].toUpperCase();
-		var textB = b[propertyName].toUpperCase();
+		let textA = a[propertyName].toUpperCase();
+		let textB = b[propertyName].toUpperCase();
 		if (!order || order == 'asc') {
 			return textA < textB ? -1 : textA > textB ? 1 : 0;
 		} else if (order == 'desc') {
@@ -15081,12 +15082,12 @@ function sortObjectArrayByProperty(array, propertyName, order) {
 	}.bind(propertyName));
 }
 function sortObjectArrayByTwoProperties(array, prop1, prop2, order, order2) {
-	var props = { prop1: prop1, prop2: prop2 };
+	let props = { prop1, prop2 };
 	return array.sort(function (a, b) {
 		prop1 = props['prop1'];
 		prop2 = props['prop2'];
-		var textA = a[prop1].toUpperCase();
-		var textB = b[prop1].toUpperCase();
+		let textA = a[prop1].toUpperCase();
+		let textB = b[prop1].toUpperCase();
 
 		if (!order || order == 'asc') {
 			if (textA < textB) {
@@ -15097,8 +15098,8 @@ function sortObjectArrayByTwoProperties(array, prop1, prop2, order, order2) {
 				if (!a[prop2] || !b[prop2]) {
 					return 0;
 				}
-				var text2A = a[prop2].toUpperCase();
-				var text2B = b[prop2].toUpperCase();
+				let text2A = a[prop2].toUpperCase();
+				let text2B = b[prop2].toUpperCase();
 				if (!order2 || order2 == 'asc') {
 					return text2A > text2B ? -1 : text2A < text2B ? 1 : 0;
 				} else if (order2 == 'desc') {
@@ -15114,13 +15115,13 @@ function sortObjectArrayByTwoProperties(array, prop1, prop2, order, order2) {
 				if (!a[prop2] || !b[prop2]) {
 					return 0;
 				}
-				var _text2A = a[prop2].toUpperCase();
-				var _text2B = b[prop2].toUpperCase();
-				console.log('text2A: ' + _text2A + ' | text2B: ' + _text2B);
+				let text2A = a[prop2].toUpperCase();
+				let text2B = b[prop2].toUpperCase();
+				console.log('text2A: ' + text2A + ' | text2B: ' + text2B);
 				if (!order2 || order2 == 'asc') {
-					return _text2A > _text2B ? -1 : _text2A < _text2B ? 1 : 0;
+					return text2A > text2B ? -1 : text2A < text2B ? 1 : 0;
 				} else if (order2 == 'desc') {
-					return _text2A < _text2B ? -1 : _text2A > _text2B ? 1 : 0;
+					return text2A < text2B ? -1 : text2A > text2B ? 1 : 0;
 				}
 			}
 		}
@@ -15129,7 +15130,7 @@ function sortObjectArrayByTwoProperties(array, prop1, prop2, order, order2) {
 
 function btnEffect(event) {
 	console.log(event);
-	var $el = void 0;
+	let $el;
 	if (event.target.nodeName == 'I') {
 		$el = $(event.target.offsetParent);
 	} else {
@@ -15145,9 +15146,9 @@ function btnEffect(event) {
 }
 function uniqBy(a, key) {
 	key = key ? key : JSON.stringify;
-	var seen = {};
+	let seen = {};
 	return a.filter(function (item) {
-		var k = key(item);
+		let k = key(item);
 		if (!k || k == "null") {
 			return false;
 		}
@@ -15168,12 +15169,28 @@ function isElementInViewport(el) {
 	//     el = el[0];
 	// }
 
-	var rect = el.getBoundingClientRect();
+	let rect = el.getBoundingClientRect();
 
 	return rect.top >= 0 && rect.left >= 0 && rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) && /*or $(window).height() */
 	rect.right <= (window.innerWidth || document.documentElement.clientWidth) /*or $(window).width() */
 	;
 }
+const Utilities = {
+	tagNameToSlug(tag) {
+		if (!tag || typeof tag != 'string') {
+			return;
+		}
+		return tag.split(' ').join('-').toLowerCase();
+	},
+	tagSlugToName(tag) {
+		tag = tag.replace(/-/g, ' ');
+		tag = tag.split(' ').map(([h, ...t]) => h.toUpperCase() + t.join('').toLowerCase()).join(' ');
+		return tag;
+	},
+	AplusB(a, b) {
+		return parseFloat(a) + parseFloat(b);
+	}
+};
 
 
 /* WEBPACK VAR INJECTION */}.call(__webpack_exports__, __webpack_require__(2)))
@@ -25175,14 +25192,18 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
 /* unused harmony export MD */
 /* unused harmony export min_to_hours */
 /* unused harmony export countdown */
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return sec_to_hhmmss; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "e", function() { return sec_to_hourminsec; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return sec_to_hhmmss; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "d", function() { return sec_to_hourminsec; });
 /* unused harmony export hourmin */
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return sec_to_hourmin; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "e", function() { return sec_to_hourmin; });
 /* unused harmony export momentRelative */
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "c", function() { return momentCalendar; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return momentCalendar; });
 /* unused harmony export momentDate */
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "d", function() { return linkify; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "c", function() { return linkify; });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__items_store_lang_js__ = __webpack_require__(179);
+
+let text = window.store ? store.getters.text : __WEBPACK_IMPORTED_MODULE_0__items_store_lang_js__["a" /* default */].en;
+
 function MD(val) {
 	// model -> view
 	// formats the value when updating the input element.
@@ -25195,7 +25216,7 @@ function MD(val) {
 	// }
 }
 function min_to_hours(val) {
-	var nr = val / 60;
+	let nr = val / 60;
 	if (val == 10) {
 		nr = nr.toFixed(2);
 	}
@@ -25208,10 +25229,10 @@ function min_to_hours(val) {
 	// }
 }
 function countdown(val) {
-	var item = allItems.nodes[val];
-	var p = item.planned_time;
-	var u = item.used_time;
-	var time = parseFloat(p) * 60 - parseFloat(u);
+	let item = allItems.nodes[val];
+	let p = item.planned_time;
+	let u = item.used_time;
+	let time = parseFloat(p) * 60 - parseFloat(u);
 	return calc_hhmmss(time);
 }
 function sec_to_hhmmss(val) {
@@ -25221,10 +25242,10 @@ function calc_hhmmss(val) {
 	function pad(num) {
 		return ("0" + num).slice(-2);
 	}
-	var secs = void 0;
-	var minutes = Math.floor(val / 60);
+	let secs;
+	let minutes = Math.floor(val / 60);
 	secs = val % 60;
-	var hours = Math.floor(minutes / 60);
+	let hours = Math.floor(minutes / 60);
 	minutes = minutes % 60;
 	if (hours > 0) {
 		return pad(hours) + ":" + pad(minutes) + ":" + pad(secs);
@@ -25238,17 +25259,17 @@ function sec_to_hourminsec(val) {
 			return num + " " + unit;
 		}return '';
 	}
-	var secs = void 0;
-	var minutes = Math.floor(val / 60);
+	let secs;
+	let minutes = Math.floor(val / 60);
 	secs = val % 60;
-	var hours = Math.floor(minutes / 60);
+	let hours = Math.floor(minutes / 60);
 	minutes = minutes % 60;
 	if (hours > 0) {
-		return pad(hours, vm.text.global.hour + ' ') + pad(minutes, vm.text.global.min);
+		return pad(hours, text.global.hour + ' ') + pad(minutes, text.global.min);
 	} else if (minutes > 0) {
-		return pad(minutes, vm.text.global.min + ' ') + pad(secs, vm.text.global.sec);
+		return pad(minutes, text.global.min + ' ') + pad(secs, text.global.sec);
 	} else {
-		return pad(secs, vm.text.global.sec);
+		return pad(secs, text.global.sec);
 	}
 }
 function hourmin(val) {
@@ -25257,12 +25278,12 @@ function hourmin(val) {
 			return num + " " + unit;
 		}return '';
 	}
-	var minutes = val % 60;
-	var hours = Math.floor(val / 60);
+	let minutes = val % 60;
+	let hours = Math.floor(val / 60);
 	if (hours > 0) {
-		return pad(hours, vm.text.global.hour + ' ') + pad(minutes, vm.text.global.min);
+		return pad(hours, text.global.hour + ' ') + pad(minutes, text.global.min);
 	} else {
-		return pad(minutes, vm.text.global.min);
+		return pad(minutes, text.global.min);
 	}
 }
 function sec_to_hourmin(val) {
@@ -25271,15 +25292,15 @@ function sec_to_hourmin(val) {
 			return num + " " + unit;
 		}return '';
 	}
-	var secs = void 0;
-	var minutes = Math.floor(val / 60);
+	let secs;
+	let minutes = Math.floor(val / 60);
 	secs = val % 60;
-	var hours = Math.floor(minutes / 60);
+	let hours = Math.floor(minutes / 60);
 	minutes = minutes % 60;
 	if (hours > 0) {
-		return pad(hours, vm.text.global.hour + ' ') + pad(minutes, vm.text.global.min);
+		return pad(hours, text.global.hour + ' ') + pad(minutes, text.global.min);
 	} else {
-		return pad(minutes, vm.text.global.min);
+		return pad(minutes, text.global.min);
 	}
 }
 function momentRelative(val) {
@@ -25307,7 +25328,7 @@ function momentDate(val) {
 }
 
 function linkify(val) {
-	var a = linkifyHtml(val, {
+	let a = linkifyHtml(val, {
 		defaultProtocol: 'https'
 	});
 	return a;
@@ -25348,17 +25369,17 @@ function inherits(parent, child) {
 	maxDate: 'today',
 	// enableTime: true,
 	time_24hr: true,
-	onOpen: function onOpen(dateObj, dateStr, instance) {
+	onOpen(dateObj, dateStr, instance) {
 		// console.log(instance);
-		var id = instance.element.name;
+		let id = instance.element.name;
 		if (!vm.$root.beforeEditCache_doneDate) {
 			vm.$root.beforeEditCache_doneDate = {};
 		}
 		console.log('flatPickr[onOpen] id: ' + id + '.    dateStr: ' + dateStr);
 		vm.$root.beforeEditCache_doneDate[id] = dateStr;
 	},
-	onClose: function onClose(dateObj, dateStr, instance) {
-		var id = instance.element.name;
+	onClose(dateObj, dateStr, instance) {
+		let id = instance.element.name;
 		console.log('flatPickr[onClose] id: ' + id + '.    dateStr: ' + dateStr);
 		console.log('vm.$root.beforeEditCache_doneDate[id] = ' + vm.$root.beforeEditCache_doneDate[id]);
 		if (vm.$root.beforeEditCache_doneDate[id] == dateStr) {
@@ -25718,1398 +25739,107 @@ module.exports = function(module) {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__components_globalFunctions_js__ = __webpack_require__(5);
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-function _toArray(arr) { return Array.isArray(arr) ? arr : Array.from(arr); }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-
-
-var _class = function () {
-	function _class(items) {
-		_classCallCheck(this, _class);
-
-		// properties
-		if (!items) {
-			return;
-		}
-		this.source = items;
-		this.nodes = {}; // →　"id":{ task obj };
-		this.orphans = [];
-		// this.doneitems	= [];
-		this.filteredItemRoot = {
-			children_order: [], children: [], body: "",
-			// totalPlannedTime:0, totalUsedTime:0,
-			planned_time: 0, used_time: 0
-		};
-		this.backups = {};
-		this.backups.rootChildren = []; // replace with root later on
-		// process items
-		this.itemsProcessed = 0;
-		this.firstInitialization();
+class Selection {
+	constructor() {
+		this.selectedId = null;
+		this.si = this.getSelectedId();
+		this.lastSelectedId = null;
+		this.filter = ['all'];
+		this.tags = [];
+		this.hiddenTags = [];
+		this.hiddenItems = [];
+		this.hiddenBookmarks = [];
+		this.view = 'tree';
 	}
-
-	_createClass(_class, [{
-		key: 'firstInitialization',
-		value: function firstInitialization() {
-			console.log('run first initialization at source-length: ' + this.source.length);
-			this.source.forEach(function (item) {
-				this.initialize(item);
-				//Sort all nodes after making sure you got all of them.
-				// console.log('this.itemsProcessed = '+this.itemsProcessed);
-				if (this.itemsProcessed === this.source.length) {
-					this.organizeAfterInitialization();
-				}
-			}.bind(this));
-		}
-	}, {
-		key: 'initialize',
-		value: function initialize(item, index) {
-			console.log('run node initialization');
-			// variables
-			var node = JSON.parse(JSON.stringify(item));
-			var parent = this.nodes[node.parent_id];
-
-			// assign extra item values
-			node = this.setDefaultItemValues(node);
-			// node.parent_id_backup = node.parent_id;
-			// Register and organize nodes:
-			if (node.depth == 0) {
-				this.root = node;console.log('root-node');
-			} else if (parent) {
-				parent.children.push(node);
-			} else {
-				this.orphans.push(node);
-			}
-			this.nodes[node.id] = node;
-			this.itemsProcessed++;
-		}
-	}, {
-		key: 'organizeAfterInitialization',
-		value: function organizeAfterInitialization() {
-			console.log('run organizeAfterInitialization');
-			Object.keys(this.nodes).forEach(function (id) {
-				this.sortChildren(id);
-				this.updateChildrenDueDate(id);
-				var item = this.nodes[id];
-				// this.attachParentBody(id);　//Maybe I should only do this when pressing DONE
-			}.bind(this));
-			if (this.root) {
-				this.backups.rootChildren = this.root.children;
-			}
-		}
-	}, {
-		key: 'duplicate',
-		value: function duplicate(id) {
-			var item = this.nodes[id];
-			var index = this.siblingIndex(id) + 1;
-			var dupe = JSON.parse(JSON.stringify(item));
-			// this.nodes[item.parent_id].children.splice(index, 0, dupe);
-
-			var addNextItemAs = null;
-			var addTags = dupe.tagged.map(function (tagObj) {
-				return tagObj.tag_name;
-			});
-			var duplication = true;
-			vm.postNewItem(dupe, index, addNextItemAs, addTags, duplication);
-		}
-	}, {
-		key: 'setDefaultItemValues',
-		value: function setDefaultItemValues(item) {
-			// item.parent_id_backup = item.parent_id;
-			item.depth = Number(item.depth);
-			if (item.show_children == null) {
-				item.show_children = 1;
-			}
-			if (!item.children) {
-				item.children = [];
-			}
-			if (!item.due_date) {
-				item.due_date = "0000-00-00 00:00:00";
-			}
-			if (!item.done_date) {
-				item.done_date = "0000-00-00 00:00:00";
-			}
-			if (!item.done) {
-				item.done = false;
-			}
-			if (!item.used_time) {
-				item.used_time = 0;
-			}
-			if (!item.tagged) {
-				item.tagged = [];
-			}
-			if (!item.children_order) {
-				item.children_order = [];
-			} else if (typeof item.children_order === 'string') {
-				item.children_order = item.children_order.split(',').map(Number);
-			}
-			return item;
-		}
-	}, {
-		key: 'addAndCleanNodesRecursively',
-		value: function addAndCleanNodesRecursively(item) {
-			this.setDefaultItemValues(item);
-			this.nodes[item.id] = item;
-			if (item.children) {
-				item.children.forEach(function (child) {
-					return allItems.addAndCleanNodesRecursively(child);
-				});
-			}
-		}
-	}, {
-		key: 'addItem',
-		value: function addItem(item, index, addNextItemAs, addTags, duplication) {
-			// debugger;
-			this.addAndCleanNodesRecursively(item);
-			var parent = this.nodes[item.parent_id];
-			if (!parent.children_order) {
-				parent.children_order = [];
-			}
-			//Remove the Temp item
-			// console.log('Remove the Temp item');
-			// console.log(parent.children);
-			// console.log(parent.children_order);
-			this.nodes[item.parent_id].children = parent.children.filter(function (i) {
-				return !i.temp;
-			});
-			this.nodes[item.parent_id].children_order = parent.children_order.filter(function (i) {
-				return i != 'x';
-			});
-			delete this.nodes['x'];
-			// let a = this.nodes[item.parent_id].children;
-			// let b = this.nodes[item.parent_id].children_order;
-			// console.log(`
-			// 	this.nodes[item.parent_id].children_order -> ${a}
-			// 	this.nodes[item.parent_id].children -> ${b}
-			// 	`);
-			//Actually ADD the item!
-			parent.children.splice(index, 0, item);
-			parent.children_order.splice(index, 0, item.id);
-
-			// Patches etc.
-			selection.selectedId = item.id;
-			// if ( this.isTopLvlItemInFilteredRoot(item.id)
-			// 	&& item.parent_id == this.root.id )
-			// {
-			// 	this.backups.rootChildren.push(item);
-			// 	vm.patchRootChildrenOrderWithFilter(item.id);
-			// } else {
-			vm.patch(item.parent_id, 'children_order');
-			// }
-			if (addTags) {
-				this.tagItem(item.id, addTags);
-			}
-			this.attachParentBody(item.id);
-			this.autoCalculateDoneState(item.parent_id);
-
-			if (selection.view == 'journal') {
-				selection.view = null;
-				selection.view = 'journal';
-			}
-			if (selection.filter.includes('today')) {
-				selection.filter = selection.filter.filter(function (f) {
-					return f != 'today';
-				});
-				selection.filter.push('today');
-			}
-			if (selection.tags.length) {
-				var tags = selection.tags;
-				selection.tags = [];
-				selection.tags = tags;
-			}
-
-			if (duplication || addNextItemAs == 'stop') {
-				vm.addingNewUnder = null;
-				Vue.nextTick(function () {
-					return vm.scrollToItemIfNeeded(item.id);
-				});
-			} else if (vm.addingNewUnder == 'x') {
-				vm.showAddNewItem(item.id, addNextItemAs);
-			}
-		}
-	}, {
-		key: 'addTempNewItem',
-		value: function addTempNewItem(item, index, addNextItemAs, addTags) {
-			item = JSON.parse(JSON.stringify(item));
-			console.log('temp item.body');
-			console.log(item.body);
-			item.id = 'x';
-			item.temp = true;
-			this.addAndCleanNodesRecursively(item);
-			console.log(item.body);
-			var parent = this.nodes[item.parent_id];
-			if (!parent.children_order) {
-				parent.children_order = [];
-			}
-			//Actually ADD the item!
-			parent.children.splice(index, 0, item);
-			parent.children_order.splice(index, 0, item.id);
-			vm.addingNewUnder = item.id;
-			if (addNextItemAs == 'stop') {
-				Vue.nextTick(function () {
-					return vm.scrollToItemIfNeeded(item.id);
-				});
-			}
-		}
-	}, {
-		key: 'tagNameToSlug',
-		value: function tagNameToSlug(tag) {
-			if (!tag || typeof tag != 'string') {
-				return;
-			}
-			return tag.split(' ').join('-').toLowerCase();
-		}
-	}, {
-		key: 'tagSlugToName',
-		value: function tagSlugToName(tag) {
-			tag = tag.replace(/-/g, ' ');
-			tag = tag.split(' ').map(function (_ref) {
-				var _ref2 = _toArray(_ref),
-				    h = _ref2[0],
-				    t = _ref2.slice(1);
-
-				return h.toUpperCase() + t.join('').toLowerCase();
-			}).join(' ');
-			return tag;
-		}
-	}, {
-		key: 'hasTag',
-		value: function hasTag(id, tags) {
-			var item = this.nodes[id];
-			if (!item) {
-				console.log("[hasTag(id, tags)] what is this shit... id:" + id);return false;
-			}
-			if (!item.tagged || !item.tagged.length) {
-				return false;
-			}
-			var hasTags = void 0;
-			if (tags instanceof Array) {
-				tags.forEach(function (tag) {
-					tag = this.tagNameToSlug(tag);
-					var tagExists = item.tagged.find(function (itemTags) {
-						return itemTags.tag_slug == tag;
-					});
-					if (tagExists) {
-						hasTags = true;
-					}
-				}.bind(this));
-			} else {
-				var tag = this.tagNameToSlug(tags);
-				var tagExists = item.tagged.find(function (itemTags) {
-					return itemTags.tag_slug == tag;
-				});
-				if (tagExists) {
-					hasTags = true;
-				}
-			}
-			return hasTags;
-		}
-	}, {
-		key: 'hasParentWithTag',
-		value: function hasParentWithTag(id, tags) {
-			if (!id) {
-				return false;
-			}
-			var item = this.nodes[id];
-			var parent_id = this.nodes[id].parent_id;
-			if (!parent_id) {
-				return false;
-			}
-			if (!this.nodes[parent_id]) {
-				// console.log('Parent of ('+id+')['+item.body+'] is non existant.');
-				return false;
-			}
-			var parentHasTag = this.hasTag(parent_id, tags);
-			if (parentHasTag) {
-				return true;
-			} else {
-				return this.hasParentWithTag(parent_id, tags);
-			}
-		}
-	}, {
-		key: 'parentIdWithTag',
-		value: function parentIdWithTag(id, tags) {
-			// debugger;
-			var item = this.nodes[id];
-			console.log('id & body = ' + item.id + " - " + item.body);
-			var parent_id = this.nodes[id].parent_id;
-			if (!parent_id) {
-				return false;
-			}
-
-			var parentHasTag = this.hasTag(parent_id, tags);
-			console.log('parentHasTag');
-			console.log(parentHasTag);
-			if (parentHasTag) {
-				return parent_id;
-			} else {
-				return this.parentIdWithTag(parent_id, tags);
-			}
-		}
-	}, {
-		key: 'returnTagsAsArray',
-		value: function returnTagsAsArray(id) {
-			return this.nodes[id].tagged.map(function (obj) {
-				return obj.tag_name;
-			});
-		}
-	}, {
-		key: 'hideTaggedNodes',
-		value: function hideTaggedNodes(tag) {
-			Object.keys(this.nodes).forEach(function (id) {
-				id = parseFloat(id);
-				if (this.hasTag(id, tag)) {
-					if (!selection.hiddenItems.includes(id)) {
-						selection.hiddenItems.push(id);
-					}
-				}
-			}.bind(this));
-		}
-	}, {
-		key: 'hideDoneNodes',
-		value: function hideDoneNodes() {
-			Object.keys(this.nodes).forEach(function (id) {
-				id = parseFloat(id);
-				if (this.nodes[id].done) {
-					if (!selection.hiddenItems.includes(id)) {
-						selection.hiddenItems.push(id);
-					}
-				}
-			}.bind(this));
-		}
-	}, {
-		key: 'siblingIndex',
-		value: function siblingIndex(id) {
-			var item = this.nodes[id];
-			if (!item) {
-				return false;
-			}
-			var parent_id = item.parent_id;
-			if (!parent_id || !this.nodes[parent_id]) {
-				return false;
-			}
-			// console.log('sibind parent_id');
-			// console.log(parent_id);
-			// console.log(this.nodes[parent_id]);
-			var siblingsArray = this.nodes[parent_id].children_order;
-			return siblingsArray.indexOf(id);
-		}
-	}, {
-		key: 'olderSiblingId',
-		value: function olderSiblingId(id) {
-			var item = this.nodes[id];
-			if (!item) {
-				return;
-			}
-			var parent_id = item.parent_id;
-			if (!parent_id) {
-				return;
-			}
-			var siblingsArray = this.nodes[parent_id].children_order;
-			if (siblingsArray.length <= 1 || this.siblingIndex(id) == 0) {
-				return parent_id;
-			}
-			var siblingIndex = siblingsArray.indexOf(id);
-			return this.nodes[parent_id].children_order[siblingIndex - 1];
-		}
-	}, {
-		key: 'nextItemId',
-		value: function nextItemId(id, debug) {
-			if (debug) {
-				debugger;
-			}
-			if (!id) {
-				return;
-			}
-			var item = this.nodes[id];
-			if (!item) {
-				return;
-			}
-			var nextItemId = void 0;
-			// Select next item on top level.
-			if (this.isTopLvlItemInFilteredRoot(id) && !item.show_children || selection.view == 'journal') {
-				var ind = vm.$refs.root.childrenOrder.indexOf(id);
-				if (ind + 1 == vm.$refs.root.childrenOrder.length) {
-					return vm.$refs.root.childrenOrder[0];
-				}
-				return vm.$refs.root.childrenOrder[ind + 1];
-			}
-			// Select first child if any.
-			if (item.show_children && item.children.length) {
-				nextItemId = item.children_order[0];
-				if (vm.hiddenItemIds.includes(nextItemId)) {
-					nextItemId = this.nextItemRecursion(nextItemId);
-				}
-			} else {
-				nextItemId = this.nextItemRecursion(id);
-			}
-			return nextItemId;
-		}
-		// nextVisibleItemId(id)
-		// {
-		// 	let item = this.nodes[id];
-		// 	let nextItemId;
-		// 	// Select first child if any.
-		// 	if (item.show_children && item.children.length > 0)
-		// 	{
-		// 		nextItemId = item.children_order[0];
-		//  	} else {
-		// 		nextItemId = this.nextItemRecursion(id);
-		//  	}
-		//  	if(vm.hiddenItemIds.includes(nextItemId))
-		//  	{
-		// 	 	return this.nextVisibleItemId(nextItemId);
-		//  	} else {
-		// 	 	return nextItemId;
-		//  	}
-		// }
-
-	}, {
-		key: 'nextSiblingOrParentsSiblingId',
-		value: function nextSiblingOrParentsSiblingId(id) {
-			var item = this.nodes[id];
-			if (!item) {
-				return;
-			}
-			var parent_id = item.parent_id;
-			if (!parent_id) {
-				return;
-			}
-			var children_order = this.nodes[parent_id].children_order;
-			var nextIndex = this.siblingIndex(id) + 1;
-			if (nextIndex == children_order.length) {
-				return this.nextSiblingOrParentsSiblingId(parent_id);
-			} else {
-				return children_order[nextIndex];
-			}
-		}
-	}, {
-		key: 'deepestChild',
-		value: function deepestChild(id) {
-			return vm.$refs.root.childrensDeepestChildren.find(function (obj) {
-				return obj.id == id;
-			}).deepestChild;
-		}
-	}, {
-		key: 'topLvlParentOfDeepestChild',
-		value: function topLvlParentOfDeepestChild(id) {
-			return vm.$refs.root.childrensDeepestChildren.find(function (obj) {
-				return obj.deepestChild == id;
-			}).id;
-		}
-	}, {
-		key: 'prevItemId',
-		value: function prevItemId(id, debug) {
-			if (debug) {
-				debugger;
-			}
-			if (!id) {
-				return false;
-			}
-			var item = this.nodes[id];
-			if (item.depth == 0) {
-				return false;
-			}
-			var parent_id = item.parent_id;
-			var prevItemId = void 0;
-			var index = void 0;
-			// Select next item on top level.
-			var childrenIds = vm.$refs.root.childrenOrder;
-			if (this.isTopLvlItemInFilteredRoot(id) || selection.view == 'journal') {
-				index = childrenIds.indexOf(id);
-				if (index == 0) {
-					if (selection.view == 'journal') {
-						prevItemId = childrenIds[childrenIds.length - 1];
-					} else {
-						prevItemId = this.deepestChild(childrenIds[childrenIds.length - 1]);
-					}
-				} else {
-					prevItemId = childrenIds[index - 1];
-					if (selection.view != 'journal') {
-						prevItemId = this.deepestChild(prevItemId);
-					}
-				}
-			} else {
-				index = this.siblingIndex(id);
-				if (childrenIds[0] == id) {
-					prevItemId = this.deepestChild(childrenIds[childrenIds.length - 1]);
-				} else if (index == 0) {
-					prevItemId = parent_id;
-				} else {
-					prevItemId = this.nodes[parent_id].children_order[index - 1];
-					prevItemId = this.getDeepestLastChildId(prevItemId);
-				}
-			}
-			if (vm.hiddenItemIds.includes(prevItemId)) {
-				return this.prevItemId(prevItemId);
-			} else {
-				return prevItemId;
-			}
-		}
-	}, {
-		key: 'nextItemRecursion',
-		value: function nextItemRecursion(id) {
-			// debugger;
-			var nextIndex = this.siblingIndex(id) + 1;
-			var item = this.nodes[id];
-			var parent_id = item.parent_id;
-			// let tagsSelected = selection.tags.length;
-
-			if (vm.itIsADeepestChild(id)) {
-				var topLvlItemId = this.topLvlParentOfDeepestChild(id);
-				var topLvlChildrenIds = vm.$refs.root.childrenOrder;
-				var ind = topLvlChildrenIds.indexOf(topLvlItemId);
-				if (ind + 1 == topLvlChildrenIds.length) {
-					var firstItemId = topLvlChildrenIds[0];
-					if (firstItemId == id) {
-						return null;
-					}
-					return firstItemId;
-				}
-				return topLvlChildrenIds[ind + 1];
-			}
-			var parentsChildrenOrder = this.nodes[parent_id].children_order;
-			var itemIsLastSibling = nextIndex == parentsChildrenOrder.length;
-			if (itemIsLastSibling) {
-				if (parent_id == this.root.id) {
+	clear() {
+		this.filter = [];
+		this.tags = [];
+		this.hiddenTags = [];
+		this.hiddenItems = [];
+		this.hiddenBookmarks = [];
+	}
+	reset() {
+		this.filter = ['all'];
+		this.tags = [];
+		this.hiddenTags = [];
+		this.hiddenItems = [];
+		this.hiddenBookmarks = [];
+	}
+	getSelectedId() {
+		return this.selectedId;
+	}
+	nothingSelected() {
+		let n = !this.tags.length && !this.hiddenTags.length && !this.hiddenItems.length && !this.hiddenBookmarks.length && (this.filter.length == 1 && this.filter.includes('all') || !this.filter.length);
+		return n;
+	}
+	noFilterOrTag() {
+		let n = !this.tags.length && (this.filter.length == 1 && this.filter.includes('all') || !this.filter.length);
+		return n;
+	}
+	addKeywords(keyword, value, operator) {
+		if (keyword == 'tag') {
+			if (operator == 'NOT') {
+				if (this.hiddenTags.includes(value)) {
 					return;
 				}
-				return this.nextItemRecursion(parent_id);
-			}
-			var nextItemId = this.nodes[parent_id].children_order[nextIndex];
-			if (vm.hiddenItemIds.includes(nextItemId)) {
-				return this.nextItemRecursion(nextItemId);
-			}
-			return nextItemId;
-		}
-		// nextVisibleItemRecursion(id)
-		// {
-		// 	// debugger;
-		// 	let nextIndex = this.siblingIndex(id)+1;
-		// 	let item = this.nodes[id];
-		// 	let parent_id = item.parent_id;
-		// 	let parentsChildrenOrder = this.nodes[parent_id].children_order;
-		// 	let itemIsLastSibling = (nextIndex == parentsChildrenOrder.length);	
-		// 	if(itemIsLastSibling)
-		// 	{
-		// 		if(parent_id == this.root.id){ return; }
-		// 		return this.nextItemRecursion(parent_id);
-		// 	}
-		// 	let nextItemId = this.nodes[parent_id].children_order[nextIndex];
-		// 	return nextItemId;
-		// }
-
-	}, {
-		key: 'isTopLvlItemInFilteredRoot',
-		value: function isTopLvlItemInFilteredRoot(id) {
-			var s = selection;
-			if (selection.nothingSelected() && selection.view == 'tree') {
-				// console.log('the root is not filtered');
-				return false;
-			}
-			if (id == this.root.id) {
-				return true;
-			} else if (vm.$refs.root.childrenOrder.includes(id)) {
-				return true;
+				this.hiddenTags.push(value);
+				this.tags = this.tags.filter(tag => tag !== value);
 			} else {
-				return false;
-			}
-		}
-		// nextFilteredItemId(id)
-		// {
-		// 	let index = this.root.children_order.indexOf(id);
-		// 	return this.root.children_order[index+1];
-		// }
-		// prevFilteredItemId(id)
-		// {
-		// 	let index = this.root.children_order.indexOf(id);
-		// 	return this.root.children_order[index-1];
-		// }
-
-	}, {
-		key: 'sortChildren',
-		value: function sortChildren(id) {
-			console.log('sortingChildren');
-			var item = this.nodes[id];
-			item.children_order = item.children_order.filter(function (id) {
-				var child = this.nodes[id];
-				var a = item.children.indexOf(child);
-				var b = ~a; // Anything that's not -1 will become something else than 0, so will be included.
-				return b;
-			}.bind(this));
-
-			var order = item.children_order;
-			var items = item.children;
-			if (order instanceof Array && order.length) {
-				item.children = order.map(function (id) {
-					return items.find(function (t) {
-						return t.id === id;
-					});
-				});
-			}
-		}
-		// resetChildrenOrder(id)
-		// {
-		// 	let item = this.nodes[id];
-		// 	let resetChildrenOrder = item.children.map(function(child){
-		// 	   return child.id;
-		// 	});
-		// 	this.nodes[id].children_order = resetChildrenOrder;
-		// }
-
-	}, {
-		key: 'giveNewParent',
-		value: function giveNewParent(id, new_parent_id, specificNewIndex) {
-			if (this.isTopLvlItemInFilteredRoot(id)) {
-				var errMsg = vm.text.flashes.moveTopLvlItem;
-				console.log(errMsg);
-				vm.sendFlash('warning', errMsg);
-				return;
-			}
-			console.log('giving new parent');
-			var parent_id = this.nodes[id].parent_id;
-			var targetItem = this.nodes[id];
-			var newParent = this.nodes[new_parent_id];
-			console.log('newParent ↓ ');
-			console.log(newParent);
-			var prevParent = this.nodes[parent_id];
-			console.log('prevParent ↓ ');
-			console.log(prevParent);
-			var siblingIndex = this.siblingIndex(id);
-			targetItem.parent_id = new_parent_id;
-			targetItem.depth = newParent.depth + 1;
-			if (!newParent.children_order) {
-				newParent.children_order = [];
-			}
-			if (specificNewIndex || specificNewIndex == 0) {
-				newParent.children.splice(specificNewIndex, 0, targetItem);
-				newParent.children_order.splice(specificNewIndex, 0, id);
-			} else if (prevParent.depth - 1 == newParent.depth && new_parent_id == prevParent.parent_id) {
-				// when unindenting
-				var newIndex = this.siblingIndex(prevParent.id) + 1;
-				newParent.children.splice(newIndex, 0, targetItem);
-				newParent.children_order.splice(newIndex, 0, id);
-			} else {
-				// when indenting
-				newParent.children.push(targetItem);
-				newParent.children_order.push(id);
-			}
-			// Open newParent show_children if closed
-			newParent.show_children = 1;
-
-			// Delete items attached to previous parent
-			prevParent.children.splice(siblingIndex, 1);
-			prevParent.children_order.splice(siblingIndex, 1);
-			// Fix bug where item would still show if it prevParent has an array of 0 and the moved child was originally the last child...
-			if (prevParent.children.length == 0) {
-				prevParent.children = [];
-			}
-
-			// Patches etc.
-			this.attachParentBody(id);
-			var tags = this.itemTagArray(new_parent_id);
-			this.tagItem(id, tags);
-			vm.patch(id, 'depth');
-			vm.patch(id, 'parent_id');
-			vm.patch(new_parent_id, 'children_order');
-			vm.patch(new_parent_id, 'show_children');
-			vm.patch(parent_id, 'children_order');
-			this.updateChildrenDepth(targetItem.id);
-			this.updateChildrenDueDate(new_parent_id);
-			this.updateChildrenDueDate(parent_id);
-			this.autoCalculateDoneState(new_parent_id);
-			this.autoCalculateDoneState(parent_id);
-		}
-	}, {
-		key: 'updateChildrenDepth',
-		value: function updateChildrenDepth(id) {
-			var targetChildren = this.nodes[id].children;
-			if (!(targetChildren || targetChildren.length)) {
-				return false;
-			}
-			targetChildren.forEach(function (child) {
-				console.log(child);
-				child.depth = this.nodes[child.parent_id].depth + 1;
-				vm.patch(child.id, 'depth');
-				this.updateChildrenDepth(child.id);
-				return true;
-			}.bind(this));
-		}
-	}, {
-		key: 'copyParentBodyToAllChildren',
-		value: function copyParentBodyToAllChildren(parent_id) {
-			var _this = this;
-
-			if (!parent_id) {
-				return;
-			}
-			var item = this.nodes[parent_id];
-			if (!item.children_order.length) {
-				return;
-			}
-			var b = item.body;
-			item.children_order.forEach(function (childId) {
-				var child = _this.nodes[childId];
-				child.parents_bodies = b;
-				if (!vm) {
+				if (this.tags.includes(value)) {
 					return;
 				}
-				vm.patch(child.id, 'parents_bodies');
-			});
-		}
-	}, {
-		key: 'hasParentDueToday',
-		value: function hasParentDueToday(id) {
-			id = id ? id : selection.selectedId;
-			var item = this.nodes[id];
-			if (!item.parent_id) {
-				return false;
+				this.tags.push(value);
+				this.hiddenTags = this.hiddenTags.filter(tag => tag !== value);
 			}
-			var parent = this.nodes[item.parent_id];
-			if (!parent) {
-				return false;
-			}
-			var diff = moment(parent.due_date).diff(moment(), 'days');
-			if (diff <= 0) {
-				return true;
-			} else {
-				return this.hasParentDueToday(item.parent_id);
-			}
-		}
-	}, {
-		key: 'isDueToday',
-		value: function isDueToday(id) {
-			id = id ? id : selection.selectedId;
-			var item = this.nodes[id];
-			var diff = moment(item.due_date).diff(moment(), 'days');
-			if (diff <= 0) {
-				return true;
-			}
-			return false;
-		}
-	}, {
-		key: 'attachParentBody',
-		value: function attachParentBody(id) {
-			if (!id) {
+		} else {
+			if (operator == 'NOT' && keyword == 'journal') {
+				this.hiddenBookmarks.push(keyword);
 				return;
 			}
-			var item = this.nodes[id];
-			if (!item.parent_id) {
-				return;
-			}
-			var parent = this.nodes[item.parent_id];
-			if (!parent) {
-				return;
-			}
-			item.parents_bodies = parent.body;
-			vm.patch(id, 'parents_bodies');
-		}
-	}, {
-		key: 'isProject',
-		value: function isProject(id) {
-			if (!id) {
-				return false;
-			}
-			if (this.nodes[id].body.slice(-1) == ':') {
-				return true;
-			} else {
-				return false;
-			}
-		}
-	}, {
-		key: 'deleteItem',
-		value: function deleteItem(id) {
-			var item = this.nodes[id];
-			var previousItemId = this.prevItemId(id) ? this.prevItemId(id) : null;
-			// Delete all children as well!
-			if (Array.isArray(item.children) && item.children.length) {
-				var allChildrenIds = this.getAllChildrenIds(id);
-				vm.deleteItemApi(allChildrenIds);
-			}
-			// Delete items attached to previous parent
-			var parent_id = item.parent_id;
-			var prevParent = this.nodes[parent_id];
-			if (prevParent) {
-				var siblingIndex = this.siblingIndex(id);
-				prevParent.children.splice(siblingIndex, 1);
-				prevParent.children_order.splice(siblingIndex, 1);
-				// Patch and recalculate
-				vm.patch(parent_id, 'children_order');
-			}
-			vm.deleteItemApi(id);
-			// this.autoCalculateDoneState(parent_id);
-			if (selection.view == 'journal') {
-				selection.view = null;
-				selection.view = 'journal';
-			}
-			if (selection.filter.includes('today')) {
-				selection.filter = selection.filter.filter(function (f) {
-					return f != 'today';
-				});
-				selection.filter.push('today');
-			}
-			var newSelectedId = this.nextItemId(previousItemId) ? this.nextItemId(previousItemId) : null;
-			console.log('new selected ID is: ' + newSelectedId);
-			selection.selectedId = newSelectedId;
-			delete this.nodes[id];
-		}
-	}, {
-		key: 'tagItem',
-		value: function tagItem(id, tags) {
-			console.log(tags);
-			if (!tags) {
-				return;
-			}
-			if (Array.isArray(tags)) {
-				tags = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__components_globalFunctions_js__["j" /* removeEmptyValuesFromArray */])(tags);
-				tags = tags.filter(function (t) {
-					return !this.hasTag(id, t);
-				}.bind(this));
-				if (!tags.length) {
+			if (keyword == 'journal') {
+				if (this.view == 'journal') {
 					return;
 				}
-			} else {
-				if (!tags.replace(/\s/g, "").length) {
+				this.view = 'journal';
+			} else if (value) {
+				this.view = 'tree';
+				if (this.filter.includes(value)) {
 					return;
 				}
-				if (this.hasTag(id, tags)) {
-					console.log('NG! Has the tag already!!');
-					return;
-				}
-			}
-			vm.patchTag(id, tags);
-			var item = this.nodes[id];
-			if (item.children.length) {
-				item.children_order.forEach(function (childId) {
-					this.tagItem(childId, tags);
-				}.bind(this));
+				this.filter.push(value);
 			}
 		}
-	}, {
-		key: 'itemTagArray',
-		value: function itemTagArray(id) {
-			var item = this.nodes[id];
-			return item.tagged.map(function (tagObj) {
-				return tagObj.tag_name;
-			});
-		}
-	}, {
-		key: 'prepareTag',
-		value: function prepareTag(id, tags) {
-			var item = this.nodes[id];
-		}
-	}, {
-		key: 'prepareDonePatch',
-		value: function prepareDonePatch(id) {
-			var item = this.nodes[id];
-			var done_date = moment().format();
-			item.done_date = done_date;
-			vm.patchDone(id);
-			if (item.done) {
-				vm.popup(id, 'afterDone');
+		Vue.nextTick(() => {
+			if (!vm.filteredItemsFlat.map(i => i.id).includes(this.selectedId)) {
+				this.selectedId = null;
 			}
-			// this.autoCalculateDoneState(item.parent_id);
-			if (item.done) {
-				// IF DONE:
-				//Add parent's body
-				this.attachParentBody(id);
-			}
+		});
+	}
+	getHiddenItemsTotalUsedTime() {
+		if (!this.hiddenItems.length) {
+			return 0;
 		}
-	}, {
-		key: 'autoCalculateDoneState',
-		value: function autoCalculateDoneState(id) {
-			if (this.nodes[id].depth == 0) {
-				return;
-			}
-			if (this.allChildrenDone(id) == true && !this.isProject(id)) {
-				vm.markDone(id, 'done');
-			} else {
-				vm.markDone(id, 'notDone');
-			}
+		return this.hiddenItems.reduce(function (a, id) {
+			let b = store.state.nodes[id].used_time;
+			console.log(b);
+			return a + b;
+		}, 0);
+	}
+	getHiddenItemsTotalPlannedTime() {
+		if (!this.hiddenItems.length) {
+			return 0;
 		}
-	}, {
-		key: 'allChildrenDone',
-		value: function allChildrenDone(id) {
-			var children = this.nodes[id].children;
-			if (!children.length) {
-				return false;
-			}
-			var doneAmount = children.reduce(function (prev, child) {
-				var a = child.done ? 1 : 0;
-				return this.AplusB(a, prev);
-			}.bind(this), 0);
-			if (children.length == doneAmount) {
-				return true;
-			} else {
-				return false;
-			}
-		}
-	}, {
-		key: 'getAllChildrenIds',
-		value: function getAllChildrenIds(id) {
-			var allChildrenIds = [];
-			this.getAllChildrenIdsRecursive(id, allChildrenIds);
-			return allChildrenIds;
-		}
-	}, {
-		key: 'getAllChildrenIdsRecursive',
-		value: function getAllChildrenIdsRecursive(id, allChildrenIds) {
-			var item = this.nodes[id];
-			if (!(Array.isArray(item.children) && item.children.length)) {
-				return;
-			} else {
-				item.children_order.forEach(function (item) {
-					allChildrenIds.push(item);
-				});
-				item.children_order.forEach(function (item) {
-					return allItems.getAllChildrenIdsRecursive(item, allChildrenIds);
-				});
-			}
-		}
-	}, {
-		key: 'updateItemTagsDom',
-		value: function updateItemTagsDom(id, tags, requestType) {
-			var _this2 = this;
+		return this.hiddenItems.reduce(function (a, id) {
+			let b = store.state.nodes[id].planned_time;
+			console.log(b);
+			return a + b;
+		}, 0);
+	}
+	selectPrevious() {}
 
-			/* requestType can be:
-   	'tag': tag item  (default if null)
-   	'untag': untag item with certain tag
-   	'retag': delete all tags and retag new ones
-   */
-			if (!tags) {
-				return;
-			}
-			if (Array.isArray(tags)) {
-				tags.forEach(function (t) {
-					return _this2.updateItemTagsDom(id, t, requestType);
-				});
-				return;
-			}
-			var tagName = tags.trim();
-			var tagSlug = this.tagNameToSlug(tagName);
-			var tempTag = { 'temp': 'temp',
-				'tag_name': tagName,
-				'tag_slug': tagSlug,
-				'tag': {
-					'name': tagName,
-					'slug': tagSlug
-				} };
-			if (requestType == 'tag' || !requestType) {
-				console.log(this.nodes[id].tagged);
-				this.nodes[id].tagged.push(tempTag);
-				console.log(this.nodes[id].tagged);
-			}
-			if (requestType == 'untag') {
-				this.nodes[id].tagged = this.nodes[id].tagged.filter(function (t) {
-					return t.tag_slug != tagSlug;
-				});
-			}
-		}
-		// calculateTotalTime(id)
-		// {
-		// 	let item = this.nodes[id];
-		//     //call this on PARENT -> climb up the parent tree
-		//     if (item.parent_id){
-		// 	    this.calculateTotalTime(item.parent_id);
-		//     }
-		// }
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = Selection;
 
-	}, {
-		key: 'calTotalPlannedTime',
-		value: function calTotalPlannedTime(id) {
-			var item = this.nodes[id];
-			var totalPlannedTime = void 0;
-			if (!(Array.isArray(item.children) && item.children.length)) {
-				// if we don't have children, do nothing, leave the time as-is
-				totalPlannedTime = !item.done || selection.view == 'journal' ? parseFloat(item.planned_time) : 0;
-			} else {
-				// add up all the times of our direct children
-				totalPlannedTime = item.children.reduce(function (prev, next) {
-					var x = next.totalPlannedTime ? next.totalPlannedTime : next.planned_time;
-					return prev + parseFloat(x);
-				}, !item.done || selection.view == 'journal' ? parseFloat(item.planned_time) : 0);
-			}
-			return parseFloat(totalPlannedTime);
-		}
-	}, {
-		key: 'calTotalUsedTime',
-		value: function calTotalUsedTime(id) {
-			var item = this.nodes[id];
-			var totalUsedTime = void 0;
-			if (!(Array.isArray(item.children) && item.children.length)) {
-				// if we don't have children, do nothing, leave the time as-is
-				totalUsedTime = !item.done || selection.view == 'journal' ? parseFloat(item.used_time) : 0;
-			} else {
-				// add up all the times of our direct children
-				totalUsedTime = item.children.reduce(function (prev, next) {
-					var x = next.totalUsedTime ? next.totalUsedTime : next.used_time;
-					return prev + parseFloat(x);
-				}, !item.done || selection.view == 'journal' ? parseFloat(item.used_time) : 0);
-			}
-			return parseFloat(totalUsedTime);
-		}
-	}, {
-		key: 'checkValParentTree',
-		value: function (_checkValParentTree) {
-			function checkValParentTree(_x, _x2) {
-				return _checkValParentTree.apply(this, arguments);
-			}
-
-			checkValParentTree.toString = function () {
-				return _checkValParentTree.toString();
-			};
-
-			return checkValParentTree;
-		}(function (id, val) {
-			var pId = this.nodes[id].parent_id;
-			console.log('checkValParentTree pId: ' + checkValParentTree);
-			if (!pId) {
-				return false;
-			}
-			var checkVal = this.nodes[pId].item[val];
-			console.log('checkValParentTree checkVal: ' + checkVal);
-			if (checkVal) {
-				return checkVal;
-			} else {
-				return this.checkValParentTree(pId, val);
-			}
-		})
-	}, {
-		key: 'AplusB',
-		value: function AplusB(a, b) {
-			return parseFloat(a) + parseFloat(b);
-		}
-	}, {
-		key: 'moveItem',
-		value: function moveItem(id, direction) {
-			if (this.isTopLvlItemInFilteredRoot(id)) {
-				var errMsg = vm.text.flashes.moveTopLvlItem;
-				console.log(errMsg);
-				vm.sendFlash('warning', errMsg);
-				return;
-			}
-			clearTimeout(window.patchDelay);
-			var pId = this.nodes[id].parent_id;
-			var parent = this.nodes[pId];
-			var index = this.siblingIndex(id);
-			if (direction == 'up') {
-				if (index == 0) {
-					if (parent.depth == 0) {
-						console.log('ceiling!');return;
-					}
-					// Jump to last child of previous Sibling
-					var parentOlderSiblingId = this.olderSiblingId(pId);
-					var newInd = parentOlderSiblingId == parent.parent_id ? 0 : null;
-					this.giveNewParent(id, parentOlderSiblingId, newInd);
-				} else {
-					// When moving through siblings
-					parent.children_order.splice(index, 1);
-					parent.children_order.splice(index - 1, 0, id);
-					this.sortChildren(pId);
-					window.patchDelay = setTimeout(function () {
-						vm.patch(pId, 'children_order');
-					}, 1000);
-				}
-			} else if (direction == 'down') {
-				if (index + 1 == parent.children_order.length) {
-					if (parent.depth == 0) {
-						console.log('floor!');return;
-					}
-					// Jump to First child of next Sibling
-					var new_parent_id = this.nextSiblingOrParentsSiblingId(id);
-					console.log('new_parent_id: ' + new_parent_id);
-					this.giveNewParent(id, new_parent_id, 0);
-				} else {
-					// When moving through siblings
-					parent.children_order.splice(index, 1);
-					parent.children_order.splice(index + 1, 0, id);
-					this.sortChildren(pId);
-					window.patchDelay = setTimeout(function () {
-						vm.patch(pId, 'children_order');
-					}, 1000);
-				}
-			}
-			Vue.nextTick(function () {
-				return vm.scrollToItemIfNeeded(id);
-			});
-		}
-	}, {
-		key: 'flushDoneItems',
-		value: function flushDoneItems() // Do not use yet. Not sure how to best implement this...
-		{
-			var _this3 = this;
-
-			var nodes = this.nodes;
-			var keys = Object.keys(nodes);
-			var doneItemsObject = keys.reduce(function (prev, id) {
-				if (nodes[id].done) {
-					_this3.deleteItem(id);
-				}
-			});
-		}
-	}, {
-		key: 'setDueDate',
-		value: function setDueDate(id, duedate) {
-			var dd = duedate ? duedate : moment().format();
-			var oriDueDate = this.nodes[id].due_date;
-			var diff = moment(oriDueDate).diff(dd, 'days');
-			if (diff == 0) {
-				dd = '0000-00-00 00:00:00';
-			}
-			this.nodes[id].due_date = dd;
-			if (diff == 0 && selection.filter.includes('today')) {
-				selection.selectedId = this.nextItemId(id);
-			}
-			vm.patchDueDate(id, dd);
-			this.updateChildrenDueDate(id);
-		}
-	}, {
-		key: 'getParentsAsArray',
-		value: function getParentsAsArray(id) {
-			var pArr = [];
-			this.getParentsRecursive(id, pArr);
-			pArr.reverse().shift();
-			return pArr;
-		}
-	}, {
-		key: 'getParentsRecursive',
-		value: function getParentsRecursive(id, pArr) {
-			var pId = this.nodes[id].parent_id;
-			if (!pId) {
-				return;
-			}
-			pArr.push(this.nodes[pId].body);
-			this.getParentsRecursive(pId, pArr);
-		}
-	}, {
-		key: 'getLastChildId',
-		value: function getLastChildId(id) {
-			var item = this.nodes[id];
-			var childrenCount = item.children.length;
-			if (childrenCount && item.show_children) {
-				var lastChild = item.children[childrenCount - 1];
-				return lastChild.id;
-			}
-			return id;
-		}
-	}, {
-		key: 'getDeepestLastChildId',
-		value: function getDeepestLastChildId(id) {
-			// debugger;
-			var lastChildId = this.getLastChildId(id);
-			var item = this.nodes[lastChildId];
-			if (item.children.length && item.show_children) {
-				return this.getDeepestLastChildId(lastChildId);
-			}
-			return lastChildId;
-		}
-	}, {
-		key: 'updateChildrenDueDate',
-		value: function updateChildrenDueDate(id) {
-			var item = this.nodes[id];
-			if (!item.children.length) {
-				return false;
-			}
-			item.children.forEach(function (child) {
-				if (item.dueDateParent) {
-					child.dueDateParent = item.dueDateParent;
-					this.updateChildrenDueDate(child.id);
-				} else if (item.due_date && item.due_date != '0000-00-00 00:00:00') {
-					child.dueDateParent = item.due_date;
-					this.updateChildrenDueDate(child.id);
-				} else {
-					child.dueDateParent = false;
-					this.updateChildrenDueDate(child.id);
-				}
-			}.bind(this));
-		}
-		// FILTER REWRITE
-		// filterItems(keyword, value, operator)
-		// {
-		// 	// debugger;
-		// 	// Start by resetting the parent id's to their original state
-		// 	this.root.children.forEach(function(item){
-		// 		item.parent_id = item.parent_id_backup;
-		// 	});
-		// 	if (operator == 'NOT' && keyword == 'journal')
-		// 	{
-		// 		this.hideDoneNodes();
-		// 		selection.addKeywords(keyword,value,operator);
-		// 		return;
-		// 	}
-		// 	else if (operator == 'NOT' && keyword == 'tag')
-		// 	{
-		// 		this.hideTaggedNodes(value);
-		// 		selection.addKeywords(keyword,value,operator);
-		// 		return;
-		// 	}
-
-		// 	let arrayToFilter;
-		// 	if (operator == 'AND'
-		// 	 // || (selection.view == 'journal' && selection.nothingSelected())
-		// 	 )
-		// 	{
-		// 		console.log('filterItems: a');
-		// 		arrayToFilter = this.flattenTree(this.root.children);
-		// 	}
-		// 	else if (selection.view == 'journal')
-		// 	{
-		// 		console.log('filterItems: b');
-		// 		selection.clear();
-		// 		arrayToFilter = vm.doneData;
-		// 	}
-		// 	else
-		// 	{
-		// 		console.log('filterItems: c');
-		// 		selection.clear();
-		// 		arrayToFilter = this.flattenTree(this.backups.rootChildren);
-		// 	}
-		// 	selection.addKeywords(keyword,value,operator);
-
-		// 	let filteredArray = [];
-		// 	if (keyword == 'all')
-		// 	{
-		// 		filteredArray = this.backups.rootChildren;
-		// 	}
-		// 	if (keyword == 'journal')
-		// 	{
-		// 		vm.resetDoneData();
-		// 		filteredArray = vm.doneData;
-		// 	}
-		// 	if (keyword == 'duedate')
-		// 	{
-		// 		let dueDateFilterResults = this.arrayFilterDate(arrayToFilter, value, operator);
-		// 		Array.prototype.push.apply(filteredArray, dueDateFilterResults);
-		// 	}
-		// 	if (keyword == 'tag')
-		// 	{
-		// 		let tagFilterResults = this.arrayFilterTag(arrayToFilter, value, operator);
-		// 		Array.prototype.push.apply(filteredArray, tagFilterResults);
-		// 	}
-		// 	filteredArray.forEach(function(item){
-		// 		item.parent_id = this.root.id;
-		// 	}.bind(this));
-		// 	this.root.children = filteredArray;
-		// 	this.resetChildrenOrder(this.root.id);
-		// }
-		// arrayFilterTag(array, tags)
-		// {
-		// 	let filteredArray = [];
-		// 	array.forEach(function (item) {
-		// 		let id = item.id;
-		// 		let target = this.hasTag(id, tags);
-		// 		if ( selection.view == 'tree'
-		// 			&& target
-		// 			&& this.hasParentWithTag(id, tags) )
-		// 		{
-		// 			target = false;
-		// 		}
-		// 		// console.log(id+" - "+item.body+" →　hasTag["+tags+"]　=　"+hasTag);
-		// 		// console.log(id+" - "+item.body+" →　hasParentWithTag["+tags+"] =　"+hasParentWithTag);
-		// 		if(target)
-		// 		{
-		// 			item.show_children = 1;
-		// 			filteredArray.push(item);
-		// 		}
-		// 	}.bind(this));
-		// 	return filteredArray;
-		// }
-		// arrayFilterDone(array, operator)
-		// {
-		// 	let filteredArray = [];
-		// 	array.forEach(function (item) {
-		// 		if(item.done)
-		// 		{
-		// 			item.show_children = 1;
-		// 			filteredArray.push(item);
-		// 		}
-		// 	}.bind(this));
-		// 	return filteredArray;
-		// }
-		// arrayFilterDate(array, date, operator)
-		// {
-		// 	let filteredArray = [];
-		// 	if(date == 'today')
-		// 	{
-		// 		array.forEach(function (item) {
-		// 			let diff = moment(item.due_date).diff(moment(), 'days');
-		// 			if (diff <= 0){
-		// 				filteredArray.push(item);
-		// 			}
-		// 		}.bind(this));
-		// 	}
-		// 	return filteredArray;
-		// }
-		// hideItem(id)
-		// {
-		// 	if(!selection.hiddenItems.includes(id))
-		// 	{
-		// 		selection.hiddenItems.push(id);
-		// 	}
-		// 	this.nodes[id].children.forEach(function(child) {
-		// 		this.hideItem(child.id)
-		// 	}.bind(this));
-		// }
-
-	}, {
-		key: 'flattenTree',
-		value: function flattenTree(array) {
-			var flattenedTree = [];
-			array.forEach(function (item) {
-				flattenedTree.push(item);
-				if (item.children.length) {
-					Array.prototype.push.apply(flattenedTree, this.flattenTree(item.children));
-				}
-			}.bind(this));
-			return flattenedTree;
-		}
-		// rebindArrayParentIds(array, newParentId)
-		// {
-		// 	if(newParentId == 'backup')
-		// 	{
-		// 		array.forEach(function(item){
-		// 			item.parent_id = item.parent_id_backup;
-		// 		});
-		// 	} else {
-		// 		array.forEach(function(item){
-		// 			item.parent_id = newParentId;
-		// 		});
-		// 	}
-		// }
-
-	}, {
-		key: 'formatDone',
-		value: function formatDone(doneArray) {
-			var doneItemsObject = doneArray.reduce(function (prev, item) {
-				if (item.done) {
-					var donePropName = moment(item.done_date).format('YYYY/MM/DD');
-					// if we don't have a slot for this date, make one
-					if (!prev.hasOwnProperty(donePropName)) {
-						prev[donePropName] = [];
-					}
-					prev[donePropName].push(item);
-				}
-				return prev;
-			}, {});
-			return Object.keys(doneItemsObject).map(function (k) {
-				var rObj = {};
-				rObj['date'] = k;
-				rObj['items'] = doneItemsObject[k];
-				// rObj['totalUsedTime'] = rObj['items'].reduce((prev, next) => {
-				// 	return allItems.AplusB(prev, next.used_time);
-				//   	}, 0);
-				return rObj;
-			});
-		}
-	}]);
-
-	return _class;
-}();
-
-/* harmony default export */ __webpack_exports__["a"] = (_class);
 
 /***/ }),
 /* 22 */
@@ -27123,15 +25853,15 @@ exports.tokenize = exports.test = exports.scanner = exports.parser = exports.opt
 
 var _class = __webpack_require__(10);
 
-var _options = __webpack_require__(195);
+var _options = __webpack_require__(203);
 
 var options = _interopRequireWildcard(_options);
 
-var _scanner = __webpack_require__(192);
+var _scanner = __webpack_require__(200);
 
 var scanner = _interopRequireWildcard(_scanner);
 
-var _parser = __webpack_require__(191);
+var _parser = __webpack_require__(199);
 
 var parser = _interopRequireWildcard(_parser);
 
@@ -27512,7 +26242,7 @@ exports.default = EntityParser;
 
 exports.__esModule = true;
 
-var _utils = __webpack_require__(198);
+var _utils = __webpack_require__(206);
 
 function EventedTokenizer(delegate, entityParser) {
   this.delegate = delegate;
@@ -39205,8 +37935,821 @@ return zhTw;
 
 
 /***/ }),
-/* 144 */,
-/* 145 */
+/* 144 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* unused harmony export Store */
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return mapState; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "d", function() { return mapMutations; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "c", function() { return mapGetters; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "e", function() { return mapActions; });
+/**
+ * vuex v2.3.0
+ * (c) 2017 Evan You
+ * @license MIT
+ */
+var applyMixin = function (Vue) {
+  var version = Number(Vue.version.split('.')[0]);
+
+  if (version >= 2) {
+    var usesInit = Vue.config._lifecycleHooks.indexOf('init') > -1;
+    Vue.mixin(usesInit ? { init: vuexInit } : { beforeCreate: vuexInit });
+  } else {
+    // override init and inject vuex init procedure
+    // for 1.x backwards compatibility.
+    var _init = Vue.prototype._init;
+    Vue.prototype._init = function (options) {
+      if ( options === void 0 ) options = {};
+
+      options.init = options.init
+        ? [vuexInit].concat(options.init)
+        : vuexInit;
+      _init.call(this, options);
+    };
+  }
+
+  /**
+   * Vuex init hook, injected into each instances init hooks list.
+   */
+
+  function vuexInit () {
+    var options = this.$options;
+    // store injection
+    if (options.store) {
+      this.$store = options.store;
+    } else if (options.parent && options.parent.$store) {
+      this.$store = options.parent.$store;
+    }
+  }
+};
+
+var devtoolHook =
+  typeof window !== 'undefined' &&
+  window.__VUE_DEVTOOLS_GLOBAL_HOOK__;
+
+function devtoolPlugin (store) {
+  if (!devtoolHook) { return }
+
+  store._devtoolHook = devtoolHook;
+
+  devtoolHook.emit('vuex:init', store);
+
+  devtoolHook.on('vuex:travel-to-state', function (targetState) {
+    store.replaceState(targetState);
+  });
+
+  store.subscribe(function (mutation, state) {
+    devtoolHook.emit('vuex:mutation', mutation, state);
+  });
+}
+
+/**
+ * Get the first item that pass the test
+ * by second argument function
+ *
+ * @param {Array} list
+ * @param {Function} f
+ * @return {*}
+ */
+/**
+ * Deep copy the given object considering circular structure.
+ * This function caches all nested objects and its copies.
+ * If it detects circular structure, use cached copy to avoid infinite loop.
+ *
+ * @param {*} obj
+ * @param {Array<Object>} cache
+ * @return {*}
+ */
+
+
+/**
+ * forEach for object
+ */
+function forEachValue (obj, fn) {
+  Object.keys(obj).forEach(function (key) { return fn(obj[key], key); });
+}
+
+function isObject (obj) {
+  return obj !== null && typeof obj === 'object'
+}
+
+function isPromise (val) {
+  return val && typeof val.then === 'function'
+}
+
+function assert (condition, msg) {
+  if (!condition) { throw new Error(("[vuex] " + msg)) }
+}
+
+var Module = function Module (rawModule, runtime) {
+  this.runtime = runtime;
+  this._children = Object.create(null);
+  this._rawModule = rawModule;
+  var rawState = rawModule.state;
+  this.state = (typeof rawState === 'function' ? rawState() : rawState) || {};
+};
+
+var prototypeAccessors$1 = { namespaced: {} };
+
+prototypeAccessors$1.namespaced.get = function () {
+  return !!this._rawModule.namespaced
+};
+
+Module.prototype.addChild = function addChild (key, module) {
+  this._children[key] = module;
+};
+
+Module.prototype.removeChild = function removeChild (key) {
+  delete this._children[key];
+};
+
+Module.prototype.getChild = function getChild (key) {
+  return this._children[key]
+};
+
+Module.prototype.update = function update (rawModule) {
+  this._rawModule.namespaced = rawModule.namespaced;
+  if (rawModule.actions) {
+    this._rawModule.actions = rawModule.actions;
+  }
+  if (rawModule.mutations) {
+    this._rawModule.mutations = rawModule.mutations;
+  }
+  if (rawModule.getters) {
+    this._rawModule.getters = rawModule.getters;
+  }
+};
+
+Module.prototype.forEachChild = function forEachChild (fn) {
+  forEachValue(this._children, fn);
+};
+
+Module.prototype.forEachGetter = function forEachGetter (fn) {
+  if (this._rawModule.getters) {
+    forEachValue(this._rawModule.getters, fn);
+  }
+};
+
+Module.prototype.forEachAction = function forEachAction (fn) {
+  if (this._rawModule.actions) {
+    forEachValue(this._rawModule.actions, fn);
+  }
+};
+
+Module.prototype.forEachMutation = function forEachMutation (fn) {
+  if (this._rawModule.mutations) {
+    forEachValue(this._rawModule.mutations, fn);
+  }
+};
+
+Object.defineProperties( Module.prototype, prototypeAccessors$1 );
+
+var ModuleCollection = function ModuleCollection (rawRootModule) {
+  var this$1 = this;
+
+  // register root module (Vuex.Store options)
+  this.root = new Module(rawRootModule, false);
+
+  // register all nested modules
+  if (rawRootModule.modules) {
+    forEachValue(rawRootModule.modules, function (rawModule, key) {
+      this$1.register([key], rawModule, false);
+    });
+  }
+};
+
+ModuleCollection.prototype.get = function get (path) {
+  return path.reduce(function (module, key) {
+    return module.getChild(key)
+  }, this.root)
+};
+
+ModuleCollection.prototype.getNamespace = function getNamespace (path) {
+  var module = this.root;
+  return path.reduce(function (namespace, key) {
+    module = module.getChild(key);
+    return namespace + (module.namespaced ? key + '/' : '')
+  }, '')
+};
+
+ModuleCollection.prototype.update = function update$1 (rawRootModule) {
+  update(this.root, rawRootModule);
+};
+
+ModuleCollection.prototype.register = function register (path, rawModule, runtime) {
+    var this$1 = this;
+    if ( runtime === void 0 ) runtime = true;
+
+  var parent = this.get(path.slice(0, -1));
+  var newModule = new Module(rawModule, runtime);
+  parent.addChild(path[path.length - 1], newModule);
+
+  // register nested modules
+  if (rawModule.modules) {
+    forEachValue(rawModule.modules, function (rawChildModule, key) {
+      this$1.register(path.concat(key), rawChildModule, runtime);
+    });
+  }
+};
+
+ModuleCollection.prototype.unregister = function unregister (path) {
+  var parent = this.get(path.slice(0, -1));
+  var key = path[path.length - 1];
+  if (!parent.getChild(key).runtime) { return }
+
+  parent.removeChild(key);
+};
+
+function update (targetModule, newModule) {
+  // update target module
+  targetModule.update(newModule);
+
+  // update nested modules
+  if (newModule.modules) {
+    for (var key in newModule.modules) {
+      if (!targetModule.getChild(key)) {
+        console.warn(
+          "[vuex] trying to add a new module '" + key + "' on hot reloading, " +
+          'manual reload is needed'
+        );
+        return
+      }
+      update(targetModule.getChild(key), newModule.modules[key]);
+    }
+  }
+}
+
+var Vue; // bind on install
+
+var Store = function Store (options) {
+  var this$1 = this;
+  if ( options === void 0 ) options = {};
+
+  assert(Vue, "must call Vue.use(Vuex) before creating a store instance.");
+  assert(typeof Promise !== 'undefined', "vuex requires a Promise polyfill in this browser.");
+
+  var state = options.state; if ( state === void 0 ) state = {};
+  var plugins = options.plugins; if ( plugins === void 0 ) plugins = [];
+  var strict = options.strict; if ( strict === void 0 ) strict = false;
+
+  // store internal state
+  this._committing = false;
+  this._actions = Object.create(null);
+  this._mutations = Object.create(null);
+  this._wrappedGetters = Object.create(null);
+  this._modules = new ModuleCollection(options);
+  this._modulesNamespaceMap = Object.create(null);
+  this._subscribers = [];
+  this._watcherVM = new Vue();
+
+  // bind commit and dispatch to self
+  var store = this;
+  var ref = this;
+  var dispatch = ref.dispatch;
+  var commit = ref.commit;
+  this.dispatch = function boundDispatch (type, payload) {
+    return dispatch.call(store, type, payload)
+  };
+  this.commit = function boundCommit (type, payload, options) {
+    return commit.call(store, type, payload, options)
+  };
+
+  // strict mode
+  this.strict = strict;
+
+  // init root module.
+  // this also recursively registers all sub-modules
+  // and collects all module getters inside this._wrappedGetters
+  installModule(this, state, [], this._modules.root);
+
+  // initialize the store vm, which is responsible for the reactivity
+  // (also registers _wrappedGetters as computed properties)
+  resetStoreVM(this, state);
+
+  // apply plugins
+  plugins.concat(devtoolPlugin).forEach(function (plugin) { return plugin(this$1); });
+};
+
+var prototypeAccessors = { state: {} };
+
+prototypeAccessors.state.get = function () {
+  return this._vm._data.$$state
+};
+
+prototypeAccessors.state.set = function (v) {
+  assert(false, "Use store.replaceState() to explicit replace store state.");
+};
+
+Store.prototype.commit = function commit (_type, _payload, _options) {
+    var this$1 = this;
+
+  // check object-style commit
+  var ref = unifyObjectStyle(_type, _payload, _options);
+    var type = ref.type;
+    var payload = ref.payload;
+    var options = ref.options;
+
+  var mutation = { type: type, payload: payload };
+  var entry = this._mutations[type];
+  if (!entry) {
+    console.error(("[vuex] unknown mutation type: " + type));
+    return
+  }
+  this._withCommit(function () {
+    entry.forEach(function commitIterator (handler) {
+      handler(payload);
+    });
+  });
+  this._subscribers.forEach(function (sub) { return sub(mutation, this$1.state); });
+
+  if (options && options.silent) {
+    console.warn(
+      "[vuex] mutation type: " + type + ". Silent option has been removed. " +
+      'Use the filter functionality in the vue-devtools'
+    );
+  }
+};
+
+Store.prototype.dispatch = function dispatch (_type, _payload) {
+  // check object-style dispatch
+  var ref = unifyObjectStyle(_type, _payload);
+    var type = ref.type;
+    var payload = ref.payload;
+
+  var entry = this._actions[type];
+  if (!entry) {
+    console.error(("[vuex] unknown action type: " + type));
+    return
+  }
+  return entry.length > 1
+    ? Promise.all(entry.map(function (handler) { return handler(payload); }))
+    : entry[0](payload)
+};
+
+Store.prototype.subscribe = function subscribe (fn) {
+  var subs = this._subscribers;
+  if (subs.indexOf(fn) < 0) {
+    subs.push(fn);
+  }
+  return function () {
+    var i = subs.indexOf(fn);
+    if (i > -1) {
+      subs.splice(i, 1);
+    }
+  }
+};
+
+Store.prototype.watch = function watch (getter, cb, options) {
+    var this$1 = this;
+
+  assert(typeof getter === 'function', "store.watch only accepts a function.");
+  return this._watcherVM.$watch(function () { return getter(this$1.state, this$1.getters); }, cb, options)
+};
+
+Store.prototype.replaceState = function replaceState (state) {
+    var this$1 = this;
+
+  this._withCommit(function () {
+    this$1._vm._data.$$state = state;
+  });
+};
+
+Store.prototype.registerModule = function registerModule (path, rawModule) {
+  if (typeof path === 'string') { path = [path]; }
+  assert(Array.isArray(path), "module path must be a string or an Array.");
+  this._modules.register(path, rawModule);
+  installModule(this, this.state, path, this._modules.get(path));
+  // reset store to update getters...
+  resetStoreVM(this, this.state);
+};
+
+Store.prototype.unregisterModule = function unregisterModule (path) {
+    var this$1 = this;
+
+  if (typeof path === 'string') { path = [path]; }
+  assert(Array.isArray(path), "module path must be a string or an Array.");
+  this._modules.unregister(path);
+  this._withCommit(function () {
+    var parentState = getNestedState(this$1.state, path.slice(0, -1));
+    Vue.delete(parentState, path[path.length - 1]);
+  });
+  resetStore(this);
+};
+
+Store.prototype.hotUpdate = function hotUpdate (newOptions) {
+  this._modules.update(newOptions);
+  resetStore(this, true);
+};
+
+Store.prototype._withCommit = function _withCommit (fn) {
+  var committing = this._committing;
+  this._committing = true;
+  fn();
+  this._committing = committing;
+};
+
+Object.defineProperties( Store.prototype, prototypeAccessors );
+
+function resetStore (store, hot) {
+  store._actions = Object.create(null);
+  store._mutations = Object.create(null);
+  store._wrappedGetters = Object.create(null);
+  store._modulesNamespaceMap = Object.create(null);
+  var state = store.state;
+  // init all modules
+  installModule(store, state, [], store._modules.root, true);
+  // reset vm
+  resetStoreVM(store, state, hot);
+}
+
+function resetStoreVM (store, state, hot) {
+  var oldVm = store._vm;
+
+  // bind store public getters
+  store.getters = {};
+  var wrappedGetters = store._wrappedGetters;
+  var computed = {};
+  forEachValue(wrappedGetters, function (fn, key) {
+    // use computed to leverage its lazy-caching mechanism
+    computed[key] = function () { return fn(store); };
+    Object.defineProperty(store.getters, key, {
+      get: function () { return store._vm[key]; },
+      enumerable: true // for local getters
+    });
+  });
+
+  // use a Vue instance to store the state tree
+  // suppress warnings just in case the user has added
+  // some funky global mixins
+  var silent = Vue.config.silent;
+  Vue.config.silent = true;
+  store._vm = new Vue({
+    data: {
+      $$state: state
+    },
+    computed: computed
+  });
+  Vue.config.silent = silent;
+
+  // enable strict mode for new vm
+  if (store.strict) {
+    enableStrictMode(store);
+  }
+
+  if (oldVm) {
+    if (hot) {
+      // dispatch changes in all subscribed watchers
+      // to force getter re-evaluation for hot reloading.
+      store._withCommit(function () {
+        oldVm._data.$$state = null;
+      });
+    }
+    Vue.nextTick(function () { return oldVm.$destroy(); });
+  }
+}
+
+function installModule (store, rootState, path, module, hot) {
+  var isRoot = !path.length;
+  var namespace = store._modules.getNamespace(path);
+
+  // register in namespace map
+  if (module.namespaced) {
+    store._modulesNamespaceMap[namespace] = module;
+  }
+
+  // set state
+  if (!isRoot && !hot) {
+    var parentState = getNestedState(rootState, path.slice(0, -1));
+    var moduleName = path[path.length - 1];
+    store._withCommit(function () {
+      Vue.set(parentState, moduleName, module.state);
+    });
+  }
+
+  var local = module.context = makeLocalContext(store, namespace, path);
+
+  module.forEachMutation(function (mutation, key) {
+    var namespacedType = namespace + key;
+    registerMutation(store, namespacedType, mutation, local);
+  });
+
+  module.forEachAction(function (action, key) {
+    var namespacedType = namespace + key;
+    registerAction(store, namespacedType, action, local);
+  });
+
+  module.forEachGetter(function (getter, key) {
+    var namespacedType = namespace + key;
+    registerGetter(store, namespacedType, getter, local);
+  });
+
+  module.forEachChild(function (child, key) {
+    installModule(store, rootState, path.concat(key), child, hot);
+  });
+}
+
+/**
+ * make localized dispatch, commit, getters and state
+ * if there is no namespace, just use root ones
+ */
+function makeLocalContext (store, namespace, path) {
+  var noNamespace = namespace === '';
+
+  var local = {
+    dispatch: noNamespace ? store.dispatch : function (_type, _payload, _options) {
+      var args = unifyObjectStyle(_type, _payload, _options);
+      var payload = args.payload;
+      var options = args.options;
+      var type = args.type;
+
+      if (!options || !options.root) {
+        type = namespace + type;
+        if (!store._actions[type]) {
+          console.error(("[vuex] unknown local action type: " + (args.type) + ", global type: " + type));
+          return
+        }
+      }
+
+      return store.dispatch(type, payload)
+    },
+
+    commit: noNamespace ? store.commit : function (_type, _payload, _options) {
+      var args = unifyObjectStyle(_type, _payload, _options);
+      var payload = args.payload;
+      var options = args.options;
+      var type = args.type;
+
+      if (!options || !options.root) {
+        type = namespace + type;
+        if (!store._mutations[type]) {
+          console.error(("[vuex] unknown local mutation type: " + (args.type) + ", global type: " + type));
+          return
+        }
+      }
+
+      store.commit(type, payload, options);
+    }
+  };
+
+  // getters and state object must be gotten lazily
+  // because they will be changed by vm update
+  Object.defineProperties(local, {
+    getters: {
+      get: noNamespace
+        ? function () { return store.getters; }
+        : function () { return makeLocalGetters(store, namespace); }
+    },
+    state: {
+      get: function () { return getNestedState(store.state, path); }
+    }
+  });
+
+  return local
+}
+
+function makeLocalGetters (store, namespace) {
+  var gettersProxy = {};
+
+  var splitPos = namespace.length;
+  Object.keys(store.getters).forEach(function (type) {
+    // skip if the target getter is not match this namespace
+    if (type.slice(0, splitPos) !== namespace) { return }
+
+    // extract local getter type
+    var localType = type.slice(splitPos);
+
+    // Add a port to the getters proxy.
+    // Define as getter property because
+    // we do not want to evaluate the getters in this time.
+    Object.defineProperty(gettersProxy, localType, {
+      get: function () { return store.getters[type]; },
+      enumerable: true
+    });
+  });
+
+  return gettersProxy
+}
+
+function registerMutation (store, type, handler, local) {
+  var entry = store._mutations[type] || (store._mutations[type] = []);
+  entry.push(function wrappedMutationHandler (payload) {
+    handler(local.state, payload);
+  });
+}
+
+function registerAction (store, type, handler, local) {
+  var entry = store._actions[type] || (store._actions[type] = []);
+  entry.push(function wrappedActionHandler (payload, cb) {
+    var res = handler({
+      dispatch: local.dispatch,
+      commit: local.commit,
+      getters: local.getters,
+      state: local.state,
+      rootGetters: store.getters,
+      rootState: store.state
+    }, payload, cb);
+    if (!isPromise(res)) {
+      res = Promise.resolve(res);
+    }
+    if (store._devtoolHook) {
+      return res.catch(function (err) {
+        store._devtoolHook.emit('vuex:error', err);
+        throw err
+      })
+    } else {
+      return res
+    }
+  });
+}
+
+function registerGetter (store, type, rawGetter, local) {
+  if (store._wrappedGetters[type]) {
+    console.error(("[vuex] duplicate getter key: " + type));
+    return
+  }
+  store._wrappedGetters[type] = function wrappedGetter (store) {
+    return rawGetter(
+      local.state, // local state
+      local.getters, // local getters
+      store.state, // root state
+      store.getters // root getters
+    )
+  };
+}
+
+function enableStrictMode (store) {
+  store._vm.$watch(function () { return this._data.$$state }, function () {
+    assert(store._committing, "Do not mutate vuex store state outside mutation handlers.");
+  }, { deep: true, sync: true });
+}
+
+function getNestedState (state, path) {
+  return path.length
+    ? path.reduce(function (state, key) { return state[key]; }, state)
+    : state
+}
+
+function unifyObjectStyle (type, payload, options) {
+  if (isObject(type) && type.type) {
+    options = payload;
+    payload = type;
+    type = type.type;
+  }
+
+  assert(typeof type === 'string', ("Expects string as the type, but found " + (typeof type) + "."));
+
+  return { type: type, payload: payload, options: options }
+}
+
+function install (_Vue) {
+  if (Vue) {
+    console.error(
+      '[vuex] already installed. Vue.use(Vuex) should be called only once.'
+    );
+    return
+  }
+  Vue = _Vue;
+  applyMixin(Vue);
+}
+
+// auto install in dist mode
+if (typeof window !== 'undefined' && window.Vue) {
+  install(window.Vue);
+}
+
+var mapState = normalizeNamespace(function (namespace, states) {
+  var res = {};
+  normalizeMap(states).forEach(function (ref) {
+    var key = ref.key;
+    var val = ref.val;
+
+    res[key] = function mappedState () {
+      var state = this.$store.state;
+      var getters = this.$store.getters;
+      if (namespace) {
+        var module = getModuleByNamespace(this.$store, 'mapState', namespace);
+        if (!module) {
+          return
+        }
+        state = module.context.state;
+        getters = module.context.getters;
+      }
+      return typeof val === 'function'
+        ? val.call(this, state, getters)
+        : state[val]
+    };
+    // mark vuex getter for devtools
+    res[key].vuex = true;
+  });
+  return res
+});
+
+var mapMutations = normalizeNamespace(function (namespace, mutations) {
+  var res = {};
+  normalizeMap(mutations).forEach(function (ref) {
+    var key = ref.key;
+    var val = ref.val;
+
+    val = namespace + val;
+    res[key] = function mappedMutation () {
+      var args = [], len = arguments.length;
+      while ( len-- ) args[ len ] = arguments[ len ];
+
+      if (namespace && !getModuleByNamespace(this.$store, 'mapMutations', namespace)) {
+        return
+      }
+      return this.$store.commit.apply(this.$store, [val].concat(args))
+    };
+  });
+  return res
+});
+
+var mapGetters = normalizeNamespace(function (namespace, getters) {
+  var res = {};
+  normalizeMap(getters).forEach(function (ref) {
+    var key = ref.key;
+    var val = ref.val;
+
+    val = namespace + val;
+    res[key] = function mappedGetter () {
+      if (namespace && !getModuleByNamespace(this.$store, 'mapGetters', namespace)) {
+        return
+      }
+      if (!(val in this.$store.getters)) {
+        console.error(("[vuex] unknown getter: " + val));
+        return
+      }
+      return this.$store.getters[val]
+    };
+    // mark vuex getter for devtools
+    res[key].vuex = true;
+  });
+  return res
+});
+
+var mapActions = normalizeNamespace(function (namespace, actions) {
+  var res = {};
+  normalizeMap(actions).forEach(function (ref) {
+    var key = ref.key;
+    var val = ref.val;
+
+    val = namespace + val;
+    res[key] = function mappedAction () {
+      var args = [], len = arguments.length;
+      while ( len-- ) args[ len ] = arguments[ len ];
+
+      if (namespace && !getModuleByNamespace(this.$store, 'mapActions', namespace)) {
+        return
+      }
+      return this.$store.dispatch.apply(this.$store, [val].concat(args))
+    };
+  });
+  return res
+});
+
+function normalizeMap (map) {
+  return Array.isArray(map)
+    ? map.map(function (key) { return ({ key: key, val: key }); })
+    : Object.keys(map).map(function (key) { return ({ key: key, val: map[key] }); })
+}
+
+function normalizeNamespace (fn) {
+  return function (namespace, map) {
+    if (typeof namespace !== 'string') {
+      map = namespace;
+      namespace = '';
+    } else if (namespace.charAt(namespace.length - 1) !== '/') {
+      namespace += '/';
+    }
+    return fn(namespace, map)
+  }
+}
+
+function getModuleByNamespace (store, helper, namespace) {
+  var module = store._modulesNamespaceMap[namespace];
+  if (!module) {
+    console.error(("[vuex] module namespace not found in " + helper + "(): " + namespace));
+  }
+  return module
+}
+
+var index_esm = {
+  Store: Store,
+  install: install,
+  version: '2.3.0',
+  mapState: mapState,
+  mapMutations: mapMutations,
+  mapGetters: mapGetters,
+  mapActions: mapActions
+};
+
+/* harmony default export */ __webpack_exports__["a"] = (index_esm);
+
+
+/***/ }),
+/* 145 */,
+/* 146 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -39214,28 +38757,18 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_jquery__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_jquery___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_jquery__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__components_globalFunctions_js__ = __webpack_require__(5);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_autosize__ = __webpack_require__(8);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_autosize___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_autosize__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_autosize_input__ = __webpack_require__(15);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_autosize_input___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_3_autosize_input__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_linkifyjs__ = __webpack_require__(189);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_linkifyjs___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_4_linkifyjs__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5_linkifyjs_html__ = __webpack_require__(188);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5_linkifyjs_html___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_5_linkifyjs_html__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6_linkifyjs_plugins_hashtag__ = __webpack_require__(199);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6_linkifyjs_plugins_hashtag___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_6_linkifyjs_plugins_hashtag__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7_moment__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7_moment___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_7_moment__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8_flatpickr__ = __webpack_require__(185);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8_flatpickr___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_8_flatpickr__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__components_flatPickrOptions_js__ = __webpack_require__(12);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10_vue__ = __webpack_require__(7);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10_vue___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_10_vue__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_11_vue_resource__ = __webpack_require__(215);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_12__vue_components_vueFilters_js__ = __webpack_require__(177);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_13__items_app_js__ = __webpack_require__(175);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_14__vue_components_dataTree_js__ = __webpack_require__(21);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_15__components_ListAppKeyBindings_js__ = __webpack_require__(174);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_linkifyjs__ = __webpack_require__(197);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_linkifyjs___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_linkifyjs__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_linkifyjs_html__ = __webpack_require__(196);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_linkifyjs_html___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_3_linkifyjs_html__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_linkifyjs_plugins_hashtag__ = __webpack_require__(207);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_linkifyjs_plugins_hashtag___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_4_linkifyjs_plugins_hashtag__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5_moment__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5_moment___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_5_moment__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6_flatpickr__ = __webpack_require__(193);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6_flatpickr___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_6_flatpickr__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__components_flatPickrOptions_js__ = __webpack_require__(12);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__items_initialize_js__ = __webpack_require__(176);
 // IMPORT jQuery
 
 
@@ -39244,9 +38777,6 @@ window.$ = __WEBPACK_IMPORTED_MODULE_0_jquery___default.a;
 window.jQuery = __WEBPACK_IMPORTED_MODULE_0_jquery___default.a;
 
 // IMPORT Own jQuery replacement functions
-
-
-
 
 window.btnEffect = __WEBPACK_IMPORTED_MODULE_1__components_globalFunctions_js__["b" /* btnEffect */];
 // Make hasClass(el) available as el.hasClass();
@@ -39258,9 +38788,9 @@ window.Element.prototype.hasClass = function (config) {
 
 
  // optional
-window.linkifyHtml = __WEBPACK_IMPORTED_MODULE_5_linkifyjs_html___default.a;
-window.hashtag = __WEBPACK_IMPORTED_MODULE_6_linkifyjs_plugins_hashtag___default.a;
-__WEBPACK_IMPORTED_MODULE_6_linkifyjs_plugins_hashtag___default()(__WEBPACK_IMPORTED_MODULE_4_linkifyjs__);
+window.linkifyHtml = __WEBPACK_IMPORTED_MODULE_3_linkifyjs_html___default.a;
+window.hashtag = __WEBPACK_IMPORTED_MODULE_4_linkifyjs_plugins_hashtag___default.a;
+__WEBPACK_IMPORTED_MODULE_4_linkifyjs_plugins_hashtag___default()(__WEBPACK_IMPORTED_MODULE_2_linkifyjs__);
 
 // IMPORT Moment
 // having trouble with these:
@@ -39269,107 +38799,32 @@ __WEBPACK_IMPORTED_MODULE_6_linkifyjs_plugins_hashtag___default()(__WEBPACK_IMPO
 // moment-countdown/dist/moment-countdown.min.js
 // var moment = require('moment');
 
-window.moment = __WEBPACK_IMPORTED_MODULE_7_moment___default.a;
+window.moment = __WEBPACK_IMPORTED_MODULE_5_moment___default.a;
 
 // IMPORT FlatPickr
 
-window.Flatpickr = __WEBPACK_IMPORTED_MODULE_8_flatpickr___default.a;
+window.Flatpickr = __WEBPACK_IMPORTED_MODULE_6_flatpickr___default.a;
 
-
-// Vue Basics
-
-window.Vue = __WEBPACK_IMPORTED_MODULE_10_vue___default.a;
-
-__WEBPACK_IMPORTED_MODULE_10_vue___default.a.use(__WEBPACK_IMPORTED_MODULE_11_vue_resource__["a" /* default */]);
-
-
-__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_12__vue_components_vueFilters_js__["a" /* default */])(__WEBPACK_IMPORTED_MODULE_10_vue___default.a);
-// Vue Components
-
-
-// JS Classes
-
-
+window.flatPickConfig = __WEBPACK_IMPORTED_MODULE_7__components_flatPickrOptions_js__["a" /* default */];
 
 __WEBPACK_IMPORTED_MODULE_0_jquery___default()('body').on('click', 'button', function (e) {
 	console.log(e);
 	__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__components_globalFunctions_js__["b" /* btnEffect */])(e);
 });
 
+
+
 console.log('start fetching all items');
+/*/ ～～～～～～～～～～～～～～～～～～～～～～～　\*\		*/
 __WEBPACK_IMPORTED_MODULE_0_jquery___default.a.getJSON('/api/items', function (fetchedData) {
+	/*
+ \*\ ～～～～～～～～～～～～～～～～～～～～～～～　/*/
 	console.log('fetched all items');
-
-	//response
-	window.eventHub = new __WEBPACK_IMPORTED_MODULE_10_vue___default.a();
-	window.allItems = new __WEBPACK_IMPORTED_MODULE_14__vue_components_dataTree_js__["a" /* default */](fetchedData);
-	console.log(allItems);
-
-	window.vm = new __WEBPACK_IMPORTED_MODULE_10_vue___default.a(__WEBPACK_IMPORTED_MODULE_13__items_app_js__["a" /* default */]);
-	new __WEBPACK_IMPORTED_MODULE_15__components_ListAppKeyBindings_js__["a" /* default */]();
-	// vm.allData = allItems.root;
-	// vm.doneData = allItems.doneitems;
-	vm.nodes = allItems.nodes;
-
-	console.log('allItems ↓');
-	console.log(allItems);
-
-	__WEBPACK_IMPORTED_MODULE_10_vue___default.a.directive('flatpicky', {
-		inserted: function inserted(el) {
-			new __WEBPACK_IMPORTED_MODULE_8_flatpickr___default.a(el, __WEBPACK_IMPORTED_MODULE_9__components_flatPickrOptions_js__["a" /* default */]);
-		}
-	});
-	__WEBPACK_IMPORTED_MODULE_10_vue___default.a.directive('focus', {
-		inserted: function inserted(el, binding) {
-			if (vm.mobile && !binding.modifiers.mobile) {
-				return;
-			}
-			el.focus();
-		}
-	});
-	__WEBPACK_IMPORTED_MODULE_10_vue___default.a.directive('autoheight', {
-		inserted: function inserted(el, binding) {
-			__WEBPACK_IMPORTED_MODULE_10_vue___default.a.nextTick(function () {
-				__WEBPACK_IMPORTED_MODULE_2_autosize___default()(el);
-			});
-		}
-	});
-	__WEBPACK_IMPORTED_MODULE_10_vue___default.a.directive('autowidth', {
-		inserted: function inserted(el, binding) {
-			__WEBPACK_IMPORTED_MODULE_10_vue___default.a.nextTick(function () {
-				__WEBPACK_IMPORTED_MODULE_3_autosize_input___default()(el);
-			});
-		}
-	});
-	__WEBPACK_IMPORTED_MODULE_10_vue___default.a.directive('ios-dblclick', {
-		inserted: function inserted(el, binding) {
-			// TODO create ios Double click directive
-			// clicks++;
-			// if (clicks == 1) {
-			//     setTimeout(function(){
-			//         if(clicks == 1) {
-			//             single_click_callback.call(self, event);
-			//         } else {
-			//             double_click_callback.call(self, event);
-			//         }
-			//     clicks = 0;
-			//     }, timeout || 300);
-			// }
-		}
-	});
-
-	vm.patching = false;
-	vm.loading = false;
+	__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_8__items_initialize_js__["a" /* default */])(fetchedData);
 }); // end ajax - get data
 
 /***/ }),
-/* 146 */,
-/* 147 */
-/***/ (function(module, exports) {
-
-// removed by extract-text-webpack-plugin
-
-/***/ }),
+/* 147 */,
 /* 148 */
 /***/ (function(module, exports) {
 
@@ -39382,7 +38837,12 @@ __WEBPACK_IMPORTED_MODULE_0_jquery___default.a.getJSON('/api/items', function (f
 // removed by extract-text-webpack-plugin
 
 /***/ }),
-/* 150 */,
+/* 150 */
+/***/ (function(module, exports) {
+
+// removed by extract-text-webpack-plugin
+
+/***/ }),
 /* 151 */,
 /* 152 */,
 /* 153 */,
@@ -39401,20 +38861,30 @@ __WEBPACK_IMPORTED_MODULE_0_jquery___default.a.getJSON('/api/items', function (f
 /* 166 */,
 /* 167 */,
 /* 168 */,
-/* 169 */
+/* 169 */,
+/* 170 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__components_valueMorphers2_js__ = __webpack_require__(9);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__components_flatPickrOptions_js__ = __webpack_require__(12);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_autosize__ = __webpack_require__(8);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_autosize___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_autosize__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_autosize_input__ = __webpack_require__(15);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_autosize_input___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_3_autosize_input__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__components_globalFunctions_js__ = __webpack_require__(5);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5_clipboard__ = __webpack_require__(180);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5_clipboard___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_5_clipboard__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__components_globalFunctions_js__ = __webpack_require__(5);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_clipboard__ = __webpack_require__(188);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_clipboard___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_clipboard__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__itemMenu_vue__ = __webpack_require__(242);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__itemMenu_vue___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_3__itemMenu_vue__);
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 //
 //
 //
@@ -40003,8 +39473,9 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 // import Morph from '../components/valueMorphers.js'
 // window.Morph = new Morph();
 
-
-
+// import flatPickConfig from '../components/flatPickrOptions.js';
+// import autosize from 'autosize';
+// import autosizeInput from 'autosize-input';
 
 
 
@@ -40012,18 +39483,20 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony default export */ __webpack_exports__["default"] = ({
 	name: 'Card',
 	template: '#items-card-template',
-	mounted: function mounted() {
-		var copyElPath = "#card-" + this.item.id + "-copy";
-		var self = this;
-		new __WEBPACK_IMPORTED_MODULE_5_clipboard___default.a(copyElPath, {
-			text: function text(trigger) {
+	components: { itemMenu: __WEBPACK_IMPORTED_MODULE_3__itemMenu_vue___default.a },
+	mounted() {
+		let copyElPath = "#card-" + this.item.id + "-copy";
+		let self = this;
+		new __WEBPACK_IMPORTED_MODULE_2_clipboard___default.a(copyElPath, {
+			text: function (trigger) {
 				console.log(trigger);
-				var spaceVariable = parseFloat(self.item.depth);
-				var allChildren = self.allVisibleChildItems.reduce(function (all, val) {
-					var spacesVal = parseFloat(val.depth) - spaceVariable;
-					var spaces = '　　'.repeat(spacesVal);
-					return all + '\n' + spaces + '\u30FB' + val.body;
-				}, '' + self.item.body);
+				let spaceVariable = parseFloat(self.item.depth);
+				let allChildren = self.allVisibleChildItems.reduce(function (all, val) {
+					let spacesVal = parseFloat(val.depth) - spaceVariable;
+					let spaces = '　　'.repeat(spacesVal);
+					return `${all}
+${spaces}・${val.body}`;
+				}, `${self.item.body}`);
 				return allChildren;
 			}
 		}).on('success', function (e) {
@@ -40033,16 +39506,20 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 			e.clearSelection();
 		});
 		if (this.journalView && this.item.journalDate) {
-			var copyElPath_Journal = "#journal-card-" + this.item.done_date + "-copy";
-			new __WEBPACK_IMPORTED_MODULE_5_clipboard___default.a(copyElPath_Journal, {
-				text: function text(trigger) {
+			let copyElPath_Journal = "#journal-card-" + this.item.done_date + "-copy";
+			new __WEBPACK_IMPORTED_MODULE_2_clipboard___default.a(copyElPath_Journal, {
+				text: function (trigger) {
 					console.log(trigger);
 					console.log(self);
-					var usedT = self.totalUsedMin ? '\n' + self.basis.text.menu.usedTime + ': ' + self.sec_to_hourmin(self.totalUsedSec) : '';
-					var journalDateTxt = self.journalDate + '\n==========' + usedT;
-					var allChildren = self.allVisibleChildItems.reduce(function (all, val) {
-						var pb = !all.includes('\u3010' + val.parents_bodies + '\u3011') ? '\n\u3010' + val.parents_bodies + '\u3011' : '';
-						return '' + all + pb + '\n\u30FB' + val.body;
+					let usedT = self.totalUsedMin ? `
+${self.basis.text.menu.usedTime}: ${self.sec_to_hourmin(self.totalUsedSec)}` : '';
+					let journalDateTxt = `${self.journalDate}
+==========${usedT}`;
+					let allChildren = self.allVisibleChildItems.reduce(function (all, val) {
+						let pb = !all.includes(`【${val.parents_bodies}】`) ? `
+【${val.parents_bodies}】` : ``;
+						return `${all}${pb}
+・${val.body}`;
 					}, journalDateTxt);
 					return allChildren;
 				}
@@ -40059,9 +39536,8 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 			this.$root.addingNewEmptyList = true;
 		}
 	},
-
 	props: ['item', 'parentsChildrenOrder', 'parentTags'],
-	data: function data() {
+	data() {
 		return {
 			newItem: {
 				body: '',
@@ -40070,116 +39546,108 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 				due_date: '0000-00-00 00:00:00',
 				children: ''
 			},
+			showItemMenu: false,
 			newTag: null
 		};
 	},
-
 	// components: { 
 	// Flatpickr: Flatpickr,
 	// },
 	computed: {
-		visibleChildren: function visibleChildren() {
-			var _this = this;
-
-			if (!this.item || !this.item.children.length || !allItems) {
+		visibleChildren() {
+			if (!this.item || !this.item.children.length) {
 				return [];
 			}
+			// console.log('visibleChildren');
 			if (typeof parseFloat(this.item.id) != 'number' || this.item.id == 'x') {}
 			// return [];
 
 			// console.log(this.item);
-			return this.item.children.filter(function (child) {
-				return !_this.$root.hiddenItemIds.includes(child.id);
-			});
+			return this.item.children.filter(child => !this.$root.$store.getters.hiddenItemIds.includes(child.id));
 		},
-		allVisibleChildItems: function allVisibleChildItems() {
-			var _this2 = this;
-
-			if (!this.item || !this.item.children.length || !allItems) {
+		allVisibleChildItems() {
+			if (!this.item || !this.item.children.length) {
 				return [];
 			}
-			var flattenedTree = allItems.flattenTree(this.item.children);
-			var visibleChildren = flattenedTree.filter(function (item) {
-				return !_this2.$root.hiddenItemIds.includes(item.id);
-			});
+			// console.log('allVisibleChildItems');
+			let flattenedTree = this.$root.$store.getters.flattenTree(this.item.children);
+			let visibleChildren = flattenedTree.filter(item => !this.$root.$store.getters.hiddenItemIds.includes(item.id));
 			return visibleChildren;
 		},
-		preparedPlusComputedTags: function preparedPlusComputedTags() {
-			if (!this.item || !allItems) {
+		preparedPlusComputedTags() {
+			if (!this.item) {
 				return [];
 			}
-			if (this.item.id == allItems.root.id) {
+			if (this.item.id == this.$root.$store.getters.root.id) {
 				return [];
 			}
-			var alltags = this.newItem.preparedTags;
+			let alltags = this.newItem.preparedTags;
 			if (selection.tags.length) {
-				alltags = alltags.concat(selection.tags.map(function (tag) {
-					return allItems.tagSlugToName(tag);
-				}));
+				alltags = alltags.concat(selection.tags.map(tag => __WEBPACK_IMPORTED_MODULE_1__components_globalFunctions_js__["d" /* Utilities */].tagSlugToName(tag)));
 			}
 			if (this.parentTags.length) {
 				alltags = alltags.concat(this.parentTags);
 			}
-			if (this.$root.addingNewAsChild) {
-				var tagz = allItems.returnTagsAsArray(this.item.id);
+			if (this.$root.$store.state.addingNewAsChild) {
+				let tagz = this.$root.$store.getters.returnTagsAsArray(this.item.id);
 				alltags = alltags.concat(tagz);
 			}
-			if (allItems.isTopLvlItemInFilteredRoot(this.item.id)) {
-				if (allItems.nodes[this.item.parent_id]) {
-					var tagzies = allItems.returnTagsAsArray(this.item.parent_id);
+			if (this.$root.$store.getters.isTopLvlItemInFilteredRoot(this.item.id)) {
+				if (this.$root.$store.state.nodes[this.item.parent_id]) {
+					let tagzies = this.$root.$store.getters.returnTagsAsArray(this.item.parent_id);
 					alltags = alltags.concat(tagzies);
 				}
 			}
-			alltags = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_4__components_globalFunctions_js__["k" /* uniq */])(alltags);
+			alltags = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__components_globalFunctions_js__["e" /* uniq */])(alltags);
 			return alltags.sort();
 		},
-		listIsEmpty: function listIsEmpty() {
-			if (!this.item || !allItems || !allItems.root) {
+		listIsEmpty() {
+			if (!this.item || !this.$root.$store.getters.root) {
 				return false;
 			}
-			if (this.item.id != allItems.root.id) {
+			if (this.item.id != this.$root.$store.getters.root.id) {
 				return false;
 			}
 			if (!this.visibleChildren.length) {
 				return true;
 			}
 		},
-		basis: function basis() {
-			if (!this.item || !allItems) {
+		basis() {
+			if (!this.item) {
 				return 0;
 			}
 			return this.$root;
 		},
-		totalPlannedMin: function totalPlannedMin() {
-			if (!this.item || !allItems) {
+		totalPlannedMin() {
+			if (!this.item) {
 				return 0;
 			}
-			var selfValue = this.item.planned_time ? parseFloat(this.item.planned_time) : 0;
-			var childrenArray = this.allVisibleChildItems;
+			let selfValue = this.item.planned_time ? parseFloat(this.item.planned_time) : 0;
+			let childrenArray = this.allVisibleChildItems;
 			if (!childrenArray || !childrenArray.length) {
 				return selfValue;
 			}
-			var x = childrenArray.reduce(function (prevVal, child) {
+			let x = childrenArray.reduce(function (prevVal, child) {
 				return prevVal + parseFloat(child.planned_time);
 			}, selfValue);
 			return x ? parseFloat(x) : 0;
 		},
-		totalUsedSec: function totalUsedSec() {
-			if (!this.item || !allItems) {
+		totalUsedSec() {
+			if (!this.item) {
 				return 0;
 			}
-			var selfValue = this.item.used_time ? parseFloat(this.item.used_time) : 0;
-			var childrenArray = this.allVisibleChildItems;
+			let selfValue = this.item.used_time ? parseFloat(this.item.used_time) : 0;
+			let childrenArray = this.allVisibleChildItems;
 			if (!childrenArray || !childrenArray.length) {
 				return selfValue;
 			}
-			var x = childrenArray.reduce(function (prevVal, child) {
+			let x = childrenArray.reduce(function (prevVal, child) {
 				return prevVal + parseFloat(child.used_time);
 			}, selfValue);
 			return x ? x : 0;
 		},
-		journalView: function journalView() {
-			if (!this.item || !allItems) {
+		journalView() {
+			if (!this.item) {
 				return;
 			}
 			if (this.$root.selection.view == 'journal') {
@@ -40188,18 +39656,18 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 				return false;
 			}
 		},
-		visiblePrevItemId: function visiblePrevItemId() {
-			if (!this.item || !allItems) {
+		visiblePrevItemId() {
+			if (!this.item) {
 				return;
 			}
-			var index = this.parentsChildrenOrder.indexOf(this.item.id);
+			let index = this.parentsChildrenOrder.indexOf(this.item.id);
 			if (index == 0) {
-				return allItems.root.id;
+				return this.root.id;
 			}
 			return this.parentsChildrenOrder[index - 1];
 		},
-		journalDate: function journalDate() {
-			if (!this.item || !allItems) {
+		journalDate() {
+			if (!this.item) {
 				return;
 			}
 			// console.log('run on '+this.item.id+' - '+this.item.body);
@@ -40210,15 +39678,15 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 			// JOURNAL REWRITE. original:
 			// if(this.item.depth == 0){ return; }
 			// let prevId = this.visiblePrevItemId;
-			// let prevDoneDate = allItems.nodes[prevId].done_date;
+			// let prevDoneDate = this.$root.$store.state.nodes[prevId].done_date;
 			// prevDoneDate = moment(prevDoneDate).format('YYYY/MM/DD');
 			// let thisDoneDate = moment(this.item.done_date).format('YYYY/MM/DD');
 			// if (thisDoneDate != prevDoneDate){
 			// 	return thisDoneDate;
 			// }
 		},
-		journalParentString: function journalParentString() {
-			if (!this.item || !allItems) {
+		journalParentString() {
+			if (!this.item) {
 				return;
 			}
 			// console.log('run on '+this.item.id+' - '+this.item.body);
@@ -40229,16 +39697,16 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 				if (this.item.depth == 0) {
 					return;
 				}
-				var prevId = this.visiblePrevItemId;
-				var parentString = this.item.parents_bodies;
-				var prevParentString = allItems.nodes[prevId].parents_bodies;
+				let prevId = this.visiblePrevItemId;
+				let parentString = this.item.parents_bodies;
+				let prevParentString = this.$root.$store.state.nodes[prevId].parents_bodies;
 
-				var prevDoneDate = allItems.nodes[prevId].done_date;
+				let prevDoneDate = this.$root.$store.state.nodes[prevId].done_date;
 				// console.log('moment dates');
 				// console.log(prevDoneDate);
 				// console.log(this.item.done_date);
 				prevDoneDate = moment(prevDoneDate).format('YYYY/MM/DD');
-				var thisDoneDate = moment(this.item.done_date).format('YYYY/MM/DD');
+				let thisDoneDate = moment(this.item.done_date).format('YYYY/MM/DD');
 
 				if (parentString && (parentString != prevParentString || thisDoneDate != prevDoneDate)) {
 					return parentString;
@@ -40246,70 +39714,63 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 			}
 			return false;
 		},
-		totalUsedMin: function totalUsedMin() {
-			if (!this.item || !allItems) {
+		totalUsedMin() {
+			if (!this.item) {
 				return 0;
 			}
 			return Math.floor(this.totalUsedSec / 60);
 		},
-		totalPlannedSec: function totalPlannedSec() {
-			if (!this.item || !allItems) {
+		totalPlannedSec() {
+			if (!this.item) {
 				return 0;
 			}
 			return this.totalPlannedMin * 60;
 		},
-		totalPlannedHour: function totalPlannedHour() {
-			if (!this.item || !allItems) {
+		totalPlannedHour() {
+			if (!this.item) {
 				return 0;
 			}
 			return this.totalPlannedMin / 60;
 		},
-		isProject: function isProject() {
-			if (!this.item || !allItems) {
+		isProject() {
+			if (!this.item) {
 				return;
 			}
 			// console.log('checking isProject');
-			return allItems.isProject(this.item.id);
+			return this.$root.$store.getters.isProject(this.item.id);
 		},
-		siblingIndex: function siblingIndex() {
-			if (!this.item || !allItems) {
+		siblingIndex() {
+			if (!this.item) {
 				return;
 			}
-			return allItems.siblingIndex(this.item.id);
+			return this.$root.$store.getters.siblingIndex(this.item.id);
 		},
-		olderSiblingId: function olderSiblingId() {
-			if (!this.item || !allItems) {
+		olderSiblingId() {
+			if (!this.item) {
 				return;
 			}
-			return allItems.olderSiblingId(this.item.id);
+			return this.$root.$store.getters.olderSiblingId(this.item.id);
 		},
-		parentsChildren_order: function parentsChildren_order() {
-			if (!this.item || !allItems) {
+		parentsChildren_order() {
+			if (!this.item) {
 				return;
 			}
 			if (this.item.depth == 0) {
-				return allItems.nodes[this.item.id].children_order;
+				return this.$root.$store.state.nodes[this.item.id].children_order;
 			}
 			return this.$parent.item.children_order;
 		},
-		childrenOrder: function childrenOrder() {
-			if (!this.item || !allItems) {
+		childrenOrder() {
+			if (!this.item) {
 				return 0;
 			}
-			if (this.$root.selection.view == 'journal' && this.item.id == allItems.root.id) {
-				return this.item.children.reduce(function (a, c) {
-					return a.concat(c.children);
-				}, []).map(function (child) {
-					return child.id;
-				});
+			if (this.$root.selection.view == 'journal' && this.item.id == this.$root.$store.getters.root.id) {
+				return this.item.children.reduce((a, c) => a.concat(c.children), []).map(child => child.id);
 			}
-			return this.visibleChildren.map(function (child) {
-				return child.id;
-			});
+			return this.visibleChildren.map(child => child.id);
 		},
-
 		// deepestChild()
-		// { if(!this.item || !allItems){ return; }
+		// { if(!this.item){ return; }
 		// 	let dc;
 		// 	if (!this.childrenOrder.length)
 		// 	{
@@ -40319,109 +39780,107 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 		// 		return this.visibleChildren[i-1].deepestChild;
 		// 	}
 		// },
-		childrensDeepestChildren: function childrensDeepestChildren() {
-			if (!this.item || !allItems) {
+		childrensDeepestChildren() {
+			if (!this.item) {
 				return;
 			}
 			return this.visibleChildren.map(function (item) {
 				return {
 					'id': item.id,
-					'deepestChild': this.$root.findDeepestVisibleChild(item.id)
+					'deepestChild': this.$root.$store.getters.findDeepestVisibleChild(item.id)
 				};
 			}.bind(this));
 		},
-		showAddNewBox: function showAddNewBox() {
-			if (!this.item || !allItems) {
+		showAddNewBox() {
+			if (!this.item) {
 				return;
 			}
-			if (!this.$root.addingNewUnder) {
+			if (!this.$root.$store.state.addingNewUnder) {
 				return false;
 			}
-			if (this.$root.addingNewUnder == this.item.id) {
+			if (this.$root.$store.state.addingNewUnder == this.item.id) {
 				return true;
 			}
 			return false;
 		},
-		addingNewAsFirstChild: function addingNewAsFirstChild() {
-			if (!this.item || !allItems) {
+		addingNewAsFirstChild() {
+			if (!this.item) {
 				return;
 			}
-			return this.$root.addingNewAsFirstChild;
+			return this.$root.$store.state.addingNewAsFirstChild;
 		},
-		addingNewAsChild: function addingNewAsChild() {
-			if (!this.item || !allItems) {
+		addingNewAsChild() {
+			if (!this.item) {
 				return;
 			}
-			return this.$root.addingNewAsChild;
+			return this.$root.$store.state.addingNewAsChild;
 		},
-		hasDueDate: function hasDueDate() {
-			if (!this.item || !allItems) {
+		hasDueDate() {
+			if (!this.item) {
 				return;
 			}
 			return this.item.due_date && this.item.due_date != '0000-00-00 00:00:00';
 		},
-		hasDoneDate: function hasDoneDate() {
-			if (!this.item || !allItems) {
+		hasDoneDate() {
+			if (!this.item) {
 				return;
 			}
 			return this.item.done_date && this.item.done_date != '0000-00-00 00:00:00';
 		},
-		hastotalUsedSec: function hastotalUsedSec() {
-			if (!this.item || !allItems) {
+		hastotalUsedSec() {
+			if (!this.item) {
 				return;
 			}
 			return this.item.children_order.length && this.item.totalUsedSec && this.item.totalUsedSec != '0' && this.item.used_time != this.item.totalUsedSec;
 		},
-		hasTotalPlannedMin: function hasTotalPlannedMin() {
-			if (!this.item || !allItems) {
+		hasTotalPlannedMin() {
+			if (!this.item) {
 				return;
 			}
 			return this.item.children_order.length && this.totalPlannedMin && this.totalPlannedMin != '0' && this.item.planned_time != this.totalPlannedMin;
 		},
-		hasPlannedTime: function hasPlannedTime() {
-			if (!this.item || !allItems) {
+		hasPlannedTime() {
+			if (!this.item) {
 				return;
 			}
 			return this.item.planned_time && this.item.planned_time != '0';
 		},
-		hasUsedTime: function hasUsedTime() {
-			if (!this.item || !allItems) {
+		hasUsedTime() {
+			if (!this.item) {
 				return;
 			}
 			return this.item.used_time && this.item.used_time != '0';
 		},
-		allTags_c: function allTags_c() {
-			if (!this.item || !allItems) {
-				return;
-			}
-			return this.$root.allTags;
-		},
-		totalMinLeft: function totalMinLeft() {
-			if (!this.item || !allItems) {
+		// allTags_c()
+		// { if(!this.item){ return; }
+		// 	return this.$root.allTags;
+		// },
+		totalMinLeft() {
+			if (!this.item) {
 				return 0;
 			}
 			return this.totalPlannedMin - this.totalUsedMin;
 		},
-		totalSecLeft: function totalSecLeft() {
-			if (!this.item || !allItems) {
+		totalSecLeft() {
+			if (!this.item) {
 				return 0;
 			}
 			return this.totalPlannedSec - this.totalUsedSec;
 		},
-		secLeft: function secLeft() {
-			if (!this.item || !allItems) {
+		secLeft() {
+			if (!this.item) {
 				return 0;
 			}
 			return this.item.planned_time * 60 - this.item.used_time;
 		},
-		minLeft: function minLeft() {
-			if (!this.item || !allItems) {
+		minLeft() {
+			if (!this.item) {
 				return 0;
 			}
 			return this.secLeft / 60;
 		},
-		totalTimeDifferentFromParent: function totalTimeDifferentFromParent() {
-			if (!this.item || !allItems) {
+		totalTimeDifferentFromParent() {
+			if (!this.item) {
 				return 0;
 			}
 			if (!this.item.parent_id) {
@@ -40429,56 +39888,55 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 			}
 			return this.totalPlannedSec != this.$parent.totalPlannedSec;
 		},
-		tagsArray: function tagsArray() {
-			if (!this.item || !allItems) {
+		tagsArray() {
+			if (!this.item) {
 				return true;
 			}
-			return this.item.tagged.map(function (obj) {
-				return obj.tag_name;
-			});
+			return this.item.tagged.map(obj => obj.tag_name);
 		},
-		isHidden: function isHidden() {
-			if (!this.item || !allItems) {
+		isHidden() {
+			if (!this.item) {
 				return true;
 			}
-			return this.$root.hiddenItemIds.includes(this.item.id);
+			// console.log('allVisibleChildItems');
+			return this.$root.$store.getters.hiddenItemIds.includes(this.item.id);
 		},
-		allChildrenDone: function allChildrenDone() {
-			if (!this.item || !allItems) {
+		allChildrenDone() {
+			if (!this.item) {
 				return true;
 			}
-			return allItems.allChildrenDone(this.item.id);
+			return this.$root.$store.getters.allChildrenDone(this.item.id);
 		},
-		thebody: function thebody() {
+		thebody() {
 			return this.item.body;
 		}
 	},
 	methods: {
-		linkify: __WEBPACK_IMPORTED_MODULE_0__components_valueMorphers2_js__["d" /* linkify */],
-		momentCalendar: __WEBPACK_IMPORTED_MODULE_0__components_valueMorphers2_js__["c" /* momentCalendar */],
-		sec_to_hourminsec: __WEBPACK_IMPORTED_MODULE_0__components_valueMorphers2_js__["e" /* sec_to_hourminsec */],
-		sec_to_hourmin: __WEBPACK_IMPORTED_MODULE_0__components_valueMorphers2_js__["a" /* sec_to_hourmin */],
-		convertbodyURLtoHTML: function convertbodyURLtoHTML() {
+		linkify: __WEBPACK_IMPORTED_MODULE_0__components_valueMorphers2_js__["c" /* linkify */],
+		momentCalendar: __WEBPACK_IMPORTED_MODULE_0__components_valueMorphers2_js__["b" /* momentCalendar */],
+		sec_to_hourminsec: __WEBPACK_IMPORTED_MODULE_0__components_valueMorphers2_js__["d" /* sec_to_hourminsec */],
+		sec_to_hourmin: __WEBPACK_IMPORTED_MODULE_0__components_valueMorphers2_js__["e" /* sec_to_hourmin */],
+		convertbodyURLtoHTML() {
 			// console.log('converting');
 			if (!this.item || this.item.depth == 0) {
 				return;
 			}
-			var bodyboxQS = '#' + this.$el.id + ' .js-body-text';
-			var a = document.querySelector(bodyboxQS);
+			let bodyboxQS = '#' + this.$el.id + ' .js-body-text';
+			let a = document.querySelector(bodyboxQS);
 			if (!a || !a.innerHTML.includes('a href')) {
 				return;
 			}
 			a.innerHTML = a.innerHTML.replace("&lt;a href=", "<a href=").replace('target="_blank"&gt;', 'target="_blank">').replace("&lt;/a&gt;", "</a>");
 		},
-		addTimer: function addTimer(item) {
+		addTimer(item) {
 			//Codementor
-			this.$root.addTimer(item.id);
+			this.$root.$store.dispatch('addTimer', { id: item.id });
 		},
-		selectItem: function selectItem(item) {
-			selection.selectedId = item.id;
+		selectItem(item) {
+			this.$root.$store.dispatch('selectItem', { id: item.id });
 		},
-		clickOnAddNewCurtain: function clickOnAddNewCurtain(event) {
-			if (!vm.mobile) {
+		clickOnAddNewCurtain(event) {
+			if (!this.$root.$store.getters.mobile) {
 				return;
 			}
 			if (event && event.srcElement.nodeName != 'FORM') {
@@ -40486,8 +39944,8 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 			}
 			this.$root.cancelAddNew();
 		},
-		clickOnEditCurtain: function clickOnEditCurtain(item, event) {
-			if (!vm.mobile) {
+		clickOnEditCurtain(item, event) {
+			if (!this.$root.$store.getters.mobile) {
 				return;
 			}
 			if (event && event.srcElement.nodeName != 'FORM') {
@@ -40495,27 +39953,27 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 			}
 			this.doneEdit(item);
 		},
-		newItemIndent: function newItemIndent() {
+		newItemIndent() {
 			if (!this.item.children.length || !this.item.show_children) {
 				// If item has no children yet / no visible children
-				this.$root.addingNewAsChild = true;
+				this.$root.$store.state.addingNewAsChild = true;
 				return;
 			}
-			var lastChildId = allItems.getLastChildId(this.item.id);
-			vm.showAddNewItem(lastChildId);
+			let lastChildId = this.$root.$store.getters.getLastChildId(this.item.id);
+			this.$root.showAddNewItem(lastChildId);
 		},
-		newItemUnindent: function newItemUnindent() {
-			if (this.$root.addingNewAsChild) {
-				this.$root.addingNewAsChild = false;
-				this.$root.addingNewAsFirstChild = false;
+		newItemUnindent() {
+			if (this.$root.$store.state.addingNewAsChild) {
+				this.$root.$store.state.addingNewAsChild = false;
+				this.$root.$store.state.addingNewAsFirstChild = false;
 				return;
 			}
 			if (selection.view == 'journal') {
 				return;
 			}
-			vm.showAddNewItem(this.item.parent_id);
+			this.$root.showAddNewItem({ id: this.item.parent_id });
 		},
-		keydownOnNew: function keydownOnNew(item, e, field) {
+		keydownOnNew(item, e, field) {
 			if (this.newTag && this.newTag.substring(0, 1) != ' ') {
 				this.newTag = ' ' + this.newTag;
 			}
@@ -40543,13 +40001,13 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 			// Delete / backspace
 			if (e.keyCode === 8 || e.keyCode === 46) {
 				if (field == 'delete-tag') {
-					var tagName = e.srcElement.value;
+					let tagName = e.srcElement.value;
 					this.deletePreparedTag(item.id, tagName);
 				}
 			}
 			// ENTER
 			if (e.keyCode === 13 && !e.shiftKey && !e.altKey && !e.metaKey && !e.ctrlKey) {
-				if (vm.mobile && field == 'body') {
+				if (this.$root.mobile && field == 'body') {
 					return;
 				}
 				e.preventDefault();
@@ -40562,8 +40020,8 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 					return;
 				}
 				if (field == 'delete-tag') {
-					var _tagName = e.srcElement.value;
-					this.deletePreparedTag(item.id, _tagName);
+					let tagName = e.srcElement.value;
+					this.deletePreparedTag(item.id, tagName);
 				}
 				if (!this.newItem.body) {
 					return;
@@ -40576,7 +40034,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 				if (!this.newItem.body) {
 					return;
 				}
-				var addNextItemAs = 'child';
+				let addNextItemAs = 'child';
 				this.addNew(addNextItemAs);
 				return;
 			}
@@ -40610,14 +40068,14 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 				}
 				if (field == 'planned-time') {
 					e.preventDefault();
-					var plsFocus = '#new-under-' + this.item.id + ' .js-newitem-body';
+					let plsFocus = '#new-under-' + this.item.id + ' .js-newitem-body';
 					document.querySelector(plsFocus).focus();
 					return;
 				}
 				if (field == 'prepare-tag') {
 					e.preventDefault();
-					var _plsFocus = '#new-under-' + this.item.id + ' .js-update-planned-time__button';
-					document.querySelector(_plsFocus).focus();
+					let plsFocus = '#new-under-' + this.item.id + ' .js-update-planned-time__button';
+					document.querySelector(plsFocus).focus();
 					return;
 				}
 			}
@@ -40626,14 +40084,14 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 				// If body is empty!
 				if (field == 'body' && !this.newItem.body) {
 					e.preventDefault();
-					var _plsFocus2 = '#new-under-' + this.item.id + ' .js-update-planned-time__button';
-					document.querySelector(_plsFocus2).focus();
+					let plsFocus = '#new-under-' + this.item.id + ' .js-update-planned-time__button';
+					document.querySelector(plsFocus).focus();
 					return;
 				}
 				if (field == 'planned-time') {
 					e.preventDefault();
-					var _plsFocus3 = '#new-under-' + this.item.id + ' .js-prepare-tag';
-					document.querySelector(_plsFocus3).focus();
+					let plsFocus = '#new-under-' + this.item.id + ' .js-prepare-tag';
+					document.querySelector(plsFocus).focus();
 					return;
 				}
 				if (field == 'prepare-tag' && !this.newItem.body) {
@@ -40649,7 +40107,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 				this.$root.setCancelThroughKeydown();
 			}
 		},
-		keydownOnEdit: function keydownOnEdit(item, e, field) {
+		keydownOnEdit(item, e, field) {
 			if (field == 'planned-time') {
 				item.planned_time = parseFloat(item.planned_time);
 			}
@@ -40675,19 +40133,20 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 			// Delete / backspace
 			if (e.keyCode === 8 || e.keyCode === 46) {
 				if (field == 'delete-tag') {
-					var tagName = e.srcElement.value;
+					let tagName = e.srcElement.value;
 					this.deleteTag(item.id, tagName);
 				}
 			}
 			// ENTER
 			if (e.keyCode === 13 && !e.shiftKey && !e.altKey) {
-				if (vm.mobile && field == 'body') {
+				console.log(`Keydown on edit: ${field} - ${e.keyCode}`);
+				if (this.$root.mobile && field == 'body') {
 					return;
 				}
 				e.preventDefault();
 				if (field == 'delete-tag') {
-					var _tagName2 = e.srcElement.value;
-					this.deleteTag(item.id, _tagName2);
+					let tagName = e.srcElement.value;
+					this.deleteTag(item.id, tagName);
 					return;
 				}
 				if (field == 'planned-time') {
@@ -40708,17 +40167,17 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 				}
 				if (field == 'planned-time') {
 					e.preventDefault();
-					var plsFocus = '#updatebox-' + item.id + ' .js-edititem-body';
+					let plsFocus = '#updatebox-' + item.id + ' .js-edititem-body';
 					document.querySelector(plsFocus).focus();
 					return;
 				}
 				if (field == 'add-tag') {
 					e.preventDefault();
-					if (vm.editingItemTags) {
-						vm.editingItemTags = null;return;
+					if (this.$root.editingItemTags) {
+						this.$root.editingItemTags = null;return;
 					}
-					var _plsFocus4 = '#updatebox-' + item.id + ' .js-update-planned-time__button';
-					document.querySelector(_plsFocus4).focus();
+					let plsFocus = '#updatebox-' + item.id + ' .js-update-planned-time__button';
+					document.querySelector(plsFocus).focus();
 					return;
 				}
 			}
@@ -40729,13 +40188,13 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 				}
 				e.preventDefault();
 				if (field == 'planned-time') {
-					var _plsFocus5 = '#add-tag-' + item.id + ' .js-add-tag';
-					document.querySelector(_plsFocus5).focus();
+					let plsFocus = '#add-tag-' + item.id + ' .js-add-tag';
+					document.querySelector(plsFocus).focus();
 					return;
 				}
 				if (field == 'add-tag') {
-					if (vm.editingItemTags) {
-						vm.editingItemTags = null;
+					if (this.$root.editingItemTags) {
+						this.$root.editingItemTags = null;
 					}
 					return;
 				}
@@ -40743,11 +40202,10 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 			// ESC
 			if (e.keyCode === 27) {
 				this.$root.setCancelThroughKeydown();
-				this.cancelEdit(item);
+				this.cancelEdit(item.id);
 			}
 		},
-		blurOnEdit: function blurOnEdit(item, field) {
-			console.log('Blur on Edit');
+		blurOnEdit(item, field) {
 			if (this.$root.cancelThroughKeydown) {
 				return;
 			}
@@ -40755,12 +40213,12 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 				this.addTag(item);
 				return;
 			}
-			var self = this;
+			let self = this;
 			setTimeout(function () {
 				if (document.activeElement.nodeName == 'INPUT' || document.activeElement.nodeName == 'TEXTAREA' || document.activeElement.nodeName == 'A' || document.activeElement.nodeName == 'BUTTON') {
 					return;
 				} else {
-					if (vm.mobile) {
+					if (self.$root.mobile) {
 						return;
 					}
 					console.log('blurring on edit');
@@ -40769,65 +40227,64 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 			}, 50);
 			// Codementor: is there any better way than this?
 		},
-		blurOnAddNew: function blurOnAddNew(item, field) {
+		blurOnAddNew(item, field) {
 			if (this.$root.cancelThroughKeydown) {
 				return;
 			}
-			console.log('Blur on Add New');
 			if (this.$root.mobile && field == 'prepare-tag') {
 				this.prepareTag(item);
 				return;
 			}
-			if (vm.mobile) {
+			if (this.$root.mobile) {
 				return;
 			}
-			var self = this;
+			let self = this;
 			setTimeout(function () {
 				if (document.activeElement.nodeName == 'INPUT' || document.activeElement.nodeName == 'TEXTAREA' || document.activeElement.nodeName == 'A' || document.activeElement.nodeName == 'BUTTON') {
 					return;
 				} else {
-					// if(vm.mobile){ self.addNew('stop'); return; }
-					if (vm.mobile) {
+					// if(self.$root.mobile){ self.addNew('stop'); return; }
+					console.log('bluring on Add New');
+					if (self.$root.mobile) {
 						return;
 					}
 					self.cancelAddNew();
 				}
 			}, 50);
 		},
-		updateDone: function updateDone(id) {
-			allItems.prepareDonePatch(id);
+		updateDone(id) {
+			this.$root.$store.dispatch('prepareDonePatch', { id });
 		},
-		updateShowChildren: function updateShowChildren(id) {
-			this.$root.patch(id, 'show_children');
+		updateShowChildren(id) {
+			this.$root.$store.dispatch('patch', { id, field: 'show_children' });
 		},
-		cancelEdit: function cancelEdit(item) {
-			this.$root.cancelEdit(item);
+		cancelEdit(id) {
+			this.$root.cancelEdit({ id });
 		},
-		startEdit: function startEdit(item, event) {
-			this.$root.startEdit(item, event);
+		startEdit(item, event) {
+			this.$root.startEdit({ item, event });
 		},
-		doneEdit: function doneEdit(item) {
-			this.$root.doneEdit(item);
+		doneEdit(item) {
+			this.$root.doneEdit({ item });
 		},
-		startEditDoneDate: function startEditDoneDate(item, event) {
+		startEditDoneDate(item, event) {
 			console.log('startEditDoneDate');
-			item = item ? item : allItems.nodes[selection.selectedId];
+			item = item ? item : this.$root.$store.state.nodes[selection.selectedId];
 			this.$root.beforeEditCache_done_date = item.done_date;
 			this.$root.editingDoneDateItem = item.id;
 		},
-		setToday: function setToday(id) {
-			this.$root.setToday(id);
+		setToday(id) {
+			this.$root.setToday({ id });
 		},
-		deleteItem: function deleteItem(item) {
-			var id = item.id;
-			this.$root.deleteItem(id);
+		deleteItemDialogue(id) {
+			this.$root.deleteItemDialogue({ id });
 		},
-		addNew: function addNew(addNextItemAs) {
-			var addTags = this.preparedPlusComputedTags;
-			var olderSibling = this.item;
-			var newItem = this.newItem;
+		addNew(addNextItemAs) {
+			let addTags = this.preparedPlusComputedTags;
+			let olderSibling = this.item;
+			let newItem = this.newItem;
 			// debugger;
-			this.$root.addNew(addNextItemAs, newItem, olderSibling, addTags);
+			this.$root.addNew({ addNextItemAs, newItem, olderSibling, addTags });
 			// Reset stuff
 			this.newItem.body = '';
 			this.newItem.due_date = '0000-00-00 00:00:00';
@@ -40836,48 +40293,48 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 			this.newItem.planned_time = '';
 			this.newItem.preparedTags = [];
 		},
-		cancelAddNew: function cancelAddNew() {
+		cancelAddNew() {
 			this.newItem.body = '';
-			var cancelUnderId = this.item.id;
-			this.$root.cancelAddNew(cancelUnderId);
+			let cancelUnderId = this.item.id;
+			this.$root.cancelAddNew({ cancelUnderId });
 		},
-		addTag: function addTag(item) {
-			var id = item ? item.id : selection.selectedId;
-			var tag = this.newTag;
-			allItems.tagItem(id, tag);
+		addTag(item) {
+			let id = item ? item.id : selection.selectedId;
+			let tag = this.newTag;
+			this.$root.$store.dispatch('tagItem', { id, tags: tag });
 			this.newTag = null;
 		},
-		prepareTag: function prepareTag(item) {
-			var id = item ? item.id : selection.selectedId;
-			var tag = this.newTag;
+		prepareTag(item) {
+			let id = item ? item.id : selection.selectedId;
+			let tag = this.newTag;
 			if (tag == 't' || tag == 'T' || tag == 'today' || tag == 'Today') {
 				tag = 'Today';
 			}
 			this.newItem.preparedTags.push(tag);
 			this.newTag = null;
 		},
-		deleteTag: function deleteTag(id, tagName, event) {
-			var plsFocus = '#add-tag-' + id + ' .js-add-tag';
+		deleteTag(id, tagName, event) {
+			let plsFocus = '#add-tag-' + id + ' .js-add-tag';
 			document.querySelector(plsFocus).focus();
-			this.$root.patchTag(id, tagName, 'untag');
+			this.$root.patchTag({ id: id, tags: tagName, requestType: 'untag' });
 		},
-		deletePreparedTag: function deletePreparedTag(tag, item) {
-			var plsFocus = '#new-under-' + this.item.id + ' .js-prepare-tag';
+		deletePreparedTag(tag, item) {
+			let plsFocus = '#new-under-' + this.item.id + ' .js-prepare-tag';
 			document.querySelector(plsFocus).focus();
-			var tagIndex = this.newItem.preparedTags.indexOf(tagIndex);
+			let tagIndex = this.newItem.preparedTags.indexOf(tagIndex);
 			this.newItem.preparedTags.splice(tagIndex, 1);
 		},
-		setPlannedTime: function setPlannedTime(item, event) {
+		setPlannedTime(item, event) {
 			item.planned_time = event.srcElement.value ? parseFloat(event.srcElement.value) : 0;
-			var plsFocus = '#add-tag-' + item.id + ' .js-add-tag';
+			let plsFocus = '#add-tag-' + item.id + ' .js-add-tag';
 			Vue.nextTick(function () {
 				console.log('returning to editting: ' + plsFocus);
 				document.querySelector(plsFocus).focus();
 			});
 		},
-		setPlannedTimeNewItem: function setPlannedTimeNewItem(item, event) {
+		setPlannedTimeNewItem(item, event) {
 			this.newItem.planned_time = event.srcElement.value ? parseFloat(event.srcElement.value) : 0;
-			var plsFocus = "#new-under-" + item.id + " .js-prepare-tag";
+			let plsFocus = "#new-under-" + item.id + " .js-prepare-tag";
 			Vue.nextTick(function () {
 				console.log('returning to : ' + plsFocus);
 				document.querySelector(plsFocus).focus();
@@ -40887,7 +40344,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 });
 
 /***/ }),
-/* 170 */
+/* 171 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -40943,19 +40400,28 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 	props: ['flashes'],
 	components: {
 		'Flash': {
-			template: '\n\t\t\t\t<div\n\t\t\t\t\tclass="flash"\n\t\t\t\t\t:class="flash.type"\n\t\t\t\t>\n\t\t\t\t\t\t<div class="bodybox">{{ flash.msg }}\n\t\t\t\t\t\t\t<span v-if="flash.type==\'ajaxError\'">{{ countDown }}</span>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t\t<button class="close" @click="close">\u2717</button>\n\t\t\t\t</div>\n    \t\t',
+			template: `
+				<div
+					class="flash"
+					:class="flash.type"
+				>
+						<div class="bodybox">{{ flash.msg }}
+							<span v-if="flash.type=='ajaxError'">{{ countDown }}</span>
+						</div>
+						<button class="close" @click="close">✗</button>
+				</div>
+    		`,
 			props: ['flash', 'index'],
-			data: function data() {
+			data() {
 				return { countDown: 4 };
 			},
-
 			// computed: {
 			// 	countDown()
 			// 	{
 			// 		return this.countDownIni;
 			// 	},
 			// },
-			mounted: function mounted() {
+			mounted() {
 				if (this.flash.type == 'ajaxError') {
 					window.timers['flash-' + this.index] = window.setInterval(function () {
 						this.countDown--;
@@ -40969,48 +40435,41 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 					this.close();
 				}.bind(this), 2000);
 			},
-
 			methods: {
-				close: function close() {
-					var _this = this;
-
+				close() {
 					if (window.timers['flash-' + this.index]) {
 						clearInterval(window.timers['flash-' + this.index]);
 						delete window.timers['flash-' + this.index];
 					}
-					this.$root.flashes = this.$root.flashes.filter(function (f) {
-						return f != _this.flash;
-					});
+					this.$root.closeFlash({ flash: this.flash });
 				}
 			}
 		}
 	},
-	data: function data() {
+	data() {
 		return {
 			timerRunning: true
 		};
 	},
-	mounted: function mounted() {
+	mounted() {
 		if (!window.timers) {
 			window.timers = {};
 		}
-		eventHub.$on('playTimer', this.playTimer);
 		eventHub.$on('clearAll', this.clearAll);
 	},
-
 	computed: {
-		card: function card() {
+		card() {
 			return this.$root.$refs.root;
 		},
-		basis: function basis() {
+		basis() {
 			return this.$root;
 		}
 	},
 	methods: {
-		maskClick: function maskClick(event) {
+		maskClick(event) {
 			if (event.target.id == 'flashes-mask') {}
 		},
-		clearAll: function clearAll(event) {
+		clearAll(event) {
 			this.$root.flashes = [];
 			window.timers = {};
 		}
@@ -41018,7 +40477,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 });
 
 /***/ }),
-/* 171 */
+/* 172 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -41204,40 +40663,39 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 	name: 'Popouts',
 	template: '#popouts-template',
 	props: ['popouts'],
-	data: function data() {
+	data() {
 		return {
 			timerRunning: true
 		};
 	},
-	mounted: function mounted() {
-		eventHub.$on('playTimer', this.playTimer);
-		eventHub.$on('clearAll', this.clearAll);
+	created() {
+		this.$bus.$on('playTimer', this.playTimer);
+		this.$bus.$on('clearAll', this.clearAll);
 	},
-
 	computed: {
-		card: function card() {
+		card() {
 			return this.$root.$refs.root;
 		},
-		basis: function basis() {
+		basis() {
 			return this.$root;
 		},
-		popoutExists: function popoutExists() {
+		popoutExists() {
 			return this.popouts.timer.length || this.popouts.delete.length || this.popouts.edit.length || this.popouts.guide;
 		}
 	},
 	methods: {
-		sec_to_hhmmss: __WEBPACK_IMPORTED_MODULE_0__components_valueMorphers2_js__["b" /* sec_to_hhmmss */], momentCalendar: __WEBPACK_IMPORTED_MODULE_0__components_valueMorphers2_js__["c" /* momentCalendar */],
-		countdownTimer: function countdownTimer(used_time, planned_time) {
-			var secondsLeft = planned_time * 60 - used_time;
+		sec_to_hhmmss: __WEBPACK_IMPORTED_MODULE_0__components_valueMorphers2_js__["a" /* sec_to_hhmmss */], momentCalendar: __WEBPACK_IMPORTED_MODULE_0__components_valueMorphers2_js__["b" /* momentCalendar */],
+		countdownTimer(used_time, planned_time) {
+			let secondsLeft = planned_time * 60 - used_time;
 			if (secondsLeft > 0) {
 				return this.sec_to_hhmmss(secondsLeft);
 			} else {
 				return this.sec_to_hhmmss(used_time - planned_time * 60);
 			}
 		},
-		removePopout: function removePopout(item) {
+		removePopout(item) {
 			this.timerRunning = false;
-			var index = this.$root.popouts.timer.indexOf(item);
+			let index = this.$root.popouts.timer.indexOf(item);
 			if (index == -1) {
 				index = this.$root.popouts.delete.indexOf(item);
 				this.$root.popouts.delete.splice(index, 1);
@@ -41245,34 +40703,28 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 			}
 			this.$root.popouts.timer.splice(index, 1);
 		},
-		popoutCall: function popoutCall(msg, item) {
-			eventHub.$emit(msg, item.id);
+		popoutCall(msg, item) {
+			Vue.bus.$emit(msg, item.id);
 			this.removePopout(item);
 		},
-		maskClick: function maskClick(event) {
+		maskClick(event) {
 			if (event.target.id == 'js-popouts-mask') {
 				this.clearAll();
 			}
 		},
-		clearAll: function clearAll(event) {
-			var _this = this;
-
-			vm.popouts.delete = [];
-			vm.popouts.timer.forEach(function (item) {
-				return _this.closeTimer(item);
-			});
-			vm.popouts.edit.forEach(function (item) {
-				return vm.cancelEdit(item);
-			});
-			vm.popouts.guide = false;
+		clearAll(event) {
+			this.$root.popouts.delete = [];
+			this.$root.popouts.timer.forEach(item => this.closeTimer(item));
+			// vm.popouts.edit.forEach(item => vm.cancelEdit(item));
+			this.$root.popouts.guide = false;
 			window.timers = {};
 		},
-		updateDone: function updateDone(item) {
+		updateDone(item) {
 			this.pauseTimer(item);
-			allItems.prepareDonePatch(item.id);
+			this.$root.prepareDonePatch({ id: item.id });
 			document.querySelector('.js-btn-ok').focus();
 		},
-		timerNav: function timerNav(button, item, value) {
+		timerNav(button, item, value) {
 			if (button == 'play') {
 				this.playTimer(item);
 			}
@@ -41289,11 +40741,15 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 				this.closeTimer(item);
 			}
 		},
-		playTimer: function playTimer(item) {
+		playTimer(item) {
+			item = item ? item : this.timer[0] ? this.timer[0] : null;
+			if (!item) {
+				console.log('no timer item');return;
+			}
 			// console.log(item);
 			console.log("timer started: " + moment().format('HH:mm:ss'));
 			this.timerRunning = true;
-			var update = function update() {
+			let update = function () {
 				if (item.planned_time > 0) {
 					item.used_time = ++item.used_time;
 				} else {
@@ -41306,7 +40762,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 			}
 			timers[item.id] = setInterval(update, 1000);
 		},
-		pauseTimer: function pauseTimer(item) {
+		pauseTimer(item) {
 			console.log("timer paused: " + moment().format('HH:mm:ss'));
 			this.timerRunning = false;
 			if (!window.timers) {
@@ -41317,18 +40773,18 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 			}
 			clearInterval(window.timers[item.id]);
 			delete window.timers[item.id];
-			vm.patch(item.id, 'used_time');
+			this.$root.patch({ id: item.id, field: 'used_time' });
 		},
-		forwardTimer: function forwardTimer(item, time) {
+		forwardTimer(item, time) {
 			time = time * 60;
 			item.used_time = item.used_time + time;
 		},
-		resetTimer: function resetTimer(item) {
+		resetTimer(item) {
 			console.log("timer reset: " + moment().format('HH:mm:ss'));
 			item.used_time = 0;
-			vm.patch(item.id, 'used_time');
+			this.$root.patch({ id: item.id, field: 'used_time' });
 		},
-		closeTimer: function closeTimer(item) {
+		closeTimer(item) {
 			console.log("timer closed: " + moment().format('HH:mm:ss'));
 			if (window.timers && window.timers[item.id]) {
 				clearInterval(window.timers[item.id]);
@@ -41337,7 +40793,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 			if (item.used_time < 5) {
 				item.used_time = 0;
 			} else {
-				vm.patch(item.id, 'used_time');
+				this.$root.patch({ id: item.id, field: 'used_time' });
 			}
 			this.removePopout(item);
 		}
@@ -41345,7 +40801,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 });
 
 /***/ }),
-/* 172 */
+/* 173 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -41453,53 +40909,53 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
     name: 'Popups',
     template: '#popups-template',
     props: ['popups'],
-    data: function data() {
+    data() {
         return { flatPickConfig: __WEBPACK_IMPORTED_MODULE_2__components_flatPickrOptions_js__["a" /* default */] };
     },
-
     computed: {
-        basis: function basis() {
+        basis() {
             return this.$root;
         }
     },
     methods: {
-        sec_to_hhmmss: __WEBPACK_IMPORTED_MODULE_0__components_valueMorphers2_js__["b" /* sec_to_hhmmss */], momentCalendar: __WEBPACK_IMPORTED_MODULE_0__components_valueMorphers2_js__["c" /* momentCalendar */],
-        addPopup: function addPopup(popup) {
+        sec_to_hhmmss: __WEBPACK_IMPORTED_MODULE_0__components_valueMorphers2_js__["a" /* sec_to_hhmmss */], momentCalendar: __WEBPACK_IMPORTED_MODULE_0__components_valueMorphers2_js__["b" /* momentCalendar */],
+        addPopup(popup) {
             this.$root.popups.push(popup);
         },
-        removePopup: function removePopup(popup) {
+        removePopup(popup) {
             clearTimeout(popup.timer);
             if (popup.type == 'afterDone') {
                 if (popup.item.used_time) {
-                    this.$root.patch(popup.item.id, 'used_time');
+                    this.$root.patch({ id: popup.item.id, field: 'used_time' });
                 }
                 if (popup.item.completion_memo) {
-                    this.$root.patch(popup.item.id, 'completion_memo');
+                    this.$root.patch({ id: popup.item.id, field: 'completion_memo' });
                 }
             }
-            var index = this.$root.popups.indexOf(popup);
+            let index = this.$root.popups.indexOf(popup);
             this.$root.popups.splice(index, 1);
+            let self = this;
             Vue.nextTick(function () {
-                if (vm.popups.length) {
+                if (self.$root.popups.length) {
                     document.querySelector('#c-popups>div:first-child textarea').focus();
                 }
             });
         },
-        incrementUsedTime: function incrementUsedTime(item, amount) {
+        incrementUsedTime(item, amount) {
             if (!item.used_time) {
                 item.used_time = amount;
             } else {
                 item.used_time = parseFloat(item.used_time) + amount;
             }
         },
-        setNotDone: function setNotDone(popup) {
-            this.$root.markDone(popup.item.id, 'notDone');
+        setNotDone(popup) {
+            this.$root.markDone({ id: popup.item.id, markAs: 'notDone' });
             this.removePopup(popup);
         },
-        resetUsedTime: function resetUsedTime(item) {
+        resetUsedTime(item) {
             item.used_time = 0;
         },
-        keydownInCompletionMemo: function keydownInCompletionMemo(popup, e) {
+        keydownInCompletionMemo(popup, e) {
             if ( // ESCape
             e.keyCode == 13 && (e.ctrlKey || e.metaKey) || // Enter
             e.keyCode == 27 // Escape
@@ -41507,7 +40963,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
                     this.removePopup(popup);
                 }
         },
-        keydownInPopup: function keydownInPopup(popup, e, field) {
+        keydownInPopup(popup, e, field) {
             if (field == 'flatPickr') {
                 if (e.keyCode == '9' && e.shiftKey) {
                     // Tab
@@ -41530,14 +40986,14 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
     },
     directives: {
         focus: {
-            inserted: function inserted(el) {
+            inserted(el) {
                 Vue.nextTick(function () {
                     el.focus();
                 });
             }
         },
         autoheight: {
-            inserted: function inserted(el, binding) {
+            inserted(el, binding) {
                 Vue.nextTick(function () {
                     __WEBPACK_IMPORTED_MODULE_1_autosize___default()(el);
                 });
@@ -41547,297 +41003,2491 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 });
 
 /***/ }),
-/* 173 */,
-/* 174 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* WEBPACK VAR INJECTION */(function($) {var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-var _class = function () {
-	function _class() {
-		_classCallCheck(this, _class);
-
-		this.invokeKeydownListenerPause();
-		this.invokeKeyBindingListener();
-	}
-
-	_createClass(_class, [{
-		key: 'keystroke',
-		value: function keystroke(k) {
-			if (selection.view == 'journal' && (
-			// Disable keystrokes when in the journal.
-			k == 'arrowRight' || k == 'arrowLeft' || k == 'meta_arrowUp' || k == 'meta_arrowDown' || k == 'meta_arrowRight' || k == 'meta_arrowLeft' || k == 'spaceBar' || k == 'tab' || k == 'shift_tab' || k == 't' || k == 's')) {
-				console.log('cannot use ' + k + ' in journal mode');
-				var errMsg = vm.text.flashes.cannotDoThisInJournal;
-				console.log(errMsg);
-				vm.sendFlash('warning', errMsg);
-				return;
-			}
-			console.log(k);
-			if (k == 'arrowUp') {
-				vm.selectItem('prev');
-			} else if (k == 'arrowDown') {
-				vm.selectItem('next');
-			} else if (k == 'arrowRight') {
-				vm.showChildren(null, 'show');
-			} else if (k == 'arrowLeft') {
-				vm.showChildren(null, 'hide');
-			} else if (k == 'meta_arrowUp') {
-				vm.moveItem('up');
-			} else if (k == 'meta_arrowDown') {
-				vm.moveItem('down');
-			} else if (k == 'meta_arrowRight') {
-				vm.indent();
-			} else if (k == 'meta_arrowLeft') {
-				vm.unindent();
-			} else if (k == 'spaceBar') {
-				vm.markDone();
-			} else if (k == 'tab') {
-				vm.indent();
-			} else if (k == 'shift_tab') {
-				vm.unindent();
-			} else if (k == 'enter') {
-				vm.showAddNewItem();
-			} else if (k == 'shift_enter') {
-				vm.showAddNewItem(null, 'child');
-			} else if (k == 'meta_enter') {
-				vm.startEdit();
-			} else if (k == 'ctrl_u') {
-				vm.startEdit();
-			} else if (k == 't') {
-				vm.setToday();
-			} else if (k == 'shift_t') {
-				vm.startEditTags();
-			} else if (k == 's') {
-				vm.addTimer();
-			} else if (k == 'meta_shift_d') {
-				vm.duplicate();
-			} else if (k == 'meta_backspace') {
-				vm.deleteItem();
-			} else if (k == 'backspace') {
-				vm.deleteItem();
-			} else if (k == 'delete') {
-				vm.deleteItem();
-			}
-		}
-	}, {
-		key: 'invokeKeydownListenerPause',
-		value: function invokeKeydownListenerPause() {
-			//Codementor: crappy hack down here.
-			window.keydownListenerPaused = false;
-			window.preventKeydownListener = function () {
-				window.keydownListenerPaused = true;
-				setTimeout(function () {
-					window.keydownListenerPaused = false;
-				}.bind(this), 200);
-			};
-		}
-	}, {
-		key: 'invokeKeyBindingListener',
-		value: function invokeKeyBindingListener() {
-			var self = this;
-			window.addEventListener('keydown', function (e) {
-				if (keydownListenerPaused) {
-					// console.log('keydownListenerPaused'); 
-					return;
-				}
-				var x = e.keyCode;
-				if (document.activeElement.className == "flatpickr-days") {
-					if (x == 9) {
-						// Tab
-						console.log('hiya!');
-						e.preventDefault();
-						return;
-						// This stops the event listener when a flatpickr dialogue is open.
-					}
-				}
-				if (vm.popouts.delete.length || vm.popouts.timer.length) {
-					if (x == 27) {
-						// escape
-						e.preventDefault();
-						eventHub.$emit('clearAll');
-						console.log('Escape');
-					}
-					if (x == 9) {
-						// TAB
-						e.preventDefault();
-						if (e.shiftKey) {
-							$(".btn-cancel").focus();
-						} else {
-							$(".btn-ok").focus();
-						}
-					}
-					if (x == 37) {
-						// arrow left
-						e.preventDefault();
-						$(".btn-cancel").focus();
-					}
-					if (x == 39) {
-						// arrow right
-						e.preventDefault();
-						$(".btn-ok").focus();
-					}
-				} else if (vm.editingItem || vm.addingNewUnder || vm.editingItemTags) {
-					if (document.activeElement.nodeName != 'BUTTON') {
-						return;
-					}
-					if (e.keyCode == 27) {
-						// Escape
-						if (vm.editingItem) {
-							vm.cancelEdit;
-							console.log('escapeOnEditButtonFocus');
-						} else if (vm.addingNewUnder) {
-							vm.cancelAddNew;
-							console.log('escapeOnNewButtonFocus');
-						}
-					}
-				} else if (document.activeElement.nodeName == 'INPUT' || document.activeElement.nodeName == 'TEXTAREA' || document.activeElement.nodeName == 'A' || document.activeElement.nodeName == 'BUTTON') {
-					console.log('inputs or buttons are focussed!');
-					return;
-				} else {
-					// console.log('keydown event: NO inputs or buttons are focussed!');
-					// INPUT AREAS NOT IN FOCUS
-					switch (e.keyCode) {
-						case 37:
-							// arrowLeft
-							e.preventDefault();
-							if (e.ctrlKey || e.metaKey) {
-								self.keystroke('meta_arrowLeft');
-								break;
-							}
-							self.keystroke('arrowLeft');
-							break;
-						case 39:
-							// arrowRight
-							e.preventDefault();
-							if (e.ctrlKey || e.metaKey) {
-								self.keystroke('meta_arrowRight');
-								break;
-							}
-							self.keystroke('arrowRight');
-							break;
-						case 38:
-							// arrowUp
-							e.preventDefault();
-							if (e.ctrlKey || e.metaKey) {
-								self.keystroke('meta_arrowUp');
-								break;
-							}
-							self.keystroke('arrowUp');
-							break;
-						case 40:
-							// arrowDown
-							e.preventDefault();
-							if (e.ctrlKey || e.metaKey) {
-								self.keystroke('meta_arrowDown');
-								break;
-							}
-							self.keystroke('arrowDown');
-							break;
-						case 32:
-							// spaceBar
-							e.preventDefault();
-							self.keystroke('spaceBar');
-							break;
-						case 9:
-							// tab
-							e.preventDefault();
-							if (e.shiftKey) {
-								self.keystroke('shift_tab');
-								break;
-							}
-							self.keystroke('tab');
-							break;
-						case 13:
-							// enter
-							e.preventDefault();
-							if (e.ctrlKey || e.metaKey) {
-								self.keystroke('meta_enter');
-							} else if (e.shiftKey) {
-								self.keystroke('shift_enter');
-							} else {
-								self.keystroke('enter');
-							}
-							break;
-						case 84:
-							// key t
-							e.preventDefault();
-							if (e.ctrlKey || e.metaKey || e.shiftKey) {
-								self.keystroke('shift_t');
-							} else {
-								self.keystroke('t');
-							}
-							break;
-						case 83:
-							// key s
-							self.keystroke('s');
-							break;
-						case 85:
-							// key u
-							if (e.ctrlKey) {
-								self.keystroke('ctrl_u');
-								break;
-							}
-							self.keystroke('u');
-							break;
-						case 68:
-							// key d
-							e.preventDefault();
-							if ((e.ctrlKey || e.metaKey) && e.shiftKey) {
-								self.keystroke('meta_shift_d');
-								break;
-							}
-							break;
-						case 8:
-							// DELETE (backspace)
-							e.preventDefault();
-							if (e.ctrlKey || e.metaKey) {
-								self.keystroke('meta_backspace');
-								break;
-							}
-							self.keystroke('backspace');
-							break;
-						case 46:
-							// DELETE (real delete)
-							e.preventDefault();
-							self.keystroke('delete');
-							break;
-					} // end switch
-				} // END INPUT AREAS NOT IN FOCUS
-			});
-		}
-	}]);
-
-	return _class;
-}(); // END default CLASS
-
-
-/* harmony default export */ __webpack_exports__["a"] = (_class);
-/* WEBPACK VAR INJECTION */}.call(__webpack_exports__, __webpack_require__(2)))
-
-/***/ }),
+/* 174 */,
 /* 175 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__components_valueMorphers2_js__ = __webpack_require__(9);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__vue_components_Flashes_vue__ = __webpack_require__(207);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__vue_components_Flashes_vue___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1__vue_components_Flashes_vue__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__vue_components_Card_vue__ = __webpack_require__(206);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__vue_components_Card_vue___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2__vue_components_Card_vue__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__vue_components_Popups_vue__ = __webpack_require__(209);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__vue_components_Popups_vue___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_3__vue_components_Popups_vue__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__vue_components_Popouts_vue__ = __webpack_require__(208);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__vue_components_Popouts_vue___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_4__vue_components_Popouts_vue__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__components_globalFunctions_js__ = __webpack_require__(5);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__vue_components_Selection_js__ = __webpack_require__(176);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__vue_components_dataTree_js__ = __webpack_require__(21);
-function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
+/* WEBPACK VAR INJECTION */(function($) {/* harmony default export */ __webpack_exports__["a"] = (class {
+	constructor() {
+		this.invokeKeydownListenerPause();
+		this.invokeKeyBindingListener();
+	}
+	keystroke(k) {
+		if (selection.view == 'journal' && (
+		// Disable keystrokes when in the journal.
+		k == 'arrowRight' || k == 'arrowLeft' || k == 'meta_arrowUp' || k == 'meta_arrowDown' || k == 'meta_arrowRight' || k == 'meta_arrowLeft' || k == 'spaceBar' || k == 'tab' || k == 'shift_tab' || k == 't' || k == 's')) {
+			console.log('cannot use ' + k + ' in journal mode');
+			let errMsg = store.getters.text.flashes.cannotDoThisInJournal;
+			console.log(errMsg);
+			store.dispatch('sendFlash', { type: 'warning', msg: errMsg });
+			return;
+		}
+		console.log(k);
+		if (k == 'arrowUp') {
+			store.dispatch('selectItem', { direction: 'prev' });
+		} else if (k == 'arrowDown') {
+			store.dispatch('selectItem', { direction: 'next' });
+		} else if (k == 'arrowRight') {
+			store.dispatch('showChildren', { action: 'show' });
+		} else if (k == 'arrowLeft') {
+			store.dispatch('showChildren', { action: 'hide' });
+		} else if (k == 'meta_arrowUp') {
+			store.dispatch('moveItem', { direction: 'up' });
+		} else if (k == 'meta_arrowDown') {
+			store.dispatch('moveItem', { direction: 'down' });
+		} else if (k == 'meta_arrowRight') {
+			store.dispatch('indent');
+		} else if (k == 'meta_arrowLeft') {
+			store.dispatch('unindent');
+		} else if (k == 'spaceBar') {
+			store.dispatch('markDone');
+		} else if (k == 'tab') {
+			store.dispatch('indent');
+		} else if (k == 'shift_tab') {
+			store.dispatch('unindent');
+		} else if (k == 'enter') {
+			store.dispatch('showAddNewItem');
+		} else if (k == 'shift_enter') {
+			store.dispatch('showAddNewItem', { addAs: 'child' });
+		} else if (k == 'meta_enter') {
+			store.dispatch('startEdit');
+		} else if (k == 'ctrl_u') {
+			store.dispatch('startEdit');
+		} else if (k == 't') {
+			store.dispatch('setToday');
+		} else if (k == 'shift_t') {
+			store.dispatch('startEditTags');
+		} else if (k == 's') {
+			store.dispatch('addTimer');
+		} else if (k == 'meta_shift_d') {
+			store.dispatch('duplicate');
+		} else if (k == 'meta_backspace') {
+			store.dispatch('deleteItemDialogue');
+		} else if (k == 'backspace') {
+			store.dispatch('deleteItemDialogue');
+		} else if (k == 'delete') {
+			store.dispatch('deleteItemDialogue');
+		}
+	}
+	invokeKeydownListenerPause() {
+		//Codementor: crappy hack down here.
+		window.keydownListenerPaused = false;
+		window.preventKeydownListener = function () {
+			console.log('preventing keydown listener');
+			window.keydownListenerPaused = true;
+			setTimeout(function () {
+				window.keydownListenerPaused = false;
+			}.bind(this), 500);
+		};
+	}
+	invokeKeyBindingListener() {
+		let self = this;
+		window.addEventListener('keydown', function (e) {
+			if (keydownListenerPaused) {
+				// console.log('keydownListenerPaused'); 
+				return;
+			}
+			let x = e.keyCode;
+			if (document.activeElement.className == "flatpickr-days") {
+				if (x == 9) {
+					// Tab
+					console.log('hiya!');
+					e.preventDefault();
+					return;
+					// This stops the event listener when a flatpickr dialogue is open.
+				}
+			}
+			if (store.state.popouts.delete.length || store.state.popouts.timer.length) {
+				if (x == 27) {
+					// escape
+					e.preventDefault();
+					eventHub.$emit('clearAll');
+					console.log('Escape');
+				}
+				if (x == 9) {
+					// TAB
+					e.preventDefault();
+					if (e.shiftKey) {
+						$(".btn-cancel").focus();
+					} else {
+						$(".btn-ok").focus();
+					}
+				}
+				if (x == 37) {
+					// arrow left
+					e.preventDefault();
+					$(".btn-cancel").focus();
+				}
+				if (x == 39) {
+					// arrow right
+					e.preventDefault();
+					$(".btn-ok").focus();
+				}
+			} else if (vm.editingItem || vm.addingNewUnder || vm.editingItemTags) {
+				if (document.activeElement.nodeName != 'BUTTON') {
+					return;
+				}
+				if (e.keyCode == 27) {
+					// Escape
+					if (vm.editingItem) {
+						vm.cancelEdit();
+						console.log('escapeOnEditButtonFocus');
+					} else if (vm.addingNewUnder) {
+						vm.cancelAddNew();
+						console.log('escapeOnNewButtonFocus');
+					}
+				}
+			} else if (document.activeElement.nodeName == 'INPUT' || document.activeElement.nodeName == 'TEXTAREA' || document.activeElement.nodeName == 'A' || document.activeElement.nodeName == 'BUTTON') {
+				console.log('inputs or buttons are focussed!');
+				return;
+			} else {
+				// console.log('keydown event: NO inputs or buttons are focussed!');
+				// INPUT AREAS NOT IN FOCUS
+				switch (e.keyCode) {
+					case 37:
+						// arrowLeft
+						e.preventDefault();
+						if (e.ctrlKey || e.metaKey) {
+							self.keystroke('meta_arrowLeft');
+							break;
+						}
+						self.keystroke('arrowLeft');
+						break;
+					case 39:
+						// arrowRight
+						e.preventDefault();
+						if (e.ctrlKey || e.metaKey) {
+							self.keystroke('meta_arrowRight');
+							break;
+						}
+						self.keystroke('arrowRight');
+						break;
+					case 38:
+						// arrowUp
+						e.preventDefault();
+						if (e.ctrlKey || e.metaKey) {
+							self.keystroke('meta_arrowUp');
+							break;
+						}
+						self.keystroke('arrowUp');
+						break;
+					case 40:
+						// arrowDown
+						e.preventDefault();
+						if (e.ctrlKey || e.metaKey) {
+							self.keystroke('meta_arrowDown');
+							break;
+						}
+						self.keystroke('arrowDown');
+						break;
+					case 32:
+						// spaceBar
+						e.preventDefault();
+						self.keystroke('spaceBar');
+						break;
+					case 9:
+						// tab
+						e.preventDefault();
+						if (e.shiftKey) {
+							self.keystroke('shift_tab');
+							break;
+						}
+						self.keystroke('tab');
+						break;
+					case 13:
+						// enter
+						e.preventDefault();
+						if (e.ctrlKey || e.metaKey) {
+							self.keystroke('meta_enter');
+						} else if (e.shiftKey) {
+							self.keystroke('shift_enter');
+						} else {
+							self.keystroke('enter');
+						}
+						break;
+					case 84:
+						// key t
+						e.preventDefault();
+						if (e.ctrlKey || e.metaKey || e.shiftKey) {
+							self.keystroke('shift_t');
+						} else {
+							self.keystroke('t');
+						}
+						break;
+					case 83:
+						// key s
+						self.keystroke('s');
+						break;
+					case 85:
+						// key u
+						if (e.ctrlKey) {
+							self.keystroke('ctrl_u');
+							break;
+						}
+						self.keystroke('u');
+						break;
+					case 68:
+						// key d
+						e.preventDefault();
+						if ((e.ctrlKey || e.metaKey) && e.shiftKey) {
+							self.keystroke('meta_shift_d');
+							break;
+						}
+						break;
+					case 8:
+						// DELETE (backspace)
+						e.preventDefault();
+						if (e.ctrlKey || e.metaKey) {
+							self.keystroke('meta_backspace');
+							break;
+						}
+						self.keystroke('backspace');
+						break;
+					case 46:
+						// DELETE (real delete)
+						e.preventDefault();
+						self.keystroke('delete');
+						break;
+				} // end switch
+			} // END INPUT AREAS NOT IN FOCUS
+		});
+	}
 
-window.langContentsItems = {
+}); // END default CLASS
+/* WEBPACK VAR INJECTION */}.call(__webpack_exports__, __webpack_require__(2)))
+
+/***/ }),
+/* 176 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_vue__ = __webpack_require__(7);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_vue___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_vue__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_vuex__ = __webpack_require__(144);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_vue_resource__ = __webpack_require__(223);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__vue_components_Selection_js__ = __webpack_require__(21);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__components_ListAppKeyBindings_js__ = __webpack_require__(175);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__store_store_js__ = __webpack_require__(183);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__vm_js__ = __webpack_require__(184);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__vue_components_Directives_js__ = __webpack_require__(241);
+
+
+
+
+// import VueFilters from '../vue-components/vueFilters.js';
+
+
+//Start List App:
+// JS Classes
+
+
+
+
+
+
+// import Flatpickr from 'flatpickr';
+// import flatPickConfig from '../components/flatPickrOptions.js';
+
+
+/* harmony default export */ __webpack_exports__["a"] = (function (fetchedData) {
+	console.log('initializing Vue...');
+	if (!fetchedData) {
+		console.log('no fetchedData');return;
+	}
+
+	window.fetchedData = fetchedData;
+	window.Vue = __WEBPACK_IMPORTED_MODULE_0_vue___default.a;
+	__WEBPACK_IMPORTED_MODULE_0_vue___default.a.use(__WEBPACK_IMPORTED_MODULE_1_vuex__["a" /* default */]);
+	__WEBPACK_IMPORTED_MODULE_0_vue___default.a.use(__WEBPACK_IMPORTED_MODULE_2_vue_resource__["a" /* default */]);
+	__WEBPACK_IMPORTED_MODULE_0_vue___default.a.use(__WEBPACK_IMPORTED_MODULE_7__vue_components_Directives_js__["a" /* default */]);
+	// VueFilters(Vue);
+	new __WEBPACK_IMPORTED_MODULE_4__components_ListAppKeyBindings_js__["a" /* default */]();
+	window.store = new __WEBPACK_IMPORTED_MODULE_1_vuex__["a" /* default */].Store(__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_5__store_store_js__["a" /* default */])());
+	window.vm = new __WEBPACK_IMPORTED_MODULE_0_vue___default.a(__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_6__vm_js__["a" /* default */])());
+
+	// Vue.directive('flatpicky', {
+	// 	inserted(el)
+	// 	{
+	// 		new Flatpickr(el,flatPickConfig);
+	// 	},
+	// });
+	// Vue.directive('focus', {
+	// 	inserted(el, binding)
+	// 	{
+	// 		if(vm.mobile && !binding.modifiers.mobile){ return; }
+	// 		el.focus()
+	// 	}
+	// });
+	// Vue.directive('autoheight', {
+	// 	inserted(el, binding)
+	// 	{
+	// 		Vue.nextTick(function ()
+	// 		{
+	// 			autosize(el);
+	// 		});
+	// 	}
+	// });
+	// Vue.directive('autowidth', {
+	// 	inserted(el, binding)
+	// 	{
+	// 		Vue.nextTick(function ()
+	// 		{
+	// 			autosizeInput(el);
+	// 		});
+	// 	}
+	// });
+
+
+	store.commit('updateState', { field: 'patching', value: false });
+	store.commit('updateState', { field: 'loading', value: false });
+});
+
+/***/ }),
+/* 177 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__components_globalFunctions_js__ = __webpack_require__(5);
+
+// import { sec_to_hourmin } from '../../components/valueMorphers2.js';
+
+/* harmony default export */ __webpack_exports__["a"] = ({
+
+	giveNewParent({ state, commit, dispatch, getters }, { id, new_parent_id, specificNewIndex } = {}) {
+		if (getters.isTopLvlItemInFilteredRoot(id)) {
+			let errMsg = getters.text.flashes.moveTopLvlItem;
+			console.log(errMsg);
+			dispatch('sendFlash', { type: 'warning', msg: errMsg });
+			return;
+		}
+		console.log('giving new parent');
+		let parent_id = state.nodes[id].parent_id;
+		let targetItem = state.nodes[id];
+		let newParent = state.nodes[new_parent_id];
+		console.log('newParent ↓ ');
+		console.log(newParent);
+		let prevParent = state.nodes[parent_id];
+		console.log('prevParent ↓ ');
+		console.log(prevParent);
+		let siblingIndex = getters.siblingIndex(id);
+		// targetItem.parent_id = new_parent_id;
+		commit('updateState', { id: id, field: 'parent_id', value: new_parent_id });
+		// targetItem.depth = newParent.depth+1;
+		commit('updateState', { id: id, field: 'depth', value: newParent.depth + 1 });
+		// e.g. VUEX
+
+
+		if (!newParent.children_order) {
+			// newParent.children_order = [];
+			commit('updateState', { id: new_parent_id, field: 'children_order', value: [] });
+		}
+		if (specificNewIndex || specificNewIndex == 0) {
+			// newParent.children.splice(specificNewIndex,0,targetItem);
+			// newParent.children_order.splice(specificNewIndex,0,id);
+			commit('addChild', { 'index': specificNewIndex, 'item': targetItem, 'newParentId': new_parent_id });
+		} else if (prevParent.depth - 1 == newParent.depth && new_parent_id == prevParent.parent_id) {
+			// when unindenting
+			let newIndex = getters.siblingIndex(prevParent.id) + 1;
+			// newParent.children.splice(newIndex,0,targetItem);
+			// newParent.children_order.splice(newIndex,0,id);
+			commit('addChild', { 'index': newIndex, 'item': targetItem, 'newParentId': new_parent_id });
+		} else {
+			// when indenting
+			// newParent.children.push(targetItem);
+			// newParent.children_order.push(id)
+			commit('addChild', { 'item': targetItem, 'newParentId': new_parent_id });
+		}
+		// Open newParent show_children if closed
+		// newParent.show_children = 1;
+		commit('updateState', { 'field': 'show_children', 'id': new_parent_id, 'value': 1 });
+
+		// Delete items attached to previous parent
+		// prevParent.children.splice(siblingIndex,1);
+		// prevParent.children_order.splice(siblingIndex,1);
+		commit('deleteChild', { 'index': siblingIndex, 'id': prevParent.id });
+		// Fix bug where item would still show if it prevParent has an array of 0 and the moved child was originally the last child...
+		if (prevParent.children.length == 0) {
+			// prevParent.children = [];
+			commit('updateState', { 'field': 'children', 'id': prevParent.id, 'value': [] });
+		}
+
+		// Patches etc.
+		dispatch('attachParentBody', { id: id });
+		let tags = getters.itemTagArray(new_parent_id);
+		dispatch('tagItem', { id: id, tags: tags });
+		dispatch('patch', { id: id, field: 'depth' });
+		dispatch('patch', { id: id, field: 'parent_id' });
+		dispatch('patch', { id: new_parent_id, field: 'children_order' });
+		dispatch('patch', { id: new_parent_id, field: 'show_children' });
+		dispatch('patch', { id: parent_id, field: 'children_order' });
+		dispatch('updateChildrenDepth', { id: targetItem.id });
+		dispatch('updateChildrenDueDate', { id: new_parent_id });
+		dispatch('updateChildrenDueDate', { id: parent_id });
+		dispatch('autoCalculateDoneState', { id: new_parent_id });
+		dispatch('autoCalculateDoneState', { id: parent_id });
+	},
+	duplicate({ state, commit, dispatch, getters }, { id } = {}) {
+		id = !id ? selection.selectedId : id;
+		let item = state.nodes[id];
+		let index = getters.siblingIndex(id) + 1;
+		let dupe = JSON.parse(JSON.stringify(item));
+		// state.nodes[item.parent_id].children.splice(index, 0, dupe);
+
+		let addNextItemAs = null;
+		let addTags = dupe.tagged.map(tagObj => tagObj.tag_name);
+		let duplication = true;
+		dispatch('postNewItem', { newItem: dupe, index, addNextItemAs, addTags, duplication });
+	},
+	addAndCleanNodesRecursively({ state, commit, dispatch, getters }, { item } = {}) {
+		item = getters.setDefaultItemValues(item);
+		state.nodes[item.id] = item;
+		if (item.children) {
+			item.children.forEach(function (child) {
+				return dispatch('addAndCleanNodesRecursively', { item: child });
+			});
+		}
+	},
+	addItem({ state, commit, dispatch, getters }, { item, index, addNextItemAs, addTags, duplication } = {}) {
+		// debugger;
+		dispatch('addAndCleanNodesRecursively', { item });
+		let parent = state.nodes[item.parent_id];
+		if (!parent.children_order) {
+			parent.children_order = [];
+		}
+		//Remove the Temp item
+		// console.log('Remove the Temp item');
+		// console.log(parent.children);
+		// console.log(parent.children_order);
+		state.nodes[item.parent_id].children = parent.children.filter(i => !i.temp);
+		state.nodes[item.parent_id].children_order = parent.children_order.filter(i => i != 'x');
+		delete state.nodes['x'];
+		// let a = state.nodes[item.parent_id].children;
+		// let b = state.nodes[item.parent_id].children_order;
+		// console.log(`
+		// 	state.nodes[item.parent_id].children_order -> ${a}
+		// 	state.nodes[item.parent_id].children -> ${b}
+		// 	`);
+		//Actually ADD the item!
+		parent.children.splice(index, 0, item);
+		parent.children_order.splice(index, 0, item.id);
+
+		// Patches etc.
+		selection.selectedId = item.id;
+		// if ( getters.isTopLvlItemInFilteredRoot(item.id)
+		// 	&& item.parent_id == state.root.id )
+		// {
+		// 	getters.backups.rootChildren.push(item);
+		// 	vm.patchRootChildrenOrderWithFilter(item.id);
+		// } else {
+		dispatch('patch', { id: item.parent_id, field: 'children_order' });
+		// }
+		if (addTags) {
+			dispatch('tagItem', { id: item.id, tags: addTags });
+		}
+		dispatch('attachParentBody', { id: item.id });
+		dispatch('autoCalculateDoneState', { id: item.parent_id });
+
+		if (selection.view == 'journal') {
+			selection.view = null;
+			selection.view = 'journal';
+		}
+		if (selection.filter.includes('today')) {
+			selection.filter = selection.filter.filter(f => f != 'today');
+			selection.filter.push('today');
+		}
+		if (selection.tags.length) {
+			let tags = selection.tags;
+			selection.tags = [];
+			selection.tags = tags;
+		}
+
+		if (duplication || addNextItemAs == 'stop') {
+			state.addingNewUnder = null;
+			Vue.nextTick(() => dispatch('scrollToItemIfNeeded', { id: item.id }));
+		} else if (state.addingNewUnder == 'x') {
+			dispatch('showAddNewItem', { id: item.id, addAs: addNextItemAs });
+		}
+	},
+	addTempNewItem({ state, commit, dispatch, getters }, { item, index, addNextItemAs, addTags } = {}) {
+		item = JSON.parse(JSON.stringify(item));
+		console.log('temp item.body');
+		console.log(item.body);
+		item.id = 'x';
+		item.temp = true;
+		dispatch('addAndCleanNodesRecursively', { item });
+		console.log(item.body);
+		const parent = state.nodes[item.parent_id];
+		if (!parent.children_order) {
+			parent.children_order = [];
+		}
+		//Actually ADD the item!
+		parent.children.splice(index, 0, item);
+		parent.children_order.splice(index, 0, item.id);
+		state.addingNewUnder = item.id;
+		if (addNextItemAs == 'stop') {
+			Vue.nextTick(() => dispatch('scrollToItemIfNeeded', { id: item.id }));
+		}
+	},
+	hideTaggedNodes({ state, commit, dispatch, getters }, { tag } = {}) {
+		Object.keys(state.nodes).forEach(function (id) {
+			id = parseFloat(id);
+			if (getters.hasTag(id, tag)) {
+				if (!selection.hiddenItems.includes(id)) {
+					selection.hiddenItems.push(id);
+				}
+			}
+		}.bind(this));
+	},
+	hideDoneNodes({ state, commit, dispatch, getters } = {}) {
+		Object.keys(state.nodes).forEach(function (id) {
+			id = parseFloat(id);
+			if (state.nodes[id].done) {
+				if (!selection.hiddenItems.includes(id)) {
+					selection.hiddenItems.push(id);
+				}
+			}
+		}.bind(this));
+	},
+	sortAllChildren({ state, commit, dispatch, getters } = {}) {
+		console.log('sorting all children');
+		Object.keys(state.nodes).forEach(function (id) {
+			dispatch('sortChildren', { id });
+			dispatch('updateChildrenDueDate', { id });
+		}.bind(this));
+	},
+	sortChildren({ state, commit, dispatch, getters }, { id } = {}) {
+		// console.log('sortingChildren');
+		let item = state.nodes[id];
+		item.children_order = item.children_order.filter(function (id) {
+			let child = state.nodes[id];
+			let a = item.children.indexOf(child);
+			let b = ~a; // Anything that's not -1 will become something else than 0, so will be included.
+			return b;
+		}.bind(this));
+
+		let order = item.children_order;
+		let items = item.children;
+		if (order instanceof Array && order.length) {
+			item.children = order.map(id => items.find(t => t.id === id));
+		}
+	},
+	updateChildrenDepth({ state, commit, dispatch, getters }, { id } = {}) {
+		let targetChildren = state.nodes[id].children;
+		if (!(targetChildren || targetChildren.length)) {
+			return false;
+		}
+		targetChildren.forEach(function (child) {
+			console.log(child);
+			child.depth = state.nodes[child.parent_id].depth + 1;
+			dispatch('patch', { id: child.id, field: 'depth' });
+			dispatch('updateChildrenDepth', { id: child.id });
+			return true;
+		}.bind(this));
+	},
+	copyParentBodyToAllChildren({ state, commit, dispatch, getters }, { parent_id } = {}) {
+		if (!parent_id) {
+			return;
+		}
+		let item = state.nodes[parent_id];
+		if (!item.children_order.length) {
+			return;
+		}
+		let b = item.body;
+		item.children_order.forEach(childId => {
+			let child = state.nodes[childId];
+			child.parents_bodies = b;
+			if (!vm) {
+				return;
+			}
+			dispatch('patch', { id: child.id, field: 'parents_bodies' });
+		});
+	},
+	attachParentBody({ state, commit, dispatch, getters }, { id } = {}) {
+		if (!id) {
+			return;
+		}
+		let item = state.nodes[id];
+		if (!item.parent_id) {
+			return;
+		}
+		let parent = state.nodes[item.parent_id];
+		if (!parent) {
+			return;
+		}
+		item.parents_bodies = parent.body;
+		dispatch('patch', { id: id, field: 'parents_bodies' });
+	},
+	deleteItem({ state, commit, dispatch, getters }, { id } = {}) {
+		if (!id) {
+			console.log('item id not specified at deleteItem');
+		}
+		let item = state.nodes[id];
+		let previousItemId = getters.prevItemId(id) ? getters.prevItemId(id) : null;
+		// Delete all children as well!
+		if (Array.isArray(item.children) && item.children.length) {
+			let allChildrenIds = getters.getAllChildrenIds(id);
+			dispatch('deleteItemApi', { idOrArray: allChildrenIds });
+		}
+		// Delete items attached to previous parent
+		let parent_id = item.parent_id;
+		let prevParent = state.nodes[parent_id];
+		if (prevParent) {
+			let siblingIndex = getters.siblingIndex(id);
+			prevParent.children.splice(siblingIndex, 1);
+			prevParent.children_order.splice(siblingIndex, 1);
+			// Patch and recalculate
+			dispatch('patch', { id: parent_id, field: 'children_order' });
+		}
+		dispatch('deleteItemApi', { idOrArray: id });
+		// dispatch('autoCalculateDoneState', { id:parent_id });
+		if (selection.view == 'journal') {
+			selection.view = null;
+			selection.view = 'journal';
+		}
+		if (selection.filter.includes('today')) {
+			selection.filter = selection.filter.filter(f => f != 'today');
+			selection.filter.push('today');
+		}
+		let newSelectedId = getters.nextItemId(previousItemId) ? getters.nextItemId(previousItemId) : null;
+		console.log(`new selected ID is: ${newSelectedId}`);
+		selection.selectedId = newSelectedId;
+		delete state.nodes[id];
+	},
+	tagItem({ state, commit, dispatch, getters }, { id, tags } = {}) {
+		console.log(tags);
+		if (!tags) {
+			return;
+		}
+		if (Array.isArray(tags)) {
+			tags = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__components_globalFunctions_js__["f" /* removeEmptyValuesFromArray */])(tags);
+			tags = tags.filter(function (t) {
+				return !getters.hasTag(id, t);
+			}.bind(this));
+			if (!tags.length) {
+				return;
+			}
+		} else {
+			if (!tags.replace(/\s/g, "").length) {
+				return;
+			}
+			if (getters.hasTag(id, tags)) {
+				console.log('NG! Has the tag already!!');
+				return;
+			}
+		}
+		dispatch('patchTag', { id, tags });
+		let item = state.nodes[id];
+		if (item.children.length) {
+			item.children_order.forEach(function (childId) {
+				dispatch('tagItem', { id: childId, tags: tags });
+			}.bind(this));
+		}
+	},
+	prepareTag({ state, commit, dispatch, getters }, { id, tags } = {}) {
+		let item = state.nodes[id];
+	},
+	prepareDonePatch({ state, commit, dispatch, getters }, { id } = {}) {
+		let item = state.nodes[id];
+		let done_date = moment().format();
+		item.done_date = done_date;
+		dispatch('patchDone', { id });
+		if (item.done) {
+			dispatch('popup', { id: id, type: 'afterDone' });
+		}
+		// dispatch('autoCalculateDoneState', { id:item.parent_id });
+		if (item.done) {
+			// IF DONE:
+			//Add parent's body
+			dispatch('attachParentBody', { id: id });
+		}
+	},
+	autoCalculateDoneState({ state, commit, dispatch, getters }, { id } = {}) {
+		if (state.nodes[id].depth == 0) {
+			return;
+		}
+		if (getters.allChildrenDone(id) == true && !getters.isProject(id)) {
+			dispatch('markDone', { id, markAs: 'done' });
+		} else {
+			dispatch('markDone', { id, markAs: 'notDone' });
+		}
+	},
+	updateItemTagsDom({ state, commit, dispatch, getters }, { id, tags, requestType } = {}) {
+		/* requestType can be:
+  	'tag': tag item  (default if null)
+  	'untag': untag item with certain tag
+  	'retag': delete all tags and retag new ones
+  */
+		if (!tags) {
+			return;
+		}
+		if (Array.isArray(tags)) {
+			tags.forEach(t => dispatch('updateItemTagsDom', { id, tags: t, requestType }));
+			return;
+		}
+		let tagName = tags.trim();
+		let tagSlug = __WEBPACK_IMPORTED_MODULE_0__components_globalFunctions_js__["d" /* Utilities */].tagNameToSlug(tagName);
+		let tempTag = { 'temp': 'temp',
+			'tag_name': tagName,
+			'tag_slug': tagSlug,
+			'tag': {
+				'name': tagName,
+				'slug': tagSlug
+			} };
+		if (requestType == 'tag' || !requestType) {
+			console.log(state.nodes[id].tagged);
+			state.nodes[id].tagged.push(tempTag);
+			console.log(state.nodes[id].tagged);
+		}
+		if (requestType == 'untag') {
+			state.nodes[id].tagged = state.nodes[id].tagged.filter(t => t.tag_slug != tagSlug);
+		}
+	},
+	moveItem({ state, commit, dispatch, getters }, { id, direction } = {}) {
+		id = !id ? selection.selectedId : id;
+		if (getters.isTopLvlItemInFilteredRoot(id)) {
+			let errMsg = getters.text.flashes.moveTopLvlItem;
+			console.log(errMsg);
+			dispatch('sendFlash', { type: 'warning', msg: errMsg });
+			return;
+		}
+		clearTimeout(window.patchDelay);
+		let pId = state.nodes[id].parent_id;
+		let parent = state.nodes[pId];
+		let index = getters.siblingIndex(id);
+		if (direction == 'up') {
+			if (index == 0) {
+				if (parent.depth == 0) {
+					console.log('ceiling!');return;
+				}
+				// Jump to last child of previous Sibling
+				let parentOlderSiblingId = getters.olderSiblingId(pId);
+				let newInd = parentOlderSiblingId == parent.parent_id ? 0 : null;
+				dispatch('giveNewParent', { id, new_parent_id: parentOlderSiblingId, specificNewIndex: newInd });
+			} else {
+				// When moving through siblings
+				parent.children_order.splice(index, 1);
+				parent.children_order.splice(index - 1, 0, id);
+				dispatch('sortChildren', { id: pId });
+				window.patchDelay = setTimeout(function () {
+					dispatch('patch', { id: pId, field: 'children_order' });
+				}, 1000);
+			}
+		} else if (direction == 'down') {
+			if (index + 1 == parent.children_order.length) {
+				if (parent.depth == 0) {
+					console.log('floor!');return;
+				}
+				// Jump to First child of next Sibling
+				let new_parent_id = getters.nextSiblingOrParentsSiblingId(id);
+				console.log('new_parent_id: ' + new_parent_id);
+				dispatch('giveNewParent', { id, new_parent_id: new_parent_id, specificNewIndex: 0 });
+			} else {
+				// When moving through siblings
+				parent.children_order.splice(index, 1);
+				parent.children_order.splice(index + 1, 0, id);
+				dispatch('sortChildren', { id: pId });
+				window.patchDelay = setTimeout(function () {
+					dispatch('patch', { id: pId, field: 'children_order' });
+				}, 1000);
+			}
+		}
+		Vue.nextTick(() => dispatch('scrollToItemIfNeeded', { id: id }));
+	},
+	flushDoneItems({ state, commit, dispatch, getters } = {}) {
+		// Do not use yet. Not sure how to best implement the below...
+		let nodes = state.nodes;
+		let keys = Object.keys(nodes);
+		let doneItemsObject = keys.reduce((prev, id) => {
+			if (nodes[id].done) {
+				dispatch('deleteItem', { id });
+			}
+		});
+	},
+	setDueDate({ state, commit, dispatch, getters }, { id, duedate } = {}) {
+		let dd = duedate ? duedate : moment().format();
+		let oriDueDate = state.nodes[id].due_date;
+		let diff = moment(oriDueDate).diff(dd, 'days');
+		if (diff == 0) {
+			dd = '0000-00-00 00:00:00';
+		}
+		state.nodes[id].due_date = dd;
+		if (diff == 0 && selection.filter.includes('today')) {
+			selection.selectedId = getters.nextItemId(id);
+		}
+		dispatch('patchDueDate', { id, duedate: dd });
+		dispatch('updateChildrenDueDate', { id: id });
+	},
+	updateChildrenDueDate({ state, commit, dispatch, getters }, { id } = {}) {
+		let item = state.nodes[id];
+		if (!item.children.length) {
+			return false;
+		}
+		item.children.forEach(function (child) {
+			if (item.dueDateParent) {
+				child.dueDateParent = item.dueDateParent;
+				dispatch('updateChildrenDueDate', { id: child.id });
+			} else if (item.due_date && item.due_date != '0000-00-00 00:00:00') {
+				child.dueDateParent = item.due_date;
+				dispatch('updateChildrenDueDate', { id: child.id });
+			} else {
+				child.dueDateParent = false;
+				dispatch('updateChildrenDueDate', { id: child.id });
+			}
+		}.bind(this));
+	},
+	formatDone({ state, commit, dispatch, getters }, { doneArray } = {}) {
+		let doneItemsObject = doneArray.reduce((prev, item) => {
+			if (item.done) {
+				let donePropName = moment(item.done_date).format('YYYY/MM/DD');
+				// if we don't have a slot for thiz date, make one
+				if (!prev.hasOwnProperty(donePropName)) {
+					prev[donePropName] = [];
+				}
+				prev[donePropName].push(item);
+			}
+			return prev;
+		}, {});
+		return Object.keys(doneItemsObject).map(function (k) {
+			let rObj = {};
+			rObj['date'] = k;
+			rObj['items'] = doneItemsObject[k];
+			// rObj['totalUsedTime'] = rObj['items'].reduce((prev, next) => {
+			// 	return Utilities.AplusB(prev, next.used_time);
+			//   	}, 0);
+			return rObj;
+		});
+	},
+	// Original VM
+	setCancelThroughKeydown({ state, commit, dispatch, getters }) {
+		state.cancelThroughKeydown = true;
+		setTimeout(function () {
+			state.cancelThroughKeydown = false;
+		}, 100);
+	},
+	startEdit({ state, commit, dispatch, getters }, { item, event } = {}) {
+		// debugger;
+		if (event && (event.srcElement.hasClass('done') || event.srcElement.hasClass('custom-tag'))) {
+			return;
+		}
+		console.log('startEdit');
+		item = item ? item : state.nodes[selection.selectedId];
+		commit('updateState', { beforeEditCache_body: item.body });
+		commit('updateState', { beforeEditCache_planned_time: item.planned_time });
+		// if( state.mobile )
+		// {
+		// 	state.popouts.edit.push(item);
+		// 	return;
+		// }
+		commit('updateState', { editingItem: item.id });
+	},
+	scrollToItemIfNeeded({ state, commit, dispatch, getters }, { id } = {}) {
+		if (!id) {
+			return;
+		};
+		let el = document.getElementById('item-body-' + id);
+		if (!__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__components_globalFunctions_js__["a" /* isElementInViewport */])(el)) {
+			el.scrollIntoView();
+		}
+	},
+	doneEdit({ state, commit, dispatch, getters }, { item } = {}) {
+		console.log('Done edit!');
+		item = item ? item : state.nodes[selection.selectedId];
+		// if (!state.editingItem)
+		// {
+		// 	return;
+		// }
+		commit('updateState', { editingItem: null });
+		commit('updatePopouts', { edit: [] });
+		if (state.editingItemTags) {
+			commit('updateState', { editingItemTags: null });
+			return;
+		}
+		if (!item.body) {
+			commit('updateState', { id: item.id, body: state.beforeEditCache_body });
+		}
+		// item.body = item.body.trim();
+
+		if (typeof item.planned_time != 'number' || Number.isNaN(item.planned_time)) {
+			commit('updateState', { id: item.id, planned_time: 0 });
+		}
+		if (item.planned_time != state.beforeEditCache_planned_time) {
+			dispatch('patch', { id: item.id, field: 'planned_time' });
+		}
+		if (item.body != state.beforeEditCache_body) {
+			dispatch('patch', { id: item.id, field: 'body' });
+			dispatch('copyParentBodyToAllChildren', { parent_id: item.id });
+		}
+		commit('updateState', { beforeEditCache_body: null });
+		commit('updateState', { beforeEditCache_planned_time: null });
+		// setTimeout(() => this.convertbodyURLtoHTML(),1000);
+	},
+	cancelEdit({ state, commit, dispatch, getters }, { id = selection.selectedId } = {}) {
+		if (state.editingItem || state.popouts.edit.length) {
+			Vue.nextTick(() => {
+				console.log("cancel edit. Reverting to: " + state.beforeEditCache_body);
+				commit('updateState', { id, body: state.beforeEditCache_body });
+				commit('updateState', { id, planned_time: state.beforeEditCache_planned_time });
+			});
+		}
+		commit('updateState', { editingItem: null });
+		commit('updateState', { editingItemTags: null });
+		commit('updatePopouts', { edit: [] });
+	},
+	cancelAddNew({ state, commit, dispatch, getters }, { cancelUnderId } = {}) {
+		preventKeydownListener();
+		console.log('cancelAddNew');
+		state.addingNewUnder = null;
+		// state.addingNewEmptyList = false;
+		if (selection.selectedId == cancelUnderId || selection.selectedId == null) {
+			// to prevent item being reselected when cancelAddNew through blur because of clicking on another item.
+			selection.selectedId = selection.lastSelectedId;
+		}
+		// Reset newItem to sibling stance.
+		state.addingNewAsChild = false;
+		// $(':focus').blur();
+	},
+	addNew({ state, commit, dispatch, getters }, { addNextItemAs, newItem, olderSibling, addTags } = {}) {
+		newItem = newItem ? newItem : state.newItem;
+		if (!newItem.body) {
+			return;
+		}
+		addTags = addTags ? addTags : [];
+		if (olderSibling) {
+			olderSibling = olderSibling;
+		} else if (selection.selectedId) {
+			olderSibling = state.nodes[selection.selectedId];
+		} else {
+			olderSibling = false;
+		}
+		// Set parent ID and depth & protect against bugs when olderSibling is the root:
+		newItem.parent_id = olderSibling.parent_id ? olderSibling.parent_id : state.root.id;
+		newItem.depth = olderSibling.depth == 0 ? 1 : olderSibling.depth;
+
+		let OlderSiblingIndex = getters.siblingIndex(olderSibling.id);
+		let index = isNaN(OlderSiblingIndex) ? 0 : OlderSiblingIndex + 1;
+		console.log(`
+		adding new item[${newItem.body}]
+		with parent id = ${newItem.parent_id}
+		depth = ${newItem.depth}
+		index = ${index}`);
+		if (state.addingNewAsChild) {
+			newItem.depth = olderSibling.depth + 1;
+			newItem.parent_id = olderSibling.id;
+			index = 0;
+		}
+		if (selection.view == "journal") {
+			newItem.done = 1;
+			let doneDate = !olderSibling || olderSibling.depth == 0 ? moment().format() : olderSibling.done_date;
+			newItem.done_date = doneDate;
+		}
+		if (selection.filter.includes('today') && getters.isTopLvlItemInFilteredRoot(olderSibling.id) && !state.addingNewAsChild) {
+			newItem.due_date = moment().format();
+			addTags = addTags.filter(function (val) {
+				return val != 'Today';
+			});
+		}
+		console.log('sending newItem:');
+		console.log(JSON.parse(JSON.stringify(newItem)));
+		console.log('sending tags:');
+		console.log(addTags);
+		// Send to Root for Ajax call.
+		dispatch('addTempNewItem', { newItem, index, addNextItemAs, addTags });
+		dispatch('postNewItem', { newItem, index, addNextItemAs, addTags, duplication: null });
+		commit('resetNewItem');
+	},
+	checkFilteredItemsTree({ state, commit, dispatch, getters }) {
+		//Go through ALL ITEMS and return those that have the tag AND no parent with the tag.
+		__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__components_globalFunctions_js__["g" /* objectToArray */])(state.nodes).forEach(function (item) {
+			let target;
+			let targetHidden;
+			let hasParentWithTag;
+			let targetToday;
+			let topLvlItem;
+			if (selection.nothingSelected()) {
+				topLvlItem = item.depth == 1 ? true : false;
+				if (topLvlItem) {
+					return true;
+				}
+			} else {
+				target = selection.tags.every(tag => getters.hasTag(item.id, tag));
+				targetHidden = selection.hiddenTags.some(tag => getters.hasTag(item.id, tag));
+				hasParentWithTag = selection.tags.some(tag => getters.hasParentWithTag(item.id, tag));
+				targetToday = true;
+				if (selection.filter.includes('today')) {
+					targetToday = false;
+					let diff = moment(item.due_date).diff(moment(), 'days');
+					if (diff <= 0) {
+						targetToday = true;
+					}
+				}
+			}
+			if (target) {
+				console.log(`target = [${item.body}]
+			hidden: ${targetHidden}
+			parentwithTag: ${hasParentWithTag}
+			targetToday: ${targetToday}`);
+			}
+			// if ( target && !targetHidden && !hasParentWithTag && targetToday )
+			// {
+			// 	return true;
+			// }
+		}.bind(this));
+	},
+	// resetDoneData()
+	// {
+	// 	let dd = objectToArray(state.nodes).filter(item => item.done);
+	// 	dd = sortObjectArrayByTwoProperties(dd,'done_date','parents_bodies','desc','asc');
+	// 	state.doneData = dd;
+	// },
+	// getItemWithVisibleChildren(id)
+	// {
+	// 	id = (id) ? id : selection.selectedId;
+	// 	if (!id){ return; }
+	// 	let item = state.nodes[id];
+	// 	if (!item){ return; }
+	// 	let visibleChildren = [];
+	// 	item.children.forEach(function(child){
+	// 		if(!state.hiddenItemIds.includes(child.id))
+	// 		{
+	// 			visibleChildren.push(getters.getItemWithVisibleChildren(child.id));
+	// 		}
+	// 	}.bind(this));
+	// 	item.children = visibleChildren;
+	// 	return item;
+	// },
+	// returnDoneChildrenAmount(item){
+	// 	let x = item.children.reduce(function(prevChild, currChild) {
+	// 		let y = (currChild.done) ? 1 : 0;
+	// 		return prevChild + y;
+	// 	}, 0);
+	// 	return x;
+	// },
+	showChildren({ state, commit, dispatch, getters }, { id, action } = {}) {
+		id = id ? id : selection.selectedId;
+		let item = state.nodes[id];
+		if (!item.children || !item.children.length) {
+			return;
+		}
+		if (action == 'show') {
+			if (item.show_children) {
+				return;
+			}
+			item.show_children = true;
+		} else if (action == 'hide') {
+			if (!item.show_children) {
+				return;
+			}
+			item.show_children = false;
+		} else {
+			item.show_children = !item.show_children;
+		}
+		dispatch('patch', { id: id, field: 'show_children' });
+	},
+	markDone({ state, commit, dispatch, getters }, { id, markAs } = {}) {
+		id = id ? id : selection.selectedId;
+		if (!id) {
+			return;
+		}
+		let item = state.nodes[id];
+		if (!item) {
+			return;
+		}
+		if (markAs == 'notDone') {
+			item.done = false;
+			dispatch('prepareDonePatch', { id });
+			return;
+		}
+		if (item.children.length && !getters.allChildrenDone(id)) {
+			return;
+		}
+		if (markAs == 'done') {
+			item.done = true;
+		} else {
+			item.done = !item.done;
+		}
+		dispatch('prepareDonePatch', { id });
+	},
+	indent({ state, commit, dispatch, getters }, { id } = {}) {
+		id = id ? id : selection.selectedId;
+		// if(!getters.isTopLvlItemInFilteredRoot(id)){ 
+		// 	console.log("can't indent a topLvlItem in filtered list");
+		// 	return;
+		// }
+		let new_parent_id = getters.olderSiblingId(id);
+		if (new_parent_id == state.nodes[id].parent_id) {
+			console.log('bump! ceiling!');return;
+		}
+		console.log('new_parent_id / olderSiblingId: ' + new_parent_id);
+		dispatch('giveNewParent', { id, new_parent_id });
+	},
+	unindent({ state, commit, dispatch, getters }, { id } = {}) {
+		id = id ? id : selection.selectedId;
+		// if(!getters.isTopLvlItemInFilteredRoot(id)){ 
+		// 	console.log("can't unindent a topLvlItem in filtered list");
+		// 	return;
+		// }
+		let depth = state.nodes[id].depth;
+		let olderSiblingId = getters.olderSiblingId(id);
+		let olderSiblingDepth = state.nodes[olderSiblingId].depth;
+
+		while (olderSiblingDepth != depth - 1) {
+			olderSiblingId = getters.olderSiblingId(olderSiblingId);
+			olderSiblingDepth = state.nodes[olderSiblingId].depth;
+		}
+		let new_parent_id = olderSiblingId;
+		let new_parent_depth = olderSiblingDepth;
+		console.log('new_parent: ' + new_parent_id);
+
+		if (!new_parent_id) {
+			console.log('crash! floor!');return;
+		}
+		if (new_parent_depth == 0 && depth == 1) {
+			console.log('crash! floor!');return;
+		}
+		if (new_parent_id == state.nodes[id].parent_id) {
+			new_parent_id = state.nodes[new_parent_id].parent_id;
+		}
+		dispatch('giveNewParent', { id, new_parent_id });
+	},
+	selectItem({ state, commit, dispatch, getters }, { id, direction } = {}) {
+		id = id ? id : selection.selectedId;
+		let nextSelectedId;
+		if (!direction) {
+			nextSelectedId = id;
+		} else if (direction == 'next') {
+			if (!id || id == state.root.id) {
+				nextSelectedId = vm.$refs.root.childrenOrder[0];
+			} else {
+				nextSelectedId = getters.nextItemId(id);
+			}
+		} else if (direction == 'prev') {
+			if (!id || id == state.root.id) {
+				let l = vm.$refs.root.childrenOrder.length;
+				nextSelectedId = vm.$refs.root.childrenOrder[l - 1];
+			} else {
+				nextSelectedId = getters.prevItemId(id);
+			}
+		}
+		selection.selectedId = nextSelectedId;
+		dispatch('scrollToItemIfNeeded', { id: nextSelectedId });
+	},
+	setToday({ state, commit, dispatch, getters }, { id } = {}) {
+		id = id ? id : selection.selectedId;
+		if (!id) {
+			return;
+		}
+		if (getters.hasParentDueToday(id)) {
+			console.log('parent is already due');return;
+		}
+		dispatch('setDueDate', { id });
+	},
+	showAddNewItem({ state, commit, dispatch, getters }, { id, addAs } = {}) {
+		id = id ? id : selection.selectedId ? selection.selectedId : state.root.id;
+		if (!id) {
+			return;
+		}
+		console.log('showAddNewItem for [' + state.nodes[id].body + ']');
+		state.addingNewUnder = id;
+		selection.lastSelectedId = id;
+		selection.selectedId = null;
+		state.addingNewAsFirstChild = addAs == 'child' ? true : false;
+		state.addingNewAsChild = addAs == 'child' ? true : false;
+	},
+	startEditTags({ state, commit, dispatch, getters }, { id } = {}) {
+		id = id ? id : selection.selectedId;
+		if (!id) {
+			return;
+		}
+		state.editingItemTags = id;
+	},
+	stopPatching({ state, commit, dispatch, getters }) {
+		if (window.stopPatchingIcon) {
+			clearTimeout(window.stopPatchingIcon);
+		}
+		window.stopPatchingIcon = setTimeout(function () {
+			state.patching = false;
+		}.bind(state), 300);
+	},
+	startPatching({ state, commit, dispatch, getters }) {
+		if (window.stopPatchingIcon) {
+			clearTimeout(window.stopPatchingIcon);
+		}
+		state.patching = true;
+	},
+	patchRootChildrenOrderWithFilter({ state, commit, dispatch, getters }, { id } = {}) {
+		vm.$http.get('api/items/' + state.root.id).then(function (response) {
+			let rootChildrenOrder = response.data.children_order;
+			rootChildrenOrder = rootChildrenOrder + ',' + id;
+			vm.$http.patch('api/items/' + state.root.id, { 'children_order': rootChildrenOrder }).then(function (response) {
+				let newRootChildrenOrder = response.data.children_order;
+				console.log('newRootChildrenOrder = ' + newRootChildrenOrder);
+			});
+		});
+	},
+	patch({ state, commit, dispatch, getters }, { id, field, value } = {}) {
+		// if(getters.isTopLvlItemInFilteredRoot(id)){ 
+		// 	if(field == 'children_order' || field == 'parent_id'){
+		// 		console.log("you can't sync a toplvlItem when filtering");
+		// 		return;
+		// 	}
+		// }
+		dispatch('startPatching');
+		let patchObj = {};
+		let patchVal = value ? value : state.nodes[id][field];
+		if (field == 'children_order') {
+			patchVal = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__components_globalFunctions_js__["h" /* arrayToString */])(patchVal);
+		}
+		patchObj[field] = patchVal;
+		vm.$http.patch('/api/items/' + id, patchObj, { method: 'PATCH' }).then(function (response) {
+			console.log(`patched ${id}[${state.nodes[id].body}].${field} = ${patchObj[field]}`);
+			dispatch('stopPatching');
+		}, response => {
+			state.patching = 'error';
+			let errMsg = getters.text.flashes.ajaxError;
+			console.log(errMsg);
+			dispatch('sendFlash', { type: 'ajaxError', msg: errMsg });
+			return;
+		});
+	},
+	patchTag({ state, commit, dispatch, getters }, { id, tags, requestType } = {}) {
+		/* requestType can be:
+  	'tag': tag item  (default if null)
+  	'untag': untag item with certain tag
+  	'retag': delete all tags and retag new ones
+  */
+		if (!tags) {
+			return;
+		}
+		dispatch('updateItemTagsDom', { id, tags, requestType });
+		if (Array.isArray(tags)) {
+			tags = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__components_globalFunctions_js__["f" /* removeEmptyValuesFromArray */])(tags);
+			if (!tags.length) {
+				return;
+			}
+		} else {
+			if (!tags.replace(/\s/g, "").length) {
+				return;
+			}
+		}
+		dispatch('startPatching');
+		let patchObj = {};
+		patchObj['tags'] = tags;
+		patchObj['type'] = requestType;
+		vm.$http.patch('/api/itemtags/' + id, patchObj, { method: 'PATCH' }).then(function (tagResponse) {
+			let syncedTags = tagResponse.data.tags;
+			console.log('tagged [' + state.nodes[id].body + '] with: ' + tagResponse.data.tags + ';');
+			console.log(tagResponse);
+			// Re-Add tags of item
+			vm.$http.get('/api/itemtags/' + id, { type: 'tags' })
+			// Codementor: Request type doesn't work......
+			.then(function (updatedTagList) {
+				state.nodes[id].tagged = updatedTagList.data;
+				console.log('updatedTagList of [' + state.nodes[id].body + '] with: ' + updatedTagList.data.map(t => t.tag_name) + ';');
+			});
+			dispatch('stopPatching');
+		});
+	},
+	patchDueDate({ state, commit, dispatch, getters }, { id, duedate } = {}) {
+		dispatch('startPatching');
+		if (duedate == '0000-00-00 00:00:00') {
+			vm.$http.patch('/api/items/' + id, { 'due_date': duedate }).then(function (response) {
+				dispatch('stopPatching');
+			});
+			return;
+		}
+		duedate = moment(duedate).format();
+		console.log('PatchDueDate: ' + duedate);
+		vm.$http.patch('/api/items/' + id, { 'due_date': duedate }).then(function (response) {
+			dispatch('stopPatching');
+		});
+	},
+	patchDone({ state, commit, dispatch, getters }, { id } = {}) {
+		dispatch('startPatching');
+		let done_date;
+		let doneValue = state.nodes[id].done;
+		if (doneValue) {
+			done_date = moment().format();
+		} else {
+			done_date = '0000-00-00 00:00:00';
+		}
+		vm.$http.patch('/api/items/' + id, { 'done': doneValue, 'done_date': done_date }).then(function (response) {
+			dispatch('stopPatching');
+		});
+	},
+	deleteItemDialogue({ state, commit, dispatch, getters }, { id } = {}) {
+		id = !id ? selection.selectedId : id;
+		dispatch('popout', { id: id, type: 'confirm-delete' });
+	},
+	deleteItemApi({ state, commit, dispatch, getters }, { idOrArray } = {}) {
+		dispatch('startPatching');
+		if (Array.isArray(idOrArray) && idOrArray.length) {
+			let array = idOrArray; // It's an array!
+			array.forEach(id => {
+				dispatch('deleteItemApi', { idOrArray: id });
+			});
+		} else {
+			let id = idOrArray; // It's an ID!
+			if (!id) {
+				return;
+			}
+			let item = state.nodes[id];
+			vm.$http.delete('/api/items/' + id).then(function (response) {
+				console.log(`deleted: ${id}[${item.body}]`);
+				dispatch('stopPatching');
+			});
+		}
+	},
+	popup({ state, commit, dispatch, getters }, { id, type } = {}) {
+		id = !id ? selection.selectedId : id;
+		let item = state.nodes[id];
+		let popupExists = state.popups.filter(function (popup) {
+			return popup.item.id === id;
+		})[0];
+		if (popupExists) {
+			return;
+		}
+		state.popups.push({
+			item,
+			type: type,
+			timeout: true, // not yet fully integrated
+			time: 10 });
+		//         if (type == 'afterDone') {
+		// Vue.nextTick(function() {
+		// 	let fpId = "#done-date-edit-"+id;
+		// 	let fpEl = document.querySelector(fpId);
+		// 	fpEl.flatpickrify();
+		// 	let fpId_b = "#done-date-edit-"+id+"-popup";
+		// 	let fpEl_b = document.querySelector(fpId_b);
+		// 	fpEl_b.flatpickrify();
+		// });
+		//         }
+	},
+	sendFlash({ state, commit, dispatch, getters }, { type, msg } = {}) {
+		state.flashes.push({ type, msg });
+	},
+	popout({ state, commit, dispatch, getters }, { id, type } = {}) {
+		id = !id ? selection.selectedId : id;
+		if (!id) {
+			return;
+		}
+		let item = state.nodes[id];
+		// let popoutExists = state.popouts.filter(function (popout) { return popout.item.id === id; })[0];
+		// if(!popoutExists){
+		// console.log("poppy doesn't exist");
+		if (type == 'timer') {
+			state.popouts.timer.push(item);
+			Vue.nextTick(() => {
+				console.log('emitting playTimer on Vue.nextTick');
+				Vue.bus.$emit('playTimer', item);
+			});
+			// setTimeout(() => {
+			// 	console.log('emitting playTimer after 1 sec');
+			// 	eventHub.$emit('playTimer');
+			// },1000);
+		}
+		if (type == 'confirm-delete') {
+			state.popouts.delete.push(item);
+		}
+		// }
+	},
+	addTimer({ state, commit, dispatch, getters }, { id = selection.selectedId } = {}) {
+		dispatch('popout', { id, type: 'timer' });
+		return;
+	},
+	fetchDone({ state, commit, dispatch, getters }, { tags, operator } = {}) {
+		state.loading = true;
+		vm.$http.get('/api/items/fetchdone').then(function (response) {
+			// debugger;
+			state.fetchedDone = true;
+			console.log('fetched Done');
+			let data = response.data;
+			console.log(data);
+			if (!data.length) {
+				console.log('no done items...');
+				state.loading = false;
+				return;
+			}
+			// clean up and add as nodes
+			data.forEach(item => {
+				item = getters.setDefaultItemValues(item);
+				if (!state.nodes[item.id]) {
+					state.nodes[item.id] = item;
+				}
+			});
+			// Codementor
+			selection.view = null;
+			selection.view = 'journal';
+			state.loading = false;
+		});
+	},
+	// fetchTagged(tags, requestType){
+	// 	/* requestType can be:
+	// 		'withAnyTag': fetch articles with any tag listed
+	// 		'withAllTags': only fetch articles with all the tags
+	// 		'tagNames': fetch all existing tags
+	// 	*/
+	// 	state.loading = true;
+	// 	let request = {};
+	// 	requestType = (!requestType) ? 'withAnyTag' : requestType;
+	// 	request['tags'] = tags;
+	// 	request['type'] = requestType;
+	// 	console.log('request');
+	// 	console.log(request);
+	// 	vm.$http.post('/api/itemtags/fetchTagged', request).then(function(response){
+	// 		let aaa = response.data;
+	// 		aaa = json(aaa);
+	// 		console.log('fetched tagged items!');
+	// 		console.log(response);
+	// 		console.log(response.json());
+	// 		console.log(aaa);
+	// 		allItems.filteredTagItems = aaa;
+	// 		allItems.nodes = aaa;
+	// 		state.root = aaa;
+	// 		state.allData = aaa;
+	// 		state.loading = false;
+	// 	});
+	// },
+	filterItems({ state, commit, dispatch, getters }, { keyword, value, event } = {}) {
+		if (state.editingItem) {
+			return;
+		}
+		// debugger;
+		let operator = null;
+		if (event) {
+			event.preventDefault();
+			if (event.ctrlKey || event.metaKey) {
+				operator = 'AND';
+			} else if (event.altKey) {
+				operator = 'NOT';
+			}
+		}
+		if (!operator) {
+			selection.clear();
+		}
+		if (keyword == 'journal' && !state.fetchedDone) {
+			dispatch('fetchDone', { tags: null, operator: operator });
+		}
+		selection.addKeywords(keyword, value, operator);
+		// FILTER REWRITE
+		// allItems.filterItems(keyword,value,operator);
+		// setTimeout(()=>{ 
+		// 	let a = selection.tags;
+		// 	selection.tags = [];
+		// 	selection.tags = a;
+		// 	console.log(selection.tags);
+		// },500);
+		// console.log(selection.tags);
+		// setTimeout(()=>{ vm.test() },1000);
+	},
+	removeFilter({ state, commit, dispatch, getters }, { tag } = {}) {
+		selection.hiddenTags = selection.hiddenTags.filter(x => x !== tag);
+	},
+	postNewItem({ state, commit, dispatch, getters }, { newItem, index, addNextItemAs, addTags, duplication } = {}) {
+		dispatch('startPatching');
+		// Prepare children_order for sending to DB.
+		if (newItem.children_order) {
+			newItem.children_order = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__components_globalFunctions_js__["h" /* arrayToString */])(newItem.children_order);
+		}
+		// let data = {
+		// 	newItemArray: [newItem, newItem]
+		// }
+		let data = newItem;
+		// newItem.id = 99999999;
+		// index = 0;
+		// allItems.addItem(newItem, index);
+		// return;
+
+		// let data = newItem;
+		// data = JSON.stringify(data);
+		vm.$http.post('/api/items', data) //SEND
+		// vm.$http.post('/api/items',newItem) //SEND
+		.then(function (response) {
+			//response
+			let storedItem = response.data;
+			// Revert old item's children_order back to string.
+			// storedItem.children_order = (!newItem.children_order) ? [] : newItem.children_order.split(',').map(Number);
+			// if(storedItem.constructor === Array){
+			// 	console.log(storedItem);
+			// 	console.log('storedItem ARRAY');
+			// 	storedItem.forEach(item => allItems.addItem(item));
+			// 	return;
+			// }
+			console.log('starting dom update...');
+			console.log('Index: ');
+			console.log(index);
+			dispatch('addItem', { item: storedItem, index, addNextItemAs, addTags, duplication });
+			dispatch('stopPatching');
+		}, response => {
+			state.patching = 'error';
+			let errMsg = getters.text.flashes.ajaxError;
+			console.log(errMsg);
+			dispatch('sendFlash', { type: 'ajaxError', msg: errMsg });
+		});
+	},
+	test({ state, commit, dispatch, getters }, { id } = {}) {
+		document.querySelectorAll(".tag-menu a").forEach(el => alert(JSON.stringify(el.style.color)));
+		// id = (!id) ? selection.selectedId : id ;
+		// id = selection.selectedId;
+		// let item = state.nodes[id];
+		// this.patchTag(id, 'bloem', 'tag');
+	},
+	alert({ state, commit, dispatch, getters }, { value } = {}) {
+		alert(value);
+	}
+
+});
+
+/***/ }),
+/* 178 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__components_globalFunctions_js__ = __webpack_require__(5);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__components_valueMorphers2_js__ = __webpack_require__(9);
+var _this = this;
+
+
+
+
+/* harmony default export */ __webpack_exports__["a"] = ({
+	hasTag: (state, getters) => (id, tags) => {
+		let item = state.nodes[id];
+		if (!item) {
+			console.log("[hasTag(id, tags)] what is state shit... id:" + id);return false;
+		}
+		if (!item.tagged || !item.tagged.length) {
+			return false;
+		}
+		let hasTags;
+		if (!Array.isArray(tags)) {
+			tags = [tags];
+		}
+		tags.forEach(function (tag) {
+			tag = __WEBPACK_IMPORTED_MODULE_0__components_globalFunctions_js__["d" /* Utilities */].tagNameToSlug(tag);
+			let tagExists = item.tagged.find(itemTags => itemTags.tag_slug == tag);
+			if (tagExists) {
+				hasTags = true;
+			}
+		});
+		return hasTags;
+	},
+	hasParentWithTag: (state, getters) => (id, tags) => {
+		if (!id) {
+			return false;
+		}
+		let item = state.nodes[id];
+		let parent_id = state.nodes[id].parent_id;
+		if (!parent_id) {
+			return false;
+		}
+		if (!state.nodes[parent_id]) {
+			// console.log('Parent of ('+id+')['+item.body+'] is non existant.');
+			return false;
+		}
+		let parentHasTag = getters.hasTag(parent_id, tags);
+		if (parentHasTag) {
+			return true;
+		} else {
+			return getters.hasParentWithTag(parent_id, tags);
+		}
+	},
+	parentIdWithTag: (state, getters) => (id, tags) => {
+		// debugger;
+		let item = state.nodes[id];
+		console.log('id & body = ' + item.id + " - " + item.body);
+		let parent_id = state.nodes[id].parent_id;
+		if (!parent_id) {
+			return false;
+		}
+
+		let parentHasTag = getters.hasTag(parent_id, tags);
+		console.log('parentHasTag');
+		console.log(parentHasTag);
+		if (parentHasTag) {
+			return parent_id;
+		} else {
+			return getters.parentIdWithTag(parent_id, tags);
+		}
+	},
+	returnTagsAsArray: (state, getters) => id => {
+		return state.nodes[id].tagged.map(obj => obj.tag_name);
+	},
+	siblingIndex: (state, getters) => id => {
+		let item = state.nodes[id];
+		if (!item) {
+			return false;
+		}
+		let parent_id = item.parent_id;
+		if (!parent_id || !state.nodes[parent_id]) {
+			return false;
+		}
+		// console.log('sibind parent_id');
+		// console.log(parent_id);
+		// console.log(state.nodes[parent_id]);
+		let siblingsArray = state.nodes[parent_id].children_order;
+		return siblingsArray.indexOf(id);
+	},
+	olderSiblingId: (state, getters) => id => {
+		let item = state.nodes[id];
+		if (!item) {
+			return;
+		}
+		let parent_id = item.parent_id;
+		if (!parent_id) {
+			return;
+		}
+		let siblingsArray = state.nodes[parent_id].children_order;
+		if (siblingsArray.length <= 1 || getters.siblingIndex(id) == 0) {
+			return parent_id;
+		}
+		let siblingIndex = siblingsArray.indexOf(id);
+		return state.nodes[parent_id].children_order[siblingIndex - 1];
+	},
+	nextItemId: (state, getters) => (id, debug) => {
+		if (debug) {
+			debugger;
+		}
+		if (!id) {
+			return;
+		}
+		let item = state.nodes[id];
+		if (!item) {
+			return;
+		}
+		let nextItemId;
+		// Select next item on top level.
+		if (getters.isTopLvlItemInFilteredRoot(id) && !item.show_children || selection.view == 'journal') {
+			let ind = vm.$refs.root.childrenOrder.indexOf(id);
+			if (ind + 1 == vm.$refs.root.childrenOrder.length) {
+				return vm.$refs.root.childrenOrder[0];
+			}
+			return vm.$refs.root.childrenOrder[ind + 1];
+		}
+		// Select first child if any.
+		if (item.show_children && item.children.length) {
+			nextItemId = item.children_order[0];
+			if (getters.hiddenItemIds.includes(nextItemId)) {
+				nextItemId = getters.nextItemRecursion(nextItemId);
+			}
+		} else {
+			nextItemId = getters.nextItemRecursion(id);
+		}
+		return nextItemId;
+	},
+	nextSiblingOrParentsSiblingId: (state, getters) => id => {
+		let item = state.nodes[id];
+		if (!item) {
+			return;
+		}
+		let parent_id = item.parent_id;
+		if (!parent_id) {
+			return;
+		}
+		let children_order = state.nodes[parent_id].children_order;
+		let nextIndex = getters.siblingIndex(id) + 1;
+		if (nextIndex == children_order.length) {
+			return getters.nextSiblingOrParentsSiblingId(parent_id);
+		} else {
+			return children_order[nextIndex];
+		}
+	},
+	deepestChild: (state, getters) => id => {
+		return vm.$refs.root.childrensDeepestChildren.find(obj => obj.id == id).deepestChild;
+	},
+	topLvlParentOfDeepestChild: (state, getters) => id => {
+		return vm.$refs.root.childrensDeepestChildren.find(obj => obj.deepestChild == id).id;
+	},
+	prevItemId: (state, getters) => (id, debug) => {
+		if (debug) {
+			debugger;
+		}
+		if (!id) {
+			return false;
+		}
+		let item = state.nodes[id];
+		if (item.depth == 0) {
+			return false;
+		}
+		let parent_id = item.parent_id;
+		let prevItemId;
+		let index;
+		// Select next item on top level.
+		let childrenIds = vm.$refs.root.childrenOrder;
+		if (getters.isTopLvlItemInFilteredRoot(id) || selection.view == 'journal') {
+			index = childrenIds.indexOf(id);
+			if (index == 0) {
+				if (selection.view == 'journal') {
+					prevItemId = childrenIds[childrenIds.length - 1];
+				} else {
+					prevItemId = getters.deepestChild(childrenIds[childrenIds.length - 1]);
+				}
+			} else {
+				prevItemId = childrenIds[index - 1];
+				if (selection.view != 'journal') {
+					prevItemId = getters.deepestChild(prevItemId);
+				}
+			}
+		} else {
+			index = getters.siblingIndex(id);
+			if (childrenIds[0] == id) {
+				prevItemId = getters.deepestChild(childrenIds[childrenIds.length - 1]);
+			} else if (index == 0) {
+				prevItemId = parent_id;
+			} else {
+				prevItemId = state.nodes[parent_id].children_order[index - 1];
+				prevItemId = getters.getDeepestLastChildId(prevItemId);
+			}
+		}
+		if (getters.hiddenItemIds.includes(prevItemId)) {
+			return getters.prevItemId(prevItemId);
+		} else {
+			return prevItemId;
+		}
+	},
+	nextItemRecursion: (state, getters) => id => {
+		// debugger;
+		let nextIndex = getters.siblingIndex(id) + 1;
+		let item = state.nodes[id];
+		let parent_id = item.parent_id;
+		// let tagsSelected = selection.tags.length;
+
+		if (getters.itIsADeepestChild(id)) {
+			let topLvlItemId = getters.topLvlParentOfDeepestChild(id);
+			let topLvlChildrenIds = vm.$refs.root.childrenOrder;
+			let ind = topLvlChildrenIds.indexOf(topLvlItemId);
+			if (ind + 1 == topLvlChildrenIds.length) {
+				let firstItemId = topLvlChildrenIds[0];
+				if (firstItemId == id) {
+					return null;
+				}
+				return firstItemId;
+			}
+			return topLvlChildrenIds[ind + 1];
+		}
+		let parentsChildrenOrder = state.nodes[parent_id].children_order;
+		let itemIsLastSibling = nextIndex == parentsChildrenOrder.length;
+		if (itemIsLastSibling) {
+			if (parent_id == state.root.id) {
+				return;
+			}
+			return getters.nextItemRecursion(parent_id);
+		}
+		let nextItemId = state.nodes[parent_id].children_order[nextIndex];
+		if (getters.hiddenItemIds.includes(nextItemId)) {
+			return getters.nextItemRecursion(nextItemId);
+		}
+		return nextItemId;
+	},
+	isTopLvlItemInFilteredRoot: (state, getters) => id => {
+		// console.log('running isTopLvlItemInFilteredRoot');
+		let s = selection;
+		if (selection.nothingSelected() && selection.view == 'tree') {
+			// console.log('the root is not filtered');
+			return false;
+		}
+		if (id == state.root.id) {
+			return true;
+		} else if (vm.$refs.root.childrenOrder.includes(id)) {
+			return true;
+		} else {
+			return false;
+		}
+	},
+	hasParentDueToday: (state, getters) => id => {
+		id = id ? id : selection.selectedId;
+		let item = state.nodes[id];
+		if (!item.parent_id) {
+			return false;
+		}
+		let parent = state.nodes[item.parent_id];
+		if (!parent) {
+			return false;
+		}
+		let diff = moment(parent.due_date).diff(moment(), 'days');
+		if (diff <= 0) {
+			return true;
+		} else {
+			return getters.hasParentDueToday(item.parent_id);
+		}
+	},
+	isDueToday: (state, getters) => id => {
+		id = id ? id : selection.selectedId;
+		let item = state.nodes[id];
+		let diff = moment(item.due_date).diff(moment(), 'days');
+		if (diff <= 0) {
+			return true;
+		}
+		return false;
+	},
+	isProject: (state, getters) => id => {
+		if (!id) {
+			return false;
+		}
+		if (state.nodes[id].body.slice(-1) == ':') {
+			return true;
+		} else {
+			return false;
+		}
+	},
+	itemTagArray: (state, getters) => id => {
+		let item = state.nodes[id];
+		return item.tagged.map(function (tagObj) {
+			return tagObj.tag_name;
+		});
+	},
+	allChildrenDone: (state, getters) => id => {
+		let children = state.nodes[id].children;
+		if (!children.length) {
+			return false;
+		}
+		let doneAmount = children.reduce(function (prev, child) {
+			let a = child.done ? 1 : 0;
+			return __WEBPACK_IMPORTED_MODULE_0__components_globalFunctions_js__["d" /* Utilities */].AplusB(a, prev);
+		}, 0);
+		if (children.length == doneAmount) {
+			return true;
+		} else {
+			return false;
+		}
+	},
+	getAllChildrenIds: (state, getters) => id => {
+		let allChildrenIds = [];
+		getters.getAllChildrenIdsRecursive(id, allChildrenIds);
+		return allChildrenIds;
+	},
+	getAllChildrenIdsRecursive: (state, getters) => (id, allChildrenIds) => {
+		let item = state.nodes[id];
+		if (!(Array.isArray(item.children) && item.children.length)) {
+			return;
+		} else {
+			item.children_order.forEach(item => {
+				allChildrenIds.push(item);
+			});
+			item.children_order.forEach(item => {
+				return getters.getAllChildrenIdsRecursive(item, allChildrenIds);
+			});
+		}
+	},
+	calTotalPlannedTime: (state, getters) => id => {
+		let item = state.nodes[id];
+		let totalPlannedTime;
+		if (!(Array.isArray(item.children) && item.children.length)) {
+			// if we don't have children, do nothing, leave the time as-is
+			totalPlannedTime = !item.done || selection.view == 'journal' ? parseFloat(item.planned_time) : 0;
+		} else {
+			// add up all the times of our direct children
+			totalPlannedTime = item.children.reduce((prev, next) => {
+				let x = next.totalPlannedTime ? next.totalPlannedTime : next.planned_time;
+				return prev + parseFloat(x);
+			}, !item.done || selection.view == 'journal' ? parseFloat(item.planned_time) : 0);
+		}
+		return parseFloat(totalPlannedTime);
+	},
+	calTotalUsedTime: (state, getters) => id => {
+		let item = state.nodes[id];
+		let totalUsedTime;
+		if (!(Array.isArray(item.children) && item.children.length)) {
+			// if we don't have children, do nothing, leave the time as-is
+			totalUsedTime = !item.done || selection.view == 'journal' ? parseFloat(item.used_time) : 0;
+		} else {
+			// add up all the times of our direct children
+			totalUsedTime = item.children.reduce((prev, next) => {
+				let x = next.totalUsedTime ? next.totalUsedTime : next.used_time;
+				return prev + parseFloat(x);
+			}, !item.done || selection.view == 'journal' ? parseFloat(item.used_time) : 0);
+		}
+		return parseFloat(totalUsedTime);
+	},
+	checkValParentTree: (state, getters) => (id, val) => {
+		let pId = state.nodes[id].parent_id;
+		console.log('checkValParentTree pId: ' + checkValParentTree);
+		if (!pId) {
+			return false;
+		}
+		let checkVal = state.nodes[pId].item[val];
+		console.log('checkValParentTree checkVal: ' + checkVal);
+		if (checkVal) {
+			return checkVal;
+		} else {
+			return getters.checkValParentTree(pId, val);
+		}
+	},
+	getParentsAsArray: (state, getters) => id => {
+		let pArr = [];
+		getters.getParentsRecursive(id, pArr);
+		pArr.reverse().shift();
+		return pArr;
+	},
+	getParentsRecursive: (state, getters) => (id, pArr) => {
+		let pId = state.nodes[id].parent_id;
+		if (!pId) {
+			return;
+		}
+		pArr.push(state.nodes[pId].body);
+		getters.getParentsRecursive(pId, pArr);
+	},
+	getLastChildId: (state, getters) => id => {
+		let item = state.nodes[id];
+		let childrenCount = item.children.length;
+		if (childrenCount && item.show_children) {
+			let lastChild = item.children[childrenCount - 1];
+			return lastChild.id;
+		}
+		return id;
+	},
+	getDeepestLastChildId: (state, getters) => id => {
+		// debugger;
+		let lastChildId = getters.getLastChildId(id);
+		let item = state.nodes[lastChildId];
+		if (item.children.length && item.show_children) {
+			return getters.getDeepestLastChildId(lastChildId);
+		}
+		return lastChildId;
+	},
+	setDefaultItemValues: (state, getters) => item => {
+		// item.parent_id_backup = item.parent_id;
+		item.depth = Number(item.depth);
+		if (item.show_children == null) {
+			item.show_children = 1;
+		}
+		if (!item.children) {
+			item.children = [];
+		}
+		if (!item.due_date) {
+			item.due_date = "0000-00-00 00:00:00";
+		}
+		if (!item.done_date) {
+			item.done_date = "0000-00-00 00:00:00";
+		}
+		if (!item.done) {
+			item.done = false;
+		}
+		if (!item.used_time) {
+			item.used_time = 0;
+		}
+		if (!item.tagged) {
+			item.tagged = [];
+		}
+		if (!item.children_order) {
+			item.children_order = [];
+		} else if (typeof item.children_order === 'string') {
+			item.children_order = item.children_order.split(',').map(Number);
+		}
+		return item;
+	},
+	flattenTree: (state, getters) => array => {
+		let flattenedTree = [];
+		array.forEach(function (item) {
+			flattenedTree.push(item);
+			if (item.children.length) {
+				Array.prototype.push.apply(flattenedTree, getters.flattenTree(item.children));
+			}
+		}.bind(_this));
+		return flattenedTree;
+	},
+	// Original VM
+	itIsADeepestChild: (state, getters) => id => {
+		// console.log('running itIsADeepestChild');
+		if (!id) {
+			console.log('you need an ID');return;
+		}
+		if (vm.$refs.root.childrensDeepestChildren.map(item => item.deepestChild).includes(id)) {
+			return true;
+		}return false;
+	},
+	countChildren: (state, getters) => item => {
+		if (!item || !item.children) {
+			return 0;
+		}
+		let children = getters.flattenTree(item.children);
+		let x = children.length;
+		return x;
+	},
+	countDoneChildren: (state, getters) => item => {
+		if (!item.children) {
+			return 0;
+		}
+		let children = getters.flattenTree(item.children);
+		let doneChildren = children.filter(child => child.done);
+		let x = doneChildren.length;
+		return x;
+	},
+	findDeepestVisibleChild: (state, getters) => id => {
+		// console.log('running findDeepestVisibleChild');
+		id = id ? id : selection.selectedId;
+		let item = state.nodes[id];
+		let children = item.children.filter(child => !getters.hiddenItemIds.includes(child.id));
+		if (!children.length) {
+			return id;
+		}
+		let deepestId = children[children.length - 1].id;
+		return getters.findDeepestVisibleChild(deepestId);
+	},
+	isFirstItem: (state, getters) => id => {
+		if (getters.noItems) {
+			return false;
+		}
+		return getters.siblingIndex(id) == 0;
+	},
+	// Computed properties
+	language: (state, getters) => {
+		if (state.setLanguage) {
+			return state.setLanguage;
+		} else if (defaultLanguage) {
+			return defaultLanguage;
+		} else {
+			return 'en';
+		}
+	},
+	text: (state, getters) => {
+		return state.languageContents[getters.language];
+	},
+	allData: (state, getters) => {
+		if (!window.fetchedData) {
+			return {
+				"body": "ALL",
+				"children": [],
+				"children_order": [],
+				"depth": 0,
+				"done": false,
+				"done_date": "0000-00-00 00:00:00",
+				"due_date": "0000-00-00 00:00:00",
+				"id": "x",
+				"show_children": 1,
+				"tagged": [],
+				"used_time": 0
+			};
+		}
+		return {
+			"body": "ALL",
+			"children": getters.filteredItems,
+			"children_order": state.nodes[state.root.id].children_order,
+			"id": state.nodes[state.root.id].id,
+			"depth": 0,
+			"done": false,
+			"done_date": "0000-00-00 00:00:00",
+			"due_date": "0000-00-00 00:00:00",
+			"show_children": 1,
+			"tagged": [],
+			"used_time": 0
+		};
+	},
+	mobile: (state, getters) => {
+		if (state.manualMobile) {
+			return true;
+		}
+		return __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__components_globalFunctions_js__["i" /* mobilecheck */])();
+	},
+	mobileSmall: (state, getters) => {
+		if (window.innerWidth < 385) {
+			return true;
+		}
+	},
+	noItems: (state, getters) => {
+		if (!getters.allData.children.length) {
+			return true;
+		}
+		return false;
+		// if(!state || !state.root || !state.root.children.length){
+		// 	return true;
+		// } return false;
+	},
+	// doneItems: (state, getters) =>
+	// () => { // Flat
+	// 	return getters.filteredItemsFlat.filter(child => child.done);
+	// },
+	filteredItems: (state, getters) => {
+		// if(getters.noItems){ return []; }
+		if (selection.view == 'tree') {
+			return getters.filteredItemsTree;
+		} else if (selection.view == 'journal') {
+			return getters.filteredItemsJournal;
+		}
+	},
+	filteredItemsJournal: (state, getters) => {
+		if (selection.view != 'journal') {
+			return [];
+		}
+		let dates = {};
+		getters.filteredItemsFlat.forEach(function (item) {
+			if (!item.done) {
+				return;
+			}
+			let dd = moment(item.done_date).format('YYYY-MM-DD');
+			if (!dates[dd]) {
+				dates[dd] = [];
+			}
+			dates[dd].push(item);
+		}.bind(_this));
+		let datesArray = [];
+		Object.keys(dates).forEach(function (dd) {
+			let journalItem = {
+				'done_date': moment(dd).format('YYYY-MM-DD'),
+				'children': __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__components_globalFunctions_js__["j" /* sortObjectArrayByProperty */])(dates[dd], 'parents_bodies'),
+				'depth': 0,
+				'journalDate': true
+			};
+			journalItem = getters.setDefaultItemValues(journalItem);
+			datesArray.push(journalItem);
+		});
+		datesArray = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__components_globalFunctions_js__["j" /* sortObjectArrayByProperty */])(datesArray, 'done_date', 'desc');
+		return datesArray;
+	},
+	journalDates: (state, getters) => {
+		return Object.keys(getters.filteredItemsJournal);
+	},
+	filteredItemsFlat: (state, getters) => {
+		let ar = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__components_globalFunctions_js__["g" /* objectToArray */])(state.nodes).filter(function (item) {
+			let target = selection.tags.every(tag => getters.hasTag(item.id, tag));
+			let targetHidden = selection.hiddenTags.some(tag => getters.hasTag(item.id, tag));
+			let targetDone = selection.view == 'journal' ? item.done : true;
+			let targetToday = true;
+			// 		console.log(`
+			// ${item.body} =
+			// target = ${target}
+			// targetHidden = ${targetHidden}
+			// targetDone = ${targetDone}
+			// targetToday = ${targetToday}
+			// 			`);
+			if (selection.filter.includes('today')) {
+				targetToday = false;
+				let diff = moment(item.due_date).diff(moment(), 'days');
+				if (diff <= 0 || getters.hasParentDueToday(item.id)) {
+					targetToday = true;
+				}
+				let doneDateDiff = moment(item.done_date).diff(moment(), 'days');
+				if (doneDateDiff <= 1) {
+					targetToday = false;
+				}
+			}
+			if (target && !targetHidden && targetDone && targetToday) {
+				return true;
+			}
+		}.bind(_this));
+		if (selection.view == 'journal') {
+			ar = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__components_globalFunctions_js__["k" /* sortObjectArrayByTwoProperties */])(ar, 'done_date', 'parents_bodies', 'desc', 'asc');
+		}
+		return ar;
+	},
+	filteredItemsTree: (state, getters) => {
+		console.log(`update filteredItemsTree (nodes length: ${__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__components_globalFunctions_js__["g" /* objectToArray */])(state.nodes).length})`);
+		//Go through ALL ITEMS and return those that have the tag AND no parent with the tag.
+		let children = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__components_globalFunctions_js__["g" /* objectToArray */])(state.nodes).filter(function (item) {
+			let target;
+			let hasParentWithTag;
+			let targetToday;
+			let topLvlItem;
+			if (selection.noFilterOrTag()) {
+				topLvlItem = item.depth == 1 ? true : false;
+				if (topLvlItem) {
+					return true;
+				} else {
+					return false;
+				}
+			}
+
+			if (selection.tags.length > 1) {
+				hasParentWithTag = selection.tags.every(tag => getters.hasParentWithTag(item.id, tag));
+			} else {
+				hasParentWithTag = selection.tags.some(tag => getters.hasParentWithTag(item.id, tag));
+			}
+			target = selection.tags.every(tag => getters.hasTag(item.id, tag));
+
+			if (!selection.filter.includes('today') && target && !hasParentWithTag) {
+				return true;
+			}
+
+			if (selection.filter.includes('today')) {
+				let doneDateDiff = moment(item.done_date).diff(moment(), 'days');
+				if (item.done && doneDateDiff <= -1) {
+					return false;
+				}
+				let hasParentDueToday = getters.hasParentDueToday(item.id);
+				let isDue = getters.isDueToday(item.id);
+				if (!selection.tags.length && isDue) {
+					return true;
+				} else if (selection.tags.length && target && (isDue || hasParentDueToday) && !(hasParentWithTag && hasParentDueToday)) {
+					return true;
+				}
+			}
+			return false;
+		}.bind(_this));
+		// Sort on root children_order when no filter:
+		if (selection.noFilterOrTag()) {
+			let order = state.root.children_order;
+			if (order instanceof Array && order.length) {
+				// order = order.filter(id => vm.$refs.root.childrenOrder.includes(id));
+				children = order.map(id => children.find(t => t.id === id));
+			}
+		}
+		if (selection.filter.includes('today')) {
+			children = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__components_globalFunctions_js__["j" /* sortObjectArrayByProperty */])(children, 'done_date');
+		}
+		return children;
+	},
+	hiddenItemIds: (state, getters) => {
+		// console.log('running hiddenItemIds');
+		return __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__components_globalFunctions_js__["g" /* objectToArray */])(state.nodes).filter(function (item) {
+			let targetHidden = selection.hiddenTags.some(tag => getters.hasTag(item.id, tag));
+			if (targetHidden) {
+				return true;
+			}
+		}.bind(_this)).map(item => item.id);
+	},
+	selectionFilter: (state, getters) => {
+		// For list title
+		return selection.filter.map(function (val, i) {
+			if (selection.filter.length == i + 1) {
+				val = __WEBPACK_IMPORTED_MODULE_0__components_globalFunctions_js__["d" /* Utilities */].tagSlugToName(val);
+			} else {
+				val = __WEBPACK_IMPORTED_MODULE_0__components_globalFunctions_js__["d" /* Utilities */].tagSlugToName(val) + ', ';
+			}
+			return val;
+		});
+	},
+	selectionTags: (state, getters) => {
+		// For list title
+		return selection.tags.map(function (val, i) {
+			if (selection.tags.length == i + 1) {
+				val = __WEBPACK_IMPORTED_MODULE_0__components_globalFunctions_js__["d" /* Utilities */].tagSlugToName(val);
+			} else {
+				val = __WEBPACK_IMPORTED_MODULE_0__components_globalFunctions_js__["d" /* Utilities */].tagSlugToName(val) + ', ';
+			}
+			return val;
+		});
+	},
+	selectionHiddenTags: (state, getters) => {
+		// For list title
+		return selection.hiddenTags.map(function (val, i) {
+			if (selection.hiddenTags.length == i + 1) {
+				val = __WEBPACK_IMPORTED_MODULE_0__components_globalFunctions_js__["d" /* Utilities */].tagSlugToName(val);
+			} else {
+				val = __WEBPACK_IMPORTED_MODULE_0__components_globalFunctions_js__["d" /* Utilities */].tagSlugToName(val) + ', ';
+			}
+			return val;
+		});
+	},
+	// allVisibleItems: (state, getters) =>
+	// () => {
+	// {
+	// 	if(!getters.allData){ return []; }
+	// 	return filteredItemsFlat;
+	// 	// let items = getters.flattenTree(state.root.children);
+	// 	// return items.filter(function(item)
+	// 	// {
+	// 	// 	return !selection.hiddenItems.includes(item.id);
+	// 	// });
+	// },
+	allTagsComputed: (state, getters) => {
+		var t0 = performance.now();
+		if (getters.noItems) {
+			return [];
+		}
+		let allTagsArray = [];
+		// let items = getters.flattenTree(state.root.children);
+		// FILTER REWRITE
+		// let items = getters.allVisibleItems;
+		// let items = (vm.$refs.root) ? vm.$refs.root.allVisibleChildItems : [] ;
+		let items = getters.filteredItemsFlat.length ? getters.filteredItemsFlat : [];
+		if (!items.length) {
+			return [];
+		}
+		items.forEach(function (item) {
+			item.tagged.forEach(function (taggedObj) {
+				if (!taggedObj.tag || !taggedObj.tag.name) {
+					return; // solves bugs with broken tags
+				}
+				let tagAlreadyPushed = allTagsArray.find(function (pushedTag) {
+					return pushedTag.name == taggedObj.tag.name;
+				}.bind(taggedObj));
+
+				if (!tagAlreadyPushed) {
+					allTagsArray.push(taggedObj.tag);
+				}
+			}.bind(allTagsArray));
+		}.bind(allTagsArray));
+		allTagsArray = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__components_globalFunctions_js__["j" /* sortObjectArrayByProperty */])(allTagsArray, 'name');
+		var t1 = performance.now();
+		console.log("Call to allTagsComputed took " + (t1 - t0) + " milliseconds.");
+		return allTagsArray;
+	},
+	allTagsComputed_2: (state, getters) => {
+		let t2_0 = performance.now();
+		if (getters.noItems) {
+			return [];
+		}
+		let allTagsArray = [];
+		// let items = getters.flattenTree(state.root.children);
+		// FILTER REWRITE
+		// let items = getters.allVisibleItems;
+		// let items = (vm.$refs.root) ? vm.$refs.root.allVisibleChildItems : [] ;
+		let items = getters.filteredItemsFlat.length ? getters.filteredItemsFlat : [];
+		console.log('allTagsComputed_2');
+		// console.log('vm.$refs.root.allVisibleChildItems');
+		// console.log(vm.$refs.root.allVisibleChildItems);
+		if (!items.length) {
+			return [];
+		}
+		allTagsArray = items.reduce(function (a, item) {
+			let tags = item.tagged.map(taggedObj => taggedObj.tag).filter(tag => tag);
+			return a.concat(tags);
+		}, []);
+		allTagsArray = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__components_globalFunctions_js__["l" /* uniqBy */])(allTagsArray);
+		// console.log('allTagsArray in allTagsComputed_2');
+		// console.log(allTagsArray);
+		allTagsArray = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__components_globalFunctions_js__["j" /* sortObjectArrayByProperty */])(allTagsArray, 'name');
+		let t2_1 = performance.now();
+		console.log("Call to allTagsComputed_2 took " + (t2_1 - t2_0) + " milliseconds.");
+		return allTagsArray;
+	},
+	allTagsComputed_3: (state, getters) => {
+		let t3_0 = performance.now();
+		if (getters.noItems) {
+			return [];
+		}
+		let allTagsArray = new Set();
+		// let items = getters.flattenTree(state.root.children);
+		// FILTER REWRITE
+		// let items = getters.allVisibleItems;
+		// let items = (vm.$refs.root) ? vm.$refs.root.allVisibleChildItems : [] ;
+		let items = getters.filteredItemsFlat.length ? getters.filteredItemsFlat : [];
+		if (!items.length) {
+			return [];
+		}
+		items.forEach(function (item) {
+			if (item.tagged.length) {
+				item.tagged.forEach(taggedObj => {
+					if (taggedObj) {
+						allTagsArray.add(taggedObj.tag);
+					}
+				});
+			}
+		}.bind(allTagsArray));
+		allTagsArray = [...allTagsArray];
+		allTagsArray = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__components_globalFunctions_js__["l" /* uniqBy */])(allTagsArray);
+		allTagsArray = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__components_globalFunctions_js__["j" /* sortObjectArrayByProperty */])(allTagsArray, 'name');
+		let t3_1 = performance.now();
+		console.log("Call to allTagsComputed_3 took " + (t3_1 - t3_0) + " milliseconds.");
+		return allTagsArray;
+	},
+	allTagsComputed_1b: (state, getters) => {
+		var t0 = performance.now();
+		if (getters.noItems) {
+			return [];
+		}
+		let allTagsArray = [];
+		// let items = getters.flattenTree(state.root.children);
+		// FILTER REWRITE
+		// let items = getters.allVisibleItems;
+		// let items = (vm.$refs.root) ? vm.$refs.root.allVisibleChildItems : [] ;
+		let items = getters.filteredItemsFlat.length ? getters.filteredItemsFlat : [];
+		if (!items.length) {
+			return [];
+		}
+		items.forEach(function (item) {
+			item.tagged.forEach(function (taggedObj) {
+				if (!taggedObj.tag || !taggedObj.tag.name) {
+					return; // solves bugs with broken tags
+				}
+				let tagAlreadyPushed = allTagsArray.find(function (pushedTag) {
+					return pushedTag.name == taggedObj.tag.name;
+				}.bind(taggedObj));
+
+				if (!tagAlreadyPushed) {
+					allTagsArray.push(taggedObj.tag);
+				}
+			}.bind(allTagsArray));
+		}.bind(allTagsArray));
+		allTagsArray = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__components_globalFunctions_js__["j" /* sortObjectArrayByProperty */])(allTagsArray, 'name');
+		var t1 = performance.now();
+		console.log("Call to allTagsComputed 1b took " + (t1 - t0) + " milliseconds.");
+		return allTagsArray;
+	},
+	itemAmount: (state, getters) => {
+		if (getters.noItems) {
+			return 0;
+		}
+		// let x = getters.countChildren(getters.allData);
+		// let x = vm.$refs.root.allVisibleChildItems.length;
+		let items = getters.filteredItemsFlat.length ? getters.filteredItemsFlat : [];
+		return items.length - 1;
+	},
+	doneItemAmount: (state, getters) => {
+		if (getters.noItems) {
+			return 0;
+		}
+		// let doneChildren = vm.$refs.root.allVisibleChildItems.filter(child => child.done).length;
+		let items = getters.filteredItemsFlat.length ? getters.filteredItemsFlat : [];
+		let doneChildren = items.filter(child => child.done).length;
+		return doneChildren;
+	},
+	totalPlannedMin: (state, getters) => {
+		let selfValue = 0;
+		let childrenArray = getters.filteredItemsFlat;
+		if (!childrenArray || !childrenArray.length) {
+			return selfValue;
+		}
+		let x = childrenArray.reduce(function (prevVal, child) {
+			return prevVal + parseFloat(child.planned_time);
+		}, selfValue);
+		return x ? parseFloat(x) : 0;
+	},
+	totalPlannedSec: (state, getters) => {
+		return getters.totalPlannedMin * 60;
+	},
+	totalUsedSec: (state, getters) => {
+		let selfValue = 0;
+		let childrenArray = getters.filteredItemsFlat;
+		if (!childrenArray || !childrenArray.length) {
+			return selfValue;
+		}
+		let x = childrenArray.reduce(function (prevVal, child) {
+			return prevVal + parseFloat(child.used_time);
+		}, selfValue);
+		return x ? x : 0;
+	},
+	totalSecLeft: (state, getters) => {
+		if (getters.noItems) {
+			return 0;
+		}
+		return getters.totalPlannedSec - getters.totalUsedSec;
+	},
+	totalUsedHourMin: (state, getters) => {
+		return __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__components_valueMorphers2_js__["e" /* sec_to_hourmin */])(getters.totalUsedSec);
+	},
+	totalHourMinLeft: (state, getters) => {
+		return __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__components_valueMorphers2_js__["e" /* sec_to_hourmin */])(getters.totalSecLeft);
+	},
+	lastItems: (state, getters) => {
+		if (getters.noItems) {
+			return [];
+		}
+		let lastChild = getters.topLvlItems[getters.topLvlItems.length - 1];
+		let deepestChild = getters.findDeepestVisibleChild(lastChild);
+		return [lastChild, deepestChild];
+	},
+	firstItem: (state, getters) => {
+		if (getters.noItems) {
+			return null;
+		}
+		return getters.topLvlItems[0];
+	},
+	topLvlItems: (state, getters) => {
+		if (getters.noItems) {
+			return [];
+		}
+		return getters.filteredItemsTree.map(i => i.id);
+	}
+
+});
+
+/***/ }),
+/* 179 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony default export */ __webpack_exports__["a"] = ({
 	'en': {
 		'global': //
 		{
@@ -41985,1711 +43635,300 @@ window.langContentsItems = {
 			'ajaxError': '接続エラー。再読込まで '
 		}
 	}
+});
 
+/***/ }),
+/* 180 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony default export */ __webpack_exports__["a"] = ({
+	updateState(state, payload) // { id, field, value } or other
+	{
+		let key = payload.field;
+		let val = payload.value;
+		if (!key && !val) {
+			key = Object.keys(payload).filter(k => k != 'id')[0];
+			val = payload[key];
+		}
+		if (payload.id) {
+			state.nodes[payload.id][key] = val;
+			return;
+		}
+		state[key] = val;
+	},
+	updatePopouts(state, payload) // { field, value } or other
+	{
+		let key = payload.field;
+		let val = payload.value;
+		if (!key && !val) {
+			key = Object.keys(payload)[0];
+			val = payload[key];
+		}
+		state.popouts[key] = val;
+	},
+	updatePopups(state, payload) // { field, value } or other
+	{
+		let key = payload.field;
+		let val = payload.value;
+		if (!key && !val) {
+			key = Object.keys(payload)[0];
+			val = payload[key];
+		}
+		state.popups[key] = val;
+	},
+	resetNewItem(state) {
+		state.newItem.body = '';
+		state.newItem.due_date = '0000-00-00 00:00:00';
+		state.newItem.done_date = '0000-00-00 00:00:00';
+		state.newItem.done = false;
+		state.newItem.planned_time = '';
+		state.newItem.preparedTags = [];
+	},
+	addChild(state, { newParentId, index, item }) {
+		if (!index) {
+			state.nodes[newParentId].children.push(item);
+			state.nodes[newParentId].children_order.push(item.id);
+			return;
+		}
+		state.nodes[newParentId].children.splice(index, 0, item);
+		state.nodes[newParentId].children_order.splice(index, 0, item.id);
+	},
+	deleteChild(state, { index, id }) {
+		state.nodes[id].children.splice(index, 1);
+		state.nodes[id].children_order.splice(index, 1);
+	},
+	closeFlash(state, { flash }) {
+		state.flashes = state.flashes.filter(f => f != flash);
+	}
+});
+
+/***/ }),
+/* 181 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__lang_js__ = __webpack_require__(179);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__stateInitializer_js__ = __webpack_require__(182);
+
+
+// import Selection from '../../vue-components/Selection.js';
+// window.selection = new Selection();
+
+let a = {
+    // selection,
+    languageContents: __WEBPACK_IMPORTED_MODULE_0__lang_js__["a" /* default */],
+    debug: false,
+    doneData: null,
+    addingNewUnder: null,
+    addingNewAsChild: false,
+    addingNewAsFirstChild: false,
+    editingItem: null,
+    editingItemTags: null,
+    editingDoneDateItem: null,
+    loading: true,
+    patching: true,
+    popups: [],
+    popouts: { 'delete': [], 'timer': [], 'edit': [], 'guide': false },
+    flashes: [], // e.g. {'type':'','msg':''}
+    timerItems: [],
+    beforeEditCache_body: null,
+    beforeEditCache_planned_time: null,
+    fetchedDone: false,
+    cancelThroughKeydown: false,
+    manualMobile: false,
+    newItem: {
+        body: '',
+        planned_time: 0,
+        preparedTags: [],
+        due_date: '0000-00-00 00:00:00',
+        children: ''
+    },
+    newTag: null,
+    setLanguage: null
 };
 
+/* harmony default export */ __webpack_exports__["a"] = (() => Object.assign(a, __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__stateInitializer_js__["a" /* initializeState */])(window.fetchedData)));
+
+/***/ }),
+/* 182 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return initializeState; });
+
+
+function organizeAfterInitialization(returnedObject) {
+	console.log('run organizeAfterInitialization');
+	Object.keys(returnedObject.nodes).forEach(function (id) {
+		store.dispatch('sortChildren', { id });
+		store.dispatch('updateChildrenDueDate', { id });
+	}.bind(this));
+}
+function setDefaultItemValues(item) {
+	// item.parent_id_backup = item.parent_id;
+	item.depth = Number(item.depth);
+	if (item.show_children == null) {
+		item.show_children = 1;
+	}
+	if (!item.children) {
+		item.children = [];
+	}
+	if (!item.due_date) {
+		item.due_date = "0000-00-00 00:00:00";
+	}
+	if (!item.done_date) {
+		item.done_date = "0000-00-00 00:00:00";
+	}
+	if (!item.done) {
+		item.done = false;
+	}
+	if (!item.used_time) {
+		item.used_time = 0;
+	}
+	if (!item.tagged) {
+		item.tagged = [];
+	}
+	if (!item.children_order) {
+		item.children_order = [];
+	} else if (typeof item.children_order === 'string') {
+		item.children_order = item.children_order.split(',').map(Number);
+	}
+	return item;
+}
+function makeNode(item, returnedObject) {
+	let node = JSON.parse(JSON.stringify(item));
+	let parent = returnedObject.nodes[node.parent_id];
+	// assign extra item values
+	node = setDefaultItemValues(node);
+	// Register and organize nodes:
+	if (node.depth == 0) {
+		returnedObject.root = node;console.log('root-node');
+	} else if (parent) {
+		parent.children.push(node);
+	} else {
+		returnedObject.orphans.push(node);
+	}
+	returnedObject.nodes[node.id] = node;
+}
+function initializeState(fetchedData) {
+	console.log(`initializeState() with fetchedData ↓`);
+	console.log(fetchedData);
+	if (!fetchedData) {
+		return;
+	}
+
+	let returnedObject = {};
+	returnedObject.source = fetchedData;
+	returnedObject.orphans = [];
+	returnedObject.nodes = {};
+	returnedObject.root = {};
+	fetchedData.forEach(item => makeNode(item, returnedObject));
+
+	// organizeAfterInitialization(returnedObject);
+	return returnedObject;
+}
+
+
+/***/ }),
+/* 183 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__state_js__ = __webpack_require__(181);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__getters_js__ = __webpack_require__(178);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__mutations_js__ = __webpack_require__(180);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__actions_js__ = __webpack_require__(177);
+
+
+
+
+
+/* harmony default export */ __webpack_exports__["a"] = (() => ({
+  state: __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__state_js__["a" /* default */])(),
+  getters: __WEBPACK_IMPORTED_MODULE_1__getters_js__["a" /* default */],
+  mutations: __WEBPACK_IMPORTED_MODULE_2__mutations_js__["a" /* default */],
+  actions: __WEBPACK_IMPORTED_MODULE_3__actions_js__["a" /* default */]
+}));
+
+/***/ }),
+/* 184 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__vue_components_Card_vue__ = __webpack_require__(214);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__vue_components_Card_vue___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0__vue_components_Card_vue__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__vue_components_Popups_vue__ = __webpack_require__(217);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__vue_components_Popups_vue___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1__vue_components_Popups_vue__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__vue_components_Popouts_vue__ = __webpack_require__(216);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__vue_components_Popouts_vue___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2__vue_components_Popouts_vue__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__vue_components_Flashes_vue__ = __webpack_require__(215);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__vue_components_Flashes_vue___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_3__vue_components_Flashes_vue__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_vuex__ = __webpack_require__(144);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__components_globalFunctions_js__ = __webpack_require__(5);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__vue_components_Selection_js__ = __webpack_require__(21);
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+// components:
 
 
 
 
 
 
-
+let tagSlugToName = __WEBPACK_IMPORTED_MODULE_5__components_globalFunctions_js__["d" /* Utilities */].tagSlugToName;
 
 
 window.selection = new __WEBPACK_IMPORTED_MODULE_6__vue_components_Selection_js__["a" /* default */]();
 
-/* harmony default export */ __webpack_exports__["a"] = ({
+/* harmony default export */ __webpack_exports__["a"] = (() => ({
 	el: '#items-app',
-	data: {
-		doneData: null,
-		// FILTER REWRITE
-		// allData: {
-		// 	"body":"ALL",
-		// 	"children":[],
-		// 	"children_order":[],
-		// 	"depth":0,
-		// 	"done":false,
-		// 	"done_date":"0000-00-00 00:00:00",
-		// 	"due_date":"0000-00-00 00:00:00",
-		// 	"id":"x",
-		// 	"show_children":1,
-		// 	"tagged":[],
-		// 	"used_time":0
-		// },
-		nodes: {},
-		selection: selection,
-		addingNewUnder: null,
-		// addingNewEmptyList: false,
-		addingNewAsChild: false,
-		addingNewAsFirstChild: false,
-		editingItem: null,
-		editingItemTags: null,
-		editingDoneDateItem: null,
-		loading: true,
-		patching: true,
-		popups: [],
-		popouts: { 'delete': [], 'timer': [], 'edit': [], 'guide': false },
-		flashes: [], // e.g. {'type':'','msg':''}
-		timerItems: [],
-		beforeEditCache_body: null,
-		beforeEditCache_planned_time: null,
-		fetchedDone: false,
-		cancelThroughKeydown: false,
-		manualMobile: false,
-		newItem: {
-			body: '',
-			planned_time: 0,
-			preparedTags: [],
-			due_date: '0000-00-00 00:00:00',
-			children: ''
-		},
-		newTag: null,
-		setLanguage: null,
-		langContentsItems: langContentsItems
-	},
+	store,
 	components: {
-		Card: __WEBPACK_IMPORTED_MODULE_2__vue_components_Card_vue___default.a,
-		Popups: __WEBPACK_IMPORTED_MODULE_3__vue_components_Popups_vue___default.a,
-		Popouts: __WEBPACK_IMPORTED_MODULE_4__vue_components_Popouts_vue___default.a,
-		Flashes: __WEBPACK_IMPORTED_MODULE_1__vue_components_Flashes_vue___default.a
+		Card: __WEBPACK_IMPORTED_MODULE_0__vue_components_Card_vue___default.a,
+		Popups: __WEBPACK_IMPORTED_MODULE_1__vue_components_Popups_vue___default.a,
+		Popouts: __WEBPACK_IMPORTED_MODULE_2__vue_components_Popouts_vue___default.a,
+		Flashes: __WEBPACK_IMPORTED_MODULE_3__vue_components_Flashes_vue___default.a
 	},
-	mounted: function mounted() {
+	mounted() {
 		eventHub.$on('confirm-ok', function (id) {
 			console.log('computer says "ok"...');
 			console.log(id);
-			allItems.deleteItem(id);
+			store.dispatch('deleteItem', { id });
 		});
 		eventHub.$on('confirm-cancel', function (id) {
 			console.log('computer says "no"...');
 			console.log(id);
 			return;
 		});
-		// window.addEventListener( "scroll", function( event ) {
-		//     console.log(vm.mobile); return;
-		// });
-		// window.addEventListener( "onscroll", function( event ) {
-		//     console.log(vm.mobile); return;
-		// });
-		//      window.onscroll = function(e) {
-		// console.log(vm.mobile); return; };
-		// 	if(vm.mobile){ return; }
-		// 	let el = document.getElementsByClassName('line');
-		// 	// let el = $('.navigation');
-		// 	if (!isElementInViewport(el[0]))
-		// 	{
-		//     	console.log('a');
-		//     	document.querySelector("body").className += " scrolled-down";
-		// 	}
-		// 	else
-		// 	{
-		//     	let a = document.querySelector("body");
-		//     	document.querySelector("body").className = a.className.replace('scrolled-down','');
-		//     	console.log(a.className);
-		// 	}
-		// }.bind(this);
+		this.sortAllChildren();
 	},
-
-	computed: {
-		language: function language() {
-			if (this.setLanguage) {
-				return this.setLanguage;
-			} else if (defaultLanguage) {
-				return defaultLanguage;
-			} else {
-				return 'en';
-			}
-		},
-		text: function text() {
-			if (this.language == 'en') {
-				return this.langContentsItems.en;
-			}
-			if (this.language == 'ja') {
-				return this.langContentsItems.ja;
-			}
-		},
-		allData: function allData() {
-			if (!allItems || !allItems.root) {
-				return {
-					"body": "ALL",
-					"children": [],
-					"children_order": [],
-					"depth": 0,
-					"done": false,
-					"done_date": "0000-00-00 00:00:00",
-					"due_date": "0000-00-00 00:00:00",
-					"id": "x",
-					"show_children": 1,
-					"tagged": [],
-					"used_time": 0
-				};
-			}
-			return {
-				"body": "ALL",
-				"children": this.filteredItems,
-				"children_order": this.nodes[allItems.root.id].children_order,
-				"id": this.nodes[allItems.root.id].id,
-				"depth": 0,
-				"done": false,
-				"done_date": "0000-00-00 00:00:00",
-				"due_date": "0000-00-00 00:00:00",
-				"show_children": 1,
-				"tagged": [],
-				"used_time": 0
-			};
-		},
-		mobile: function mobile() {
-			if (this.manualMobile) {
-				return true;
-			}
-			return __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_5__components_globalFunctions_js__["d" /* mobilecheck */])();
-		},
-		mobileSmall: function mobileSmall() {
-			if (window.innerWidth < 385) {
-				return true;
-			}
-		},
-		noItems: function noItems() {
-			if (!this.allData.children.length) {
-				return true;
-			}
-			return false;
-			// if(!allItems || !allItems.root || !allItems.root.children.length){
-			// 	return true;
-			// } return false;
-		},
-
-		// doneItems() // Flat
-		// {
-		// 	return this.filteredItemsFlat.filter(child => child.done);
-		// },
-		filteredItems: function filteredItems() {
-			// if(this.noItems){ return []; }
-			if (this.selection.view == 'tree') {
-				return this.filteredItemsTree;
-			} else if (this.selection.view == 'journal') {
-				return this.filteredItemsJournal;
-			}
-		},
-		filteredItemsJournal: function filteredItemsJournal() {
-			if (this.selection.view != 'journal') {
-				return [];
-			}
-			var dates = {};
-			this.filteredItemsFlat.forEach(function (item) {
-				if (!item.done) {
-					return;
-				}
-				var dd = moment(item.done_date).format('YYYY-MM-DD');
-				if (!dates[dd]) {
-					dates[dd] = [];
-				}
-				dates[dd].push(item);
-			}.bind(this));
-			var datesArray = [];
-			Object.keys(dates).forEach(function (dd) {
-				var journalItem = {
-					'done_date': moment(dd).format('YYYY-MM-DD'),
-					'children': __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_5__components_globalFunctions_js__["e" /* sortObjectArrayByProperty */])(dates[dd], 'parents_bodies'),
-					'depth': 0,
-					'journalDate': true
-				};
-				journalItem = allItems.setDefaultItemValues(journalItem);
-				datesArray.push(journalItem);
-			});
-			datesArray = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_5__components_globalFunctions_js__["e" /* sortObjectArrayByProperty */])(datesArray, 'done_date', 'desc');
-			return datesArray;
-		},
-		journalDates: function journalDates() {
-			return Object.keys(this.filteredItemsJournal);
-		},
-		filteredItemsFlat: function filteredItemsFlat() {
-			var ar = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_5__components_globalFunctions_js__["f" /* objectToArray */])(this.nodes).filter(function (item) {
-				var target = this.selection.tags.every(function (tag) {
-					return allItems.hasTag(item.id, tag);
-				});
-				var targetHidden = this.selection.hiddenTags.some(function (tag) {
-					return allItems.hasTag(item.id, tag);
-				});
-				var targetDone = selection.view == 'journal' ? item.done : true;
-				var targetToday = true;
-				if (selection.filter.includes('today')) {
-					targetToday = false;
-					var diff = moment(item.due_date).diff(moment(), 'days');
-					if (diff <= 0 || allItems.hasParentDueToday(item.id)) {
-						targetToday = true;
-					}
-					var doneDateDiff = moment(item.done_date).diff(moment(), 'days');
-					if (doneDateDiff <= 1) {
-						targetToday = false;
-					}
-				}
-				if (target && !targetHidden && targetDone && targetToday) {
-					return true;
-				}
-			}.bind(this));
-			if (selection.view == 'journal') {
-				ar = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_5__components_globalFunctions_js__["g" /* sortObjectArrayByTwoProperties */])(ar, 'done_date', 'parents_bodies', 'desc', 'asc');
-			}
-			return ar;
-		},
-		filteredItemsTree: function filteredItemsTree() {
-			console.log('update filteredItemsTree (nodes length: ' + __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_5__components_globalFunctions_js__["f" /* objectToArray */])(this.nodes).length + ')');
-			//Go through ALL ITEMS and return those that have the tag AND no parent with the tag.
-			var children = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_5__components_globalFunctions_js__["f" /* objectToArray */])(this.nodes).filter(function (item) {
-				var target = void 0;
-				var hasParentWithTag = void 0;
-				var targetToday = void 0;
-				var topLvlItem = void 0;
-				if (this.selection.noFilterOrTag()) {
-					topLvlItem = item.depth == 1 ? true : false;
-					if (topLvlItem) {
-						return true;
-					} else {
-						return false;
-					}
-				}
-
-				if (this.selection.tags.length > 1) {
-					hasParentWithTag = this.selection.tags.every(function (tag) {
-						return allItems.hasParentWithTag(item.id, tag);
-					});
-				} else {
-					hasParentWithTag = this.selection.tags.some(function (tag) {
-						return allItems.hasParentWithTag(item.id, tag);
-					});
-				}
-				target = this.selection.tags.every(function (tag) {
-					return allItems.hasTag(item.id, tag);
-				});
-
-				if (!selection.filter.includes('today') && target && !hasParentWithTag) {
-					return true;
-				}
-
-				if (selection.filter.includes('today')) {
-					var doneDateDiff = moment(item.done_date).diff(moment(), 'days');
-					if (item.done && doneDateDiff <= -1) {
-						return false;
-					}
-					var hasParentDueToday = allItems.hasParentDueToday(item.id);
-					var isDue = allItems.isDueToday(item.id);
-					if (!selection.tags.length && isDue) {
-						return true;
-					} else if (selection.tags.length && target && (isDue || hasParentDueToday) && !(hasParentWithTag && hasParentDueToday)) {
-						return true;
-					}
-				}
-				return false;
-			}.bind(this));
-			// Sort on root children_order when no filter:
-			if (this.selection.noFilterOrTag()) {
-				var order = allItems.root.children_order;
-				if (order instanceof Array && order.length) {
-					// order = order.filter(id => this.$refs.root.childrenOrder.includes(id));
-					children = order.map(function (id) {
-						return children.find(function (t) {
-							return t.id === id;
-						});
-					});
-				}
-			}
-			if (selection.filter.includes('today')) {
-				children = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_5__components_globalFunctions_js__["e" /* sortObjectArrayByProperty */])(children, 'done_date');
-			}
-			return children;
-		},
-		hiddenItemIds: function hiddenItemIds() {
-			return __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_5__components_globalFunctions_js__["f" /* objectToArray */])(this.nodes).filter(function (item) {
-				var targetHidden = this.selection.hiddenTags.some(function (tag) {
-					return allItems.hasTag(item.id, tag);
-				});
-				if (targetHidden) {
-					return true;
-				}
-			}.bind(this)).map(function (item) {
-				return item.id;
-			});
-		},
-		selectionFilter: function selectionFilter() // For list title
-		{
-			return selection.filter.map(function (val, i) {
-				if (selection.filter.length == i + 1) {
-					val = allItems.tagSlugToName(val);
-				} else {
-					val = allItems.tagSlugToName(val) + ', ';
-				}
-				return val;
-			});
-		},
-		selectionTags: function selectionTags() // For list title
-		{
-			return selection.tags.map(function (val, i) {
-				if (selection.tags.length == i + 1) {
-					val = allItems.tagSlugToName(val);
-				} else {
-					val = allItems.tagSlugToName(val) + ', ';
-				}
-				return val;
-			});
-		},
-		selectionHiddenTags: function selectionHiddenTags() // For list title
-		{
-			return selection.hiddenTags.map(function (val, i) {
-				if (selection.hiddenTags.length == i + 1) {
-					val = allItems.tagSlugToName(val);
-				} else {
-					val = allItems.tagSlugToName(val) + ', ';
-				}
-				return val;
-			});
-		},
-
-		// allVisibleItems()
-		// {
-		// 	if(!this.allData){ return []; }
-		// 	return filteredItemsFlat;
-		// 	// let items = allItems.flattenTree(allItems.root.children);
-		// 	// return items.filter(function(item)
-		// 	// {
-		// 	// 	return !selection.hiddenItems.includes(item.id);
-		// 	// });
-		// },
-		allTagsComputed: function allTagsComputed() {
-			var t0 = performance.now();
-			if (this.noItems) {
-				return [];
-			}
-			var allTagsArray = [];
-			// let items = allItems.flattenTree(allItems.root.children);
-			// FILTER REWRITE
-			// let items = this.allVisibleItems;
-			// let items = (this.$refs.root) ? this.$refs.root.allVisibleChildItems : [] ;
-			var items = this.filteredItemsFlat.length ? this.filteredItemsFlat : [];
-			if (!items.length) {
-				return [];
-			}
-			items.forEach(function (item) {
-				item.tagged.forEach(function (taggedObj) {
-					if (!taggedObj.tag || !taggedObj.tag.name) {
-						return; // solves bugs with broken tags
-					}
-					var tagAlreadyPushed = allTagsArray.find(function (pushedTag) {
-						return pushedTag.name == taggedObj.tag.name;
-					}.bind(taggedObj));
-
-					if (!tagAlreadyPushed) {
-						allTagsArray.push(taggedObj.tag);
-					}
-				}.bind(allTagsArray));
-			}.bind(allTagsArray));
-			allTagsArray = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_5__components_globalFunctions_js__["e" /* sortObjectArrayByProperty */])(allTagsArray, 'name');
-			var t1 = performance.now();
-			console.log("Call to allTagsComputed took " + (t1 - t0) + " milliseconds.");
-			return allTagsArray;
-		},
-		allTagsComputed_2: function allTagsComputed_2() {
-			var t2_0 = performance.now();
-			if (this.noItems) {
-				return [];
-			}
-			var allTagsArray = [];
-			// let items = allItems.flattenTree(allItems.root.children);
-			// FILTER REWRITE
-			// let items = this.allVisibleItems;
-			// let items = (this.$refs.root) ? this.$refs.root.allVisibleChildItems : [] ;
-			var items = this.filteredItemsFlat.length ? this.filteredItemsFlat : [];
-			console.log('allTagsComputed_2');
-			// console.log('this.$refs.root.allVisibleChildItems');
-			// console.log(this.$refs.root.allVisibleChildItems);
-			if (!items.length) {
-				return [];
-			}
-			allTagsArray = items.reduce(function (a, item) {
-				var tags = item.tagged.map(function (taggedObj) {
-					return taggedObj.tag;
-				}).filter(function (tag) {
-					return tag;
-				});
-				return a.concat(tags);
-			}, []);
-			allTagsArray = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_5__components_globalFunctions_js__["h" /* uniqBy */])(allTagsArray);
-			// console.log('allTagsArray in allTagsComputed_2');
-			// console.log(allTagsArray);
-			allTagsArray = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_5__components_globalFunctions_js__["e" /* sortObjectArrayByProperty */])(allTagsArray, 'name');
-			var t2_1 = performance.now();
-			console.log("Call to allTagsComputed_2 took " + (t2_1 - t2_0) + " milliseconds.");
-			return allTagsArray;
-		},
-		allTagsComputed_3: function allTagsComputed_3() {
-			var t3_0 = performance.now();
-			if (this.noItems) {
-				return [];
-			}
-			var allTagsArray = new Set();
-			// let items = allItems.flattenTree(allItems.root.children);
-			// FILTER REWRITE
-			// let items = this.allVisibleItems;
-			// let items = (this.$refs.root) ? this.$refs.root.allVisibleChildItems : [] ;
-			var items = this.filteredItemsFlat.length ? this.filteredItemsFlat : [];
-			if (!items.length) {
-				return [];
-			}
-			items.forEach(function (item) {
-				if (item.tagged.length) {
-					item.tagged.forEach(function (taggedObj) {
-						if (taggedObj) {
-							allTagsArray.add(taggedObj.tag);
-						}
-					});
-				}
-			}.bind(allTagsArray));
-			allTagsArray = [].concat(_toConsumableArray(allTagsArray));
-			allTagsArray = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_5__components_globalFunctions_js__["h" /* uniqBy */])(allTagsArray);
-			allTagsArray = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_5__components_globalFunctions_js__["e" /* sortObjectArrayByProperty */])(allTagsArray, 'name');
-			var t3_1 = performance.now();
-			console.log("Call to allTagsComputed_3 took " + (t3_1 - t3_0) + " milliseconds.");
-			return allTagsArray;
-		},
-		allTagsComputed_1b: function allTagsComputed_1b() {
-			var t0 = performance.now();
-			if (this.noItems) {
-				return [];
-			}
-			var allTagsArray = [];
-			// let items = allItems.flattenTree(allItems.root.children);
-			// FILTER REWRITE
-			// let items = this.allVisibleItems;
-			// let items = (this.$refs.root) ? this.$refs.root.allVisibleChildItems : [] ;
-			var items = this.filteredItemsFlat.length ? this.filteredItemsFlat : [];
-			if (!items.length) {
-				return [];
-			}
-			items.forEach(function (item) {
-				item.tagged.forEach(function (taggedObj) {
-					if (!taggedObj.tag || !taggedObj.tag.name) {
-						return; // solves bugs with broken tags
-					}
-					var tagAlreadyPushed = allTagsArray.find(function (pushedTag) {
-						return pushedTag.name == taggedObj.tag.name;
-					}.bind(taggedObj));
-
-					if (!tagAlreadyPushed) {
-						allTagsArray.push(taggedObj.tag);
-					}
-				}.bind(allTagsArray));
-			}.bind(allTagsArray));
-			allTagsArray = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_5__components_globalFunctions_js__["e" /* sortObjectArrayByProperty */])(allTagsArray, 'name');
-			var t1 = performance.now();
-			console.log("Call to allTagsComputed 1b took " + (t1 - t0) + " milliseconds.");
-			return allTagsArray;
-		},
-		itemAmount: function itemAmount() {
-			if (this.noItems) {
-				return 0;
-			}
-			// let x = this.countChildren(this.allData);
-			// let x = this.$refs.root.allVisibleChildItems.length;
-			var items = this.filteredItemsFlat.length ? this.filteredItemsFlat : [];
-			return items.length - 1;
-		},
-		doneItemAmount: function doneItemAmount() {
-			if (this.noItems) {
-				return 0;
-			}
-			// let doneChildren = this.$refs.root.allVisibleChildItems.filter(child => child.done).length;
-			var items = this.filteredItemsFlat.length ? this.filteredItemsFlat : [];
-			var doneChildren = items.filter(function (child) {
-				return child.done;
-			}).length;
-			return doneChildren;
-		},
-		totalPlannedMin: function totalPlannedMin() {
-			if (this.noItems) {
-				return 0;
-			}
-			var selfValue = 0;
-			var childrenArray = this.filteredItemsFlat;
-			if (!childrenArray || !childrenArray.length) {
-				return selfValue;
-			}
-			var x = childrenArray.reduce(function (prevVal, child) {
-				return prevVal + parseFloat(child.planned_time);
-			}, selfValue);
-			return x ? parseFloat(x) : 0;
-		},
-		totalPlannedSec: function totalPlannedSec() {
-			return this.totalPlannedMin * 60;
-		},
-		totalUsedSec: function totalUsedSec() {
-			if (this.noItems) {
-				return 0;
-			}
-			var selfValue = 0;
-			var childrenArray = this.filteredItemsFlat;
-			if (!childrenArray || !childrenArray.length) {
-				return selfValue;
-			}
-			var x = childrenArray.reduce(function (prevVal, child) {
-				return prevVal + parseFloat(child.used_time);
-			}, selfValue);
-			return x ? x : 0;
-		},
-		totalSecLeft: function totalSecLeft() {
-			if (this.noItems) {
-				return 0;
-			}
-			return this.totalPlannedSec - this.totalUsedSec;
-		},
-		totalUsedHourMin: function totalUsedHourMin() {
-			return __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__components_valueMorphers2_js__["a" /* sec_to_hourmin */])(this.totalUsedSec);
-		},
-		totalHourMinLeft: function totalHourMinLeft() {
-			return __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__components_valueMorphers2_js__["a" /* sec_to_hourmin */])(this.totalSecLeft);
-		},
-		lastItems: function lastItems() {
-			if (this.noItems) {
-				return [];
-			}
-			var lastChild = this.topLvlItems[this.topLvlItems.length - 1];
-			var deepestChild = this.findDeepestVisibleChild(lastChild);
-			return [lastChild, deepestChild];
-		},
-		firstItem: function firstItem() {
-			if (this.noItems) {
-				return null;
-			}
-			return this.topLvlItems[0];
-		},
-		topLvlItems: function topLvlItems() {
-			if (this.noItems) {
-				return [];
-			}
-			return this.filteredItemsTree.map(function (i) {
-				return i.id;
-			});
-		}
+	data: {
+		selection: window.selection
 	},
-	watch: {
-		// allTagsComputed()
-		// {
-		// 	alert('allTagsComputed changed');
-		// 	console.log('allTagsComputed changed');
-		// },
-		// selection:
-		// {
-		// 	handler() {
-		// try 2
-		// Vue.nextTick(() => {
-		// 	this.allTagsComputed.forEach(t => {
-		// 		let el = document.querySelector("a[value='"+t.slug+"']");
-		// 		if(selection.tags.includes(t.slug))
-		// 		{
-		// 			el.className += ' active';
-		// 		} else {
-		// 			el.className = el.className.replace('active','');
-		// 		}
-		// 	})				
-		// });
-		// Vue.nextTick(()=> console.log('a'));
-
-		// try 3
-		// setTimeout(() => {
-		// 	document.querySelectorAll(".tag-menu a").forEach(el => el.className = el.className.replace('active',''));
-		// 	this.allTagsComputed.forEach(t => {
-		// 		let el = document.querySelector("a[value='"+t.slug+"']");
-		// 		if(selection.tags.includes(t.slug))
-		// 		{
-		// 			el.className += ' active';
-		// 		} else {
-		// 			el.className = el.className.replace('active','');
-		// 		}
-		// 	})
-		// },1000);
-		// },
-		// deep: true
-		// },
-	},
-	methods: {
-		setCancelThroughKeydown: function setCancelThroughKeydown() {
-			this.cancelThroughKeydown = true;
-			setTimeout(function () {
-				this.cancelThroughKeydown = false;
-			}.bind(this), 100);
-		},
-		startEdit: function startEdit(item, event) {
-			// debugger;
-			if (event && (event.srcElement.hasClass('done') || event.srcElement.hasClass('custom-tag'))) {
-				return;
-			}
-			console.log('startEdit');
-			item = item ? item : allItems.nodes[selection.selectedId];
-			this.beforeEditCache_body = item.body;
-			this.beforeEditCache_planned_time = item.planned_time;
-			// if( this.mobile )
-			// {
-			// 	this.popouts.edit.push(item);
-			// 	return;
-			// }
-			this.editingItem = item.id;
-		},
-		scrollToItemIfNeeded: function scrollToItemIfNeeded(id) {
-			var el = document.getElementById('item-body-' + id);
-			if (!__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_5__components_globalFunctions_js__["a" /* isElementInViewport */])(el)) {
-				el.scrollIntoView();
-			}
-		},
-		doneEdit: function doneEdit(item) {
-			console.log('Done edit!');
-			item = item ? item : allItems.nodes[selection.selectedId];
-			// if (!this.editingItem)
-			// {
-			// 	return;
-			// }
-			this.editingItem = null;
-			vm.popouts.edit = [];
-			if (this.editingItemTags) {
-				this.editingItemTags = null;
-				return;
-			}
-			if (!item.body) {
-				item.body = this.beforeEditCache_body;
-			}
-			// item.body = item.body.trim();
-
-			if (typeof item.planned_time != 'number' || Number.isNaN(item.planned_time)) {
-				item.planned_time = 0;
-			}
-			if (item.planned_time != this.beforeEditCache_planned_time) {
-				this.patch(item.id, 'planned_time');
-			}
-			if (item.body != this.beforeEditCache_body) {
-				this.patch(item.id, 'body');
-				allItems.copyParentBodyToAllChildren(item.id);
-			}
-			this.beforeEditCache_body = null;
-			this.beforeEditCache_planned_time = null;
-			// setTimeout(() => this.convertbodyURLtoHTML(),1000);
-		},
-		cancelEdit: function cancelEdit(item) {
-			item = item ? item : allItems.nodes[selection.selectedId];
-			if (this.editingItem || this.popouts.edit.length) {
-				console.log("cancel edit. Reverting to:");
-				console.log(this.beforeEditCache_body);
-				item.body = this.beforeEditCache_body;
-				item.planned_time = this.beforeEditCache_planned_time;
-			}
-			this.editingItem = null;
-			this.editingItemTags = null;
-			this.popouts.edit = [];
-		},
-		cancelAddNew: function cancelAddNew(cancelUnderId) {
-			preventKeydownListener();
-			console.log('cancelAddNew');
-			this.addingNewUnder = null;
-			// this.addingNewEmptyList = false;
-			if (selection.selectedId == cancelUnderId || selection.selectedId == null) {
-				// This is to prevent item being reselected when cancelAddNew through blur because of clicking on another item.
-				selection.selectedId = selection.lastSelectedId;
-			}
-			// Reset newItem to sibling stance.
-			this.addingNewAsChild = false;
-			// $(':focus').blur();
-		},
-		addNew: function addNew(addNextItemAs, newItem, olderSibling, addTags) {
-			newItem = newItem ? newItem : this.newItem;
-			if (!newItem.body) {
-				return;
-			}
-			addTags = addTags ? addTags : [];
-			if (olderSibling) {
-				olderSibling = olderSibling;
-			} else if (selection.selectedId) {
-				olderSibling = allItems.nodes[selection.selectedId];
-			} else {
-				olderSibling = false;
-			}
-			// Set parent ID and depth & protect against bugs when olderSibling is the root:
-			newItem.parent_id = olderSibling.parent_id ? olderSibling.parent_id : allItems.root.id;
-			newItem.depth = olderSibling.depth == 0 ? 1 : olderSibling.depth;
-
-			var OlderSiblingIndex = allItems.siblingIndex(olderSibling.id);
-			var index = isNaN(OlderSiblingIndex) ? 0 : OlderSiblingIndex + 1;
-			console.log('\n\t\t\t\tadding new item[' + newItem.body + ']\n\t\t\t\twith parent id = ' + newItem.parent_id + '\n\t\t\t\tdepth = ' + newItem.depth + '\n\t\t\t\tindex = ' + index);
-			if (this.addingNewAsChild) {
-				newItem.depth = olderSibling.depth + 1;
-				newItem.parent_id = olderSibling.id;
-				index = 0;
-			}
-			if (selection.view == "journal") {
-				newItem.done = 1;
-				var doneDate = !olderSibling || olderSibling.depth == 0 ? moment().format() : olderSibling.done_date;
-				newItem.done_date = doneDate;
-			}
-			if (selection.filter.includes('today') && allItems.isTopLvlItemInFilteredRoot(olderSibling.id) && !this.addingNewAsChild) {
-				newItem.due_date = moment().format();
-				addTags = addTags.filter(function (val) {
-					return val != 'Today';
-				});
-			}
-			console.log('sending newItem:');
-			console.log(JSON.parse(JSON.stringify(newItem)));
-			console.log('sending tags:');
-			console.log(addTags);
-			// Send to Root for Ajax call.
-			allItems.addTempNewItem(newItem, index, addNextItemAs, addTags);
-			this.postNewItem(newItem, index, addNextItemAs, addTags);
-			this.newItem.body = '';
-			this.newItem.due_date = '0000-00-00 00:00:00';
-			this.newItem.done_date = '0000-00-00 00:00:00';
-			this.newItem.done = false;
-			this.newItem.planned_time = '';
-			this.newItem.preparedTags = [];
-		},
-		itIsADeepestChild: function itIsADeepestChild(id) {
-			if (!id) {
-				console.log('you need an ID');return;
-			}
-			if (this.$refs.root.childrensDeepestChildren.map(function (item) {
-				return item.deepestChild;
-			}).includes(id)) {
-				return true;
-			}return false;
-		},
-		checkFilteredItemsTree: function checkFilteredItemsTree() {
-			//Go through ALL ITEMS and return those that have the tag AND no parent with the tag.
-			__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_5__components_globalFunctions_js__["f" /* objectToArray */])(this.nodes).forEach(function (item) {
-				var target = void 0;
-				var targetHidden = void 0;
-				var hasParentWithTag = void 0;
-				var targetToday = void 0;
-				var topLvlItem = void 0;
-				if (this.selection.nothingSelected()) {
-					topLvlItem = item.depth == 1 ? true : false;
-					if (topLvlItem) {
-						return true;
-					}
-				} else {
-					target = this.selection.tags.every(function (tag) {
-						return allItems.hasTag(item.id, tag);
-					});
-					targetHidden = this.selection.hiddenTags.some(function (tag) {
-						return allItems.hasTag(item.id, tag);
-					});
-					hasParentWithTag = this.selection.tags.some(function (tag) {
-						return allItems.hasParentWithTag(item.id, tag);
-					});
-					targetToday = true;
-					if (selection.filter.includes('today')) {
-						targetToday = false;
-						var diff = moment(item.due_date).diff(moment(), 'days');
-						if (diff <= 0) {
-							targetToday = true;
-						}
-					}
-				}
-				if (target) {
-					console.log('target = [' + item.body + ']\n\t\t\t\t\thidden: ' + targetHidden + '\n\t\t\t\t\tparentwithTag: ' + hasParentWithTag + '\n\t\t\t\t\ttargetToday: ' + targetToday);
-				}
-				// if ( target && !targetHidden && !hasParentWithTag && targetToday )
-				// {
-				// 	return true;
-				// }
-			}.bind(this));
-		},
-
-		// resetDoneData()
-		// {
-		// 	let dd = objectToArray(this.nodes).filter(item => item.done);
-		// 	dd = sortObjectArrayByTwoProperties(dd,'done_date','parents_bodies','desc','asc');
-		// 	this.doneData = dd;
-		// },
-		// getItemWithVisibleChildren(id)
-		// {
-		// 	id = (id) ? id : selection.selectedId;
-		// 	if (!id){ return; }
-		// 	let item = allItems.nodes[id];
-		// 	if (!item){ return; }
-		// 	let visibleChildren = [];
-		// 	item.children.forEach(function(child){
-		// 		if(!this.hiddenItemIds.includes(child.id))
-		// 		{
-		// 			visibleChildren.push(this.getItemWithVisibleChildren(child.id));
-		// 		}
-		// 	}.bind(this));
-		// 	item.children = visibleChildren;
-		// 	return item;
-		// },
-		tagSlugToName: function tagSlugToName(tagslug) {
-			return allItems.tagSlugToName(tagslug);
-		},
-		countChildren: function countChildren(item) {
-			if (!item || !item.children) {
-				return 0;
-			}
-			var children = allItems.flattenTree(item.children);
-			var x = children.length;
-			return x;
-		},
-		countDoneChildren: function countDoneChildren(item) {
-			if (!item.children) {
-				return 0;
-			}
-			var children = allItems.flattenTree(item.children);
-			var doneChildren = children.filter(function (child) {
-				return child.done;
-			});
-			var x = doneChildren.length;
-			return x;
-		},
-
-		// returnDoneChildrenAmount(item){
-		// 	let x = item.children.reduce(function(prevChild, currChild) {
-		// 		let y = (currChild.done) ? 1 : 0;
-		// 		return prevChild + y;
-		// 	}, 0);
-		// 	return x;
-		// },
-		showChildren: function showChildren(id, show_or_hide) {
-			id = id ? id : selection.selectedId;
-			var item = allItems.nodes[id];
-			if (!item.children || !item.children.length) {
-				return;
-			}
-			if (show_or_hide == 'show') {
-				if (item.show_children) {
-					return;
-				}
-				item.show_children = true;
-			} else if (show_or_hide == 'hide') {
-				if (!item.show_children) {
-					return;
-				}
-				item.show_children = false;
-			} else {
-				item.show_children = !item.show_children;
-			}
-			this.patch(id, 'show_children');
-		},
-		markDone: function markDone(id, markAs) {
-			id = id ? id : selection.selectedId;
-			if (!id) {
-				return;
-			}
-			var item = allItems.nodes[id];
-			if (!item) {
-				return;
-			}
-			if (markAs == 'notDone') {
-				item.done = false;
-				allItems.prepareDonePatch(id);
-				return;
-			}
-			if (item.children.length && !allItems.allChildrenDone(id)) {
-				return;
-			}
-			if (markAs == 'done') {
-				item.done = true;
-			} else {
-				item.done = !item.done;
-			}
-			allItems.prepareDonePatch(id);
-		},
-		moveItem: function moveItem(direction) {
-			var id = selection.selectedId;
-			if (!id) {
-				return;
-			}
-			allItems.moveItem(id, direction);
-		},
-		indent: function indent(id) {
-			id = id ? id : selection.selectedId;
-			// if(!allItems.isTopLvlItemInFilteredRoot(id)){ 
-			// 	console.log("can't indent a topLvlItem in filtered list");
-			// 	return;
-			// }
-			var new_parent_id = allItems.olderSiblingId(id);
-			if (new_parent_id == allItems.nodes[id].parent_id) {
-				console.log('bump! ceiling!');return;
-			}
-			console.log('new_parent_id / olderSiblingId: ' + new_parent_id);
-			allItems.giveNewParent(id, new_parent_id);
-		},
-		unindent: function unindent(id) {
-			id = id ? id : selection.selectedId;
-			// if(!allItems.isTopLvlItemInFilteredRoot(id)){ 
-			// 	console.log("can't unindent a topLvlItem in filtered list");
-			// 	return;
-			// }
-			var depth = allItems.nodes[id].depth;
-			var olderSiblingId = allItems.olderSiblingId(id);
-			var olderSiblingDepth = allItems.nodes[olderSiblingId].depth;
-
-			while (olderSiblingDepth != depth - 1) {
-				olderSiblingId = allItems.olderSiblingId(olderSiblingId);
-				olderSiblingDepth = allItems.nodes[olderSiblingId].depth;
-			}
-			var new_parent_id = olderSiblingId;
-			var new_parent_depth = olderSiblingDepth;
-			console.log('new_parent: ' + new_parent_id);
-
-			if (!new_parent_id) {
-				console.log('crash! floor!');return;
-			}
-			if (new_parent_depth == 0 && depth == 1) {
-				console.log('crash! floor!');return;
-			}
-			if (new_parent_id == allItems.nodes[id].parent_id) {
-				new_parent_id = allItems.nodes[new_parent_id].parent_id;
-			}
-			allItems.giveNewParent(id, new_parent_id);
-		},
-		selectItem: function selectItem(direction) {
-			var id = selection.selectedId;
-			var item = allItems.nodes[id];
-			var sel = void 0;
-			if (direction == 'next') {
-				if (!id || id == allItems.root.id) {
-					sel = this.$refs.root.childrenOrder[0];
-				} else {
-					sel = allItems.nextItemId(id);
-				}
-			} else if (direction == 'prev') {
-				if (!id || id == allItems.root.id) {
-					var l = this.$refs.root.childrenOrder.length;
-					sel = this.$refs.root.childrenOrder[l - 1];
-				} else {
-					sel = allItems.prevItemId(id);
-				}
-			}
-			selection.selectedId = sel;
-			this.scrollToItemIfNeeded(sel);
-		},
-		findDeepestVisibleChild: function findDeepestVisibleChild(id) {
-			var _this = this;
-
-			id = id ? id : selection.selectedId;
-			var item = allItems.nodes[id];
-			var children = item.children.filter(function (child) {
-				return !_this.hiddenItemIds.includes(child.id);
-			});
-			if (!children.length) {
-				return id;
-			}
-			var deepestId = children[children.length - 1].id;
-			return this.findDeepestVisibleChild(deepestId);
-		},
-		setToday: function setToday(id) {
-			id = id ? id : selection.selectedId;
-			if (!id) {
-				return;
-			}
-			if (allItems.hasParentDueToday(id)) {
-				console.log('parent is already due');return;
-			}
-			allItems.setDueDate(id);
-		},
-		showAddNewItem: function showAddNewItem(id, addAs) {
-			id = id ? id : selection.selectedId ? selection.selectedId : allItems.root.id;
-			if (!id) {
-				return;
-			}
-			console.log('showAddNewItem for [' + allItems.nodes[id].body + ']');
-			this.addingNewUnder = id;
-			selection.lastSelectedId = id;
-			selection.selectedId = null;
-			this.addingNewAsFirstChild = addAs == 'child' ? true : false;
-			this.addingNewAsChild = addAs == 'child' ? true : false;
-		},
-		startEditTags: function startEditTags(id) {
-			id = id ? id : selection.selectedId;
-			if (!id) {
-				return;
-			}
-			this.editingItemTags = id;
-		},
-		stopPatching: function stopPatching() {
-			if (window.stopPatchingIcon) {
-				clearTimeout(window.stopPatchingIcon);
-			}
-			window.stopPatchingIcon = setTimeout(function () {
-				this.patching = false;
-			}.bind(this), 300);
-		},
-		startPatching: function startPatching() {
-			if (window.stopPatchingIcon) {
-				clearTimeout(window.stopPatchingIcon);
-			}
-			this.patching = true;
-		},
-		patchRootChildrenOrderWithFilter: function patchRootChildrenOrderWithFilter(id) {
-			this.$http.get('api/items/' + allItems.root.id).then(function (response) {
-				var rootChildrenOrder = response.data.children_order;
-				rootChildrenOrder = rootChildrenOrder + ',' + id;
-				this.$http.patch('api/items/' + allItems.root.id, { 'children_order': rootChildrenOrder }).then(function (response) {
-					var newRootChildrenOrder = response.data.children_order;
-					console.log('newRootChildrenOrder = ' + newRootChildrenOrder);
-				});
-			});
-		},
-		patch: function patch(id, arg, value) {
-			var _this2 = this;
-
-			// if(allItems.isTopLvlItemInFilteredRoot(id)){ 
-			// 	if(arg == 'children_order' || arg == 'parent_id'){
-			// 		console.log("you can't sync a toplvlItem when filtering");
-			// 		return;
-			// 	}
-			// }
-			this.startPatching();
-			var patchObj = {};
-			var patchVal = value ? value : allItems.nodes[id][arg];
-			if (arg == 'children_order') {
-				patchVal = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_5__components_globalFunctions_js__["i" /* arrayToString */])(patchVal);
-			}
-			patchObj[arg] = patchVal;
-			this.$http.patch('/api/items/' + id, patchObj, { method: 'PATCH' }).then(function (response) {
-				console.log('patched ' + id + '[' + allItems.nodes[id].body + '].' + arg + ' = ' + patchObj[arg]);
-				this.stopPatching();
-			}, function (response) {
-				_this2.patching = 'error';
-				var errMsg = vm.text.flashes.ajaxError;
-				console.log(errMsg);
-				vm.sendFlash('ajaxError', errMsg);
-				return;
-			});
-		},
-		patchTag: function patchTag(id, tags, requestType) {
-			/* requestType can be:
-   	'tag': tag item  (default if null)
-   	'untag': untag item with certain tag
-   	'retag': delete all tags and retag new ones
-   */
-			if (!tags) {
-				return;
-			}
-			allItems.updateItemTagsDom(id, tags, requestType);
-			if (Array.isArray(tags)) {
-				tags = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_5__components_globalFunctions_js__["j" /* removeEmptyValuesFromArray */])(tags);
-				if (!tags.length) {
-					return;
-				}
-			} else {
-				if (!tags.replace(/\s/g, "").length) {
-					return;
-				}
-			}
-			this.startPatching();
-			var patchObj = {};
-			patchObj['tags'] = tags;
-			patchObj['type'] = requestType;
-			this.$http.patch('/api/itemtags/' + id, patchObj, { method: 'PATCH' }).then(function (tagResponse) {
-				var syncedTags = tagResponse.data.tags;
-				console.log('tagged [' + allItems.nodes[id].body + '] with: ' + tagResponse.data.tags + ';');
-				console.log(tagResponse);
-				// Re-Add tags of item
-				this.$http.get('/api/itemtags/' + id, { type: 'tags' })
-				// Codementor: Request type doesn't work......
-				.then(function (updatedTagList) {
-					allItems.nodes[id].tagged = updatedTagList.data;
-					console.log('updatedTagList of [' + allItems.nodes[id].body + '] with: ' + updatedTagList.data.map(function (t) {
-						return t.tag_name;
-					}) + ';');
-				});
-				this.stopPatching();
-			});
-		},
-		patchDueDate: function patchDueDate(id, duedate) {
-			this.startPatching();
-			if (duedate == '0000-00-00 00:00:00') {
-				this.$http.patch('/api/items/' + id, { 'due_date': duedate }).then(function (response) {
-					this.stopPatching();
-				});
-				return;
-			}
-			duedate = moment(duedate).format();
-			console.log('PatchDueDate: ' + duedate);
-			this.$http.patch('/api/items/' + id, { 'due_date': duedate }).then(function (response) {
-				this.stopPatching();
-			});
-		},
-		patchDone: function patchDone(id) {
-			this.startPatching();
-			var done_date = void 0;
-			var doneValue = allItems.nodes[id].done;
-			if (doneValue) {
-				done_date = moment().format();
-			} else {
-				done_date = '0000-00-00 00:00:00';
-			}
-			this.$http.patch('/api/items/' + id, { 'done': doneValue, 'done_date': done_date }).then(function (response) {
-				this.stopPatching();
-			});
-		},
-		deleteItem: function deleteItem(id) {
-			id = !id ? selection.selectedId : id;
-			// if (confirm("Do you really want to delete: "+allItems.nodes[id].body+"?") == false) {
-			//        return;
-			//    }
-			this.popout(id, 'confirm-delete');
-		},
-		deleteItemApi: function deleteItemApi(idOrArray) {
-			var _this3 = this;
-
-			this.startPatching();
-			if (Array.isArray(idOrArray) && idOrArray.length) {
-				var array = idOrArray; // It's an array!
-				array.forEach(function (id) {
-					_this3.deleteItemApi(id);
-				});
-			} else {
-				var id = idOrArray; // It's an ID!
-				if (!id) {
-					return;
-				}
-				var item = allItems.nodes[id];
-				this.$http.delete('/api/items/' + id).then(function (response) {
-					console.log('deleted: ' + id + '[' + item.body + ']');
-					this.stopPatching();
-				});
-			}
-		},
-		popup: function popup(id, type) {
-			id = !id ? selection.selectedId : id;
-			var item = allItems.nodes[id];
-			var popupExists = this.popups.filter(function (popup) {
-				return popup.item.id === id;
-			})[0];
-			if (popupExists) {
-				return;
-			}
-			this.popups.push({
-				item: item,
-				type: type,
-				timeout: true, // not yet fully integrated
-				time: 10 });
-			//         if (type == 'afterDone') {
-			// Vue.nextTick(function() {
-			// 	let fpId = "#done-date-edit-"+id;
-			// 	let fpEl = document.querySelector(fpId);
-			// 	fpEl.flatpickrify();
-			// 	let fpId_b = "#done-date-edit-"+id+"-popup";
-			// 	let fpEl_b = document.querySelector(fpId_b);
-			// 	fpEl_b.flatpickrify();
-			// });
-			//         }
-		},
-		sendFlash: function sendFlash(type, msg) {
-			this.flashes.push({ type: type, msg: msg });
-		},
-		popout: function popout(id, type) {
-			id = !id ? selection.selectedId : id;
-			if (!id) {
-				return;
-			}
-			var item = allItems.nodes[id];
-			// let popoutExists = this.popouts.filter(function (popout) { return popout.item.id === id; })[0];
-			// if(!popoutExists){
-			// console.log("poppy doesn't exist");
-			if (type == 'timer') {
-				this.popouts.timer.push(item);
-				Vue.nextTick(function () {
-					console.log('emitted playTimer');
-					eventHub.$emit('playTimer');
-				});
-			}
-			if (type == 'confirm-delete') {
-				this.popouts.delete.push(item);
-			}
-			// }
-		},
-		addTimer: function addTimer(id) {
-			id = !id ? selection.selectedId : id;
-			this.popout(id, 'timer');
-			return;
-		},
-		fetchDone: function fetchDone(tags, operator) {
-			this.loading = true;
-			this.$http.get('/api/items/fetchdone').then(function (response) {
-				// debugger;
-				this.fetchedDone = true;
-				console.log('fetched Done');
-				var data = response.data;
-				console.log(data);
-				if (!data.length) {
-					console.log('no done items...');
-					this.loading = false;
-					return;
-				}
-				// clean up and add as nodes
-				data.forEach(function (item) {
-					item = allItems.setDefaultItemValues(item);
-					if (!allItems.nodes[item.id]) {
-						allItems.nodes[item.id] = item;
-					}
-				});
-				// Codementor
-				this.selection.view = null;
-				this.selection.view = 'journal';
-				this.loading = false;
-			});
-		},
-
-
-		// fetchTagged(tags, requestType){
-		// 	/* requestType can be:
-		// 		'withAnyTag': fetch articles with any tag listed
-		// 		'withAllTags': only fetch articles with all the tags
-		// 		'tagNames': fetch all existing tags
-		// 	*/
-		// 	this.loading = true;
-		// 	let request = {};
-		// 	requestType = (!requestType) ? 'withAnyTag' : requestType;
-		// 	request['tags'] = tags;
-		// 	request['type'] = requestType;
-		// 	console.log('request');
-		// 	console.log(request);
-		// 	this.$http.post('/api/itemtags/fetchTagged', request).then(function(response){
-		// 		let aaa = response.data;
-		// 		aaa = json(aaa);
-		// 		console.log('fetched tagged items!');
-		// 		console.log(response);
-		// 		console.log(response.json());
-		// 		console.log(aaa);
-		// 		allItems.filteredTagItems = aaa;
-		// 		allItems.nodes = aaa;
-		// 		allItems.root = aaa;
-		// 		this.allData = aaa;
-		// 		this.loading = false;
-		// 	});
-		// },
-		filterItems: function filterItems(keyword, value, event) {
-			if (this.editingItem) {
-				return;
-			}
-			// debugger;
-			var operator = null;
-			if (event) {
-				event.preventDefault();
-				if (event.ctrlKey || event.metaKey) {
-					operator = 'AND';
-				} else if (event.altKey) {
-					operator = 'NOT';
-				}
-			}
-			if (!operator) {
-				selection.clear();
-			}
-			if (keyword == 'journal' && !this.fetchedDone) {
-				this.fetchDone(null, operator);
-			}
-			selection.addKeywords(keyword, value, operator);
-			// FILTER REWRITE
-			// allItems.filterItems(keyword,value,operator);
-			// setTimeout(()=>{ 
-			// 	let a = selection.tags;
-			// 	selection.tags = [];
-			// 	selection.tags = a;
-			// 	console.log(selection.tags);
-			// },500);
-			// console.log(selection.tags);
-			// setTimeout(()=>{ vm.test() },1000);
-		},
-		removeFilter: function removeFilter(tag) {
-			selection.hiddenTags = selection.hiddenTags.filter(function (x) {
-				return x !== tag;
-			});
-		},
-		duplicate: function duplicate(id) {
-			id = !id ? selection.selectedId : id;
-			allItems.duplicate(id);
-		},
-		postNewItem: function postNewItem(newItem, index, addNextItemAs, addTags, duplication) {
-			var _this4 = this;
-
-			this.startPatching();
-			// Prepare children_order for sending to DB.
-			if (newItem.children_order) {
-				newItem.children_order = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_5__components_globalFunctions_js__["i" /* arrayToString */])(newItem.children_order);
-			}
-			// let data = {
-			// 	newItemArray: [newItem, newItem]
-			// }
-			var data = newItem;
-			// newItem.id = 99999999;
-			// index = 0;
-			// allItems.addItem(newItem, index);
-			// return;
-
-			// let data = newItem;
-			// data = JSON.stringify(data);
-			this.$http.post('/api/items', data) //SEND
-			// this.$http.post('/api/items',newItem) //SEND
-			.then(function (response) {
-				//response
-				var storedItem = response.data;
-				// Revert old item's children_order back to string.
-				// storedItem.children_order = (!newItem.children_order) ? [] : newItem.children_order.split(',').map(Number);
-				// if(storedItem.constructor === Array){
-				// 	console.log(storedItem);
-				// 	console.log('storedItem ARRAY');
-				// 	storedItem.forEach(item => allItems.addItem(item));
-				// 	return;
-				// }
-				console.log('starting dom update...');
-				console.log('Index: ');
-				console.log(index);
-				allItems.addItem(storedItem, index, addNextItemAs, addTags, duplication);
-				this.stopPatching();
-			}, function (response) {
-				_this4.patching = 'error';
-				var errMsg = vm.text.flashes.ajaxError;
-				console.log(errMsg);
-				vm.sendFlash('ajaxError', errMsg);
-			});
-		},
-		isFirstItem: function isFirstItem(id) {
-			if (this.noItems) {
-				return false;
-			}
-			return allItems.siblingIndex(id) == 0;
-		},
-		test: function test(id) {
-			document.querySelectorAll(".tag-menu a").forEach(function (el) {
-				return alert(JSON.stringify(el.style.color));
-			});
-			// id = (!id) ? selection.selectedId : id ;
-			// id = selection.selectedId;
-			// let item = allItems.nodes[id];
-			// this.patchTag(id, 'bloem', 'tag');
-		},
-		alert: function (_alert) {
-			function alert(_x) {
-				return _alert.apply(this, arguments);
-			}
-
-			alert.toString = function () {
-				return _alert.toString();
-			};
-
-			return alert;
-		}(function (value) {
-			alert(value);
-		})
-	},
+	computed: _extends({}, __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_4_vuex__["b" /* mapState */])(['nodes', 'root', 'orphans', 'source', 'languageContents',
+	// 'selection',
+	'debug', 'doneData', 'addingNewUnder', 'addingNewAsChild', 'addingNewAsFirstChild', 'editingItem', 'editingItemTags', 'editingDoneDateItem', 'loading', 'patching', 'popups', 'popouts', 'flashes', 'timerItems', 'beforeEditCache_body', 'beforeEditCache_planned_time', 'fetchedDone', 'cancelThroughKeydown', 'manualMobile', 'newItem', 'newTag', 'setLanguage']), __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_4_vuex__["c" /* mapGetters */])(['hasTag', 'hasParentWithTag', 'parentIdWithTag', 'returnTagsAsArray', 'siblingIndex', 'olderSiblingId', 'nextItemId', 'nextSiblingOrParentsSiblingId', 'deepestChild', 'topLvlParentOfDeepestChild', 'prevItemId', 'nextItemRecursion', 'isTopLvlItemInFilteredRoot', 'hasParentDueToday', 'isDueToday', 'isProject', 'itemTagArray', 'allChildrenDone', 'getAllChildrenIds', 'getAllChildrenIdsRecursive', 'calTotalPlannedTime', 'calTotalUsedTime', 'checkValParentTree', 'getParentsAsArray', 'getParentsRecursive', 'getLastChildId', 'getDeepestLastChildId', 'setDefaultItemValues', 'flattenTree', 'itIsADeepestChild', 'countChildren', 'countDoneChildren', 'findDeepestVisibleChild', 'isFirstItem', 'language', 'text', 'allData', 'mobile', 'mobileSmall', 'noItems', 'filteredItems', 'filteredItemsJournal', 'journalDates', 'filteredItemsFlat', 'filteredItemsTree', 'hiddenItemIds', 'selectionFilter', 'selectionTags', 'selectionHiddenTags', 'allTagsComputed', 'allTagsComputed_2', 'allTagsComputed_3', 'allTagsComputed_1b', 'itemAmount', 'doneItemAmount', 'totalPlannedMin', 'totalPlannedSec', 'totalUsedSec', 'totalSecLeft', 'totalUsedHourMin', 'totalHourMinLeft', 'lastItems', 'firstItem', 'topLvlItems'])),
+	watch: {},
+	methods: _extends({
+		tagSlugToName
+	}, __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_4_vuex__["d" /* mapMutations */])(['updateState', 'resetNewItem', 'addChild', 'deleteChild', 'closeFlash', 'updatePopouts', 'updatePopups']), __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_4_vuex__["e" /* mapActions */])(['giveNewParent', 'duplicate', 'addAndCleanNodesRecursively', 'addItem', 'addTempNewItem', 'hideTaggedNodes', 'hideDoneNodes', 'sortAllChildren', 'sortChildren', 'updateChildrenDepth', 'copyParentBodyToAllChildren', 'attachParentBody', 'deleteItem', 'deleteItemDialogue', 'tagItem', 'prepareTag', 'prepareDonePatch', 'autoCalculateDoneState', 'updateItemTagsDom', 'moveItem', 'flushDoneItems', 'setDueDate', 'updateChildrenDueDate', 'formatDone', 'setCancelThroughKeydown', 'startEdit', 'scrollToItemIfNeeded', 'doneEdit', 'cancelEdit', 'cancelAddNew', 'addNew', 'checkFilteredItemsTree', 'showChildren', 'markDone', 'indent', 'unindent', 'selectItem', 'setToday', 'showAddNewItem', 'startEditTags', 'stopPatching', 'startPatching', 'patchRootChildrenOrderWithFilter', 'patch', 'patchTag', 'patchDueDate', 'patchDone', 'deleteItem', 'deleteItemApi', 'popup', 'sendFlash', 'popout', 'addTimer', 'fetchDone', 'filterItems', 'removeFilter', 'postNewItem', 'test', 'alert'])),
 	http: {
 		headers: {
 			'X-CSRF-TOKEN': document.querySelector('#csrf-token').getAttribute('content')
 		}
 	}
-});
+}));
 
 /***/ }),
-/* 176 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-var Selection = function () {
-	function Selection() {
-		_classCallCheck(this, Selection);
-
-		this.selectedId = null;
-		this.si = this.getSelectedId();
-		this.lastSelectedId = null;
-		this.filter = ['all'];
-		this.tags = [];
-		this.hiddenTags = [];
-		this.hiddenItems = [];
-		this.hiddenBookmarks = [];
-		this.view = 'tree';
-	}
-
-	_createClass(Selection, [{
-		key: 'clear',
-		value: function clear() {
-			this.filter = [];
-			this.tags = [];
-			this.hiddenTags = [];
-			this.hiddenItems = [];
-			this.hiddenBookmarks = [];
-		}
-	}, {
-		key: 'reset',
-		value: function reset() {
-			this.filter = ['all'];
-			this.tags = [];
-			this.hiddenTags = [];
-			this.hiddenItems = [];
-			this.hiddenBookmarks = [];
-		}
-	}, {
-		key: 'getSelectedId',
-		value: function getSelectedId() {
-			return this.selectedId;
-		}
-	}, {
-		key: 'nothingSelected',
-		value: function nothingSelected() {
-			var n = !this.tags.length && !this.hiddenTags.length && !this.hiddenItems.length && !this.hiddenBookmarks.length && (this.filter.length == 1 && this.filter.includes('all') || !this.filter.length);
-			return n;
-		}
-	}, {
-		key: 'noFilterOrTag',
-		value: function noFilterOrTag() {
-			var n = !this.tags.length && (this.filter.length == 1 && this.filter.includes('all') || !this.filter.length);
-			return n;
-		}
-	}, {
-		key: 'addKeywords',
-		value: function addKeywords(keyword, value, operator) {
-			var _this = this;
-
-			if (keyword == 'tag') {
-				if (operator == 'NOT') {
-					if (this.hiddenTags.includes(value)) {
-						return;
-					}
-					this.hiddenTags.push(value);
-					this.tags = this.tags.filter(function (tag) {
-						return tag !== value;
-					});
-				} else {
-					if (this.tags.includes(value)) {
-						return;
-					}
-					this.tags.push(value);
-					this.hiddenTags = this.hiddenTags.filter(function (tag) {
-						return tag !== value;
-					});
-				}
-			} else {
-				if (operator == 'NOT' && keyword == 'journal') {
-					this.hiddenBookmarks.push(keyword);
-					return;
-				}
-				if (keyword == 'journal') {
-					if (this.view == 'journal') {
-						return;
-					}
-					this.view = 'journal';
-				} else if (value) {
-					this.view = 'tree';
-					if (this.filter.includes(value)) {
-						return;
-					}
-					this.filter.push(value);
-				}
-			}
-			Vue.nextTick(function () {
-				if (!vm.filteredItemsFlat.map(function (i) {
-					return i.id;
-				}).includes(_this.selectedId)) {
-					_this.selectedId = null;
-				}
-			});
-		}
-	}, {
-		key: 'getHiddenItemsTotalUsedTime',
-		value: function getHiddenItemsTotalUsedTime() {
-			if (!this.hiddenItems.length) {
-				return 0;
-			}
-			return this.hiddenItems.reduce(function (a, id) {
-				var b = allItems.nodes[id].used_time;
-				console.log(b);
-				return a + b;
-			}, 0);
-		}
-	}, {
-		key: 'getHiddenItemsTotalPlannedTime',
-		value: function getHiddenItemsTotalPlannedTime() {
-			if (!this.hiddenItems.length) {
-				return 0;
-			}
-			return this.hiddenItems.reduce(function (a, id) {
-				var b = allItems.nodes[id].planned_time;
-				console.log(b);
-				return a + b;
-			}, 0);
-		}
-	}, {
-		key: 'selectPrevious',
-		value: function selectPrevious() {}
-	}]);
-
-	return Selection;
-}();
-
-/* harmony default export */ __webpack_exports__["a"] = (Selection);
-
-/***/ }),
-/* 177 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony default export */ __webpack_exports__["a"] = (function (Vue) {
-
-	Vue.filter('M/D', {
-		// model -> view
-		// formats the value when updating the input element.
-		read: function read(val) {
-			return moment(val).format("M/D");
-		}
-	});
-	Vue.filter('min_to_hours', {
-		// model -> view
-		// formats the value when updating the input element.
-		read: function read(val) {
-			var nr = val / 60;
-			if (val == 10) {
-				nr = nr.toFixed(2);
-			}
-			return nr;
-		},
-		// view -> model
-		// formats the value when writing to the data.
-		write: function write(val, oldVal) {
-			var nr = parseFloat(val) * 60;
-			return nr;
-		}
-	});
-	Vue.filter('countdown', {
-		read: function read(val) {
-			var item = allItems.nodes[val];
-			var p = item.planned_time;
-			var u = item.used_time;
-			var time = parseFloat(p) * 60 - parseFloat(u);
-			return calc_hhmmss(time);
-		}
-	});
-	Vue.filter('hhmmss', {
-		read: function read(val) {
-			return calc_hhmmss(val);
-		}
-	});
-	function calc_hhmmss(val) {
-		function pad(num) {
-			return ("0" + num).slice(-2);
-		}
-		var secs = void 0;
-		var minutes = Math.floor(val / 60);
-		secs = val % 60;
-		var hours = Math.floor(minutes / 60);
-		minutes = minutes % 60;
-		if (hours > 0) {
-			return pad(hours) + ":" + pad(minutes) + ":" + pad(secs);
-		} else {
-			return pad(minutes) + ":" + pad(secs);
-		}
-	}
-	Vue.filter('sec-to-hourminsec', {
-		read: function read(val) {
-			function pad(num, unit) {
-				if (num > 0) {
-					return num + " " + unit;
-				}return '';
-			}
-			var secs = void 0;
-			var minutes = Math.floor(val / 60);
-			secs = val % 60;
-			var hours = Math.floor(minutes / 60);
-			minutes = minutes % 60;
-			if (hours > 0) {
-				return pad(hours, 'hour ') + pad(minutes, 'min');
-			} else if (minutes > 0) {
-				return pad(minutes, 'min ') + pad(secs, 'sec');
-			} else {
-				return pad(secs, 'sec');
-			}
-		}
-	});
-	Vue.filter('hourmin', {
-		read: function read(val) {
-			function pad(num, unit) {
-				if (num > 0) {
-					return num + " " + unit;
-				}return '';
-			}
-			var minutes = val % 60;
-			var hours = Math.floor(val / 60);
-			if (hours > 0) {
-				return pad(hours, 'hour ') + pad(minutes, 'min');
-			} else {
-				return pad(minutes, 'min');
-			}
-		}
-	});
-	Vue.filter('sec-to-hourmin', {
-		read: function read(val) {
-			function pad(num, unit) {
-				if (num > 0) {
-					return num + " " + unit;
-				}return '';
-			}
-			var secs = void 0;
-			var minutes = Math.floor(val / 60);
-			secs = val % 60;
-			var hours = Math.floor(minutes / 60);
-			minutes = minutes % 60;
-			if (hours > 0) {
-				return pad(hours, 'hour ') + pad(minutes, 'min');
-			} else {
-				return pad(minutes, 'min');
-			}
-		}
-	});
-	Vue.filter('momentRelative', {
-		read: function read(val) {
-			return moment(val).fromNow();
-		}
-	});
-	Vue.filter('momentCalendar', {
-		read: function read(val) {
-			return moment(val).startOf('day').calendar(null, {
-				sameDay: '[Today]',
-				nextDay: '[Tomorrow]',
-				nextWeek: 'dddd',
-				lastDay: '[Yesterday]',
-				lastWeek: '[Last] dddd',
-				sameElse: 'YYYY/MM/DD'
-			});
-		}
-	});
-	Vue.filter('momentDate', {
-		read: function read(val) {
-			return moment(val).startOf('day').calendar(null, {
-				sameDay: 'YYYY/MM/DD',
-				nextDay: 'YYYY/MM/DD',
-				nextWeek: 'YYYY/MM/DD',
-				lastDay: 'YYYY/MM/DD',
-				lastWeek: 'YYYY/MM/DD',
-				sameElse: 'YYYY/MM/DD'
-			});
-		}
-	});
-
-	Vue.filter('linkify', {
-		read: function read(val) {
-			var a = linkifyHtml(val, {
-				defaultProtocol: 'https'
-			});
-			return a;
-		}
-	});
-}); // export default function(Vue)
-
-/***/ }),
-/* 178 */,
-/* 179 */
+/* 185 */,
+/* 186 */,
+/* 187 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;(function (global, factory) {
     if (true) {
-        !(__WEBPACK_AMD_DEFINE_ARRAY__ = [module, __webpack_require__(203)], __WEBPACK_AMD_DEFINE_FACTORY__ = (factory),
+        !(__WEBPACK_AMD_DEFINE_ARRAY__ = [module, __webpack_require__(211)], __WEBPACK_AMD_DEFINE_FACTORY__ = (factory),
 				__WEBPACK_AMD_DEFINE_RESULT__ = (typeof __WEBPACK_AMD_DEFINE_FACTORY__ === 'function' ?
 				(__WEBPACK_AMD_DEFINE_FACTORY__.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__)) : __WEBPACK_AMD_DEFINE_FACTORY__),
 				__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
@@ -43920,12 +44159,12 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
 });
 
 /***/ }),
-/* 180 */
+/* 188 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;(function (global, factory) {
     if (true) {
-        !(__WEBPACK_AMD_DEFINE_ARRAY__ = [module, __webpack_require__(179), __webpack_require__(204), __webpack_require__(187)], __WEBPACK_AMD_DEFINE_FACTORY__ = (factory),
+        !(__WEBPACK_AMD_DEFINE_ARRAY__ = [module, __webpack_require__(187), __webpack_require__(212), __webpack_require__(195)], __WEBPACK_AMD_DEFINE_FACTORY__ = (factory),
 				__WEBPACK_AMD_DEFINE_RESULT__ = (typeof __WEBPACK_AMD_DEFINE_FACTORY__ === 'function' ?
 				(__WEBPACK_AMD_DEFINE_FACTORY__.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__)) : __WEBPACK_AMD_DEFINE_FACTORY__),
 				__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
@@ -44127,14 +44366,14 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
 });
 
 /***/ }),
-/* 181 */
+/* 189 */
 /***/ (function(module, exports, __webpack_require__) {
 
-exports = module.exports = __webpack_require__(182)();
+exports = module.exports = __webpack_require__(190)();
 exports.push([module.i, "\n.fade-enter-active, .fade-leave-active {\n  transition: opacity .5s;\n}\n.fade-enter, .fade-leave-to {\n  opacity: 0;\n}\n#flashes-mask {\n  position: fixed;\n  width: 100%;\n  top: 0;\n  z-index: 10;\n}\n.flash {\n  margin: 0.5rem;\n  background-color: white;\n  box-shadow: 0px 2px 4px 0px rgba(136, 136, 136, 0.5);\n  display: -webkit-box;\n  display: -ms-flexbox;\n  display: flex;\n  -webkit-box-pack: justify;\n      -ms-flex-pack: justify;\n          justify-content: space-between;\n  transition: all 0.35s;\n}\n.flash button {\n    padding: 0 0.5rem;\n}\n.flash .bodybox {\n    display: -webkit-box;\n    display: -ms-flexbox;\n    display: flex;\n    -webkit-box-orient: horizontal;\n    -webkit-box-direction: normal;\n        -ms-flex-direction: row;\n            flex-direction: row;\n}\n", ""]);
 
 /***/ }),
-/* 182 */
+/* 190 */
 /***/ (function(module, exports) {
 
 /*
@@ -44190,7 +44429,7 @@ module.exports = function() {
 
 
 /***/ }),
-/* 183 */
+/* 191 */
 /***/ (function(module, exports) {
 
 var DOCUMENT_NODE_TYPE = 9;
@@ -44226,10 +44465,10 @@ module.exports = closest;
 
 
 /***/ }),
-/* 184 */
+/* 192 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var closest = __webpack_require__(183);
+var closest = __webpack_require__(191);
 
 /**
  * Delegates event to a selector.
@@ -44276,7 +44515,7 @@ module.exports = delegate;
 
 
 /***/ }),
-/* 185 */
+/* 193 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(jQuery) {var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
@@ -46559,7 +46798,7 @@ if (true) module.exports = Flatpickr;
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(2)))
 
 /***/ }),
-/* 186 */
+/* 194 */
 /***/ (function(module, exports) {
 
 /**
@@ -46614,11 +46853,11 @@ exports.fn = function(value) {
 
 
 /***/ }),
-/* 187 */
+/* 195 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var is = __webpack_require__(186);
-var delegate = __webpack_require__(184);
+var is = __webpack_require__(194);
+var delegate = __webpack_require__(192);
 
 /**
  * Validates all params and calls the right
@@ -46715,21 +46954,21 @@ module.exports = listen;
 
 
 /***/ }),
-/* 188 */
+/* 196 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(190).default;
+module.exports = __webpack_require__(198).default;
 
 
 /***/ }),
-/* 189 */
+/* 197 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = __webpack_require__(22);
 
 
 /***/ }),
-/* 190 */
+/* 198 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -46738,7 +46977,7 @@ module.exports = __webpack_require__(22);
 exports.__esModule = true;
 exports.default = linkifyHtml;
 
-var _simpleHtmlTokenizer = __webpack_require__(196);
+var _simpleHtmlTokenizer = __webpack_require__(204);
 
 var _simpleHtmlTokenizer2 = _interopRequireDefault(_simpleHtmlTokenizer);
 
@@ -46954,7 +47193,7 @@ function attrsToStrings(attrs) {
 }
 
 /***/ }),
-/* 191 */
+/* 199 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -46969,7 +47208,7 @@ var _text = __webpack_require__(13);
 
 var TEXT_TOKENS = _interopRequireWildcard(_text);
 
-var _multi = __webpack_require__(193);
+var _multi = __webpack_require__(201);
 
 var MULTI_TOKENS = _interopRequireWildcard(_multi);
 
@@ -47249,7 +47488,7 @@ exports.run = run;
 exports.start = S_START;
 
 /***/ }),
-/* 192 */
+/* 200 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -47436,7 +47675,7 @@ exports.run = run;
 exports.start = start;
 
 /***/ }),
-/* 193 */
+/* 201 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -47647,7 +47886,7 @@ exports.TEXT = TEXT;
 exports.URL = URL;
 
 /***/ }),
-/* 194 */
+/* 202 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -47681,7 +47920,7 @@ function hashtag(linkify) {
 }
 
 /***/ }),
-/* 195 */
+/* 203 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -47814,7 +48053,7 @@ function typeToTarget(href, type) {
 }
 
 /***/ }),
-/* 196 */
+/* 204 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -47838,7 +48077,7 @@ var _tokenizer = __webpack_require__(28);
 
 var _tokenizer2 = _interopRequireDefault(_tokenizer);
 
-var _tokenize = __webpack_require__(197);
+var _tokenize = __webpack_require__(205);
 
 var _tokenize2 = _interopRequireDefault(_tokenize);
 
@@ -47855,7 +48094,7 @@ var HTML5Tokenizer = {
 exports.default = HTML5Tokenizer;
 
 /***/ }),
-/* 197 */
+/* 205 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -47884,7 +48123,7 @@ function tokenize(input, options) {
 }
 
 /***/ }),
-/* 198 */
+/* 206 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -47911,16 +48150,16 @@ function preprocessInput(input) {
 }
 
 /***/ }),
-/* 199 */
+/* 207 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(194).default;
+module.exports = __webpack_require__(202).default;
 
 
 /***/ }),
-/* 200 */,
-/* 201 */,
-/* 202 */
+/* 208 */,
+/* 209 */,
+/* 210 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var map = {
@@ -48169,10 +48408,10 @@ webpackContext.keys = function webpackContextKeys() {
 };
 webpackContext.resolve = webpackContextResolve;
 module.exports = webpackContext;
-webpackContext.id = 202;
+webpackContext.id = 210;
 
 /***/ }),
-/* 203 */
+/* 211 */
 /***/ (function(module, exports) {
 
 function select(element) {
@@ -48221,7 +48460,7 @@ module.exports = select;
 
 
 /***/ }),
-/* 204 */
+/* 212 */
 /***/ (function(module, exports) {
 
 function E () {
@@ -48293,15 +48532,15 @@ module.exports = E;
 
 
 /***/ }),
-/* 205 */,
-/* 206 */
+/* 213 */,
+/* 214 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var Component = __webpack_require__(6)(
   /* script */
-  __webpack_require__(169),
+  __webpack_require__(170),
   /* template */
-  __webpack_require__(213),
+  __webpack_require__(221),
   /* scopeId */
   null,
   /* cssModules */
@@ -48328,18 +48567,18 @@ module.exports = Component.exports
 
 
 /***/ }),
-/* 207 */
+/* 215 */
 /***/ (function(module, exports, __webpack_require__) {
 
 
 /* styles */
-__webpack_require__(216)
+__webpack_require__(224)
 
 var Component = __webpack_require__(6)(
   /* script */
-  __webpack_require__(170),
+  __webpack_require__(171),
   /* template */
-  __webpack_require__(212),
+  __webpack_require__(220),
   /* scopeId */
   null,
   /* cssModules */
@@ -48366,14 +48605,14 @@ module.exports = Component.exports
 
 
 /***/ }),
-/* 208 */
+/* 216 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var Component = __webpack_require__(6)(
   /* script */
-  __webpack_require__(171),
+  __webpack_require__(172),
   /* template */
-  __webpack_require__(214),
+  __webpack_require__(222),
   /* scopeId */
   null,
   /* cssModules */
@@ -48400,14 +48639,14 @@ module.exports = Component.exports
 
 
 /***/ }),
-/* 209 */
+/* 217 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var Component = __webpack_require__(6)(
   /* script */
-  __webpack_require__(172),
+  __webpack_require__(173),
   /* template */
-  __webpack_require__(210),
+  __webpack_require__(218),
   /* scopeId */
   null,
   /* cssModules */
@@ -48434,7 +48673,7 @@ module.exports = Component.exports
 
 
 /***/ }),
-/* 210 */
+/* 218 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
@@ -48611,8 +48850,8 @@ if (false) {
 }
 
 /***/ }),
-/* 211 */,
-/* 212 */
+/* 219 */,
+/* 220 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
@@ -48643,7 +48882,7 @@ if (false) {
 }
 
 /***/ }),
-/* 213 */
+/* 221 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
@@ -48806,14 +49045,14 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
       'u-lightgray': _vm.item.temp,
         'c-body-text--done': _vm.item.done
     }
-  }, [_vm._v(_vm._s(_vm.linkify(_vm.item.body)))]), _vm._v(" "), (_vm.item.completion_memo) ? _c('div', {
+  }, [_vm._v(_vm._s(_vm.item.body))]), _vm._v(" "), (_vm.item.completion_memo) ? _c('div', {
     staticClass: "l-completion-notes c-completion-notes bodybox",
     on: {
       "click": function($event) {
         _vm.selectItem(_vm.item)
       }
     }
-  }, [_vm._v(_vm._s(_vm.item.completion_memo))]) : _vm._e()]), _vm._v(" "), (false) ? _c('span', {
+  }, [_vm._v(_vm._s(_vm.item.completion_memo))]) : _vm._e()]), _vm._v(" "), (_vm.basis.debug) ? _c('span', {
     staticClass: "d-inline-flex"
   }, [_vm._v("\n\t\t\t\t(" + _vm._s(_vm.item.id) + ") D-" + _vm._s(_vm.item.depth) + ")\n\t\t\t\t"), (_vm.item.children_order.length) ? _c('span', [_vm._v("\n\t\t\t\t\t[" + _vm._s(_vm.item.children_order) + "]\n\t\t\t\t")]) : _vm._e(), _vm._v(" "), _c('span')]) : _vm._e(), _vm._v(" "), (_vm.item.id == _vm.basis.editingItem) ? _c('form', {
     class: {
@@ -49061,7 +49300,11 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
       on: {
         "dblclick": function($event) {
           $event.preventDefault();
-          _vm.basis.filterItems('tag', tag.tag_slug, $event)
+          _vm.basis.filterItems({
+            keyword: 'tag',
+            value: tag.tag_slug,
+            event: $event
+          })
         }
       }
     }, [_vm._v("\n\t\t\t\t\t\t\t" + _vm._s(tag.tag_name) + "\n\t\t\t\t\t\t\t"), (
@@ -49193,7 +49436,11 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
       on: {
         "dblclick": function($event) {
           $event.preventDefault();
-          _vm.basis.filterItems('tag', tag.tag_slug, $event)
+          _vm.basis.filterItems({
+            keyword: 'tag',
+            value: tag.tag_slug,
+            event: $event
+          })
         }
       }
     }, [_vm._v("\n\t\t\t\t\t" + _vm._s(tag.tag_name) + "\n\t\t\t\t\t"), (
@@ -49222,19 +49469,19 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     _vm.basis.selection.selectedId == _vm.item.id) ? _c('div', {
     staticClass: "c-item-nav"
   }, [(!_vm.basis.mobile && _vm.basis.selection.view != 'journal') ? _c('button', {
-    staticClass: "o-btn c-item-nav__copy btn btn-dipclick",
+    staticClass: "o-btn c-item-nav__text btn btn-dipclick",
     attrs: {
       "id": 'card-' + _vm.item.id + '-copy'
     }
   }, [_vm._v("\n\t\t\t\t\t" + _vm._s(_vm.basis.text.card.copy) + "\n\t\t\t\t")]) : _vm._e(), _vm._v(" "), (_vm.basis.mobile) ? _c('button', {
-    staticClass: "o-btn c-item-nav__edit",
+    staticClass: "o-btn c-item-nav__text",
     on: {
       "click": function($event) {
         _vm.startEdit(_vm.item)
       }
     }
   }, [_vm._v("\n\t\t\t\t\t" + _vm._s(_vm.basis.text.card.edit) + "\n\t\t\t\t")]) : _vm._e(), _vm._v(" "), (_vm.basis.mobile && _vm.basis.selection.view != 'journal') ? _c('button', {
-    staticClass: "o-btn c-item-nav__set-today",
+    staticClass: "o-btn c-item-nav__text",
     on: {
       "click": function($event) {
         _vm.setToday(_vm.item.id)
@@ -49250,24 +49497,44 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
   }, [_c('i', {
     staticClass: "zmdi zmdi-timer"
   })]) : _vm._e(), _vm._v(" "), (_vm.item.done) ? _c('button', {
+    staticClass: "o-btn c-item-nav__text",
+    on: {
+      "click": function($event) {
+        _vm.basis.popup({
+          id: _vm.item.id,
+          type: 'afterDone'
+        })
+      }
+    }
+  }, [_vm._v("\n\t\t\t\t\t" + _vm._s(_vm.basis.text.popups.journalNotes) + "\n\t\t\t\t")]) : _vm._e(), _vm._v(" "), (false) ? _c('button', {
     staticClass: "o-btn more",
     on: {
       "click": function($event) {
-        _vm.basis.popup(_vm.item.id, 'afterDone')
+        _vm.showItemMenu = true
       }
     }
   }, [_c('i', {
     staticClass: "zmdi zmdi-more"
-  })]) : _vm._e(), _vm._v(" "), ( true) ? _c('button', {
+  })]) : _vm._e(), _vm._v(" "), (false) ? _c('item-menu', {
+    directives: [{
+      name: "show",
+      rawName: "v-show",
+      value: (_vm.showItemMenu),
+      expression: "showItemMenu"
+    }],
+    attrs: {
+      "item": _vm.item
+    }
+  }) : _vm._e(), _vm._v(" "), ( true) ? _c('button', {
     staticClass: "o-btn c-item-nav__delete",
     on: {
       "click": function($event) {
-        _vm.deleteItem(_vm.item)
+        _vm.deleteItemDialogue(_vm.item.id)
       }
     }
   }, [_c('i', {
-    staticClass: "zmdi zmdi-delete"
-  })]) : _vm._e()]) : _vm._e()])]) : _vm._e(), _vm._v(" "), (_vm.item.children.length) ? _c('div', {
+    staticClass: "zmdi zmdi-delete c-item-nav__delete"
+  })]) : _vm._e()], 1) : _vm._e()])]) : _vm._e(), _vm._v(" "), (_vm.item.children.length) ? _c('div', {
     directives: [{
       name: "show",
       rawName: "v-show",
@@ -49320,7 +49587,9 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     },
     on: {
       "click": function($event) {
-        _vm.basis.setLanguage = 'ja'
+        _vm.basis.$store.commit('updateState', {
+          setLanguage: 'ja'
+        })
       }
     }
   }, [_vm._v("日本語")]) : _vm._e(), _vm._v(" "), (_vm.basis.language != 'en') ? _c('a', {
@@ -49330,7 +49599,9 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     },
     on: {
       "click": function($event) {
-        _vm.basis.setLanguage = 'en'
+        _vm.basis.$store.commit('updateState', {
+          setLanguage: 'en'
+        })
       }
     }
   }, [_vm._v("English")]) : _vm._e()]) : _vm._e(), _vm._v(" "), _c('textarea', {
@@ -49579,7 +49850,7 @@ if (false) {
 }
 
 /***/ }),
-/* 214 */
+/* 222 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
@@ -49787,7 +50058,7 @@ if (false) {
 }
 
 /***/ }),
-/* 215 */
+/* 223 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -50876,7 +51147,7 @@ var xhrClient = function (request) {
 
 var nodeClient = function (request) {
 
-    var client = __webpack_require__(219);
+    var client = __webpack_require__(227);
 
     return new PromiseObj(function (resolve) {
 
@@ -51340,17 +51611,17 @@ if (typeof window !== 'undefined' && window.Vue) {
 
 
 /***/ }),
-/* 216 */
+/* 224 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // style-loader: Adds some css to the DOM by adding a <style> tag
 
 // load the styles
-var content = __webpack_require__(181);
+var content = __webpack_require__(189);
 if(typeof content === 'string') content = [[module.i, content, '']];
 if(content.locals) module.exports = content.locals;
 // add the styles to the DOM
-var update = __webpack_require__(217)("c7fa9af0", content, false);
+var update = __webpack_require__(225)("c7fa9af0", content, false);
 // Hot Module Replacement
 if(false) {
  // When the styles change, update the <style> tags
@@ -51366,7 +51637,7 @@ if(false) {
 }
 
 /***/ }),
-/* 217 */
+/* 225 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /*
@@ -51385,7 +51656,7 @@ if (typeof DEBUG !== 'undefined' && DEBUG) {
   ) }
 }
 
-var listToStyles = __webpack_require__(218)
+var listToStyles = __webpack_require__(226)
 
 /*
 type StyleObject = {
@@ -51587,7 +51858,7 @@ function applyToTag (styleElement, obj) {
 
 
 /***/ }),
-/* 218 */
+/* 226 */
 /***/ (function(module, exports) {
 
 /**
@@ -51620,21 +51891,202 @@ module.exports = function listToStyles (parentId, list) {
 
 
 /***/ }),
-/* 219 */
+/* 227 */
 /***/ (function(module, exports) {
 
 /* (ignored) */
 
 /***/ }),
-/* 220 */,
-/* 221 */
+/* 228 */,
+/* 229 */
 /***/ (function(module, exports, __webpack_require__) {
 
-__webpack_require__(145);
-__webpack_require__(148);
+__webpack_require__(146);
 __webpack_require__(149);
-module.exports = __webpack_require__(147);
+__webpack_require__(150);
+module.exports = __webpack_require__(148);
 
+
+/***/ }),
+/* 230 */,
+/* 231 */,
+/* 232 */,
+/* 233 */,
+/* 234 */,
+/* 235 */,
+/* 236 */,
+/* 237 */,
+/* 238 */,
+/* 239 */,
+/* 240 */,
+/* 241 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_autosize__ = __webpack_require__(8);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_autosize___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_autosize__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_autosize_input__ = __webpack_require__(15);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_autosize_input___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_autosize_input__);
+
+
+
+/* harmony default export */ __webpack_exports__["a"] = ({
+	install(Vue) {
+		window.eventHub = new Vue();
+		Vue.prototype.$bus = window.eventHub;
+		Vue.bus = window.eventHub;
+		Vue.directive('flatpicky', {
+			inserted(el) {
+				new Flatpickr(el, flatPickConfig);
+			}
+		});
+		Vue.directive('focus', {
+			inserted(el, binding) {
+				if (vm.mobile && !binding.modifiers.mobile) {
+					return;
+				}
+				el.focus();
+			}
+		});
+		Vue.directive('autoheight', {
+			inserted(el, binding) {
+				Vue.nextTick(function () {
+					__WEBPACK_IMPORTED_MODULE_0_autosize___default()(el);
+				});
+			}
+		});
+		Vue.directive('autowidth', {
+			inserted(el, binding) {
+				Vue.nextTick(function () {
+					__WEBPACK_IMPORTED_MODULE_1_autosize_input___default()(el);
+				});
+			}
+		});
+		Vue.directive('ios-dblclick', {
+			inserted(el, binding) {
+				// TODO create ios Double click directive
+				// clicks++;
+				// if (clicks == 1) {
+				//     setTimeout(function(){
+				//         if(clicks == 1) {
+				//             single_click_callback.call(self, event);
+				//         } else {
+				//             double_click_callback.call(self, event);
+				//         }
+				//     clicks = 0;
+				//     }, timeout || 300);
+				// }
+			}
+		});
+	}
+});
+
+/***/ }),
+/* 242 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var Component = __webpack_require__(6)(
+  /* script */
+  __webpack_require__(243),
+  /* template */
+  __webpack_require__(244),
+  /* scopeId */
+  null,
+  /* cssModules */
+  null
+)
+Component.options.__file = "/Users/lucaban/Sites/lucaban/resources/assets/js/vue-components/itemMenu.vue"
+if (Component.esModule && Object.keys(Component.esModule).some(function (key) {return key !== "default" && key !== "__esModule"})) {console.error("named exports are not supported in *.vue files.")}
+if (Component.options.functional) {console.error("[vue-loader] itemMenu.vue: functional components are not supported with templates, they should use render functions.")}
+
+/* hot reload */
+if (false) {(function () {
+  var hotAPI = require("vue-hot-reload-api")
+  hotAPI.install(require("vue"), false)
+  if (!hotAPI.compatible) return
+  module.hot.accept()
+  if (!module.hot.data) {
+    hotAPI.createRecord("data-v-6236ec4a", Component.options)
+  } else {
+    hotAPI.reload("data-v-6236ec4a", Component.options)
+  }
+})()}
+
+module.exports = Component.exports
+
+
+/***/ }),
+/* 243 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+/* harmony default export */ __webpack_exports__["default"] = ({
+    name: 'itemMenu',
+    template: '#item-menu-template',
+    props: ['item'],
+    // data(){},
+    computed: {},
+    methods: {}
+});
+
+/***/ }),
+/* 244 */
+/***/ (function(module, exports, __webpack_require__) {
+
+module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
+  return _vm._m(0)
+},staticRenderFns: [function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
+  return _c('div', {
+    staticClass: "o-menu"
+  }, [_c('div', {
+    staticClass: "o-menu__body"
+  }, [_c('div', {
+    staticClass: "o-menu__item"
+  }, [_c('div', {
+    staticClass: "o-menu__itembody"
+  }, [_vm._v("Assign")]), _vm._v(" "), _c('div', {
+    staticClass: "o-menu__itemkey"
+  }, [_vm._v("Ctrl + A")])]), _vm._v(" "), _c('div', {
+    staticClass: "o-menu__item"
+  }, [_c('div', {
+    staticClass: "o-menu__itembody"
+  }, [_vm._v("Assign")]), _vm._v(" "), _c('div', {
+    staticClass: "o-menu__itemkey"
+  }, [_vm._v("Ctrl + A")])]), _vm._v(" "), _c('div', {
+    staticClass: "o-menu__item"
+  }, [_c('div', {
+    staticClass: "o-menu__itembody"
+  }, [_vm._v("Assign")]), _vm._v(" "), _c('div', {
+    staticClass: "o-menu__itemkey"
+  }, [_vm._v("Ctrl + A")])])])])
+}]}
+module.exports.render._withStripped = true
+if (false) {
+  module.hot.accept()
+  if (module.hot.data) {
+     require("vue-hot-reload-api").rerender("data-v-6236ec4a", module.exports)
+  }
+}
 
 /***/ })
 /******/ ]);

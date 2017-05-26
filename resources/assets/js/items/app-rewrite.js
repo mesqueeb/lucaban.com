@@ -172,12 +172,12 @@ window.langContentsItems = {
 
 };
 
-import { sec_to_hourmin } from '../components/valueMorphers2.js';
 import Flashes from '../vue-components/Flashes.vue';
 import Card from '../vue-components/Card.vue';
 import Popups from '../vue-components/Popups.vue';
 import Popouts from '../vue-components/Popouts.vue';
 import { hasClass, mobilecheck, isElementInViewport, objectToArray, uniqBy, uniq, arrayToString, sortObjectArrayByProperty, sortObjectArrayByTwoProperties, removeEmptyValuesFromArray } from '../components/globalFunctions.js';
+import { sec_to_hourmin } from '../components/valueMorphers2.js';
 import Selection from '../vue-components/Selection.js';
 import Tree from '../vue-components/dataTree.js';
 
