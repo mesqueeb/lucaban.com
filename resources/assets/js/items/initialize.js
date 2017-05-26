@@ -30,7 +30,6 @@ export default function(fetchedData)
 	Vue.use(listDirectives);
 	// VueFilters(Vue);
 	new ListAppKeyBindings();
-	window.eventHub = new Vue();
 	window.store = new Vuex.Store(ListStore());
 	window.vm = new Vue(ListApp());
 

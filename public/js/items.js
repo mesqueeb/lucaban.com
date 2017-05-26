@@ -25820,7 +25820,7 @@ class Selection {
 			return 0;
 		}
 		return this.hiddenItems.reduce(function (a, id) {
-			let b = allItems.nodes[id].used_time;
+			let b = store.state.nodes[id].used_time;
 			console.log(b);
 			return a + b;
 		}, 0);
@@ -25830,7 +25830,7 @@ class Selection {
 			return 0;
 		}
 		return this.hiddenItems.reduce(function (a, id) {
-			let b = allItems.nodes[id].planned_time;
+			let b = store.state.nodes[id].planned_time;
 			console.log(b);
 			return a + b;
 		}, 0);
@@ -38871,6 +38871,20 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__components_globalFunctions_js__ = __webpack_require__(5);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_clipboard__ = __webpack_require__(188);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_clipboard___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_clipboard__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__itemMenu_vue__ = __webpack_require__(242);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__itemMenu_vue___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_3__itemMenu_vue__);
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 //
 //
 //
@@ -39465,9 +39479,11 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
 
 
+
 /* harmony default export */ __webpack_exports__["default"] = ({
 	name: 'Card',
 	template: '#items-card-template',
+	components: { itemMenu: __WEBPACK_IMPORTED_MODULE_3__itemMenu_vue___default.a },
 	mounted() {
 		let copyElPath = "#card-" + this.item.id + "-copy";
 		let self = this;
@@ -39530,6 +39546,7 @@ ${self.basis.text.menu.usedTime}: ${self.sec_to_hourmin(self.totalUsedSec)}` : '
 				due_date: '0000-00-00 00:00:00',
 				children: ''
 			},
+			showItemMenu: false,
 			newTag: null
 		};
 	},
@@ -39645,7 +39662,7 @@ ${self.basis.text.menu.usedTime}: ${self.sec_to_hourmin(self.totalUsedSec)}` : '
 			}
 			let index = this.parentsChildrenOrder.indexOf(this.item.id);
 			if (index == 0) {
-				return this.$root.$store.getters.root.id;
+				return this.root.id;
 			}
 			return this.parentsChildrenOrder[index - 1];
 		},
@@ -39954,7 +39971,7 @@ ${self.basis.text.menu.usedTime}: ${self.sec_to_hourmin(self.totalUsedSec)}` : '
 			if (selection.view == 'journal') {
 				return;
 			}
-			this.$root.showAddNewItem(this.item.parent_id);
+			this.$root.showAddNewItem({ id: this.item.parent_id });
 		},
 		keydownOnNew(item, e, field) {
 			if (this.newTag && this.newTag.substring(0, 1) != ' ') {
@@ -40122,6 +40139,7 @@ ${self.basis.text.menu.usedTime}: ${self.sec_to_hourmin(self.totalUsedSec)}` : '
 			}
 			// ENTER
 			if (e.keyCode === 13 && !e.shiftKey && !e.altKey) {
+				console.log(`Keydown on edit: ${field} - ${e.keyCode}`);
 				if (this.$root.mobile && field == 'body') {
 					return;
 				}
@@ -40184,11 +40202,10 @@ ${self.basis.text.menu.usedTime}: ${self.sec_to_hourmin(self.totalUsedSec)}` : '
 			// ESC
 			if (e.keyCode === 27) {
 				this.$root.setCancelThroughKeydown();
-				this.cancelEdit(item);
+				this.cancelEdit(item.id);
 			}
 		},
 		blurOnEdit(item, field) {
-			console.log('Blur on Edit');
 			if (this.$root.cancelThroughKeydown) {
 				return;
 			}
@@ -40201,7 +40218,7 @@ ${self.basis.text.menu.usedTime}: ${self.sec_to_hourmin(self.totalUsedSec)}` : '
 				if (document.activeElement.nodeName == 'INPUT' || document.activeElement.nodeName == 'TEXTAREA' || document.activeElement.nodeName == 'A' || document.activeElement.nodeName == 'BUTTON') {
 					return;
 				} else {
-					if (this.$root.mobile) {
+					if (self.$root.mobile) {
 						return;
 					}
 					console.log('blurring on edit');
@@ -40214,7 +40231,6 @@ ${self.basis.text.menu.usedTime}: ${self.sec_to_hourmin(self.totalUsedSec)}` : '
 			if (this.$root.cancelThroughKeydown) {
 				return;
 			}
-			console.log('Blur on Add New');
 			if (this.$root.mobile && field == 'prepare-tag') {
 				this.prepareTag(item);
 				return;
@@ -40227,8 +40243,9 @@ ${self.basis.text.menu.usedTime}: ${self.sec_to_hourmin(self.totalUsedSec)}` : '
 				if (document.activeElement.nodeName == 'INPUT' || document.activeElement.nodeName == 'TEXTAREA' || document.activeElement.nodeName == 'A' || document.activeElement.nodeName == 'BUTTON') {
 					return;
 				} else {
-					// if(this.$root.mobile){ self.addNew('stop'); return; }
-					if (this.$root.mobile) {
+					// if(self.$root.mobile){ self.addNew('stop'); return; }
+					console.log('bluring on Add New');
+					if (self.$root.mobile) {
 						return;
 					}
 					self.cancelAddNew();
@@ -40241,14 +40258,14 @@ ${self.basis.text.menu.usedTime}: ${self.sec_to_hourmin(self.totalUsedSec)}` : '
 		updateShowChildren(id) {
 			this.$root.$store.dispatch('patch', { id, field: 'show_children' });
 		},
-		cancelEdit(item) {
-			this.$root.cancelEdit(item);
+		cancelEdit(id) {
+			this.$root.cancelEdit({ id });
 		},
 		startEdit(item, event) {
-			this.$root.startEdit(item, event);
+			this.$root.startEdit({ item, event });
 		},
 		doneEdit(item) {
-			this.$root.doneEdit(item);
+			this.$root.doneEdit({ item });
 		},
 		startEditDoneDate(item, event) {
 			console.log('startEditDoneDate');
@@ -40257,18 +40274,17 @@ ${self.basis.text.menu.usedTime}: ${self.sec_to_hourmin(self.totalUsedSec)}` : '
 			this.$root.editingDoneDateItem = item.id;
 		},
 		setToday(id) {
-			this.$root.setToday(id);
+			this.$root.setToday({ id });
 		},
-		deleteItem(item) {
-			let id = item.id;
-			this.$root.deleteItem(id);
+		deleteItemDialogue(id) {
+			this.$root.deleteItemDialogue({ id });
 		},
 		addNew(addNextItemAs) {
 			let addTags = this.preparedPlusComputedTags;
 			let olderSibling = this.item;
 			let newItem = this.newItem;
 			// debugger;
-			this.$root.addNew(addNextItemAs, newItem, olderSibling, addTags);
+			this.$root.addNew({ addNextItemAs, newItem, olderSibling, addTags });
 			// Reset stuff
 			this.newItem.body = '';
 			this.newItem.due_date = '0000-00-00 00:00:00';
@@ -40280,12 +40296,12 @@ ${self.basis.text.menu.usedTime}: ${self.sec_to_hourmin(self.totalUsedSec)}` : '
 		cancelAddNew() {
 			this.newItem.body = '';
 			let cancelUnderId = this.item.id;
-			this.$root.cancelAddNew(cancelUnderId);
+			this.$root.cancelAddNew({ cancelUnderId });
 		},
 		addTag(item) {
 			let id = item ? item.id : selection.selectedId;
 			let tag = this.newTag;
-			this.$root.$store.dispatch('tagItem', { id }, { tags: tag });
+			this.$root.$store.dispatch('tagItem', { id, tags: tag });
 			this.newTag = null;
 		},
 		prepareTag(item) {
@@ -40300,7 +40316,7 @@ ${self.basis.text.menu.usedTime}: ${self.sec_to_hourmin(self.totalUsedSec)}` : '
 		deleteTag(id, tagName, event) {
 			let plsFocus = '#add-tag-' + id + ' .js-add-tag';
 			document.querySelector(plsFocus).focus();
-			this.$root.patchTag(id, tagName, 'untag');
+			this.$root.patchTag({ id: id, tags: tagName, requestType: 'untag' });
 		},
 		deletePreparedTag(tag, item) {
 			let plsFocus = '#new-under-' + this.item.id + ' .js-prepare-tag';
@@ -40425,7 +40441,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 						clearInterval(window.timers['flash-' + this.index]);
 						delete window.timers['flash-' + this.index];
 					}
-					this.$root.flashes = this.$root.flashes.filter(f => f != this.flash);
+					this.$root.closeFlash({ flash: this.flash });
 				}
 			}
 		}
@@ -40439,7 +40455,6 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 		if (!window.timers) {
 			window.timers = {};
 		}
-		eventHub.$on('playTimer', this.playTimer);
 		eventHub.$on('clearAll', this.clearAll);
 	},
 	computed: {
@@ -40653,9 +40668,9 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 			timerRunning: true
 		};
 	},
-	mounted() {
-		eventHub.$on('playTimer', this.playTimer);
-		eventHub.$on('clearAll', this.clearAll);
+	created() {
+		this.$bus.$on('playTimer', this.playTimer);
+		this.$bus.$on('clearAll', this.clearAll);
 	},
 	computed: {
 		card() {
@@ -40689,7 +40704,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 			this.$root.popouts.timer.splice(index, 1);
 		},
 		popoutCall(msg, item) {
-			eventHub.$emit(msg, item.id);
+			Vue.bus.$emit(msg, item.id);
 			this.removePopout(item);
 		},
 		maskClick(event) {
@@ -40698,15 +40713,15 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 			}
 		},
 		clearAll(event) {
-			vm.popouts.delete = [];
-			vm.popouts.timer.forEach(item => this.closeTimer(item));
-			vm.popouts.edit.forEach(item => vm.cancelEdit(item));
-			vm.popouts.guide = false;
+			this.$root.popouts.delete = [];
+			this.$root.popouts.timer.forEach(item => this.closeTimer(item));
+			// vm.popouts.edit.forEach(item => vm.cancelEdit(item));
+			this.$root.popouts.guide = false;
 			window.timers = {};
 		},
 		updateDone(item) {
 			this.pauseTimer(item);
-			allItems.prepareDonePatch(item.id);
+			this.$root.prepareDonePatch({ id: item.id });
 			document.querySelector('.js-btn-ok').focus();
 		},
 		timerNav(button, item, value) {
@@ -40727,6 +40742,10 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 			}
 		},
 		playTimer(item) {
+			item = item ? item : this.timer[0] ? this.timer[0] : null;
+			if (!item) {
+				console.log('no timer item');return;
+			}
 			// console.log(item);
 			console.log("timer started: " + moment().format('HH:mm:ss'));
 			this.timerRunning = true;
@@ -40754,7 +40773,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 			}
 			clearInterval(window.timers[item.id]);
 			delete window.timers[item.id];
-			vm.patch(item.id, 'used_time');
+			this.$root.patch({ id: item.id, field: 'used_time' });
 		},
 		forwardTimer(item, time) {
 			time = time * 60;
@@ -40763,7 +40782,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 		resetTimer(item) {
 			console.log("timer reset: " + moment().format('HH:mm:ss'));
 			item.used_time = 0;
-			vm.patch(item.id, 'used_time');
+			this.$root.patch({ id: item.id, field: 'used_time' });
 		},
 		closeTimer(item) {
 			console.log("timer closed: " + moment().format('HH:mm:ss'));
@@ -40774,7 +40793,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 			if (item.used_time < 5) {
 				item.used_time = 0;
 			} else {
-				vm.patch(item.id, 'used_time');
+				this.$root.patch({ id: item.id, field: 'used_time' });
 			}
 			this.removePopout(item);
 		}
@@ -40907,16 +40926,17 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
             clearTimeout(popup.timer);
             if (popup.type == 'afterDone') {
                 if (popup.item.used_time) {
-                    this.$root.patch(popup.item.id, 'used_time');
+                    this.$root.patch({ id: popup.item.id, field: 'used_time' });
                 }
                 if (popup.item.completion_memo) {
-                    this.$root.patch(popup.item.id, 'completion_memo');
+                    this.$root.patch({ id: popup.item.id, field: 'completion_memo' });
                 }
             }
             let index = this.$root.popups.indexOf(popup);
             this.$root.popups.splice(index, 1);
+            let self = this;
             Vue.nextTick(function () {
-                if (vm.popups.length) {
+                if (self.$root.popups.length) {
                     document.querySelector('#c-popups>div:first-child textarea').focus();
                 }
             });
@@ -40929,7 +40949,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
             }
         },
         setNotDone(popup) {
-            this.$root.markDone(popup.item.id, 'notDone');
+            this.$root.markDone({ id: popup.item.id, markAs: 'notDone' });
             this.removePopup(popup);
         },
         resetUsedTime(item) {
@@ -41043,21 +41063,22 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 		} else if (k == 'meta_shift_d') {
 			store.dispatch('duplicate');
 		} else if (k == 'meta_backspace') {
-			store.dispatch('deleteItem');
+			store.dispatch('deleteItemDialogue');
 		} else if (k == 'backspace') {
-			store.dispatch('deleteItem');
+			store.dispatch('deleteItemDialogue');
 		} else if (k == 'delete') {
-			store.dispatch('deleteItem');
+			store.dispatch('deleteItemDialogue');
 		}
 	}
 	invokeKeydownListenerPause() {
 		//Codementor: crappy hack down here.
 		window.keydownListenerPaused = false;
 		window.preventKeydownListener = function () {
+			console.log('preventing keydown listener');
 			window.keydownListenerPaused = true;
 			setTimeout(function () {
 				window.keydownListenerPaused = false;
-			}.bind(this), 200);
+			}.bind(this), 500);
 		};
 	}
 	invokeKeyBindingListener() {
@@ -41110,10 +41131,10 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 				if (e.keyCode == 27) {
 					// Escape
 					if (vm.editingItem) {
-						vm.cancelEdit;
+						vm.cancelEdit();
 						console.log('escapeOnEditButtonFocus');
 					} else if (vm.addingNewUnder) {
-						vm.cancelAddNew;
+						vm.cancelAddNew();
 						console.log('escapeOnNewButtonFocus');
 					}
 				}
@@ -41282,7 +41303,6 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 	__WEBPACK_IMPORTED_MODULE_0_vue___default.a.use(__WEBPACK_IMPORTED_MODULE_7__vue_components_Directives_js__["a" /* default */]);
 	// VueFilters(Vue);
 	new __WEBPACK_IMPORTED_MODULE_4__components_ListAppKeyBindings_js__["a" /* default */]();
-	window.eventHub = new __WEBPACK_IMPORTED_MODULE_0_vue___default.a();
 	window.store = new __WEBPACK_IMPORTED_MODULE_1_vuex__["a" /* default */].Store(__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_5__store_store_js__["a" /* default */])());
 	window.vm = new __WEBPACK_IMPORTED_MODULE_0_vue___default.a(__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_6__vm_js__["a" /* default */])());
 
@@ -41334,7 +41354,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
 /* harmony default export */ __webpack_exports__["a"] = ({
 
-	giveNewParent({ state, commit, dispatch, getters }, { id, new_parent_id, specificNewIndex }) {
+	giveNewParent({ state, commit, dispatch, getters }, { id, new_parent_id, specificNewIndex } = {}) {
 		if (getters.isTopLvlItemInFilteredRoot(id)) {
 			let errMsg = getters.text.flashes.moveTopLvlItem;
 			console.log(errMsg);
@@ -41396,18 +41416,18 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 		dispatch('attachParentBody', { id: id });
 		let tags = getters.itemTagArray(new_parent_id);
 		dispatch('tagItem', { id: id, tags: tags });
-		dispatch('patch', { id: id, arg: 'depth', value: '' });
-		dispatch('patch', { id: id, arg: 'parent_id', value: '' });
-		dispatch('patch', { id: new_parent_id, arg: 'children_order', value: '' });
-		dispatch('patch', { id: new_parent_id, arg: 'show_children', value: '' });
-		dispatch('patch', { id: parent_id, arg: 'children_order', value: '' });
+		dispatch('patch', { id: id, field: 'depth' });
+		dispatch('patch', { id: id, field: 'parent_id' });
+		dispatch('patch', { id: new_parent_id, field: 'children_order' });
+		dispatch('patch', { id: new_parent_id, field: 'show_children' });
+		dispatch('patch', { id: parent_id, field: 'children_order' });
 		dispatch('updateChildrenDepth', { id: targetItem.id });
 		dispatch('updateChildrenDueDate', { id: new_parent_id });
 		dispatch('updateChildrenDueDate', { id: parent_id });
 		dispatch('autoCalculateDoneState', { id: new_parent_id });
 		dispatch('autoCalculateDoneState', { id: parent_id });
 	},
-	duplicate({ state, commit, dispatch, getters }, { id }) {
+	duplicate({ state, commit, dispatch, getters }, { id } = {}) {
 		id = !id ? selection.selectedId : id;
 		let item = state.nodes[id];
 		let index = getters.siblingIndex(id) + 1;
@@ -41419,7 +41439,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 		let duplication = true;
 		dispatch('postNewItem', { newItem: dupe, index, addNextItemAs, addTags, duplication });
 	},
-	addAndCleanNodesRecursively({ state, commit, dispatch, getters }, { item }) {
+	addAndCleanNodesRecursively({ state, commit, dispatch, getters }, { item } = {}) {
 		item = getters.setDefaultItemValues(item);
 		state.nodes[item.id] = item;
 		if (item.children) {
@@ -41428,7 +41448,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 			});
 		}
 	},
-	addItem({ state, commit, dispatch, getters }, { item, index, addNextItemAs, addTags, duplication }) {
+	addItem({ state, commit, dispatch, getters }, { item, index, addNextItemAs, addTags, duplication } = {}) {
 		// debugger;
 		dispatch('addAndCleanNodesRecursively', { item });
 		let parent = state.nodes[item.parent_id];
@@ -41460,7 +41480,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 		// 	getters.backups.rootChildren.push(item);
 		// 	vm.patchRootChildrenOrderWithFilter(item.id);
 		// } else {
-		dispatch('patch', { id: item.parent_id, arg: 'children_order', value: '' });
+		dispatch('patch', { id: item.parent_id, field: 'children_order' });
 		// }
 		if (addTags) {
 			dispatch('tagItem', { id: item.id, tags: addTags });
@@ -41489,7 +41509,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 			dispatch('showAddNewItem', { id: item.id, addAs: addNextItemAs });
 		}
 	},
-	addTempNewItem({ state, commit, dispatch, getters }, { item, index, addNextItemAs, addTags }) {
+	addTempNewItem({ state, commit, dispatch, getters }, { item, index, addNextItemAs, addTags } = {}) {
 		item = JSON.parse(JSON.stringify(item));
 		console.log('temp item.body');
 		console.log(item.body);
@@ -41509,7 +41529,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 			Vue.nextTick(() => dispatch('scrollToItemIfNeeded', { id: item.id }));
 		}
 	},
-	hideTaggedNodes({ state, commit, dispatch, getters }, { tag }) {
+	hideTaggedNodes({ state, commit, dispatch, getters }, { tag } = {}) {
 		Object.keys(state.nodes).forEach(function (id) {
 			id = parseFloat(id);
 			if (getters.hasTag(id, tag)) {
@@ -41519,7 +41539,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 			}
 		}.bind(this));
 	},
-	hideDoneNodes({ state, commit, dispatch, getters }) {
+	hideDoneNodes({ state, commit, dispatch, getters } = {}) {
 		Object.keys(state.nodes).forEach(function (id) {
 			id = parseFloat(id);
 			if (state.nodes[id].done) {
@@ -41529,15 +41549,15 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 			}
 		}.bind(this));
 	},
-	sortAllChildren({ state, commit, dispatch, getters }) {
+	sortAllChildren({ state, commit, dispatch, getters } = {}) {
 		console.log('sorting all children');
 		Object.keys(state.nodes).forEach(function (id) {
 			dispatch('sortChildren', { id });
 			dispatch('updateChildrenDueDate', { id });
 		}.bind(this));
 	},
-	sortChildren({ state, commit, dispatch, getters }, { id }) {
-		console.log('sortingChildren');
+	sortChildren({ state, commit, dispatch, getters }, { id } = {}) {
+		// console.log('sortingChildren');
 		let item = state.nodes[id];
 		item.children_order = item.children_order.filter(function (id) {
 			let child = state.nodes[id];
@@ -41552,7 +41572,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 			item.children = order.map(id => items.find(t => t.id === id));
 		}
 	},
-	updateChildrenDepth({ state, commit, dispatch, getters }, { id }) {
+	updateChildrenDepth({ state, commit, dispatch, getters }, { id } = {}) {
 		let targetChildren = state.nodes[id].children;
 		if (!(targetChildren || targetChildren.length)) {
 			return false;
@@ -41560,12 +41580,12 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 		targetChildren.forEach(function (child) {
 			console.log(child);
 			child.depth = state.nodes[child.parent_id].depth + 1;
-			dispatch('patch', { id: child.id, arg: 'depth', value: '' });
+			dispatch('patch', { id: child.id, field: 'depth' });
 			dispatch('updateChildrenDepth', { id: child.id });
 			return true;
 		}.bind(this));
 	},
-	copyParentBodyToAllChildren({ state, commit, dispatch, getters }, { parent_id }) {
+	copyParentBodyToAllChildren({ state, commit, dispatch, getters }, { parent_id } = {}) {
 		if (!parent_id) {
 			return;
 		}
@@ -41580,10 +41600,10 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 			if (!vm) {
 				return;
 			}
-			dispatch('patch', { id: child.id, arg: 'parents_bodies', value: '' });
+			dispatch('patch', { id: child.id, field: 'parents_bodies' });
 		});
 	},
-	attachParentBody({ state, commit, dispatch, getters }, { id }) {
+	attachParentBody({ state, commit, dispatch, getters }, { id } = {}) {
 		if (!id) {
 			return;
 		}
@@ -41596,9 +41616,12 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 			return;
 		}
 		item.parents_bodies = parent.body;
-		dispatch('patch', { id: id, arg: 'parents_bodies', value: '' });
+		dispatch('patch', { id: id, field: 'parents_bodies' });
 	},
-	deleteItem({ state, commit, dispatch, getters }, { id }) {
+	deleteItem({ state, commit, dispatch, getters }, { id } = {}) {
+		if (!id) {
+			console.log('item id not specified at deleteItem');
+		}
 		let item = state.nodes[id];
 		let previousItemId = getters.prevItemId(id) ? getters.prevItemId(id) : null;
 		// Delete all children as well!
@@ -41614,7 +41637,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 			prevParent.children.splice(siblingIndex, 1);
 			prevParent.children_order.splice(siblingIndex, 1);
 			// Patch and recalculate
-			dispatch('patch', { id: parent_id, arg: 'children_order', value: '' });
+			dispatch('patch', { id: parent_id, field: 'children_order' });
 		}
 		dispatch('deleteItemApi', { idOrArray: id });
 		// dispatch('autoCalculateDoneState', { id:parent_id });
@@ -41631,7 +41654,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 		selection.selectedId = newSelectedId;
 		delete state.nodes[id];
 	},
-	tagItem({ state, commit, dispatch, getters }, { id, tags }) {
+	tagItem({ state, commit, dispatch, getters }, { id, tags } = {}) {
 		console.log(tags);
 		if (!tags) {
 			return;
@@ -41661,10 +41684,10 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 			}.bind(this));
 		}
 	},
-	prepareTag({ state, commit, dispatch, getters }, { id, tags }) {
+	prepareTag({ state, commit, dispatch, getters }, { id, tags } = {}) {
 		let item = state.nodes[id];
 	},
-	prepareDonePatch({ state, commit, dispatch, getters }, { id }) {
+	prepareDonePatch({ state, commit, dispatch, getters }, { id } = {}) {
 		let item = state.nodes[id];
 		let done_date = moment().format();
 		item.done_date = done_date;
@@ -41679,7 +41702,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 			dispatch('attachParentBody', { id: id });
 		}
 	},
-	autoCalculateDoneState({ state, commit, dispatch, getters }, { id }) {
+	autoCalculateDoneState({ state, commit, dispatch, getters }, { id } = {}) {
 		if (state.nodes[id].depth == 0) {
 			return;
 		}
@@ -41689,7 +41712,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 			dispatch('markDone', { id, markAs: 'notDone' });
 		}
 	},
-	updateItemTagsDom({ state, commit, dispatch, getters }, { id, tags, requestType }) {
+	updateItemTagsDom({ state, commit, dispatch, getters }, { id, tags, requestType } = {}) {
 		/* requestType can be:
   	'tag': tag item  (default if null)
   	'untag': untag item with certain tag
@@ -41720,7 +41743,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 			state.nodes[id].tagged = state.nodes[id].tagged.filter(t => t.tag_slug != tagSlug);
 		}
 	},
-	moveItem({ state, commit, dispatch, getters }, { id, direction }) {
+	moveItem({ state, commit, dispatch, getters }, { id, direction } = {}) {
 		id = !id ? selection.selectedId : id;
 		if (getters.isTopLvlItemInFilteredRoot(id)) {
 			let errMsg = getters.text.flashes.moveTopLvlItem;
@@ -41747,7 +41770,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 				parent.children_order.splice(index - 1, 0, id);
 				dispatch('sortChildren', { id: pId });
 				window.patchDelay = setTimeout(function () {
-					dispatch('patch', { id: pId, arg: 'children_order', value: '' });
+					dispatch('patch', { id: pId, field: 'children_order' });
 				}, 1000);
 			}
 		} else if (direction == 'down') {
@@ -41765,13 +41788,13 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 				parent.children_order.splice(index + 1, 0, id);
 				dispatch('sortChildren', { id: pId });
 				window.patchDelay = setTimeout(function () {
-					dispatch('patch', { id: pId, arg: 'children_order', value: '' });
+					dispatch('patch', { id: pId, field: 'children_order' });
 				}, 1000);
 			}
 		}
 		Vue.nextTick(() => dispatch('scrollToItemIfNeeded', { id: id }));
 	},
-	flushDoneItems({ state, commit, dispatch, getters }) {
+	flushDoneItems({ state, commit, dispatch, getters } = {}) {
 		// Do not use yet. Not sure how to best implement the below...
 		let nodes = state.nodes;
 		let keys = Object.keys(nodes);
@@ -41781,7 +41804,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 			}
 		});
 	},
-	setDueDate({ state, commit, dispatch, getters }, { id, duedate }) {
+	setDueDate({ state, commit, dispatch, getters }, { id, duedate } = {}) {
 		let dd = duedate ? duedate : moment().format();
 		let oriDueDate = state.nodes[id].due_date;
 		let diff = moment(oriDueDate).diff(dd, 'days');
@@ -41795,7 +41818,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 		dispatch('patchDueDate', { id, duedate: dd });
 		dispatch('updateChildrenDueDate', { id: id });
 	},
-	updateChildrenDueDate({ state, commit, dispatch, getters }, { id }) {
+	updateChildrenDueDate({ state, commit, dispatch, getters }, { id } = {}) {
 		let item = state.nodes[id];
 		if (!item.children.length) {
 			return false;
@@ -41813,7 +41836,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 			}
 		}.bind(this));
 	},
-	formatDone({ state, commit, dispatch, getters }, { doneArray }) {
+	formatDone({ state, commit, dispatch, getters }, { doneArray } = {}) {
 		let doneItemsObject = doneArray.reduce((prev, item) => {
 			if (item.done) {
 				let donePropName = moment(item.done_date).format('YYYY/MM/DD');
@@ -41842,23 +41865,23 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 			state.cancelThroughKeydown = false;
 		}, 100);
 	},
-	startEdit({ state, commit, dispatch, getters }, { item, event }) {
+	startEdit({ state, commit, dispatch, getters }, { item, event } = {}) {
 		// debugger;
 		if (event && (event.srcElement.hasClass('done') || event.srcElement.hasClass('custom-tag'))) {
 			return;
 		}
 		console.log('startEdit');
 		item = item ? item : state.nodes[selection.selectedId];
-		state.beforeEditCache_body = item.body;
-		state.beforeEditCache_planned_time = item.planned_time;
+		commit('updateState', { beforeEditCache_body: item.body });
+		commit('updateState', { beforeEditCache_planned_time: item.planned_time });
 		// if( state.mobile )
 		// {
 		// 	state.popouts.edit.push(item);
 		// 	return;
 		// }
-		state.editingItem = item.id;
+		commit('updateState', { editingItem: item.id });
 	},
-	scrollToItemIfNeeded({ state, commit, dispatch, getters }, { id }) {
+	scrollToItemIfNeeded({ state, commit, dispatch, getters }, { id } = {}) {
 		if (!id) {
 			return;
 		};
@@ -41867,51 +41890,51 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 			el.scrollIntoView();
 		}
 	},
-	doneEdit({ state, commit, dispatch, getters }, { item }) {
+	doneEdit({ state, commit, dispatch, getters }, { item } = {}) {
 		console.log('Done edit!');
 		item = item ? item : state.nodes[selection.selectedId];
 		// if (!state.editingItem)
 		// {
 		// 	return;
 		// }
-		state.editingItem = null;
-		state.popouts.edit = [];
+		commit('updateState', { editingItem: null });
+		commit('updatePopouts', { edit: [] });
 		if (state.editingItemTags) {
-			state.editingItemTags = null;
+			commit('updateState', { editingItemTags: null });
 			return;
 		}
 		if (!item.body) {
-			item.body = state.beforeEditCache_body;
+			commit('updateState', { id: item.id, body: state.beforeEditCache_body });
 		}
 		// item.body = item.body.trim();
 
 		if (typeof item.planned_time != 'number' || Number.isNaN(item.planned_time)) {
-			item.planned_time = 0;
+			commit('updateState', { id: item.id, planned_time: 0 });
 		}
 		if (item.planned_time != state.beforeEditCache_planned_time) {
-			dispatch('patch', { id: item.id, arg: 'planned_time', value: '' });
+			dispatch('patch', { id: item.id, field: 'planned_time' });
 		}
 		if (item.body != state.beforeEditCache_body) {
-			dispatch('patch', { id: item.id, arg: 'body', value: '' });
+			dispatch('patch', { id: item.id, field: 'body' });
 			dispatch('copyParentBodyToAllChildren', { parent_id: item.id });
 		}
-		state.beforeEditCache_body = null;
-		state.beforeEditCache_planned_time = null;
+		commit('updateState', { beforeEditCache_body: null });
+		commit('updateState', { beforeEditCache_planned_time: null });
 		// setTimeout(() => this.convertbodyURLtoHTML(),1000);
 	},
-	cancelEdit({ state, commit, dispatch, getters }, { item }) {
-		item = item ? item : state.nodes[selection.selectedId];
+	cancelEdit({ state, commit, dispatch, getters }, { id = selection.selectedId } = {}) {
 		if (state.editingItem || state.popouts.edit.length) {
-			console.log("cancel edit. Reverting to:");
-			console.log(state.beforeEditCache_body);
-			item.body = state.beforeEditCache_body;
-			item.planned_time = state.beforeEditCache_planned_time;
+			Vue.nextTick(() => {
+				console.log("cancel edit. Reverting to: " + state.beforeEditCache_body);
+				commit('updateState', { id, body: state.beforeEditCache_body });
+				commit('updateState', { id, planned_time: state.beforeEditCache_planned_time });
+			});
 		}
-		state.editingItem = null;
-		state.editingItemTags = null;
-		state.popouts.edit = [];
+		commit('updateState', { editingItem: null });
+		commit('updateState', { editingItemTags: null });
+		commit('updatePopouts', { edit: [] });
 	},
-	cancelAddNew({ state, commit, dispatch, getters }, { cancelUnderId }) {
+	cancelAddNew({ state, commit, dispatch, getters }, { cancelUnderId } = {}) {
 		preventKeydownListener();
 		console.log('cancelAddNew');
 		state.addingNewUnder = null;
@@ -41924,7 +41947,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 		state.addingNewAsChild = false;
 		// $(':focus').blur();
 	},
-	addNew({ state, commit, dispatch, getters }, { addNextItemAs, newItem, olderSibling, addTags }) {
+	addNew({ state, commit, dispatch, getters }, { addNextItemAs, newItem, olderSibling, addTags } = {}) {
 		newItem = newItem ? newItem : state.newItem;
 		if (!newItem.body) {
 			return;
@@ -42040,7 +42063,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 	// 	}, 0);
 	// 	return x;
 	// },
-	showChildren({ state, commit, dispatch, getters }, { id, action }) {
+	showChildren({ state, commit, dispatch, getters }, { id, action } = {}) {
 		id = id ? id : selection.selectedId;
 		let item = state.nodes[id];
 		if (!item.children || !item.children.length) {
@@ -42059,9 +42082,9 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 		} else {
 			item.show_children = !item.show_children;
 		}
-		dispatch('patch', { id: id, arg: 'show_children', value: '' });
+		dispatch('patch', { id: id, field: 'show_children' });
 	},
-	markDone({ state, commit, dispatch, getters }, { id, markAs }) {
+	markDone({ state, commit, dispatch, getters }, { id, markAs } = {}) {
 		id = id ? id : selection.selectedId;
 		if (!id) {
 			return;
@@ -42085,7 +42108,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 		}
 		dispatch('prepareDonePatch', { id });
 	},
-	indent({ state, commit, dispatch, getters }, { id }) {
+	indent({ state, commit, dispatch, getters }, { id } = {}) {
 		id = id ? id : selection.selectedId;
 		// if(!getters.isTopLvlItemInFilteredRoot(id)){ 
 		// 	console.log("can't indent a topLvlItem in filtered list");
@@ -42098,7 +42121,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 		console.log('new_parent_id / olderSiblingId: ' + new_parent_id);
 		dispatch('giveNewParent', { id, new_parent_id });
 	},
-	unindent({ state, commit, dispatch, getters }, { id }) {
+	unindent({ state, commit, dispatch, getters }, { id } = {}) {
 		id = id ? id : selection.selectedId;
 		// if(!getters.isTopLvlItemInFilteredRoot(id)){ 
 		// 	console.log("can't unindent a topLvlItem in filtered list");
@@ -42127,7 +42150,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 		}
 		dispatch('giveNewParent', { id, new_parent_id });
 	},
-	selectItem({ state, commit, dispatch, getters }, { id, direction }) {
+	selectItem({ state, commit, dispatch, getters }, { id, direction } = {}) {
 		id = id ? id : selection.selectedId;
 		let nextSelectedId;
 		if (!direction) {
@@ -42149,7 +42172,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 		selection.selectedId = nextSelectedId;
 		dispatch('scrollToItemIfNeeded', { id: nextSelectedId });
 	},
-	setToday({ state, commit, dispatch, getters }, { id }) {
+	setToday({ state, commit, dispatch, getters }, { id } = {}) {
 		id = id ? id : selection.selectedId;
 		if (!id) {
 			return;
@@ -42159,7 +42182,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 		}
 		dispatch('setDueDate', { id });
 	},
-	showAddNewItem({ state, commit, dispatch, getters }, { id, addAs }) {
+	showAddNewItem({ state, commit, dispatch, getters }, { id, addAs } = {}) {
 		id = id ? id : selection.selectedId ? selection.selectedId : state.root.id;
 		if (!id) {
 			return;
@@ -42171,7 +42194,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 		state.addingNewAsFirstChild = addAs == 'child' ? true : false;
 		state.addingNewAsChild = addAs == 'child' ? true : false;
 	},
-	startEditTags({ state, commit, dispatch, getters }, { id }) {
+	startEditTags({ state, commit, dispatch, getters }, { id } = {}) {
 		id = id ? id : selection.selectedId;
 		if (!id) {
 			return;
@@ -42192,7 +42215,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 		}
 		state.patching = true;
 	},
-	patchRootChildrenOrderWithFilter({ state, commit, dispatch, getters }, { id }) {
+	patchRootChildrenOrderWithFilter({ state, commit, dispatch, getters }, { id } = {}) {
 		vm.$http.get('api/items/' + state.root.id).then(function (response) {
 			let rootChildrenOrder = response.data.children_order;
 			rootChildrenOrder = rootChildrenOrder + ',' + id;
@@ -42202,7 +42225,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 			});
 		});
 	},
-	patch({ state, commit, dispatch, getters }, { id, field, value }) {
+	patch({ state, commit, dispatch, getters }, { id, field, value } = {}) {
 		// if(getters.isTopLvlItemInFilteredRoot(id)){ 
 		// 	if(field == 'children_order' || field == 'parent_id'){
 		// 		console.log("you can't sync a toplvlItem when filtering");
@@ -42227,7 +42250,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 			return;
 		});
 	},
-	patchTag({ state, commit, dispatch, getters }, { id, tags, requestType }) {
+	patchTag({ state, commit, dispatch, getters }, { id, tags, requestType } = {}) {
 		/* requestType can be:
   	'tag': tag item  (default if null)
   	'untag': untag item with certain tag
@@ -42265,7 +42288,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 			dispatch('stopPatching');
 		});
 	},
-	patchDueDate({ state, commit, dispatch, getters }, { id, duedate }) {
+	patchDueDate({ state, commit, dispatch, getters }, { id, duedate } = {}) {
 		dispatch('startPatching');
 		if (duedate == '0000-00-00 00:00:00') {
 			vm.$http.patch('/api/items/' + id, { 'due_date': duedate }).then(function (response) {
@@ -42279,7 +42302,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 			dispatch('stopPatching');
 		});
 	},
-	patchDone({ state, commit, dispatch, getters }, { id }) {
+	patchDone({ state, commit, dispatch, getters }, { id } = {}) {
 		dispatch('startPatching');
 		let done_date;
 		let doneValue = state.nodes[id].done;
@@ -42292,14 +42315,11 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 			dispatch('stopPatching');
 		});
 	},
-	deleteItem({ state, commit, dispatch, getters }, { id }) {
+	deleteItemDialogue({ state, commit, dispatch, getters }, { id } = {}) {
 		id = !id ? selection.selectedId : id;
-		// if (confirm("Do you really want to delete: "+state.nodes[id].body+"?") == false) {
-		//        return;
-		//    }
 		dispatch('popout', { id: id, type: 'confirm-delete' });
 	},
-	deleteItemApi({ state, commit, dispatch, getters }, { idOrArray }) {
+	deleteItemApi({ state, commit, dispatch, getters }, { idOrArray } = {}) {
 		dispatch('startPatching');
 		if (Array.isArray(idOrArray) && idOrArray.length) {
 			let array = idOrArray; // It's an array!
@@ -42318,7 +42338,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 			});
 		}
 	},
-	popup({ state, commit, dispatch, getters }, { id, type }) {
+	popup({ state, commit, dispatch, getters }, { id, type } = {}) {
 		id = !id ? selection.selectedId : id;
 		let item = state.nodes[id];
 		let popupExists = state.popups.filter(function (popup) {
@@ -42343,10 +42363,10 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 		// });
 		//         }
 	},
-	sendFlash({ state, commit, dispatch, getters }, { type, msg }) {
+	sendFlash({ state, commit, dispatch, getters }, { type, msg } = {}) {
 		state.flashes.push({ type, msg });
 	},
-	popout({ state, commit, dispatch, getters }, { id, type }) {
+	popout({ state, commit, dispatch, getters }, { id, type } = {}) {
 		id = !id ? selection.selectedId : id;
 		if (!id) {
 			return;
@@ -42357,22 +42377,25 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 		// console.log("poppy doesn't exist");
 		if (type == 'timer') {
 			state.popouts.timer.push(item);
-			Vue.nextTick(function () {
-				console.log('emitted playTimer');
-				eventHub.$emit('playTimer');
+			Vue.nextTick(() => {
+				console.log('emitting playTimer on Vue.nextTick');
+				Vue.bus.$emit('playTimer', item);
 			});
+			// setTimeout(() => {
+			// 	console.log('emitting playTimer after 1 sec');
+			// 	eventHub.$emit('playTimer');
+			// },1000);
 		}
 		if (type == 'confirm-delete') {
 			state.popouts.delete.push(item);
 		}
 		// }
 	},
-	addTimer({ state, commit, dispatch, getters }, { id }) {
-		id = !id ? selection.selectedId : id;
-		dispatch('popout', { id: id, type: 'timer' });
+	addTimer({ state, commit, dispatch, getters }, { id = selection.selectedId } = {}) {
+		dispatch('popout', { id, type: 'timer' });
 		return;
 	},
-	fetchDone({ state, commit, dispatch, getters }, { tags, operator }) {
+	fetchDone({ state, commit, dispatch, getters }, { tags, operator } = {}) {
 		state.loading = true;
 		vm.$http.get('/api/items/fetchdone').then(function (response) {
 			// debugger;
@@ -42425,7 +42448,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 	// 		state.loading = false;
 	// 	});
 	// },
-	filterItems({ state, commit, dispatch, getters }, { keyword, value, event }) {
+	filterItems({ state, commit, dispatch, getters }, { keyword, value, event } = {}) {
 		if (state.editingItem) {
 			return;
 		}
@@ -42457,10 +42480,10 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 		// console.log(selection.tags);
 		// setTimeout(()=>{ vm.test() },1000);
 	},
-	removeFilter({ state, commit, dispatch, getters }, { tag }) {
+	removeFilter({ state, commit, dispatch, getters }, { tag } = {}) {
 		selection.hiddenTags = selection.hiddenTags.filter(x => x !== tag);
 	},
-	postNewItem({ state, commit, dispatch, getters }, { newItem, index, addNextItemAs, addTags, duplication }) {
+	postNewItem({ state, commit, dispatch, getters }, { newItem, index, addNextItemAs, addTags, duplication } = {}) {
 		dispatch('startPatching');
 		// Prepare children_order for sending to DB.
 		if (newItem.children_order) {
@@ -42502,14 +42525,14 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 			dispatch('sendFlash', { type: 'ajaxError', msg: errMsg });
 		});
 	},
-	test({ state, commit, dispatch, getters }, { id }) {
+	test({ state, commit, dispatch, getters }, { id } = {}) {
 		document.querySelectorAll(".tag-menu a").forEach(el => alert(JSON.stringify(el.style.color)));
 		// id = (!id) ? selection.selectedId : id ;
 		// id = selection.selectedId;
 		// let item = state.nodes[id];
 		// this.patchTag(id, 'bloem', 'tag');
 	},
-	alert({ state, commit, dispatch, getters }, { value }) {
+	alert({ state, commit, dispatch, getters }, { value } = {}) {
 		alert(value);
 	}
 
@@ -43120,6 +43143,13 @@ var _this = this;
 			let targetHidden = selection.hiddenTags.some(tag => getters.hasTag(item.id, tag));
 			let targetDone = selection.view == 'journal' ? item.done : true;
 			let targetToday = true;
+			// 		console.log(`
+			// ${item.body} =
+			// target = ${target}
+			// targetHidden = ${targetHidden}
+			// targetDone = ${targetDone}
+			// targetToday = ${targetToday}
+			// 			`);
 			if (selection.filter.includes('today')) {
 				targetToday = false;
 				let diff = moment(item.due_date).diff(moment(), 'days');
@@ -43613,12 +43643,39 @@ var _this = this;
 
 "use strict";
 /* harmony default export */ __webpack_exports__["a"] = ({
-	updateState(state, { id, field, value }) {
-		if (!id) {
-			state[field] = value;
+	updateState(state, payload) // { id, field, value } or other
+	{
+		let key = payload.field;
+		let val = payload.value;
+		if (!key && !val) {
+			key = Object.keys(payload).filter(k => k != 'id')[0];
+			val = payload[key];
+		}
+		if (payload.id) {
+			state.nodes[payload.id][key] = val;
 			return;
 		}
-		state.nodes[id][field] = value;
+		state[key] = val;
+	},
+	updatePopouts(state, payload) // { field, value } or other
+	{
+		let key = payload.field;
+		let val = payload.value;
+		if (!key && !val) {
+			key = Object.keys(payload)[0];
+			val = payload[key];
+		}
+		state.popouts[key] = val;
+	},
+	updatePopups(state, payload) // { field, value } or other
+	{
+		let key = payload.field;
+		let val = payload.value;
+		if (!key && !val) {
+			key = Object.keys(payload)[0];
+			val = payload[key];
+		}
+		state.popups[key] = val;
 	},
 	resetNewItem(state) {
 		state.newItem.body = '';
@@ -43640,6 +43697,9 @@ var _this = this;
 	deleteChild(state, { index, id }) {
 		state.nodes[id].children.splice(index, 1);
 		state.nodes[id].children_order.splice(index, 1);
+	},
+	closeFlash(state, { flash }) {
+		state.flashes = state.flashes.filter(f => f != flash);
 	}
 });
 
@@ -43805,7 +43865,8 @@ function initializeState(fetchedData) {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__vue_components_Flashes_vue__ = __webpack_require__(215);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__vue_components_Flashes_vue___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_3__vue_components_Flashes_vue__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_vuex__ = __webpack_require__(144);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__vue_components_Selection_js__ = __webpack_require__(21);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__components_globalFunctions_js__ = __webpack_require__(5);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__vue_components_Selection_js__ = __webpack_require__(21);
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 // components:
@@ -43815,8 +43876,10 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 
 
 
+let tagSlugToName = __WEBPACK_IMPORTED_MODULE_5__components_globalFunctions_js__["d" /* Utilities */].tagSlugToName;
 
-window.selection = new __WEBPACK_IMPORTED_MODULE_5__vue_components_Selection_js__["a" /* default */]();
+
+window.selection = new __WEBPACK_IMPORTED_MODULE_6__vue_components_Selection_js__["a" /* default */]();
 
 /* harmony default export */ __webpack_exports__["a"] = (() => ({
 	el: '#items-app',
@@ -43847,7 +43910,9 @@ window.selection = new __WEBPACK_IMPORTED_MODULE_5__vue_components_Selection_js_
 	// 'selection',
 	'debug', 'doneData', 'addingNewUnder', 'addingNewAsChild', 'addingNewAsFirstChild', 'editingItem', 'editingItemTags', 'editingDoneDateItem', 'loading', 'patching', 'popups', 'popouts', 'flashes', 'timerItems', 'beforeEditCache_body', 'beforeEditCache_planned_time', 'fetchedDone', 'cancelThroughKeydown', 'manualMobile', 'newItem', 'newTag', 'setLanguage']), __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_4_vuex__["c" /* mapGetters */])(['hasTag', 'hasParentWithTag', 'parentIdWithTag', 'returnTagsAsArray', 'siblingIndex', 'olderSiblingId', 'nextItemId', 'nextSiblingOrParentsSiblingId', 'deepestChild', 'topLvlParentOfDeepestChild', 'prevItemId', 'nextItemRecursion', 'isTopLvlItemInFilteredRoot', 'hasParentDueToday', 'isDueToday', 'isProject', 'itemTagArray', 'allChildrenDone', 'getAllChildrenIds', 'getAllChildrenIdsRecursive', 'calTotalPlannedTime', 'calTotalUsedTime', 'checkValParentTree', 'getParentsAsArray', 'getParentsRecursive', 'getLastChildId', 'getDeepestLastChildId', 'setDefaultItemValues', 'flattenTree', 'itIsADeepestChild', 'countChildren', 'countDoneChildren', 'findDeepestVisibleChild', 'isFirstItem', 'language', 'text', 'allData', 'mobile', 'mobileSmall', 'noItems', 'filteredItems', 'filteredItemsJournal', 'journalDates', 'filteredItemsFlat', 'filteredItemsTree', 'hiddenItemIds', 'selectionFilter', 'selectionTags', 'selectionHiddenTags', 'allTagsComputed', 'allTagsComputed_2', 'allTagsComputed_3', 'allTagsComputed_1b', 'itemAmount', 'doneItemAmount', 'totalPlannedMin', 'totalPlannedSec', 'totalUsedSec', 'totalSecLeft', 'totalUsedHourMin', 'totalHourMinLeft', 'lastItems', 'firstItem', 'topLvlItems'])),
 	watch: {},
-	methods: _extends({}, __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_4_vuex__["d" /* mapMutations */])(['updateState', 'resetNewItem', 'addChild', 'deleteChild']), __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_4_vuex__["e" /* mapActions */])(['giveNewParent', 'duplicate', 'addAndCleanNodesRecursively', 'addItem', 'addTempNewItem', 'hideTaggedNodes', 'hideDoneNodes', 'sortAllChildren', 'sortChildren', 'updateChildrenDepth', 'copyParentBodyToAllChildren', 'attachParentBody', 'deleteItem', 'tagItem', 'prepareTag', 'prepareDonePatch', 'autoCalculateDoneState', 'updateItemTagsDom', 'moveItem', 'flushDoneItems', 'setDueDate', 'updateChildrenDueDate', 'formatDone', 'setCancelThroughKeydown', 'startEdit', 'scrollToItemIfNeeded', 'doneEdit', 'cancelEdit', 'cancelAddNew', 'addNew', 'checkFilteredItemsTree', 'showChildren', 'markDone', 'indent', 'unindent', 'selectItem', 'setToday', 'showAddNewItem', 'startEditTags', 'stopPatching', 'startPatching', 'patchRootChildrenOrderWithFilter', 'patch', 'patchTag', 'patchDueDate', 'patchDone', 'deleteItem', 'deleteItemApi', 'popup', 'sendFlash', 'popout', 'addTimer', 'fetchDone', 'filterItems', 'removeFilter', 'postNewItem', 'test', 'alert'])),
+	methods: _extends({
+		tagSlugToName
+	}, __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_4_vuex__["d" /* mapMutations */])(['updateState', 'resetNewItem', 'addChild', 'deleteChild', 'closeFlash', 'updatePopouts', 'updatePopups']), __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_4_vuex__["e" /* mapActions */])(['giveNewParent', 'duplicate', 'addAndCleanNodesRecursively', 'addItem', 'addTempNewItem', 'hideTaggedNodes', 'hideDoneNodes', 'sortAllChildren', 'sortChildren', 'updateChildrenDepth', 'copyParentBodyToAllChildren', 'attachParentBody', 'deleteItem', 'deleteItemDialogue', 'tagItem', 'prepareTag', 'prepareDonePatch', 'autoCalculateDoneState', 'updateItemTagsDom', 'moveItem', 'flushDoneItems', 'setDueDate', 'updateChildrenDueDate', 'formatDone', 'setCancelThroughKeydown', 'startEdit', 'scrollToItemIfNeeded', 'doneEdit', 'cancelEdit', 'cancelAddNew', 'addNew', 'checkFilteredItemsTree', 'showChildren', 'markDone', 'indent', 'unindent', 'selectItem', 'setToday', 'showAddNewItem', 'startEditTags', 'stopPatching', 'startPatching', 'patchRootChildrenOrderWithFilter', 'patch', 'patchTag', 'patchDueDate', 'patchDone', 'deleteItem', 'deleteItemApi', 'popup', 'sendFlash', 'popout', 'addTimer', 'fetchDone', 'filterItems', 'removeFilter', 'postNewItem', 'test', 'alert'])),
 	http: {
 		headers: {
 			'X-CSRF-TOKEN': document.querySelector('#csrf-token').getAttribute('content')
@@ -48980,7 +49045,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
       'u-lightgray': _vm.item.temp,
         'c-body-text--done': _vm.item.done
     }
-  }, [_vm._v(_vm._s(_vm.linkify(_vm.item.body)))]), _vm._v(" "), (_vm.item.completion_memo) ? _c('div', {
+  }, [_vm._v(_vm._s(_vm.item.body))]), _vm._v(" "), (_vm.item.completion_memo) ? _c('div', {
     staticClass: "l-completion-notes c-completion-notes bodybox",
     on: {
       "click": function($event) {
@@ -49235,7 +49300,11 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
       on: {
         "dblclick": function($event) {
           $event.preventDefault();
-          _vm.basis.filterItems('tag', tag.tag_slug, $event)
+          _vm.basis.filterItems({
+            keyword: 'tag',
+            value: tag.tag_slug,
+            event: $event
+          })
         }
       }
     }, [_vm._v("\n\t\t\t\t\t\t\t" + _vm._s(tag.tag_name) + "\n\t\t\t\t\t\t\t"), (
@@ -49367,7 +49436,11 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
       on: {
         "dblclick": function($event) {
           $event.preventDefault();
-          _vm.basis.filterItems('tag', tag.tag_slug, $event)
+          _vm.basis.filterItems({
+            keyword: 'tag',
+            value: tag.tag_slug,
+            event: $event
+          })
         }
       }
     }, [_vm._v("\n\t\t\t\t\t" + _vm._s(tag.tag_name) + "\n\t\t\t\t\t"), (
@@ -49396,19 +49469,19 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     _vm.basis.selection.selectedId == _vm.item.id) ? _c('div', {
     staticClass: "c-item-nav"
   }, [(!_vm.basis.mobile && _vm.basis.selection.view != 'journal') ? _c('button', {
-    staticClass: "o-btn c-item-nav__copy btn btn-dipclick",
+    staticClass: "o-btn c-item-nav__text btn btn-dipclick",
     attrs: {
       "id": 'card-' + _vm.item.id + '-copy'
     }
   }, [_vm._v("\n\t\t\t\t\t" + _vm._s(_vm.basis.text.card.copy) + "\n\t\t\t\t")]) : _vm._e(), _vm._v(" "), (_vm.basis.mobile) ? _c('button', {
-    staticClass: "o-btn c-item-nav__edit",
+    staticClass: "o-btn c-item-nav__text",
     on: {
       "click": function($event) {
         _vm.startEdit(_vm.item)
       }
     }
   }, [_vm._v("\n\t\t\t\t\t" + _vm._s(_vm.basis.text.card.edit) + "\n\t\t\t\t")]) : _vm._e(), _vm._v(" "), (_vm.basis.mobile && _vm.basis.selection.view != 'journal') ? _c('button', {
-    staticClass: "o-btn c-item-nav__set-today",
+    staticClass: "o-btn c-item-nav__text",
     on: {
       "click": function($event) {
         _vm.setToday(_vm.item.id)
@@ -49424,24 +49497,44 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
   }, [_c('i', {
     staticClass: "zmdi zmdi-timer"
   })]) : _vm._e(), _vm._v(" "), (_vm.item.done) ? _c('button', {
+    staticClass: "o-btn c-item-nav__text",
+    on: {
+      "click": function($event) {
+        _vm.basis.popup({
+          id: _vm.item.id,
+          type: 'afterDone'
+        })
+      }
+    }
+  }, [_vm._v("\n\t\t\t\t\t" + _vm._s(_vm.basis.text.popups.journalNotes) + "\n\t\t\t\t")]) : _vm._e(), _vm._v(" "), (false) ? _c('button', {
     staticClass: "o-btn more",
     on: {
       "click": function($event) {
-        _vm.basis.popup(_vm.item.id, 'afterDone')
+        _vm.showItemMenu = true
       }
     }
   }, [_c('i', {
     staticClass: "zmdi zmdi-more"
-  })]) : _vm._e(), _vm._v(" "), ( true) ? _c('button', {
+  })]) : _vm._e(), _vm._v(" "), (false) ? _c('item-menu', {
+    directives: [{
+      name: "show",
+      rawName: "v-show",
+      value: (_vm.showItemMenu),
+      expression: "showItemMenu"
+    }],
+    attrs: {
+      "item": _vm.item
+    }
+  }) : _vm._e(), _vm._v(" "), ( true) ? _c('button', {
     staticClass: "o-btn c-item-nav__delete",
     on: {
       "click": function($event) {
-        _vm.deleteItem(_vm.item)
+        _vm.deleteItemDialogue(_vm.item.id)
       }
     }
   }, [_c('i', {
-    staticClass: "zmdi zmdi-delete"
-  })]) : _vm._e()]) : _vm._e()])]) : _vm._e(), _vm._v(" "), (_vm.item.children.length) ? _c('div', {
+    staticClass: "zmdi zmdi-delete c-item-nav__delete"
+  })]) : _vm._e()], 1) : _vm._e()])]) : _vm._e(), _vm._v(" "), (_vm.item.children.length) ? _c('div', {
     directives: [{
       name: "show",
       rawName: "v-show",
@@ -49494,7 +49587,9 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     },
     on: {
       "click": function($event) {
-        _vm.basis.setLanguage = 'ja'
+        _vm.basis.$store.commit('updateState', {
+          setLanguage: 'ja'
+        })
       }
     }
   }, [_vm._v("日本語")]) : _vm._e(), _vm._v(" "), (_vm.basis.language != 'en') ? _c('a', {
@@ -49504,7 +49599,9 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     },
     on: {
       "click": function($event) {
-        _vm.basis.setLanguage = 'en'
+        _vm.basis.$store.commit('updateState', {
+          setLanguage: 'en'
+        })
       }
     }
   }, [_vm._v("English")]) : _vm._e()]) : _vm._e(), _vm._v(" "), _c('textarea', {
@@ -51835,6 +51932,9 @@ module.exports = __webpack_require__(148);
 
 /* harmony default export */ __webpack_exports__["a"] = ({
 	install(Vue) {
+		window.eventHub = new Vue();
+		Vue.prototype.$bus = window.eventHub;
+		Vue.bus = window.eventHub;
 		Vue.directive('flatpicky', {
 			inserted(el) {
 				new Flatpickr(el, flatPickConfig);
@@ -51880,6 +51980,113 @@ module.exports = __webpack_require__(148);
 		});
 	}
 });
+
+/***/ }),
+/* 242 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var Component = __webpack_require__(6)(
+  /* script */
+  __webpack_require__(243),
+  /* template */
+  __webpack_require__(244),
+  /* scopeId */
+  null,
+  /* cssModules */
+  null
+)
+Component.options.__file = "/Users/lucaban/Sites/lucaban/resources/assets/js/vue-components/itemMenu.vue"
+if (Component.esModule && Object.keys(Component.esModule).some(function (key) {return key !== "default" && key !== "__esModule"})) {console.error("named exports are not supported in *.vue files.")}
+if (Component.options.functional) {console.error("[vue-loader] itemMenu.vue: functional components are not supported with templates, they should use render functions.")}
+
+/* hot reload */
+if (false) {(function () {
+  var hotAPI = require("vue-hot-reload-api")
+  hotAPI.install(require("vue"), false)
+  if (!hotAPI.compatible) return
+  module.hot.accept()
+  if (!module.hot.data) {
+    hotAPI.createRecord("data-v-6236ec4a", Component.options)
+  } else {
+    hotAPI.reload("data-v-6236ec4a", Component.options)
+  }
+})()}
+
+module.exports = Component.exports
+
+
+/***/ }),
+/* 243 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+/* harmony default export */ __webpack_exports__["default"] = ({
+    name: 'itemMenu',
+    template: '#item-menu-template',
+    props: ['item'],
+    // data(){},
+    computed: {},
+    methods: {}
+});
+
+/***/ }),
+/* 244 */
+/***/ (function(module, exports, __webpack_require__) {
+
+module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
+  return _vm._m(0)
+},staticRenderFns: [function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
+  return _c('div', {
+    staticClass: "o-menu"
+  }, [_c('div', {
+    staticClass: "o-menu__body"
+  }, [_c('div', {
+    staticClass: "o-menu__item"
+  }, [_c('div', {
+    staticClass: "o-menu__itembody"
+  }, [_vm._v("Assign")]), _vm._v(" "), _c('div', {
+    staticClass: "o-menu__itemkey"
+  }, [_vm._v("Ctrl + A")])]), _vm._v(" "), _c('div', {
+    staticClass: "o-menu__item"
+  }, [_c('div', {
+    staticClass: "o-menu__itembody"
+  }, [_vm._v("Assign")]), _vm._v(" "), _c('div', {
+    staticClass: "o-menu__itemkey"
+  }, [_vm._v("Ctrl + A")])]), _vm._v(" "), _c('div', {
+    staticClass: "o-menu__item"
+  }, [_c('div', {
+    staticClass: "o-menu__itembody"
+  }, [_vm._v("Assign")]), _vm._v(" "), _c('div', {
+    staticClass: "o-menu__itemkey"
+  }, [_vm._v("Ctrl + A")])])])])
+}]}
+module.exports.render._withStripped = true
+if (false) {
+  module.hot.accept()
+  if (module.hot.data) {
+     require("vue-hot-reload-api").rerender("data-v-6236ec4a", module.exports)
+  }
+}
 
 /***/ })
 /******/ ]);

@@ -1,12 +1,41 @@
 export default {
-updateState (state, { id, field, value })
+updateState (state, payload) // { id, field, value } or other
 {
-	if (!id)
+	let key = payload.field;
+	let val = payload.value;
+	if (!key && !val)
 	{
-        state[field] = value;
+		key = Object.keys(payload).filter(k => k != 'id')[0];
+		val = payload[key];
+	}
+	if (payload.id)
+	{
+		state.nodes[payload.id][key] = val;
         return;
 	}
-	state.nodes[id][field] = value;
+    state[key] = val;
+},
+updatePopouts (state, payload) // { field, value } or other
+{
+		let key = payload.field;
+		let val = payload.value;
+        if (!key && !val)
+        {
+			key = Object.keys(payload)[0];
+	        val = payload[key];
+        }
+        state.popouts[key] = val;
+},
+updatePopups (state, payload) // { field, value } or other
+{
+		let key = payload.field;
+		let val = payload.value;
+        if (!key && !val)
+        {
+			key = Object.keys(payload)[0];
+	        val = payload[key];
+        }
+        state.popups[key] = val;
 },
 resetNewItem (state)
 {
@@ -32,5 +61,9 @@ deleteChild (state, { index, id })
 {
 	state.nodes[id].children.splice(index,1);
 	state.nodes[id].children_order.splice(index,1);
+},
+closeFlash (state, { flash })
+{
+	state.flashes = state.flashes.filter(f => f != flash);
 }
 };

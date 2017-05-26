@@ -106,7 +106,7 @@
 					'u-lightgray':item.temp,
 					'c-body-text--done': item.done
 					}"
-				>{{ linkify(item.body) }}</div>
+				>{{ item.body }}</div>
 				<div class="l-completion-notes c-completion-notes bodybox"
 					v-if="item.completion_memo"
 					@click="selectItem(item)"
@@ -238,7 +238,7 @@
 								|| item.id == basis.editingItem
 								|| item.id == basis.editingItemTags"
 							class="o-pill--custom-tag"
-							@dblclick.prevent="basis.filterItems('tag', tag.tag_slug, $event)"
+							@dblclick.prevent="basis.filterItems({keyword:'tag', value:tag.tag_slug, event:$event})"
 						>
 							{{ tag.tag_name }}
 							<button
@@ -343,7 +343,7 @@
 						|| item.id == basis.editingItem
 						|| item.id == basis.editingItemTags"
 					class="o-pill--custom-tag"
-					@dblclick.prevent="basis.filterItems('tag', tag.tag_slug, $event)"
+					@dblclick.prevent="basis.filterItems({keyword:'tag', value:tag.tag_slug, event:$event})"
 				>
 					{{ tag.tag_name }}
 					<button
@@ -371,7 +371,7 @@
 					&& basis.selection.selectedId == item.id"
 			>
 				<button
-					class="o-btn c-item-nav__copy btn btn-dipclick"
+					class="o-btn c-item-nav__text btn btn-dipclick"
 					:id="'card-'+item.id+'-copy'"
 					v-if="!basis.mobile && basis.selection.view != 'journal'"
 				>
@@ -379,14 +379,14 @@
 				</button>
 				<button
 					v-if="basis.mobile"
-					class="o-btn c-item-nav__edit"
+					class="o-btn c-item-nav__text"
 					@click="startEdit(item)"
 				>
 					{{ basis.text.card.edit }}
 				</button>
 				<button
 					v-if="basis.mobile && basis.selection.view != 'journal'"
-					class="o-btn c-item-nav__set-today"
+					class="o-btn c-item-nav__text"
 					@click="setToday(item.id)"
 				>
 					{{ basis.text.card.setToday }}
@@ -400,11 +400,23 @@
 				</button>
 				<button
 					v-if="item.done"
+					class="o-btn c-item-nav__text"
+					@click="basis.popup({ id:item.id, type:'afterDone' })"
+				>
+					{{ basis.text.popups.journalNotes }}
+				</button>
+				<button
+					v-if="false"
 					class="o-btn more"
-					@click="basis.popup(item.id, 'afterDone')"
+					@click="showItemMenu = true"
 				>
 					<i class="zmdi zmdi-more"></i>
 				</button>
+				<item-menu
+					v-if="false"
+					v-show="showItemMenu"
+					:item="item"
+				></item-menu>
 				<!--
 				- font icon / woff format [font awesome]
 				  material design iconic fonts
@@ -415,9 +427,9 @@
 				<button
 					class="o-btn c-item-nav__delete" 
 					v-if="true || item.children_order.length==0"
-					@click="deleteItem(item)"
+					@click="deleteItemDialogue(item.id)"
 				>
-					<i class="zmdi zmdi-delete"></i>
+					<i class="zmdi zmdi-delete c-item-nav__delete"></i>
 				</button>
 			</div>
 <!-- / .ITEM-NAV -->
@@ -463,12 +475,12 @@
 			<div class="c-language-picker w-100" v-if="listIsEmpty && basis.mobile">
 				<a href="#"
 					class="c-language-picker__a" 
-					@click="basis.setLanguage = 'ja'"
+					@click="basis.$store.commit('updateState',{setLanguage:'ja'})"
 					v-if="basis.language != 'ja'"
 				>日本語</a>
 				<a href="#"
 					class="c-language-picker__a" 
-					@click="basis.setLanguage = 'en'"
+					@click="basis.$store.commit('updateState',{setLanguage:'en'})"
 					v-if="basis.language != 'en'"
 				>English</a>
 			</div>
@@ -591,10 +603,12 @@ import { linkify, momentCalendar, sec_to_hourminsec, sec_to_hourmin } from '../c
 // import autosizeInput from 'autosize-input';
 import { uniq, Utilities } from '../components/globalFunctions.js';
 import Clipboard from 'clipboard';
+import itemMenu from './itemMenu.vue';
 
 export default {
 	name: 'Card',
 	template:'#items-card-template',
+	components: { itemMenu },
 	mounted()
 	{
 		let copyElPath = "#card-"+this.item.id+"-copy";
@@ -658,6 +672,7 @@ return `${all}${pb}
 				due_date: '0000-00-00 00:00:00',
 				children: '',
 			},
+			showItemMenu: false,
 			newTag: null,
 		};
 	},
@@ -749,7 +764,7 @@ return `${all}${pb}
 		visiblePrevItemId()
 		{ if(!this.item){ return; }
 			let index = this.parentsChildrenOrder.indexOf(this.item.id);
-			if (index == 0){ return this.$root.$store.getters.root.id; }
+			if (index == 0){ return this.root.id; }
 			return this.parentsChildrenOrder[index-1];
 		},
 		journalDate()
@@ -1000,7 +1015,7 @@ return `${all}${pb}
 			{
 				return;
 			}
-			this.$root.showAddNewItem(this.item.parent_id);
+			this.$root.showAddNewItem({ id:this.item.parent_id });
 		},
 		keydownOnNew(item, e, field)
 		{
@@ -1194,6 +1209,7 @@ return `${all}${pb}
 			// ENTER
 			if (e.keyCode === 13 && !e.shiftKey && !e.altKey)
 			{
+				console.log(`Keydown on edit: ${field} - ${e.keyCode}`);
 				if(this.$root.mobile && field == 'body'){ return; }
 				e.preventDefault();
 	        	if(field == 'delete-tag')
@@ -1262,12 +1278,11 @@ return `${all}${pb}
 			if (e.keyCode === 27)
 			{
 	    		this.$root.setCancelThroughKeydown();
-				this.cancelEdit(item);
+				this.cancelEdit(item.id);
 			}
 	    },
 	    blurOnEdit(item, field)
 	    {
-	    	console.log('Blur on Edit');
 	    	if(this.$root.cancelThroughKeydown){ return; }
 	    	if (this.$root.mobile && field == 'add-tag')
 	    	{
@@ -1284,7 +1299,7 @@ return `${all}${pb}
 		    	{
 	        		return;
 				}　else {
-    				if(this.$root.mobile){ return; }
+    				if(self.$root.mobile){ return; }
 			    	console.log('blurring on edit');
 					self.doneEdit(item);
 				}
@@ -1294,7 +1309,6 @@ return `${all}${pb}
 	    blurOnAddNew(item, field)
 	    {
 	    	if(this.$root.cancelThroughKeydown){ return; }
-	    	console.log('Blur on Add New');
 	    	if (this.$root.mobile && field == 'prepare-tag')
 	    	{
 				this.prepareTag(item);
@@ -1311,8 +1325,9 @@ return `${all}${pb}
 		    	{
 	        		return;
 				}　else {
-			    	// if(this.$root.mobile){ self.addNew('stop'); return; }
-			    	if(this.$root.mobile){ return; }
+			    	// if(self.$root.mobile){ self.addNew('stop'); return; }
+			    	console.log('bluring on Add New');
+			    	if(self.$root.mobile){ return; }
 					self.cancelAddNew();
 				}
 	    	},50);
@@ -1325,17 +1340,17 @@ return `${all}${pb}
 		{
 			this.$root.$store.dispatch('patch',{id,field:'show_children'});
 		},
-		cancelEdit(item)
+		cancelEdit(id)
 		{
-			this.$root.cancelEdit(item);
+			this.$root.cancelEdit({id});
 		},
 		startEdit(item, event)
 		{
-			this.$root.startEdit(item, event);
+			this.$root.startEdit({item, event});
 		},
 		doneEdit(item)
 		{
-			this.$root.doneEdit(item);
+			this.$root.doneEdit({item});
 		},
 		startEditDoneDate(item, event)
 		{
@@ -1346,12 +1361,11 @@ return `${all}${pb}
 		},
 		setToday(id)
 		{
-			this.$root.setToday(id);
+			this.$root.setToday({id});
 		},
-		deleteItem(item)
+		deleteItemDialogue(id)
 		{
-			let id = item.id;
-			this.$root.deleteItem(id);
+			this.$root.deleteItemDialogue({id});
 		},
 		addNew(addNextItemAs)
 		{
@@ -1359,7 +1373,7 @@ return `${all}${pb}
 			let olderSibling = this.item;
 			let newItem = this.newItem;
 			// debugger;
-			this.$root.addNew(addNextItemAs, newItem, olderSibling, addTags)
+			this.$root.addNew({addNextItemAs, newItem, olderSibling, addTags});
 			// Reset stuff
 			this.newItem.body = '';
 			this.newItem.due_date = '0000-00-00 00:00:00';
@@ -1372,13 +1386,13 @@ return `${all}${pb}
 		{
 			this.newItem.body = '';
 			let cancelUnderId = this.item.id;
-			this.$root.cancelAddNew(cancelUnderId);
+			this.$root.cancelAddNew({cancelUnderId});
 		},
 		addTag(item)
 		{
 			let id = (item) ? item.id : selection.selectedId;
 			let tag = this.newTag;
-			this.$root.$store.dispatch('tagItem', {id}, {tags:tag});
+			this.$root.$store.dispatch('tagItem', {id, tags:tag});
 			this.newTag = null;
 		},
 		prepareTag(item)
@@ -1396,7 +1410,7 @@ return `${all}${pb}
 		{
 			let plsFocus = '#add-tag-'+id+' .js-add-tag';
 			document.querySelector(plsFocus).focus();			
-			this.$root.patchTag(id, tagName, 'untag');
+			this.$root.patchTag({id:id, tags:tagName, requestType:'untag'});
 		},
 		deletePreparedTag(tag, item)
 		{

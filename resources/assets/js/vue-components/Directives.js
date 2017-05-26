@@ -3,6 +3,9 @@ import autosizeInput from 'autosize-input';
 
 export default {
 install(Vue){
+    window.eventHub = new Vue();
+    Vue.prototype.$bus = window.eventHub;
+    Vue.bus = window.eventHub;
 	Vue.directive('flatpicky', {
 		inserted(el)
 		{

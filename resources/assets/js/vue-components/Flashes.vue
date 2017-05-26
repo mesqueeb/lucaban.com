@@ -91,7 +91,7 @@ export default {
 		        		clearInterval(window.timers['flash-'+this.index]);
 		        		delete window.timers['flash-'+this.index];
 			        }
-		        	this.$root.flashes = this.$root.flashes.filter(f => f != this.flash);
+		        	this.$root.closeFlash({flash:this.flash});
 		        },
     		},
     	},
@@ -104,7 +104,6 @@ export default {
 	mounted()
 	{
 		if(!window.timers){ window.timers = {}; }
-		eventHub.$on('playTimer', this.playTimer);
 		eventHub.$on('clearAll', this.clearAll);
 	},
 	computed: {

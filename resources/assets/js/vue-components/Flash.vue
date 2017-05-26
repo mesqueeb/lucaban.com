@@ -50,7 +50,7 @@ export default {
     methods: {
         close()
         {
-        	this.$root.flashes = this.$root.flashes.filter(f => f != this.flash);
+        	this.$root.closeFlash({flash:this.flash});
         },
         maskClick(event)
         {

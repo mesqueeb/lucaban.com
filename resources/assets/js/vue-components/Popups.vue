@@ -113,16 +113,17 @@ export default {
             clearTimeout(popup.timer);
             if( popup.type=='afterDone' ){
                 if(popup.item.used_time){
-                    this.$root.patch(popup.item.id, 'used_time');
+                    this.$root.patch({ id:popup.item.id, field:'used_time' });
                 }
                 if(popup.item.completion_memo){
-                    this.$root.patch(popup.item.id, 'completion_memo');
+                    this.$root.patch({ id:popup.item.id, field:'completion_memo' });
                 }
             }
             let index = this.$root.popups.indexOf(popup);
             this.$root.popups.splice(index, 1);
+            let self = this;
             Vue.nextTick(function () {
-                if(vm.popups.length){
+                if(self.$root.popups.length){
                     document.querySelector('#c-popups>div:first-child textarea').focus();
                 }
             });
@@ -137,7 +138,7 @@ export default {
         },
         setNotDone(popup)
         {
-            this.$root.markDone(popup.item.id, 'notDone');
+            this.$root.markDone({ id:popup.item.id, markAs:'notDone' });
             this.removePopup(popup);
         },
         resetUsedTime(item){

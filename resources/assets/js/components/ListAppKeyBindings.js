@@ -47,17 +47,18 @@ keystroke(k)
 	if(k == 'shift_t'){ store.dispatch('startEditTags') } else
 	if(k == 's'){ store.dispatch('addTimer') } else
 	if(k == 'meta_shift_d'){ store.dispatch('duplicate') } else
-	if(k == 'meta_backspace'){ store.dispatch('deleteItem') } else
-	if(k == 'backspace'){ store.dispatch('deleteItem') } else
-	if(k == 'delete'){ store.dispatch('deleteItem') }
+	if(k == 'meta_backspace'){ store.dispatch('deleteItemDialogue') } else
+	if(k == 'backspace'){ store.dispatch('deleteItemDialogue') } else
+	if(k == 'delete'){ store.dispatch('deleteItemDialogue') }
 }
 invokeKeydownListenerPause()
 {
 	//Codementor: crappy hack down here.
 	window.keydownListenerPaused = false;
 	window.preventKeydownListener = function(){
+		console.log('preventing keydown listener');
 		window.keydownListenerPaused = true;
-		setTimeout(function(){ window.keydownListenerPaused = false; }.bind(this), 200);
+		setTimeout(function(){ window.keydownListenerPaused = false; }.bind(this), 500);
 	};
 }
 invokeKeyBindingListener()
@@ -119,12 +120,12 @@ invokeKeyBindingListener()
 			{ // Escape
 				if(vm.editingItem)
 				{
-					vm.cancelEdit;
+					vm.cancelEdit();
 					console.log('escapeOnEditButtonFocus');
 				}
 				else if(vm.addingNewUnder)
 				{
-					vm.cancelAddNew;
+					vm.cancelAddNew();
 					console.log('escapeOnNewButtonFocus');
 				}
 			}

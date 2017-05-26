@@ -4,6 +4,8 @@ import Popups from '../vue-components/Popups.vue';
 import Popouts from '../vue-components/Popouts.vue';
 import Flashes from '../vue-components/Flashes.vue';
 import { mapMutations, mapGetters, mapState, mapActions } from 'vuex';
+import { Utilities } from '../components/globalFunctions.js';
+let tagSlugToName = Utilities.tagSlugToName;
 
 import Selection from '../vue-components/Selection.js';
 window.selection = new Selection();
@@ -137,11 +139,15 @@ export default () => ({
 	},
 	methods:
 	{
+		tagSlugToName,
 		...mapMutations([
 			'updateState',
 			'resetNewItem',
 			'addChild',
 			'deleteChild',
+			'closeFlash',
+			'updatePopouts',
+			'updatePopups'
 	    ]),
 	    ...mapActions([
 	    	'giveNewParent',
@@ -157,6 +163,7 @@ export default () => ({
 			'copyParentBodyToAllChildren',
 			'attachParentBody',
 			'deleteItem',
+			'deleteItemDialogue',
 			'tagItem',
 			'prepareTag',
 			'prepareDonePatch',

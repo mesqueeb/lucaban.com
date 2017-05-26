@@ -568,6 +568,13 @@ filteredItemsFlat: (state, getters) => {
 		let targetHidden = selection.hiddenTags.some(tag => getters.hasTag(item.id, tag));
 		let targetDone = (selection.view == 'journal') ? item.done : true;
 		let targetToday = true;
+// 		console.log(`
+// ${item.body} =
+// target = ${target}
+// targetHidden = ${targetHidden}
+// targetDone = ${targetDone}
+// targetToday = ${targetToday}
+// 			`);
 		if ( selection.filter.includes('today') )
 		{
 			targetToday = false;

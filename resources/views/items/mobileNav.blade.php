@@ -19,7 +19,7 @@
 		</button>
 		<div>
 			<button id=""
-				@click="moveItem('up')"
+				@click="moveItem({direction:'up'})"
 				:class="{
 					'o-btn':true,
 					'u-disabled':(firstItem == selection.selectedId)}"
@@ -28,7 +28,7 @@
 				<i class="zmdi zmdi-caret-up-circle"></i>
 			</button>
 			<button id=""
-				@click="moveItem('down')"
+				@click="moveItem({direction:'down'})"
 				:class="{
 					'o-btn':true,
 					'u-disabled':(lastItems.includes(selection.selectedId))}"
