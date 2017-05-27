@@ -1,6 +1,5 @@
 import { Utilities, hasClass, mobilecheck, isElementInViewport, objectToArray, uniqBy, uniq, arrayToString, sortObjectArrayByProperty, sortObjectArrayByTwoProperties, removeEmptyValuesFromArray } from '../../components/globalFunctions.js';
 // import { sec_to_hourmin } from '../../components/valueMorphers2.js';
-import Clipboard from 'clipboard';
 
 export default {
 giveNewParent ({state, commit, dispatch, getters},
