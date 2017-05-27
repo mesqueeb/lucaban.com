@@ -4,11 +4,11 @@
 >
 	<div v-show="totalUsedHourMin && selection.view != 'journal'">
 		@{{ text.menu.usedTime }}
-		<div class="c-stats__used-time">@{{ totalUsedHourMin }}</div>
+		<div class="c-stats__used-time">@{{ totalUsedHourMin() }}</div>
 	</div>
 	<div v-show="totalHourMinLeft && selection.view != 'journal'">
 		@{{ text.menu.timeLeft }}
-		<div class="c-stats__time-left">@{{ totalHourMinLeft }}</div>
+		<div class="c-stats__time-left">@{{ totalHourMinLeft() }}</div>
 	</div>
 	<div v-show="selection.view != 'journal'">
 		@{{ text.menu.items }}

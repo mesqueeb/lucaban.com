@@ -1,11 +1,13 @@
 import languageContents from './lang.js';
+import keybindings from './keybindings.js';
 import { initializeState } from './stateInitializer.js';
-// import Selection from '../../vue-components/Selection.js';
-// window.selection = new Selection();
+import Selection from '../../vue-components/Selection.js';
+window.selection = new Selection();
 
 let a = {
-    // selection,
+    selection,
     languageContents,
+    keybindings,
     debug: false,
     doneData: null,
     addingNewUnder: null,
@@ -27,9 +29,11 @@ let a = {
     manualMobile: false,
     newItem: {
         body: '',
-        planned_time:0,
-        preparedTags:[],
         due_date: '0000-00-00 00:00:00',
+        done_date: '0000-00-00 00:00:00',
+        done: false,
+        planned_time: '',
+        preparedTags: [],
         children: '',
     },
     newTag: null,

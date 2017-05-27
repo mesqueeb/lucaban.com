@@ -18,6 +18,7 @@
 			ref="root"
 			:parents-children-order="[]"
 			:parent-tags="[]"
+			:new-item="newItem"
 			{{-- :alltags="allTags" --}}
 		></Card>
 {{-- 

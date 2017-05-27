@@ -2,6 +2,89 @@ import { mobilecheck,Utilities,objectToArray,uniqBy,sortObjectArrayByProperty,so
 import { sec_to_hourmin } from '../../components/valueMorphers2.js';
 
 export default {
+totalPlannedMin: (state, getters) =>
+(id = state.root.id) => {
+	let item = state.nodes[id];
+	if (!item){ return 0; }
+
+	let selfValue = (item.planned_time) ? parseFloat(item.planned_time) : 0;
+	let childrenArray = getters.allVisibleChildItems(id);
+	if (!childrenArray || !childrenArray.length) { return selfValue; }
+	let x = childrenArray.reduce(function(prevVal, child){
+		return prevVal + parseFloat(child.planned_time);
+	}, selfValue);
+    return (x) ? parseFloat(x) : 0;
+},
+totalUsedSec: (state, getters) =>
+(id = state.root.id) => {
+	let item = state.nodes[id];
+	if (!item){ return 0; }
+
+	let selfValue = (item.used_time) ? parseFloat(item.used_time) : 0;
+	let childrenArray = getters.allVisibleChildItems(id);
+	if (!childrenArray || !childrenArray.length) { return selfValue; }
+	let x = childrenArray.reduce(function(prevVal, child){
+		return prevVal + parseFloat(child.used_time);
+	}, selfValue);
+    return (x) ? x : 0;
+},
+totalUsedMin: (state, getters) =>
+(id = state.root.id) => {
+	return Math.floor(getters.totalUsedSec(id)/60);
+},
+totalUsedHourMin: (state, getters) =>
+(id = state.root.id) => {
+	// console.log(`id: ${id} in totalUsedHourMin ${state.root.id}`);
+	return sec_to_hourmin(getters.totalUsedSec(id));
+},
+totalPlannedSec: (state, getters) =>
+(id = state.root.id) => {
+	return getters.totalPlannedMin(id)*60;
+},
+totalPlannedHour: (state, getters) =>
+(id = state.root.id) => {
+	return getters.totalPlannedMin(id)/60;
+},
+totalMinLeft: (state, getters) =>
+(id = state.root.id) => {
+	return getters.totalPlannedMin(id)-getters.totalUsedMin(id);
+},
+totalSecLeft: (state, getters) =>
+(id = state.root.id) => {
+	return getters.totalPlannedSec(id)-getters.totalUsedSec(id);
+},
+totalHourMinLeft: (state, getters) =>
+(id = state.root.id) => {
+	return sec_to_hourmin(getters.totalSecLeft(id));
+},
+secLeft: (state, getters) =>
+(id = state.root.id) => {
+	let item = state.nodes[id];
+	if (!item){ return 0; }
+	return item.planned_time*60-item.used_time;
+},
+minLeft: (state, getters) =>
+(id = state.root.id) => {
+	return getters.secLeft(id)/60;
+},
+totalTimeDifferentFromParent: (state, getters) =>
+(id) => {
+	let item = state.nodes[id];
+	if(!item){ return 0; }
+	if(!item.parent_id){ return true; }
+
+	return getters.totalPlannedSec(id) != getters.totalPlannedSec(item.parent_id);
+},
+tagsArray: (state, getters) =>
+(id) => {
+	let item = state.nodes[id];
+	if(!item){ return true; }
+
+	return item.tagged.map(obj => obj.tag_name);
+},
+oS: (state, getters) => {
+	return 'mac';
+},
 hasTag: (state, getters) =>
 (id, tags) => {
 	let item = state.nodes[id];
@@ -93,12 +176,12 @@ nextItemId: (state, getters) =>
 	if ( getters.isTopLvlItemInFilteredRoot(id) && !item.show_children
 	  || selection.view == 'journal' )
 	{
-		let ind = vm.$refs.root.childrenOrder.indexOf(id);
-		if (ind+1 == vm.$refs.root.childrenOrder.length)
+		let ind = getters.childrenOrder(state.root.id).indexOf(id);
+		if (ind+1 == getters.childrenOrder(state.root.id).length)
 		{
-			return vm.$refs.root.childrenOrder[0];
+			return getters.childrenOrder(state.root.id)[0];
 		}
-		return vm.$refs.root.childrenOrder[ind+1];
+		return getters.childrenOrder(state.root.id)[ind+1];
 	}
 	// Select first child if any.
 	if (item.show_children && item.children.length)
@@ -128,13 +211,22 @@ nextSiblingOrParentsSiblingId: (state, getters) =>
 		return children_order[nextIndex];
 	}
 },
+childrensDeepestChildren: (state, getters) =>
+(id = state.root.id) => {
+	return getters.visibleDirectChildren(id).map(function(item){
+		return {
+			'id':item.id,
+			'deepestChild':getters.findDeepestVisibleChild(item.id)
+		};
+	});
+},
 deepestChild: (state, getters) =>
 (id) => {
-	return vm.$refs.root.childrensDeepestChildren.find(obj => (obj.id == id)).deepestChild;
+	return getters.childrensDeepestChildren(state.root.id).find(obj => (obj.id == id)).deepestChild;
 },
 topLvlParentOfDeepestChild: (state, getters) =>
 (id) => {
-	return vm.$refs.root.childrensDeepestChildren.find(obj => (obj.deepestChild == id)).id;
+	return getters.childrensDeepestChildren(state.root.id).find(obj => (obj.deepestChild == id)).id;
 },
 prevItemId: (state, getters) =>
 (id, debug) => {
@@ -146,7 +238,7 @@ prevItemId: (state, getters) =>
 	let prevItemId;
 	let index;
 	// Select next item on top level.
-	let childrenIds = vm.$refs.root.childrenOrder;
+	let childrenIds = getters.childrenOrder(state.root.id);
 	if (getters.isTopLvlItemInFilteredRoot(id) || selection.view == 'journal')
 	{
 		index = childrenIds.indexOf(id);
@@ -194,7 +286,7 @@ nextItemRecursion: (state, getters) =>
 	if (getters.itIsADeepestChild(id))
 	{
 		let topLvlItemId = getters.topLvlParentOfDeepestChild(id);
-		let topLvlChildrenIds = vm.$refs.root.childrenOrder;
+		let topLvlChildrenIds = getters.childrenOrder(state.root.id);
 		let ind = topLvlChildrenIds.indexOf(topLvlItemId);
 		if (ind+1 == topLvlChildrenIds.length)
 		{ 
@@ -230,7 +322,7 @@ isTopLvlItemInFilteredRoot: (state, getters) =>
 	if (id == state.root.id)
 	{
 		return true;
-	} else if (vm.$refs.root.childrenOrder.includes(id)) {
+	} else if (getters.childrenOrder(state.root.id).includes(id)) {
 		return true;
 	} else {
 		return false;
@@ -419,7 +511,7 @@ flattenTree: (state, getters) =>
 		{
 			Array.prototype.push.apply(flattenedTree, getters.flattenTree(item.children));
 		}
-	}.bind(this));
+	});
 	return flattenedTree;
 },
 // Original VM
@@ -427,7 +519,7 @@ itIsADeepestChild: (state, getters) =>
 (id) => {
 	// console.log('running itIsADeepestChild');
 	if (!id){ console.log('you need an ID'); return; }
-	if (vm.$refs.root.childrensDeepestChildren.map(item => item.deepestChild).includes(id))
+	if (getters.childrensDeepestChildren(state.root.id).map(item => item.deepestChild).includes(id))
 	{
 		return true;
 	} return false;
@@ -448,9 +540,8 @@ countDoneChildren: (state, getters) =>
 	return x;
 },
 findDeepestVisibleChild: (state, getters) =>
-(id) => {
+(id = selection.selectedId) => {
 	// console.log('running findDeepestVisibleChild');
-	id = (id) ? id : selection.selectedId;
 	let item = state.nodes[id];
 	let children = item.children.filter(child => !getters.hiddenItemIds.includes(child.id));
 	if (!children.length) { return id; }
@@ -544,7 +635,7 @@ filteredItemsJournal: (state, getters) => {
 			dates[dd] = [];
 		}
 		dates[dd].push(item);
-	}.bind(this));
+	});
 	let datesArray = [];
 	Object.keys(dates).forEach(function(dd){
 		let journalItem = {
@@ -590,7 +681,7 @@ filteredItemsFlat: (state, getters) => {
 		{
 			return true;
 		}
-	}.bind(this));
+	});
 	if (selection.view == 'journal')
 	{
 		ar = sortObjectArrayByTwoProperties(ar,'done_date','parents_bodies','desc','asc');
@@ -643,14 +734,14 @@ filteredItemsTree: (state, getters) => {
 			}
 		}
 		return false;
-	}.bind(this));
+	});
 	// Sort on root children_order when no filter:
 	if(selection.noFilterOrTag( ))
 	{
 		let order = state.root.children_order;
 		if (order instanceof Array && order.length)
 		{
-			// order = order.filter(id => vm.$refs.root.childrenOrder.includes(id));
+			// order = order.filter(id => getters.childrenOrder(state.root.id).includes(id));
 			children = order.map(id => children.find(t => t.id === id));
 		}
 	}
@@ -660,12 +751,51 @@ filteredItemsTree: (state, getters) => {
 	}
 	return children;
 },
+allVisibleChildItems: (state, getters) =>
+(id) => {
+	let item = state.nodes[id];
+	if(!item || !item.children.length){ return []; }
+	
+	let flattenedTree = getters.flattenTree(item.children);
+	let visibleChildren = flattenedTree.filter(child => !getters.hiddenItemIds.includes(child.id));
+	return visibleChildren;
+},
+visibleDirectChildren: (state, getters) =>
+(id) => {
+	if (id == state.root.id){ return getters.filteredItems; }
+	let item = state.nodes[id];
+	if(!item || !item.children.length){ return []; }
+
+	return item.children.filter(child => !getters.hiddenItemIds.includes(child.id));
+},
+childrenOrder: (state, getters) =>
+(id) => {
+	let children = getters.visibleDirectChildren(id);
+	if (selection.view == 'journal' && id == state.root.id)
+	{
+		children = children.reduce((a, c) => a.concat(c.children), []);
+	}
+	return children.map(child => child.id);
+},
+clipboardText: (state, getters) =>
+(id = selection.selectedId) => {
+	let item = state.nodes[id];
+	if(!item){ return ''; }
+	let spaceVariable = parseFloat(item.depth);
+    let allChildren = getters.allVisibleChildItems(id).reduce(function(all, val){
+		let spacesVal = parseFloat(val.depth)-spaceVariable;
+		let spaces = '　　'.repeat(spacesVal);
+		return `${all}
+${spaces}・${val.body}`;
+	}, `${item.body}`);
+    return allChildren;
+},
 hiddenItemIds: (state, getters) => {
 	// console.log('running hiddenItemIds');
 	return objectToArray(state.nodes).filter(function(item){
 		let targetHidden = selection.hiddenTags.some(tag => getters.hasTag(item.id, tag));
 		if(targetHidden){ return true; }
-	}.bind(this)).map(item => item.id);
+	}).map(item => item.id);
 },
 selectionFilter: (state, getters) => { // For list title
 	return selection.filter.map(function (val, i) {
@@ -706,25 +836,10 @@ selectionHiddenTags: (state, getters) => { // For list title
 		return val;
 	});
 },
-// allVisibleItems: (state, getters) =>
-// () => {
-// {
-// 	if(!getters.allData){ return []; }
-// 	return filteredItemsFlat;
-// 	// let items = getters.flattenTree(state.root.children);
-// 	// return items.filter(function(item)
-// 	// {
-// 	// 	return !selection.hiddenItems.includes(item.id);
-// 	// });
-// },
 allTagsComputed: (state, getters) => {
 	var t0 = performance.now( );
 	if(getters.noItems){ return []; }
 	let allTagsArray = [];
-	// let items = getters.flattenTree(state.root.children);
-	// FILTER REWRITE
-	// let items = getters.allVisibleItems;
-	// let items = (vm.$refs.root) ? vm.$refs.root.allVisibleChildItems : [] ;
 	let items = (getters.filteredItemsFlat.length) ? getters.filteredItemsFlat : [] ;
 	if(!items.length){ return []; }
 	items.forEach(function(item)
@@ -754,14 +869,8 @@ allTagsComputed_2: (state, getters) => {
 	let t2_0 = performance.now( );
 	if(getters.noItems){ return []; }
 	let allTagsArray = [];
-	// let items = getters.flattenTree(state.root.children);
-	// FILTER REWRITE
-	// let items = getters.allVisibleItems;
-	// let items = (vm.$refs.root) ? vm.$refs.root.allVisibleChildItems : [] ;
 	let items = (getters.filteredItemsFlat.length) ? getters.filteredItemsFlat : [] ;
 	console.log('allTagsComputed_2');
-	// console.log('vm.$refs.root.allVisibleChildItems');
-	// console.log(vm.$refs.root.allVisibleChildItems);
 	if(!items.length){ return []; }
 	allTagsArray = items.reduce(function(a, item)
 	{
@@ -780,10 +889,6 @@ allTagsComputed_3: (state, getters) => {
 	let t3_0 = performance.now( );
 	if(getters.noItems){ return []; }
 	let allTagsArray = new Set( );
-	// let items = getters.flattenTree(state.root.children);
-	// FILTER REWRITE
-	// let items = getters.allVisibleItems;
-	// let items = (vm.$refs.root) ? vm.$refs.root.allVisibleChildItems : [] ;
 	let items = (getters.filteredItemsFlat.length) ? getters.filteredItemsFlat : [] ;
 	if(!items.length){ return []; }
 	items.forEach(function(item)
@@ -803,10 +908,6 @@ allTagsComputed_1b: (state, getters) => {
 	var t0 = performance.now( );
 	if(getters.noItems){ return []; }
 	let allTagsArray = [];
-	// let items = getters.flattenTree(state.root.children);
-	// FILTER REWRITE
-	// let items = getters.allVisibleItems;
-	// let items = (vm.$refs.root) ? vm.$refs.root.allVisibleChildItems : [] ;
 	let items = (getters.filteredItemsFlat.length) ? getters.filteredItemsFlat : [] ;
 	if(!items.length){ return []; }
 	items.forEach(function(item)
@@ -834,48 +935,14 @@ allTagsComputed_1b: (state, getters) => {
 },
 itemAmount: (state, getters) => {
 	if(getters.noItems){ return 0; }
-	// let x = getters.countChildren(getters.allData);
-	// let x = vm.$refs.root.allVisibleChildItems.length;
 	let items = (getters.filteredItemsFlat.length) ? getters.filteredItemsFlat : [] ;
 	return items.length-1;
 },
 doneItemAmount: (state, getters) => {
 	if(getters.noItems){ return 0; }
-	// let doneChildren = vm.$refs.root.allVisibleChildItems.filter(child => child.done).length;
 	let items = (getters.filteredItemsFlat.length) ? getters.filteredItemsFlat : [] ;
 	let doneChildren = items.filter(child => child.done).length;
 	return doneChildren;
-},
-totalPlannedMin: (state, getters) => {
-	let selfValue = 0;
-	let childrenArray = getters.filteredItemsFlat;
-	if (!childrenArray || !childrenArray.length) { return selfValue; }
-	let x = childrenArray.reduce(function(prevVal, child){
-		return prevVal + parseFloat(child.planned_time);
-	}, selfValue);
-    return (x) ? parseFloat(x) : 0;
-},
-totalPlannedSec: (state, getters) => {
-	return getters.totalPlannedMin*60;
-},
-totalUsedSec: (state, getters) => {
-	let selfValue = 0;
-	let childrenArray = getters.filteredItemsFlat;
-	if (!childrenArray || !childrenArray.length) { return selfValue; }
-	let x = childrenArray.reduce(function(prevVal, child){
-		return prevVal + parseFloat(child.used_time);
-	}, selfValue);
-    return (x) ? x : 0;
-},
-totalSecLeft: (state, getters) => {
-	if(getters.noItems){ return 0; }
-	return getters.totalPlannedSec-getters.totalUsedSec;
-},
-totalUsedHourMin: (state, getters) => {
-	return sec_to_hourmin(getters.totalUsedSec);
-},
-totalHourMinLeft: (state, getters) => {
-	return sec_to_hourmin(getters.totalSecLeft);
 },
 lastItems: (state, getters) => {
 	if(getters.noItems ){ return []; }

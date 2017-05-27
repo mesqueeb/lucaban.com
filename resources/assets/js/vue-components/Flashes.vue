@@ -1,5 +1,5 @@
 <template id="flash-template">
-<div id="flashes-mask">
+<div id="c-flashes-mask">
 <transition-group name="fade">
 	<Flash
 		v-for="(flash, index) in flashes"
@@ -18,13 +18,13 @@
 .fade-enter, .fade-leave-to /* .fade-leave-active in <2.1.8 */ {
   opacity: 0
 }
-#flashes-mask{
+#c-flashes-mask{
 	position: fixed;
     width: 100%;
     top: 0;
     z-index: 10;
 }
-.flash {
+.o-flash {
     margin: 0.5rem;
     background-color: rgba(255, 255, 255, 1);
     // border: solid thin rgba(0,0,0,0.1);
@@ -33,13 +33,18 @@
     justify-content: space-between;
 	-webkit-transition: all 0.35s;
 	transition: all 0.35s;
-	button {
-	    padding: 0 0.5rem;
-	}
-	.bodybox {
-		display: flex;
-		flex-direction: row;
-	}
+}
+.o-flash__button {
+    padding: 0 0.5rem;
+}
+.o-flash__body {
+	display: flex;
+	flex-direction: row;
+	padding: 0.5em;
+}
+.o-flash--success{
+}
+.o-flash--error{
 }
 </style>
 <script>
@@ -51,13 +56,13 @@ export default {
     	'Flash': {
     		template: `
 				<div
-					class="flash"
-					:class="flash.type"
+					class="o-flash"
+					:class="'o-flash--'+flash.type"
 				>
-						<div class="bodybox">{{ flash.msg }}
+						<div class="o-flash__body" v-html="flash.msg">
 							<span v-if="flash.type=='ajaxError'">{{ countDown }}</span>
 						</div>
-						<button class="close" @click="close">✗</button>
+						<button class="o-btn o-flash__button" @click="close">✗</button>
 				</div>
     		`,
 		    props: ['flash', 'index'],

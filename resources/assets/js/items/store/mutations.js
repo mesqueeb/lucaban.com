@@ -1,5 +1,5 @@
 export default {
-updateState (state, payload) // { id, field, value } or other
+updateState(state, payload) // { id, field, value } or other
 {
 	let key = payload.field;
 	let val = payload.value;
@@ -15,7 +15,7 @@ updateState (state, payload) // { id, field, value } or other
 	}
     state[key] = val;
 },
-updatePopouts (state, payload) // { field, value } or other
+updatePopouts(state, payload) // { field, value } or other
 {
 		let key = payload.field;
 		let val = payload.value;
@@ -26,7 +26,7 @@ updatePopouts (state, payload) // { field, value } or other
         }
         state.popouts[key] = val;
 },
-updatePopups (state, payload) // { field, value } or other
+updatePopups(state, payload) // { field, value } or other
 {
 		let key = payload.field;
 		let val = payload.value;
@@ -37,7 +37,7 @@ updatePopups (state, payload) // { field, value } or other
         }
         state.popups[key] = val;
 },
-resetNewItem (state)
+resetNewItem(state)
 {
 	state.newItem.body = '';
 	state.newItem.due_date = '0000-00-00 00:00:00';
@@ -46,8 +46,10 @@ resetNewItem (state)
 	state.newItem.planned_time = '';
 	state.newItem.preparedTags = [];
 },
-addChild (state, { newParentId, index, item })
+addChild(state, { newParentId, index, item })
 {
+	if (!state.nodes[newParentId].children){ state.nodes[newParentId].children = []; }
+	if (!state.nodes[newParentId].children_order){ state.nodes[newParentId].children_order = []; }
 	if (!index)
 	{
  		state.nodes[newParentId].children.push(item);
@@ -57,12 +59,12 @@ addChild (state, { newParentId, index, item })
 	state.nodes[newParentId].children.splice(index,0,item);
 	state.nodes[newParentId].children_order.splice(index,0,item.id);
 },
-deleteChild (state, { index, id })
+deleteChild(state, { index, id })
 {
 	state.nodes[id].children.splice(index,1);
 	state.nodes[id].children_order.splice(index,1);
 },
-closeFlash (state, { flash })
+closeFlash(state, { flash })
 {
 	state.flashes = state.flashes.filter(f => f != flash);
 }

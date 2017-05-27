@@ -26,6 +26,7 @@
 			v-if="language != 'en'"
 		>English</a>
 		<a href="#"
+			id="js-copy__1068" 
 			@click="test()"
 			v-if="debug"
 		>TEST</a>
