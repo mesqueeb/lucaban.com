@@ -17,7 +17,7 @@ function arrayToString(arr)
 	return c_o.substring(1);
 }
 function objectToArray(obj) {
-	return Object.keys(obj).map(function (key) { return obj[key]; });
+	return Object.keys(obj).map(function(key) { return obj[key]; });
 }
 
 function hasClass(element, cls) {
@@ -120,7 +120,7 @@ function uniq(a) {
     return Array.from(new Set(a));
 }
 
-function isElementInViewport (el) {
+function isElementInViewport(el) {
 
     //special bonus for those using jQuery
     // if (typeof jQuery === "function" && el instanceof jQuery) {
@@ -137,18 +137,18 @@ function isElementInViewport (el) {
     );
 }
 const Utilities = {
-	tagNameToSlug (tag)
+	tagNameToSlug(tag)
 	{
 		if(!tag || typeof tag != 'string'){ return; }
 		return tag.split(' ').join('-').toLowerCase();
 	},
-	tagSlugToName (tag)
+	tagSlugToName(tag)
 	{
 		tag = tag.replace(/-/g, ' ');
 		tag = tag.split(' ').map ( ([h, ...t]) => h.toUpperCase() + t.join('').toLowerCase() ).join(' ');
 		return tag;
 	},
-	AplusB (a, b)
+	AplusB(a, b)
 	{
 	    return parseFloat(a) + parseFloat(b);
 	},

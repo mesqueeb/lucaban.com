@@ -110,7 +110,7 @@ invokeKeyBindingListener()
 				$(".btn-ok").focus();
 			}
 		}
-		else if(vm.editingItem || vm.addingNewUnder || vm.editingItemTags)
+		else if(store.state.editingItem || store.state.addingNewUnder || store.state.editingItemTags)
 		{
 			if(document.activeElement.nodeName != 'BUTTON')
 			{
@@ -118,14 +118,14 @@ invokeKeyBindingListener()
 		    }
 			if(e.keyCode == 27)
 			{ // Escape
-				if(vm.editingItem)
+				if(store.state.editingItem)
 				{
-					vm.cancelEdit();
+					store.dispatch('cancelEdit');
 					console.log('escapeOnEditButtonFocus');
 				}
-				else if(vm.addingNewUnder)
+				else if(store.state.addingNewUnder)
 				{
-					vm.cancelAddNew();
+					store.dispatch('cancelAddNew');
 					console.log('escapeOnNewButtonFocus');
 				}
 			}

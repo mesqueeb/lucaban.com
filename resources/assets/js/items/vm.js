@@ -7,9 +7,6 @@ import { mapMutations, mapGetters, mapState, mapActions } from 'vuex';
 import { Utilities } from '../components/globalFunctions.js';
 let tagSlugToName = Utilities.tagSlugToName;
 
-import Selection from '../vue-components/Selection.js';
-window.selection = new Selection();
-
 export default () => ({
 	el:'#items-app',
 	store,
@@ -33,7 +30,6 @@ export default () => ({
         this.sortAllChildren();
     },
     data: {
-	    selection:window.selection,
     },
 	computed:
 	{
@@ -43,7 +39,7 @@ export default () => ({
 			'orphans',
 			'source',
 			'languageContents',
-			// 'selection',
+			'selection',
 			'debug',
 			'doneData',
 			'addingNewUnder',
@@ -66,8 +62,10 @@ export default () => ({
 			'newItem',
 			'newTag',
 			'setLanguage',
+			'keybindings',
 		]),
 		...mapGetters([
+			'oS',
 			'hasTag',
 			'hasParentWithTag',
 			'parentIdWithTag',

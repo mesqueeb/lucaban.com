@@ -30,7 +30,7 @@
               <textarea name="c-popup__completion_memo__txtarea"
                 v-model="popup.item.completion_memo"
                 @keydown="keydownInCompletionMemo(popup, $event)"
-                v-focus
+                v-focus.noMobile
                 v-autoheight
               ></textarea>
             </div>

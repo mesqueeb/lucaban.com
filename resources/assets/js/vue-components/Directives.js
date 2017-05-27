@@ -15,7 +15,7 @@ install(Vue){
 	Vue.directive('focus', {
 		inserted(el, binding)
 		{
-			if(vm.mobile && !binding.modifiers.mobile){ return; }
+			if(binding.modifiers.noMobile){ return; }
 			el.focus()
 		}
 	});

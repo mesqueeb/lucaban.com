@@ -1,12 +1,12 @@
 import { Utilities, hasClass, mobilecheck, isElementInViewport, objectToArray, uniqBy, uniq, arrayToString, sortObjectArrayByProperty, sortObjectArrayByTwoProperties, removeEmptyValuesFromArray } from '../../components/globalFunctions.js';
 // import { sec_to_hourmin } from '../../components/valueMorphers2.js';
+import Clipboard from 'clipboard';
 
 export default {
-
 giveNewParent ({state, commit, dispatch, getters},
 	{ id, new_parent_id, specificNewIndex } = {})
 {
-	if(getters.isTopLvlItemInFilteredRoot(id))
+	if (getters.isTopLvlItemInFilteredRoot(id))
 	{ 
 		let errMsg = getters.text.flashes.moveTopLvlItem;
 		console.log(errMsg);
@@ -63,7 +63,8 @@ giveNewParent ({state, commit, dispatch, getters},
 	// prevParent.children_order.splice(siblingIndex,1);
 	commit('deleteChild',{'index':siblingIndex,'id':prevParent.id });
 	// Fix bug where item would still show if it prevParent has an array of 0 and the moved child was originally the last child...
-	if(prevParent.children.length == 0){ 
+	if (prevParent.children.length == 0)
+	{
 		// prevParent.children = [];
 		commit('updateState',{'field':'children','id':prevParent.id, 'value':[] });
 	}
@@ -102,7 +103,7 @@ addAndCleanNodesRecursively ({state, commit, dispatch, getters},
 {
 	item = getters.setDefaultItemValues(item);
 	state.nodes[item.id] = item;
-	if(item.children)
+	if (item.children)
 	{
 		item.children.forEach(function(child) {
 			return dispatch('addAndCleanNodesRecursively', { item:child });
@@ -115,7 +116,6 @@ addItem ({state, commit, dispatch, getters},
 	// debugger;
 	dispatch('addAndCleanNodesRecursively', {item} );
 	let parent = state.nodes[item.parent_id];
-	if(!parent.children_order) { parent.children_order = []; }
 	//Remove the Temp item
 	// console.log('Remove the Temp item');
 	// console.log(parent.children);
@@ -130,8 +130,7 @@ addItem ({state, commit, dispatch, getters},
 	// 	state.nodes[item.parent_id].children -> ${b}
 	// 	`);
 	//Actually ADD the item!
-	parent.children.splice(index, 0, item);
-	parent.children_order.splice(index, 0, item.id);
+	commit('addChild',{ newParentId:item.parent_id, index, item });
 
 	// Patches etc.
     selection.selectedId = item.id;
@@ -143,7 +142,7 @@ addItem ({state, commit, dispatch, getters},
 	// } else {
 	    dispatch('patch', { id:item.parent_id, field:'children_order' });
 	// }
-    if(addTags){ dispatch('tagItem', { id:item.id, tags:addTags }); }
+    if (addTags){ dispatch('tagItem', { id:item.id, tags:addTags }); }
 	dispatch('attachParentBody',{ id: item.id });
 	dispatch('autoCalculateDoneState', { id:item.parent_id });
 	
@@ -169,7 +168,7 @@ addItem ({state, commit, dispatch, getters},
     {
     	state.addingNewUnder = null;
     	Vue.nextTick(()=> dispatch('scrollToItemIfNeeded', { id:item.id }));
-    } else if(state.addingNewUnder == 'x') {
+    } else if (state.addingNewUnder == 'x') {
 	    dispatch('showAddNewItem', { id:item.id, addAs:addNextItemAs });
     }
 },
@@ -184,7 +183,7 @@ addTempNewItem ({state, commit, dispatch, getters},
 	dispatch('addAndCleanNodesRecursively', {item} );
 	console.log(item.body);
 	const parent = state.nodes[item.parent_id];
-	if(!parent.children_order) { parent.children_order = []; }
+	if (!parent.children_order) { parent.children_order = []; }
 	//Actually ADD the item!
 	parent.children.splice(index, 0, item);
 	parent.children_order.splice(index, 0, item.id);
@@ -199,9 +198,9 @@ hideTaggedNodes ({state, commit, dispatch, getters},
 {
 	Object.keys(state.nodes).forEach(function(id) {
 		id = parseFloat(id);
-		if(getters.hasTag(id, tag))
+		if (getters.hasTag(id, tag))
 		{
-			if(!selection.hiddenItems.includes(id))
+			if (!selection.hiddenItems.includes(id))
 			{
 				selection.hiddenItems.push(id);
 			}
@@ -212,8 +211,8 @@ hideDoneNodes ({state, commit, dispatch, getters} = {})
 {
 	Object.keys(state.nodes).forEach(function(id) {
 		id = parseFloat(id);
-		if(state.nodes[id].done){
-			if(!selection.hiddenItems.includes(id)){
+		if (state.nodes[id].done){
+			if (!selection.hiddenItems.includes(id)){
 				selection.hiddenItems.push(id);
 			}
 		}
@@ -328,17 +327,17 @@ tagItem ({state, commit, dispatch, getters},
 	{id, tags} = {})
 {
 	console.log(tags);
-	if(!tags){ return; }
-	if(Array.isArray(tags))
+	if (!tags){ return; }
+	if (Array.isArray(tags))
 	{
 		tags = removeEmptyValuesFromArray(tags);
 		tags = tags.filter(function(t){
 			return !getters.hasTag(id,t);
 		}.bind(this));
-		if(!tags.length){ return; }
+		if (!tags.length){ return; }
 	} else {
-		if(!tags.replace(/\s/g, "").length){ return; }
-		if(getters.hasTag(id, tags))
+		if (!tags.replace(/\s/g, "").length){ return; }
+		if (getters.hasTag(id, tags))
 		{
 			console.log('NG! Has the tag already!!');
 			return;
@@ -346,7 +345,7 @@ tagItem ({state, commit, dispatch, getters},
 	}
 	dispatch('patchTag', { id,tags });
 	let item = state.nodes[id];
-	if(item.children.length)
+	if (item.children.length)
 	{
 		item.children_order.forEach(function(childId){
 			dispatch('tagItem', { id:childId, tags:tags });
@@ -366,7 +365,7 @@ prepareDonePatch ({state, commit, dispatch, getters},
 	let done_date = moment().format();
 	item.done_date = done_date;
 	dispatch('patchDone', {id} );
-	if(item.done)
+	if (item.done)
 	{
 		dispatch('popup', { id:id, type:'afterDone' });
 	}
@@ -396,8 +395,8 @@ updateItemTagsDom ({state, commit, dispatch, getters},
 		'untag': untag item with certain tag
 		'retag': delete all tags and retag new ones
 	*/
-	if(!tags){ return; }
-	if(Array.isArray(tags)){
+	if (!tags){ return; }
+	if (Array.isArray(tags)){
 		tags.forEach(t => dispatch('updateItemTagsDom', { id, tags:t, requestType } ));
 		return;
 	}
@@ -410,13 +409,13 @@ updateItemTagsDom ({state, commit, dispatch, getters},
 			'name':tagName,
 			'slug':tagSlug
 		}};
-	if(requestType == 'tag' || !requestType)
+	if (requestType == 'tag' || !requestType)
 	{
 		console.log(state.nodes[id].tagged);
 		state.nodes[id].tagged.push(tempTag);
 		console.log(state.nodes[id].tagged);
 	}
-	if(requestType == 'untag')
+	if (requestType == 'untag')
 	{
 		state.nodes[id].tagged = state.nodes[id].tagged.filter(t => t.tag_slug != tagSlug);
 	}
@@ -425,7 +424,7 @@ moveItem ({state, commit, dispatch, getters},
 	{id, direction} = {})
 {
 	id = (!id) ? selection.selectedId : id ;
-	if(getters.isTopLvlItemInFilteredRoot(id))
+	if (getters.isTopLvlItemInFilteredRoot(id))
 	{ 
 		let errMsg = getters.text.flashes.moveTopLvlItem;
 		console.log(errMsg);
@@ -436,11 +435,11 @@ moveItem ({state, commit, dispatch, getters},
 	let pId = state.nodes[id].parent_id;
 	let parent = state.nodes[pId];
 	let index = getters.siblingIndex(id);
-	if(direction == 'up')
+	if (direction == 'up')
 	{
-		if(index == 0)
+		if (index == 0)
 		{
-			if(parent.depth == 0){ console.log('ceiling!'); return; }
+			if (parent.depth == 0){ console.log('ceiling!'); return; }
 			// Jump to last child of previous Sibling
 			let parentOlderSiblingId = getters.olderSiblingId(pId);
 			let newInd = (parentOlderSiblingId == parent.parent_id) ? 0 : null;
@@ -456,9 +455,9 @@ moveItem ({state, commit, dispatch, getters},
 	}
 	else if (direction == 'down')
 	{
-		if( index+1 == parent.children_order.length )
+		if ( index+1 == parent.children_order.length )
 		{
-			if(parent.depth == 0){ console.log('floor!'); return; }
+			if (parent.depth == 0){ console.log('floor!'); return; }
 			// Jump to First child of next Sibling
 			let new_parent_id = getters.nextSiblingOrParentsSiblingId(id);
 			console.log('new_parent_id: '+new_parent_id);
@@ -479,7 +478,7 @@ flushDoneItems ({state, commit, dispatch, getters} = {})
 	let nodes = state.nodes;
 	let keys = Object.keys(nodes);
 	let doneItemsObject = keys.reduce((prev,id) => {
-		if(nodes[id].done)
+		if (nodes[id].done)
 		{
 			dispatch('deleteItem', {id} );
 		}
@@ -523,11 +522,11 @@ formatDone ({state, commit, dispatch, getters},
 	{doneArray} = {})
 {
 	let doneItemsObject = doneArray.reduce((prev,item) => {
-		if(item.done)
+		if (item.done)
 		{
 		  	let donePropName = moment(item.done_date).format('YYYY/MM/DD');
 		  	// if we don't have a slot for thiz date, make one
-		  	if(!prev.hasOwnProperty(donePropName))
+		  	if (!prev.hasOwnProperty(donePropName))
 		  	{
 		    	prev[donePropName] = [];
 		  	}
@@ -568,7 +567,7 @@ startEdit ({state, commit, dispatch, getters},
 	item = (item) ? item : state.nodes[selection.selectedId];
 	commit('updateState',{ beforeEditCache_body:item.body });
 	commit('updateState',{ beforeEditCache_planned_time:item.planned_time });
-	// if( state.mobile )
+	// if ( state.mobile )
 	// {
 	// 	state.popouts.edit.push(item);
 	// 	return;
@@ -580,7 +579,7 @@ scrollToItemIfNeeded ({state, commit, dispatch, getters},
 {
 	if (!id){ return };
 	let el = document.getElementById('item-body-'+id);
-	if(!isElementInViewport(el))
+	if (!isElementInViewport(el))
 	{
 		el.scrollIntoView();
 	}
@@ -596,7 +595,7 @@ doneEdit ({state, commit, dispatch, getters},
 	// }
 	commit('updateState',{ editingItem:null });
 	commit('updatePopouts',{ edit:[] });
-	if(state.editingItemTags)
+	if (state.editingItemTags)
 	{
 		commit('updateState',{ editingItemTags:null });
 		return;
@@ -627,7 +626,7 @@ doneEdit ({state, commit, dispatch, getters},
 cancelEdit ({state, commit, dispatch, getters},
 	{id = selection.selectedId} = {})
 {
-	if(state.editingItem || state.popouts.edit.length)
+	if (state.editingItem || state.popouts.edit.length)
 	{
 		Vue.nextTick(() => {
 			console.log("cancel edit. Reverting to: "+state.beforeEditCache_body);
@@ -646,7 +645,7 @@ cancelAddNew ({state, commit, dispatch, getters},
 	console.log('cancelAddNew');
 	state.addingNewUnder = null;
 	// state.addingNewEmptyList = false;
-	if(selection.selectedId == cancelUnderId || selection.selectedId == null)
+	if (selection.selectedId == cancelUnderId || selection.selectedId == null)
 	{ // to prevent item being reselected when cancelAddNew through blur because of clicking on another item.
 		selection.selectedId = selection.lastSelectedId;
 	}
@@ -657,8 +656,8 @@ cancelAddNew ({state, commit, dispatch, getters},
 addNew ({state, commit, dispatch, getters},
 	{addNextItemAs, newItem, olderSibling, addTags} = {})
 {
-	newItem = (newItem) ? newItem : state.newItem;
-	if(!newItem.body){ return; }
+	store.commit('resetNewItem');
+	if (!newItem.body){ return; }
 	addTags = (addTags) ? addTags : [];
 	if (olderSibling)
 	{
@@ -685,7 +684,7 @@ addNew ({state, commit, dispatch, getters},
 		newItem.parent_id = olderSibling.id;
 		index = 0;
 	}
-	if(selection.view == "journal")
+	if (selection.view == "journal")
 	{
 		newItem.done = 1;
 		let doneDate = (!olderSibling || olderSibling.depth == 0) ? moment().format() : olderSibling.done_date;
@@ -705,9 +704,8 @@ addNew ({state, commit, dispatch, getters},
 	console.log('sending tags:');
 	console.log(addTags);
 	// Send to Root for Ajax call.
-	dispatch('addTempNewItem', {newItem, index, addNextItemAs, addTags });
+	dispatch('addTempNewItem', { item:newItem, index, addNextItemAs, addTags });
 	dispatch('postNewItem', { newItem, index, addNextItemAs, addTags, duplication:null });
-	commit('resetNewItem');
 },
 checkFilteredItemsTree ({state, commit, dispatch, getters})
 {
@@ -760,7 +758,7 @@ checkFilteredItemsTree ({state, commit, dispatch, getters})
 // 	if (!item){ return; }
 // 	let visibleChildren = [];
 // 	item.children.forEach(function(child){
-// 		if(!state.hiddenItemIds.includes(child.id))
+// 		if (!state.hiddenItemIds.includes(child.id))
 // 		{
 // 			visibleChildren.push(getters.getItemWithVisibleChildren(child.id));
 // 		}
@@ -818,12 +816,12 @@ indent ({state, commit, dispatch, getters},
 	{id} = {})
 {
 	id = (id) ? id : selection.selectedId;
-	// if(!getters.isTopLvlItemInFilteredRoot(id)){ 
+	// if (!getters.isTopLvlItemInFilteredRoot(id)){ 
 	// 	console.log("can't indent a topLvlItem in filtered list");
 	// 	return;
 	// }
 	let new_parent_id = getters.olderSiblingId(id);
-	if(new_parent_id == state.nodes[id].parent_id){ console.log('bump! ceiling!'); return; }
+	if (new_parent_id == state.nodes[id].parent_id){ console.log('bump! ceiling!'); return; }
 	console.log('new_parent_id / olderSiblingId: '+new_parent_id);
 	dispatch('giveNewParent', { id,new_parent_id });
 },
@@ -831,7 +829,7 @@ unindent ({state, commit, dispatch, getters},
 	{id} = {})
 {
 	id = (id) ? id : selection.selectedId;
-	// if(!getters.isTopLvlItemInFilteredRoot(id)){ 
+	// if (!getters.isTopLvlItemInFilteredRoot(id)){ 
 	// 	console.log("can't unindent a topLvlItem in filtered list");
 	// 	return;
 	// }
@@ -847,9 +845,9 @@ unindent ({state, commit, dispatch, getters},
 	let new_parent_depth = olderSiblingDepth;
 	console.log('new_parent: '+new_parent_id);
 
-	if(!new_parent_id){ console.log('crash! floor!'); return; }
-	if(new_parent_depth == 0 && depth == 1){ console.log('crash! floor!'); return; }
-	if(new_parent_id == state.nodes[id].parent_id){
+	if (!new_parent_id){ console.log('crash! floor!'); return; }
+	if (new_parent_depth == 0 && depth == 1){ console.log('crash! floor!'); return; }
+	if (new_parent_id == state.nodes[id].parent_id){
 		new_parent_id = state.nodes[new_parent_id].parent_id;
 	}
 	dispatch('giveNewParent', { id, new_parent_id });
@@ -888,8 +886,8 @@ setToday ({state, commit, dispatch, getters},
 	{id} = {})
 {
 	id = (id) ? id : selection.selectedId;
-	if(!id){ return; }
-	if(getters.hasParentDueToday(id)){ console.log('parent is already due'); return; }
+	if (!id){ return; }
+	if (getters.hasParentDueToday(id)){ console.log('parent is already due'); return; }
 	dispatch('setDueDate', {id});
 },
 showAddNewItem ({state, commit, dispatch, getters},
@@ -908,17 +906,17 @@ startEditTags ({state, commit, dispatch, getters},
 	{id} = {})
 {
 	id = (id) ? id : selection.selectedId;
-	if(!id){ return; }
+	if (!id){ return; }
 	state.editingItemTags = id;
 },
 stopPatching ({state, commit, dispatch, getters})
 {
-	if(window.stopPatchingIcon){ clearTimeout(window.stopPatchingIcon); }
+	if (window.stopPatchingIcon){ clearTimeout(window.stopPatchingIcon); }
     window.stopPatchingIcon = setTimeout(function(){ state.patching = false; }.bind(state), 300);
 },
 startPatching ({state, commit, dispatch, getters})
 {
-    if(window.stopPatchingIcon){ clearTimeout(window.stopPatchingIcon); }
+    if (window.stopPatchingIcon){ clearTimeout(window.stopPatchingIcon); }
 	state.patching = true;
 },
 patchRootChildrenOrderWithFilter ({state, commit, dispatch, getters},
@@ -936,8 +934,8 @@ patchRootChildrenOrderWithFilter ({state, commit, dispatch, getters},
 patch ({state, commit, dispatch, getters},
 	{id, field, value} = {})
 {
-	// if(getters.isTopLvlItemInFilteredRoot(id)){ 
-	// 	if(field == 'children_order' || field == 'parent_id'){
+	// if (getters.isTopLvlItemInFilteredRoot(id)){ 
+	// 	if (field == 'children_order' || field == 'parent_id'){
 	// 		console.log("you can't sync a toplvlItem when filtering");
 	// 		return;
 	// 	}
@@ -945,7 +943,7 @@ patch ({state, commit, dispatch, getters},
 	dispatch('startPatching');
 	let patchObj = {};
 	let patchVal = (value) ? value : state.nodes[id][field];
-	if(field == 'children_order'){
+	if (field == 'children_order'){
 		patchVal = arrayToString(patchVal);
 	}
 	patchObj[field] = patchVal;
@@ -969,13 +967,13 @@ patchTag ({state, commit, dispatch, getters},
 		'untag': untag item with certain tag
 		'retag': delete all tags and retag new ones
 	*/
-	if(!tags){ return; }
+	if (!tags){ return; }
 	dispatch('updateItemTagsDom', { id, tags, requestType });
-	if(Array.isArray(tags)){
+	if (Array.isArray(tags)){
 		tags = removeEmptyValuesFromArray(tags);
-		if(!tags.length){ return; }
+		if (!tags.length){ return; }
 	} else {
-		if(!tags.replace(/\s/g, "").length){ return; }
+		if (!tags.replace(/\s/g, "").length){ return; }
 	}
 	dispatch('startPatching');
 	let patchObj = {};
@@ -1060,7 +1058,7 @@ popup ({state, commit, dispatch, getters},
 	id = (!id) ? selection.selectedId : id ;
 	let item = state.nodes[id];
 	let popupExists = state.popups.filter(function (popup) { return popup.item.id === id; })[0];
-	if(popupExists){ return; }
+	if (popupExists){ return; }
 	state.popups.push({
     	item,
         type: type,
@@ -1087,12 +1085,12 @@ popout ({state, commit, dispatch, getters},
 	{id, type} = {})
 {
 	id = (!id) ? selection.selectedId : id ;
-	if(!id){ return; }
+	if (!id){ return; }
 	let item = state.nodes[id];
 	// let popoutExists = state.popouts.filter(function (popout) { return popout.item.id === id; })[0];
-	// if(!popoutExists){
+	// if (!popoutExists){
 		// console.log("poppy doesn't exist");
-		if(type=='timer'){
+		if (type=='timer'){
 			state.popouts.timer.push(item);
 			Vue.nextTick(() => {
 				console.log('emitting playTimer on Vue.nextTick');
@@ -1103,7 +1101,7 @@ popout ({state, commit, dispatch, getters},
 			// 	eventHub.$emit('playTimer');
 			// },1000);
 		}
-		if(type=='confirm-delete'){
+		if (type=='confirm-delete'){
 			state.popouts.delete.push(item);
 		}
 	// }
@@ -1124,7 +1122,7 @@ fetchDone ({state, commit, dispatch, getters},
 		console.log('fetched Done');
 		let data = response.data;
 		console.log(data);
-		if(!data.length){ 
+		if (!data.length){ 
 			console.log('no done items...');
 			state.loading = false;
 			return;
@@ -1132,7 +1130,7 @@ fetchDone ({state, commit, dispatch, getters},
 		// clean up and add as nodes
 		data.forEach(item => {
 			item = getters.setDefaultItemValues(item)
-			if(!state.nodes[item.id]){ state.nodes[item.id] = item; }
+			if (!state.nodes[item.id]){ state.nodes[item.id] = item; }
 		});
 		// Codementor
 		selection.view = null;
@@ -1170,7 +1168,7 @@ fetchDone ({state, commit, dispatch, getters},
 filterItems ({state, commit, dispatch, getters},
 	{keyword, value, event} = {})
 {
-	if(state.editingItem){ return; }
+	if (state.editingItem){ return; }
 	// debugger;
 	let operator = null;
 	if (event){
@@ -1212,7 +1210,7 @@ postNewItem ({state, commit, dispatch, getters},
 {
 	dispatch('startPatching');
 	// Prepare children_order for sending to DB.
-	if(newItem.children_order){
+	if (newItem.children_order){
 		newItem.children_order = arrayToString(newItem.children_order);
 	}
 	// let data = {
@@ -1232,7 +1230,7 @@ postNewItem ({state, commit, dispatch, getters},
 		let storedItem = response.data;
 		// Revert old item's children_order back to string.
 		// storedItem.children_order = (!newItem.children_order) ? [] : newItem.children_order.split(',').map(Number);
-		// if(storedItem.constructor === Array){
+		// if (storedItem.constructor === Array){
 		// 	console.log(storedItem);
 		// 	console.log('storedItem ARRAY');
 		// 	storedItem.forEach(item => allItems.addItem(item));

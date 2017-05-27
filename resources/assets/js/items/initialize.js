@@ -13,7 +13,12 @@
 
 	import listDirectives from '../vue-components/Directives.js';
 
-
+	// require('quasar-framework/dist/quasar.ios.css');
+	import Quasar from 'quasar-framework';
+	// const VueClipboard = require('vue-clipboard')
+	// import VueClipboard from 'vue-clipboard';
+	import VueClipboard from 'vue-clipboard2';
+ 
 	// import Flatpickr from 'flatpickr';
 	// import flatPickConfig from '../components/flatPickrOptions.js';
 
@@ -28,43 +33,11 @@ export default function(fetchedData)
 	Vue.use(Vuex);
 	Vue.use(VueResource);
 	Vue.use(listDirectives);
-	// VueFilters(Vue);
+	Vue.use(Quasar);
+	Vue.use(VueClipboard);
 	new ListAppKeyBindings();
 	window.store = new Vuex.Store(ListStore());
 	window.vm = new Vue(ListApp());
-
-	// Vue.directive('flatpicky', {
-	// 	inserted(el)
-	// 	{
-	// 		new Flatpickr(el,flatPickConfig);
-	// 	},
-	// });
-	// Vue.directive('focus', {
-	// 	inserted(el, binding)
-	// 	{
-	// 		if(vm.mobile && !binding.modifiers.mobile){ return; }
-	// 		el.focus()
-	// 	}
-	// });
-	// Vue.directive('autoheight', {
-	// 	inserted(el, binding)
-	// 	{
-	// 		Vue.nextTick(function ()
-	// 		{
-	// 			autosize(el);
-	// 		});
-	// 	}
-	// });
-	// Vue.directive('autowidth', {
-	// 	inserted(el, binding)
-	// 	{
-	// 		Vue.nextTick(function ()
-	// 		{
-	// 			autosizeInput(el);
-	// 		});
-	// 	}
-	// });
-
 
 	store.commit('updateState', { field:'patching', value:false } );
 	store.commit('updateState', { field:'loading', value:false } );

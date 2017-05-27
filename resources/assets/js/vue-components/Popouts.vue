@@ -26,7 +26,7 @@
 				>{{ basis.text.global.cancel }}</button>
 				<button
 					class="o-btn o-btn--warning btn-ok js-btn-ok"
-					v-focus
+					v-focus.noMobile
 					@click="popoutCall('confirm-ok', item)"
 				>{{ basis.text.global.delete }}</button>
 			</div>
@@ -53,7 +53,7 @@
 			<div class="c-popout__nav">
 				<button
 					class="o-btn btn-ok js-btn-ok"
-					v-focus
+					v-focus.noMobile
 					@click="this.clearAll"
 				>{{ basis.text.popouts.ok }}</button>
 			</div>
