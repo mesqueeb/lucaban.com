@@ -23,14 +23,16 @@
 		</span>
 		<button
 			class="o-btn btn btn-dipclick ml-auto"
-			:id="'journal-card-'+item.done_date+'-copy'"
+			v-clipboard:copy="basis.$store.getters.clipboardTextJournal(item)"
+			v-clipboard:success="clipboardSuccess"
+			v-clipboard:error="clipboardError"
 			v-if="true || !basis.mobile"
 		>
 			{{ basis.text.card.copy }}
 		</button>
-		<div class="w-100 d-flex" v-if="totalUsedMin">
+		<div class="w-100 d-flex" v-if="sec_to_hourmin(get.totalUsedSec(item))">
 			<span class="c-journal-used-time">{{ basis.text.menu.usedTime }}: </span>
-			<span class="o-pill--used-time">{{ sec_to_hourmin(totalUsedSec) }}</span>
+			<span class="o-pill--used-time">{{ sec_to_hourmin(get.totalUsedSec(item)) }}</span>
 		</div>
 	</div>
 		<!-- v-if="journalView && item.depth != 0 && item.parents_bodies" -->
@@ -116,9 +118,8 @@
 					}"
 				>
 					<textarea
-						v-focus
-						v-autoheight
 						class="js-edititem-body c-updatebox__textarea"
+						v-focus v-autoheight
 						v-model="item.body"
 						@blur="blurOnEdit(item)"
 						@keydown="keydownOnEdit(item, $event, 'body')"
@@ -173,11 +174,11 @@
 						>1{{ (basis.mobileSmall) ? basis.text.global.h : basis.text.global.hour }}</button>
 						<div><input
 							class="c-update-planned-time__input" 
-							type="number"
 							v-show="true"
 							v-model="item.planned_time"
 							@blur="blurOnEdit(item)"
 							@keydown="keydownOnEdit(item, $event, 'planned-time')"
+							type="number"
 						/>{{ basis.text.global.min }}</div>
 					</div>
 					<div :class="{'c-item-tags':true,
@@ -192,14 +193,11 @@
 							<label>
 								{{ basis.text.card.addTag }}
 								<input
-									type="text"
 									class="c-add-tag__input js-add-tag"
-									v-model="newTag"
-									v-autowidth
-									v-focus.noMobile
+									v-model="newTag" placeholder="..."
 									@blur="blurOnEdit(item, 'add-tag')"
 									@keydown="keydownOnEdit(item, $event, 'add-tag')"
-									placeholder="..."
+									type="text" v-autowidth v-focus.noMobile
 								>
 							</label>
 						</div>
@@ -249,14 +247,11 @@
 					<label>
 						{{ basis.text.card.addTag }}
 						<input
-							type="text"
 							class="c-add-tag__input js-add-tag"
-							v-model="newTag"
-							v-autowidth
-							v-focus.noMobile
+							type="text" v-autowidth v-focus.noMobile
+							v-model="newTag" placeholder="..."
 							@keydown="keydownOnEdit(item, $event, 'add-tag')"
 							@blur="blurOnEdit(item, 'add-tag')"
-							placeholder="..."
 						>
 					</label>
 				</div>
@@ -349,12 +344,21 @@
 		v-show="item.show_children"
 		:style="(addingNewAsFirstChild)?'order:3;':''"
 	>
-		<Card v-for="childCard in visibleDirectChildren"
+		<Card
+			v-if="!item.journalDate"
+			v-for="childCard in visibleDirectChildren"
 			:item="childCard"
-			:new-item="newItem"
 			:key="childCard.id"
 			:parent-tags="tagsArray"
 		></Card>
+		<Card
+			v-if="item.journalDate"
+			v-for="childCard in item.children"
+			:item="childCard"
+			:key="childCard.id"
+			:parent-tags="tagsArray"
+		></Card>
+			<!-- :new-item="newItem" -->
 	</div>
 <!-- / CHILDREN -->
 
@@ -573,6 +577,7 @@ export default {
 		olderSiblingId(){ return this.get.olderSiblingId(this.id) },
 		addingNewAsFirstChild(){ return this.$store.state.addingNewAsFirstChild; },
 		addingNewAsChild(){ return this.$store.state.addingNewAsChild; },
+		journalDate(){ return this.get.journalDate(this.item) },
 /* \ ============================================== / *\
 \* / ============================================== \ */
 		preparedPlusComputedTags()
@@ -609,35 +614,15 @@ export default {
 				return true;
 			} else { return false; }
 		},
-		journalDate()
-		{ if (!this.item){ return; }
-			// console.log('run on '+this.item.id+' - '+this.item.body);
-			if ( this.$root.selection.view != 'journal'
-			  || !this.journalView
-			  || !this.item.journalDate )
-			{
-				return false;
-			}
-			return moment(this.item.done_date,'YYYYMMDD').format('YYYY/MM/DD');
-			// JOURNAL REWRITE. original:
-			// if (this.item.depth == 0){ return; }
-			// let prevId = this.visiblePrevItemId;
-			// let prevDoneDate = this.$store.state.nodes[prevId].done_date;
-			// prevDoneDate = moment(prevDoneDate).format('YYYY/MM/DD');
-			// let thisDoneDate = moment(this.item.done_date).format('YYYY/MM/DD');
-			// if (thisDoneDate != prevDoneDate){
-			// 	return thisDoneDate;
-			// }
-
-		},
 		journalParentString()
 		{ if (!this.item){ return; }
 			// console.log('run on '+this.item.id+' - '+this.item.body);
 			if (this.$root.selection.view != 'journal'){ return false; }
-			if (this.journalView){
+			if (this.journalView && !this.item.journalDate){
 				if (this.item.depth == 0){ return; }
 				let prevId = this.visiblePrevItemId;
 				let parentString = this.item.parents_bodies;
+				if (!this.$store.state.nodes[prevId]){ return; }
 				let prevParentString = this.$store.state.nodes[prevId].parents_bodies;
 
 				let prevDoneDate = this.$store.state.nodes[prevId].done_date;
@@ -736,39 +721,14 @@ export default {
 		doneEdit(item){ this.dispatch('doneEdit', {item}) },
 		setToday(id){ this.dispatch('setToday', {id}) },
 		deleteItemDialogue(id){ this.dispatch('deleteItemDialogue', {id}) },
-
-		triggerClipboardJSJournal()
+		
+		clipboardSuccess()
 		{
-			if (this.journalView && this.item.journalDate)
-			{
-				let copyElPath_Journal = "#journal-card-"+this.item.done_date+"-copy";
-				let self = this;
-				new Clipboard(copyElPath_Journal, {
-				    text: function(trigger) {
-				    	console.log(trigger);
-				    	return self.clipboardTextJournal();
-				    }
-				}).on('success', function(e) {
-				    // console.info('Action:', e.action);
-				    // console.info('Text:', e.text);
-				    // console.info('Trigger:', e.trigger);
-				    e.clearSelection();
-				});
-			}
+			this.$store.dispatch('sendFlash', { type:'success', msg:this.$root.keybindings.copyClipboard.success[this.l] });
 		},
-		clipboardTextJournal()
+		clipboardError()
 		{
-			let usedT = (this.totalUsedMin) ? `
-${this.basis.text.menu.usedTime}: ${this.sec_to_hourmin(this.totalUsedSec)}` : '';
-	    	let journalDateTxt = `${this.journalDate}
-==========${usedT}` ;
-	        let allChildren = this.allVisibleChildItems.reduce(function(all, val){
-	        	let pb = (!all.includes(`【${val.parents_bodies}】`)) ? `
-【${val.parents_bodies}】` :`` ;
-				return `${all}${pb}
-・${val.body}`;
-			}, journalDateTxt);
-	        return allChildren;
+			this.$store.dispatch('sendFlash', { type:'error', msg:this.$root.keybindings.copyClipboard.error[this.l] });
 		},
 		convertbodyURLtoHTML()
 		{

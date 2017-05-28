@@ -40,11 +40,11 @@
 			</div>
 			<div
 				class="o-popmenu__item"
-				v-if="basis.mobile && basis.selection.view != 'journal'"
+				v-if="basis.selection.view != 'journal'"
 				@click="basis.setToday({id:item.id}), $refs.popover.close()"
 			>
 				<div v-html="basis.keybindings.setToday.popmenu[l]"></div>
-				<div v-if="!basis.mobile">{{ basis.keybindings.setToday[oS] }}</div>
+				<div v-if="!basis.mobile" v-html="stringToKeyboardKeys(basis.keybindings.setToday[oS])"></div>
 			</div>
 			<div
 				class="o-popmenu__item"
@@ -52,7 +52,7 @@
 				@click="basis.startEdit({item}), $refs.popover.close()"
 			>
 				<div v-html="basis.keybindings.edit.popmenu[l]"></div>
-				<div v-if="!basis.mobile">{{ basis.keybindings.edit[oS] }}</div>
+				<div v-if="!basis.mobile" v-html="stringToKeyboardKeys(basis.keybindings.edit[oS])"></div>
 			</div>
 			<div
 				class="o-popmenu__item"
@@ -67,7 +67,7 @@
 				@click="basis.deleteItemDialogue({ id:item.id }), $refs.popover.close()"
 			>
 				<div><i class="zmdi zmdi-delete"></i> {{ basis.keybindings.delete.popmenu[l] }}</div>
-				<div v-if="!basis.mobile">{{ basis.keybindings.delete[oS] }}</div>
+				<div v-if="!basis.mobile" v-html="stringToKeyboardKeys(basis.keybindings.delete[oS])"></div>
 			</div>
 		</div>
 		</q-popover>
@@ -83,6 +83,7 @@
 </template>
 <script>
 import Clipboard from 'clipboard';
+import {stringToKeyboardKeys} from '../components/globalFunctions.js'
 export default{
 	name: 'itemNav',
 	props: ['item','clipboardTextJournal'],
@@ -106,6 +107,7 @@ export default{
 	},
 	methods:
 	{
+		stringToKeyboardKeys,
 		hello(){
 			console.log('hello');
 		},

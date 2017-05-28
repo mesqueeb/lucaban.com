@@ -1,5 +1,6 @@
 import { mobilecheck,Utilities,objectToArray,uniqBy,sortObjectArrayByProperty,sortObjectArrayByTwoProperties } from '../../components/globalFunctions.js';
 import { sec_to_hourmin } from '../../components/valueMorphers2.js';
+import * as moment from 'moment';
 
 export default {
 totalPlannedMin: (state, getters) =>
@@ -16,13 +17,22 @@ totalPlannedMin: (state, getters) =>
     return (x) ? parseFloat(x) : 0;
 },
 totalUsedSec: (state, getters) =>
-(id = state.root.id) => {
-	let item = state.nodes[id];
+(idOrItem = state.root.id) => {
+	let item;
+	let childrenArray;
+	if (typeof idOrItem === 'object' && idOrItem.journalDate)
+	{
+		item = idOrItem;
+		childrenArray = item.children;
+	} else {
+		item = state.nodes[idOrItem];
+		childrenArray = getters.allVisibleChildItems(idOrItem);
+	}
 	if (!item){ return 0; }
 
 	let selfValue = (item.used_time) ? parseFloat(item.used_time) : 0;
-	let childrenArray = getters.allVisibleChildItems(id);
 	if (!childrenArray || !childrenArray.length) { return selfValue; }
+	
 	let x = childrenArray.reduce(function(prevVal, child){
 		return prevVal + parseFloat(child.used_time);
 	}, selfValue);
@@ -78,7 +88,7 @@ totalTimeDifferentFromParent: (state, getters) =>
 tagsArray: (state, getters) =>
 (id) => {
 	let item = state.nodes[id];
-	if(!item){ return true; }
+	if(!item){ return []; }
 
 	return item.tagged.map(obj => obj.tag_name);
 },
@@ -789,6 +799,29 @@ clipboardText: (state, getters) =>
 ${spaces}・${val.body}`;
 	}, `${item.body}`);
     return allChildren;
+},
+clipboardTextJournal: (state, getters) =>
+(item) => {
+	let usedT = (getters.totalUsedMin(item)) ? `
+${getters.text.menu.usedTime}: ${sec_to_hourmin(getters.totalUsedSec(item))}` : '';
+	let journalDateTxt = `${getters.journalDate(item)}
+==========${usedT}` ;
+    let allChildren = item.children.reduce(function(all, val){
+    	let pb = (!all.includes(`【${val.parents_bodies}】`)) ? `
+【${val.parents_bodies}】` :`` ;
+		return `${all}${pb}
+・${val.body}`;
+	}, journalDateTxt);
+    return allChildren;
+},
+journalDate: (state, getters) =>
+(item) => {
+	if ( selection.view != 'journal'
+	  || !item.journalDate )
+	{
+		return false;
+	}
+	return moment(item.done_date,'YYYYMMDD').format('YYYY/MM/DD');
 },
 hiddenItemIds: (state, getters) => {
 	// console.log('running hiddenItemIds');

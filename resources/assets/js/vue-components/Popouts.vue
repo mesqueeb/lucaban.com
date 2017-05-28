@@ -45,8 +45,8 @@
 					<tr>
 						<th>{{ basis.text.guide.action }}</th><th>{{ basis.text.guide.key }}</th>
 					</tr>
-					<tr v-for="row in basis.text.guide.keybindings">
-						<td v-html="row.note"></td><td>{{ row.key }}</td>
+					<tr v-for="k in guide">
+						<td v-html="basis.keybindings[k].guide[basis.language]"></td><td v-html="stringToKeyboardKeys(basis.keybindings[k][basis.oS])"></td>
 					</tr>
 				</table>
 			</div>
@@ -76,7 +76,7 @@
 					}"
 				>
 					<div class="l-toggle-div--popout o-toggle-div">
-						<input class="o-toggle"
+						<input class="o-toggle__check"
 							type="checkbox"
 							v-if="item.children_order.length==0 || item.done == true"
 							v-model="item.done"
@@ -171,6 +171,7 @@ Deleted
 // import PopoutConfirmation from './PopoutConfirmation.vue';
 import { sec_to_hhmmss, momentCalendar } from '../components/valueMorphers2.js'
 import autosize from 'autosize';
+import {stringToKeyboardKeys} from '../components/globalFunctions.js'
 
 export default {
     name: 'Popouts',
@@ -187,13 +188,10 @@ export default {
 		this.$bus.$on('clearAll', this.clearAll);
 	},
 	computed: {
+		basis(){ return this.$root },
 		card()
 		{
 			return this.$root.$refs.root;
-		},
-		basis()
-		{
-			return this.$root;
 		},
 		popoutExists()
 		{
@@ -202,9 +200,13 @@ export default {
 					|| this.popouts.edit.length
 					|| this.popouts.guide );
 		},
+		guide()
+		{
+			return Object.keys(this.basis.keybindings).filter(k => this.basis.keybindings[k].mac);
+		},
 	},
     methods: {
-    	sec_to_hhmmss, momentCalendar,
+    	sec_to_hhmmss, momentCalendar, stringToKeyboardKeys,
     	countdownTimer(used_time, planned_time)
     	{
     		let secondsLeft = planned_time*60-used_time;

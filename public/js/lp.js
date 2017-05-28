@@ -11847,7 +11847,8 @@ module.exports = __webpack_require__(148);
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* WEBPACK VAR INJECTION */(function($) {/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "i", function() { return mobilecheck; });
+/* WEBPACK VAR INJECTION */(function($) {/* unused harmony export stringToKeyboardKeys */
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "i", function() { return mobilecheck; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "g", function() { return objectToArray; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "l", function() { return uniqBy; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "e", function() { return uniq; });
@@ -11867,7 +11868,15 @@ function mobilecheck() {
 	})(navigator.userAgent || navigator.vendor || window.opera);
 	return check;
 }
-
+function stringToKeyboardKeys(str) {
+	return str.split(' ').map(k => {
+		if (!k.includes('+') && !k.includes('click')) {
+			return `<span class='o-keyboardkey'>${k}</span>`;
+		} else {
+			return k;
+		}
+	}).join(' ');
+}
 function arrayToString(arr) {
 	if (!Array.isArray(arr) || !arr.length) {
 		return '';

@@ -14802,18 +14802,19 @@ return jQuery;
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* WEBPACK VAR INJECTION */(function($) {/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "i", function() { return mobilecheck; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "g", function() { return objectToArray; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "l", function() { return uniqBy; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "e", function() { return uniq; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "h", function() { return arrayToString; });
+/* WEBPACK VAR INJECTION */(function($) {/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "e", function() { return stringToKeyboardKeys; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "j", function() { return mobilecheck; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "h", function() { return objectToArray; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "m", function() { return uniqBy; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "f", function() { return uniq; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "i", function() { return arrayToString; });
 /* unused harmony export sec_to_hourmin */
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "c", function() { return hasClass; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return btnEffect; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return isElementInViewport; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "j", function() { return sortObjectArrayByProperty; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "k", function() { return sortObjectArrayByTwoProperties; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "f", function() { return removeEmptyValuesFromArray; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "k", function() { return sortObjectArrayByProperty; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "l", function() { return sortObjectArrayByTwoProperties; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "g", function() { return removeEmptyValuesFromArray; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "d", function() { return Utilities; });
 function mobilecheck() {
 	let check = false;
@@ -14822,7 +14823,15 @@ function mobilecheck() {
 	})(navigator.userAgent || navigator.vendor || window.opera);
 	return check;
 }
-
+function stringToKeyboardKeys(str) {
+	return str.split(' ').map(k => {
+		if (!k.includes('+') && !k.includes('click')) {
+			return `<span class='o-keyboardkey'>${k}</span>`;
+		} else {
+			return k;
+		}
+	}).join(' ');
+}
 function arrayToString(arr) {
 	if (!Array.isArray(arr) || !arr.length) {
 		return '';
@@ -39739,6 +39748,10 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
+//
+//
+//
 
 
 // import flatPickConfig from '../components/flatPickrOptions.js';
@@ -39867,6 +39880,9 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 		addingNewAsChild() {
 			return this.$store.state.addingNewAsChild;
 		},
+		journalDate() {
+			return this.get.journalDate(this.item);
+		},
 		/* \ ============================================== / *\
   \* / ============================================== \ */
 		preparedPlusComputedTags() {
@@ -39893,7 +39909,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 					alltags = alltags.concat(tagzies);
 				}
 			}
-			alltags = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__components_globalFunctions_js__["e" /* uniq */])(alltags);
+			alltags = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__components_globalFunctions_js__["f" /* uniq */])(alltags);
 			return alltags.sort();
 		},
 		journalView() {
@@ -39906,25 +39922,6 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 				return false;
 			}
 		},
-		journalDate() {
-			if (!this.item) {
-				return;
-			}
-			// console.log('run on '+this.item.id+' - '+this.item.body);
-			if (this.$root.selection.view != 'journal' || !this.journalView || !this.item.journalDate) {
-				return false;
-			}
-			return moment(this.item.done_date, 'YYYYMMDD').format('YYYY/MM/DD');
-			// JOURNAL REWRITE. original:
-			// if (this.item.depth == 0){ return; }
-			// let prevId = this.visiblePrevItemId;
-			// let prevDoneDate = this.$store.state.nodes[prevId].done_date;
-			// prevDoneDate = moment(prevDoneDate).format('YYYY/MM/DD');
-			// let thisDoneDate = moment(this.item.done_date).format('YYYY/MM/DD');
-			// if (thisDoneDate != prevDoneDate){
-			// 	return thisDoneDate;
-			// }
-		},
 		journalParentString() {
 			if (!this.item) {
 				return;
@@ -39933,12 +39930,15 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 			if (this.$root.selection.view != 'journal') {
 				return false;
 			}
-			if (this.journalView) {
+			if (this.journalView && !this.item.journalDate) {
 				if (this.item.depth == 0) {
 					return;
 				}
 				let prevId = this.visiblePrevItemId;
 				let parentString = this.item.parents_bodies;
+				if (!this.$store.state.nodes[prevId]) {
+					return;
+				}
 				let prevParentString = this.$store.state.nodes[prevId].parents_bodies;
 
 				let prevDoneDate = this.$store.state.nodes[prevId].done_date;
@@ -40073,35 +40073,11 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 			this.dispatch('deleteItemDialogue', { id });
 		},
 
-		triggerClipboardJSJournal() {
-			if (this.journalView && this.item.journalDate) {
-				let copyElPath_Journal = "#journal-card-" + this.item.done_date + "-copy";
-				let self = this;
-				new __WEBPACK_IMPORTED_MODULE_2_clipboard___default.a(copyElPath_Journal, {
-					text: function (trigger) {
-						console.log(trigger);
-						return self.clipboardTextJournal();
-					}
-				}).on('success', function (e) {
-					// console.info('Action:', e.action);
-					// console.info('Text:', e.text);
-					// console.info('Trigger:', e.trigger);
-					e.clearSelection();
-				});
-			}
+		clipboardSuccess() {
+			this.$store.dispatch('sendFlash', { type: 'success', msg: this.$root.keybindings.copyClipboard.success[this.l] });
 		},
-		clipboardTextJournal() {
-			let usedT = this.totalUsedMin ? `
-${this.basis.text.menu.usedTime}: ${this.sec_to_hourmin(this.totalUsedSec)}` : '';
-			let journalDateTxt = `${this.journalDate}
-==========${usedT}`;
-			let allChildren = this.allVisibleChildItems.reduce(function (all, val) {
-				let pb = !all.includes(`【${val.parents_bodies}】`) ? `
-【${val.parents_bodies}】` : ``;
-				return `${all}${pb}
-・${val.body}`;
-			}, journalDateTxt);
-			return allChildren;
+		clipboardError() {
+			this.$store.dispatch('sendFlash', { type: 'error', msg: this.$root.keybindings.copyClipboard.error[this.l] });
 		},
 		convertbodyURLtoHTML() {
 			// console.log('converting');
@@ -40650,6 +40626,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__components_valueMorphers2_js__ = __webpack_require__(8);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_autosize__ = __webpack_require__(10);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_autosize___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_autosize__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__components_globalFunctions_js__ = __webpack_require__(3);
 //
 //
 //
@@ -40824,6 +40801,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
 
 
+
 /* harmony default export */ __webpack_exports__["default"] = ({
 	name: 'Popouts',
 	template: '#popouts-template',
@@ -40838,18 +40816,21 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 		this.$bus.$on('clearAll', this.clearAll);
 	},
 	computed: {
-		card() {
-			return this.$root.$refs.root;
-		},
 		basis() {
 			return this.$root;
 		},
+		card() {
+			return this.$root.$refs.root;
+		},
 		popoutExists() {
 			return this.popouts.timer.length || this.popouts.delete.length || this.popouts.edit.length || this.popouts.guide;
+		},
+		guide() {
+			return Object.keys(this.basis.keybindings).filter(k => this.basis.keybindings[k].mac);
 		}
 	},
 	methods: {
-		sec_to_hhmmss: __WEBPACK_IMPORTED_MODULE_0__components_valueMorphers2_js__["a" /* sec_to_hhmmss */], momentCalendar: __WEBPACK_IMPORTED_MODULE_0__components_valueMorphers2_js__["b" /* momentCalendar */],
+		sec_to_hhmmss: __WEBPACK_IMPORTED_MODULE_0__components_valueMorphers2_js__["a" /* sec_to_hhmmss */], momentCalendar: __WEBPACK_IMPORTED_MODULE_0__components_valueMorphers2_js__["b" /* momentCalendar */], stringToKeyboardKeys: __WEBPACK_IMPORTED_MODULE_2__components_globalFunctions_js__["e" /* stringToKeyboardKeys */],
 		countdownTimer(used_time, planned_time) {
 			let secondsLeft = planned_time * 60 - used_time;
 			if (secondsLeft > 0) {
@@ -41175,6 +41156,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_clipboard__ = __webpack_require__(12);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_clipboard___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_clipboard__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__components_globalFunctions_js__ = __webpack_require__(3);
 //
 //
 //
@@ -41258,6 +41240,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+
 
 
 /* harmony default export */ __webpack_exports__["default"] = ({
@@ -41281,6 +41264,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 		}
 	},
 	methods: {
+		stringToKeyboardKeys: __WEBPACK_IMPORTED_MODULE_1__components_globalFunctions_js__["e" /* stringToKeyboardKeys */],
 		hello() {
 			console.log('hello');
 		},
@@ -41925,7 +41909,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 			return;
 		}
 		if (Array.isArray(tags)) {
-			tags = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__components_globalFunctions_js__["f" /* removeEmptyValuesFromArray */])(tags);
+			tags = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__components_globalFunctions_js__["g" /* removeEmptyValuesFromArray */])(tags);
 			tags = tags.filter(function (t) {
 				return !getters.hasTag(id, t);
 			}.bind(this));
@@ -42262,7 +42246,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 	},
 	checkFilteredItemsTree({ state, commit, dispatch, getters }) {
 		//Go through ALL ITEMS and return those that have the tag AND no parent with the tag.
-		__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__components_globalFunctions_js__["g" /* objectToArray */])(state.nodes).forEach(function (item) {
+		__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__components_globalFunctions_js__["h" /* objectToArray */])(state.nodes).forEach(function (item) {
 			let target;
 			let targetHidden;
 			let hasParentWithTag;
@@ -42500,7 +42484,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 		let patchObj = {};
 		let patchVal = value ? value : state.nodes[id][field];
 		if (field == 'children_order') {
-			patchVal = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__components_globalFunctions_js__["h" /* arrayToString */])(patchVal);
+			patchVal = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__components_globalFunctions_js__["i" /* arrayToString */])(patchVal);
 		}
 		patchObj[field] = patchVal;
 		vm.$http.patch('/api/items/' + id, patchObj, { method: 'PATCH' }).then(function (response) {
@@ -42525,7 +42509,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 		}
 		dispatch('updateItemTagsDom', { id, tags, requestType });
 		if (Array.isArray(tags)) {
-			tags = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__components_globalFunctions_js__["f" /* removeEmptyValuesFromArray */])(tags);
+			tags = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__components_globalFunctions_js__["g" /* removeEmptyValuesFromArray */])(tags);
 			if (!tags.length) {
 				return;
 			}
@@ -42751,7 +42735,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 		dispatch('startPatching');
 		// Prepare children_order for sending to DB.
 		if (newItem.children_order) {
-			newItem.children_order = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__components_globalFunctions_js__["h" /* arrayToString */])(newItem.children_order);
+			newItem.children_order = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__components_globalFunctions_js__["i" /* arrayToString */])(newItem.children_order);
 		}
 		// let data = {
 		// 	newItemArray: [newItem, newItem]
@@ -42809,6 +42793,9 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__components_globalFunctions_js__ = __webpack_require__(3);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__components_valueMorphers2_js__ = __webpack_require__(8);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_moment__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_moment___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_moment__);
+
 
 
 
@@ -42829,17 +42816,25 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 		}, selfValue);
 		return x ? parseFloat(x) : 0;
 	},
-	totalUsedSec: (state, getters) => (id = state.root.id) => {
-		let item = state.nodes[id];
+	totalUsedSec: (state, getters) => (idOrItem = state.root.id) => {
+		let item;
+		let childrenArray;
+		if (typeof idOrItem === 'object' && idOrItem.journalDate) {
+			item = idOrItem;
+			childrenArray = item.children;
+		} else {
+			item = state.nodes[idOrItem];
+			childrenArray = getters.allVisibleChildItems(idOrItem);
+		}
 		if (!item) {
 			return 0;
 		}
 
 		let selfValue = item.used_time ? parseFloat(item.used_time) : 0;
-		let childrenArray = getters.allVisibleChildItems(id);
 		if (!childrenArray || !childrenArray.length) {
 			return selfValue;
 		}
+
 		let x = childrenArray.reduce(function (prevVal, child) {
 			return prevVal + parseFloat(child.used_time);
 		}, selfValue);
@@ -42891,7 +42886,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 	tagsArray: (state, getters) => id => {
 		let item = state.nodes[id];
 		if (!item) {
-			return true;
+			return [];
 		}
 
 		return item.tagged.map(obj => obj.tag_name);
@@ -43160,7 +43155,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 		if (!parent) {
 			return false;
 		}
-		let diff = moment(parent.due_date).diff(moment(), 'days');
+		let diff = __WEBPACK_IMPORTED_MODULE_2_moment__(parent.due_date).diff(__WEBPACK_IMPORTED_MODULE_2_moment__(), 'days');
 		if (diff <= 0) {
 			return true;
 		} else {
@@ -43170,7 +43165,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 	isDueToday: (state, getters) => id => {
 		id = id ? id : selection.selectedId;
 		let item = state.nodes[id];
-		let diff = moment(item.due_date).diff(moment(), 'days');
+		let diff = __WEBPACK_IMPORTED_MODULE_2_moment__(item.due_date).diff(__WEBPACK_IMPORTED_MODULE_2_moment__(), 'days');
 		if (diff <= 0) {
 			return true;
 		}
@@ -43432,7 +43427,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 		if (state.manualMobile) {
 			return true;
 		}
-		return __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__components_globalFunctions_js__["i" /* mobilecheck */])();
+		return __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__components_globalFunctions_js__["j" /* mobilecheck */])();
 	},
 	mobileSmall: (state, getters) => {
 		if (window.innerWidth < 385) {
@@ -43469,7 +43464,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 			if (!item.done) {
 				return;
 			}
-			let dd = moment(item.done_date).format('YYYY-MM-DD');
+			let dd = __WEBPACK_IMPORTED_MODULE_2_moment__(item.done_date).format('YYYY-MM-DD');
 			if (!dates[dd]) {
 				dates[dd] = [];
 			}
@@ -43478,22 +43473,22 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 		let datesArray = [];
 		Object.keys(dates).forEach(function (dd) {
 			let journalItem = {
-				'done_date': moment(dd).format('YYYY-MM-DD'),
-				'children': __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__components_globalFunctions_js__["j" /* sortObjectArrayByProperty */])(dates[dd], 'parents_bodies'),
+				'done_date': __WEBPACK_IMPORTED_MODULE_2_moment__(dd).format('YYYY-MM-DD'),
+				'children': __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__components_globalFunctions_js__["k" /* sortObjectArrayByProperty */])(dates[dd], 'parents_bodies'),
 				'depth': 0,
 				'journalDate': true
 			};
 			journalItem = getters.setDefaultItemValues(journalItem);
 			datesArray.push(journalItem);
 		});
-		datesArray = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__components_globalFunctions_js__["j" /* sortObjectArrayByProperty */])(datesArray, 'done_date', 'desc');
+		datesArray = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__components_globalFunctions_js__["k" /* sortObjectArrayByProperty */])(datesArray, 'done_date', 'desc');
 		return datesArray;
 	},
 	journalDates: (state, getters) => {
 		return Object.keys(getters.filteredItemsJournal);
 	},
 	filteredItemsFlat: (state, getters) => {
-		let ar = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__components_globalFunctions_js__["g" /* objectToArray */])(state.nodes).filter(function (item) {
+		let ar = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__components_globalFunctions_js__["h" /* objectToArray */])(state.nodes).filter(function (item) {
 			let target = selection.tags.every(tag => getters.hasTag(item.id, tag));
 			let targetHidden = selection.hiddenTags.some(tag => getters.hasTag(item.id, tag));
 			let targetDone = selection.view == 'journal' ? item.done : true;
@@ -43507,11 +43502,11 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 			// 			`);
 			if (selection.filter.includes('today')) {
 				targetToday = false;
-				let diff = moment(item.due_date).diff(moment(), 'days');
+				let diff = __WEBPACK_IMPORTED_MODULE_2_moment__(item.due_date).diff(__WEBPACK_IMPORTED_MODULE_2_moment__(), 'days');
 				if (diff <= 0 || getters.hasParentDueToday(item.id)) {
 					targetToday = true;
 				}
-				let doneDateDiff = moment(item.done_date).diff(moment(), 'days');
+				let doneDateDiff = __WEBPACK_IMPORTED_MODULE_2_moment__(item.done_date).diff(__WEBPACK_IMPORTED_MODULE_2_moment__(), 'days');
 				if (doneDateDiff <= 1) {
 					targetToday = false;
 				}
@@ -43521,14 +43516,14 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 			}
 		});
 		if (selection.view == 'journal') {
-			ar = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__components_globalFunctions_js__["k" /* sortObjectArrayByTwoProperties */])(ar, 'done_date', 'parents_bodies', 'desc', 'asc');
+			ar = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__components_globalFunctions_js__["l" /* sortObjectArrayByTwoProperties */])(ar, 'done_date', 'parents_bodies', 'desc', 'asc');
 		}
 		return ar;
 	},
 	filteredItemsTree: (state, getters) => {
-		console.log(`update filteredItemsTree (nodes length: ${__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__components_globalFunctions_js__["g" /* objectToArray */])(state.nodes).length})`);
+		console.log(`update filteredItemsTree (nodes length: ${__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__components_globalFunctions_js__["h" /* objectToArray */])(state.nodes).length})`);
 		//Go through ALL ITEMS and return those that have the tag AND no parent with the tag.
-		let children = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__components_globalFunctions_js__["g" /* objectToArray */])(state.nodes).filter(function (item) {
+		let children = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__components_globalFunctions_js__["h" /* objectToArray */])(state.nodes).filter(function (item) {
 			let target;
 			let hasParentWithTag;
 			let targetToday;
@@ -43554,7 +43549,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 			}
 
 			if (selection.filter.includes('today')) {
-				let doneDateDiff = moment(item.done_date).diff(moment(), 'days');
+				let doneDateDiff = __WEBPACK_IMPORTED_MODULE_2_moment__(item.done_date).diff(__WEBPACK_IMPORTED_MODULE_2_moment__(), 'days');
 				if (item.done && doneDateDiff <= -1) {
 					return false;
 				}
@@ -43577,7 +43572,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 			}
 		}
 		if (selection.filter.includes('today')) {
-			children = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__components_globalFunctions_js__["j" /* sortObjectArrayByProperty */])(children, 'done_date');
+			children = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__components_globalFunctions_js__["k" /* sortObjectArrayByProperty */])(children, 'done_date');
 		}
 		return children;
 	},
@@ -43623,9 +43618,28 @@ ${spaces}・${val.body}`;
 		}, `${item.body}`);
 		return allChildren;
 	},
+	clipboardTextJournal: (state, getters) => item => {
+		let usedT = getters.totalUsedMin(item) ? `
+${getters.text.menu.usedTime}: ${__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__components_valueMorphers2_js__["e" /* sec_to_hourmin */])(getters.totalUsedSec(item))}` : '';
+		let journalDateTxt = `${getters.journalDate(item)}
+==========${usedT}`;
+		let allChildren = item.children.reduce(function (all, val) {
+			let pb = !all.includes(`【${val.parents_bodies}】`) ? `
+【${val.parents_bodies}】` : ``;
+			return `${all}${pb}
+・${val.body}`;
+		}, journalDateTxt);
+		return allChildren;
+	},
+	journalDate: (state, getters) => item => {
+		if (selection.view != 'journal' || !item.journalDate) {
+			return false;
+		}
+		return __WEBPACK_IMPORTED_MODULE_2_moment__(item.done_date, 'YYYYMMDD').format('YYYY/MM/DD');
+	},
 	hiddenItemIds: (state, getters) => {
 		// console.log('running hiddenItemIds');
-		return __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__components_globalFunctions_js__["g" /* objectToArray */])(state.nodes).filter(function (item) {
+		return __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__components_globalFunctions_js__["h" /* objectToArray */])(state.nodes).filter(function (item) {
 			let targetHidden = selection.hiddenTags.some(tag => getters.hasTag(item.id, tag));
 			if (targetHidden) {
 				return true;
@@ -43689,7 +43703,7 @@ ${spaces}・${val.body}`;
 				}
 			}.bind(allTagsArray));
 		}.bind(allTagsArray));
-		allTagsArray = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__components_globalFunctions_js__["j" /* sortObjectArrayByProperty */])(allTagsArray, 'name');
+		allTagsArray = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__components_globalFunctions_js__["k" /* sortObjectArrayByProperty */])(allTagsArray, 'name');
 		var t1 = performance.now();
 		console.log("Call to allTagsComputed took " + (t1 - t0) + " milliseconds.");
 		return allTagsArray;
@@ -43709,10 +43723,10 @@ ${spaces}・${val.body}`;
 			let tags = item.tagged.map(taggedObj => taggedObj.tag).filter(tag => tag);
 			return a.concat(tags);
 		}, []);
-		allTagsArray = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__components_globalFunctions_js__["l" /* uniqBy */])(allTagsArray);
+		allTagsArray = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__components_globalFunctions_js__["m" /* uniqBy */])(allTagsArray);
 		// console.log('allTagsArray in allTagsComputed_2');
 		// console.log(allTagsArray);
-		allTagsArray = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__components_globalFunctions_js__["j" /* sortObjectArrayByProperty */])(allTagsArray, 'name');
+		allTagsArray = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__components_globalFunctions_js__["k" /* sortObjectArrayByProperty */])(allTagsArray, 'name');
 		let t2_1 = performance.now();
 		console.log("Call to allTagsComputed_2 took " + (t2_1 - t2_0) + " milliseconds.");
 		return allTagsArray;
@@ -43737,8 +43751,8 @@ ${spaces}・${val.body}`;
 			}
 		}.bind(allTagsArray));
 		allTagsArray = [...allTagsArray];
-		allTagsArray = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__components_globalFunctions_js__["l" /* uniqBy */])(allTagsArray);
-		allTagsArray = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__components_globalFunctions_js__["j" /* sortObjectArrayByProperty */])(allTagsArray, 'name');
+		allTagsArray = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__components_globalFunctions_js__["m" /* uniqBy */])(allTagsArray);
+		allTagsArray = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__components_globalFunctions_js__["k" /* sortObjectArrayByProperty */])(allTagsArray, 'name');
 		let t3_1 = performance.now();
 		console.log("Call to allTagsComputed_3 took " + (t3_1 - t3_0) + " milliseconds.");
 		return allTagsArray;
@@ -43767,7 +43781,7 @@ ${spaces}・${val.body}`;
 				}
 			}.bind(allTagsArray));
 		}.bind(allTagsArray));
-		allTagsArray = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__components_globalFunctions_js__["j" /* sortObjectArrayByProperty */])(allTagsArray, 'name');
+		allTagsArray = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__components_globalFunctions_js__["k" /* sortObjectArrayByProperty */])(allTagsArray, 'name');
 		var t1 = performance.now();
 		console.log("Call to allTagsComputed 1b took " + (t1 - t0) + " milliseconds.");
 		return allTagsArray;
@@ -43848,8 +43862,8 @@ ${spaces}・${val.body}`;
 			'ja': '削除'
 		},
 		'guide': {
-			'en': '',
-			'ja': ''
+			'en': 'Delete item',
+			'ja': '削除'
 		},
 		'popmenu': {
 			'en': 'Delete item',
@@ -43921,8 +43935,8 @@ ${spaces}・${val.body}`;
 		}
 	},
 	'edit': {
-		'mac': '⌘ + enter',
-		'win': 'ctrl + enter',
+		'mac': '⌘ enter',
+		'win': 'ctrl enter',
 		'name': {
 			'en': 'edit',
 			'ja': '編集'
@@ -43937,8 +43951,8 @@ ${spaces}・${val.body}`;
 		}
 	},
 	'editTag': {
-		'mac': 'shift + T',
-		'win': 'shift + T',
+		'mac': 'shift T',
+		'win': 'shift T',
 		'name': {
 			'en': '',
 			'ja': ''
@@ -43953,8 +43967,8 @@ ${spaces}・${val.body}`;
 		}
 	},
 	'hideTag': {
-		'mac': 'alt + click on tag',
-		'win': 'alt + click on tag',
+		'mac': 'alt click',
+		'win': 'alt click',
 		'name': {
 			'en': '',
 			'ja': ''
@@ -43969,8 +43983,8 @@ ${spaces}・${val.body}`;
 		}
 	},
 	'move': {
-		'mac': '⌘ + ↑↓',
-		'win': 'ctrl + ↑↓',
+		'mac': '⌘ ↑↓',
+		'win': 'ctrl ↑↓',
 		'name': {
 			'en': '',
 			'ja': ''
@@ -43985,8 +43999,8 @@ ${spaces}・${val.body}`;
 		}
 	},
 	'duplicate': {
-		'mac': '⌘ + shift + D',
-		'win': 'ctrl + shift + D',
+		'mac': '⌘ shift D',
+		'win': 'ctrl shift D',
 		'name': {
 			'en': '',
 			'ja': ''
@@ -44315,7 +44329,7 @@ let tagSlugToName = __WEBPACK_IMPORTED_MODULE_5__components_globalFunctions_js__
 		});
 		Vue.directive('focus', {
 			inserted(el, binding) {
-				if (binding.modifiers.noMobile && __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__components_globalFunctions_js__["i" /* mobilecheck */])()) {
+				if (binding.modifiers.noMobile && __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__components_globalFunctions_js__["j" /* mobilecheck */])()) {
 					return;
 				}
 				el.focus();
@@ -59325,17 +59339,33 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
   }, [_c('span', [_vm._v(_vm._s(_vm.momentCalendar(_vm.journalDate)))]), _vm._v(" "), (_vm.journalDate != _vm.momentCalendar(_vm.journalDate)) ? _c('span', {
     staticClass: "c-section-head__subtitle"
   }, [_vm._v("\n\t\t\t" + _vm._s(_vm.journalDate) + "\n\t\t")]) : _vm._e(), _vm._v(" "), ( true) ? _c('button', {
-    staticClass: "o-btn btn btn-dipclick ml-auto",
-    attrs: {
-      "id": 'journal-card-' + _vm.item.done_date + '-copy'
-    }
-  }, [_vm._v("\n\t\t\t" + _vm._s(_vm.basis.text.card.copy) + "\n\t\t")]) : _vm._e(), _vm._v(" "), (_vm.totalUsedMin) ? _c('div', {
+    directives: [{
+      name: "clipboard",
+      rawName: "v-clipboard:copy",
+      value: (_vm.basis.$store.getters.clipboardTextJournal(_vm.item)),
+      expression: "basis.$store.getters.clipboardTextJournal(item)",
+      arg: "copy"
+    }, {
+      name: "clipboard",
+      rawName: "v-clipboard:success",
+      value: (_vm.clipboardSuccess),
+      expression: "clipboardSuccess",
+      arg: "success"
+    }, {
+      name: "clipboard",
+      rawName: "v-clipboard:error",
+      value: (_vm.clipboardError),
+      expression: "clipboardError",
+      arg: "error"
+    }],
+    staticClass: "o-btn btn btn-dipclick ml-auto"
+  }, [_vm._v("\n\t\t\t" + _vm._s(_vm.basis.text.card.copy) + "\n\t\t")]) : _vm._e(), _vm._v(" "), (_vm.sec_to_hourmin(_vm.get.totalUsedSec(_vm.item))) ? _c('div', {
     staticClass: "w-100 d-flex"
   }, [_c('span', {
     staticClass: "c-journal-used-time"
   }, [_vm._v(_vm._s(_vm.basis.text.menu.usedTime) + ": ")]), _vm._v(" "), _c('span', {
     staticClass: "o-pill--used-time"
-  }, [_vm._v(_vm._s(_vm.sec_to_hourmin(_vm.totalUsedSec)))])]) : _vm._e()]) : _vm._e(), _vm._v(" "), (_vm.journalParentString) ? _c('div', {
+  }, [_vm._v(_vm._s(_vm.sec_to_hourmin(_vm.get.totalUsedSec(_vm.item))))])]) : _vm._e()]) : _vm._e(), _vm._v(" "), (_vm.journalParentString) ? _c('div', {
     staticClass: "c-subsection-head",
     on: {
       "click": function($event) {
@@ -59617,8 +59647,8 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     }],
     staticClass: "c-add-tag__input js-add-tag",
     attrs: {
-      "type": "text",
-      "placeholder": "..."
+      "placeholder": "...",
+      "type": "text"
     },
     domProps: {
       "value": (_vm.newTag)
@@ -59696,11 +59726,6 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     }
   }, [_c('label', [_vm._v("\n\t\t\t\t\t\t" + _vm._s(_vm.basis.text.card.addTag) + "\n\t\t\t\t\t\t"), _c('input', {
     directives: [{
-      name: "model",
-      rawName: "v-model",
-      value: (_vm.newTag),
-      expression: "newTag"
-    }, {
       name: "autowidth",
       rawName: "v-autowidth"
     }, {
@@ -59709,6 +59734,11 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
       modifiers: {
         "noMobile": true
       }
+    }, {
+      name: "model",
+      rawName: "v-model",
+      value: (_vm.newTag),
+      expression: "newTag"
     }],
     staticClass: "c-add-tag__input js-add-tag",
     attrs: {
@@ -59828,16 +59858,23 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     }],
     staticClass: "l-children",
     style: ((_vm.addingNewAsFirstChild) ? 'order:3;' : '')
-  }, _vm._l((_vm.visibleDirectChildren), function(childCard) {
-    return _c('Card', {
+  }, [_vm._l((_vm.visibleDirectChildren), function(childCard) {
+    return (!_vm.item.journalDate) ? _c('Card', {
       key: childCard.id,
       attrs: {
         "item": childCard,
-        "new-item": _vm.newItem,
         "parent-tags": _vm.tagsArray
       }
-    })
-  })) : _vm._e(), _vm._v(" "), (_vm.showAddNewBox ||
+    }) : _vm._e()
+  }), _vm._v(" "), _vm._l((_vm.item.children), function(childCard) {
+    return (_vm.item.journalDate) ? _c('Card', {
+      key: childCard.id,
+      attrs: {
+        "item": childCard,
+        "parent-tags": _vm.tagsArray
+      }
+    }) : _vm._e()
+  })], 2) : _vm._e(), _vm._v(" "), (_vm.showAddNewBox ||
     (_vm.listIsEmpty && !_vm.basis.mobile && _vm.basis.selection.view != 'journal')) ? _c('form', {
     class: {
       'addnewbox': true,
@@ -60189,12 +60226,16 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     staticClass: "c-popout__bodybox"
   }, [_c('table', {
     staticClass: "c-guide__table"
-  }, [_c('tr', [_c('th', [_vm._v(_vm._s(_vm.basis.text.guide.action))]), _c('th', [_vm._v(_vm._s(_vm.basis.text.guide.key))])]), _vm._v(" "), _vm._l((_vm.basis.text.guide.keybindings), function(row) {
+  }, [_c('tr', [_c('th', [_vm._v(_vm._s(_vm.basis.text.guide.action))]), _c('th', [_vm._v(_vm._s(_vm.basis.text.guide.key))])]), _vm._v(" "), _vm._l((_vm.guide), function(k) {
     return _c('tr', [_c('td', {
       domProps: {
-        "innerHTML": _vm._s(row.note)
+        "innerHTML": _vm._s(_vm.basis.keybindings[k].guide[_vm.basis.language])
       }
-    }), _c('td', [_vm._v(_vm._s(row.key))])])
+    }), _c('td', {
+      domProps: {
+        "innerHTML": _vm._s(_vm.stringToKeyboardKeys(_vm.basis.keybindings[k][_vm.basis.oS]))
+      }
+    })])
   })], 2)]), _vm._v(" "), _c('div', {
     staticClass: "c-popout__nav"
   }, [_c('button', {
@@ -60232,7 +60273,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
         value: (item.done),
         expression: "item.done"
       }],
-      staticClass: "o-toggle",
+      staticClass: "o-toggle__check",
       attrs: {
         "type": "checkbox"
       },
@@ -60412,7 +60453,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     domProps: {
       "innerHTML": _vm._s(_vm.basis.keybindings.copyClipboard.popmenu[_vm.l])
     }
-  }), _vm._v(" "), (!_vm.basis.mobile) ? _c('div') : _vm._e()]), _vm._v(" "), (_vm.basis.mobile && _vm.basis.selection.view != 'journal') ? _c('div', {
+  }), _vm._v(" "), (!_vm.basis.mobile) ? _c('div') : _vm._e()]), _vm._v(" "), (_vm.basis.selection.view != 'journal') ? _c('div', {
     staticClass: "o-popmenu__item",
     on: {
       "click": function($event) {
@@ -60425,7 +60466,11 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     domProps: {
       "innerHTML": _vm._s(_vm.basis.keybindings.setToday.popmenu[_vm.l])
     }
-  }), _vm._v(" "), (!_vm.basis.mobile) ? _c('div', [_vm._v(_vm._s(_vm.basis.keybindings.setToday[_vm.oS]))]) : _vm._e()]) : _vm._e(), _vm._v(" "), (_vm.basis.mobile) ? _c('div', {
+  }), _vm._v(" "), (!_vm.basis.mobile) ? _c('div', {
+    domProps: {
+      "innerHTML": _vm._s(_vm.stringToKeyboardKeys(_vm.basis.keybindings.setToday[_vm.oS]))
+    }
+  }) : _vm._e()]) : _vm._e(), _vm._v(" "), (_vm.basis.mobile) ? _c('div', {
     staticClass: "o-popmenu__item",
     on: {
       "click": function($event) {
@@ -60438,7 +60483,11 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     domProps: {
       "innerHTML": _vm._s(_vm.basis.keybindings.edit.popmenu[_vm.l])
     }
-  }), _vm._v(" "), (!_vm.basis.mobile) ? _c('div', [_vm._v(_vm._s(_vm.basis.keybindings.edit[_vm.oS]))]) : _vm._e()]) : _vm._e(), _vm._v(" "), (_vm.item.done) ? _c('div', {
+  }), _vm._v(" "), (!_vm.basis.mobile) ? _c('div', {
+    domProps: {
+      "innerHTML": _vm._s(_vm.stringToKeyboardKeys(_vm.basis.keybindings.edit[_vm.oS]))
+    }
+  }) : _vm._e()]) : _vm._e(), _vm._v(" "), (_vm.item.done) ? _c('div', {
     staticClass: "o-popmenu__item",
     on: {
       "click": function($event) {
@@ -60459,7 +60508,11 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     }
   }, [_c('div', [_c('i', {
     staticClass: "zmdi zmdi-delete"
-  }), _vm._v(" " + _vm._s(_vm.basis.keybindings.delete.popmenu[_vm.l]))]), _vm._v(" "), (!_vm.basis.mobile) ? _c('div', [_vm._v(_vm._s(_vm.basis.keybindings.delete[_vm.oS]))]) : _vm._e()])])])], 1)]) : _vm._e()
+  }), _vm._v(" " + _vm._s(_vm.basis.keybindings.delete.popmenu[_vm.l]))]), _vm._v(" "), (!_vm.basis.mobile) ? _c('div', {
+    domProps: {
+      "innerHTML": _vm._s(_vm.stringToKeyboardKeys(_vm.basis.keybindings.delete[_vm.oS]))
+    }
+  }) : _vm._e()])])])], 1)]) : _vm._e()
 },staticRenderFns: []}
 module.exports.render._withStripped = true
 if (false) {

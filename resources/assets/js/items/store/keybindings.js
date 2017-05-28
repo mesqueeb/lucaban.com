@@ -31,8 +31,8 @@ export default {
 			'ja':'削除',
 		},
 		'guide':{
-			'en':'',
-			'ja':'',
+			'en':'Delete item',
+			'ja':'削除',
 		},
 		'popmenu':{
 			'en':'Delete item',
@@ -104,8 +104,8 @@ export default {
 		},
 	},
 	'edit':{
-		'mac':'⌘ + enter',
-		'win':'ctrl + enter',
+		'mac':'⌘ enter',
+		'win':'ctrl enter',
 		'name':{
 			'en':'edit',
 			'ja':'編集',
@@ -120,8 +120,8 @@ export default {
 		},
 	},
 	'editTag':{
-		'mac':'shift + T',
-		'win':'shift + T',
+		'mac':'shift T',
+		'win':'shift T',
 		'name':{
 			'en':'',
 			'ja':'',
@@ -136,8 +136,8 @@ export default {
 		},
 	},
 	'hideTag':{
-		'mac':'alt + click on tag',
-		'win':'alt + click on tag',
+		'mac':'alt click',
+		'win':'alt click',
 		'name':{
 			'en':'',
 			'ja':'',
@@ -152,8 +152,8 @@ export default {
 		},
 	},
 	'move':{
-		'mac':'⌘ + ↑↓',
-		'win':'ctrl + ↑↓',
+		'mac':'⌘ ↑↓',
+		'win':'ctrl ↑↓',
 		'name':{
 			'en':'',
 			'ja':'',
@@ -168,8 +168,8 @@ export default {
 		},
 	},
 	'duplicate':{
-		'mac':'⌘ + shift + D',
-		'win':'ctrl + shift + D',
+		'mac':'⌘ shift D',
+		'win':'ctrl shift D',
 		'name':{
 			'en':'',
 			'ja':'',
