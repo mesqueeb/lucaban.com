@@ -84,7 +84,8 @@
 <script>
 import Clipboard from 'clipboard';
 export default{
-	props:['item','clipboardTextJournal'],
+	name: 'itemNav',
+	props: ['item','clipboardTextJournal'],
 	data(){
 		return { copySuccess: false }
 	},

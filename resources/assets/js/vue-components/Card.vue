@@ -51,37 +51,9 @@
 			'show_children': item.show_children,
 		}"
 	>
-		<div
-			class=""
-			v-if="!journalView"
-			:class="{'o-toggle-div':true,
-				'l-toggle-div':true,
-				'o-toggle-div--both':item.children_order.length>0&&(item.done == true || allChildrenDone)}"
-		>
-			<input
-				type="checkbox"
-				class="styled-check"
-				:id="'show_children_'+item.id"
-				v-model="item.show_children"
-				@change="updateShowChildren(item.id)"
-			>
-			<label
-				class="arrow"
-				:for="'show_children_'+item.id"
-				v-if="item.children_order.length>0"
-			></label>
-			<input
-				class="o-toggle"
-				type="checkbox"
-				v-if="item.children_order.length==0 || item.done == true || allChildrenDone"
-				v-model="item.done"
-				@change="updateDone(item.id)"
-			>
-		</div>
-		<div
-			class=""
-			v-if="journalView"
-		>・</div>
+		<!-- ITEM TOGGLES -->
+		<item-toggles :item="item"></item-toggles>
+		<!-- / ITEM TOGGLES -->
 		<div
 			:class="{
 				'c-body-div':true,
@@ -534,11 +506,12 @@ import { linkify, momentCalendar, sec_to_hourminsec, sec_to_hourmin } from '../c
 import { uniq, Utilities } from '../components/globalFunctions.js';
 import Clipboard from 'clipboard';
 import itemNav from './itemNav.vue';
+import itemToggles from './itemToggles.vue';
 
 export default {
 	name: 'Card',
 	template:'#items-card-template',
-	components: { itemNav },
+	components: { itemNav, itemToggles },
 	mounted()
 	{
 		// this.newItem.preparedTags = JSON.parse(JSON.stringify(this.parentTags));
@@ -750,21 +723,20 @@ export default {
 		momentCalendar,
 		sec_to_hourminsec,
 		sec_to_hourmin,
-		triggerClipboardJS(){
-			let copyElPath = "#card-"+this.item.id+"-copy";
-			let self = this;
-			new Clipboard(copyElPath, {
-			    text: function(trigger) {
-			    	console.log(trigger);
-			    	return store.getters.clipboardText(self.item.id);
-			    }
-			}).on('success', function(e) {
-			    // console.info('Action:', e.action);
-			    // console.info('Text:', e.text);
-			    // console.info('Trigger:', e.trigger);
-			    e.clearSelection();
-			});
-		},
+
+		commit(action, payload){ this.$store.commit(action, payload); },
+		dispatch(action, payload){ this.$store.dispatch(action, payload); },
+
+		addTimer(item){ this.dispatch('addTimer', {id:item.id}) },
+		selectItem(item){ this.dispatch('selectItem', {id:item.id}) },
+		updateDone(id){ this.dispatch('prepareDonePatch', {id}) },
+		updateShowChildren(id){ this.dispatch('patch', {id,field:'show_children'}) },
+		cancelEdit(id){ this.dispatch('cancelEdit', {id}) },
+		startEdit(item, event){ this.dispatch('startEdit', {item, event}) },
+		doneEdit(item){ this.dispatch('doneEdit', {item}) },
+		setToday(id){ this.dispatch('setToday', {id}) },
+		deleteItemDialogue(id){ this.dispatch('deleteItemDialogue', {id}) },
+
 		triggerClipboardJSJournal()
 		{
 			if (this.journalView && this.item.journalDate)
@@ -806,15 +778,6 @@ ${this.basis.text.menu.usedTime}: ${this.sec_to_hourmin(this.totalUsedSec)}` : '
 			let a = document.querySelector(bodyboxQS);
 			if (!a || !a.innerHTML.includes('a href')){ return; }
 			a.innerHTML = a.innerHTML.replace("&lt;a href=", "<a href=").replace('target="_blank"&gt;','target="_blank">').replace("&lt;/a&gt;","</a>");
-		},
-		addTimer(item)
-		{
-			//Codementor
-			this.$store.dispatch('addTimer', { id:item.id });
-		},
-		selectItem(item)
-		{
-			this.$store.dispatch('selectItem', { id:item.id });
 		},
 		clickOnAddNewCurtain(event)
 		{
@@ -1167,40 +1130,12 @@ ${this.basis.text.menu.usedTime}: ${this.sec_to_hourmin(this.totalUsedSec)}` : '
 				}
 	    	},50);
 	    },
-		updateDone(id)
-		{
-			this.$store.dispatch('prepareDonePatch',{id});
-		},
-		updateShowChildren(id)
-		{
-			this.$store.dispatch('patch',{id,field:'show_children'});
-		},
-		cancelEdit(id)
-		{
-			this.$root.cancelEdit({id});
-		},
-		startEdit(item, event)
-		{
-			this.$root.startEdit({item, event});
-		},
-		doneEdit(item)
-		{
-			this.$root.doneEdit({item});
-		},
 		startEditDoneDate(item, event)
 		{
 			console.log('startEditDoneDate');
 			item = (item) ? item : this.$store.state.nodes[selection.selectedId];
 			this.$root.beforeEditCache_done_date = item.done_date;
 			this.$root.editingDoneDateItem = item.id;
-		},
-		setToday(id)
-		{
-			this.$root.setToday({id});
-		},
-		deleteItemDialogue(id)
-		{
-			this.$root.deleteItemDialogue({id});
 		},
 		addNew(addNextItemAs)
 		{
@@ -1215,7 +1150,7 @@ ${this.basis.text.menu.usedTime}: ${this.sec_to_hourmin(this.totalUsedSec)}` : '
 			this.newItem.preparedTags = [];
 			// this.$store.commit('resetNewItem');
 			// debugger;
-			this.$store.dispatch('addNew',{ addNextItemAs, newItem, olderSibling, addTags });
+			this.dispatch('addNew', { addNextItemAs, newItem, olderSibling, addTags });
 			// Reset stuff
 		},
 		cancelAddNew()
@@ -1228,7 +1163,7 @@ ${this.basis.text.menu.usedTime}: ${this.sec_to_hourmin(this.totalUsedSec)}` : '
 		{
 			let id = (item) ? item.id : selection.selectedId;
 			let tag = this.newTag;
-			this.$store.dispatch('tagItem', {id, tags:tag});
+			this.dispatch('tagItem', {id, tags:tag});
 			this.newTag = null;
 		},
 		prepareTag(item)

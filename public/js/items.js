@@ -39235,34 +39235,8 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_clipboard___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_clipboard__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__itemNav_vue__ = __webpack_require__(223);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__itemNav_vue___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_3__itemNav_vue__);
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__itemToggles_vue__ = __webpack_require__(255);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__itemToggles_vue___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_4__itemToggles_vue__);
 //
 //
 //
@@ -39772,10 +39746,11 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
 
 
+
 /* harmony default export */ __webpack_exports__["default"] = ({
 	name: 'Card',
 	template: '#items-card-template',
-	components: { itemNav: __WEBPACK_IMPORTED_MODULE_3__itemNav_vue___default.a },
+	components: { itemNav: __WEBPACK_IMPORTED_MODULE_3__itemNav_vue___default.a, itemToggles: __WEBPACK_IMPORTED_MODULE_4__itemToggles_vue___default.a },
 	mounted() {
 		// this.newItem.preparedTags = JSON.parse(JSON.stringify(this.parentTags));
 		// this.convertbodyURLtoHTML();
@@ -40062,21 +40037,42 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 		momentCalendar: __WEBPACK_IMPORTED_MODULE_0__components_valueMorphers2_js__["b" /* momentCalendar */],
 		sec_to_hourminsec: __WEBPACK_IMPORTED_MODULE_0__components_valueMorphers2_js__["d" /* sec_to_hourminsec */],
 		sec_to_hourmin: __WEBPACK_IMPORTED_MODULE_0__components_valueMorphers2_js__["e" /* sec_to_hourmin */],
-		triggerClipboardJS() {
-			let copyElPath = "#card-" + this.item.id + "-copy";
-			let self = this;
-			new __WEBPACK_IMPORTED_MODULE_2_clipboard___default.a(copyElPath, {
-				text: function (trigger) {
-					console.log(trigger);
-					return store.getters.clipboardText(self.item.id);
-				}
-			}).on('success', function (e) {
-				// console.info('Action:', e.action);
-				// console.info('Text:', e.text);
-				// console.info('Trigger:', e.trigger);
-				e.clearSelection();
-			});
+
+		commit(action, payload) {
+			this.$store.commit(action, payload);
 		},
+		dispatch(action, payload) {
+			this.$store.dispatch(action, payload);
+		},
+
+		addTimer(item) {
+			this.dispatch('addTimer', { id: item.id });
+		},
+		selectItem(item) {
+			this.dispatch('selectItem', { id: item.id });
+		},
+		updateDone(id) {
+			this.dispatch('prepareDonePatch', { id });
+		},
+		updateShowChildren(id) {
+			this.dispatch('patch', { id, field: 'show_children' });
+		},
+		cancelEdit(id) {
+			this.dispatch('cancelEdit', { id });
+		},
+		startEdit(item, event) {
+			this.dispatch('startEdit', { item, event });
+		},
+		doneEdit(item) {
+			this.dispatch('doneEdit', { item });
+		},
+		setToday(id) {
+			this.dispatch('setToday', { id });
+		},
+		deleteItemDialogue(id) {
+			this.dispatch('deleteItemDialogue', { id });
+		},
+
 		triggerClipboardJSJournal() {
 			if (this.journalView && this.item.journalDate) {
 				let copyElPath_Journal = "#journal-card-" + this.item.done_date + "-copy";
@@ -40118,13 +40114,6 @@ ${this.basis.text.menu.usedTime}: ${this.sec_to_hourmin(this.totalUsedSec)}` : '
 				return;
 			}
 			a.innerHTML = a.innerHTML.replace("&lt;a href=", "<a href=").replace('target="_blank"&gt;', 'target="_blank">').replace("&lt;/a&gt;", "</a>");
-		},
-		addTimer(item) {
-			//Codementor
-			this.$store.dispatch('addTimer', { id: item.id });
-		},
-		selectItem(item) {
-			this.$store.dispatch('selectItem', { id: item.id });
 		},
 		clickOnAddNewCurtain(event) {
 			if (!this.$store.getters.mobile) {
@@ -40443,32 +40432,11 @@ ${this.basis.text.menu.usedTime}: ${this.sec_to_hourmin(this.totalUsedSec)}` : '
 				}
 			}, 50);
 		},
-		updateDone(id) {
-			this.$store.dispatch('prepareDonePatch', { id });
-		},
-		updateShowChildren(id) {
-			this.$store.dispatch('patch', { id, field: 'show_children' });
-		},
-		cancelEdit(id) {
-			this.$root.cancelEdit({ id });
-		},
-		startEdit(item, event) {
-			this.$root.startEdit({ item, event });
-		},
-		doneEdit(item) {
-			this.$root.doneEdit({ item });
-		},
 		startEditDoneDate(item, event) {
 			console.log('startEditDoneDate');
 			item = item ? item : this.$store.state.nodes[selection.selectedId];
 			this.$root.beforeEditCache_done_date = item.done_date;
 			this.$root.editingDoneDateItem = item.id;
-		},
-		setToday(id) {
-			this.$root.setToday({ id });
-		},
-		deleteItemDialogue(id) {
-			this.$root.deleteItemDialogue({ id });
 		},
 		addNew(addNextItemAs) {
 			let addTags = this.preparedPlusComputedTags;
@@ -40482,7 +40450,7 @@ ${this.basis.text.menu.usedTime}: ${this.sec_to_hourmin(this.totalUsedSec)}` : '
 			this.newItem.preparedTags = [];
 			// this.$store.commit('resetNewItem');
 			// debugger;
-			this.$store.dispatch('addNew', { addNextItemAs, newItem, olderSibling, addTags });
+			this.dispatch('addNew', { addNextItemAs, newItem, olderSibling, addTags });
 			// Reset stuff
 		},
 		cancelAddNew() {
@@ -40493,7 +40461,7 @@ ${this.basis.text.menu.usedTime}: ${this.sec_to_hourmin(this.totalUsedSec)}` : '
 		addTag(item) {
 			let id = item ? item.id : selection.selectedId;
 			let tag = this.newTag;
-			this.$store.dispatch('tagItem', { id, tags: tag });
+			this.dispatch('tagItem', { id, tags: tag });
 			this.newTag = null;
 		},
 		prepareTag(item) {
@@ -41293,6 +41261,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
 
 /* harmony default export */ __webpack_exports__["default"] = ({
+	name: 'itemNav',
 	props: ['item', 'clipboardTextJournal'],
 	data() {
 		return { copySuccess: false };
@@ -59383,89 +59352,11 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     attrs: {
       "id": 'item-body-' + _vm.item.id
     }
-  }, [(!_vm.journalView) ? _c('div', {
-    class: {
-      'o-toggle-div': true,
-      'l-toggle-div': true,
-      'o-toggle-div--both': _vm.item.children_order.length > 0 && (_vm.item.done == true || _vm.allChildrenDone)
-    }
-  }, [_c('input', {
-    directives: [{
-      name: "model",
-      rawName: "v-model",
-      value: (_vm.item.show_children),
-      expression: "item.show_children"
-    }],
-    staticClass: "styled-check",
+  }, [_c('item-toggles', {
     attrs: {
-      "type": "checkbox",
-      "id": 'show_children_' + _vm.item.id
-    },
-    domProps: {
-      "checked": Array.isArray(_vm.item.show_children) ? _vm._i(_vm.item.show_children, null) > -1 : (_vm.item.show_children)
-    },
-    on: {
-      "change": function($event) {
-        _vm.updateShowChildren(_vm.item.id)
-      },
-      "__c": function($event) {
-        var $$a = _vm.item.show_children,
-          $$el = $event.target,
-          $$c = $$el.checked ? (true) : (false);
-        if (Array.isArray($$a)) {
-          var $$v = null,
-            $$i = _vm._i($$a, $$v);
-          if ($$c) {
-            $$i < 0 && (_vm.item.show_children = $$a.concat($$v))
-          } else {
-            $$i > -1 && (_vm.item.show_children = $$a.slice(0, $$i).concat($$a.slice($$i + 1)))
-          }
-        } else {
-          _vm.item.show_children = $$c
-        }
-      }
+      "item": _vm.item
     }
-  }), _vm._v(" "), (_vm.item.children_order.length > 0) ? _c('label', {
-    staticClass: "arrow",
-    attrs: {
-      "for": 'show_children_' + _vm.item.id
-    }
-  }) : _vm._e(), _vm._v(" "), (_vm.item.children_order.length == 0 || _vm.item.done == true || _vm.allChildrenDone) ? _c('input', {
-    directives: [{
-      name: "model",
-      rawName: "v-model",
-      value: (_vm.item.done),
-      expression: "item.done"
-    }],
-    staticClass: "o-toggle",
-    attrs: {
-      "type": "checkbox"
-    },
-    domProps: {
-      "checked": Array.isArray(_vm.item.done) ? _vm._i(_vm.item.done, null) > -1 : (_vm.item.done)
-    },
-    on: {
-      "change": function($event) {
-        _vm.updateDone(_vm.item.id)
-      },
-      "__c": function($event) {
-        var $$a = _vm.item.done,
-          $$el = $event.target,
-          $$c = $$el.checked ? (true) : (false);
-        if (Array.isArray($$a)) {
-          var $$v = null,
-            $$i = _vm._i($$a, $$v);
-          if ($$c) {
-            $$i < 0 && (_vm.item.done = $$a.concat($$v))
-          } else {
-            $$i > -1 && (_vm.item.done = $$a.slice(0, $$i).concat($$a.slice($$i + 1)))
-          }
-        } else {
-          _vm.item.done = $$c
-        }
-      }
-    }
-  }) : _vm._e()]) : _vm._e(), _vm._v(" "), (_vm.journalView) ? _c('div', {}, [_vm._v("・")]) : _vm._e(), _vm._v(" "), _c('div', {
+  }), _vm._v(" "), _c('div', {
     class: {
       'c-body-div': true,
       'c-body-div--editing': (!_vm.basis.mobile && _vm.item.id == _vm.basis.editingItem),
@@ -59928,7 +59819,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     attrs: {
       "item": _vm.item
     }
-  })], 1)]) : _vm._e(), _vm._v(" "), (_vm.item.children.length) ? _c('div', {
+  })], 1)], 1) : _vm._e(), _vm._v(" "), (_vm.item.children.length) ? _c('div', {
     directives: [{
       name: "show",
       rawName: "v-show",
@@ -62427,6 +62318,224 @@ __webpack_require__(150);
 __webpack_require__(151);
 module.exports = __webpack_require__(149);
 
+
+/***/ }),
+/* 237 */,
+/* 238 */,
+/* 239 */,
+/* 240 */,
+/* 241 */,
+/* 242 */,
+/* 243 */,
+/* 244 */,
+/* 245 */,
+/* 246 */,
+/* 247 */,
+/* 248 */,
+/* 249 */,
+/* 250 */,
+/* 251 */,
+/* 252 */,
+/* 253 */,
+/* 254 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+/* harmony default export */ __webpack_exports__["default"] = ({
+	name: 'itemToggles',
+	props: ['item'],
+	computed: {
+		basis() {
+			return this.$root;
+		},
+		get() {
+			return this.$store.getters;
+		}
+	},
+	methods: {
+		// commit(action, payload){ this.$store.commit(action, payload); },
+		dispatch(action, payload) {
+			this.$store.dispatch(action, payload);
+		}
+	}
+});
+
+/***/ }),
+/* 255 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var Component = __webpack_require__(5)(
+  /* script */
+  __webpack_require__(254),
+  /* template */
+  __webpack_require__(256),
+  /* scopeId */
+  null,
+  /* cssModules */
+  null
+)
+Component.options.__file = "/Users/lucaban/Sites/lucaban/resources/assets/js/vue-components/itemToggles.vue"
+if (Component.esModule && Object.keys(Component.esModule).some(function (key) {return key !== "default" && key !== "__esModule"})) {console.error("named exports are not supported in *.vue files.")}
+if (Component.options.functional) {console.error("[vue-loader] itemToggles.vue: functional components are not supported with templates, they should use render functions.")}
+
+/* hot reload */
+if (false) {(function () {
+  var hotAPI = require("vue-hot-reload-api")
+  hotAPI.install(require("vue"), false)
+  if (!hotAPI.compatible) return
+  module.hot.accept()
+  if (!module.hot.data) {
+    hotAPI.createRecord("data-v-2e7a725a", Component.options)
+  } else {
+    hotAPI.reload("data-v-2e7a725a", Component.options)
+  }
+})()}
+
+module.exports = Component.exports
+
+
+/***/ }),
+/* 256 */
+/***/ (function(module, exports, __webpack_require__) {
+
+module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
+  return _c('div', [(_vm.basis.selection.view != 'journal') ? _c('div', {
+    class: {
+      'o-toggle-div': true,
+      'l-toggle-div': true,
+      'o-toggle-div--both': _vm.item.children_order.length > 0 &&
+        (_vm.item.done == true || _vm.get.allChildrenDone(_vm.item.id))
+    }
+  }, [_c('input', {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: (_vm.item.show_children),
+      expression: "item.show_children"
+    }],
+    staticClass: "o-toggle__arrow-helper",
+    attrs: {
+      "type": "checkbox",
+      "id": 'show_children_' + _vm.item.id
+    },
+    domProps: {
+      "checked": Array.isArray(_vm.item.show_children) ? _vm._i(_vm.item.show_children, null) > -1 : (_vm.item.show_children)
+    },
+    on: {
+      "change": function($event) {
+        _vm.dispatch('patch', {
+          id: _vm.item.id,
+          field: 'show_children'
+        })
+      },
+      "__c": function($event) {
+        var $$a = _vm.item.show_children,
+          $$el = $event.target,
+          $$c = $$el.checked ? (true) : (false);
+        if (Array.isArray($$a)) {
+          var $$v = null,
+            $$i = _vm._i($$a, $$v);
+          if ($$c) {
+            $$i < 0 && (_vm.item.show_children = $$a.concat($$v))
+          } else {
+            $$i > -1 && (_vm.item.show_children = $$a.slice(0, $$i).concat($$a.slice($$i + 1)))
+          }
+        } else {
+          _vm.item.show_children = $$c
+        }
+      }
+    }
+  }), _vm._v(" "), (_vm.item.children_order.length > 0) ? _c('label', {
+    staticClass: "o-toggle__arrow",
+    attrs: {
+      "for": 'show_children_' + _vm.item.id
+    }
+  }) : _vm._e(), _vm._v(" "), (_vm.item.children_order.length == 0 ||
+    _vm.item.done == true || _vm.get.allChildrenDone(_vm.item.id)) ? _c('input', {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: (_vm.item.done),
+      expression: "item.done"
+    }],
+    staticClass: "o-toggle__check",
+    attrs: {
+      "type": "checkbox"
+    },
+    domProps: {
+      "checked": Array.isArray(_vm.item.done) ? _vm._i(_vm.item.done, null) > -1 : (_vm.item.done)
+    },
+    on: {
+      "change": function($event) {
+        _vm.dispatch('prepareDonePatch', {
+          id: _vm.item.id
+        })
+      },
+      "__c": function($event) {
+        var $$a = _vm.item.done,
+          $$el = $event.target,
+          $$c = $$el.checked ? (true) : (false);
+        if (Array.isArray($$a)) {
+          var $$v = null,
+            $$i = _vm._i($$a, $$v);
+          if ($$c) {
+            $$i < 0 && (_vm.item.done = $$a.concat($$v))
+          } else {
+            $$i > -1 && (_vm.item.done = $$a.slice(0, $$i).concat($$a.slice($$i + 1)))
+          }
+        } else {
+          _vm.item.done = $$c
+        }
+      }
+    }
+  }) : _vm._e()]) : _vm._e(), _vm._v(" "), (_vm.basis.selection.view == 'journal') ? _c('div', {}, [_vm._v("・")]) : _vm._e()])
+},staticRenderFns: []}
+module.exports.render._withStripped = true
+if (false) {
+  module.hot.accept()
+  if (module.hot.data) {
+     require("vue-hot-reload-api").rerender("data-v-2e7a725a", module.exports)
+  }
+}
 
 /***/ })
 /******/ ]);
