@@ -1,3 +1,4 @@
+import { mobilecheck } from '../components/globalFunctions.js';
 import autosize from 'autosize';
 import autosizeInput from 'autosize-input';
 
@@ -15,7 +16,7 @@ install(Vue){
 	Vue.directive('focus', {
 		inserted(el, binding)
 		{
-			if(binding.modifiers.noMobile){ return; }
+			if (binding.modifiers.noMobile && mobilecheck()){ return; }
 			el.focus()
 		}
 	});

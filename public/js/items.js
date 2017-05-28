@@ -44325,10 +44325,12 @@ let tagSlugToName = __WEBPACK_IMPORTED_MODULE_5__components_globalFunctions_js__
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_autosize__ = __webpack_require__(10);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_autosize___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_autosize__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_autosize_input__ = __webpack_require__(152);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_autosize_input___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_autosize_input__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__components_globalFunctions_js__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_autosize__ = __webpack_require__(10);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_autosize___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_autosize__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_autosize_input__ = __webpack_require__(152);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_autosize_input___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_autosize_input__);
+
 
 
 
@@ -44344,7 +44346,7 @@ let tagSlugToName = __WEBPACK_IMPORTED_MODULE_5__components_globalFunctions_js__
 		});
 		Vue.directive('focus', {
 			inserted(el, binding) {
-				if (binding.modifiers.noMobile) {
+				if (binding.modifiers.noMobile && __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__components_globalFunctions_js__["i" /* mobilecheck */])()) {
 					return;
 				}
 				el.focus();
@@ -44353,14 +44355,14 @@ let tagSlugToName = __WEBPACK_IMPORTED_MODULE_5__components_globalFunctions_js__
 		Vue.directive('autoheight', {
 			inserted(el, binding) {
 				Vue.nextTick(function () {
-					__WEBPACK_IMPORTED_MODULE_0_autosize___default()(el);
+					__WEBPACK_IMPORTED_MODULE_1_autosize___default()(el);
 				});
 			}
 		});
 		Vue.directive('autowidth', {
 			inserted(el, binding) {
 				Vue.nextTick(function () {
-					__WEBPACK_IMPORTED_MODULE_1_autosize_input___default()(el);
+					__WEBPACK_IMPORTED_MODULE_2_autosize_input___default()(el);
 				});
 			}
 		});
