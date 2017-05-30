@@ -12,6 +12,21 @@
 	class="d-flex flex-wrap"
 	v-if="!isHidden || listIsEmpty"
 >
+
+	<div
+		class="c-section-head"
+		v-if="basis.selection.filter.includes('today') && item.id == basis.root.id"
+	>
+		<button
+			class="o-btn btn btn-dipclick ml-auto"
+			v-clipboard:copy="basis.$store.getters.clipboardText(item)"
+			v-clipboard:success="clipboardSuccess"
+			v-clipboard:error="clipboardError"
+			v-if="true"
+		>
+			{{ basis.text.card.copy }}
+		</button>		
+	</div>
 	<div
 		class="c-section-head"
 		v-if="journalDate && item.journalDate"
@@ -26,7 +41,7 @@
 			v-clipboard:copy="basis.$store.getters.clipboardTextJournal(item)"
 			v-clipboard:success="clipboardSuccess"
 			v-clipboard:error="clipboardError"
-			v-if="true || !basis.mobile"
+			v-if="true"
 		>
 			{{ basis.text.card.copy }}
 		</button>
@@ -549,7 +564,8 @@ export default {
 			if (this.item.id != this.$store.state.root.id){ return false; }
 			if (!this.visibleDirectChildren.length){ return true; }
 		},
-		basis(){ return this.$root; },
+		basis(){ return this.$root },
+		l(){ return this.$root.language },
 		thebody(){ return this.item.body },
  /* \ ============================================== / *\
 | ◉ |	FROM THE STORE 								| ◉	 |

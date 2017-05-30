@@ -788,12 +788,25 @@ childrenOrder: (state, getters) =>
 	return children.map(child => child.id);
 },
 clipboardText: (state, getters) =>
-(id = selection.selectedId) => {
-	let item = state.nodes[id];
+(idOrItem = selection.selectedId) => {
+	let item;
+	let children;
+	let directChildren;
+	let spaceVariable = 0;
+	if (typeof idOrItem === 'object')
+	{
+		item = idOrItem;
+		children = item.children;
+		directChildren = true;
+	} else {
+		item = state.nodes[idOrItem];
+		children = getters.allVisibleChildItems(idOrItem);
+		spaceVariable = parseFloat(item.depth);
+	}
+
 	if(!item){ return ''; }
-	let spaceVariable = parseFloat(item.depth);
-    let allChildren = getters.allVisibleChildItems(id).reduce(function(all, val){
-		let spacesVal = parseFloat(val.depth)-spaceVariable;
+    let allChildren = children.reduce(function(all, val){
+		let spacesVal = (directChildren) ? 0 : parseFloat(val.depth)-spaceVariable;
 		let spaces = '　　'.repeat(spacesVal);
 		return `${all}
 ${spaces}・${val.body}`;
@@ -807,10 +820,12 @@ ${getters.text.menu.usedTime}: ${sec_to_hourmin(getters.totalUsedSec(item))}` : 
 	let journalDateTxt = `${getters.journalDate(item)}
 ==========${usedT}` ;
     let allChildren = item.children.reduce(function(all, val){
+    	let completionMemo = (val.completion_memo) ? `
+　　${val.completion_memo}`:'';
     	let pb = (!all.includes(`【${val.parents_bodies}】`)) ? `
 【${val.parents_bodies}】` :`` ;
 		return `${all}${pb}
-・${val.body}`;
+・${val.body}${completionMemo}`;
 	}, journalDateTxt);
     return allChildren;
 },

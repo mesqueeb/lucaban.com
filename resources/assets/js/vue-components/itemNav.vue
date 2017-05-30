@@ -40,14 +40,6 @@
 			</div>
 			<div
 				class="o-popmenu__item"
-				v-if="basis.selection.view != 'journal'"
-				@click="basis.setToday({id:item.id}), $refs.popover.close()"
-			>
-				<div v-html="basis.keybindings.setToday.popmenu[l]"></div>
-				<div v-if="!basis.mobile" v-html="stringToKeyboardKeys(basis.keybindings.setToday[oS])"></div>
-			</div>
-			<div
-				class="o-popmenu__item"
 				v-if="basis.mobile"
 				@click="basis.startEdit({item}), $refs.popover.close()"
 			>
@@ -61,6 +53,14 @@
 			>
 				<div>{{ basis.text.popups.journalNotes }}</div>
 				<div v-if="!basis.mobile"></div>
+			</div>
+			<div
+				class="o-popmenu__item"
+				v-if="basis.selection.view != 'journal'"
+				@click="basis.setToday({id:item.id}), $refs.popover.close()"
+			>
+				<div v-html="basis.keybindings.setToday.popmenu[l]"></div>
+				<div v-if="!basis.mobile" v-html="stringToKeyboardKeys(basis.keybindings.setToday[oS])"></div>
 			</div>
 			<div
 				class="o-popmenu__item"
@@ -92,18 +92,9 @@ export default{
 	},
 	computed:
 	{
-		basis()
-		{ if(!this.item){ return 0; }
-			return this.$root;
-		},
-		l()
-		{
-			return this.$root.language;
-		},
-		oS()
-		{
-			return this.$root.oS;
-		},
+		basis(){ return this.$root },
+		l(){ return this.$root.language },
+		oS(){ return this.$root.oS },
 	},
 	methods:
 	{

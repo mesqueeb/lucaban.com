@@ -39752,6 +39752,21 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 
 // import flatPickConfig from '../components/flatPickrOptions.js';
@@ -39804,6 +39819,9 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 		},
 		basis() {
 			return this.$root;
+		},
+		l() {
+			return this.$root.language;
 		},
 		thebody() {
 			return this.item.body;
@@ -41251,9 +41269,6 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 	},
 	computed: {
 		basis() {
-			if (!this.item) {
-				return 0;
-			}
 			return this.$root;
 		},
 		l() {
@@ -43604,14 +43619,26 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 		}
 		return children.map(child => child.id);
 	},
-	clipboardText: (state, getters) => (id = selection.selectedId) => {
-		let item = state.nodes[id];
+	clipboardText: (state, getters) => (idOrItem = selection.selectedId) => {
+		let item;
+		let children;
+		let directChildren;
+		let spaceVariable = 0;
+		if (typeof idOrItem === 'object') {
+			item = idOrItem;
+			children = item.children;
+			directChildren = true;
+		} else {
+			item = state.nodes[idOrItem];
+			children = getters.allVisibleChildItems(idOrItem);
+			spaceVariable = parseFloat(item.depth);
+		}
+
 		if (!item) {
 			return '';
 		}
-		let spaceVariable = parseFloat(item.depth);
-		let allChildren = getters.allVisibleChildItems(id).reduce(function (all, val) {
-			let spacesVal = parseFloat(val.depth) - spaceVariable;
+		let allChildren = children.reduce(function (all, val) {
+			let spacesVal = directChildren ? 0 : parseFloat(val.depth) - spaceVariable;
 			let spaces = '　　'.repeat(spacesVal);
 			return `${all}
 ${spaces}・${val.body}`;
@@ -43624,10 +43651,12 @@ ${getters.text.menu.usedTime}: ${__webpack_require__.i(__WEBPACK_IMPORTED_MODULE
 		let journalDateTxt = `${getters.journalDate(item)}
 ==========${usedT}`;
 		let allChildren = item.children.reduce(function (all, val) {
+			let completionMemo = val.completion_memo ? `
+　　${val.completion_memo}` : '';
 			let pb = !all.includes(`【${val.parents_bodies}】`) ? `
 【${val.parents_bodies}】` : ``;
 			return `${all}${pb}
-・${val.body}`;
+・${val.body}${completionMemo}`;
 		}, journalDateTxt);
 		return allChildren;
 	},
@@ -59334,11 +59363,34 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     }
   }, [(!_vm.isHidden || _vm.listIsEmpty) ? _c('div', {
     staticClass: "d-flex flex-wrap"
-  }, [(_vm.journalDate && _vm.item.journalDate) ? _c('div', {
+  }, [(_vm.basis.selection.filter.includes('today') && _vm.item.id == _vm.basis.root.id) ? _c('div', {
+    staticClass: "c-section-head"
+  }, [(true) ? _c('button', {
+    directives: [{
+      name: "clipboard",
+      rawName: "v-clipboard:copy",
+      value: (_vm.basis.$store.getters.clipboardText(_vm.item)),
+      expression: "basis.$store.getters.clipboardText(item)",
+      arg: "copy"
+    }, {
+      name: "clipboard",
+      rawName: "v-clipboard:success",
+      value: (_vm.clipboardSuccess),
+      expression: "clipboardSuccess",
+      arg: "success"
+    }, {
+      name: "clipboard",
+      rawName: "v-clipboard:error",
+      value: (_vm.clipboardError),
+      expression: "clipboardError",
+      arg: "error"
+    }],
+    staticClass: "o-btn btn btn-dipclick ml-auto"
+  }, [_vm._v("\n\t\t\t" + _vm._s(_vm.basis.text.card.copy) + "\n\t\t")]) : _vm._e()]) : _vm._e(), _vm._v(" "), (_vm.journalDate && _vm.item.journalDate) ? _c('div', {
     staticClass: "c-section-head"
   }, [_c('span', [_vm._v(_vm._s(_vm.momentCalendar(_vm.journalDate)))]), _vm._v(" "), (_vm.journalDate != _vm.momentCalendar(_vm.journalDate)) ? _c('span', {
     staticClass: "c-section-head__subtitle"
-  }, [_vm._v("\n\t\t\t" + _vm._s(_vm.journalDate) + "\n\t\t")]) : _vm._e(), _vm._v(" "), ( true) ? _c('button', {
+  }, [_vm._v("\n\t\t\t" + _vm._s(_vm.journalDate) + "\n\t\t")]) : _vm._e(), _vm._v(" "), (true) ? _c('button', {
     directives: [{
       name: "clipboard",
       rawName: "v-clipboard:copy",
@@ -60453,24 +60505,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     domProps: {
       "innerHTML": _vm._s(_vm.basis.keybindings.copyClipboard.popmenu[_vm.l])
     }
-  }), _vm._v(" "), (!_vm.basis.mobile) ? _c('div') : _vm._e()]), _vm._v(" "), (_vm.basis.selection.view != 'journal') ? _c('div', {
-    staticClass: "o-popmenu__item",
-    on: {
-      "click": function($event) {
-        _vm.basis.setToday({
-          id: _vm.item.id
-        }), _vm.$refs.popover.close()
-      }
-    }
-  }, [_c('div', {
-    domProps: {
-      "innerHTML": _vm._s(_vm.basis.keybindings.setToday.popmenu[_vm.l])
-    }
-  }), _vm._v(" "), (!_vm.basis.mobile) ? _c('div', {
-    domProps: {
-      "innerHTML": _vm._s(_vm.stringToKeyboardKeys(_vm.basis.keybindings.setToday[_vm.oS]))
-    }
-  }) : _vm._e()]) : _vm._e(), _vm._v(" "), (_vm.basis.mobile) ? _c('div', {
+  }), _vm._v(" "), (!_vm.basis.mobile) ? _c('div') : _vm._e()]), _vm._v(" "), (_vm.basis.mobile) ? _c('div', {
     staticClass: "o-popmenu__item",
     on: {
       "click": function($event) {
@@ -60497,7 +60532,24 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
         }), _vm.$refs.popover.close()
       }
     }
-  }, [_c('div', [_vm._v(_vm._s(_vm.basis.text.popups.journalNotes))]), _vm._v(" "), (!_vm.basis.mobile) ? _c('div') : _vm._e()]) : _vm._e(), _vm._v(" "), _c('div', {
+  }, [_c('div', [_vm._v(_vm._s(_vm.basis.text.popups.journalNotes))]), _vm._v(" "), (!_vm.basis.mobile) ? _c('div') : _vm._e()]) : _vm._e(), _vm._v(" "), (_vm.basis.selection.view != 'journal') ? _c('div', {
+    staticClass: "o-popmenu__item",
+    on: {
+      "click": function($event) {
+        _vm.basis.setToday({
+          id: _vm.item.id
+        }), _vm.$refs.popover.close()
+      }
+    }
+  }, [_c('div', {
+    domProps: {
+      "innerHTML": _vm._s(_vm.basis.keybindings.setToday.popmenu[_vm.l])
+    }
+  }), _vm._v(" "), (!_vm.basis.mobile) ? _c('div', {
+    domProps: {
+      "innerHTML": _vm._s(_vm.stringToKeyboardKeys(_vm.basis.keybindings.setToday[_vm.oS]))
+    }
+  }) : _vm._e()]) : _vm._e(), _vm._v(" "), _c('div', {
     staticClass: "o-popmenu__item",
     on: {
       "click": function($event) {
