@@ -29,13 +29,6 @@
 	import moment from 'moment';
 	window.moment = moment;
 
-// IMPORT FlatPickr
-	import Flatpickr from 'flatpickr';
-	window.Flatpickr = Flatpickr;
-	import flatPickConfig from './components/flatPickrOptions.js';
-	window.flatPickConfig = flatPickConfig;
-
-
 $('body').on('click', 'button', function(e){
 	console.log(e);
 	btnEffect(e);

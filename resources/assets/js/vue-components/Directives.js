@@ -1,4 +1,6 @@
 import { mobilecheck } from '../components/globalFunctions.js';
+import Flatpickr from 'flatpickr';
+import flatPickConfig from '../components/flatPickrOptions.js';
 import autosize from 'autosize';
 import autosizeInput from 'autosize-input';
 

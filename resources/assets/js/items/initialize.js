@@ -15,13 +15,7 @@
 
 	// require('quasar-framework/dist/quasar.ios.css');
 	import Quasar from 'quasar-framework';
-	// const VueClipboard = require('vue-clipboard')
-	// import VueClipboard from 'vue-clipboard';
 	import VueClipboard from 'vue-clipboard2';
- 
-	// import Flatpickr from 'flatpickr';
-	// import flatPickConfig from '../components/flatPickrOptions.js';
-
 
 export default function(fetchedData)
 {
