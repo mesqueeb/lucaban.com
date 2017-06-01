@@ -1,15 +1,11 @@
-// IMPORT jQuery
-	import $ from 'jquery';
-	import jQuery from 'jquery';
-	// export for others scripts to use
-	window.$ = $;
-	window.jQuery = jQuery;
+	import axios from 'axios';
 
 // IMPORT Own jQuery replacement functions
-	import { arrayToString, hasClass, btnEffect, isElementInViewport } from './components/globalFunctions.js';
-	window.btnEffect = btnEffect;
+	import { hasClass, addClass, removeClass } from './components/globalFunctions.js';
 	// Make hasClass(el) available as el.hasClass();
 	window.Element.prototype.hasClass = function(config){ return hasClass(this,config)};
+	window.Element.prototype.addClass = function(config){ return addClass(this,config)};
+	window.Element.prototype.removeClass = function(config){ return removeClass(this,config)};
 
 // IMPORT linkify
 	import * as linkify from 'linkifyjs';
@@ -21,26 +17,15 @@
 
 
 // IMPORT Moment
-	// having trouble with these:
-			// countdown/countdown.js
-			// moment/min/moment-with-locales.min.js
-			// moment-countdown/dist/moment-countdown.min.js
-	// var moment = require('moment');
 	import moment from 'moment';
 	window.moment = moment;
-
-$('body').on('click', 'button', function(e){
-	console.log(e);
-	btnEffect(e);
-});
 
 	import initialize from './items/initialize.js';
 
 	console.log('start fetching all items');
 /*/ ～～～～～～～～～～～～～～～～～～～～～～～　\*\		*/
-$.getJSON('/api/items',function(fetchedData){ 			/*
+axios.get('/api/items').then(({data}) => { 			/*
 \*\ ～～～～～～～～～～～～～～～～～～～～～～～　/*/
 	console.log('fetched all items');
-	initialize(fetchedData);
-
-}); // end ajax - get data
+	initialize(data);
+});

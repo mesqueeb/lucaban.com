@@ -116,19 +116,22 @@
 			</div>
 			<div class="c-popout__nav">
 				<button
-					class="o-btn play btn btn-dipclick"
+					class="o-btn play"
+					v-btn-effect
 					v-show="!timerRunning"
 					@click="timerNav('play', item)"
 				><i class="zmdi zmdi-play"></i>
 				</button>
 				<button
-					class="o-btn pause btn btn-dipclick"
+					class="o-btn pause"
+					v-btn-effect
 					v-show="timerRunning"
 					@click="timerNav('pause', item)"
 				><i class="zmdi zmdi-pause"></i>
 				</button>
 				<button
-					class="o-btn forward btn btn-dipclick"
+					class="o-btn forward"
+					v-btn-effect
 					@click="timerNav('forward', item, 1)"
 				>
 					<i class="zmdi zmdi-fast-forward"></i>
@@ -137,7 +140,8 @@
 				1 {{ basis.text.global.min }}
 				</button>
 				<button
-					class="o-btn forward btn btn-dipclick"
+					class="o-btn forward"
+					v-btn-effect
 					@click="timerNav('forward', item, 5)"
 				>
 					<i class="zmdi zmdi-fast-forward"></i>
@@ -146,7 +150,8 @@
 				5 {{ basis.text.global.min }}
 				</button>
 				<button
-					class="o-btn reset btn btn-dipclick"
+					class="o-btn reset"
+					v-btn-effect
 					@click="timerNav('reset', item)"
 				>{{ basis.text.popouts.reset }}</button>
 				<button

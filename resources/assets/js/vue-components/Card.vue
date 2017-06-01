@@ -18,7 +18,8 @@
 		v-if="basis.selection.filter.includes('today') && item.id == basis.root.id"
 	>
 		<button
-			class="o-btn btn btn-dipclick ml-auto"
+			class="o-btn ml-auto"
+			v-btn-effect
 			v-clipboard:copy="basis.$store.getters.clipboardText(item)"
 			v-clipboard:success="clipboardSuccess"
 			v-clipboard:error="clipboardError"
@@ -37,7 +38,8 @@
 			{{ journalDate }}
 		</span>
 		<button
-			class="o-btn btn btn-dipclick ml-auto"
+			class="o-btn ml-auto"
+			v-btn-effect
 			v-clipboard:copy="basis.$store.getters.clipboardTextJournal(item)"
 			v-clipboard:success="clipboardSuccess"
 			v-clipboard:error="clipboardError"

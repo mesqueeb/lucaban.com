@@ -40,6 +40,22 @@ install(Vue){
 			});
 		}
 	});
+	Vue.directive('btn-effect', {
+		bind(el, binding)
+		{
+			el.addEventListener('click', 
+				function btnEffect(event){
+					console.log(event);
+					let element = (event.target.nodeName == 'I') ? event.target.parentElement : event.target;
+					element.addClass("btn").addClass("btn-dipclick");
+					element.addClass("btn--click");
+					setTimeout(function(){
+						element.removeClass("btn--click");
+					}, 400);
+				}
+			);
+		}
+	});
 	Vue.directive('ios-dblclick', {
 		inserted(el, binding)
 		{

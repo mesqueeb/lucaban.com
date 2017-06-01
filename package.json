@@ -1,38 +1,38 @@
 {
   "private": true,
   "scripts": {
-    "dev": "node node_modules/cross-env/dist/bin/cross-env.js NODE_ENV=development node_modules/webpack/bin/webpack.js --progress --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js",
-    "watch": "node node_modules/cross-env/dist/bin/cross-env.js NODE_ENV=development node_modules/webpack/bin/webpack.js --watch --progress --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js",
-    "hot": "node node_modules/cross-env/dist/bin/cross-env.js NODE_ENV=development node_modules/webpack-dev-server/bin/webpack-dev-server.js --inline --hot --config=node_modules/laravel-mix/setup/webpack.config.js",
-    "production": "node node_modules/cross-env/dist/bin/cross-env.js NODE_ENV=production node_modules/webpack/bin/webpack.js --progress --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js"
+    "dev": "npm run development",
+    "development": "cross-env NODE_ENV=development node_modules/webpack/bin/webpack.js --progress --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js",
+    "watch": "cross-env NODE_ENV=development node_modules/webpack/bin/webpack.js --watch --progress --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js",
+    "watch-poll": "npm run watch -- --watch-poll",
+    "hot": "cross-env NODE_ENV=development node_modules/webpack-dev-server/bin/webpack-dev-server.js --inline --hot --config=node_modules/laravel-mix/setup/webpack.config.js",
+    "prod": "npm run production",
+    "production": "cross-env NODE_ENV=production node_modules/webpack/bin/webpack.js --progress --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js"
   },
   "devDependencies": {
-    "axios": "^0.15.2",
     "babel-plugin-transform-object-rest-spread": "^6.23.0",
     "bootstrap-sass": "^3.3.7",
-    "jquery": "^3.1.0",
-    "laravel-mix": "^0.8.8",
-    "lodash": "^4.16.2",
-    "vue": "^2.2.1",
-    "vuex": "^2.3.1"
+    "cross-env": "^3.2.3",
+    "jquery": "^3.1.1",
+    "laravel-mix": "0.*",
+    "lodash": "^4.17.4"
   },
   "dependencies": {
+    "axios": "^0.16.0",
+    "vue": "^2.3.0",
+    "vuex": "^2.3.1",
     "autosize": "^3.0.20",
     "autosize-input": "^0.4.0",
     "bootstrap": "^4.0.0-alpha.6",
-    "bootstrap-sass": "^3.3.7",
     "clipboard": "^1.6.1",
-    "countdown": "^2.6.0",
     "flatpickr": "^2.4.3",
     "linkifyjs": "^2.1.4",
     "marked": "^0.3.6",
-    "material-design-iconic-font": "^2.2.0",
     "moment": "^2.17.1",
     "quasar-framework": "^0.13.9",
-    "vue-clipboard": "0.0.1",
+    "material-design-iconic-font": "^2.2.0",
+    "fastclick": "^1.0.6",
     "vue-clipboard2": "0.0.6",
-    "vue-flatpickr": "^2.2.9",
-    "vue-focus": "^2.1.0",
     "vue-resource": "^1.2.1"
   }
 }

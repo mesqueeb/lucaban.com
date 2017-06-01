@@ -31,7 +31,22 @@ function objectToArray(obj) {
 }
 
 function hasClass(element, cls) {
-    return (' ' + element.className + ' ').indexOf(' ' + cls + ' ') > -1;
+    return (' ' + element.className + ' ').includes(' ' + cls + ' ');
+}
+function addClass(element, cls) {
+    if (!(' ' + element.className + ' ').includes(' ' + cls + ' '))
+    {
+    	element.className += " "+cls;
+    }
+    return element;
+}
+function removeClass(element, cls) {
+	element.className = ' ' + element.className + ' ';
+    if (element.className.includes(' ' + cls + ' '))
+    {
+    	element.className = element.className.replace(' '+ cls + ' ', ' ');
+    }
+    return element;
 }
 
 function removeEmptyValuesFromArray(array){
@@ -97,23 +112,6 @@ function sortObjectArrayByTwoProperties(array, prop1, prop2, order, order2){
 	    }
 	}.bind(props));
 }
-
-function btnEffect(event){
-	console.log(event);
-	let $el;
-	if (event.target.nodeName == 'I'){
-		$el = $(event.target.offsetParent);
-	} else {
-		$el = $(event.target);
-	}
-	$el.addClass("btn--click");
-	setTimeout(function(){
-		$el.removeClass("btn--click");
-	}, 400);
-	setTimeout(function(){
-		// $el.blur();
-	}, 1000);
-}
 function uniqBy(a, key) {
     key = (key) ? key : JSON.stringify;
     let seen = {};
@@ -164,4 +162,4 @@ const Utilities = {
 	},
 };
 
-export { stringToKeyboardKeys, mobilecheck, objectToArray, uniqBy, uniq, arrayToString, sec_to_hourmin, hasClass, btnEffect, isElementInViewport, sortObjectArrayByProperty, sortObjectArrayByTwoProperties, removeEmptyValuesFromArray, Utilities }
+export { stringToKeyboardKeys, mobilecheck, objectToArray, uniqBy, uniq, arrayToString, sec_to_hourmin, addClass, removeClass, hasClass, isElementInViewport, sortObjectArrayByProperty, sortObjectArrayByTwoProperties, removeEmptyValuesFromArray, Utilities }
