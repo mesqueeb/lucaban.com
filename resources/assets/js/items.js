@@ -1,4 +1,3 @@
-	import axios from 'axios';
 
 // IMPORT Own jQuery replacement functions
 	import { hasClass, addClass, removeClass } from './components/globalFunctions.js';
@@ -22,6 +21,7 @@
 
 	import initialize from './items/initialize.js';
 
+	import axios from 'axios';
 	console.log('start fetching all items');
 /*/ ～～～～～～～～～～～～～～～～～～～～～～～　\*\		*/
 axios.get('/api/items').then(({data}) => { 			/*

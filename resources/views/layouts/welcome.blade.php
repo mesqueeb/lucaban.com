@@ -22,8 +22,8 @@
 
 </div>{{-- /.lp-wrapper  --}}
 <script>
-    window.defaultLanguage = "{!! $_GET["l"] or $currentLanguage !!}";
+    window.defaultLanguage = "{!! App::getLocale() !!}";
 </script>
-<script src="js/lp.js"></script>
+{{-- <script src="js/lp.js"></script> --}}
 </body>
 </html>

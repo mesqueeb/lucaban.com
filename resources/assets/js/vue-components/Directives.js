@@ -43,11 +43,11 @@ install(Vue){
 	Vue.directive('btn-effect', {
 		bind(el, binding)
 		{
+			element.addClass("btn").addClass("btn-dipclick");
 			el.addEventListener('click', 
 				function btnEffect(event){
 					console.log(event);
 					let element = (event.target.nodeName == 'I') ? event.target.parentElement : event.target;
-					element.addClass("btn").addClass("btn-dipclick");
 					element.addClass("btn--click");
 					setTimeout(function(){
 						element.removeClass("btn--click");

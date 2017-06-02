@@ -1,3 +1,4 @@
+import axios from 'axios';
 import { Utilities, hasClass, mobilecheck, isElementInViewport, objectToArray, uniqBy, uniq, arrayToString, sortObjectArrayByProperty, sortObjectArrayByTwoProperties, removeEmptyValuesFromArray } from '../../components/globalFunctions.js';
 // import { sec_to_hourmin } from '../../components/valueMorphers2.js';
 
@@ -921,10 +922,10 @@ startPatching ({state, commit, dispatch, getters})
 patchRootChildrenOrderWithFilter ({state, commit, dispatch, getters},
 	{id} = {})
 {
-	vm.$http.get('api/items/'+state.root.id).then(function(response){
+	axios.get('api/items/'+state.root.id).then(function(response){
 		let rootChildrenOrder = response.data.children_order;
 		rootChildrenOrder = rootChildrenOrder+','+id;
-		vm.$http.patch('api/items/'+state.root.id, {'children_order':rootChildrenOrder}).then(function(response){
+		axios.patch('api/items/'+state.root.id, {'children_order':rootChildrenOrder}).then(function(response){
 			let newRootChildrenOrder = response.data.children_order;
 			console.log('newRootChildrenOrder = '+newRootChildrenOrder);
 		});
@@ -946,7 +947,7 @@ patch ({state, commit, dispatch, getters},
 		patchVal = arrayToString(patchVal);
 	}
 	patchObj[field] = patchVal;
-	vm.$http.patch('/api/items/' + id, patchObj, { method: 'PATCH'})
+	axios.patch('/api/items/' + id, patchObj, { method: 'PATCH'})
 	.then(function(response){
 		console.log(`patched ${id}[${state.nodes[id].body}].${field} = ${patchObj[field]}`);
 		dispatch('stopPatching');
@@ -978,13 +979,13 @@ patchTag ({state, commit, dispatch, getters},
 	let patchObj = {};
 	patchObj['tags'] = tags;
 	patchObj['type'] = requestType;
-	vm.$http.patch('/api/itemtags/' + id, patchObj, { method: 'PATCH'})
+	axios.patch('/api/itemtags/' + id, patchObj, { method: 'PATCH'})
 	.then(function(tagResponse){
 		let syncedTags = tagResponse.data.tags;
 		console.log('tagged ['+state.nodes[id].body+'] with: '+tagResponse.data.tags+';');
 		console.log(tagResponse);
 		// Re-Add tags of item
-		vm.$http.get('/api/itemtags/' + id, { type: 'tags'})
+		axios.get('/api/itemtags/' + id, { type: 'tags'})
 		// Codementor: Request type doesn't work......
 		.then(function(updatedTagList){
 			state.nodes[id].tagged = updatedTagList.data;
@@ -998,7 +999,7 @@ patchDueDate ({state, commit, dispatch, getters},
 {
 	dispatch('startPatching');
 	if (duedate == '0000-00-00 00:00:00'){
-		vm.$http.patch('/api/items/' + id, {'due_date':duedate})
+		axios.patch('/api/items/' + id, {'due_date':duedate})
 		.then(function(response){
 			dispatch('stopPatching');
 		});
@@ -1006,7 +1007,7 @@ patchDueDate ({state, commit, dispatch, getters},
 	}
 	duedate = moment(duedate).format();
 	console.log('PatchDueDate: '+duedate);
-	vm.$http.patch('/api/items/' + id, {'due_date':duedate})
+	axios.patch('/api/items/' + id, {'due_date':duedate})
 	.then(function(response){
 		dispatch('stopPatching');
 	});
@@ -1022,7 +1023,7 @@ patchDone ({state, commit, dispatch, getters},
 	} else {
 		done_date = '0000-00-00 00:00:00';
 	}
-	vm.$http.patch('/api/items/' + id, {'done':doneValue, 'done_date':done_date})
+	axios.patch('/api/items/' + id, {'done':doneValue, 'done_date':done_date})
 	.then(function(response){
 		dispatch('stopPatching');
 	});
@@ -1044,7 +1045,7 @@ deleteItemApi ({state, commit, dispatch, getters},
 		let id = idOrArray; // It's an ID!
 		if (!id){ return; }
 		let item = state.nodes[id];
-		vm.$http.delete('/api/items/' + id)
+		axios.delete('/api/items/' + id)
 		.then(function(response){
 			console.log(`deleted: ${id}[${item.body}]`);
 			dispatch('stopPatching');
@@ -1115,7 +1116,7 @@ fetchDone ({state, commit, dispatch, getters},
 	{tags, operator} = {})
 {
 	state.loading = true;
-	vm.$http.get('/api/items/fetchdone').then(function(response){
+	axios.get('/api/items/fetchdone').then(function(response){
 		// debugger;
 		state.fetchedDone = true;
 		console.log('fetched Done');
@@ -1150,7 +1151,7 @@ fetchDone ({state, commit, dispatch, getters},
 // 	request['type'] = requestType;
 // 	console.log('request');
 // 	console.log(request);
-// 	vm.$http.post('/api/itemtags/fetchTagged', request).then(function(response){
+// 	axios.post('/api/itemtags/fetchTagged', request).then(function(response){
 // 		let aaa = response.data;
 // 		aaa = json(aaa);
 // 		console.log('fetched tagged items!');
@@ -1223,8 +1224,8 @@ postNewItem ({state, commit, dispatch, getters},
 
 	// let data = newItem;
 	// data = JSON.stringify(data);
-	vm.$http.post('/api/items',data) //SEND
-	// vm.$http.post('/api/items',newItem) //SEND
+	axios.post('/api/items',data) //SEND
+	// axios.post('/api/items',newItem) //SEND
 	.then(function(response){ //response
 		let storedItem = response.data;
 		// Revert old item's children_order back to string.

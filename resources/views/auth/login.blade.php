@@ -4,19 +4,20 @@
 <div class="container">
     <div class="row">
         <div class="col-md-8 col-md-offset-2">
-            @lang('auth.loginpage.donthaveacc')<a class="btn btn-link" href="{{ url('/register') }}">Click here to register</a>
+            @lang('auth.loginpage.donthaveacc')<a class="btn btn-link" href="{{ url('/register') }}">@lang("Click here to register")</a>
         </div>
     </div>
     <div class="row">
         <div class="col-md-8 col-md-offset-2">
             <div class="panel panel-default">
-                <div class="panel-heading">Login</div>
+                <div class="panel-heading">@lang("Login")</div>
                 <div class="panel-body">
                     <form class="form-horizontal" role="form" method="POST" action="{{ url('/login') }}">
                         {{ csrf_field() }}
 
-                        <div class="form-group{{ $errors->has('email') ? ' has-error' : '' }}">
-                            <label for="email" class="col-md-4 control-label">E-Mail Address</label>
+                        <div class="form-group{{ $errors->has('email') ? ' has-error' : '' }}"
+                        >
+                            <label for="email" class="col-md-4 control-label">@lang("E-Mail Address")</label>
 
                             <div class="col-md-6">
                                 <input id="email" type="email" class="form-control" name="email" value="{{ old('email') }}" required autofocus>
@@ -47,7 +48,7 @@
                             <div class="col-md-6 col-md-offset-4">
                                 <div class="checkbox">
                                     <label>
-                                        <input type="checkbox" name="remember" {{ old('remember') ? 'checked' : '' }}> Remember Me
+                                        <input type="checkbox" name="remember" {{ old('remember') ? 'checked' : '' }}> @lang("Remember Me")
                                     </label>
                                 </div>
                             </div>
@@ -56,11 +57,11 @@
                         <div class="form-group">
                             <div class="col-md-8 col-md-offset-4">
                                 <button type="submit" class="btn btn-primary">
-                                    Login
+                                    @lang("Login")
                                 </button>
 
                                 <a class="btn btn-link" href="{{ url('/password/reset') }}">
-                                    Forgot Your Password?
+                                    @lang("Forgot Your Password?")
                                 </a>
                             </div>
                         </div>

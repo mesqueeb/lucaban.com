@@ -11,7 +11,7 @@
 	<link rel="stylesheet" href="/css/items.css">
 	{{-- <link rel="stylesheet" href="/css/fonts/material-design-iconic-font.min.css"> --}}
 
-	<title>LIST</title>
+	<title>{{ config('app.name') }}</title>
 
 </head>
 <body>

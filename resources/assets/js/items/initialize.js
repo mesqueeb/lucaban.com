@@ -1,6 +1,5 @@
 	import Vue from 'vue';
 	import Vuex from 'vuex';
-	import VueResource from 'vue-resource';
 
 	// import VueFilters from '../vue-components/vueFilters.js';
 
@@ -25,7 +24,6 @@ export default function(fetchedData)
 	window.fetchedData = fetchedData;
 	window.Vue = Vue;
 	Vue.use(Vuex);
-	Vue.use(VueResource);
 	Vue.use(listDirectives);
 	Vue.use(Quasar);
 	Vue.use(VueClipboard);

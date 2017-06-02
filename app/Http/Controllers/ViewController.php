@@ -14,14 +14,6 @@ class viewController extends Controller
     }
     public function index()
     {
-        \App::setLocale('en');
-        view()->share('currentLanguage', 'en');
-        return view('layouts.welcome');
-    }
-    public function indexJA()
-    {
-        \App::setLocale('ja');
-        view()->share('currentLanguage', 'ja');
         return view('layouts.welcome');
     }
     public function items()
