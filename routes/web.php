@@ -17,11 +17,23 @@ Route::group(
 ],
 function()
 {
-	/** ADD ALL LOCALIZED ROUTES INSIDE THIS GROUP **/
-	Auth::routes();
+    // Authentication Routes...
+    Route::get('login', 'Auth\LoginController@showLoginForm')->name('login');
+    // Registration Routes...
+    Route::get('register', 'Auth\RegisterController@showRegistrationForm')->name('register');
+    // Password Reset Routes...
+    Route::get('password/reset', 'Auth\ForgotPasswordController@showLinkRequestForm')->name('password.request');
+    Route::get('password/reset/{token}', 'Auth\ResetPasswordController@showResetForm')->name('password.reset');
+
 	Route::get('/', ['uses' => 'ViewController@index'])->name('home');
 	Route::get('/home', ['as' => 'home', 'uses' => 'ViewController@index']);
 });
+	// AUTH API
+    Route::post('register', 'Auth\RegisterController@register');
+    Route::post('login', 'Auth\LoginController@login');
+    Route::post('logout', 'Auth\LoginController@logout')->name('logout');
+    Route::post('password/reset', 'Auth\ResetPasswordController@reset');
+    Route::post('password/email', 'Auth\ForgotPasswordController@sendResetLinkEmail')->name('password.email');
 
 Route::get('/items', ['as' => 'items', 'uses' => 'ViewController@items']);
 Route::get('/ja/items', ['as' => 'items', 'uses' => "ViewController@itemsJA"]);
