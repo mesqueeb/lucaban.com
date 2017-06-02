@@ -42,7 +42,7 @@
             <p>
                 <a class="btn btn-lg btn-success"
                     role="button"
-                    href="{{ url('/register?l=') }}"
+                    href="{{ url('/register') }}"
                 >
                     @lang("Try it out now")
                 </a>
