@@ -1143,13 +1143,13 @@ fetchDone ({state, commit, dispatch, getters},
 		state.loading = false;
 	});
 },
-clipboardSuccess ({dispatch, state})
+clipboardSuccess ({dispatch, state, getters})
 {
-	dispatch('sendFlash', { type:'success', msg:state.keybindings.copyClipboard.success[state.language] });
+	dispatch('sendFlash', { type:'success', msg:state.keybindings.copyClipboard.success[getters.language] });
 },
-clipboardError ({dispatch, state})
+clipboardError ({dispatch, state, getters})
 {
-	dispatch('sendFlash', { type:'error', msg:state.keybindings.copyClipboard.error[state.language] });
+	dispatch('sendFlash', { type:'error', msg:state.keybindings.copyClipboard.error[getters.language] });
 },
 filterItems ({state, commit, dispatch, getters},
 	{keyword, value, event} = {})

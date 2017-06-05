@@ -36049,11 +36049,11 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 			state.loading = false;
 		});
 	},
-	clipboardSuccess({ dispatch, state }) {
-		dispatch('sendFlash', { type: 'success', msg: state.keybindings.copyClipboard.success[state.language] });
+	clipboardSuccess({ dispatch, state, getters }) {
+		dispatch('sendFlash', { type: 'success', msg: state.keybindings.copyClipboard.success[getters.language] });
 	},
-	clipboardError({ dispatch, state }) {
-		dispatch('sendFlash', { type: 'error', msg: state.keybindings.copyClipboard.error[state.language] });
+	clipboardError({ dispatch, state, getters }) {
+		dispatch('sendFlash', { type: 'error', msg: state.keybindings.copyClipboard.error[getters.language] });
 	},
 	filterItems({ state, commit, dispatch, getters }, { keyword, value, event } = {}) {
 		if (state.editingItem) {
