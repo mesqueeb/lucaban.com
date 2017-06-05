@@ -14,7 +14,7 @@
 	{{-- DATA --}}
 	<div class="c-items-wrapper"
 	>
-		<Card :item="allData"
+		<Card :item="root"
 			ref="root"
 			:parents-children-order="[]"
 			:parent-tags="[]"

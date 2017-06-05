@@ -15,21 +15,6 @@
 
 	<div
 		class="c-section-head"
-		v-if="basis.selection.filter.includes('today') && item.id == basis.root.id"
-	>
-		<button
-			class="o-btn ml-auto"
-			v-btn-effect
-			v-clipboard:copy="basis.$store.getters.clipboardText(item)"
-			v-clipboard:success="clipboardSuccess"
-			v-clipboard:error="clipboardError"
-			v-if="true"
-		>
-			{{ basis.text.card.copy }}
-		</button>		
-	</div>
-	<div
-		class="c-section-head"
 		v-if="journalDate && item.journalDate"
 	>
 		<!-- Codementor: Is this the correct way to format something like this? -->
@@ -567,13 +552,12 @@ export default {
 			if (!this.visibleDirectChildren.length){ return true; }
 		},
 		basis(){ return this.$root },
+		id(){ return this.item.id },
 		l(){ return this.$root.language },
-		thebody(){ return this.item.body },
  /* \ ============================================== / *\
-| ◉ |	FROM THE STORE 								| ◉	 |
+| ◉  |	FROM THE STORE 								|  ◉ |
  \* / ============================================== \ */
 		get(){ return this.$store.getters },
-		id(){ return this.item.id },
 		visibleDirectChildren(){ return this.get.visibleDirectChildren(this.id) },
 		allVisibleChildItems(){ return this.get.allVisibleChildItems(this.id) },
 		childrenOrder(){ return this.get.childrenOrder(this.id) },
@@ -739,15 +723,9 @@ export default {
 		doneEdit(item){ this.dispatch('doneEdit', {item}) },
 		setToday(id){ this.dispatch('setToday', {id}) },
 		deleteItemDialogue(id){ this.dispatch('deleteItemDialogue', {id}) },
+		clipboardSuccess(){ this.dispatch('clipboardSuccess') },
+		clipboardError(){ this.dispatch('clipboardError') },
 		
-		clipboardSuccess()
-		{
-			this.$store.dispatch('sendFlash', { type:'success', msg:this.$root.keybindings.copyClipboard.success[this.l] });
-		},
-		clipboardError()
-		{
-			this.$store.dispatch('sendFlash', { type:'error', msg:this.$root.keybindings.copyClipboard.error[this.l] });
-		},
 		convertbodyURLtoHTML()
 		{
 			// console.log('converting');

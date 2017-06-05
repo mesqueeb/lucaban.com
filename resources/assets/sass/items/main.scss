@@ -253,15 +253,15 @@ label{
 .c-panel__stats--scrolled-down{
     margin-top: 26px;
 }
-.c-panel__title{
+.c-panel-title{
     text-align: center;
     font-size: 1.2em;
     padding: 6px 0 0;
 }
-.c-panel__title__hidden-tags{
+.c-panel-title__hidden-tags{
     text-decoration: line-through;
 }
-.c-panel__title--scrolled-down{
+.c-panel-title--scrolled-down{
     position: fixed;
     top: 0;
     left: 0;
@@ -269,6 +269,12 @@ label{
     width: 100vw;
     align-content: inherit;
     z-index: 4;
+}
+.c-panel-title__top-row{
+    display: flex;
+    span{
+        margin-left: auto;
+    }
 }
 .c-item-nav{
     margin-left: auto;

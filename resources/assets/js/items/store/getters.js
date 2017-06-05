@@ -572,37 +572,6 @@ language: (state, getters) => {
 text: (state, getters) => {
 	return state.languageContents[getters.language];
 },
-allData: (state, getters) => {
-	if(!window.fetchedData)
-	{
-		return {
-			"body":"ALL",
-			"children":[],
-			"children_order":[],
-			"depth":0,
-			"done":false,
-			"done_date":"0000-00-00 00:00:00",
-			"due_date":"0000-00-00 00:00:00",
-			"id":"x",
-			"show_children":1,
-			"tagged":[],
-			"used_time":0
-		};
-	}
-	return {
-		"body":"ALL",
-		"children":getters.filteredItems,
-		"children_order":state.nodes[state.root.id].children_order,
-		"id":state.nodes[state.root.id].id,
-		"depth":0,
-		"done":false,
-		"done_date":"0000-00-00 00:00:00",
-		"due_date":"0000-00-00 00:00:00",
-		"show_children":1,
-		"tagged":[],
-		"used_time":0
-	}
-},
 mobile: (state, getters) => {
 	if(state.manualMobile){
 		return true;
@@ -613,16 +582,9 @@ mobileSmall: (state, getters) => {
 	if (window.innerWidth < 385){ return true; }
 },
 noItems: (state, getters) => {
-	if(!getters.allData.children.length){ return true; }
+	if(!getters.visibleDirectChildren(state.root.id).length){ return true; }
 	return false;
-	// if(!state || !state.root || !state.root.children.length){
-	// 	return true;
-	// } return false;
 },
-// doneItems: (state, getters) =>
-// () => { // Flat
-// 	return getters.filteredItemsFlat.filter(child => child.done);
-// },
 filteredItems: (state, getters) => {
 	// if(getters.noItems){ return []; }
 	if (selection.view == 'tree')
@@ -763,10 +725,8 @@ filteredItemsTree: (state, getters) => {
 },
 allVisibleChildItems: (state, getters) =>
 (id) => {
-	let item = state.nodes[id];
-	if(!item || !item.children.length){ return []; }
-	
-	let flattenedTree = getters.flattenTree(item.children);
+	let children = getters.visibleDirectChildren(id);
+	let flattenedTree = getters.flattenTree(children);
 	let visibleChildren = flattenedTree.filter(child => !getters.hiddenItemIds.includes(child.id));
 	return visibleChildren;
 },
@@ -788,6 +748,35 @@ childrenOrder: (state, getters) =>
 	return children.map(child => child.id);
 },
 clipboardText: (state, getters) =>
+(id = selection.selectedId) => {
+	id = (!id) ? state.root.id : id ;
+	let item = state.nodes[id];
+	let children;
+	let directChildren;
+	let spaceVariable = 0;
+	if (selection.filter.includes('today'))
+	{
+		// item = id;
+		// children = item.children;
+		directChildren = true;
+	} else {
+		// item = state.nodes[id];
+		// children = getters.allVisibleChildItems(id);
+		spaceVariable = parseFloat(item.depth);
+	}
+	item = state.nodes[id];
+	children = getters.allVisibleChildItems(id);
+
+	if(!item){ return ''; }
+    let allChildren = children.reduce(function(all, val){
+		let spacesVal = (directChildren) ? 0 : parseFloat(val.depth)-spaceVariable;
+		let spaces = '　　'.repeat(spacesVal);
+		return `${all}
+${spaces}・${val.body}`;
+	}, `${item.body}`);
+    return allChildren;
+},
+clipboardTextFromItem: (state, getters) =>
 (idOrItem = selection.selectedId) => {
 	let item;
 	let children;

@@ -33069,21 +33069,6 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
 
 
 // import flatPickConfig from '../components/flatPickrOptions.js';
@@ -33137,20 +33122,17 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 		basis() {
 			return this.$root;
 		},
+		id() {
+			return this.item.id;
+		},
 		l() {
 			return this.$root.language;
 		},
-		thebody() {
-			return this.item.body;
-		},
 		/* \ ============================================== / *\
-  | ◉ |	FROM THE STORE 								| ◉	 |
+  | ◉  |	FROM THE STORE 								|  ◉ |
   \* / ============================================== \ */
 		get() {
 			return this.$store.getters;
-		},
-		id() {
-			return this.item.id;
 		},
 		visibleDirectChildren() {
 			return this.get.visibleDirectChildren(this.id);
@@ -33407,13 +33389,13 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 		deleteItemDialogue(id) {
 			this.dispatch('deleteItemDialogue', { id });
 		},
-
 		clipboardSuccess() {
-			this.$store.dispatch('sendFlash', { type: 'success', msg: this.$root.keybindings.copyClipboard.success[this.l] });
+			this.dispatch('clipboardSuccess');
 		},
 		clipboardError() {
-			this.$store.dispatch('sendFlash', { type: 'error', msg: this.$root.keybindings.copyClipboard.error[this.l] });
+			this.dispatch('clipboardError');
 		},
+
 		convertbodyURLtoHTML() {
 			// console.log('converting');
 			if (!this.item || this.item.depth == 0) {
@@ -35287,6 +35269,10 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 			selection.view = null;
 			selection.view = 'journal';
 		}
+		if (selection.view == 'tree') {
+			selection.view = 'journal';
+			selection.view = 'tree';
+		}
 		if (selection.filter.includes('today')) {
 			selection.filter = selection.filter.filter(f => f != 'today');
 			selection.filter.push('today');
@@ -36063,33 +36049,12 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 			state.loading = false;
 		});
 	},
-	// fetchTagged(tags, requestType){
-	// 	/* requestType can be:
-	// 		'withAnyTag': fetch articles with any tag listed
-	// 		'withAllTags': only fetch articles with all the tags
-	// 		'tagNames': fetch all existing tags
-	// 	*/
-	// 	state.loading = true;
-	// 	let request = {};
-	// 	requestType = (!requestType) ? 'withAnyTag' : requestType;
-	// 	request['tags'] = tags;
-	// 	request['type'] = requestType;
-	// 	console.log('request');
-	// 	console.log(request);
-	// 	axios.post('/api/itemtags/fetchTagged', request).then(function(response){
-	// 		let aaa = response.data;
-	// 		aaa = json(aaa);
-	// 		console.log('fetched tagged items!');
-	// 		console.log(response);
-	// 		console.log(response.json());
-	// 		console.log(aaa);
-	// 		allItems.filteredTagItems = aaa;
-	// 		allItems.nodes = aaa;
-	// 		state.root = aaa;
-	// 		state.allData = aaa;
-	// 		state.loading = false;
-	// 	});
-	// },
+	clipboardSuccess({ dispatch, state }) {
+		dispatch('sendFlash', { type: 'success', msg: state.keybindings.copyClipboard.success[state.language] });
+	},
+	clipboardError({ dispatch, state }) {
+		dispatch('sendFlash', { type: 'error', msg: state.keybindings.copyClipboard.error[state.language] });
+	},
 	filterItems({ state, commit, dispatch, getters }, { keyword, value, event } = {}) {
 		if (state.editingItem) {
 			return;
@@ -36787,36 +36752,6 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 	text: (state, getters) => {
 		return state.languageContents[getters.language];
 	},
-	allData: (state, getters) => {
-		if (!window.fetchedData) {
-			return {
-				"body": "ALL",
-				"children": [],
-				"children_order": [],
-				"depth": 0,
-				"done": false,
-				"done_date": "0000-00-00 00:00:00",
-				"due_date": "0000-00-00 00:00:00",
-				"id": "x",
-				"show_children": 1,
-				"tagged": [],
-				"used_time": 0
-			};
-		}
-		return {
-			"body": "ALL",
-			"children": getters.filteredItems,
-			"children_order": state.nodes[state.root.id].children_order,
-			"id": state.nodes[state.root.id].id,
-			"depth": 0,
-			"done": false,
-			"done_date": "0000-00-00 00:00:00",
-			"due_date": "0000-00-00 00:00:00",
-			"show_children": 1,
-			"tagged": [],
-			"used_time": 0
-		};
-	},
 	mobile: (state, getters) => {
 		if (state.manualMobile) {
 			return true;
@@ -36829,18 +36764,11 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 		}
 	},
 	noItems: (state, getters) => {
-		if (!getters.allData.children.length) {
+		if (!getters.visibleDirectChildren(state.root.id).length) {
 			return true;
 		}
 		return false;
-		// if(!state || !state.root || !state.root.children.length){
-		// 	return true;
-		// } return false;
 	},
-	// doneItems: (state, getters) =>
-	// () => { // Flat
-	// 	return getters.filteredItemsFlat.filter(child => child.done);
-	// },
 	filteredItems: (state, getters) => {
 		// if(getters.noItems){ return []; }
 		if (selection.view == 'tree') {
@@ -36971,12 +36899,8 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 		return children;
 	},
 	allVisibleChildItems: (state, getters) => id => {
-		let item = state.nodes[id];
-		if (!item || !item.children.length) {
-			return [];
-		}
-
-		let flattenedTree = getters.flattenTree(item.children);
+		let children = getters.visibleDirectChildren(id);
+		let flattenedTree = getters.flattenTree(children);
 		let visibleChildren = flattenedTree.filter(child => !getters.hiddenItemIds.includes(child.id));
 		return visibleChildren;
 	},
@@ -36998,7 +36922,36 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 		}
 		return children.map(child => child.id);
 	},
-	clipboardText: (state, getters) => (idOrItem = selection.selectedId) => {
+	clipboardText: (state, getters) => (id = selection.selectedId) => {
+		id = !id ? state.root.id : id;
+		let item = state.nodes[id];
+		let children;
+		let directChildren;
+		let spaceVariable = 0;
+		if (selection.filter.includes('today')) {
+			// item = id;
+			// children = item.children;
+			directChildren = true;
+		} else {
+			// item = state.nodes[id];
+			// children = getters.allVisibleChildItems(id);
+			spaceVariable = parseFloat(item.depth);
+		}
+		item = state.nodes[id];
+		children = getters.allVisibleChildItems(id);
+
+		if (!item) {
+			return '';
+		}
+		let allChildren = children.reduce(function (all, val) {
+			let spacesVal = directChildren ? 0 : parseFloat(val.depth) - spaceVariable;
+			let spaces = '　　'.repeat(spacesVal);
+			return `${all}
+${spaces}・${val.body}`;
+		}, `${item.body}`);
+		return allChildren;
+	},
+	clipboardTextFromItem: (state, getters) => (idOrItem = selection.selectedId) => {
 		let item;
 		let children;
 		let directChildren;
@@ -37699,11 +37652,11 @@ let tagSlugToName = __WEBPACK_IMPORTED_MODULE_5__components_globalFunctions_js__
 		this.sortAllChildren();
 	},
 	data: {},
-	computed: _extends({}, __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_4_vuex__["b" /* mapState */])(['nodes', 'root', 'orphans', 'source', 'languageContents', 'selection', 'debug', 'doneData', 'addingNewUnder', 'addingNewAsChild', 'addingNewAsFirstChild', 'editingItem', 'editingItemTags', 'editingDoneDateItem', 'loading', 'patching', 'popups', 'popouts', 'flashes', 'timerItems', 'beforeEditCache_body', 'beforeEditCache_planned_time', 'fetchedDone', 'cancelThroughKeydown', 'manualMobile', 'newItem', 'newTag', 'setLanguage', 'keybindings']), __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_4_vuex__["c" /* mapGetters */])(['oS', 'hasTag', 'hasParentWithTag', 'parentIdWithTag', 'returnTagsAsArray', 'siblingIndex', 'olderSiblingId', 'nextItemId', 'nextSiblingOrParentsSiblingId', 'deepestChild', 'topLvlParentOfDeepestChild', 'prevItemId', 'nextItemRecursion', 'isTopLvlItemInFilteredRoot', 'hasParentDueToday', 'isDueToday', 'isProject', 'itemTagArray', 'allChildrenDone', 'getAllChildrenIds', 'getAllChildrenIdsRecursive', 'calTotalPlannedTime', 'calTotalUsedTime', 'checkValParentTree', 'getParentsAsArray', 'getParentsRecursive', 'getLastChildId', 'getDeepestLastChildId', 'setDefaultItemValues', 'flattenTree', 'itIsADeepestChild', 'countChildren', 'countDoneChildren', 'findDeepestVisibleChild', 'isFirstItem', 'language', 'text', 'allData', 'mobile', 'mobileSmall', 'noItems', 'filteredItems', 'filteredItemsJournal', 'journalDates', 'filteredItemsFlat', 'filteredItemsTree', 'hiddenItemIds', 'selectionFilter', 'selectionTags', 'selectionHiddenTags', 'allTagsComputed', 'allTagsComputed_2', 'allTagsComputed_3', 'allTagsComputed_1b', 'itemAmount', 'doneItemAmount', 'totalPlannedMin', 'totalPlannedSec', 'totalUsedSec', 'totalSecLeft', 'totalUsedHourMin', 'totalHourMinLeft', 'lastItems', 'firstItem', 'topLvlItems'])),
+	computed: _extends({}, __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_4_vuex__["b" /* mapState */])(['nodes', 'root', 'orphans', 'source', 'languageContents', 'selection', 'debug', 'doneData', 'addingNewUnder', 'addingNewAsChild', 'addingNewAsFirstChild', 'editingItem', 'editingItemTags', 'editingDoneDateItem', 'loading', 'patching', 'popups', 'popouts', 'flashes', 'timerItems', 'beforeEditCache_body', 'beforeEditCache_planned_time', 'fetchedDone', 'cancelThroughKeydown', 'manualMobile', 'newItem', 'newTag', 'setLanguage', 'keybindings']), __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_4_vuex__["c" /* mapGetters */])(['oS', 'hasTag', 'hasParentWithTag', 'parentIdWithTag', 'returnTagsAsArray', 'siblingIndex', 'olderSiblingId', 'nextItemId', 'nextSiblingOrParentsSiblingId', 'deepestChild', 'topLvlParentOfDeepestChild', 'prevItemId', 'nextItemRecursion', 'isTopLvlItemInFilteredRoot', 'hasParentDueToday', 'isDueToday', 'isProject', 'itemTagArray', 'allChildrenDone', 'getAllChildrenIds', 'getAllChildrenIdsRecursive', 'calTotalPlannedTime', 'calTotalUsedTime', 'checkValParentTree', 'getParentsAsArray', 'getParentsRecursive', 'getLastChildId', 'getDeepestLastChildId', 'setDefaultItemValues', 'flattenTree', 'itIsADeepestChild', 'countChildren', 'countDoneChildren', 'findDeepestVisibleChild', 'visibleDirectChildren', 'allVisibleChildItems', 'isFirstItem', 'language', 'text', 'clipboardText', 'clipboardTextJournal', 'mobile', 'mobileSmall', 'noItems', 'filteredItems', 'filteredItemsJournal', 'journalDates', 'filteredItemsFlat', 'filteredItemsTree', 'hiddenItemIds', 'selectionFilter', 'selectionTags', 'selectionHiddenTags', 'allTagsComputed', 'allTagsComputed_2', 'allTagsComputed_3', 'allTagsComputed_1b', 'itemAmount', 'doneItemAmount', 'totalPlannedMin', 'totalPlannedSec', 'totalUsedSec', 'totalSecLeft', 'totalUsedHourMin', 'totalHourMinLeft', 'lastItems', 'firstItem', 'topLvlItems'])),
 	watch: {},
 	methods: _extends({
 		tagSlugToName
-	}, __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_4_vuex__["d" /* mapMutations */])(['updateState', 'resetNewItem', 'addChild', 'deleteChild', 'closeFlash', 'updatePopouts', 'updatePopups']), __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_4_vuex__["e" /* mapActions */])(['giveNewParent', 'duplicate', 'addAndCleanNodesRecursively', 'addItem', 'addTempNewItem', 'hideTaggedNodes', 'hideDoneNodes', 'sortAllChildren', 'sortChildren', 'updateChildrenDepth', 'copyParentBodyToAllChildren', 'attachParentBody', 'deleteItem', 'deleteItemDialogue', 'tagItem', 'prepareTag', 'prepareDonePatch', 'autoCalculateDoneState', 'updateItemTagsDom', 'moveItem', 'flushDoneItems', 'setDueDate', 'updateChildrenDueDate', 'formatDone', 'setCancelThroughKeydown', 'startEdit', 'scrollToItemIfNeeded', 'doneEdit', 'cancelEdit', 'cancelAddNew', 'addNew', 'checkFilteredItemsTree', 'showChildren', 'markDone', 'indent', 'unindent', 'selectItem', 'setToday', 'showAddNewItem', 'startEditTags', 'stopPatching', 'startPatching', 'patchRootChildrenOrderWithFilter', 'patch', 'patchTag', 'patchDueDate', 'patchDone', 'deleteItem', 'deleteItemApi', 'popup', 'sendFlash', 'popout', 'addTimer', 'fetchDone', 'filterItems', 'removeFilter', 'postNewItem', 'test', 'alert'])),
+	}, __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_4_vuex__["d" /* mapMutations */])(['updateState', 'resetNewItem', 'addChild', 'deleteChild', 'closeFlash', 'updatePopouts', 'updatePopups']), __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_4_vuex__["e" /* mapActions */])(['giveNewParent', 'clipboardSuccess', 'clipboardError', 'duplicate', 'addAndCleanNodesRecursively', 'addItem', 'addTempNewItem', 'hideTaggedNodes', 'hideDoneNodes', 'sortAllChildren', 'sortChildren', 'updateChildrenDepth', 'copyParentBodyToAllChildren', 'attachParentBody', 'deleteItem', 'deleteItemDialogue', 'tagItem', 'prepareTag', 'prepareDonePatch', 'autoCalculateDoneState', 'updateItemTagsDom', 'moveItem', 'flushDoneItems', 'setDueDate', 'updateChildrenDueDate', 'formatDone', 'setCancelThroughKeydown', 'startEdit', 'scrollToItemIfNeeded', 'doneEdit', 'cancelEdit', 'cancelAddNew', 'addNew', 'checkFilteredItemsTree', 'showChildren', 'markDone', 'indent', 'unindent', 'selectItem', 'setToday', 'showAddNewItem', 'startEditTags', 'stopPatching', 'startPatching', 'patchRootChildrenOrderWithFilter', 'patch', 'patchTag', 'patchDueDate', 'patchDone', 'deleteItem', 'deleteItemApi', 'popup', 'sendFlash', 'popout', 'addTimer', 'fetchDone', 'filterItems', 'removeFilter', 'postNewItem', 'test', 'alert'])),
 	http: {
 		headers: {
 			'X-CSRF-TOKEN': document.querySelector('#csrf-token').getAttribute('content')
@@ -37764,13 +37717,13 @@ let tagSlugToName = __WEBPACK_IMPORTED_MODULE_5__components_globalFunctions_js__
 		});
 		Vue.directive('btn-effect', {
 			bind(el, binding) {
-				element.addClass("btn").addClass("btn-dipclick");
+				// let element = (event.target.nodeName == 'I') ? event.target.parentElement : event.target;
+				el.addClass("btn").addClass("btn-dipclick");
 				el.addEventListener('click', function btnEffect(event) {
 					console.log(event);
-					let element = event.target.nodeName == 'I' ? event.target.parentElement : event.target;
-					element.addClass("btn--click");
+					el.addClass("btn--click");
 					setTimeout(function () {
-						element.removeClass("btn--click");
+						el.removeClass("btn--click");
 					}, 400);
 				});
 			}
@@ -52925,33 +52878,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     }
   }, [(!_vm.isHidden || _vm.listIsEmpty) ? _c('div', {
     staticClass: "d-flex flex-wrap"
-  }, [(_vm.basis.selection.filter.includes('today') && _vm.item.id == _vm.basis.root.id) ? _c('div', {
-    staticClass: "c-section-head"
-  }, [(true) ? _c('button', {
-    directives: [{
-      name: "btn-effect",
-      rawName: "v-btn-effect"
-    }, {
-      name: "clipboard",
-      rawName: "v-clipboard:copy",
-      value: (_vm.basis.$store.getters.clipboardText(_vm.item)),
-      expression: "basis.$store.getters.clipboardText(item)",
-      arg: "copy"
-    }, {
-      name: "clipboard",
-      rawName: "v-clipboard:success",
-      value: (_vm.clipboardSuccess),
-      expression: "clipboardSuccess",
-      arg: "success"
-    }, {
-      name: "clipboard",
-      rawName: "v-clipboard:error",
-      value: (_vm.clipboardError),
-      expression: "clipboardError",
-      arg: "error"
-    }],
-    staticClass: "o-btn ml-auto"
-  }, [_vm._v("\n\t\t\t" + _vm._s(_vm.basis.text.card.copy) + "\n\t\t")]) : _vm._e()]) : _vm._e(), _vm._v(" "), (_vm.journalDate && _vm.item.journalDate) ? _c('div', {
+  }, [(_vm.journalDate && _vm.item.journalDate) ? _c('div', {
     staticClass: "c-section-head"
   }, [_c('span', [_vm._v(_vm._s(_vm.momentCalendar(_vm.journalDate)))]), _vm._v(" "), (_vm.journalDate != _vm.momentCalendar(_vm.journalDate)) ? _c('span', {
     staticClass: "c-section-head__subtitle"

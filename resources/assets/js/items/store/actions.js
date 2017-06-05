@@ -313,6 +313,11 @@ deleteItem ({state, commit, dispatch, getters},
 		selection.view = null;
 		selection.view = 'journal';
 	}
+	if (selection.view == 'tree')
+	{
+		selection.view = 'journal';
+		selection.view = 'tree';
+	}
 	if (selection.filter.includes('today'))
 	{
 		selection.filter = selection.filter.filter(f => f != 'today');
@@ -1138,33 +1143,14 @@ fetchDone ({state, commit, dispatch, getters},
 		state.loading = false;
 	});
 },
-// fetchTagged(tags, requestType){
-// 	/* requestType can be:
-// 		'withAnyTag': fetch articles with any tag listed
-// 		'withAllTags': only fetch articles with all the tags
-// 		'tagNames': fetch all existing tags
-// 	*/
-// 	state.loading = true;
-// 	let request = {};
-// 	requestType = (!requestType) ? 'withAnyTag' : requestType;
-// 	request['tags'] = tags;
-// 	request['type'] = requestType;
-// 	console.log('request');
-// 	console.log(request);
-// 	axios.post('/api/itemtags/fetchTagged', request).then(function(response){
-// 		let aaa = response.data;
-// 		aaa = json(aaa);
-// 		console.log('fetched tagged items!');
-// 		console.log(response);
-// 		console.log(response.json());
-// 		console.log(aaa);
-// 		allItems.filteredTagItems = aaa;
-// 		allItems.nodes = aaa;
-// 		state.root = aaa;
-// 		state.allData = aaa;
-// 		state.loading = false;
-// 	});
-// },
+clipboardSuccess ({dispatch, state})
+{
+	dispatch('sendFlash', { type:'success', msg:state.keybindings.copyClipboard.success[state.language] });
+},
+clipboardError ({dispatch, state})
+{
+	dispatch('sendFlash', { type:'error', msg:state.keybindings.copyClipboard.error[state.language] });
+},
 filterItems ({state, commit, dispatch, getters},
 	{keyword, value, event} = {})
 {

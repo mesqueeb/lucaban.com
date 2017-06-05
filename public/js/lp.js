@@ -21698,7 +21698,7 @@ module.exports = {
 	"About the Author": "作成者について",
 	"Hello community. My name is Luca Ban. I always wanted to build the perfect task list app that fits my needs. I have used about all task list apps out there. But there was always something missing. So that's why I decided to create :app.": "やー。わたしは伴ルカ。ずっと前から色々なTO･DOリストや、タスクの管理アプリを使ってきたが、自分のニーズに合ったアプリがなかなか無かった。いつも何かが違うなという感じだったので、「もう自分で作るしかない」と決心し、:appを作った。",
 	"This app has been my introduction to programming and I fell in love. There are still great plans for new features so stay tuned! (I was greatly inspired by <a href='https://checkvist.com/'>Checkvist</a>.)": "このアプリを作ることでプログラミングを覚えて好きになった。まだまだ幾つかの新しい機能を作る予定があるので、楽しみにしてください！",
-	"is focussed on the following features:": "の様々の特徴"
+	":app is focussed on the following features:": ":appの様々の特徴"
 };
 
 /***/ }),
