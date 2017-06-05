@@ -9,12 +9,12 @@ class viewController extends Controller
     public function __construct()
     {
         $this->middleware('auth', [
-            'except'=>['index','indexJA'],
+            'except'=>['index'],
         ]);
     }
     public function index()
     {
-        return view('layouts.welcome');
+        return view('layouts.lp');
     }
     public function items()
     {

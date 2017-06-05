@@ -24,6 +24,6 @@
 <script>
     window.defaultLanguage = "{!! App::getLocale() !!}";
 </script>
-{{-- <script src="js/lp.js"></script> --}}
+<script src="js/lp.js"></script>
 </body>
 </html>

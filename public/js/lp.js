@@ -20033,129 +20033,76 @@ return jQuery;
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__lang_ja_json__ = __webpack_require__(240);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__lang_ja_json___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0__lang_ja_json__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_jquery__ = __webpack_require__(14);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_jquery___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_jquery__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_marked__ = __webpack_require__(217);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_marked___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_marked__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_vue__ = __webpack_require__(11);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_vue___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_3_vue__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__components_globalFunctions_js__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_jquery__ = __webpack_require__(14);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_jquery___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_jquery__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_marked__ = __webpack_require__(217);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_marked___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_marked__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_vue__ = __webpack_require__(11);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_vue___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_vue__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__components_globalFunctions_js__ = __webpack_require__(2);
+// IMPORT jQuery
 
-langContentsLP = {
-	"EN": {
-		"menu": {
-			"myList": "My LISTO",
-			"login": "Login",
-			"register": "Register",
-			"author": "Author",
-			"about": "About"
-		},
-		"lp": {
-			"jumbotron": {
-				"title": "Say hello to ",
-				"title2": "",
-				"body": "A simple task list for people who want to be organized without making things more complicated.",
-				"btn": "Try it out"
-			},
-			"features": {
-				"intro": " is focussed on the following features:",
-				"cards": [{
-					"title": "Simplicity",
-					"body": "It needs to ”just work”. I believe an app shouldn't require a manual to know how to work it. Intuition is the prime pillar.",
-					"img": "img/all.png"
-				}, {
-					"title": "Time management",
-					"body": "Add 'planned time' for a perspective of your taskload. You can use timers for increased productivity. You can easily log how much time you have spent on a task.",
-					"img": "img/timer.png"
-				}, {
-					"title": "A journal of done tasks",
-					"body": "The most important feature to know what you've done.",
-					"img": "img/journal.png"
-				}, {
-					"title": "Tags",
-					"body": "Tags for filtering and organization.",
-					"img": "img/filter.png"
-				}, {
-					"title": "Keyboard controls",
-					"body": "Keep it fast and easy to work with. And powerfull for power users.",
-					"img": "img/keyboard.jpg"
-				}]
-			},
-			"author": {
-				"title": "About the Author",
-				"body1": "Hello community. My name is Luca Ban. I always wanted to build the perfect task list app that fits my needs. I have used about all task list apps out there. But there was always something missing. So that's why I decided to create ",
-				"body1b": ".",
-				"body2": "This app has been my introduction to programming and I fell in love. There are still great plans for new features so stay tuned! (I was greatly inspired by [Checkvist](https://checkvist.com/).)",
-				"btn": "Try it out now"
-			}
-		}
-	}
-	// IMPORT jQuery
-};
 
 // export for others scripts to use
-window.$ = __WEBPACK_IMPORTED_MODULE_1_jquery___default.a;
-window.jQuery = __WEBPACK_IMPORTED_MODULE_1_jquery___default.a;
+window.$ = __WEBPACK_IMPORTED_MODULE_0_jquery___default.a;
+window.jQuery = __WEBPACK_IMPORTED_MODULE_0_jquery___default.a;
 
 
-window.marked = __WEBPACK_IMPORTED_MODULE_2_marked___default.a;
+window.marked = __WEBPACK_IMPORTED_MODULE_1_marked___default.a;
 
-window.Vue = __WEBPACK_IMPORTED_MODULE_3_vue___default.a;
+window.Vue = __WEBPACK_IMPORTED_MODULE_2_vue___default.a;
 // import lang from './lang/lp.js'
 
 
 const VueLpMaster = {
-	el: '.lp-wrapper',
-	data: {
-		'setLanguage': null,
-		langContentsLP
-	},
-	filters: {
-		marked(text) {
-			return __WEBPACK_IMPORTED_MODULE_2_marked___default()(text);
-		}
-	},
-	methods: {
-		marked(text) {
-			return __WEBPACK_IMPORTED_MODULE_2_marked___default()(text);
-		}
-	},
-	computed: {
-		language() {
-			if (this.setLanguage) {
-				return this.setLanguage;
-			} else if (defaultLanguage) {
-				return defaultLanguage;
-			} else {
-				return 'en';
-			};
-		},
-		contents() {
-			if (this.language == 'en') {
-				return this.langContentsLP.EN;
-			}
-			if (this.language == 'ja') {
-				return this.langContentsLP.JA;
-			}
-		},
-		aboutMe() {
-			return __WEBPACK_IMPORTED_MODULE_2_marked___default()(this.aboutMeTxt);
-		}
-	},
-	mounted() {
-		window.onscroll = function () {
-			let el = document.getElementsByClassName('line');
-			if (!__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_4__components_globalFunctions_js__["a" /* isElementInViewport */])(el[0])) {
-				__WEBPACK_IMPORTED_MODULE_1_jquery___default()("nav").addClass("scrolled-down");
-			} else {
-				__WEBPACK_IMPORTED_MODULE_1_jquery___default()("nav").removeClass("scrolled-down");
-			}
-		};
-	}
+  el: '.lp-wrapper',
+  data: {
+    'setLanguage': null
+  },
+  filters: {
+    marked(text) {
+      return __WEBPACK_IMPORTED_MODULE_1_marked___default()(text);
+    }
+  },
+  methods: {
+    marked(text) {
+      return __WEBPACK_IMPORTED_MODULE_1_marked___default()(text);
+    }
+  },
+  computed: {
+    language() {
+      if (this.setLanguage) {
+        return this.setLanguage;
+      } else if (defaultLanguage) {
+        return defaultLanguage;
+      } else {
+        return 'en';
+      };
+    },
+    contents() {
+      if (this.language == 'en') {
+        return this.langContentsLP.EN;
+      }
+      if (this.language == 'ja') {
+        return this.langContentsLP.JA;
+      }
+    },
+    aboutMe() {
+      return __WEBPACK_IMPORTED_MODULE_1_marked___default()(this.aboutMeTxt);
+    }
+  },
+  mounted() {
+    window.onscroll = function () {
+      let el = document.getElementsByClassName('line');
+      if (!__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_3__components_globalFunctions_js__["a" /* isElementInViewport */])(el[0])) {
+        __WEBPACK_IMPORTED_MODULE_0_jquery___default()("nav").addClass("scrolled-down");
+      } else {
+        __WEBPACK_IMPORTED_MODULE_0_jquery___default()("nav").removeClass("scrolled-down");
+      }
+    };
+  }
 };
-window.vm = new __WEBPACK_IMPORTED_MODULE_3_vue___default.a(VueLpMaster);
+window.vm = new __WEBPACK_IMPORTED_MODULE_2_vue___default.a(VueLpMaster);
 
 // require('./bootstrap');
 
@@ -21671,35 +21618,6 @@ if (true) {
 }());
 
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)))
-
-/***/ }),
-
-/***/ 240:
-/***/ (function(module, exports) {
-
-module.exports = {
-	"Click here to register": "登録はこちらへ",
-	"Login": "ログイン",
-	"Register": "無料登録",
-	"Name": "名",
-	"E-Mail Address": "メールアドレス",
-	"Password": "パスワード",
-	"Confirm Password": "パスワードの再入力",
-	"Remember Me": "ログイン状態を保存",
-	"Forgot Your Password?": "パスワードを忘れました",
-	"Click here to login": "ログインはこちらへ",
-	"Already have an account?": "既にアカウントを持っていますか？",
-	"My :app": "My :app",
-	"Author": "作成者について",
-	"Say hello to :app": ":appへようこそ",
-	"A simple task list for people who want to be organized without making things more complicated.": "余計に複雑にしなくても、簡単にタスクを管理したい方のためのリスト",
-	"Try it out": "無料で試す",
-	"Try it out now": "一旦使ってみよう",
-	"About the Author": "作成者について",
-	"Hello community. My name is Luca Ban. I always wanted to build the perfect task list app that fits my needs. I have used about all task list apps out there. But there was always something missing. So that's why I decided to create :app.": "やー。わたしは伴ルカ。ずっと前から色々なTO･DOリストや、タスクの管理アプリを使ってきたが、自分のニーズに合ったアプリがなかなか無かった。いつも何かが違うなという感じだったので、「もう自分で作るしかない」と決心し、:appを作った。",
-	"This app has been my introduction to programming and I fell in love. There are still great plans for new features so stay tuned! (I was greatly inspired by <a href='https://checkvist.com/'>Checkvist</a>.)": "このアプリを作ることでプログラミングを覚えて好きになった。まだまだ幾つかの新しい機能を作る予定があるので、楽しみにしてください！",
-	":app is focussed on the following features:": ":appの様々の特徴"
-};
 
 /***/ }),
 
