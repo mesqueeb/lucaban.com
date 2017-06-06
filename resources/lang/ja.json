@@ -1,6 +1,8 @@
 {
+"Toggle Navigation":"メニュー",
 "Click here to register":"登録はこちらへ",
 "Login":"ログイン",
+"Logout":"ログアウト",
 "Register":"無料登録",
 "Name":"名",
 "E-Mail Address":"メールアドレス",
@@ -12,8 +14,6 @@
 "Already have an account?":"既にアカウントを持っていますか？",
 "Reset Password":"パスワードをリセット",
 "Send Password Reset Link":"パスワードのリセットURLを送信",
-
-// LP
 "My :app":"My :app",
 "Author":"作成者について",
 "Say hello to :app":":appへようこそ",

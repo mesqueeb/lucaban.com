@@ -18,6 +18,6 @@ return [
 
 
     'loginpage' => [
-        'donthaveacc' => "Don't have an account yet?",
+        'donthaveacc' => 'Don't have an account yet?',
     ],
 ];
