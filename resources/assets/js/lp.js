@@ -3,8 +3,10 @@
 import Vue from 'vue';
 window.Vue = Vue;
 // import lang from './lang/lp.js'
+import { isElementInViewport, addClass, removeClass } from './components/globalFunctions.js';
+    window.Element.prototype.addClass = function(config){ return addClass(this,config) };
+    window.Element.prototype.removeClass = function(config){ return removeClass(this,config) };
 
-import { isElementInViewport } from './components/globalFunctions.js';
 const VueLpMaster = {
 	el:'.lp-wrapper',
 	data: {
@@ -51,11 +53,11 @@ const VueLpMaster = {
 			let el = document.getElementsByClassName('line');
 			if (!isElementInViewport(el[0]))
 			{
-		    	$("nav").addClass("scrolled-down");
+		    	document.querySelector('nav').addClass("scrolled-down");
 			}
 			else
 			{
-		    	$("nav").removeClass("scrolled-down");
+		    	document.querySelector('nav').removeClass("scrolled-down");
 			}
 		};
 	},

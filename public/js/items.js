@@ -4868,10 +4868,10 @@ module.exports = {
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "g", function() { return uniq; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "j", function() { return arrayToString; });
 /* unused harmony export sec_to_hourmin */
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "c", function() { return addClass; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "d", function() { return removeClass; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return hasClass; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return isElementInViewport; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return addClass; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return removeClass; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "d", function() { return hasClass; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "c", function() { return isElementInViewport; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "l", function() { return sortObjectArrayByProperty; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "m", function() { return sortObjectArrayByTwoProperties; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "h", function() { return removeEmptyValuesFromArray; });
@@ -32392,13 +32392,13 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
 // Make hasClass(el) available as el.hasClass();
 window.Element.prototype.hasClass = function (config) {
-	return __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__components_globalFunctions_js__["b" /* hasClass */])(this, config);
+	return __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__components_globalFunctions_js__["d" /* hasClass */])(this, config);
 };
 window.Element.prototype.addClass = function (config) {
-	return __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__components_globalFunctions_js__["c" /* addClass */])(this, config);
+	return __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__components_globalFunctions_js__["a" /* addClass */])(this, config);
 };
 window.Element.prototype.removeClass = function (config) {
-	return __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__components_globalFunctions_js__["d" /* removeClass */])(this, config);
+	return __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__components_globalFunctions_js__["b" /* removeClass */])(this, config);
 };
 
 // IMPORT linkify
@@ -35513,7 +35513,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 			return;
 		};
 		let el = document.getElementById('item-body-' + id);
-		if (!__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__components_globalFunctions_js__["a" /* isElementInViewport */])(el)) {
+		if (!__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__components_globalFunctions_js__["c" /* isElementInViewport */])(el)) {
 			el.scrollIntoView();
 		}
 	},

@@ -2,9 +2,9 @@
 // IMPORT Own jQuery replacement functions
 	import { hasClass, addClass, removeClass } from './components/globalFunctions.js';
 	// Make hasClass(el) available as el.hasClass();
-	window.Element.prototype.hasClass = function(config){ return hasClass(this,config)};
-	window.Element.prototype.addClass = function(config){ return addClass(this,config)};
-	window.Element.prototype.removeClass = function(config){ return removeClass(this,config)};
+	window.Element.prototype.hasClass = function(config){ return hasClass(this,config) };
+	window.Element.prototype.addClass = function(config){ return addClass(this,config) };
+	window.Element.prototype.removeClass = function(config){ return removeClass(this,config) };
 
 // IMPORT linkify
 	import * as linkify from 'linkifyjs';

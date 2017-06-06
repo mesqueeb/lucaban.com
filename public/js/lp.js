@@ -9781,6 +9781,12 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 window.Vue = __WEBPACK_IMPORTED_MODULE_0_vue___default.a;
 // import lang from './lang/lp.js'
 
+window.Element.prototype.addClass = function (config) {
+    return __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__components_globalFunctions_js__["a" /* addClass */])(this, config);
+};
+window.Element.prototype.removeClass = function (config) {
+    return __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__components_globalFunctions_js__["b" /* removeClass */])(this, config);
+};
 
 const VueLpMaster = {
     el: '.lp-wrapper',
@@ -9822,10 +9828,10 @@ const VueLpMaster = {
     mounted() {
         window.onscroll = function () {
             let el = document.getElementsByClassName('line');
-            if (!__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__components_globalFunctions_js__["a" /* isElementInViewport */])(el[0])) {
-                $("nav").addClass("scrolled-down");
+            if (!__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__components_globalFunctions_js__["c" /* isElementInViewport */])(el[0])) {
+                document.querySelector('nav').addClass("scrolled-down");
             } else {
-                $("nav").removeClass("scrolled-down");
+                document.querySelector('nav').removeClass("scrolled-down");
             }
         };
     }
@@ -9845,10 +9851,10 @@ window.vm = new __WEBPACK_IMPORTED_MODULE_0_vue___default.a(VueLpMaster);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "g", function() { return uniq; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "j", function() { return arrayToString; });
 /* unused harmony export sec_to_hourmin */
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "c", function() { return addClass; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "d", function() { return removeClass; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return hasClass; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return isElementInViewport; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return addClass; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return removeClass; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "d", function() { return hasClass; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "c", function() { return isElementInViewport; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "l", function() { return sortObjectArrayByProperty; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "m", function() { return sortObjectArrayByTwoProperties; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "h", function() { return removeEmptyValuesFromArray; });
