@@ -10,6 +10,10 @@
 "Forgot Your Password?":"パスワードを忘れました",
 "Click here to login":"ログインはこちらへ",
 "Already have an account?":"既にアカウントを持っていますか？",
+"Reset Password":"パスワードをリセット",
+"Send Password Reset Link":"パスワードのリセットURLを送信",
+
+// LP
 "My :app":"My :app",
 "Author":"作成者について",
 "Say hello to :app":":appへようこそ",
