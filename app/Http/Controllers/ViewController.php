@@ -3,14 +3,15 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class viewController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('auth', [
-            'except'=>['index'],
-        ]);
+        //dd(Auth::check());
+        // $this->middleware('auth');
+        
     }
     public function index()
     {
@@ -18,7 +19,6 @@ class viewController extends Controller
     }
     public function items()
     {
-    	$tags = \App\Item::existingTags();
-		return view('items.index')->with('tags',$tags);
+    	return view('items.index');
     }
 }

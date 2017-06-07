@@ -26,7 +26,7 @@ class ItemTagController extends Controller
      */
     public function index()
     {
-        return Item::existingTags();
+        // return Item::existingTags();
     }
 
     /**

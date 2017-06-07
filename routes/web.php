@@ -25,8 +25,8 @@ function()
     Route::get('password/reset', 'Auth\ForgotPasswordController@showLinkRequestForm')->name('password.request');
     Route::get('password/reset/{token}', 'Auth\ResetPasswordController@showResetForm')->name('password.reset');
 
-	Route::get('/', ['uses' => 'ViewController@index'])->name('home');
-	Route::get('/home', ['as' => 'home', 'uses' => 'ViewController@index']);
+    Route::get('/', ['uses' => 'ViewController@index'])->name('home');
+    Route::get('/home', ['uses' => 'ViewController@index']);
 });
 	// AUTH API
     Route::post('register', 'Auth\RegisterController@register');
@@ -35,7 +35,7 @@ function()
     Route::post('password/reset', 'Auth\ResetPasswordController@reset');
     Route::post('password/email', 'Auth\ForgotPasswordController@sendResetLinkEmail')->name('password.email');
 
-Route::get('/items', ['as' => 'items', 'uses' => 'ViewController@items']);
+// Route::get('/items', ['as' => 'items', 'uses' => 'ViewController@items'])->middleware('auth');
 ////////////////////////////////////////////////
 Route::get('/api/items/fetchdone','CardController@getDone');
 Route::post('/api/itemtags/fetchTagged','ItemTagController@fetchTagged');

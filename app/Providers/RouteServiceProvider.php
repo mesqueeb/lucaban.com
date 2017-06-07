@@ -35,13 +35,9 @@ class RouteServiceProvider extends ServiceProvider
      */
     public function map()
     {
-        $this->mapApiRoutes();
-
-        $this->mapWebRoutes();
-
         $this->mapListoRoutes();
-
-        //
+        // $this->mapApiRoutes();
+        $this->mapWebRoutes();
     }
 
     /**
@@ -54,8 +50,10 @@ class RouteServiceProvider extends ServiceProvider
     protected function mapWebRoutes()
     {
         Route::middleware('web')
-             ->namespace($this->namespace)
-             ->group(base_path('routes/web.php'));
+            ->domain(substr(env('SESSION_DOMAIN'),1))
+            ->namespace($this->namespace)
+            ->group(base_path('routes/web.php'));
+   
     }
 
     /**
@@ -73,12 +71,12 @@ class RouteServiceProvider extends ServiceProvider
              ->group(base_path('routes/api.php'));
     }
     protected function mapListoRoutes()
-    {
+    {   
         Route::group([
             'namespace' => $this->namespace,
-            'middleware' => '',
-            'domain' => 'listo.'.env('SESSION_DOMAIN'),
-        ], function($router){
+            'domain' => 'listo'.env('SESSION_DOMAIN'),
+            'middleware' => ['web','auth'],
+        ], function(){
             require base_path('routes/listo.php');
         });
     }

@@ -19,13 +19,13 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 // http://api.example.com/listo/tasks
 // http://listo.example.com/
 
-Route::group([
-	'middleware' => 'auth:api',
-	'domain' => 'api.'.env('SESSION_DOMAIN'),
-], function($router){
-	Route::group([
-		'prefix' => 'listo',
-	], function($router){
-
-	});
-});
+// Route::group([
+// 	'middleware' => 'auth:api',
+// 	'domain' => 'api'.env('SESSION_DOMAIN'),
+// ], function(){
+// 	Route::group([
+// 		'prefix' => 'listo',
+// 	], function(){
+		
+// 	});
+// });
