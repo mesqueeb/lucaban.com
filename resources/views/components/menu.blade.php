@@ -24,7 +24,7 @@
         @if (Route::has('login'))
             @if (Auth::check())
                 <li class="nav-item">
-                    <a class="nav-link" href="{{ url('/items') }}">
+                    <a class="nav-link" href="{{ route('listo.index') }}">
                         @lang("My :app", ['app' => config('app.name')])
                     </a>
                 </li>

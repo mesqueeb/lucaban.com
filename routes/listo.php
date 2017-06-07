@@ -6,6 +6,10 @@
 
 Route::get('/', ['uses' => 'ViewController@items','as'=>'listo.index']);
 
+Route::get('/api/items/fetchdone','CardController@getDone');
+Route::post('/api/itemtags/fetchTagged','ItemTagController@fetchTagged');
+Route::resource('/api/items','CardController');
+Route::resource('/api/itemtags','ItemTagController');
 // Route::group(
 // [
 // 	'prefix' => LaravelLocalization::setLocale(),

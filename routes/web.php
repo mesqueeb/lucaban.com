@@ -36,9 +36,3 @@ function()
     Route::post('password/email', 'Auth\ForgotPasswordController@sendResetLinkEmail')->name('password.email');
 
 // Route::get('/items', ['as' => 'items', 'uses' => 'ViewController@items'])->middleware('auth');
-////////////////////////////////////////////////
-Route::get('/api/items/fetchdone','CardController@getDone');
-Route::post('/api/itemtags/fetchTagged','ItemTagController@fetchTagged');
-Route::resource('/api/items','CardController');
-Route::resource('/api/itemtags','ItemTagController');
-////////////////////////////////////////////////
