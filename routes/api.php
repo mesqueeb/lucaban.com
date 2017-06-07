@@ -16,3 +16,16 @@ use Illuminate\Http\Request;
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
+// http://api.example.com/listo/tasks
+// http://listo.example.com/
+
+Route::group([
+	'middleware' => 'auth:api',
+	'domain' => 'api.'.env('SESSION_DOMAIN'),
+], function($router){
+	Route::group([
+		'prefix' => 'listo',
+	], function($router){
+
+	});
+});

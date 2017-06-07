@@ -39,6 +39,8 @@ class RouteServiceProvider extends ServiceProvider
 
         $this->mapWebRoutes();
 
+        $this->mapListoRoutes();
+
         //
     }
 
@@ -69,5 +71,15 @@ class RouteServiceProvider extends ServiceProvider
              ->middleware('api')
              ->namespace($this->namespace)
              ->group(base_path('routes/api.php'));
+    }
+    protected function mapListoRoutes()
+    {
+        Route::group([
+            'namespace' => $this->namespace,
+            'middleware' => '',
+            'domain' => 'listo.'.env('SESSION_DOMAIN'),
+        ], function($router){
+            require base_path('routes/listo.php');
+        });
     }
 }
