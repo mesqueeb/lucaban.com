@@ -22,7 +22,7 @@
 </div>{{-- /Inner Wrapper  --}}
 </div>{{-- /Outer Wrapper  --}}
 <script>
-	window.defaultLanguage = "{{ $_GET["l"] or 'en' }}";
+	window.defaultLanguage = "{!! App::getLocale() !!}";
 </script>
 <script src="js/items.js"></script>
 </body>

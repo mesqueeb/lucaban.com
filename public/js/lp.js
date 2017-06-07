@@ -9782,59 +9782,24 @@ window.Vue = __WEBPACK_IMPORTED_MODULE_0_vue___default.a;
 // import lang from './lang/lp.js'
 
 window.Element.prototype.addClass = function (config) {
-    return __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__components_globalFunctions_js__["a" /* addClass */])(this, config);
+	return __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__components_globalFunctions_js__["a" /* addClass */])(this, config);
 };
 window.Element.prototype.removeClass = function (config) {
-    return __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__components_globalFunctions_js__["b" /* removeClass */])(this, config);
+	return __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__components_globalFunctions_js__["b" /* removeClass */])(this, config);
 };
 
 const VueLpMaster = {
-    el: '.lp-wrapper',
-    data: {
-        'setLanguage': null
-    },
-    filters: {
-        marked(text) {
-            return marked(text);
-        }
-    },
-    methods: {
-        marked(text) {
-            return marked(text);
-        }
-    },
-    computed: {
-        language() {
-            if (this.setLanguage) {
-                return this.setLanguage;
-            } else if (defaultLanguage) {
-                return defaultLanguage;
-            } else {
-                return 'en';
-            };
-        },
-        contents() {
-            if (this.language == 'en') {
-                return this.langContentsLP.EN;
-            }
-            if (this.language == 'ja') {
-                return this.langContentsLP.JA;
-            }
-        },
-        aboutMe() {
-            return marked(this.aboutMeTxt);
-        }
-    },
-    mounted() {
-        window.onscroll = function () {
-            let el = document.getElementsByClassName('line');
-            if (!__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__components_globalFunctions_js__["c" /* isElementInViewport */])(el[0])) {
-                document.querySelector('nav').addClass("scrolled-down");
-            } else {
-                document.querySelector('nav').removeClass("scrolled-down");
-            }
-        };
-    }
+	el: '.lp-wrapper',
+	mounted() {
+		window.onscroll = function () {
+			let el = document.getElementsByClassName('line');
+			if (!__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__components_globalFunctions_js__["c" /* isElementInViewport */])(el[0])) {
+				document.querySelector('nav').addClass("scrolled-down");
+			} else {
+				document.querySelector('nav').removeClass("scrolled-down");
+			}
+		};
+	}
 };
 window.vm = new __WEBPACK_IMPORTED_MODULE_0_vue___default.a(VueLpMaster);
 

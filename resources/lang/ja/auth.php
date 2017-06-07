@@ -15,6 +15,6 @@ return [
     'throttle' => 'ログインの試行回数が多すぎます。:seconds 秒後にお試しください。',
 
     'loginpage' => [
-        'donthaveacc' => 'アカウントをまだ持っていませんか？',
+        'donthaveacc' => "アカウントをまだ持っていませんか？",
     ],
 ];

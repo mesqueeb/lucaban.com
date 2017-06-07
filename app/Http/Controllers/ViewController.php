@@ -21,9 +21,4 @@ class viewController extends Controller
     	$tags = \App\Item::existingTags();
 		return view('items.index')->with('tags',$tags);
     }
-    public function itemsJA()
-    {
-        $tags = \App\Item::existingTags();
-        return view('items.index')->with('tags',$tags);
-    }
 }

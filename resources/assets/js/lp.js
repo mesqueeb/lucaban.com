@@ -9,44 +9,6 @@ import { isElementInViewport, addClass, removeClass } from './components/globalF
 
 const VueLpMaster = {
 	el:'.lp-wrapper',
-	data: {
-        'setLanguage':null,
-	},
-    filters: {
-        marked(text)
-        {
-            return marked(text);
-        },
-    },
-    methods: {
-    	marked(text)
-    	{
-            return marked(text);
-    	},
-    },
-    computed: {
-    	language()
-    	{
-    		if(this.setLanguage){ return this.setLanguage; }
-    		else if (defaultLanguage){ return defaultLanguage; }
-    		else { return 'en' };
-    	},
-        contents()
-        {
-        	if(this.language == 'en')
-        	{
-        		return this.langContentsLP.EN;
-        	}
-        	if(this.language == 'ja')
-        	{
-        		return this.langContentsLP.JA;
-        	}
-        },
-        aboutMe()
-        {
-            return marked(this.aboutMeTxt);
-        },
-    },
 	mounted()
 	{
         window.onscroll = function() {
