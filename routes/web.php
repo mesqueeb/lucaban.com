@@ -27,6 +27,7 @@ function()
 
     Route::get('/', ['uses' => 'ViewController@index'])->name('home');
     Route::get('/home', ['uses' => 'ViewController@index']);
+    Route::get('/controlpanel', ['uses' => 'ViewController@controlPanel', 'as' => 'userarea.controlpanel']);
 });
 	// AUTH API
     Route::post('register', 'Auth\RegisterController@register');

@@ -179,6 +179,7 @@ return [
         Conner\Tagging\Providers\TaggingServiceProvider::class,
         GeneaLabs\LaravelCaffeine\Providers\LaravelCaffeineService::class,
         Mcamara\LaravelLocalization\LaravelLocalizationServiceProvider::class,
+        Laravel\Passport\PassportServiceProvider::class,
     ],
 
     /*

@@ -1,0 +1,141 @@
+// Fixes for iOS Safari
+button {
+	padding: 0;
+}
+input, textarea {
+	border-radius: 0;
+}
+input:not([type=checkbox]):not([type=radio]), textarea{
+	-webkit-appearance: none;
+	box-shadow: none;
+}
+
+html, body { height:100%; width:100%; }
+
+input[type="color"],
+input[type="date"],
+input[type="datetime"],
+input[type="datetime-local"],
+input[type="email"],
+input[type="month"],
+input[type="number"],
+input[type="password"],
+input[type="search"],
+input[type="tel"],
+input[type="text"],
+input[type="time"],
+input[type="url"],
+input[type="week"],
+select:focus,
+textarea {
+  font-size: 14px;
+}
+.mobile{
+	input[type="color"],
+	input[type="date"],
+	input[type="datetime"],
+	input[type="datetime-local"],
+	input[type="email"],
+	input[type="month"],
+	input[type="number"],
+	input[type="password"],
+	input[type="search"],
+	input[type="tel"],
+	input[type="text"],
+	input[type="time"],
+	input[type="url"],
+	input[type="week"],
+	select:focus,
+	textarea {
+	  font-size: 16px !important;
+	}
+}
+
+// [class*="pill"] {
+// 	padding: 0.2rem 0.5rem;
+//     border-radius: 0.3rem;
+//     color: white;
+//     font-size: 0.9rem;
+//     background-color: black;
+//     background-color: $used-time-color;
+// }
+// [class*="-small"] {
+// 	font-size: 0.7rem;
+// }
+// [class*="flex"]{
+//     display: flex;
+// }
+// [class*="--wrap"]{
+//     flex-wrap: wrap;
+// }
+.l-fullwidth, .l-w100{
+    width: 100%;
+}
+
+
+.w-100{
+    width: 100%;
+}
+.d-inline-flex{
+    display: inline-flex;
+}
+.d-flex{
+    display: flex;
+}
+.flex-wrap{
+    flex-wrap: wrap;
+}
+.align-items-center{
+    align-items: center;
+}
+.ml-auto{
+    margin-left: auto;
+}
+
+/**********
+* Grow in *
+***********/
+// .animated { 
+//     -webkit-animation-duration: 1s; 
+//     animation-duration: 1s; 
+//     -webkit-animation-fill-mode: both; 
+//     animation-fill-mode: both; 
+// }
+
+// @-webkit-keyframes growIn { 
+//     0% { 
+//         -webkit-transform: scale(0.2); 
+//         opacity:0;
+//     } 
+//     50% { 
+//         -webkit-transform: scale(1.2); 
+        
+//     } 
+//     100% { 
+//         -webkit-transform: scale(1); 
+//         opacity:1;
+//     } 
+// } 
+// @keyframes growIn { 
+//     0% { 
+//         transform: scale(0.2); 
+//         opacity:0;
+//     } 
+//     50% { 
+//         transform: scale(1.2); 
+        
+//     } 
+//     100% { 
+//         transform: scale(1); 
+//         opacity:1;
+//     } 
+// } 
+// .growIn { 
+//     -webkit-transform: scale(0.2);
+//     transform: scale(0.2);
+//     opacity:0;
+// }
+// .growIn.go{
+//     -webkit-animation-name: growIn; 
+//     animation-name: growIn; 
+// }

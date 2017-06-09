@@ -1,0 +1,46 @@
+<html>
+<head>
+
+	<!-- _|Google-Analytics -->
+    <script>
+		(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+		(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+		m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+		})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+		ga('create', 'UA-92965499-1', 'auto');
+		ga('send', 'pageview');
+	</script>
+	<!-- Google-Analytics|_ -->
+
+	<meta charset="UTF-8">
+	<meta name="csrf-token" id="csrf-token" content="{{ csrf_token() }}">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no">
+	<meta name="google" value="notranslate">
+	
+	<!-- <link rel="stylesheet" href="/css/items.css"> -->
+	<!-- <link rel="stylesheet" href="/css/fonts/material-design-iconic-font.min.css"> -->
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/material-design-iconic-font/2.2.0/css/material-design-iconic-font.min.css">
+
+	<title>Listo</title>
+	<link rel="shortcut icon" type="image/x-icon" href="statics/favicon.png">
+
+</head>
+<body>
+<!-- _|OUTER-WRAPPER -->
+<div style="position: fixed; height:100%; width:100%; top:0; left:0;">
+<!-- _|INNER-WRAPPER -->
+<div style="height:calc(100% - 1px); width:100%; z-index: 1; overflow-y: scroll; -webkit-overflow-scrolling: touch;" id="background">
+
+<!-- _|LISTO-APP -->
+<div id="q-app">
+</div><!-- LISTO-APP|_ -->
+
+</div><!-- INNER-WRAPPER|_  -->
+</div><!-- OUTER-WRAPPER|_  -->
+<script>
+	window.defaultLanguage = "en";
+</script>
+<!-- <script src="js/items.js"></script> -->
+</body>
+</html>

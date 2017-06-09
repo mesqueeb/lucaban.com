@@ -66,8 +66,8 @@ class RouteServiceProvider extends ServiceProvider
     {   
         Route::group([
             'namespace' => $this->namespace,
-            'domain' => 'listo'.env('SESSION_DOMAIN'),
             'middleware' => ['web','auth'],
+            'domain' => 'listo'.env('SESSION_DOMAIN'),
         ], function(){
             require base_path('routes/listo.php');
         });
@@ -82,8 +82,8 @@ class RouteServiceProvider extends ServiceProvider
     protected function mapApiRoutes()
     {
         Route::prefix('api')
-             ->middleware(['api','auth'])
              ->namespace($this->namespace)
+             ->middleware(['api','subdomainCORS'])
              ->group(base_path('routes/api.php'));
     }
 }

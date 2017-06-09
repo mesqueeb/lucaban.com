@@ -19,6 +19,11 @@ class viewController extends Controller
     }
     public function items()
     {
-    	return view('items.index');
+        return view('items.index');
+    }    
+    public function controlPanel()
+    {
+    	return view('userarea.controlpanel');
     }
+
 }

@@ -520,6 +520,7 @@ export default {
 	components: { itemNav, itemToggles },
 	mounted()
 	{
+		console.info(this);
 		// this.newItem.preparedTags = JSON.parse(JSON.stringify(this.parentTags));
 		// this.convertbodyURLtoHTML();
 		if (this.listIsEmpty){ this.$root.addingNewEmptyList = true; }
@@ -1052,7 +1053,7 @@ export default {
 		    		||  document.activeElement.nodeName == 'BUTTON' )
 		    	{
 	        		return;
-				}　else {
+				} else {
     				if (self.$root.mobile){ return; }
 			    	console.log('blurring on edit');
 					self.doneEdit(item);
@@ -1078,7 +1079,7 @@ export default {
 		    		||  document.activeElement.nodeName == 'BUTTON' )
 		    	{
 	        		return;
-				}　else {
+				} else {
 			    	// if (self.$root.mobile){ self.addNew('stop'); return; }
 			    	console.log('bluring on Add New');
 			    	if (self.$root.mobile){ return; }

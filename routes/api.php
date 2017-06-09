@@ -13,13 +13,14 @@ use Illuminate\Http\Request;
 |
 */
 
-Route::middleware('auth:api')->get('/user', function (Request $request) {
+Route::get('/user', function (Request $request) {
     return $request->user();
 });
 
 Route::get('/items/fetchdone','CardController@getDone');
 Route::post('/itemtags/fetchTagged','ItemTagController@fetchTagged');
 Route::resource('/items','CardController');
+Route::options('/items',['uses' => 'CORSHelperController@handleCORS']);
 Route::resource('/itemtags','ItemTagController');
 
 // http://api.example.com/listo/tasks
