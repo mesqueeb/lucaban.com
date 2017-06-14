@@ -1,0 +1,54 @@
+$selection-color: rgba(245,215,110,0.5);
+$theme-color: #5dc2af;
+$duration-color: #5dacce;
+$duration-color-dark: #4679a7;
+$duedate-color: rgba(230, 94, 77, 1);
+$duedate-parent-color: rgba(230, 94, 77, 0.5);
+$done-color: #1E824C;
+$used-time-color: #5d67b3;
+
+// greys
+$border-gray: #ededed;
+$light-gray: #e6e6e6;
+$gray: #d9d9d9;
+$dark-gray: #5a5a5a;
+
+$mid-grey: #ababab;
+$sepia-background:#f5f2eb;
+$sepia-brown:#a59174;
+$sepia-grey:#c0b2b4;
+
+$color-success:#03A678;
+
+$font-family-sans-serif:  "Helvetica Neue", Helvetica, Arial, sans-serif !default;
+$font-family-serif:       Georgia, "Times New Roman", Times, serif !default;
+//** Default monospace fonts for `<code>`, `<kbd>`, and `<pre>`.
+$font-family-monospace:   Menlo, Monaco, Consolas, "Courier New", monospace !default;
+$font-family-base:        $font-family-sans-serif !default;
+
+
+// $font-family-base
+// Check Bootstrap/scss for this variable.
+@mixin text-settings() {
+    font-family: $font-family-base;
+    color: #4d4d4d;
+    font-size: 14px;
+    font-weight: 300;
+    -webkit-font-smoothing: antialiased;
+    -moz-font-smoothing: antialiased;
+    font-smoothing: antialiased;
+    resize: none;
+}
+
+@mixin pill($colour) {
+    font-size: 0.6rem;
+    align-items: center;
+    display: flex;
+    position:relative;
+    padding: 0.3em 0.5em;
+    margin: 0.1em;
+    border-radius: 0.3em;
+    color: white;
+    background-color: $colour;
+    min-height: 2.1em;
+}

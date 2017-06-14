@@ -2,6 +2,8 @@
 
 namespace App;
 
+// use Laravel\Passport\HasApiTokens;
+// →　Tried passport but then replaced with JWT
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 

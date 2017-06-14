@@ -6,13 +6,16 @@
     "type": "project",
     "require": {
         "php": ">=5.6.4",
+        "barryvdh/laravel-cors": "^0.9.2",
         "doctrine/dbal": "^2.5",
         "genealabs/laravel-caffeine": "^0.4.2",
         "guzzlehttp/guzzle": "^6.2",
         "laravel/framework": "5.4.*",
+        "laravel/passport": "^2.0",
         "laravel/tinker": "~1.0",
         "mcamara/laravel-localization": "^1.2",
-        "rtconner/laravel-tagging": "~2.2"
+        "rtconner/laravel-tagging": "~2.2",
+        "tymon/jwt-auth": "^0.5.12"
     },
     "require-dev": {
         "fzaninotto/faker": "~1.4",

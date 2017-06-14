@@ -1,0 +1,29 @@
+.animate-scale {
+    animation: q-scale 0.2s;
+}
+[v-cloak] {
+    display: none;
+}
+body {
+    @include text-settings();
+    background: #f5f5f5;
+    margin: 0;
+}
+form {
+    margin-bottom: 0;
+}
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    /* display: none; <- Crashes Chrome on hover */
+    -webkit-appearance: none;
+    margin: 0; /* <-- Apparently some margin are still there even though it's hidden */
+}
+input, textarea{
+    @include text-settings();
+    outline: none;
+    border-style: none;
+}
+label{
+    font-weight: 300;
+    margin: 0;
+}

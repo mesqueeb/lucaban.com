@@ -36,8 +36,8 @@ class RegisterController extends Controller
      */
     public function __construct()
     {
-        $this->middleware('guest');
         $this->redirectTo = route('listo.index');
+        $this->middleware('guest');
     }
 
     /**

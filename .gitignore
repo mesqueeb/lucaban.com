@@ -9,3 +9,17 @@ Homestead.yaml
 .env
 .DS_Store
 resources/assets/js/.DS_Store
+/resources/Listo/.DS_Store
+/resources/Listo/node_modules/
+/resources/Listo/dist/
+/resources/Listo/npm-debug.log
+/resources/Listo/npm-debug.log.*
+/resources/Listo/selenium-debug.log
+/resources/Listo/test/unit/coverage
+/resources/Listo/test/e2e/reports
+/resources/Listo/cordova/platforms
+/resources/Listo/cordova/plugins
+/resources/Listo/thumbs.db
+/resources/Listo/!.gitkeep
+
+resources/Listo/node_modules/.bin/jsesc

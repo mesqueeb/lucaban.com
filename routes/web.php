@@ -26,13 +26,15 @@ function()
     Route::get('password/reset/{token}', 'Auth\ResetPasswordController@showResetForm')->name('password.reset');
 
     Route::get('/', ['uses' => 'ViewController@index'])->name('home');
-    Route::get('/home', ['uses' => 'ViewController@index']);
+    Route::get('home', ['uses' => 'ViewController@index']);
+    Route::get('controlpanel', ['uses' => 'ViewController@controlPanel', 'as' => 'userarea.controlpanel']);
 });
-	// AUTH API
-    Route::post('register', 'Auth\RegisterController@register');
-    Route::post('login', 'Auth\LoginController@login');
-    Route::post('logout', 'Auth\LoginController@logout')->name('logout');
-    Route::post('password/reset', 'Auth\ResetPasswordController@reset');
-    Route::post('password/email', 'Auth\ForgotPasswordController@sendResetLinkEmail')->name('password.email');
 
-// Route::get('/items', ['as' => 'items', 'uses' => 'ViewController@items'])->middleware('auth');
+// AUTH API
+Route::post('register', 'Auth\RegisterController@register');
+Route::post('login', 'Auth\LoginController@login');
+Route::post('logout', 'Auth\LoginController@logout')->name('logout');
+Route::post('password/reset', 'Auth\ResetPasswordController@reset');
+Route::post('password/email', 'Auth\ForgotPasswordController@sendResetLinkEmail')->name('password.email');
+
+
