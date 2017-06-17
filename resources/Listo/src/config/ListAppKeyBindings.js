@@ -7,7 +7,7 @@ constructor()
 }
 keystroke(k)
 {
-	if(selection.view == 'journal' &&
+	if(store.state.selection.view == 'journal' &&
 		// Disable keystrokes when in the journal.
 		(  k == 'arrowRight'
 		|| k == 'arrowLeft'

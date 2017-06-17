@@ -117,3 +117,21 @@ export default{
 	},
 }
 </script>
+<style lang="scss">
+// @import '../css/_variables.scss';
+.c-item-nav{
+    margin-left: auto;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+.c-item-nav button{
+    margin: 0.3rem 0.5rem;
+}
+.c-item-nav__icon{
+    font-size: 1.5em;
+}
+.c-item-nav__delete{
+    color: rgba(231, 76, 60, 0.3);
+}
+</style>

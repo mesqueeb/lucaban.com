@@ -48,12 +48,10 @@ export default class Selection {
 	}
 	noFilterOrTag()
 	{
-		let n = (  !this.tags.length
-				&&  (
-					  ( this.filter.length == 1
-						&& this.filter.includes('all')
-					  ) || (!this.filter.length)
-					)
+		let n = ( !this.tags.length
+				  && ( ( this.filter.length == 1 && this.filter.includes('all') )
+					   || (!this.filter.length)
+					 )
 				);
 		return n;
 	}

@@ -1,3 +1,4 @@
+import { enhancedGetters } from 'vuex-strong-cache'
 import {
 	mobilecheck,Utilities,objectToArray,uniqBy,sortObjectArrayByProperty,sortObjectArrayByTwoProperties
 } from '../helpers/globalFunctions.js';
@@ -5,88 +6,90 @@ import { sec_to_hourmin } from '../helpers/valueMorphers2.js';
 import * as moment from 'moment';
 
 export default {
-totalPlannedMin: (state, getters) =>
-(id = state.root.id) => {
-	let item = state.nodes[id];
-	if (!item){ return 0; }
+// ...enhancedGetters({
+	totalPlannedMin: (state, getters) =>
+	(id = state.root.id) => {
+		let item = state.nodes[id];
+		if (!item){ return 0; }
 
-	let selfValue = (item.planned_time) ? parseFloat(item.planned_time) : 0;
-	let childrenArray = getters.allVisibleChildItems(id);
-	if (!childrenArray || !childrenArray.length) { return selfValue; }
-	let x = childrenArray.reduce(function(prevVal, child){
-		return prevVal + parseFloat(child.planned_time);
-	}, selfValue);
-    return (x) ? parseFloat(x) : 0;
-},
-totalUsedSec: (state, getters) =>
-(idOrItem = state.root.id) => {
-	let item;
-	let childrenArray;
-	if (typeof idOrItem === 'object' && idOrItem.journalDate)
-	{
-		item = idOrItem;
-		childrenArray = item.children;
-	} else {
-		item = state.nodes[idOrItem];
-		childrenArray = getters.allVisibleChildItems(idOrItem);
-	}
-	if (!item){ return 0; }
+		let selfValue = (item.planned_time) ? parseFloat(item.planned_time) : 0;
+		let childrenArray = getters.allVisibleChildItems(id);
+		if (!childrenArray || !childrenArray.length) { return selfValue; }
+		let x = childrenArray.reduce(function(prevVal, child){
+			return prevVal + parseFloat(child.planned_time);
+		}, selfValue);
+	    return (x) ? parseFloat(x) : 0;
+	},
+	totalUsedSec: (state, getters) =>
+	(idOrItem = state.root.id) => {
+		let item;
+		let childrenArray;
+		if (typeof idOrItem === 'object' && idOrItem.journalDate)
+		{
+			item = idOrItem;
+			childrenArray = item.children;
+		} else {
+			item = state.nodes[idOrItem];
+			childrenArray = getters.allVisibleChildItems(idOrItem);
+		}
+		if (!item){ return 0; }
 
-	let selfValue = (item.used_time) ? parseFloat(item.used_time) : 0;
-	if (!childrenArray || !childrenArray.length) { return selfValue; }
-	
-	let x = childrenArray.reduce(function(prevVal, child){
-		return prevVal + parseFloat(child.used_time);
-	}, selfValue);
-    return (x) ? x : 0;
-},
-totalUsedMin: (state, getters) =>
-(id = state.root.id) => {
-	return Math.floor(getters.totalUsedSec(id)/60);
-},
-totalUsedHourMin: (state, getters) =>
-(id = state.root.id) => {
-	// console.log(`id: ${id} in totalUsedHourMin ${state.root.id}`);
-	return sec_to_hourmin(getters.totalUsedSec(id));
-},
-totalPlannedSec: (state, getters) =>
-(id = state.root.id) => {
-	return getters.totalPlannedMin(id)*60;
-},
-totalPlannedHour: (state, getters) =>
-(id = state.root.id) => {
-	return getters.totalPlannedMin(id)/60;
-},
-totalMinLeft: (state, getters) =>
-(id = state.root.id) => {
-	return getters.totalPlannedMin(id)-getters.totalUsedMin(id);
-},
-totalSecLeft: (state, getters) =>
-(id = state.root.id) => {
-	return getters.totalPlannedSec(id)-getters.totalUsedSec(id);
-},
-totalHourMinLeft: (state, getters) =>
-(id = state.root.id) => {
-	return sec_to_hourmin(getters.totalSecLeft(id));
-},
-secLeft: (state, getters) =>
-(id = state.root.id) => {
-	let item = state.nodes[id];
-	if (!item){ return 0; }
-	return item.planned_time*60-item.used_time;
-},
-minLeft: (state, getters) =>
-(id = state.root.id) => {
-	return getters.secLeft(id)/60;
-},
-totalTimeDifferentFromParent: (state, getters) =>
-(id) => {
-	let item = state.nodes[id];
-	if (!item){ return 0; }
-	if (!item.parent_id){ return true; }
+		let selfValue = (item.used_time) ? parseFloat(item.used_time) : 0;
+		if (!childrenArray || !childrenArray.length) { return selfValue; }
+		
+		let x = childrenArray.reduce(function(prevVal, child){
+			return prevVal + parseFloat(child.used_time);
+		}, selfValue);
+	    return (x) ? x : 0;
+	},
+	totalUsedMin: (state, getters) =>
+	(id = state.root.id) => {
+		return Math.floor(getters.totalUsedSec(id)/60);
+	},
+	totalUsedHourMin: (state, getters) =>
+	(id = state.root.id) => {
+		// console.log(`id: ${id} in totalUsedHourMin ${state.root.id}`);
+		return sec_to_hourmin(getters.totalUsedSec(id));
+	},
+	totalPlannedSec: (state, getters) =>
+	(id = state.root.id) => {
+		return getters.totalPlannedMin(id)*60;
+	},
+	totalPlannedHour: (state, getters) =>
+	(id = state.root.id) => {
+		return getters.totalPlannedMin(id)/60;
+	},
+	totalMinLeft: (state, getters) =>
+	(id = state.root.id) => {
+		return getters.totalPlannedMin(id)-getters.totalUsedMin(id);
+	},
+	totalSecLeft: (state, getters) =>
+	(id = state.root.id) => {
+		return getters.totalPlannedSec(id)-getters.totalUsedSec(id);
+	},
+	totalHourMinLeft: (state, getters) =>
+	(id = state.root.id) => {
+		return sec_to_hourmin(getters.totalSecLeft(id));
+	},
+	secLeft: (state, getters) =>
+	(id = state.root.id) => {
+		let item = state.nodes[id];
+		if (!item){ return 0; }
+		return item.planned_time*60-item.used_time;
+	},
+	minLeft: (state, getters) =>
+	(id = state.root.id) => {
+		return getters.secLeft(id)/60;
+	},
+	totalTimeDifferentFromParent: (state, getters) =>
+	(id) => {
+		let item = state.nodes[id];
+		if (!item){ return 0; }
+		if (!item.parent_id){ return true; }
 
-	return getters.totalPlannedSec(id) != getters.totalPlannedSec(item.parent_id);
-},
+		return getters.totalPlannedSec(id) != getters.totalPlannedSec(item.parent_id);
+	},
+// }),
 tagsArray: (state, getters) =>
 (id) => {
 	let item = state.nodes[id];
@@ -186,7 +189,7 @@ nextItemId: (state, getters) =>
 	let nextItemId;
 	// Select next item on top level.
 	if ( getters.isTopLvlItemInFilteredRoot(id) && !item.show_children
-	  || selection.view == 'journal' )
+	  || state.selection.view == 'journal' )
 	{
 		let ind = getters.childrenOrder(state.root.id).indexOf(id);
 		if (ind+1 == getters.childrenOrder(state.root.id).length)
@@ -223,6 +226,51 @@ nextSiblingOrParentsSiblingId: (state, getters) =>
 		return children_order[nextIndex];
 	}
 },
+getLastChildId: (state, getters) =>
+(id) => {
+	let item = state.nodes[id];
+	let childrenCount = item.children.length;
+	if (childrenCount && item.show_children)
+	{
+		let lastChild = item.children[childrenCount-1];
+		return lastChild.id;
+	}
+	return id;
+},
+getDeepestLastChildId: (state, getters) =>
+(id) => {
+	// debugger;
+	let lastChildId = getters.getLastChildId(id);
+	let item = state.nodes[lastChildId];
+	if (item.children.length && item.show_children)
+	{
+		return getters.getDeepestLastChildId(lastChildId);
+	}
+	return lastChildId;
+},
+itIsADeepestChild: (state, getters) =>
+(id) => {
+	// console.log('running itIsADeepestChild');
+	if (!id){ console.log('you need an ID'); return; }
+	if (getters.childrensDeepestChildren(state.root.id).map(item => item.deepestChild).includes(id))
+	{
+		return true;
+	} return false;
+},
+findDeepestVisibleChild: (state, getters) =>
+(id = state.selection.selectedId) => {
+	// console.log('running findDeepestVisibleChild');
+	let item = state.nodes[id];
+	let children = item.children.filter(child => !getters.hiddenItemIds.includes(child.id));
+	if (!children.length) { return id; }
+	let deepestId = children[children.length-1].id;
+	return getters.findDeepestVisibleChild(deepestId);
+},
+isFirstItem: (state, getters) =>
+(id) => {
+	if (getters.noItems){ return false; }
+	return (getters.siblingIndex(id) == 0);
+},
 childrensDeepestChildren: (state, getters) =>
 (id = state.root.id) => {
 	return getters.visibleDirectChildren(id).map(function(item){
@@ -251,11 +299,11 @@ prevItemId: (state, getters) =>
 	let index;
 	// Select next item on top level.
 	let childrenIds = getters.childrenOrder(state.root.id);
-	if (getters.isTopLvlItemInFilteredRoot(id) || selection.view == 'journal')
+	if (getters.isTopLvlItemInFilteredRoot(id) || state.selection.view == 'journal')
 	{
 		index = childrenIds.indexOf(id);
 		if (index == 0) {
-			if (selection.view == 'journal')
+			if (state.selection.view == 'journal')
 			{
 				prevItemId = childrenIds[childrenIds.length-1];
 			} else {
@@ -263,7 +311,7 @@ prevItemId: (state, getters) =>
 			}
 		} else {
 			prevItemId = childrenIds[index-1];
-			if (selection.view != 'journal')
+			if (state.selection.view != 'journal')
 			{
 				prevItemId = getters.deepestChild(prevItemId);
 			}
@@ -293,7 +341,7 @@ nextItemRecursion: (state, getters) =>
 	let nextIndex = getters.siblingIndex(id)+1;
 	let item = state.nodes[id];
 	let parent_id = item.parent_id;
-	// let tagsSelected = selection.tags.length;
+	// let tagsSelected = state.selection.tags.length;
 
 	if (getters.itIsADeepestChild(id))
 	{
@@ -325,8 +373,7 @@ nextItemRecursion: (state, getters) =>
 isTopLvlItemInFilteredRoot: (state, getters) =>
 (id) => {
 	// console.log('running isTopLvlItemInFilteredRoot');
-	let s = selection;
-	if (selection.nothingSelected() && selection.view == 'tree')
+	if (getters['selection/nothingSelected'] && state.selection.view == 'tree')
 	{
 		// console.log('the root is not filtered');
 		return false;
@@ -342,7 +389,7 @@ isTopLvlItemInFilteredRoot: (state, getters) =>
 },
 hasParentDueToday: (state, getters) =>
 (id) => {
-	id = (id) ? id : selection.selectedId;
+	id = (id) ? id : state.selection.selectedId;
 	let item = state.nodes[id];
 	if (!item.parent_id){ return false; }
 	let parent = state.nodes[item.parent_id];
@@ -357,7 +404,7 @@ hasParentDueToday: (state, getters) =>
 },
 isDueToday: (state, getters) =>
 (id) => {
-	id = (id) ? id : selection.selectedId;
+	id = (id) ? id : state.selection.selectedId;
 	let item = state.nodes[id];
 	let diff = moment(item.due_date).diff(moment(), 'days');
 	if (diff <= 0) { return true; }
@@ -419,13 +466,13 @@ calTotalPlannedTime: (state, getters) =>
     if (!(Array.isArray(item.children) && item.children.length))
     {
     	// if we don't have children, do nothing, leave the time as-is
-		totalPlannedTime = (!item.done || selection.view == 'journal') ? parseFloat(item.planned_time) : 0 ;
+		totalPlannedTime = (!item.done || state.selection.view == 'journal') ? parseFloat(item.planned_time) : 0 ;
     } else {
 		// add up all the times of our direct children
 	    totalPlannedTime = item.children.reduce((prev, next) => {
 	        let x = (next.totalPlannedTime) ? next.totalPlannedTime : next.planned_time ;
 	        return prev+parseFloat(x);
-	    }, (!item.done || selection.view == 'journal') ? parseFloat(item.planned_time) : 0 );
+	    }, (!item.done || state.selection.view == 'journal') ? parseFloat(item.planned_time) : 0 );
     }
     return parseFloat(totalPlannedTime);
 },
@@ -436,13 +483,13 @@ calTotalUsedTime: (state, getters) =>
     if (!(Array.isArray(item.children) && item.children.length))
     {
     	// if we don't have children, do nothing, leave the time as-is
-		totalUsedTime = (!item.done || selection.view == 'journal') ? parseFloat(item.used_time) : 0 ;
+		totalUsedTime = (!item.done || state.selection.view == 'journal') ? parseFloat(item.used_time) : 0 ;
     } else {
 		// add up all the times of our direct children
 	    totalUsedTime = item.children.reduce((prev, next) => {
 	        let x = (next.totalUsedTime) ? next.totalUsedTime : next.used_time ;
 	        return prev+parseFloat(x);
-	    }, (!item.done || selection.view == 'journal') ? parseFloat(item.used_time) : 0 );
+	    }, (!item.done || state.selection.view == 'journal') ? parseFloat(item.used_time) : 0 );
     }
     return parseFloat(totalUsedTime);
 },
@@ -474,28 +521,6 @@ getParentsRecursive: (state, getters) =>
 	pArr.push(state.nodes[pId].body);
 	getters.getParentsRecursive(pId, pArr);
 },
-getLastChildId: (state, getters) =>
-(id) => {
-	let item = state.nodes[id];
-	let childrenCount = item.children.length;
-	if (childrenCount && item.show_children)
-	{
-		let lastChild = item.children[childrenCount-1];
-		return lastChild.id;
-	}
-	return id;
-},
-getDeepestLastChildId: (state, getters) =>
-(id) => {
-	// debugger;
-	let lastChildId = getters.getLastChildId(id);
-	let item = state.nodes[lastChildId];
-	if (item.children.length && item.show_children)
-	{
-		return getters.getDeepestLastChildId(lastChildId);
-	}
-	return lastChildId;
-},
 setDefaultItemValues: (state, getters) =>
 (item) => {
 	// item.parent_id_backup = item.parent_id;
@@ -516,6 +541,7 @@ setDefaultItemValues: (state, getters) =>
 },
 flattenTree: (state, getters) =>
 (array) => {
+	console.log('flattening tree...');
 	let flattenedTree = [];
 	array.forEach(function(item){
 		flattenedTree.push(item);
@@ -527,15 +553,6 @@ flattenTree: (state, getters) =>
 	return flattenedTree;
 },
 // Original VM
-itIsADeepestChild: (state, getters) =>
-(id) => {
-	// console.log('running itIsADeepestChild');
-	if (!id){ console.log('you need an ID'); return; }
-	if (getters.childrensDeepestChildren(state.root.id).map(item => item.deepestChild).includes(id))
-	{
-		return true;
-	} return false;
-},
 countChildren: (state, getters) =>
 (item) => {
 	if (!item || !item.children){ return 0; }
@@ -550,20 +567,6 @@ countDoneChildren: (state, getters) =>
 	let doneChildren = children.filter(child => child.done);
 	let x = doneChildren.length;
 	return x;
-},
-findDeepestVisibleChild: (state, getters) =>
-(id = selection.selectedId) => {
-	// console.log('running findDeepestVisibleChild');
-	let item = state.nodes[id];
-	let children = item.children.filter(child => !getters.hiddenItemIds.includes(child.id));
-	if (!children.length) { return id; }
-	let deepestId = children[children.length-1].id;
-	return getters.findDeepestVisibleChild(deepestId);
-},
-isFirstItem: (state, getters) =>
-(id) => {
-	if (getters.noItems){ return false; }
-	return (getters.siblingIndex(id) == 0);
 },
 // Computed properties
 language: (state, getters) => {
@@ -596,17 +599,17 @@ noItems: (state, getters) => {
 },
 filteredItems: (state, getters) => {
 	// if (getters.noItems){ return []; }
-	if (selection.view == 'tree')
+	if (state.selection.view == 'tree')
 	{
 		return getters.filteredItemsTree;
 	}
-	else if (selection.view == 'journal')
+	else if (state.selection.view == 'journal')
 	{
 		return getters.filteredItemsJournal;
 	}
 },
 filteredItemsJournal: (state, getters) => {
-	if (selection.view != 'journal'){ return []; }
+	if (state.selection.view != 'journal'){ return []; }
 	let dates = {};
 	getters.filteredItemsFlat.forEach(function(item){
 		if (!item.done){ return; }
@@ -636,9 +639,9 @@ journalDates: (state, getters) => {
 },
 filteredItemsFlat: (state, getters) => {
 	let ar = objectToArray(state.nodes).filter(function(item){
-		let target = selection.tags.every(tag => getters.hasTag(item.id, tag));
-		let targetHidden = selection.hiddenTags.some(tag => getters.hasTag(item.id, tag));
-		let targetDone = (selection.view == 'journal') ? item.done : true;
+		let target = state.selection.tags.every(tag => getters.hasTag(item.id, tag));
+		let targetHidden = state.selection.hiddenTags.some(tag => getters.hasTag(item.id, tag));
+		let targetDone = (state.selection.view == 'journal') ? item.done : true;
 		let targetToday = true;
 // 		console.log(`
 // ${item.body} =
@@ -647,7 +650,7 @@ filteredItemsFlat: (state, getters) => {
 // targetDone = ${targetDone}
 // targetToday = ${targetToday}
 // 			`);
-		if ( selection.filter.includes('today') )
+		if ( state.selection.filter.includes('today') )
 		{
 			targetToday = false;
 			let diff = moment(item.due_date).diff(moment( ), 'days');
@@ -663,7 +666,7 @@ filteredItemsFlat: (state, getters) => {
 			return true;
 		}
 	});
-	if (selection.view == 'journal')
+	if (state.selection.view == 'journal')
 	{
 		ar = sortObjectArrayByTwoProperties(ar,'done_date','parents_bodies','desc','asc');
 	}
@@ -681,36 +684,36 @@ filteredItemsTree: (state, getters) => {
 		let hasParentWithTag;
 		let targetToday;
 		let topLvlItem;
-		if (selection.noFilterOrTag( ))
+		if (getters['selection/noFilterOrTag'])
 		{
 			topLvlItem = (item.depth == 1) ? true : false;
 			if (topLvlItem){ return true; } else { return false; }
 		}
 
-		if (selection.tags.length > 1)
+		if (state.selection.tags.length > 1)
 		{
-			hasParentWithTag = selection.tags.every(tag => getters.hasParentWithTag(item.id, tag));
+			hasParentWithTag = state.selection.tags.every(tag => getters.hasParentWithTag(item.id, tag));
 		} else {
-			hasParentWithTag = selection.tags.some(tag => getters.hasParentWithTag(item.id, tag));
+			hasParentWithTag = state.selection.tags.some(tag => getters.hasParentWithTag(item.id, tag));
 		}
-		target = selection.tags.every(tag => getters.hasTag(item.id, tag));
+		target = state.selection.tags.every(tag => getters.hasTag(item.id, tag));
 
-		if ( !selection.filter.includes('today') && target && !hasParentWithTag )
+		if ( !state.selection.filter.includes('today') && target && !hasParentWithTag )
 		{
 			return true;
 		}
 
-		if ( selection.filter.includes('today') )
+		if ( state.selection.filter.includes('today') )
 		{
 			let doneDateDiff = moment(item.done_date).diff(moment( ), 'days');
 			if (item.done && doneDateDiff <= -1) { return false; }
 			let hasParentDueToday = getters.hasParentDueToday(item.id);
 			let isDue = getters.isDueToday(item.id);
-			if (!selection.tags.length && isDue)
+			if (!state.selection.tags.length && isDue)
 			{
 				return true;
 			}
-			else if ( 	selection.tags.length
+			else if ( 	state.selection.tags.length
 					&& 	target
 					&& 	(isDue || hasParentDueToday)
 					&& 	!(hasParentWithTag && hasParentDueToday) )
@@ -721,7 +724,7 @@ filteredItemsTree: (state, getters) => {
 		return false;
 	});
 	// Sort on root children_order when no filter:
-	if (selection.noFilterOrTag( ))
+	if (getters['selection/noFilterOrTag'])
 	{
 		let order = state.root.children_order;
 		if (order instanceof Array && order.length)
@@ -730,7 +733,7 @@ filteredItemsTree: (state, getters) => {
 			children = order.map(id => children.find(t => t.id === id));
 		}
 	}
-	if ( selection.filter.includes('today') )
+	if ( state.selection.filter.includes('today') )
 	{
 		children = sortObjectArrayByProperty(children,'done_date');
 	}
@@ -758,20 +761,20 @@ visibleDirectChildren: (state, getters) =>
 childrenOrder: (state, getters) =>
 (id) => {
 	let children = getters.visibleDirectChildren(id);
-	if (selection.view == 'journal' && id == state.root.id)
+	if (state.selection.view == 'journal' && id == state.root.id)
 	{
 		children = children.reduce((a, c) => a.concat(c.children), []);
 	}
 	return children.map(child => child.id);
 },
 clipboardText: (state, getters) =>
-(id = selection.selectedId) => {
+(id = state.selection.selectedId) => {
 	id = (!id) ? state.root.id : id ;
 	let item = state.nodes[id];
 	let children;
 	let directChildren;
 	let spaceVariable = 0;
-	if (selection.filter.includes('today'))
+	if (state.selection.filter.includes('today'))
 	{
 		// item = id;
 		// children = item.children;
@@ -794,7 +797,7 @@ ${spaces}・${val.body}`;
     return allChildren;
 },
 clipboardTextFromItem: (state, getters) =>
-(idOrItem = selection.selectedId) => {
+(idOrItem = state.selection.selectedId) => {
 	let item;
 	let children;
 	let directChildren;
@@ -837,7 +840,7 @@ ${getters.text.menu.usedTime}: ${sec_to_hourmin(getters.totalUsedSec(item))}` : 
 },
 journalDate: (state, getters) =>
 (item) => {
-	if ( selection.view != 'journal'
+	if ( state.selection.view != 'journal'
 	  || !item.journalDate )
 	{
 		return false;
@@ -847,13 +850,13 @@ journalDate: (state, getters) =>
 hiddenItemIds: (state, getters) => {
 	// console.log('running hiddenItemIds');
 	return objectToArray(state.nodes).filter(function(item){
-		let targetHidden = selection.hiddenTags.some(tag => getters.hasTag(item.id, tag));
+		let targetHidden = state.selection.hiddenTags.some(tag => getters.hasTag(item.id, tag));
 		if (targetHidden){ return true; }
 	}).map(item => item.id);
 },
 selectionFilter: (state, getters) => { // For list title
-	return selection.filter.map(function (val, i) {
-		if (selection.filter.length == i+1)
+	return state.selection.filter.map(function (val, i) {
+		if (state.selection.filter.length == i+1)
 		{
 			val = Utilities.tagSlugToName(val);
 		}
@@ -865,8 +868,8 @@ selectionFilter: (state, getters) => { // For list title
 	});
 },
 selectionTags: (state, getters) => { // For list title
-	return selection.tags.map(function (val, i) {
-		if (selection.tags.length == i+1)
+	return state.selection.tags.map(function (val, i) {
+		if (state.selection.tags.length == i+1)
 		{
 			val = Utilities.tagSlugToName(val);
 		}
@@ -878,8 +881,8 @@ selectionTags: (state, getters) => { // For list title
 	});
 },
 selectionHiddenTags: (state, getters) => { // For list title
-	return selection.hiddenTags.map(function (val, i) {
-		if (selection.hiddenTags.length == i+1)
+	return state.selection.hiddenTags.map(function (val, i) {
+		if (state.selection.hiddenTags.length == i+1)
 		{
 			val = Utilities.tagSlugToName(val);
 		}

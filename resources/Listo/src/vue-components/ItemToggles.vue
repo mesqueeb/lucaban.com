@@ -51,3 +51,68 @@ export default {
 	},
 }
 </script>
+<style lang="scss">
+// @import '../css/_variables.scss';
+.l-toggle-div{
+    margin-right: 0.3em;
+}
+.o-toggle-div{
+    display: flex;
+}
+.o-toggle__check{
+    height: auto;
+    width: 1.6em;
+    cursor: pointer;
+    text-align: center;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    outline: none !important;
+    background-color: transparent !important;
+    margin-top: 0 !important;
+}
+.o-toggle__check:after{
+    content: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="-2 -2 104 104" ><circle cx="50" cy="50" r="50" fill="none" stroke="#ababab" stroke-width="3"/></svg>');
+}
+.o-toggle__check:checked:after{
+    content: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="-2 -2 104 104"><circle cx="50" cy="50" r="50" fill="none" stroke="#bddad5" stroke-width="3"/><path fill="#5dc2af" d="M72 25L42 71 27 56l-4 4 20 20 34-52z"/></svg>');
+}
+.o-toggle__arrow-helper{
+    display: none; 
+    cursor: pointer;
+}
+.o-toggle__arrow-helper + .o-toggle__arrow:before{
+    position: absolute;
+    content: "";
+    display: block;
+    top: 25%;
+    left: 30%;
+    border-left: black 1px solid;
+    border-bottom: black 1px solid;
+    transform: rotateZ(-135deg);
+    width: 0.5em;
+    height: 0.5em;
+    transition: transform 0.3s ease-in-out;
+}
+.o-toggle__arrow-helper:checked + .o-toggle__arrow:before{
+    transform: rotateZ(-45deg);
+}
+.o-toggle__arrow{
+  display: block;
+  position: relative;
+  height: 1.6em;
+  width: 1.6em;
+  cursor: pointer;
+}
+.o-toggle-div--both{
+    margin-left: -1.5em;
+    .o-toggle__check{
+        margin-left: 0.4em;
+    }
+    .o-toggle__arrow{
+        margin-top: 0.1em;
+        margin-left: 0.1em;
+        margin-right: -0.5em;
+    }
+}
+</style>

@@ -30,7 +30,8 @@
     "vue-clipboard2": "0.0.6",
     "vue-router": "^2.0.0",
     "vuelidate": "^0.5.0",
-    "vuex": "^2.3.1"
+    "vuex": "^2.3.1",
+    "vuex-strong-cache": "^0.1.1"
   },
   "devDependencies": {
     "autoprefixer": "^6.4.0",

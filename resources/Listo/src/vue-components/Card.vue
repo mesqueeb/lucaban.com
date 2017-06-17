@@ -276,7 +276,7 @@ export default {
 		startEditDoneDate(item, event)
 		{
 			console.log('startEditDoneDate');
-			item = (item) ? item : this.state.nodes[selection.selectedId];
+			item = (item) ? item : this.state.nodes[this.state.selection.selectedId];
 			this.state.beforeEditCache_done_date = item.done_date;
 			this.state.editingDoneDateItem = item.id;
 		},

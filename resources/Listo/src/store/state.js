@@ -1,5 +1,5 @@
-import newSelection from './selection.js'
-window.selection = new newSelection();
+// import newSelection from './selection.js'
+// window.selection = new newSelection();
 import languageContents from './lang.js'
 import keybindings from './keybindings.js'
 window.apiBaseURL = 'http://api.lucaban.dev/';
@@ -9,7 +9,7 @@ let nodes = {}
 nodes[initialItem.id] = initialItem;
 
 export default {
-    selection,
+    // selection,
     languageContents,
     keybindings,
     nodes,

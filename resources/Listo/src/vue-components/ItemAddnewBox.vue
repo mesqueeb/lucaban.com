@@ -175,9 +175,9 @@ export default {
 		{ if (!this.item){ return []; }
 			if (this.item.id == this.state.root.id){ return []; }
 			let alltags = this.newItem.preparedTags;
-			if (selection.tags.length)
+			if (this.state.selection.tags.length)
 			{
-				alltags = alltags.concat(selection.tags.map(tag => Utilities.tagSlugToName(tag)));
+				alltags = alltags.concat(this.state.selection.tags.map(tag => Utilities.tagSlugToName(tag)));
 			}
 			if (this.parentTags.length)
 			{
@@ -236,7 +236,7 @@ export default {
 				this.commit('updateState', {addingNewAsFirstChild:false});
 				return;
 			}
-			if (selection.view == 'journal')
+			if (this.state.selection.view == 'journal')
 			{
 				return;
 			}
@@ -445,7 +445,7 @@ export default {
 		},
 		prepareTag(item)
 		{
-			let id = (item) ? item.id : selection.selectedId;
+			let id = (item) ? item.id : this.state.selection.selectedId;
 			let tag = this.newTag;
 			if (tag=='t' || tag=='T' || tag=='today' || tag=='Today')
 			{

@@ -312,7 +312,7 @@ export default {
 		},
 		addTag(item)
 		{
-			let id = (item) ? item.id : selection.selectedId;
+			let id = (item) ? item.id : this.state.selection.selectedId;
 			let tag = this.newTag;
 			this.dispatch('tagItem', {id, tags:tag});
 			this.newTag = null;
