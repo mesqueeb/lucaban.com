@@ -6,7 +6,7 @@ import { sec_to_hourmin } from '../helpers/valueMorphers2.js';
 import * as moment from 'moment';
 
 export default {
-// ...enhancedGetters({
+...enhancedGetters({
 	totalPlannedMin: (state, getters) =>
 	(id = state.root.id) => {
 		let item = state.nodes[id];
@@ -89,7 +89,7 @@ export default {
 
 		return getters.totalPlannedSec(id) != getters.totalPlannedSec(item.parent_id);
 	},
-// }),
+}),
 tagsArray: (state, getters) =>
 (id) => {
 	let item = state.nodes[id];
