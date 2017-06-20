@@ -317,8 +317,9 @@ deleteItem ({state, commit, dispatch, getters},
 	delete state.nodes[id];
 },
 tagItem ({state, commit, dispatch, getters},
-	{id, tags} = {})
+	{id, tags = state.newTag} = {})
 {
+	state.newTag = null;
 	console.log(tags);
 	if (!tags){ return; }
 	if (Array.isArray(tags))
@@ -578,14 +579,10 @@ scrollToItemIfNeeded ({state, commit, dispatch, getters},
 	}
 },
 doneEdit ({state, commit, dispatch, getters},
-	{item} = {})
+	{id = state.editingItem} = { id: state.editingItem })
 {
 	console.log('Done edit!');
-	item = (item) ? item : state.nodes[state.selection.selectedId];
-	// if (!state.editingItem)
-	// {
-	// 	return;
-	// }
+	let item = state.nodes[id];
 	commit('updateState',{ editingItem:null });
 	commit('updatePopouts',{ edit:[] });
 	if (state.editingItemTags)
@@ -595,31 +592,32 @@ doneEdit ({state, commit, dispatch, getters},
 	}
 	if (!item.body)
 	{
-		commit('updateState',{ id:item.id, body:state.beforeEditCache_body });
+		commit('updateState',{ id, body:state.beforeEditCache_body });
 	}
 	// item.body = item.body.trim();
 
 	if (typeof item.planned_time != 'number' || Number.isNaN(item.planned_time))
 	{
-		commit('updateState',{ id:item.id, planned_time:0 });
+		commit('updateState',{ id, planned_time:0 });
 	}
 	if (item.planned_time != state.beforeEditCache_planned_time)
 	{
-		dispatch('patch', { id:item.id, field:'planned_time' });
+		dispatch('patch', { id, field:'planned_time' });
 	}
 	if (item.body != state.beforeEditCache_body)
 	{
-		dispatch('patch', { id:item.id, field:'body' });
-		dispatch('copyParentBodyToAllChildren', { parent_id:item.id });
+		dispatch('patch', { id, field:'body' });
+		dispatch('copyParentBodyToAllChildren', { parent_id:id });
 	}
 	commit('updateState',{ beforeEditCache_body:null });
 	commit('updateState',{ beforeEditCache_planned_time:null });
 	// setTimeout(() => this.convertbodyURLtoHTML(),1000);
 },
-cancelEdit ({state, commit, dispatch, getters},
-	{id = state.selection.selectedId} = {})
+cancelEdit ({state, commit, dispatch, getters})
 {
-	if (state.editingItem || state.popouts.edit.length)
+	let id = (state.editingItem) ? state.editingItem : state.editingItemTags;
+	if (!id) { return; }
+	if (state.editingItem)
 	{
 		Vue.nextTick(() => {
 			console.log("cancel edit. Reverting to: "+state.beforeEditCache_body);
@@ -631,24 +629,37 @@ cancelEdit ({state, commit, dispatch, getters},
 	commit('updateState',{ editingItemTags:null });
 	commit('updatePopouts',{ edit:[] });
 },
-cancelAddNew ({state, commit, dispatch, getters},
-	{cancelUnderId} = {})
+cancelEditOrAdd ({state, commit, dispatch, getters})
 {
-	preventKeydownListener();
+	preventKeydownListener(); // see window object. initialized at ListAppKeyBindings.js
+	dispatch('setCancelThroughKeydown');
+	if (state.addingNewUnder)
+	{
+		dispatch('cancelAddNew');
+	}
+	else if (state.editingItem || state.editingItemTags)
+	{
+		dispatch('cancelEdit');
+	}
+},
+cancelAddNew ({state, commit, dispatch, getters})
+{
 	console.log('cancelAddNew');
-	state.addingNewUnder = null;
-	// state.addingNewEmptyList = false;
-	if (state.selection.selectedId == cancelUnderId || state.selection.selectedId == null)
+	if (state.selection.selectedId == state.addingNewUnder || state.selection.selectedId == null)
 	{ // to prevent item being reselected when cancelAddNew through blur because of clicking on another item.
 		state.selection.selectedId = state.selection.lastSelectedId;
 	}
 	// Reset newItem to sibling stance.
+	state.addingNewUnder = null;
 	state.addingNewAsChild = false;
-	// $(':focus').blur();
+	state.addingNewAsFirstChild = false;
 },
 addNew ({state, commit, dispatch, getters},
-	{addNextItemAs, newItem, olderSibling, addTags} = {})
+	{addNextItemAs} = {addNextItemAs:null})
 {
+	let newItem = JSON.parse(JSON.stringify(state.newItem));
+	let olderSibling = state.addingNewUnder;
+	let addTags = getters['newItem/preparedPlusComputedTags'];
 	store.commit('resetNewItem');
 	if (!newItem.body){ return; }
 	addTags = (addTags) ? addTags : [];
@@ -943,7 +954,7 @@ popup ({state, commit, dispatch, getters},
 //         }
 },
 sendFlash ({state, commit, dispatch, getters},
-	{type,msg} = {})
+	{type, msg} = {})
 {
 	commit('pushFlash', {type,msg});
 },
@@ -973,7 +984,7 @@ popout ({state, commit, dispatch, getters},
 	// }
 },
 addTimer ({state, commit, dispatch, getters},
-	{id = state.selection.selectedId} = {})
+	{id = state.selection.selectedId} = {id: state.selection.selectedId})
 {
 	dispatch('popout', { id, type:'timer' });
 	return;
@@ -985,6 +996,109 @@ clipboardSuccess ({dispatch, state, getters})
 clipboardError ({dispatch, state, getters})
 {
 	// dispatch('sendFlash', { type:'error', msg:state.keybindings.copyClipboard.error[getters.language] });
+},
+copyProgrammatic ({dispatch, state, getters},
+	{id = state.selection.selectedId} = {id: state.selection.selectedId})
+{
+	let text = getters.clipboardText(id);
+	let textArea = document.createElement("textarea");
+	// *** This styling is an extra step which is likely not required. ***
+	//
+	// Why is it here? To ensure:
+	// 1. the element is able to have focus and selection.
+	// 2. if element was to flash render it has minimal visual impact.
+	// 3. less flakyness with selection and copying which **might** occur if
+	//    the textarea element is not visible.
+	//
+	// The likelihood is the element won't even render, not even a flash,
+	// so some of these are just precautions. However in IE the element
+	// is visible whilst the popup box asking the user for permission for
+	// the web page to copy to the clipboard.
+
+	// Place in top-left corner of screen regardless of scroll position.
+	textArea.style.position = 'fixed';
+	textArea.style.top = 0;
+	textArea.style.left = 0;
+
+	// Ensure it has a small width and height. Setting to 1px / 1em
+	// doesn't work as this gives a negative w/h on some browsers.
+	textArea.style.width = '2em';
+	textArea.style.height = '2em';
+
+	// We don't need padding, reducing the size if it does flash render.
+	textArea.style.padding = 0;
+
+	// Clean up any borders.
+	textArea.style.border = 'none';
+	textArea.style.outline = 'none';
+	textArea.style.boxShadow = 'none';
+
+	// Avoid flash of white box if rendered for any reason.
+	textArea.style.background = 'transparent';
+
+	textArea.value = text;
+	document.body.appendChild(textArea);
+	textArea.select();
+	try {
+	    let successful = document.execCommand('copy');
+	    let msg = successful ? 'successful' : 'unsuccessful';
+	    dispatch('clipboardSuccess');
+	    console.log('Copying text command was ' + msg);
+	} catch (err) {
+	    dispatch('clipboardError');
+	    console.log('Oops, unable to copy');
+	}
+	document.body.removeChild(textArea);
+},
+prepareTag ({state})
+{
+	state.newItem.preparedTags.push(state.newTag);
+	state.newTag = null;
+},
+blurOnEditOrAdd ({dispatch, state, getters},
+	{ field } = { field:null })
+{
+	    	if (state.cancelThroughKeydown){ return; }
+	    	if (getters.mobile && field == 'add-tag')
+	    	{
+			    	if (state.editingItem)
+					{
+						dispatch('tagItem', { id:state.editingItem, tags:state.newTag });
+						return;
+					}
+					if (state.addingNewUnder)
+					{
+						dispatch('prepareTag');
+						return;
+					}
+	    	}
+	    	if (getters.mobile){ return; }
+	    	setTimeout(function()
+	    	{
+		    	if ( document.activeElement.nodeName == 'INPUT'
+		    		||  document.activeElement.nodeName == 'TEXTAREA'
+		    		||  document.activeElement.nodeName == 'A'
+		    		||  document.activeElement.nodeName == 'BUTTON' )
+		    	{
+	        		return;
+				} else {
+			    	if (state.editingItem)
+					{
+				    	console.log('blurring on edit');
+						dispatch('doneEdit');
+					}
+					if (state.addingNewUnder)
+					{
+				    	console.log('bluring on Add New');
+						dispatch('cancelAddNew');
+					}
+				}
+	    	},50);
+},
+focusElement({state},
+	{el})
+{
+	document.querySelector(el).focus();
 },
 filterItems ({state, commit, dispatch, getters},
 	{keyword, value, event} = {})

@@ -65,10 +65,7 @@
 			}"
 		>
 			<div class="c-timer__body">
-				<div :class="{'c-popout__bodybox':true,
-					'c-popout--done': item.done
-					}"
-				>
+				<div class="c-popout__bodybox">
 					<div class="l-toggle-div--popout o-toggle-div">
 						<input class="o-toggle__check"
 							type="checkbox"
@@ -76,7 +73,8 @@
 							v-model="item.done"
 							@change="updateDone(item)"
 						>
-					</div>{{ item.body }}
+					</div>
+					<span :class="{'c-popout--done': item.done}"></span>{{ item.body }}
 				</div>
 				<div v-if="!item.planned_time"
 					 class="c-timer__time" 

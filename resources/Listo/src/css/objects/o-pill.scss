@@ -3,7 +3,6 @@
 }
 .o-pill--custom-tag{
     @include pill($theme-color);
-    cursor: pointer;
 }
 .o-pill--done{
     @include pill($light-gray);

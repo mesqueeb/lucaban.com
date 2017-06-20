@@ -80,4 +80,8 @@ export default {
     padding: 1rem;
     margin-bottom: 6.5rem;
 }
+.c-items-wrapper{
+    max-width: 50rem;
+    margin: 0 auto;
+}
 </style>

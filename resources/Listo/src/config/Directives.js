@@ -19,7 +19,10 @@ install(Vue){
 		inserted(el, binding)
 		{
 			if (binding.modifiers.noMobile && mobilecheck()){ return; }
-			el.focus()
+			if (binding.value || binding.value === undefined)
+			{
+				el.focus()
+			}
 		}
 	});
 	Vue.directive('autoheight', {

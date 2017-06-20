@@ -72,11 +72,11 @@ Vue.use(Vuelidate)
 import router from './router.js'
 window.router = router;
 // 6.
-import ListAppKeyBindings from './config/ListAppKeyBindings.js';
-new ListAppKeyBindings();
+import WindowKeyBindings from './config/WindowKeyBindings.js';
+new WindowKeyBindings();
 // 7.
-import listDirectives from './config/Directives.js';
-Vue.use(listDirectives);
+import ListDirectives from './config/Directives.js';
+Vue.use(ListDirectives);
 // 8.
 import VueClipboard from 'vue-clipboard2';
 Vue.use(VueClipboard);

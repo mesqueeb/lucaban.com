@@ -99,7 +99,8 @@
 				</span>
 			</span>
 			<!-- // For debugging: -->
-			<Item-Update-Box :item="item"></Item-Update-Box>
+			<Item-Edit-Add-Box v-if="item.id == state.editingItem" :item="item"></Item-Edit-Add-Box>
+			<Item-Add-Tag v-if="item.id == state.editingItemTags" :item="item"></Item-Add-Tag>
 			<Item-Tags-Strip :item="item"></Item-Tags-Strip>
 			<Item-Nav :item="item"></Item-Nav>
 		</div>
@@ -128,7 +129,7 @@
 		></Card>
 	</div>
 	<!-- CHILDREN|_ -->
-	<Item-Addnew-Box :item="item"></Item-Addnew-Box>
+	<Item-Edit-Add-Box v-if="showAddNewBox" :item="state.newItem"></Item-Edit-Add-Box>
 
 </div>
 </div>
@@ -140,15 +141,17 @@ import { uniq, Utilities } from '../helpers/globalFunctions.js';
 import Clipboard from 'clipboard';
 import ItemNav from './ItemNav.vue';
 import ItemToggles from './ItemToggles.vue';
-import ItemUpdateBox from './ItemUpdateBox.vue';
-import ItemAddnewBox from './ItemAddnewBox.vue';
+// import ItemUpdateBox from './ItemUpdateBox.vue';
+// import ItemAddnewBox from './ItemAddnewBox.vue';
+import ItemEditAddBox from './ItemEditAddBox.vue';
+import ItemAddTag from './ItemAddTag.vue';
 import ItemTagsStrip from './ItemTagsStrip.vue';
 
 export default {
 	name: 'Card',
 	template:'#items-card-template',
 	components: {
-		ItemNav, ItemToggles, ItemUpdateBox, ItemAddnewBox, ItemTagsStrip,
+		ItemNav, ItemToggles, ItemEditAddBox, ItemTagsStrip, ItemAddTag
 	},
 	mounted()
 	{
@@ -191,6 +194,11 @@ export default {
 			if (!this.item || !this.state.root){ return false; }
 			if (this.item.id != this.state.root.id){ return false; }
 			if (!this.visibleDirectChildren.length){ return true; }
+		},
+		showAddNewBox()
+		{
+			return ((this.state.addingNewUnder == this.item.id)
+				|| (this.listIsEmpty && !this.mobile && this.state.selection.view != 'journal'));
 		},
 		journalView()
 		{ if (!this.item){ return; }
@@ -298,17 +306,6 @@ export default {
     display: flex;
     align-items: center;
 }
-.c-body-text--project{
-    font-weight: 600;
-}
-.c-body-text{
-    padding: 0.5em;
-    display: inline-block;
-    white-space: pre-line;
-    word-break: break-word;
-    display: flex;
-    flex-direction: column;
-}
 .c-section-head{
     border-top: 1px solid #ededed;
     color: #46c5b6;
@@ -341,16 +338,39 @@ export default {
     width: 100%;
     display: flex;
     align-items: center;
+	&--editing{
+	    flex-direction: column;
+	    align-items:flex-start;
+	    padding-bottom: 0.4em;
+	    border-bottom: thin solid rgba(245, 215, 110, 0.7);
+	}
+	&--updating-tags{
+	    flex-direction: column;
+	    flex-wrap: wrap;
+	    align-items:flex-start;
+	    padding-bottom: 0.4em;
+	    background: none;
+	    border-bottom: thin solid rgba(245, 215, 110, 0.7);
+	}
 }
-.c-body-div--editing{
+.c-body-text{
+    padding: 0.5em;
+    display: inline-block;
+    white-space: pre-line;
+    word-break: break-word;
+    display: flex;
     flex-direction: column;
-    align-items:flex-start;
-    padding-bottom: 0.4em;
-    border-bottom: thin solid rgba(245, 215, 110, 0.7);
-}
-.c-body-text--done{
-    color: $gray;
-    text-decoration: line-through;
+	&--project{
+	    font-weight: 600;
+	}
+	&--updating-tags{
+	    width: 100%;
+	    background: $selection-color;
+	}
+	&--done{
+	    color: $gray;
+	    text-decoration: line-through;
+	}
 }
 .c-journal-used-time{
     @include text-settings();

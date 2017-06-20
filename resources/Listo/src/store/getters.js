@@ -9,6 +9,7 @@ export default {
 ...enhancedGetters({
 	totalPlannedMin: (state, getters) =>
 	(id = state.root.id) => {
+		return 0; // Bug infinite loop
 		let item = state.nodes[id];
 		if (!item){ return 0; }
 
@@ -22,6 +23,7 @@ export default {
 	},
 	totalUsedSec: (state, getters) =>
 	(idOrItem = state.root.id) => {
+		return 0; // Bug infinite loop
 		let item;
 		let childrenArray;
 		if (typeof idOrItem === 'object' && idOrItem.journalDate)
@@ -42,60 +44,53 @@ export default {
 		}, selfValue);
 	    return (x) ? x : 0;
 	},
-	totalUsedMin: (state, getters) =>
-	(id = state.root.id) => {
-		return Math.floor(getters.totalUsedSec(id)/60);
-	},
-	totalUsedHourMin: (state, getters) =>
-	(id = state.root.id) => {
-		// console.log(`id: ${id} in totalUsedHourMin ${state.root.id}`);
-		return sec_to_hourmin(getters.totalUsedSec(id));
-	},
-	totalPlannedSec: (state, getters) =>
-	(id = state.root.id) => {
-		return getters.totalPlannedMin(id)*60;
-	},
-	totalPlannedHour: (state, getters) =>
-	(id = state.root.id) => {
-		return getters.totalPlannedMin(id)/60;
-	},
-	totalMinLeft: (state, getters) =>
-	(id = state.root.id) => {
-		return getters.totalPlannedMin(id)-getters.totalUsedMin(id);
-	},
-	totalSecLeft: (state, getters) =>
-	(id = state.root.id) => {
-		return getters.totalPlannedSec(id)-getters.totalUsedSec(id);
-	},
-	totalHourMinLeft: (state, getters) =>
-	(id = state.root.id) => {
-		return sec_to_hourmin(getters.totalSecLeft(id));
-	},
-	secLeft: (state, getters) =>
-	(id = state.root.id) => {
-		let item = state.nodes[id];
-		if (!item){ return 0; }
-		return item.planned_time*60-item.used_time;
-	},
-	minLeft: (state, getters) =>
-	(id = state.root.id) => {
-		return getters.secLeft(id)/60;
-	},
-	totalTimeDifferentFromParent: (state, getters) =>
-	(id) => {
-		let item = state.nodes[id];
-		if (!item){ return 0; }
-		if (!item.parent_id){ return true; }
-
-		return getters.totalPlannedSec(id) != getters.totalPlannedSec(item.parent_id);
-	},
 }),
-tagsArray: (state, getters) =>
+totalUsedMin: (state, getters) =>
+(id = state.root.id) => {
+	return Math.floor(getters.totalUsedSec(id)/60);
+},
+totalUsedHourMin: (state, getters) =>
+(id = state.root.id) => {
+	// console.log(`id: ${id} in totalUsedHourMin ${state.root.id}`);
+	return sec_to_hourmin(getters.totalUsedSec(id));
+},
+totalPlannedSec: (state, getters) =>
+(id = state.root.id) => {
+	return getters.totalPlannedMin(id)*60;
+},
+totalPlannedHour: (state, getters) =>
+(id = state.root.id) => {
+	return getters.totalPlannedMin(id)/60;
+},
+totalMinLeft: (state, getters) =>
+(id = state.root.id) => {
+	return getters.totalPlannedMin(id)-getters.totalUsedMin(id);
+},
+totalSecLeft: (state, getters) =>
+(id = state.root.id) => {
+	return getters.totalPlannedSec(id)-getters.totalUsedSec(id);
+},
+totalHourMinLeft: (state, getters) =>
+(id = state.root.id) => {
+	return sec_to_hourmin(getters.totalSecLeft(id));
+},
+secLeft: (state, getters) =>
+(id = state.root.id) => {
+	let item = state.nodes[id];
+	if (!item){ return 0; }
+	return item.planned_time*60-item.used_time;
+},
+minLeft: (state, getters) =>
+(id = state.root.id) => {
+	return getters.secLeft(id)/60;
+},
+totalTimeDifferentFromParent: (state, getters) =>
 (id) => {
 	let item = state.nodes[id];
-	if (!item){ return []; }
+	if (!item){ return 0; }
+	if (!item.parent_id){ return true; }
 
-	return item.tagged.map(obj => obj.tag_name);
+	return getters.totalPlannedSec(id) != getters.totalPlannedSec(item.parent_id);
 },
 oS: (state, getters) => {
 	return 'mac';
@@ -150,9 +145,15 @@ parentIdWithTag: (state, getters) =>
 		return getters.parentIdWithTag(parent_id, tags);
 	}
 },
-returnTagsAsArray: (state, getters) =>
+// returnTagsAsArray: (state, getters) =>
+// (id) => {
+// 	return state.nodes[id].tagged.map(obj => obj.tag_name);
+// },
+tagsArray: (state, getters) =>
 (id) => {
-	return state.nodes[id].tagged.map(obj => obj.tag_name);
+	let item = state.nodes[id];
+	if (!item){ return []; }
+	return item.tagged.map(obj => obj.tag_name);
 },
 siblingIndex: (state, getters) =>
 (id) => {

@@ -2,8 +2,8 @@ export default class
 {
 constructor()
 {
-	this.invokeKeydownListenerPause();
-	this.invokeKeyBindingListener();
+	this.iniKeydownListenerPause();
+	this.iniKeyBindingListener();
 }
 keystroke(k)
 {
@@ -28,6 +28,7 @@ keystroke(k)
 		return;
 	}
 	console.log(k);
+	if(k == 'meta_c'){ store.dispatch('copyProgrammatic') } else
 	if(k == 'arrowUp'){ store.dispatch('selectItem', { direction:'prev' }) } else
 	if(k == 'arrowDown'){ store.dispatch('selectItem', { direction:'next' }) } else
 	if(k == 'arrowRight'){ store.dispatch('showChildren', { action:'show' }) } else
@@ -51,7 +52,7 @@ keystroke(k)
 	if(k == 'backspace'){ store.dispatch('deleteItemDialogue') } else
 	if(k == 'delete'){ store.dispatch('deleteItemDialogue') }
 }
-invokeKeydownListenerPause()
+iniKeydownListenerPause()
 {
 	//Codementor: crappy hack down here.
 	window.keydownListenerPaused = false;
@@ -61,7 +62,7 @@ invokeKeydownListenerPause()
 		setTimeout(function(){ window.keydownListenerPaused = false; }.bind(this), 500);
 	};
 }
-invokeKeyBindingListener()
+iniKeyBindingListener()
 {
 	let self = this;
 	window.addEventListener('keydown', function(e){
@@ -246,6 +247,14 @@ invokeKeyBindingListener()
 				e.preventDefault();
 				self.keystroke('delete');
 				break;
+	  		case 67: // key c
+				if ((e.ctrlKey || e.metaKey)
+					&& (window.getSelection().toString()) == false)
+				{
+					e.preventDefault();
+					self.keystroke('meta_c');
+		  			break;
+		  		}
           } // end switch
     	} // END INPUT AREAS NOT IN FOCUS
     });

@@ -9,7 +9,7 @@
 		class="o-pill--done"
 		v-if="item.done
 			&& item.id != state.editingDoneDateItem
-			&& !journalView"
+			&& state.selection.view != 'journal'"
 	>
 		{{ get.text.tags.done }} {{ momentCalendar(item.done_date) }}
 		<input
@@ -54,21 +54,30 @@
 		{{ momentCalendar(item.dueDateParent) }}
 	</span>
 	<span
-		v-for="tag in item.tagged"
-		v-if="item.tagged.length"
-		v-show="!parentTags.includes(tag.tag_name)
-			&& item.id != state.editingItem
-			&& item.id != state.editingItemTags"
+		v-if="tagArray"
+		v-for="tag in tagArray"
 		class="o-pill--custom-tag"
-		@dblclick.prevent="dispatch('filterItems',{keyword:'tag', value:tag.tag_slug, event:$event})"
+		@dblclick.prevent="tagDblClick(tag,$event)"
 	>
-		{{ tag.tag_name }}
+		{{ tag }}
+		<button
+			class="o-btn delete-tag"
+			v-if="deletableTag(tag)"
+			@blur="dispatch('blurOnEditOrAdd', { id:item.id })"
+			@click.prevent="deleteTag(item.id, tag, $event)"
+			@keydown.delete="deleteTag(item.id, tag, $event)"
+			@keydown.enter="deleteTag(item.id, tag, $event)"
+		>
+			<!-- v-if="newItem.preparedTags.includes(tag)" -->
+			<i class="zmdi zmdi-close-circle"></i>
+		</button>
 	</span>
 </div>
 </template>
 
 <script>
 import { momentCalendar, sec_to_hourminsec } from '../helpers/valueMorphers2.js';
+import { Utilities, uniq } from '../helpers/globalFunctions.js'
 
 export default {
 	props:['item'],
@@ -79,27 +88,76 @@ export default {
 	{
 		get(){ return this.$store.getters },
 		state(){ return this.$store.state },
-		parentTags(){ return this.get.tagsArray(this.item.parent_id) },
+		parentTags(){
+			if (this.item.newItem)
+			{
+				return this.get.tagsArray(this.get['newItem/parent_id']);
+			} else {
+				return this.get.tagsArray(this.item.parent_id);
+			}
+		},
 		totalSecLeft(){ return this.get.totalSecLeft(this.id) },
 		secLeft(){ return this.get.secLeft(this.id) },
 		totalTimeDifferentFromParent(){ return this.get.totalTimeDifferentFromParent(this.id) },
 		hasDueDate()
-		{ if (!this.item){ return; }
+		{
 		    return (this.item.due_date && this.item.due_date != '0000-00-00 00:00:00');
 		},
-		journalView()
-		{ if (!this.item){ return; }
-			if (this.state.selection.view == 'journal'){
-				return true;
-			} else { return false; }
+		tagArray()
+		{
+			if (this.item.newItem)
+			{
+				return this.get['newItem/preparedPlusComputedTags'];
+			}
+			return this.item.tagged.map(t => t.tag_name).filter(t => !this.parentTags.includes(t));
 		},
-
 	},
 	methods:
 	{
 		momentCalendar, sec_to_hourminsec,
 		commit(action, payload){ this.$store.commit(action, payload) },
 		dispatch(action, payload){ this.$store.dispatch(action, payload) },
+		tagDblClick(tag, event){
+			if(this.state.editingItem || this.state.editingItemTags || this.state.addingNewUnder){ return; }
+			this.dispatch('filterItems',{keyword:'tag', value:Utilities.tagNameToSlug(tag), event});
+		},
+		deleteTag(id, tag, event)
+		{
+			let plsFocus = '.js-add-tag';
+			document.querySelector(plsFocus).focus();	
+			if (this.state.editingItemTags || this.state.editingItem)
+			{
+				let plsHide = this.getSrcButton(event.srcElement);
+				plsHide.hidden = true;
+				this.dispatch('patchTag',{id, tags:tag, requestType:'untag'});
+			}
+			else if (this.item.newItem)
+			{
+				this.commit('newItem/deleteTag', {tag});
+			}
+		},
+		deletableTag(tag)
+		{
+			if ((this.state.editingItem == this.item.id || this.state.editingItemTags == this.item.id)
+				&& !this.parentTags.includes(tag))
+			{
+				return true;
+			}
+			else if (this.item.newItem && this.state.newItem.preparedTags.includes(tag))
+			{
+				return true;
+			}
+			return false;
+		},
+		getSrcButton(element)
+		{
+			if (element.nodeName == 'BUTTON')
+			{
+				return element;
+			} else {
+				return this.getSrcButton(element.parentNode);
+			}
+		},
 	},
 }
 </script>
@@ -114,5 +172,8 @@ export default {
         margin-left: 0.5em;
         padding: 0;
     }
+}
+.c-item-tags--updating-tags{
+    margin-top: 0.3em;
 }
 </style>
