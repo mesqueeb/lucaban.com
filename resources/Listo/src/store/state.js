@@ -53,7 +53,7 @@ export default {
     beforeEditCache_body: null,
     beforeEditCache_planned_time: null,
     fetchedDone: false,
-    cancelThroughKeydown: false,
+    blockBlur: false,
     manualMobile: false,
     newTag: null,
     setLanguage: null,

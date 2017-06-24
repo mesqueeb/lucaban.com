@@ -9,7 +9,6 @@
 	@submit.prevent
 	@click="clickOnEditOrAddCurtain($event)"
 >
-	<!-- :id="'new-under-'+ item.id " -->
 	<div :class="[
 		'c-editaddbox__body','flex-wrap',
 		{'c-editaddbox__body--mobile':(mobile)}]"
@@ -145,8 +144,12 @@ export default {
 			  	if (this.get.mobile){ return; }
 				e.preventDefault();
 			  	if (!this.item.body){ return; }
-			  	this.dispatch('addNew');
-				this.dispatch('doneEdit');
+			  	if (this.item.newItem)
+			  	{
+				  	this.dispatch('addNew');
+			  	} else {
+					this.dispatch('doneEdit');
+			  	}				
 			  	return;
 			}
 			else if (e.metaKey || e.ctrlKey)

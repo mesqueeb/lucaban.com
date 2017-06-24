@@ -20,7 +20,15 @@
 			v-model="item.done_date"
 		>
 	</label>
-	<span
+<!-- 		<br>sec_to_hourminsec(totalSecLeft): {{ sec_to_hourminsec(totalSecLeft) }}
+		<br>totalSecLeft: {{ totalSecLeft }}
+		<br>secLeft: {{secLeft}}
+		<br>totalTimeDifferentFromParent: {{totalTimeDifferentFromParent}}
+		<br>!item.done: {{!item.done}}
+		<br>totalPlannedSec: {{totalPlannedSec}}
+		<br>get.totalPlannedSec(item.parent_id): {{get.totalPlannedSec(item.parent_id)}}
+ -->
+ 	<span
 		v-if="totalSecLeft > 0
 			&& totalSecLeft > secLeft
 			&& totalTimeDifferentFromParent
@@ -38,6 +46,7 @@
 	>
 		{{ sec_to_hourminsec(secLeft) }}
 	</span>
+		{{ sec_to_hourminsec(secLeft) }}
 	
 	<span
 		v-if="hasDueDate && !item.done
@@ -96,9 +105,45 @@ export default {
 				return this.get.tagsArray(this.item.parent_id);
 			}
 		},
-		totalSecLeft(){ return this.get.totalSecLeft(this.id) },
-		secLeft(){ return this.get.secLeft(this.id) },
-		totalTimeDifferentFromParent(){ return this.get.totalTimeDifferentFromParent(this.id) },
+		// totalSecLeft(){ return this.get.totalSecLeft(this.item.id) },
+		totalSecLeft(){ return this.totalPlannedSec-this.totalUsedSec; },
+		totalPlannedSec(){
+			return this.totalPlannedMin*60;
+		},
+		totalPlannedMin(){
+			let item = this.item;
+			if (!item){ return 0; }
+
+			let selfValue = (item.planned_time) ? parseFloat(item.planned_time) : 0;
+			let childrenArray = this.get.allVisibleChildItems(this.item.id);
+			if (!childrenArray || !childrenArray.length) { return selfValue; }
+			let x = childrenArray.reduce(function(prevVal, child){
+				return prevVal + parseFloat(child.planned_time);
+			}, selfValue);
+		    return (x) ? parseFloat(x) : 0;
+		},
+		totalUsedSec(){
+			let item = this.item;
+			let childrenArray = this.get.allVisibleChildItems(this.item.id);
+			if (!item){ return 0; }
+
+			let selfValue = (item.used_time) ? parseFloat(item.used_time) : 0;
+			if (!childrenArray || !childrenArray.length) { return selfValue; }
+			
+			let x = childrenArray.reduce(function(prevVal, child){
+				return prevVal + parseFloat(child.used_time);
+			}, selfValue);
+		    return (x) ? x : 0;
+		},
+		secLeft(){
+			if (!this.item){ return 0; }
+			return this.item.planned_time*60-this.item.used_time;
+		},
+		// totalTimeDifferentFromParent(){ return this.get.totalTimeDifferentFromParent(this.item.id) },
+		totalTimeDifferentFromParent(){
+			if (!this.item.parent_id){ return true; }
+			return this.totalPlannedSec != this.get.totalPlannedSec(this.item.parent_id);
+		},
 		hasDueDate()
 		{
 		    return (this.item.due_date && this.item.due_date != '0000-00-00 00:00:00');

@@ -4,6 +4,20 @@ import {
 // import { sec_to_hourmin } from '../../components/valueMorphers2.js';
 
 export default {
+flattenTree ({state, commit, dispatch, getters},
+	{array})
+{
+	console.log('flattening tree...');
+	let flattenedTree = [];
+	array.forEach(function(item){
+		flattenedTree.push(item);
+		if (item.children.length)
+		{
+			Array.prototype.push.apply(flattenedTree, getters.flattenTree(item.children));
+		}
+	});
+	return flattenedTree;
+},
 giveNewParent ({state, commit, dispatch, getters},
 	{ id, new_parent_id, specificNewIndex } = {})
 {
@@ -539,13 +553,13 @@ formatDone ({state, commit, dispatch, getters},
 	});
 },
 // Original VM
-setCancelThroughKeydown ({state, commit, dispatch, getters})
+blockBlur ({state, commit, dispatch, getters})
 {
-	state.cancelThroughKeydown = true;
+	state.blockBlur = true;
 	setTimeout(function()
 	{
-		state.cancelThroughKeydown = false;
-	},100);
+		state.blockBlur = false;
+	},300);
 },
 startEdit ({state, commit, dispatch, getters},
 	{item, event} = {})
@@ -582,6 +596,7 @@ doneEdit ({state, commit, dispatch, getters},
 	{id = state.editingItem} = { id: state.editingItem })
 {
 	console.log('Done edit!');
+	dispatch('blockBlur');
 	let item = state.nodes[id];
 	commit('updateState',{ editingItem:null });
 	commit('updatePopouts',{ edit:[] });
@@ -632,7 +647,7 @@ cancelEdit ({state, commit, dispatch, getters})
 cancelEditOrAdd ({state, commit, dispatch, getters})
 {
 	preventKeydownListener(); // see window object. initialized at ListAppKeyBindings.js
-	dispatch('setCancelThroughKeydown');
+	dispatch('blockBlur');
 	if (state.addingNewUnder)
 	{
 		dispatch('cancelAddNew');
@@ -657,23 +672,22 @@ cancelAddNew ({state, commit, dispatch, getters})
 addNew ({state, commit, dispatch, getters},
 	{addNextItemAs} = {addNextItemAs:null})
 {
+	dispatch('blockBlur');
+	console.log('addingNew');
 	let newItem = JSON.parse(JSON.stringify(state.newItem));
-	let olderSibling = state.addingNewUnder;
+	let olderSiblingId = state.addingNewUnder;
 	let addTags = getters['newItem/preparedPlusComputedTags'];
-	store.commit('resetNewItem');
 	if (!newItem.body){ return; }
-	addTags = (addTags) ? addTags : [];
-	if (olderSibling)
+	if (!olderSiblingId && state.selection.selectedId)
 	{
-		olderSibling = olderSibling;	
-	} else if (state.selection.selectedId) {
-		olderSibling = state.nodes[state.selection.selectedId];
-	} else {
-		olderSibling = state.root;
+		olderSiblingId = state.selection.selectedId;
+	} else if (!olderSiblingId && !state.selection.selectedId) {
+		olderSiblingId = state.root.id;
 	}
+	let olderSibling = state.nodes[olderSiblingId];
 	// Set parent ID and depth & protect against bugs when olderSibling is the root:
 	newItem.parent_id = (olderSibling.parent_id) ? olderSibling.parent_id : state.root.id;
-	newItem.depth = (olderSibling.depth == 0) ? 1 : olderSibling.depth;
+	newItem.depth = (!olderSibling.depth) ? 1 : olderSibling.depth;
 
 	let OlderSiblingIndex = getters.siblingIndex(olderSibling.id);
 	let index = (isNaN(OlderSiblingIndex)) ? 0 : OlderSiblingIndex+1;
@@ -708,6 +722,7 @@ addNew ({state, commit, dispatch, getters},
 	console.log('sending tags:');
 	console.log(addTags);
 	// Send to Root for Ajax call.
+	store.commit('resetNewItem');
 	dispatch('addTempNewItem', { item:newItem, index, addNextItemAs, addTags });
 	dispatch('postNewItem', { newItem, index, addNextItemAs, addTags, duplication:null });
 },
@@ -1058,7 +1073,7 @@ prepareTag ({state})
 blurOnEditOrAdd ({dispatch, state, getters},
 	{ field } = { field:null })
 {
-	    	if (state.cancelThroughKeydown){ return; }
+	    	if (state.blockBlur){ return; }
 	    	if (getters.mobile && field == 'add-tag')
 	    	{
 			    	if (state.editingItem)

@@ -141,8 +141,6 @@ import { uniq, Utilities } from '../helpers/globalFunctions.js';
 import Clipboard from 'clipboard';
 import ItemNav from './ItemNav.vue';
 import ItemToggles from './ItemToggles.vue';
-// import ItemUpdateBox from './ItemUpdateBox.vue';
-// import ItemAddnewBox from './ItemAddnewBox.vue';
 import ItemEditAddBox from './ItemEditAddBox.vue';
 import ItemAddTag from './ItemAddTag.vue';
 import ItemTagsStrip from './ItemTagsStrip.vue';
@@ -165,9 +163,6 @@ export default {
 		return {
 		};
 	},
-	// components: { 
-	// Flatpickr: Flatpickr,
-	// },
 	computed: {
 		id(){ return this.item.id },
  /* \ ============================================== / *\
