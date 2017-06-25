@@ -112,21 +112,21 @@
 					v-btn-effect
 					v-show="!timerRunning"
 					@click="timerNav('play', item)"
-				><i class="zmdi zmdi-play"></i>
+				><q-icon name="ion-ios-play" />
 				</button>
 				<button
 					class="o-btn pause"
 					v-btn-effect
 					v-show="timerRunning"
 					@click="timerNav('pause', item)"
-				><i class="zmdi zmdi-pause"></i>
+				><q-icon name="ion-ios-pause" />
 				</button>
 				<button
 					class="o-btn forward"
 					v-btn-effect
 					@click="timerNav('forward', item, 1)"
 				>
-					<i class="zmdi zmdi-fast-forward"></i>
+					<q-icon name="ion-ios-fastforward" />
 					<span v-if="false && item.planned_time && item.used_time<item.planned_time*60"
 					>-</span><span v-else></span>
 				1 {{ get.text.global.min }}
@@ -136,7 +136,7 @@
 					v-btn-effect
 					@click="timerNav('forward', item, 5)"
 				>
-					<i class="zmdi zmdi-fast-forward"></i>
+					<q-icon name="ion-ios-fastforward" />
 					<span v-if="false && item.planned_time && item.used_time<item.planned_time*60"
 					>-</span><span v-else></span>
 				5 {{ get.text.global.min }}

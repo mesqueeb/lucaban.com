@@ -9,20 +9,6 @@ export default {
 	{
 		// user: null,
 	},
-	mutations:
-	{
-		// updateState(state, payload) // { id, field, value } or other
-		// {
-		// 	let key = payload.field;
-		// 	let val = payload.value;
-		// 	if (!key && !val)
-		// 	{
-		// 		key = Object.keys(payload)[0];
-		// 		val = payload[key];
-		// 	}
-		//     state[key] = val;
-		// },
-	},
 	actions:
 	{
 		login ({commit, dispatch, getters, rootState},

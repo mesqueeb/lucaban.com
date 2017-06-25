@@ -80,17 +80,8 @@ export default {
 @import '../css/_variables.scss';
 .c-panel__navigation{
     display: flex;
-    margin-bottom: 0.2em;
-}
-.c-navigation__menu{
-    display: flex;
-}
-.c-navigation__tag-menu{
-    margin-left: auto;
-    display: flex;
-    align-items: center;
     flex-wrap: wrap;
-    justify-content: flex-end;
+    margin-bottom: 0.2em;
 }
 .c-panel__navigation{
     a{
@@ -110,5 +101,15 @@ export default {
         text-decoration: line-through;
         color: $duedate-color;
     }
+}
+.c-navigation__menu{
+    display: flex;
+}
+.c-navigation__tag-menu{
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    justify-content: flex-end;
 }
 </style>

@@ -66,7 +66,7 @@
 				'u-selected': item.id == state.selection.selectedId,
 				'c-body-div--updating-tags': item.id == state.editingItemTags
 				}"
-			@dblclick="dispatch('startEdit', {item, $event})"
+			@dblclick="dblclick($event)"
 			@click="selectItem"
 		>
 			<div
@@ -245,6 +245,11 @@ export default {
 		dispatch(action, payload){ this.$store.dispatch(action, payload); },
 		
 		selectItem(){ this.dispatch('selectItem', {id:this.item.id}) },
+		dblclick(e)
+		{
+			if (e.target.nodeName == 'I' || e.target.nodeName == 'BUTTON'){ return; }
+			this.dispatch('startEdit', {item:this.item});
+		},
 		// convertbodyURLtoHTML()
 		// {
 		// 	// console.log('converting');

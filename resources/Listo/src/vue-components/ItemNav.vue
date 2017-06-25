@@ -18,12 +18,12 @@
 		class="o-btn c-item-nav__icon btn btn-dipclick"
 		@click="dispatch('addTimer',{id:item.id})"
 	>
-		<i class="zmdi zmdi-timer"></i>
+		<q-icon name="ion-ios-timer-outline" />
 	</button>
 	<button
 		class="o-btn c-item-nav__icon"
 	>
-		<i class="zmdi zmdi-more"></i>
+		<q-icon name="ion-ios-more" />
 		<q-popover ref="popover" class="o-popmenu" anchor="bottom right" self="top right">
 		<!--
 		  The DOM element(s)
@@ -66,7 +66,7 @@
 				class="o-popmenu__item"
 				@click="dispatch('deleteItemDialogue', { id:item.id }), $refs.popover.close()"
 			>
-				<div><i class="zmdi zmdi-delete"></i> {{ state.keybindings.delete.popmenu[l] }}</div>
+				<div><q-icon name="ion-trash-a" /> {{ state.keybindings.delete.popmenu[l] }}</div>
 				<div v-if="!get.mobile" v-html="stringToKeyboardKeys(state.keybindings.delete[oS])"></div>
 			</div>
 		</div>

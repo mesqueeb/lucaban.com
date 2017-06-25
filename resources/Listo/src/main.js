@@ -18,7 +18,7 @@ require(`quasar/dist/quasar.${__THEME}.css`)
 //   require('quasar-extras/roboto-font')
 // }
 // import 'quasar-extras/material-icons'
-// // import 'quasar-extras/ionicons'
+// import 'quasar-extras/ionicons'
 // // import 'quasar-extras/fontawesome'
 // // import 'quasar-extras/animate'
 
@@ -68,10 +68,12 @@ import Vue from 'vue';
 window.Vue = Vue;
 Vue.config.productionTip = false
 // 2
-import Quasar, { QBtn, QIcon, QPopover, QModal } from 'quasar'
+import Quasar, { QBtn, QIcon, QPopover, QModal, QSpinnerOval } from 'quasar'
+import 'quasar-extras/material-icons'
+import 'quasar-extras/ionicons'
 Vue.use(Quasar, {
   components: {
-	QBtn, QIcon, QPopover, QModal
+	QBtn, QIcon, QPopover, QModal, QSpinnerOval
   }
 })
 // 3.

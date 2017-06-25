@@ -67,7 +67,7 @@
 			@keydown.enter="deleteTag(item.id, tag, $event)"
 			@keydown.tab="tab(index, $event)"
 		>
-			<i class="zmdi zmdi-close-circle"></i>
+			<q-icon name="ion-close-circled" />
 		</button>
 	</span>
 </div>

@@ -17,7 +17,7 @@
 					'u-disabled':(get.topLvlItems.includes(selection.selectedId))}"
 				:disabled="get.topLvlItems.includes(selection.selectedId)"
 			>
-				<i class="zmdi zmdi-caret-left-circle"></i>
+				<q-icon name="ion-android-arrow-dropleft-circle" />
 			</button>
 			<div>
 				<button id=""
@@ -27,7 +27,7 @@
 						'u-disabled':(get.firstItem == selection.selectedId)}"
 					:disabled="get.firstItem == selection.selectedId"
 				>
-					<i class="zmdi zmdi-caret-up-circle"></i>
+					<q-icon name="ion-android-arrow-dropup-circle" />
 				</button>
 				<button id=""
 					@click="dispatch('moveItem', {direction:'down'})"
@@ -36,7 +36,7 @@
 						'u-disabled':(get.lastItems.includes(selection.selectedId))}"
 					:disabled="get.lastItems.includes(selection.selectedId)"
 				>
-					<i class="zmdi zmdi-caret-down-circle"></i>
+					<q-icon name="ion-android-arrow-dropdown-circle" />
 				</button>
 			</div>
 			<button id=""
@@ -46,11 +46,11 @@
 					'u-disabled':(get.isFirstItem(selection.selectedId))}"
 				:disabled="get.isFirstItem(selection.selectedId)"
 			>
-				<i class="zmdi zmdi-caret-right-circle"></i>
+				<q-icon name="ion-android-arrow-dropright-circle" />
 			</button>
 		</div>
-		<button class="o-btn" id="floating-add-btn" @click="dispatch('showAddNewItem')">
-			<i class="zmdi zmdi-plus-circle"></i>
+		<button class="o-btn" id="floating-add-btn" @click="dispatch('showAddNewItem')">			
+			<q-icon name="ion-plus-circled" />
 		</button>
 	</div>
 </div>

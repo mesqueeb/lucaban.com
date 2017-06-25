@@ -21,5 +21,6 @@ resources/assets/js/.DS_Store
 /resources/Listo/cordova/plugins
 /resources/Listo/thumbs.db
 /resources/Listo/!.gitkeep
+/resources/Listo/ngrok
 
 resources/Listo/node_modules/.bin/jsesc

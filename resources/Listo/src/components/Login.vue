@@ -25,9 +25,15 @@
 						<!-- @input="$v.name.$touch()" -->
 				</p>
 			</div>
-			<button class="button is-primary"
+			<q-btn loader @click="login" class="button is-primary" type="submit">
+				Login
+				<q-spinner-oval slot="loading" size="20px" />
+			</q-btn>
+<!-- 			
+			<button class="button is-primary" type="submit"
+				@click="login"
 			>Login</button>
-				<!-- @click="" -->
+ -->				<!-- @click="" -->
 		</form>
 	</div>
 </div>
