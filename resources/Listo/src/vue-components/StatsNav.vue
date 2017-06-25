@@ -5,17 +5,6 @@
 		<div class="c-panel-title__top-row">
 			<span v-if="selection.filter.length" v-for="sel in get.selectionFilter">{{ sel }}</span>
 			<span v-if="selection.tags.length" v-for="sel in get.selectionTags">{{ sel }}</span>
-			<span v-if="selection.view != 'journal'">
-				<button
-					class="o-btn"
-					v-btn-effect
-					v-clipboard:copy="get.clipboardText(state.root.id)"
-					v-clipboard:success="dispatch('clipboardSuccess')"
-					v-clipboard:error="dispatch('clipboardError')"
-				>
-					{{ text.card.copy }}
-				</button>
-			</span>
 		</div>
 		<div class="c-panel-title__hidden-tags">
 			<span v-if="selection.hiddenTags.length" v-for="hidden in get.selectionHiddenTags">{{ get.hidden }}</span>
@@ -25,21 +14,35 @@
 
 	<!-- _|PANEL__STATS -->
 	<div class="c-panel__stats">
-		<div v-show="get.totalUsedHourMin(state.root.id) && selection.view != 'journal'">
-			{{ text.menu.usedTime }}
-			<div class="c-stats__used-time">{{ get.totalUsedHourMin(state.root.id) }}</div>
+		<div style="width:2rem"></div>
+		<div class="c-stats">
+			<div v-show="get.totalUsedHourMin(state.root.id) && selection.view != 'journal'">
+				{{ text.menu.usedTime }}
+				<div class="c-stats__used-time">{{ get.totalUsedHourMin(state.root.id) }}</div>
+			</div>
+			<div v-show="get.totalHourMinLeft(state.root.id) && selection.view != 'journal'">
+				{{ text.menu.timeLeft }}
+				<div class="c-stats__time-left">{{ get.totalHourMinLeft(state.root.id) }}</div>
+			</div>
+			<div v-show="selection.view != 'journal'">
+				{{ text.menu.items }}
+				<div class="c-stats__children-amount">{{ get.itemAmount }}</div>
+			</div>
+			<div v-if="get.doneItemAmount">
+				{{ (selection.view != 'journal') ? text.menu.done : text.menu.total }}
+				<div class="c-stats__done-children-amount">{{ get.doneItemAmount }}</div>
+			</div>
 		</div>
-		<div v-show="get.totalHourMinLeft(state.root.id) && selection.view != 'journal'">
-			{{ text.menu.timeLeft }}
-			<div class="c-stats__time-left">{{ get.totalHourMinLeft(state.root.id) }}</div>
-		</div>
-		<div v-show="selection.view != 'journal'">
-			{{ text.menu.items }}
-			<div class="c-stats__children-amount">{{ get.itemAmount }}</div>
-		</div>
-		<div v-if="get.doneItemAmount">
-			{{ (selection.view != 'journal') ? text.menu.done : text.menu.total }}
-			<div class="c-stats__done-children-amount">{{ get.doneItemAmount }}</div>
+		<div v-if="selection.view != 'journal'">
+			<button
+				class="o-btn"
+				v-btn-effect
+				v-clipboard:copy="get.clipboardText(state.root.id)"
+				v-clipboard:success="dispatch('clipboardSuccess')"
+				v-clipboard:error="dispatch('clipboardError')"
+			>
+				{{ text.card.copy }}
+			</button>
 		</div>
 	</div>
 </div>
@@ -87,26 +90,28 @@ export default {
 }
 .c-panel-title__top-row{
     display: flex;
-    span{
-        margin-left: auto;
-    }
+    justify-content: center;
 }
 .c-panel__stats{
     display: flex;
     flex-wrap: wrap;
-    justify-content: center;
+    justify-content: space-between;
     border-bottom: 1px $border-gray solid;
     padding: 0.4em;
+}
+.c-stats{
+    display: flex;
+    flex-wrap: wrap;
     >div{
-        margin: 0.2em;
-    }
-    >div>div{
-        position: relative;
-        padding: 0.2em 0.5em;
-        border-radius: 0.3em;
-        color: white;
-        font-size: 0.9em;
-    }
+	    margin: 0.2em;
+	}
+	>div>div{
+	    position: relative;
+	    padding: 0.2em 0.5em;
+	    border-radius: 0.3em;
+	    color: white;
+	    font-size: 0.9em;
+	}
 }
 .c-stats__used-time{
     background-color: $used-time-color;

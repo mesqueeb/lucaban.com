@@ -8,11 +8,15 @@
 
 <div class="c-panel" v-cloak>
 
-	
+	<!-- Add Item Modal -->
+	<q-modal ref="add-item-modal" position="top" @close="dispatch('doneEditOrCancelNew')">
+		<Item-Edit-Add-Box :item="state.newItem"></Item-Edit-Add-Box>
+	</q-modal>
+	<!-- /Add Item Modal -->
+
 	<Panel-Nav></Panel-Nav>
 	<div class="u-line"></div>	
 	<Stats-Nav></Stats-Nav>
-
 	<div class="layout-view c-content-wrapper">
 		<Card :item="state.root"
 			ref="root"
@@ -51,14 +55,14 @@ import LoadingSpinner from '../vue-components/LoadingSpinner.vue'
 import MobileNav from '../vue-components/MobileNav.vue'
 import PanelNav from '../vue-components/PanelNav.vue'
 import StatsNav from '../vue-components/StatsNav.vue'
-
-import { mapMutations, mapGetters, mapState, mapActions } from 'vuex'
+import ItemEditAddBox from '../vue-components/ItemEditAddBox.vue'
 
 export default {
 	store,
 	components: {
 		PanelNav,
 		StatsNav,
+		ItemEditAddBox,
 		Card,
 		Popups,
 		Popouts,
@@ -76,11 +80,19 @@ export default {
             console.log(`computer says "no"... {$id}`); return;
         });
         this.$store.dispatch('sortAllChildren');
-    },
+		if (!store.$refs) { store.$refs = {} }
+		Object.assign(store.$refs, this.$refs);
+		console.log(`Mounted 'add-item-modal'`);
+	},
 	computed:
 	{
 		get(){ return this.$store.getters },
 		state(){ return this.$store.state },
+	},
+	methods:
+	{
+		commit(action, payload){ this.$store.commit(action, payload); },
+		dispatch(action, payload){ this.$store.dispatch(action, payload); },
 	},
 }
 </script>

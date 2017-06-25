@@ -49,6 +49,7 @@
 	</div>
 	<div 
 		v-if="item.depth != 0 && !(journalView && journalDate)"
+		v-show="item.id != state.editingItem || get.mobile"
 		:id="'item-body-'+item.id"
 		:class="{
 			'c-item-card': true,
@@ -61,10 +62,8 @@
 		<div
 			:class="{
 				'c-body-div':true,
-				'c-body-div--editing':(!get.mobile && item.id == state.editingItem),
 				'textarea-wrap':true,
 				'u-selected': item.id == state.selection.selectedId,
-				'u-selected--editing':(!get.mobile && item.id == state.editingItem),
 				'c-body-div--updating-tags': item.id == state.editingItemTags
 				}"
 			@dblclick="dispatch('startEdit', {item, $event})"
@@ -76,7 +75,6 @@
 					'c-body-text--project':isProject,
 					'c-body-text--updating-tags': item.id == state.editingItemTags
 					}"
-				v-show="item.id != state.editingItem || get.mobile"
 			>
 				<div :class="{
 					'u-lightgray':item.temp,
@@ -92,27 +90,23 @@
 			<!-- For debugging: -->
 			<span v-if="state.debug" class="d-inline-flex">
 				({{item.id}}) D-{{item.depth}})
-				<span v-if="item.children_order.length">
-					[{{item.children_order}}]
-				</span>
-				<span>
-				</span>
+				<span v-if="item.children_order.length">[{{item.children_order}}]</span>
 			</span>
 			<!-- // For debugging: -->
-			<Item-Edit-Add-Box v-if="item.id == state.editingItem" :item="item"></Item-Edit-Add-Box>
+			
 			<Item-Add-Tag v-if="item.id == state.editingItemTags" :item="item"></Item-Add-Tag>
 			<Item-Tags-Strip v-if="item.id != state.editingItem" :item="item"></Item-Tags-Strip>
 			<Item-Nav :item="item"></Item-Nav>
 		</div>
 	</div>
-
+	<Item-Edit-Add-Wrapper :item="item"></Item-Edit-Add-Wrapper>
 	<!-- _|CHILDREN -->
 	<div
 		class="l-children"
 		v-if="item.children.length"
 		v-show="item.show_children"
-		:style="(state.addingNewAsFirstChild)?'order:3;':''"
 	>
+		<!-- :style="(state.addingNewAsFirstChild)?'order:3;':''" -->
 		<Card
 			v-if="!item.journalDate"
 			v-for="childCard in visibleDirectChildren"
@@ -129,7 +123,6 @@
 		></Card>
 	</div>
 	<!-- CHILDREN|_ -->
-	<Item-Edit-Add-Box v-if="showAddNewBox" :item="state.newItem"></Item-Edit-Add-Box>
 
 </div>
 </div>
@@ -141,6 +134,7 @@ import { uniq, Utilities } from '../helpers/globalFunctions.js';
 import Clipboard from 'clipboard';
 import ItemNav from './ItemNav.vue';
 import ItemToggles from './ItemToggles.vue';
+import ItemEditAddWrapper from './ItemEditAddWrapper.vue';
 import ItemEditAddBox from './ItemEditAddBox.vue';
 import ItemAddTag from './ItemAddTag.vue';
 import ItemTagsStrip from './ItemTagsStrip.vue';
@@ -150,7 +144,7 @@ export default {
 	template:'#items-card-template',
 	props: ['item'],
 	components: {
-		ItemNav, ItemToggles, ItemEditAddBox, ItemTagsStrip, ItemAddTag
+		ItemNav, ItemToggles, ItemEditAddWrapper, ItemEditAddBox, ItemTagsStrip, ItemAddTag
 	},
 	data(){ return {} },
 	mounted()
@@ -305,16 +299,16 @@ export default {
     border-left: none;
 }
 .c-body-div{
-    border-bottom: 1px solid $border-gray;
+    border-bottom: thin solid $border-gray;
     width: 100%;
     display: flex;
     align-items: center;
-	&--editing{
-	    flex-direction: column;
-	    align-items:flex-start;
-	    padding-bottom: 0.4em;
-	    border-bottom: thin solid rgba(245, 215, 110, 0.7);
-	}
+	// &--editing{
+	//     flex-direction: column;
+	//     align-items:flex-start;
+	//     padding-bottom: 0.4em;
+	//     border-bottom: thin solid rgba(245, 215, 110, 0.7);
+	// }
 	&--updating-tags{
 	    flex-wrap: wrap;
 	    background: none;

@@ -32,7 +32,6 @@ $font-family-base:        $font-family-sans-serif !default;
 @mixin text-settings() {
     font-family: $font-family-base;
     color: #4d4d4d;
-    font-size: 14px;
     font-weight: 300;
     -webkit-font-smoothing: antialiased;
     -moz-font-smoothing: antialiased;

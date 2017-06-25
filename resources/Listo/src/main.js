@@ -4,7 +4,7 @@
 // // 1. use next line to activate CUSTOM STYLE (./src/themes)
 // // require(`./themes/app.${__THEME}.styl`)
 // // 2. or, use next line to activate DEFAULT QUASAR STYLE
-// require(`quasar/dist/quasar.${__THEME}.css`)
+require(`quasar/dist/quasar.${__THEME}.css`)
 // // ==============================
 
 // import Vue from 'vue'
@@ -67,9 +67,13 @@
 import Vue from 'vue';
 window.Vue = Vue;
 Vue.config.productionTip = false
-// 2.
-import Quasar from 'quasar-framework';
-Vue.use(Quasar);
+// 2
+import Quasar, { QBtn, QIcon, QPopover, QModal } from 'quasar'
+Vue.use(Quasar, {
+  components: {
+	QBtn, QIcon, QPopover, QModal
+  }
+})
 // 3.
 import Vuex from 'vuex';
 Vue.use(Vuex);
@@ -91,7 +95,7 @@ Vue.use(ListDirectives);
 import VueClipboard from 'vue-clipboard2';
 Vue.use(VueClipboard);
 // GO.
-new Vue({
+window.vm = new Vue({
     el: '#q-app',
 	router,
 	store,
@@ -99,4 +103,6 @@ new Vue({
 });
 
 // CSS
-require(`./css/index.scss`);
+// import * from './css/index.scss'
+// require('./index.scss');
+require('./css/index.scss');

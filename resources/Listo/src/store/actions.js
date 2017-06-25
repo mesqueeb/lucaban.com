@@ -552,7 +552,7 @@ blockBlur ({state, commit, dispatch, getters})
 	setTimeout(function()
 	{
 		state.blockBlur = false;
-	},300);
+	},500);
 },
 startEdit ({state, commit, dispatch, getters},
 	{item, event} = {})
@@ -574,6 +574,7 @@ startEdit ({state, commit, dispatch, getters},
 	// 	return;
 	// }
 	commit('updateState',{ editingItem:item.id });
+	if (getters.mobile) { store.$refs['edit-item-modal-'+item.id].open() }
 },
 scrollToItemIfNeeded ({state, commit, dispatch, getters},
 	{id} = {})
@@ -590,6 +591,7 @@ doneEdit ({state, commit, dispatch, getters},
 {
 	console.log('Done edit!');
 	dispatch('blockBlur');
+	if (getters.mobile){ store.$refs['edit-item-modal-'+id].close(); }
 	let item = state.nodes[id];
 	commit('updateState',{ editingItem:null });
 	commit('updatePopouts',{ edit:[] });
@@ -625,6 +627,7 @@ cancelEdit ({state, commit, dispatch, getters})
 {
 	let id = (state.editingItem) ? state.editingItem : state.editingItemTags;
 	if (!id) { return; }
+	if (getters.mobile){ store.$refs['edit-item-modal-'+id].close() };
 	if (state.editingItem)
 	{
 		Vue.nextTick(() => {
@@ -652,6 +655,7 @@ cancelEditOrAdd ({state, commit, dispatch, getters})
 },
 cancelAddNew ({state, commit, dispatch, getters})
 {
+	if (getters.mobile){ store.$refs['add-item-modal'].close() };
 	console.log('cancelAddNew');
 	if (state.selection.selectedId == state.addingNewUnder || state.selection.selectedId == null)
 	{ // to prevent item being reselected when cancelAddNew through blur because of clicking on another item.
@@ -660,12 +664,13 @@ cancelAddNew ({state, commit, dispatch, getters})
 	// Reset newItem to sibling stance.
 	state.addingNewUnder = null;
 	state.addingNewAsChild = false;
-	state.addingNewAsFirstChild = false;
+	// state.addingNewAsFirstChild = false;
 },
 addNew ({state, commit, dispatch, getters},
 	{addNextItemAs} = {addNextItemAs:null})
 {
 	dispatch('blockBlur');
+	if (getters.mobile && addNextItemAs == 'stop'){ store.$refs['add-item-modal'].close() };
 	console.log('addingNew');
 	let newItem = JSON.parse(JSON.stringify(state.newItem));
 	let olderSiblingId = state.addingNewUnder;
@@ -905,13 +910,14 @@ setToday ({state, commit, dispatch, getters},
 showAddNewItem ({state, commit, dispatch, getters},
 	{id, addAs} = {})
 {
+	if (getters.mobile){ store.$refs['add-item-modal'].open() };
 	id = (id) ? id : (state.selection.selectedId) ? state.selection.selectedId : state.root.id ;
 	if (!id){ return; }
 	console.log('showAddNewItem for ['+state.nodes[id].body+']');
 	state.addingNewUnder = id;
 	state.selection.lastSelectedId = id;
 	state.selection.selectedId = null;
-	state.addingNewAsFirstChild = (addAs == 'child') ? true : false;
+	// state.addingNewAsFirstChild = (addAs == 'child') ? true : false;
 	state.addingNewAsChild = (addAs == 'child') ? true : false;
 },
 startEditTags ({state, commit, dispatch, getters},
@@ -1060,53 +1066,78 @@ copyProgrammatic ({dispatch, state, getters},
 },
 prepareTag ({state})
 {
+	if (!state.newTag){ return; }
 	state.newItem.preparedTags.push(state.newTag);
 	state.newTag = null;
 },
 blurOnEditOrAdd ({dispatch, commit, state, getters},
 	{ field } = { field:null })
 {
-	    	if (state.blockBlur){ return; }
-	    	if (getters.mobile && field == 'add-tag')
-	    	{
-			    	if (state.editingItem)
-					{
-						dispatch('tagItem', { id:state.editingItem, tags:state.newTag });
-						return;
-					}
-					if (state.addingNewUnder)
-					{
-						dispatch('prepareTag');
-						return;
-					}
-	    	}
-	    	if (getters.mobile){ return; }
-	    	setTimeout(function()
-	    	{
-		    	if ( document.activeElement.nodeName == 'INPUT'
-		    		||  document.activeElement.nodeName == 'TEXTAREA'
-		    		||  document.activeElement.nodeName == 'A'
-		    		||  document.activeElement.nodeName == 'BUTTON' )
-		    	{
-	        		return;
-				} else {
-			    	if (state.editingItem)
-					{
-				    	console.log('blurring on edit');
-						dispatch('doneEdit');
-					}
-			    	if (state.editingItemTags)
-					{
-				    	console.log('blurring on edit tags');
-						commit('updateState', { editingItemTags:null });
-					}
-					if (state.addingNewUnder)
-					{
-				    	console.log('bluring on Add New');
-						dispatch('cancelAddNew');
-					}
-				}
-	    	},50);
+	if (state.addingNewUnder)
+	{
+		let npt = (!state.newItem.planned_time) ? 0 : parseFloat(state.newItem.planned_time);
+		commit('newItem/updateState', { planned_time: npt });
+	}
+	if (state.blockBlur){ return; }
+	if (getters.mobile && field == 'add-tag')
+	{
+	    	if (state.editingItem)
+			{
+				dispatch('tagItem', { id:state.editingItem, tags:state.newTag });
+				return;
+			}
+			if (state.addingNewUnder)
+			{
+				dispatch('prepareTag');
+				return;
+			}
+	}
+	if (getters.mobile){ return; }
+	setTimeout(function()
+	{
+    	if ( document.activeElement.nodeName == 'INPUT'
+    		||  document.activeElement.nodeName == 'TEXTAREA'
+    		||  document.activeElement.nodeName == 'A'
+    		||  document.activeElement.nodeName == 'BUTTON' )
+    	{
+    		return;
+		} else {
+	    	if (state.editingItem)
+			{
+		    	console.log('blurring on edit');
+				dispatch('doneEdit');
+			}
+	    	if (state.editingItemTags)
+			{
+		    	console.log('blurring on edit tags');
+				commit('updateState', { editingItemTags:null });
+			}
+			if (state.addingNewUnder)
+			{
+		    	console.log('bluring on Add New');
+				dispatch('cancelAddNew');
+			}
+		}
+	},50);
+},
+doneEditOrCancelNew({state, dispatch}) // this is to use with modals
+{
+	if (state.editingItem)
+	{
+    	console.log('blurring on edit');
+		dispatch('doneEdit');
+	}
+	if (state.addingNewUnder)
+	{
+    	console.log('bluring on Add New');
+		dispatch('cancelAddNew');
+	}
+	// not yet available with modals:
+	// if (state.editingItemTags)
+	// {
+ //    	console.log('blurring on edit tags');
+	// 	commit('updateState', { editingItemTags:null });
+	// }
 },
 focusElement({state},
 	{el})

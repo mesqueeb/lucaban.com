@@ -2,15 +2,11 @@
 <form 
 	:class="[
 		'c-editaddbox', {
-			'c-editaddbox--mobile':(mobile),
-			'c-editaddbox--addnew':(item.newItem),
-			'c-editaddbox--child':state.addingNewAsChild,
-			'c-editaddbox--first-child':state.addingNewAsFirstChild,}]"
+			'c-editaddbox--mobile':(mobile)}]"
 	@submit.prevent
-	@click="clickOnEditOrAddCurtain($event)"
 >
 	<div :class="[
-		'c-editaddbox__body','flex-wrap',
+		'c-editaddbox__body',
 		{'c-editaddbox__body--mobile':(mobile)}]"
 	>
 		<div class="c-language-picker w-100" v-if="listIsEmpty && mobile">
@@ -64,7 +60,9 @@
 			<button v-if="item.newItem" class="o-btn" @click="dispatch('addNew', { addNextItemAs:'stop' })">{{ text.card.addAndClose }}</button>
 			<button v-if="!item.newItem" class="o-btn" @click="dispatch('doneEdit')">{{ text.global.save }}</button>
 		</div>
-	</div>
+<!-- 		@click="$refs['editadd-modal-'+item.id].close()"
+		$refs['editadd-modal-'+item.id].close()
+ -->	</div>
 </form>
 </template>
 
@@ -178,44 +176,22 @@ export default {
 <style lang="scss">
 @import '../css/_variables.scss';
 .c-editaddbox{
-    width: 100%;
-	&--addnew{
-	    margin-left: 1.9em;
-	    border-bottom: thin solid rgba(245, 215, 110, 0.7);
-	}
-	&--child{
-	    margin-left: 3.8em;  
-	}
-	&--mobile{
-	    border-top-left-radius: 0.3em;
-	    border-top-right-radius: 0.3em;
-	    margin-top: 1rem;
-	    padding-bottom: 0.7rem;
-	    border: none;
-	    textarea{
-	        border: rgba(245, 215, 110, 0.5) solid thin;
-	        font-size: 16px;
-	    }
+	width: 100%;
 
-	    display: flex;
-	    flex-direction: column;
-	    z-index: 10;
-	    position: fixed;
-	    width: 100vw;
-	    height: 100vh;
-	    background-color: rgba(0, 0, 0, .5);
-	    transition: opacity .3s ease;   
-	    top: 0;
-	    left: 0;
-	    margin: 0;
-	    flex-wrap: wrap;
-	    font-size: 16px;
+	font-size: 0.8em;
+    padding: 0.5em;
+	border: $selection-color solid thin;
+	&--mobile{
+		font-size: 14px;
+		padding: 1.5em;
+		border: none;
 	}
 }
 .c-editaddbox__body{
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
-    border: $selection-color solid thin;    
+    border-bottom: $border-gray solid thin;
 }
 .c-editaddbox__textarea{
     width: 100%;
@@ -224,27 +200,11 @@ export default {
     resize: none;
 }
 .c-editaddbox__lower-body{
-    font-size: 0.8em;
     display: flex;
     flex-direction: column;
     align-items: baseline;    
     >div{
-        margin: 0.3em;
-    }
-	&--mobile{
-	    background-color: white;
-	    padding: 1rem;
-	    margin: 0 1rem;
-	    border-bottom-left-radius: 0.3em;
-	    border-bottom-right-radius: 0.3em;
-	    padding-top: 0;
-	    margin-bottom: auto;
-	}
-}
-.c-editaddbox__item-tags--mobile {
-    font-size: 14px;
-    span{
-        font-size: 16px;
+        padding: 0.3em;
     }
 }
 .c-language-picker{
@@ -259,9 +219,10 @@ export default {
     display: flex;
     justify-content: space-between;
     width: 100%;
-    margin-top:0.4em;
+    margin-top: 0.3em;
+    padding-bottom: 0 !important;
     button{
-        font-size:15px;
+        font-size:1.2em;
     }
 }
 </style>

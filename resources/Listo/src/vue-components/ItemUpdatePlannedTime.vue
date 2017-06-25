@@ -8,14 +8,13 @@
 		v-for="dur in state.userSettings.plannedDurations"
 		:class="[
 			'o-btn', 'c-update-planned-time__button', 'js-update-planned-time__button',
-			{'c-update-planned-time__currentDuration': currentDur == dur }]"
-		@click.prevent="setPlannedTime(item, $event)"
+			{'c-update-planned-time__currentDuration': item.planned_time == dur }]"
+		@click.prevent="setPlannedTime(item, $event, dur)"
 		@blur="dispatch('blurOnEditOrAdd')"
 		@keydown.esc="dispatch('cancelEditOrAdd')"
-		@keydown.enter="setPlannedTime(item, $event)"
+		@keydown.enter="setPlannedTime(item, $event, dur)"
 		@keydown.up="dispatch('focusElement',{ el:'.js-edit-body' })"
 		@keydown.down="dispatch('focusElement',{ el:'.js-add-tag' })"
-		:value="dur"
 	>{{ dur }} {{ (mobileSmall) ? text.global.m : text.global.min }}</button>
 	<div>
 		<input
@@ -46,41 +45,37 @@ export default {
 		text(){ return this.get.text },
 		mobile(){ return this.get.mobile },
 		mobileSmall(){ return this.get.mobileSmall },
-		currentDur()
-		{
-	    	if (this.state.editingItem)
-			{
-				return this.item.planned_time;
-			}
-			if (this.state.addingNewUnder)
-			{
-				return this.state.newItem.planned_time;
-			}
-		},
 	},
 	methods:
 	{
 		commit(action, payload){ this.$store.commit(action, payload) },
 		dispatch(action, payload){ this.$store.dispatch(action, payload) },
-		setPlannedTime(item, event)
+		setPlannedTime(item, event, newTime)
 		{
-			item.planned_time = parseFloat(item.planned_time);
-			let newTime = (event.srcElement.value) ? parseFloat(event.srcElement.value) : 0 ;
-	    	if (this.state.editingItem)
+			this.dispatch('blockBlur');
+			event.preventDefault();
+			console.log(`launching setPlannedTime with ${newTime}`);
+
+			if (newTime)
 			{
-				item.planned_time = newTime;
+				this.item.planned_time = newTime;
 			}
-			if (this.state.addingNewUnder)
-			{
-				this.state.newItem.planned_time = newTime;
-			}
+			let npt = (!this.item.planned_time) ? 0 : parseFloat(this.item.planned_time);
+			this.item.planned_time = npt;
+
 			let plsFocus = '.js-add-tag';
 			Vue.nextTick(function ()
 			{
+				if (this.get.mobile)
+				{
+					document.querySelector(plsFocus).focus();
+				} else {
+					document.querySelectorAll(plsFocus)[1].focus();
+				}
 				console.log('returning to editting: '+plsFocus);
-				document.querySelector(plsFocus).focus();
-			});
+			}.bind(this));
 		},
+
 	},
 }
 </script>
@@ -108,7 +103,7 @@ export default {
 }
 .c-update-planned-time__button{
     color: $duration-color;
-    font-size: 1em;
+    // font-size: 1em;
     padding: 0 0.2em;
     min-height: 2.1em;
 }
@@ -120,6 +115,6 @@ export default {
     color: white;
 }
 .c-update-planned-time--mobile{
-    font-size: 14px;
+    // font-size: 14px;
 }
 </style>

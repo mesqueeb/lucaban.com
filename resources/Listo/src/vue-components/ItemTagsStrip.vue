@@ -1,9 +1,8 @@
 <template>
-<div :class="{
-	'c-item-tags':true,
-	'c-item-card__item-tags':true,
-	'c-item-tags--updating-tags': item.id == state.editingItemTags
-	}"
+<div :class="
+	['c-item-tags',
+	{ 'c-item-tags--updating-tags': item.id == state.editingItemTags,
+	'c-item-tags--mobile-editing': mobileEditing }]"
 >
 	<label
 		class="o-pill--done"
@@ -110,6 +109,10 @@ export default {
 			}
 			return this.item.tagged.map(t => t.tag_name).filter(t => !this.parentTags.includes(t));
 		},
+		mobileEditing(){
+			if (!this.get.mobile) { return false; }
+			if (this.state.editingItem == this.item.id || this.item.newItem){ return true; }
+		},
 	},
 	methods:
 	{
@@ -179,6 +182,9 @@ export default {
     }
 	&--updating-tags{
 	    margin: 0.3em 0;
+	}
+	&--mobile-editing span{
+		font-size: 0.8em;
 	}
 }
 </style>

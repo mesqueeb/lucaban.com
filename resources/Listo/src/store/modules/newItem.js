@@ -9,11 +9,28 @@ export default {
         done: false,
         planned_time: '',
         preparedTags: [],
-        children: '',
+        children: [],
+        children_order: [],
         newItem: true,
 	},
 	mutations:
 	{
+		updateState(state, payload) // { id, field, value } or other
+		{
+			let key = payload.field;
+			let val = payload.value;
+			if (!key && !val)
+			{
+				key = Object.keys(payload).filter(k => k != 'id')[0];
+				val = payload[key];
+			}
+			if (payload.id)
+			{
+				state.nodes[payload.id][key] = val;
+		        return;
+			}
+		    state[key] = val;
+		},
 		deleteTag (state, { tag })
 		{
 			state.preparedTags = state.preparedTags.filter(t => t != tag);

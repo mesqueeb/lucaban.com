@@ -24,7 +24,7 @@
 		class="o-btn c-item-nav__icon"
 	>
 		<i class="zmdi zmdi-more"></i>
-		<q-popover ref="popover" class="o-popmenu">
+		<q-popover ref="popover" class="o-popmenu" anchor="bottom right" self="top right">
 		<!--
 		  The DOM element(s)
 		-->
