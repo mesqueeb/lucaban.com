@@ -41,7 +41,7 @@
 	<div
 		class="c-subsection-head"
 		v-if="journalParentString"
-		@click="selectItem(item)"
+		@click="selectItem"
 	>
 		<div class="c-subsection-head__text">
 			{{ journalParentString }}
@@ -68,7 +68,7 @@
 				'c-body-div--updating-tags': item.id == state.editingItemTags
 				}"
 			@dblclick="dispatch('startEdit', {item, $event})"
-			@click="selectItem(item)"
+			@click="selectItem"
 		>
 			<div
 				:class="{ 'c-body-text': true,
@@ -85,7 +85,7 @@
 				>{{ item.body }}</div>
 				<div class="l-completion-notes c-completion-notes bodybox"
 					v-if="item.completion_memo"
-					@click="selectItem(item)"
+					@click="selectItem"
 				>{{ item.completion_memo }}</div>
 			</div>
 
@@ -101,7 +101,7 @@
 			<!-- // For debugging: -->
 			<Item-Edit-Add-Box v-if="item.id == state.editingItem" :item="item"></Item-Edit-Add-Box>
 			<Item-Add-Tag v-if="item.id == state.editingItemTags" :item="item"></Item-Add-Tag>
-			<Item-Tags-Strip :item="item"></Item-Tags-Strip>
+			<Item-Tags-Strip v-if="item.id != state.editingItem" :item="item"></Item-Tags-Strip>
 			<Item-Nav :item="item"></Item-Nav>
 		</div>
 	</div>
@@ -148,20 +148,15 @@ import ItemTagsStrip from './ItemTagsStrip.vue';
 export default {
 	name: 'Card',
 	template:'#items-card-template',
+	props: ['item'],
 	components: {
 		ItemNav, ItemToggles, ItemEditAddBox, ItemTagsStrip, ItemAddTag
 	},
+	data(){ return {} },
 	mounted()
 	{
-		// this.newItem.preparedTags = JSON.parse(JSON.stringify(this.parentTags));
 		// this.convertbodyURLtoHTML();
 		if (this.listIsEmpty){ this.commit( 'updateState', { addingNewEmptyList:true }); }
-	},
-	props: ['item'],
-	data()
-	{
-		return {
-		};
 	},
 	computed: {
 		id(){ return this.item.id },
@@ -172,13 +167,8 @@ export default {
 		state(){ return this.$store.state },
 		l(){ return this.get.language },
 		visibleDirectChildren(){ return this.get.visibleDirectChildren(this.id) },
-		allVisibleChildItems(){ return this.get.allVisibleChildItems(this.id) },
 		childrenOrder(){ return this.get.childrenOrder(this.id) },
-		childrensDeepestChildren(){ return this.get.childrensDeepestChildren(this.id) },
-		allChildrenDone(){ return this.get.allChildrenDone(this.id) },
 		isProject(){ return this.get.isProject(this.id) },
-		siblingIndex(){ return this.get.siblingIndex(this.id) },
-		olderSiblingId(){ return this.get.olderSiblingId(this.id) },
 		journalDate(){ return this.get.journalDate(this.item) },
 		tagsArray(){ return this.get.tagsArray(this.id) },
 		parentTags(){ return this.get.tagsArray(this.item.parent_id) },
@@ -259,31 +249,17 @@ export default {
 		sec_to_hourmin,
 		commit(action, payload){ this.$store.commit(action, payload); },
 		dispatch(action, payload){ this.$store.dispatch(action, payload); },
-
-		selectItem(item){ this.dispatch('selectItem', {id:item.id}) },
-		updateDone(id){ this.dispatch('prepareDonePatch', {id}) },
-		updateShowChildren(id){ this.dispatch('patch', {id,field:'show_children'}) },
-		setToday(id){ this.dispatch('setToday', {id}) },
-		deleteItemDialogue(id){ this.dispatch('deleteItemDialogue', {id}) },
 		
-		convertbodyURLtoHTML()
-		{
-			// console.log('converting');
-			if (!this.item || this.item.depth == 0){ return; }
-			let bodyboxQS = '#'+this.$el.id+' .js-body-text';
-			let a = document.querySelector(bodyboxQS);
-			if (!a || !a.innerHTML.includes('a href')){ return; }
-			a.innerHTML = a.innerHTML.replace("&lt;a href=", "<a href=").replace('target="_blank"&gt;','target="_blank">').replace("&lt;/a&gt;","</a>");
-		},
-
-		startEditDoneDate(item, event)
-		{
-			console.log('startEditDoneDate');
-			item = (item) ? item : this.state.nodes[this.state.selection.selectedId];
-			this.state.beforeEditCache_done_date = item.done_date;
-			this.state.editingDoneDateItem = item.id;
-		},
-
+		selectItem(){ this.dispatch('selectItem', {id:this.item.id}) },
+		// convertbodyURLtoHTML()
+		// {
+		// 	// console.log('converting');
+		// 	if (!this.item || this.item.depth == 0){ return; }
+		// 	let bodyboxQS = '#'+this.$el.id+' .js-body-text';
+		// 	let a = document.querySelector(bodyboxQS);
+		// 	if (!a || !a.innerHTML.includes('a href')){ return; }
+		// 	a.innerHTML = a.innerHTML.replace("&lt;a href=", "<a href=").replace('target="_blank"&gt;','target="_blank">').replace("&lt;/a&gt;","</a>");
+		// },
 	},
 }
 </script>
@@ -340,10 +316,7 @@ export default {
 	    border-bottom: thin solid rgba(245, 215, 110, 0.7);
 	}
 	&--updating-tags{
-	    flex-direction: column;
 	    flex-wrap: wrap;
-	    align-items:flex-start;
-	    padding-bottom: 0.4em;
 	    background: none;
 	    border-bottom: thin solid rgba(245, 215, 110, 0.7);
 	}

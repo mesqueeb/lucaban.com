@@ -6,7 +6,7 @@ Vue.use(VueRouter)
 function load (component) {
   return () => System.import(`components/${component}.vue`)
 }
-import { required, minLength, between } from 'vuelidate/lib/validators'
+// import { required, minLength, between } from 'vuelidate/lib/validators'
 export default new VueRouter({
   /*
    * NOTE! VueRouter "history" mode DOESN'T works for Cordova builds,

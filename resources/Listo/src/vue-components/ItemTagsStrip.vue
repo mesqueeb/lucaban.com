@@ -20,14 +20,6 @@
 			v-model="item.done_date"
 		>
 	</label>
-<!-- 		<br>sec_to_hourminsec(totalSecLeft): {{ sec_to_hourminsec(totalSecLeft) }}
-		<br>totalSecLeft: {{ totalSecLeft }}
-		<br>secLeft: {{secLeft}}
-		<br>totalTimeDifferentFromParent: {{totalTimeDifferentFromParent}}
-		<br>!item.done: {{!item.done}}
-		<br>totalPlannedSec: {{totalPlannedSec}}
-		<br>get.totalPlannedSec(item.parent_id): {{get.totalPlannedSec(item.parent_id)}}
- -->
  	<span
 		v-if="totalSecLeft > 0
 			&& totalSecLeft > secLeft
@@ -45,9 +37,7 @@
 			&& item.id != state.editingItemTags"
 	>
 		{{ sec_to_hourminsec(secLeft) }}
-	</span>
-		{{ sec_to_hourminsec(secLeft) }}
-	
+	</span>	
 	<span
 		v-if="hasDueDate && !item.done
 			&& item.id != state.editingItemTags"
@@ -64,7 +54,7 @@
 	</span>
 	<span
 		v-if="tagArray"
-		v-for="tag in tagArray"
+		v-for="(tag, index) in tagArray"
 		class="o-pill--custom-tag"
 		@dblclick.prevent="tagDblClick(tag,$event)"
 	>
@@ -76,8 +66,8 @@
 			@click.prevent="deleteTag(item.id, tag, $event)"
 			@keydown.delete="deleteTag(item.id, tag, $event)"
 			@keydown.enter="deleteTag(item.id, tag, $event)"
+			@keydown.tab="tab(index, $event)"
 		>
-			<!-- v-if="newItem.preparedTags.includes(tag)" -->
 			<i class="zmdi zmdi-close-circle"></i>
 		</button>
 	</span>
@@ -105,45 +95,9 @@ export default {
 				return this.get.tagsArray(this.item.parent_id);
 			}
 		},
-		// totalSecLeft(){ return this.get.totalSecLeft(this.item.id) },
-		totalSecLeft(){ return this.totalPlannedSec-this.totalUsedSec; },
-		totalPlannedSec(){
-			return this.totalPlannedMin*60;
-		},
-		totalPlannedMin(){
-			let item = this.item;
-			if (!item){ return 0; }
-
-			let selfValue = (item.planned_time) ? parseFloat(item.planned_time) : 0;
-			let childrenArray = this.get.allVisibleChildItems(this.item.id);
-			if (!childrenArray || !childrenArray.length) { return selfValue; }
-			let x = childrenArray.reduce(function(prevVal, child){
-				return prevVal + parseFloat(child.planned_time);
-			}, selfValue);
-		    return (x) ? parseFloat(x) : 0;
-		},
-		totalUsedSec(){
-			let item = this.item;
-			let childrenArray = this.get.allVisibleChildItems(this.item.id);
-			if (!item){ return 0; }
-
-			let selfValue = (item.used_time) ? parseFloat(item.used_time) : 0;
-			if (!childrenArray || !childrenArray.length) { return selfValue; }
-			
-			let x = childrenArray.reduce(function(prevVal, child){
-				return prevVal + parseFloat(child.used_time);
-			}, selfValue);
-		    return (x) ? x : 0;
-		},
-		secLeft(){
-			if (!this.item){ return 0; }
-			return this.item.planned_time*60-this.item.used_time;
-		},
-		// totalTimeDifferentFromParent(){ return this.get.totalTimeDifferentFromParent(this.item.id) },
-		totalTimeDifferentFromParent(){
-			if (!this.item.parent_id){ return true; }
-			return this.totalPlannedSec != this.get.totalPlannedSec(this.item.parent_id);
-		},
+		secLeft(){ return this.get.secLeft(this.item.id) },
+		totalSecLeft(){ return this.get.totalSecLeft(this.item.id) },
+		totalTimeDifferentFromParent(){ return this.get.totalTimeDifferentFromParent(this.item.id) },
 		hasDueDate()
 		{
 		    return (this.item.due_date && this.item.due_date != '0000-00-00 00:00:00');
@@ -162,6 +116,12 @@ export default {
 		momentCalendar, sec_to_hourminsec,
 		commit(action, payload){ this.$store.commit(action, payload) },
 		dispatch(action, payload){ this.$store.dispatch(action, payload) },
+		tab(index, e)
+		{
+			if (index+1 == this.tagArray.length && !e.shiftKey){
+				e.preventDefault();
+			}
+		},
 		tagDblClick(tag, event){
 			if(this.state.editingItem || this.state.editingItemTags || this.state.addingNewUnder){ return; }
 			this.dispatch('filterItems',{keyword:'tag', value:Utilities.tagNameToSlug(tag), event});
@@ -217,8 +177,8 @@ export default {
         margin-left: 0.5em;
         padding: 0;
     }
-}
-.c-item-tags--updating-tags{
-    margin-top: 0.3em;
+	&--updating-tags{
+	    margin: 0.3em 0;
+	}
 }
 </style>

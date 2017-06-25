@@ -331,26 +331,19 @@ deleteItem ({state, commit, dispatch, getters},
 	delete state.nodes[id];
 },
 tagItem ({state, commit, dispatch, getters},
-	{id, tags = state.newTag} = {})
+	{id, tags = state.newTag} = {id:state.selection.selectedId, tags:state.newTag})
 {
-	state.newTag = null;
-	console.log(tags);
 	if (!tags){ return; }
-	if (Array.isArray(tags))
+	tags = JSON.parse(JSON.stringify(tags));
+	state.newTag = null;
+	if (!Array.isArray(tags))
 	{
-		tags = removeEmptyValuesFromArray(tags);
-		tags = tags.filter(function(t){
-			return !getters.hasTag(id,t);
-		});
-		if (!tags.length){ return; }
-	} else {
-		if (!tags.replace(/\s/g, "").length){ return; }
-		if (getters.hasTag(id, tags))
-		{
-			console.log('NG! Has the tag already!!');
-			return;
-		}
+		tags = [tags];
 	}
+	tags = removeEmptyValuesFromArray(tags);
+	tags = tags.filter(t => !getters.hasTag(id,t));
+	if (!tags.length){ return; }
+
 	dispatch('patchTag', { id,tags });
 	let item = state.nodes[id];
 	if (item.children.length)
@@ -1070,7 +1063,7 @@ prepareTag ({state})
 	state.newItem.preparedTags.push(state.newTag);
 	state.newTag = null;
 },
-blurOnEditOrAdd ({dispatch, state, getters},
+blurOnEditOrAdd ({dispatch, commit, state, getters},
 	{ field } = { field:null })
 {
 	    	if (state.blockBlur){ return; }
@@ -1101,6 +1094,11 @@ blurOnEditOrAdd ({dispatch, state, getters},
 					{
 				    	console.log('blurring on edit');
 						dispatch('doneEdit');
+					}
+			    	if (state.editingItemTags)
+					{
+				    	console.log('blurring on edit tags');
+						commit('updateState', { editingItemTags:null });
 					}
 					if (state.addingNewUnder)
 					{

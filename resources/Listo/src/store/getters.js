@@ -1,4 +1,4 @@
-import { enhancedGetters } from 'vuex-strong-cache'
+// import { enhancedGetters } from 'vuex-strong-cache'
 import {
 	mobilecheck,Utilities,objectToArray,uniqBy,sortObjectArrayByProperty,sortObjectArrayByTwoProperties
 } from '../helpers/globalFunctions.js';
@@ -6,24 +6,22 @@ import { sec_to_hourmin } from '../helpers/valueMorphers2.js';
 import * as moment from 'moment';
 
 export default {
-...enhancedGetters({
+// ...enhancedGetters({
 	totalPlannedMin: (state, getters) =>
 	(id = state.root.id) => {
-		// return 0; // Bug infinite loop
 		let item = state.nodes[id];
 		if (!item){ return 0; }
 
 		let selfValue = (item.planned_time) ? parseFloat(item.planned_time) : 0;
-		let childrenArray = getters.allVisibleChildItems(id);
+		let childrenArray = getters.getAllChildrenIds(id);
 		if (!childrenArray || !childrenArray.length) { return selfValue; }
-		let x = childrenArray.reduce(function(prevVal, child){
-			return prevVal + parseFloat(child.planned_time);
+		let x = childrenArray.reduce(function(prevVal, childId){
+			return prevVal + parseFloat(state.nodes[childId].planned_time);
 		}, selfValue);
 	    return (x) ? parseFloat(x) : 0;
 	},
 	totalUsedSec: (state, getters) =>
 	(idOrItem = state.root.id) => {
-		// return 0; // Bug infinite loop
 		let item;
 		let childrenArray;
 		if (typeof idOrItem === 'object' && idOrItem.journalDate)
@@ -32,19 +30,19 @@ export default {
 			childrenArray = item.children;
 		} else {
 			item = state.nodes[idOrItem];
-			childrenArray = getters.allVisibleChildItems(idOrItem);
+			childrenArray = getters.getAllChildrenIds(idOrItem);
 		}
 		if (!item){ return 0; }
 
 		let selfValue = (item.used_time) ? parseFloat(item.used_time) : 0;
 		if (!childrenArray || !childrenArray.length) { return selfValue; }
 		
-		let x = childrenArray.reduce(function(prevVal, child){
-			return prevVal + parseFloat(child.used_time);
+		let x = childrenArray.reduce(function(prevVal, childId){
+			return prevVal + parseFloat(state.nodes[childId].used_time);
 		}, selfValue);
 	    return (x) ? x : 0;
 	},
-}),
+// }),
 totalUsedMin: (state, getters) =>
 (id = state.root.id) => {
 	return Math.floor(getters.totalUsedSec(id)/60);
@@ -452,12 +450,12 @@ getAllChildrenIds: (state, getters) =>
 getAllChildrenIdsRecursive: (state, getters) =>
 (id, allChildrenIds) => {
 	let item = state.nodes[id];
-	if (!(Array.isArray(item.children) && item.children.length))
+	if (!item || (!(Array.isArray(item.children) && item.children.length)))
 	{
 		return;
 	} else {
-		item.children_order.forEach(item => { allChildrenIds.push(item); });
-		item.children_order.forEach(item => { return getters.getAllChildrenIdsRecursive(item, allChildrenIds) });
+		item.children_order.forEach(childId => { allChildrenIds.push(childId); });
+		item.children_order.forEach(childId => { return getters.getAllChildrenIdsRecursive(childId, allChildrenIds) });
 	}
 },
 calTotalPlannedTime: (state, getters) =>
@@ -731,8 +729,8 @@ filteredItemsTree: (state, getters) => {
 allVisibleChildItems: (state, getters) =>
 (id) => {
 	let children = getters.visibleDirectChildren(id);
-	let flattenedTree = [];
-	// let flattenedTree = getters.flattenTree(children);
+	// let flattenedTree = [];
+	let flattenedTree = getters.flattenTree(children);
 	let visibleChildren = flattenedTree.filter(child => !getters.hiddenItemIds.includes(child.id));
 	return visibleChildren;
 },
@@ -749,7 +747,7 @@ visibleDirectChildren: (state, getters) =>
 },
 flattenTree: (state, getters) =>
 (array) => {
-	console.log('flattening tree...');
+	// console.log('flattening tree...');
 	let flattenedTree = [];
 	array.forEach(function(item){
 		flattenedTree.push(item);

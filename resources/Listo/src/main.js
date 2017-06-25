@@ -1,5 +1,4 @@
 // QUASAR DEFAULTS:
-
 // // === DEFAULT / CUSTOM STYLE ===
 // // WARNING! always comment out ONE of the two require() calls below.
 // // 1. use next line to activate CUSTOM STYLE (./src/themes)
@@ -12,7 +11,16 @@
 // import Quasar from 'quasar'
 // import router from './router'
 
+// Vue.config.productionTip = false
 // Vue.use(Quasar) // Install Quasar Framework
+
+// if (__THEME === 'mat') {
+//   require('quasar-extras/roboto-font')
+// }
+// import 'quasar-extras/material-icons'
+// // import 'quasar-extras/ionicons'
+// // import 'quasar-extras/fontawesome'
+// // import 'quasar-extras/animate'
 
 // Quasar.start(() => {
 //   /* eslint-disable no-new */
@@ -22,6 +30,7 @@
 //     render: h => h(require('./App'))
 //   })
 // })
+
 
 
 
@@ -57,6 +66,7 @@
 // 1.
 import Vue from 'vue';
 window.Vue = Vue;
+Vue.config.productionTip = false
 // 2.
 import Quasar from 'quasar-framework';
 Vue.use(Quasar);

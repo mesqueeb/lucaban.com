@@ -48,6 +48,7 @@ function removeClass(element, cls) {
 
 function removeEmptyValuesFromArray(array) {
 	let cleanArray = [];
+	array = array.map(e => e.trim());
 	array.forEach(function(val) {
 		if (val.replace(/\s/g, "").length) {
 			cleanArray.push(val);

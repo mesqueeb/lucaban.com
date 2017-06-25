@@ -1,4 +1,4 @@
- <template>
+<template>
 <form 
 	:class="[
 		'c-editaddbox', {
@@ -196,6 +196,7 @@ export default {
 	        border: rgba(245, 215, 110, 0.5) solid thin;
 	        font-size: 16px;
 	    }
+
 	    display: flex;
 	    flex-direction: column;
 	    z-index: 10;

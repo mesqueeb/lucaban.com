@@ -9,6 +9,7 @@
 			@keydown.enter="addTag"
 			@keydown.up="arrow('up',$event)"
 			@keydown.down="arrow('down',$event)"
+			@keydown.tab="tab($event)"
 			type="text" v-autowidth v-focus="state.editingItemTags"
 		>
 	</label>
@@ -35,12 +36,21 @@ export default {
 		dispatch(action, payload){ this.$store.dispatch(action, payload) },
 		addTag()
 		{
+			preventKeydownListener();
+			if (this.state.newTag){ this.state.newTag = this.state.newTag.trim() }
+			if (!this.state.newTag){ this.commit('updateState', { editingItemTags:null }) }
 			if (this.item.newItem)
 			{
 				this.dispatch('prepareTag');
 				return;
 			}
 			this.dispatch('tagItem', { id:this.item.id, tags:this.state.newTag });
+		},
+		tab(e)
+		{
+			if (this.state.editingItemTags && e.shiftKey){
+				e.preventDefault();
+			}
 		},
 		arrow(direction, e)
 		{
@@ -56,10 +66,12 @@ export default {
 		},
 		up(e)
 		{
+			if(this.store.editingItemTags){ return; }
 			this.dispatch('focusElement',{ el:'.js-update-planned-time__button' })
 		},
 		down(e)
 		{
+			if(this.store.editingItemTags){ return; }
 			if (this.newItem && !this.body)
 			{
 	        	this.dispatch('cancelEditOrAdd');
