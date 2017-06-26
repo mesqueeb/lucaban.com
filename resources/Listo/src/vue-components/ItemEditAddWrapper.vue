@@ -3,7 +3,7 @@
 	:class="['full-width',{'order-last':(showAddNewBox && !state.addingNewAsChild)}]"
 >
 	<div
-		v-if="(item.id == state.editingItem || showAddNewBox) && !get.mobile"
+		v-if="(showEditBox || showAddNewBox) && !get.mobile"
 		:class="['c-editadd-wrapper', {
 			'c-editadd-wrapper--child':state.addingNewAsChild,
 			}]"
@@ -57,8 +57,15 @@ export default {
 		},
 		showAddNewBox()
 		{
-			return ((this.state.addingNewUnder == this.item.id)
+			return (
+				(this.state.addingNewUnder
+					&& this.state.addingNewUnder == this.item.id)
 				|| (this.listIsEmpty && !this.mobile && this.state.selection.view != 'journal'));
+		},
+		showEditBox()
+		{
+			return (this.state.editingItem
+				&& this.item.id == this.state.editingItem)
 		},
 
 	},

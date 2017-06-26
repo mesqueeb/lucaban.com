@@ -11,5 +11,5 @@ Route::domain('api'.env('SESSION_DOMAIN'))
 
 Route::domain('listo'.env('SESSION_DOMAIN'))
 	->middleware(['web','auth'])
-	->get('/', 'ViewController@items')
+	->get('/', 'ViewController@listo')
 	->name('listo.index');

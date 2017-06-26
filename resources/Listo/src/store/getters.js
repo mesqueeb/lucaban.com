@@ -16,7 +16,9 @@ export default {
 		let childrenArray = getters.getAllChildrenIds(id);
 		if (!childrenArray || !childrenArray.length) { return selfValue; }
 		let x = childrenArray.reduce(function(prevVal, childId){
-			return prevVal + parseFloat(state.nodes[childId].planned_time);
+			let child = state.nodes[childId];
+			let plannedTime = (!child) ? 0 : child.planned_time;
+			return prevVal + parseFloat(plannedTime);
 		}, selfValue);
 	    return (x) ? parseFloat(x) : 0;
 	},
@@ -38,7 +40,9 @@ export default {
 		if (!childrenArray || !childrenArray.length) { return selfValue; }
 		
 		let x = childrenArray.reduce(function(prevVal, childId){
-			return prevVal + parseFloat(state.nodes[childId].used_time);
+			let child = state.nodes[childId];
+			let usedTime = (!child) ? 0 : child.used_time;
+			return prevVal + parseFloat(usedTime);
 		}, selfValue);
 	    return (x) ? x : 0;
 	},
@@ -478,6 +482,7 @@ calTotalPlannedTime: (state, getters) =>
 calTotalUsedTime: (state, getters) =>
 (id) => {
 	let item = state.nodes[id];
+	if (!item){ return 0; }
 	let totalUsedTime;
     if (!(Array.isArray(item.children) && item.children.length))
     {
@@ -840,7 +845,7 @@ ${getters.text.menu.usedTime}: ${sec_to_hourmin(getters.totalUsedSec(item))}` : 
 },
 journalDate: (state, getters) =>
 (item) => {
-	if ( state.selection.view != 'journal'
+	if ( !item || state.selection.view != 'journal'
 	  || !item.journalDate )
 	{
 		return false;

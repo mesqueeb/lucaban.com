@@ -201,8 +201,8 @@ export default {
 					if (!rootState.nodes[item.id]){ rootState.nodes[item.id] = item; }
 				});
 				// Codementor
-				selection.view = null;
-				selection.view = 'journal';
+				rootState.selection.view = null;
+				rootState.selection.view = 'journal';
 				rootState.loading = false;
 			});
 		},

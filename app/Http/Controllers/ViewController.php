@@ -19,7 +19,11 @@ class viewController extends Controller
     {
 
         return view('items.index');
-    }    
+    }
+    public function listo()
+    {
+        return \File::get(public_path() . '/Listo/index.html');
+    }
     public function controlPanel()
     {
     	return view('userarea.controlpanel');

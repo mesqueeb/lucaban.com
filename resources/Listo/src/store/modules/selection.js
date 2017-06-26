@@ -31,6 +31,22 @@ export default {
 			state.filter = [];
 			state.hiddenBookmarks = [];
 		},
+		updateState(state, payload) // { id, field, value } or other
+		{
+			let key = payload.field;
+			let val = payload.value;
+			if (!key && !val)
+			{
+				key = Object.keys(payload).filter(k => k != 'id')[0];
+				val = payload[key];
+			}
+			if (payload.id)
+			{
+				state.nodes[payload.id][key] = val;
+		        return;
+			}
+		    state[key] = val;
+		},
 	},
 	actions:
 	{
@@ -62,6 +78,10 @@ export default {
 				if (!operator || keyword == 'all')
 				{
 					commit('clearFilters');
+				}
+				if (keyword == 'all')
+				{
+					state.view = 'tree';
 				}
 				if (operator == 'NOT' && keyword == 'journal')
 				{
