@@ -907,6 +907,14 @@ setToday ({state, commit, dispatch, getters},
 	if (getters.hasParentDueToday(id)){ console.log('parent is already due'); return; }
 	dispatch('setDueDate', {id});
 },
+setTomorrow ({state, commit, dispatch, getters},
+	{id} = {})
+{
+	id = (id) ? id : state.selection.selectedId;
+	if (!id){ return; }
+	let duedate = moment().add(1, 'days').format("YYYY-MM-DD HH:mm:ss");
+	dispatch('setDueDate', {id, duedate});
+},
 showAddNewItem ({state, commit, dispatch, getters},
 	{id, addAs} = {})
 {

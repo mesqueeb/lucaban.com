@@ -407,11 +407,14 @@ hasParentDueToday: (state, getters) =>
 	}
 },
 isDueToday: (state, getters) =>
-(id) => {
-	id = (id) ? id : state.selection.selectedId;
+(id = state.selection.selectedId) => {
 	let item = state.nodes[id];
+	if (!item){ return false; }
+
 	let diff = moment(item.due_date).diff(moment(), 'days');
-	if (diff <= 0) { return true; }
+	let calendarDateDiff = moment(item.due_date).date() == moment().date();
+
+	if (diff < 0 || (diff == 0 && calendarDateDiff)) { return true; }
 	return false;
 },
 isProject: (state, getters) =>
@@ -700,7 +703,7 @@ filteredItemsTree: (state, getters) => {
 
 		if ( state.selection.filter.includes('today') )
 		{
-			let doneDateDiff = moment(item.done_date).diff(moment( ), 'days');
+			let doneDateDiff = moment(item.done_date).diff(moment(), 'days');
 			if (item.done && doneDateDiff <= -1) { return false; }
 			let hasParentDueToday = getters.hasParentDueToday(item.id);
 			let isDue = getters.isDueToday(item.id);

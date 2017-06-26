@@ -48,11 +48,27 @@ export default {
 		},
 		'guide':{
 			'en':'Do <u>T</u>oday',
-			'ja':'今日のタスクとして設定',
+			'ja':'今日に設定',
 		},
 		'popmenu':{
 			'en':'Do <u>T</u>oday',
-			'ja':'今日のタスクとして設定',
+			'ja':'今日に設定',
+		},
+	},
+	'setTomorrow':{
+		'mac':'-',
+		'win':'-',
+		'name':{
+			'en':'do tomorrow',
+			'ja':'明日やる',
+		},
+		'guide':{
+			'en':'Do tomorrow',
+			'ja':'明日に設定',
+		},
+		'popmenu':{
+			'en':'Do tomorrow',
+			'ja':'明日に設定',
 		},
 	},
 	'timer':{

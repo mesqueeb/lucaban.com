@@ -19,6 +19,7 @@ keystroke(k)
 		|| k == 'tab'
 		|| k == 'shift_tab'
 		|| k == 't'
+		|| k == '-'
 		|| k == 's' ))
 	{
 		console.log('cannot use '+k+' in journal mode');
@@ -45,6 +46,7 @@ keystroke(k)
 	if(k == 'meta_enter'){ store.dispatch('startEdit') } else
 	if(k == 'ctrl_u'){ store.dispatch('startEdit') } else
 	if(k == 't'){ store.dispatch('setToday') } else
+	if(k == '-'){ store.dispatch('setTomorrow') } else
 	if(k == 'shift_t'){ store.dispatch('startEditTags') } else
 	if(k == 's'){ store.dispatch('addTimer') } else
 	if(k == 'meta_shift_d'){ store.dispatch('duplicate') } else
@@ -255,6 +257,10 @@ iniKeyBindingListener()
 					self.keystroke('meta_c');
 		  			break;
 		  		}
+	  		case 189: // key c
+				e.preventDefault();
+				self.keystroke('-');
+	  			break;
           } // end switch
     	} // END INPUT AREAS NOT IN FOCUS
     });
