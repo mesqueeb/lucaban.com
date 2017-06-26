@@ -1159,25 +1159,11 @@ filterItems ({state, commit, dispatch, getters},
 			operator = 'NOT';
 		}
 	}
-	if (!operator)
-	{
-		commit('selection/clear');
-	}
 	if (keyword == 'journal' && !state.fetchedDone)
 	{
 		dispatch('fetchDone', { tags:null, operator:operator });
 	}
 	dispatch('selection/addKeywords', { keyword, value, operator });
-	// FILTER REWRITE
-	// allItems.filterItems(keyword,value,operator);
-	// setTimeout(()=>{ 
-	// 	let a = state.selection.tags;
-	// 	state.selection.tags = [];
-	// 	state.selection.tags = a;
-	// 	console.log(state.selection.tags);
-	// },500);
-	// console.log(state.selection.tags);
-	// setTimeout(()=>{ vm.test() },1000);
 },
 removeFilter ({state, commit, dispatch, getters},
 	{tag} = {})

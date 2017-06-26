@@ -4,7 +4,7 @@ export default {
 	{
 		selectedId: null,
 		lastSelectedId: null,
-		filter: ['all'],
+		filter: [],
 		tags: [],
 		hiddenTags: [],
 		hiddenItems: [],
@@ -15,17 +15,27 @@ export default {
 	{
 		clear (state)
 		{
-			state.filter = ['all'];
+			state.filter = [];
 			state.tags = [];
 			state.hiddenTags = [];
 			state.hiddenItems = [];
+			state.hiddenBookmarks = [];
+		},
+		clearTags (state)
+		{
+			state.hiddenTags = [];
+			state.tags = [];
+		},
+		clearFilters (state)
+		{
+			state.filter = [];
 			state.hiddenBookmarks = [];
 		},
 	},
 	actions:
 	{
 		addKeywords ({ state, rootState, getters, rootGetters, dispatch, commit },
-			{keyword,value,operator})
+			{keyword, value, operator})
 		{
 			if (keyword == 'tag')
 			{
@@ -34,18 +44,31 @@ export default {
 					if (state.hiddenTags.includes(value)){ return; }
 					state.hiddenTags.push(value);
 					state.tags = state.tags.filter(tag => tag !== value);
-				} else {
-					if (state.tags.includes(value)){ return; }
-					state.tags.push(value);
+				}
+				else if (state.tags.includes(value))
+				{
+					state.tags = state.tags.filter(tag => tag !== value);
+				}
+				else if (state.hiddenTags.includes(value))
+				{
 					state.hiddenTags = state.hiddenTags.filter(tag => tag !== value);
+				}	
+				else
+				{
+					if (!operator){ commit('clearTags') }
+					state.tags.push(value);
 				}
 			} else {
+				if (!operator || keyword == 'all')
+				{
+					commit('clearFilters');
+				}
 				if (operator == 'NOT' && keyword == 'journal')
 				{
 					state.hiddenBookmarks.push(keyword);
 					return;
 				}
-				if(keyword == 'journal')
+				if (keyword == 'journal')
 				{
 					if (state.view == 'journal'){ return; }
 					state.view = 'journal';
@@ -70,20 +93,12 @@ export default {
 					&& !state.hiddenTags.length
 					&& !state.hiddenItems.length
 					&& !state.hiddenBookmarks.length
-					&&  (
-						  ( state.filter.length == 1
-							&& state.filter.includes('all')
-						  ) || (!state.filter.length)
-						)
-					);
+					&& !state.filter.length );
 			return n;
 		},
 		noFilterOrTag: (state, getters) => {
 			let n = ( !state.tags.length
-					  && ( ( state.filter.length == 1 && state.filter.includes('all') )
-						   || (!state.filter.length)
-						 )
-					);
+					  && !state.filter.length );
 			return n;
 		},
 		getHiddenItemsTotalUsedTime: (state, getters) => {

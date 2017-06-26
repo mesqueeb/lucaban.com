@@ -35,7 +35,7 @@
 		</div>
 		<div v-if="selection.view != 'journal'">
 			<button
-				class="o-btn"
+				class="o-btn c-stats__copy-btn"
 				v-btn-effect
 				v-clipboard:copy="get.clipboardText(state.root.id)"
 				v-clipboard:success="dispatch('clipboardSuccess')"
@@ -127,5 +127,8 @@ export default {
 }
 .c-panel__stats--scrolled-down{
     margin-top: 26px;
+}
+.c-stats__copy-btn{
+	padding-top: 0.18em;
 }
 </style>

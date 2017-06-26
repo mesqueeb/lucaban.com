@@ -124,7 +124,7 @@ export default {
 				dispatch('stopPatching');
 			});
 		},
-		patchDueDate ({dispatch},
+		patchDueDate ({dispatch, rootState},
 			{id, duedate} = {})
 		{
 			if (!rootState.user.user) { console.log('not Logged in'); return; }

@@ -95,7 +95,7 @@
 			<!-- // For debugging: -->
 			
 			<Item-Add-Tag v-if="item.id == state.editingItemTags" :item="item"></Item-Add-Tag>
-			<Item-Tags-Strip v-if="item.id != state.editingItem" :item="item"></Item-Tags-Strip>
+			<Item-Tags-Strip v-if="item.id != state.editingItem" :item="item" style="padding:0.2em"></Item-Tags-Strip>
 			<Item-Nav :item="item"></Item-Nav>
 		</div>
 	</div>
@@ -307,13 +307,9 @@ export default {
     border-bottom: thin solid $border-gray;
     width: 100%;
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
-	// &--editing{
-	//     flex-direction: column;
-	//     align-items:flex-start;
-	//     padding-bottom: 0.4em;
-	//     border-bottom: thin solid rgba(245, 215, 110, 0.7);
-	// }
+    padding: 0.3em;
 	&--updating-tags{
 	    flex-wrap: wrap;
 	    background: none;
@@ -321,7 +317,7 @@ export default {
 	}
 }
 .c-body-text{
-    padding: 0.5em;
+    padding: 0.2em;
     display: inline-block;
     white-space: pre-line;
     word-break: break-word;

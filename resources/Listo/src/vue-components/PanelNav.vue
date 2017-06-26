@@ -2,17 +2,17 @@
 <div class="c-panel__navigation">
 	<div class="c-navigation__menu">
 		<a href="#"
-			:class="{'active': selection.filter.includes('all')}"
-			@click="dispatch('filterItems', { keyword:'all', value:'all', event:$event})"
+			:class="{'active': !selection.filter.length && selection.view == 'tree'}"
+			@click="dispatch('filterItems', { keyword:'all', event:$event})"
 		>{{ get.text.menu.all }}</a>
 		<a href="#"
 			:class="{'active': selection.filter.includes('today')}"
 			@click="dispatch('filterItems', { keyword:'duedate', value:'today', event:$event})"
 		>{{ get.text.menu.today }}</a>
 		<a href="#"
-			:class="{'active': selection.view.includes('journal'),
+			:class="{'active': selection.view == 'journal',
 				'filtered-out': selection.hiddenBookmarks.includes('journal')}"
-			@click="dispatch('filterItems', { keyword:'journal', value:'journal', event:$event})"
+			@click="dispatch('filterItems', { keyword:'journal', event:$event})"
 		>{{ get.text.menu.journal }}</a>
 		<a href="#"
 			@click="commit('updatePopouts', { guide:true })"

@@ -1,6 +1,6 @@
 <template>
 <!-- root node required -->
-<div>		
+<div>
 	<div class="layout-padding">
 		<form action="" @submit.prevent="login">
 			<div class="field">
@@ -25,15 +25,10 @@
 						<!-- @input="$v.name.$touch()" -->
 				</p>
 			</div>
-			<q-btn loader @click="login" class="button is-primary" type="submit">
+			<q-btn loader class="button is-primary" type="submit">
 				Login
 				<q-spinner-oval slot="loading" size="20px" />
 			</q-btn>
-<!-- 			
-			<button class="button is-primary" type="submit"
-				@click="login"
-			>Login</button>
- -->				<!-- @click="" -->
 		</form>
 	</div>
 </div>
