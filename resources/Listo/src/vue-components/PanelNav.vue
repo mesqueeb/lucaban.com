@@ -1,59 +1,55 @@
 <template>
 <div class="c-panel__navigation">
-	<div class="c-navigation__menu">
-		<a href="#"
-			:class="{'active': !selection.filter.length && selection.view == 'tree'}"
-			@click="dispatch('filterItems', { keyword:'all', event:$event})"
-		>{{ get.text.menu.all }}</a>
-		<a href="#"
-			:class="{'active': selection.filter.includes('today')}"
-			@click="dispatch('filterItems', { keyword:'duedate', value:'today', event:$event})"
-		>{{ get.text.menu.today }}</a>
-		<a href="#"
-			:class="{'active': selection.view == 'journal',
-				'filtered-out': selection.hiddenBookmarks.includes('journal')}"
-			@click="dispatch('filterItems', { keyword:'journal', event:$event})"
-		>{{ get.text.menu.journal }}</a>
-		<a href="#"
-			@click="commit('updatePopouts', { guide:true })"
-			v-if="!get.mobile"
-		>?</a>
-		<a href="#"
-			@click="commit('updateState', { setLanguage:'ja' })"
-			v-if="get.language != 'ja'"
-		>日本語</a>
-		<a href="#"
-			@click="commit('updateState', { setLanguage:'en' })"
-			v-if="get.language != 'en'"
-		>English</a>
-		<router-link :to="'login'"
-			v-if="!state.user.user"
-		>Login</router-link>
-		<a href="#"
-			id="js-copy__1068" 
-			@click="dispatch('test')"
-			v-if="state.debug"
-		>TEST</a>
-	</div>
-	<div class="c-navigation__tag-menu">
-		<a v-for="tag in get.allTagsComputed"
-			href="#"
-			:class="{'active': selection.tags.includes(tag.slug)}"
-			:value="tag.slug"
-			@click="dispatch('filterItems', { keyword:'tag', value:tag.slug, event:$event })"
-		>{{ tag.name }}</a>
-		<a v-for="tag in selection.hiddenTags"
-			class="filtered-out" href="#"
-			@click.prevent="dispatch('removeFilter', {tag})"
-		>{{ tagSlugToName(tag) }}</a>
-		
-	</div>
+	<a href="#"
+		:class="{'active':
+			!selection.filter.length
+			&& selection.view == 'tree'
+			&& $route.path == '/'
+		}"
+		@click="openMenu('All', $event)"
+	>{{ get.text.menu.all }}</a>
+	<a href="#"
+		:class="{'active':
+			selection.filter.includes('today')
+			&& $route.path == '/'
+		}"
+		@click="openMenu('Today', $event)"
+	>{{ get.text.menu.today }}</a>
+	<a href="#"
+		:class="{'active':
+				selection.view == 'journal'
+				&& $route.path == '/',
+			'filtered-out': selection.hiddenBookmarks.includes('journal')}"
+		@click="openMenu('Journal', $event)"
+	>{{ get.text.menu.journal }}</a>
+	<a href="#"
+		@click="commit('updatePopouts', { guide:true })"
+		v-if="!get.mobile"
+	>?</a>
+	<a href="#"
+		@click="commit('updateState', { setLanguage:'ja' })"
+		v-if="get.language != 'ja'"
+	>日本語</a>
+	<a href="#"
+		@click="commit('updateState', { setLanguage:'en' })"
+		v-if="get.language != 'en'"
+	>English</a>
+	<router-link :to="'login'"
+		:class="{'active':
+			$route.path.includes('login')
+		}"
+		v-if="!state.user.user"
+	>{{ get.text.user.login }}</router-link>
+	<a href="#"
+		id="js-copy__1068"
+		@click="test"
+		v-if="state.debug"
+	>TEST</a>
 </div>
 </template>
 
 <script>
 import { Utilities } from '../helpers/globalFunctions.js'
-let tagSlugToName = Utilities.tagSlugToName;
 
 export default {
 	data () {
@@ -64,14 +60,35 @@ export default {
 		get(){ return this.$store.getters },
 		state(){ return this.$store.state },
 		selection(){ return this.state.selection },
-
+		router(){ return router },
 	},
 	methods:
 	{
+		test(){
+			console.log(this.$route);
+		},
 		commit(action, payload){ this.$store.commit(action, payload) },
 		dispatch(action, payload){ this.$store.dispatch(action, payload) },
-		tagSlugToName,
+		openMenu(menu, event)
+		{
+			if (router.currentRoute.path.includes('login'))
+			{
+				router.push('/');
+			}
+			if (menu == 'All')
+			{
+				this.dispatch('filterItems', { keyword:'all', event})
+			}
+			if (menu == 'Today')
+			{
+				this.dispatch('filterItems', { keyword:'duedate', value:'today', event})
+			}
+			if (menu == 'Journal')
+			{
+				this.dispatch('filterItems', { keyword:'journal', event})
+			}
 
+		},
 	},
 }
 </script>
@@ -81,7 +98,8 @@ export default {
 .c-panel__navigation{
     display: flex;
     flex-wrap: wrap;
-    margin-bottom: 0.2em;
+    padding: 0.1em 0.3em;
+    background-color: white;
 }
 .c-panel__navigation{
     a{
@@ -94,22 +112,12 @@ export default {
             color:$theme-color;
         }
     }
-    .active{
+    .active, .router-link-active{
         color: $theme-color !important;
     }
     .filtered-out{
         text-decoration: line-through;
         color: $duedate-color;
     }
-}
-.c-navigation__menu{
-    display: flex;
-}
-.c-navigation__tag-menu{
-    margin-left: auto;
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap;
-    justify-content: flex-end;
 }
 </style>

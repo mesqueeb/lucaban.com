@@ -14,6 +14,15 @@ export default {
 			'save':'Save',
 			'reload':'Reload',
 		},
+		'user'://
+		{
+			'login':'Login',
+			'logout':'Logout',
+			'register':'Register',
+			'email':'Email Address',
+			'password':'Password',
+			'name':'Name',
+		},
 		'menu'://
 		{
 			'all':'All',
@@ -99,6 +108,15 @@ export default {
 			'delete':'削除',
 			'save':'保存',
 			'reload':'再読込',
+		},
+		'user'://
+		{
+			'login':'ログイン',
+			'logout':'ログアウト',
+			'register':'登録',
+			'email':'メールアドレス',
+			'password':'パスワード',
+			'name':'名前',
 		},
 		'menu'://
 		{

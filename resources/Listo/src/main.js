@@ -68,12 +68,12 @@ import Vue from 'vue';
 window.Vue = Vue;
 Vue.config.productionTip = false
 // 2
-import Quasar, { QBtn, QIcon, QPopover, QModal, QSpinnerOval } from 'quasar'
+import Quasar, { QBtn, QIcon, QPopover, QModal, QSpinnerOval, QLayout, QFixedPosition } from 'quasar'
 import 'quasar-extras/material-icons'
 import 'quasar-extras/ionicons'
 Vue.use(Quasar, {
   components: {
-	QBtn, QIcon, QPopover, QModal, QSpinnerOval
+	QBtn, QIcon, QPopover, QModal, QSpinnerOval, QLayout, QFixedPosition
   }
 })
 // 3.

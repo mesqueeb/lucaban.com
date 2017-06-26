@@ -21,9 +21,12 @@ export default new VueRouter({
    */
 
   routes: [
-    { path: '/', component: load('Listo') }, // Default
+    { path: '/', component: load('Index'),
+      children: [
+        { path: '', component: load('Listo') },
+        { path: 'login', component: load('Login') },
+      ]
+    }, // Default
     { path: '*', component: load('Error404') }, // Not found
-    { path: '/login', component: load('Login') },
-    { path: '/listo', component: load('Listo') },
   ]
 })

@@ -60,9 +60,7 @@
 			<button v-if="item.newItem" class="o-btn" @click="dispatch('addNew', { addNextItemAs:'stop' })">{{ text.card.addAndClose }}</button>
 			<button v-if="!item.newItem" class="o-btn" @click="dispatch('doneEdit')">{{ text.global.save }}</button>
 		</div>
-<!-- 		@click="$refs['editadd-modal-'+item.id].close()"
-		$refs['editadd-modal-'+item.id].close()
- -->	</div>
+	</div>
 </form>
 </template>
 

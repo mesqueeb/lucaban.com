@@ -4,7 +4,7 @@
 	<div class="layout-padding">
 		<form action="" @submit.prevent="login">
 			<div class="field">
-				<label class="label">Email Address</label>
+				<label class="label">{{ get.text.user.email }}</label>
 				<p class="control">
 					<input required
 						class="full-width input"
@@ -15,7 +15,7 @@
 				</p>
 			</div>
 			<div class="floating-label field">
-				<label class="label">Password</label>
+				<label class="label">{{ get.text.user.password }}</label>
 				<p class="control">
 					<input required
 						class="full-width input"
@@ -26,7 +26,7 @@
 				</p>
 			</div>
 			<q-btn loader class="button is-primary" type="submit">
-				Login
+				{{ get.text.user.login }}
 				<q-spinner-oval slot="loading" size="20px" />
 			</q-btn>
 		</form>
