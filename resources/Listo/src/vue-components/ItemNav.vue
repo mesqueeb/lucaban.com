@@ -126,7 +126,8 @@ export default{
     justify-content: center;
 }
 .c-item-nav button{
-    margin: 0.3rem 0.5rem;
+    margin: 0.1rem 0.3rem;
+    padding: 0.1rem 0.2rem;
 }
 .c-item-nav__icon{
     font-size: 1.5em;
