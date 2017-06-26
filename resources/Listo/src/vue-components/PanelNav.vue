@@ -99,7 +99,7 @@ export default {
     display: flex;
     flex-wrap: wrap;
     padding: 0.1em 0.3em;
-    background-color: white;
+    background-color: rgba(255, 255, 255, 0.95);
 }
 .c-panel__navigation{
     a{

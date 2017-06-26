@@ -1,5 +1,5 @@
 <template>
-<q-layout ref="layout" view="hhh LpR FFF" v-cloak>
+<q-layout ref="layout" view="HHH LpR FFF" v-cloak>
 
 <!-- HEADER -->
 <div slot="header" :class="{'mobile':get.mobile}">
@@ -7,15 +7,15 @@
 	<Flashes></Flashes>
 	<Popups></Popups>
 	<Popouts></Popouts>
+	<Panel-Nav v-if="get.desktop"></Panel-Nav>
 </div>
 
 <!-- BODY -->
 <router-view></router-view>
 
 <!-- FOOTER -->
-<div slot="footer">
+<div slot="footer" v-if="!get.desktop">
 	<Panel-Nav></Panel-Nav>
-	
 </div>
 
 <q-fixed-position corner="bottom-right" :offset="[18, 18]"
@@ -81,5 +81,7 @@ export default {
 </script>
 
 <style lang="scss">
-
+.layout-header {
+    box-shadow: 0 2px 4px -1px rgba(0,0,0,0.2), 0 4px 5px rgba(0,0,0,0.04), 0 1px 10px rgba(0,0,0,0.02) !important;
+}
 </style>

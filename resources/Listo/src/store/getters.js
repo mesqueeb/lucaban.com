@@ -1,9 +1,10 @@
 // import { enhancedGetters } from 'vuex-strong-cache'
+import { Platform } from 'quasar'
 import {
-	mobilecheck,Utilities,objectToArray,uniqBy,sortObjectArrayByProperty,sortObjectArrayByTwoProperties
-} from '../helpers/globalFunctions.js';
-import { sec_to_hourmin } from '../helpers/valueMorphers2.js';
-import * as moment from 'moment';
+	Utilities,objectToArray,uniqBy,sortObjectArrayByProperty,sortObjectArrayByTwoProperties
+} from '../helpers/globalFunctions.js'
+import { sec_to_hourmin } from '../helpers/valueMorphers2.js'
+import * as moment from 'moment'
 
 export default {
 // ...enhancedGetters({
@@ -568,11 +569,14 @@ language: (state, getters) => {
 text: (state, getters) => {
 	return state.languageContents[getters.language];
 },
+desktop: (state, getters) => {
+	return Platform.is.desktop;
+},
 mobile: (state, getters) => {
 	if (state.manualMobile){
 		return true;
 	}
-	return mobilecheck();
+	return Platform.is.mobile;
 },
 mobileSmall: (state, getters) => {
 	if (window.innerWidth < 385){ return true; }
