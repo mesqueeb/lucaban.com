@@ -95,20 +95,20 @@ iniKeyBindingListener()
 				e.preventDefault();
 				if (e.shiftKey)
 				{
-					$(".btn-cancel").focus();
+					store.dispatch('focusElement',{ el:'.btn-cancel' })
 				} else {
-					$(".btn-ok").focus();
+					store.dispatch('focusElement',{ el:'.btn-ok' })
 				}
 	  		}
 			if(x == 37)
 			{ // arrow left
 				e.preventDefault();
-				$(".btn-cancel").focus();
+				store.dispatch('focusElement',{ el:'.btn-cancel' })
 			}
 			if(x == 39)
 			{ // arrow right
 				e.preventDefault();
-				$(".btn-ok").focus();
+				store.dispatch('focusElement',{ el:'.btn-ok' })
 			}
 		}
 		else if(store.state.editingItem || store.state.addingNewUnder || store.state.editingItemTags)

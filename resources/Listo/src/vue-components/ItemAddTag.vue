@@ -52,7 +52,7 @@ export default {
 		},
 		arrow(direction, e)
 		{
-			if (this.body){ return; }
+			if (this.state.newTag){ return; }
 			e.preventDefault();
 			if (this.state.editingItemTags)
 			{
@@ -70,7 +70,7 @@ export default {
 		down(e)
 		{
 			if(this.store.editingItemTags){ return; }
-			if (this.newItem && !this.body)
+			if (this.item.newItem && !this.state.newTag)
 			{
 	        	this.dispatch('cancelEditOrAdd');
 	        	return;

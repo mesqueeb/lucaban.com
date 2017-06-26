@@ -349,8 +349,6 @@ export default {
 }
 .c-popout__bodybox {
     border-bottom: 1px solid #e3e3e3;
-    display: flex;
-    flex-direction: row;
     align-items: center;
     font-size: 1.1em;
     padding: 1em;
