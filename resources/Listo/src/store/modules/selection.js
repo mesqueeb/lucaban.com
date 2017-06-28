@@ -1,10 +1,18 @@
+// we import all of `date`
+import { date } from 'quasar'
+// destructuring to keep only what is needed
+const { getDateDiff } = date;
+
 export default {
 	namespaced: true,
 	state:
 	{
 		selectedId: null,
 		lastSelectedId: null,
-		filter: [],
+		filter: {
+			dueDate: { from: null, to:null },
+			doneDate: { from: null, to:null },
+		},
 		tags: [],
 		hiddenTags: [],
 		hiddenItems: [],
@@ -15,7 +23,10 @@ export default {
 	{
 		clear (state)
 		{
-			state.filter = [];
+			state.filter = {
+				dueDate: { from: null, to:null },
+				doneDate: { from: null, to:null },
+			},
 			state.tags = [];
 			state.hiddenTags = [];
 			state.hiddenItems = [];
@@ -28,7 +39,10 @@ export default {
 		},
 		clearFilters (state)
 		{
-			state.filter = [];
+			state.filter = {
+				dueDate: { from: null, to:null },
+				doneDate: { from: null, to:null },
+			},
 			state.hiddenBookmarks = [];
 		},
 		updateState(state, payload) // { id, field, value } or other
@@ -90,12 +104,13 @@ export default {
 				}
 				if (keyword == 'journal')
 				{
-					if (state.view == 'journal'){ return; }
 					state.view = 'journal';
 				} else if (value) {
 					state.view = 'tree';
-					if (state.filter.includes(value)){ return; }
-					state.filter.push(value);
+				}
+				if (keyword == 'duedate')
+				{
+					state.filter.dueDate.to = value;
 				}
 			}
 			Vue.nextTick(()=>{
@@ -109,22 +124,40 @@ export default {
 	getters:
 	{
 		nothingSelected: (state, getters) => {
-			let n = (  !state.tags.length
-					&& !state.hiddenTags.length
-					&& !state.hiddenItems.length
-					&& !state.hiddenBookmarks.length
-					&& !state.filter.length );
-			return n;
+			return getters.noTagsSelected
+				&& getters.noFiltersSelected
+				&& !(state.hiddenItems.length)
+				&& !(state.hiddenBookmarks.length);
 		},
 		noFilterOrTag: (state, getters) => {
-			let n = ( !state.tags.length
-					  && !state.filter.length );
-			return n;
+			return getters.noTagsSelected
+				&& getters.noFiltersSelected;
+		},
+		noTagsSelected: (state) => {
+			return !(state.tags.length)
+				&& !(state.hiddenTags.length);
+		},
+		noFiltersSelected: (state, getters) => {
+			return !(getters.dueDateFiltered)
+				&& !(getters.doneFiltered);
+		},
+		dueDateFiltered: (state) => {
+			return state.filter.dueDate.from != null
+				|| state.filter.dueDate.to != null;
+		},
+		doneFiltered: (state) => {
+			return state.filter.doneDate.from != null
+				|| state.filter.doneDate.to != null;
+		},
+		dueTodayFiltered: (state) => {
+			return (getDateDiff(state.filter.dueDate.to, new Date(), 'days') == 0);
 		},
 		getHiddenItemsTotalUsedTime: (state, getters) => {
 			if(!state.hiddenItems.length){ return 0; }
 			return state.hiddenItems.reduce(function(a,id){
-				let b = state.nodes[id].used_time;
+				let item = state.nodes[id];
+				if (!item){ return a; }
+				let b = item.used_time;
 				console.log(b);
 				return a + b;
 			}, 0);
@@ -132,7 +165,9 @@ export default {
 		getHiddenItemsTotalPlannedTime: (state, getters) => {
 			if(!state.hiddenItems.length){ return 0; }		
 			return state.hiddenItems.reduce(function(a,id){
-				let b = state.nodes[id].planned_time;
+				let item = state.nodes[id];
+				if (!item){ return a; }
+				let b = item.planned_time;
 				console.log(b);
 				return a + b;
 			}, 0);

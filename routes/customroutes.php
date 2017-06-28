@@ -10,6 +10,6 @@ Route::domain('api'.env('SESSION_DOMAIN'))
 	->options('items','CORSHelperController@handleCORS');
 
 Route::domain('listo'.env('SESSION_DOMAIN'))
-	->middleware(['web','auth'])
 	->get('/', 'ViewController@listo')
 	->name('listo.index');
+	// ->middleware(['web'])

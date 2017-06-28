@@ -3,7 +3,8 @@
 	<div class="c-panel-title">
 		<!-- NEEDS TO BE ADDED BACK IN: c-panel__title- -scrolled-down -->
 		<div class="c-panel-title__top-row">
-			<span v-if="selection.filter.length" v-for="sel in get.selectionFilter">{{ sel }}</span>
+			<span v-if="get['selection/noFilterOrTag']">{{ text.menu.all }}</span>
+			<span v-if="get['selection/dueTodayFiltered']">{{ text.menu.today }}</span>
 			<span v-if="selection.tags.length" v-for="sel in get.selectionTags">{{ sel }}</span>
 		</div>
 		<div class="c-panel-title__hidden-tags">
@@ -59,6 +60,35 @@ export default {
 		state(){ return this.$store.state },
 		selection(){ return this.state.selection },
 		text(){ return this.get.text },
+		selectionTags()
+		{ // For list title
+			return this.state.selection.tags.map(function (val, i) {
+				if (this.state.selection.tags.length == i+1)
+				{
+					val = Utilities.tagSlugToName(val);
+				}
+				else
+				{
+					val = Utilities.tagSlugToName(val)+', ';
+				}
+				return val;
+			});
+		},
+		selectionHiddenTags()
+		{ // For list title
+			return this.state.selection.hiddenTags.map(function (val, i) {
+				if (this.state.selection.hiddenTags.length == i+1)
+				{
+					val = Utilities.tagSlugToName(val);
+				}
+				else
+				{
+					val = Utilities.tagSlugToName(val)+', ';
+				}
+				return val;
+			});
+		},
+
 	},
 	methods:
 	{

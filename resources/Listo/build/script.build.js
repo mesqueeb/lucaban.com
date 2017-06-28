@@ -22,10 +22,10 @@ console.log((' Building Quasar App with "' + env.platform.theme + '" theme...\n'
 shell.mkdir('-p', targetPath)
 shell.cp('-R', 'src/statics', targetPath)
 
-function finalize () {
+function finalize (targetPath) {
   console.log((
-    '\n Build complete with "' + env.platform.theme.bold + '" theme in ' +
-    '"/dist"'.bold + ' folder.\n').cyan)
+    '\n Build complete with "' + env.platform.theme.bold + '" theme in the folder: '
+    + targetPath + ' folder.\n').cyan)
 
   console.log(' Built files are meant to be served over an HTTP server.'.bold)
   console.log(' Opening index.html over file:// won\'t work.'.bold)
@@ -45,6 +45,44 @@ webpack(webpackConfig, function (err, stats) {
     css.purify(finalize)
   }
   else {
-    finalize()
+    finalize(targetPath)
+  }
+})
+// 
+
+  // shell = require('shelljs'),
+  // path = require('path'),
+  // env = require('./env-utils'),
+  // config = require('../config'),
+  // webpack = require('webpack'),
+  css = require('./css-utilsPublic'),
+  webpackConfig = require('./webpack.prod.confPublic'),
+  targetPath = path.join(__dirname, '../../../public')
+
+console.log(' WARNING!'.bold)
+console.log(' Do NOT use VueRouter\'s "history" mode if')
+console.log(' building for Cordova or Electron.\n')
+
+require('./script.cleanPublic.js')
+console.log((' Building Quasar App with "' + env.platform.theme + '" theme...\n').bold)
+
+shell.mkdir('-p', targetPath)
+shell.cp('-R', 'src/statics', targetPath)
+
+webpack(webpackConfig, function (err, stats) {
+  if (err) throw err
+  process.stdout.write(stats.toString({
+    colors: true,
+    modules: false,
+    children: false,
+    chunks: false,
+    chunkModules: false
+  }) + '\n')
+
+  if (config.build.purifyCSS) {
+    css.purify(finalize)
+  }
+  else {
+    finalize(targetPath)
   }
 })

@@ -31,6 +31,10 @@ require(`quasar/dist/quasar.${__THEME}.css`)
 //   })
 // })
 
+// we import all of `date`
+import { date } from 'quasar'
+// destructuring to keep only what is needed
+window.date = date;
 
 
 

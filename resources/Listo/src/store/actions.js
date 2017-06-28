@@ -159,10 +159,10 @@ addItem ({state, commit, dispatch, getters},
 		state.selection.view = null;
 		state.selection.view = 'journal';
 	}
-	if (state.selection.filter.includes('today'))
+	if (getters['selection/dueTodayFiltered'])
 	{
-		state.selection.filter = state.selection.filter.filter(f => f != 'today');
-		state.selection.filter.push('today');
+		state.selection.filter.dueDate.to = null;
+		state.selection.filter.dueDate.to = new Date();
 	}
 	if (state.selection.tags.length)
 	{
@@ -320,10 +320,10 @@ deleteItem ({state, commit, dispatch, getters},
 		state.selection.view = 'journal';
 		state.selection.view = 'tree';
 	}
-	if (state.selection.filter.includes('today'))
+	if (getters['selection/dueTodayFiltered'])
 	{
-		state.selection.filter = state.selection.filter.filter(f => f != 'today');
-		state.selection.filter.push('today');
+		state.selection.filter.dueDate.to = null;
+		state.selection.filter.dueDate.to = new Date();
 	}
 	let newSelectedId = (getters.nextItemId(previousItemId)) ? getters.nextItemId(previousItemId) : null;
 	console.log(`new selected ID is: ${newSelectedId}`);
@@ -493,7 +493,7 @@ setDueDate ({state, commit, dispatch, getters},
 	let diff = moment(oriDueDate).diff(dd, 'days');
 	if (diff == 0){ dd = '0000-00-00 00:00:00'; }
 	state.nodes[id].due_date = dd;
-	if (diff == 0 && state.selection.filter.includes('today'))
+	if (diff == 0 && getters['selection/dueTodayFiltered'])
 	{
 		state.selection.selectedId = getters.nextItemId(id);
 	}
@@ -706,7 +706,7 @@ addNew ({state, commit, dispatch, getters},
 		let doneDate = (!olderSibling || olderSibling.depth == 0) ? moment().format() : olderSibling.done_date;
 		newItem.done_date = doneDate;
 	}
-	if ( state.selection.filter.includes('today')
+	if ( getters['selection/dueTodayFiltered']
 	   && getters.isTopLvlItemInFilteredRoot(olderSibling.id)
 	   && !state.addingNewAsChild )
 	{
@@ -742,7 +742,7 @@ checkFilteredItemsTree ({state, commit, dispatch, getters})
 			targetHidden = state.selection.hiddenTags.some(tag => getters.hasTag(item.id, tag));
 			hasParentWithTag = state.selection.tags.some(tag => getters.hasParentWithTag(item.id, tag));
 			targetToday = true;
-			if ( state.selection.filter.includes('today') )
+			if ( getters['selection/dueTodayFiltered'] )
 			{
 				targetToday = false;
 				let diff = moment(item.due_date).diff(moment(), 'days');

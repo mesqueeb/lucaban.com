@@ -22,7 +22,9 @@ class viewController extends Controller
     }
     public function listo()
     {
-        return \File::get(public_path() . '/Listo/index.html');
+        // return view('listo');
+        // return \View::make('listo');
+        return \File::get(public_path() . '/listo.html');
     }
     public function controlPanel()
     {

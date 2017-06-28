@@ -7,14 +7,14 @@
 	<Flashes></Flashes>
 	<Popups></Popups>
 	<Popouts></Popouts>
-	<Panel-Nav v-if="get.desktop"></Panel-Nav>
+	<Panel-Nav v-if="!get.mobile"></Panel-Nav>
 </div>
 
 <!-- BODY -->
 <router-view></router-view>
 
 <!-- FOOTER -->
-<div slot="footer" v-if="!get.desktop">
+<div slot="footer" v-if="get.mobile">
 	<Panel-Nav></Panel-Nav>
 </div>
 
@@ -83,5 +83,8 @@ export default {
 <style lang="scss">
 .layout-header {
     box-shadow: 0 2px 4px -1px rgba(0,0,0,0.2), 0 4px 5px rgba(0,0,0,0.04), 0 1px 10px rgba(0,0,0,0.02) !important;
+}
+.layout-footer {
+    box-shadow: 0 -2px 4px -1px rgba(0,0,0,0.2), 0 -4px 5px rgba(0,0,0,0.04), 0 -1px 10px rgba(0,0,0,0.02) !important;
 }
 </style>

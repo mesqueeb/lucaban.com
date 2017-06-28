@@ -1,10 +1,10 @@
 var
   path = require('path'),
   config = require('../config'),
-  cssUtils = require('./css-utils'),
+  cssUtils = require('./css-utilsPublic'),
   webpack = require('webpack'),
-  merge = require('webpack-merge'),
-  baseWebpackConfig = require('./webpack.base.conf'),
+  merge = require('webpack-merge'),blic
+  baseWebpackConfig = require('./webpack.base.confPublic'),
   ExtractTextPlugin = require('extract-text-webpack-plugin'),
   HtmlWebpackPlugin = require('html-webpack-plugin'),
   OptimizeCSSPlugin = require('optimize-css-assets-webpack-plugin')
@@ -38,7 +38,7 @@ module.exports = merge(baseWebpackConfig, {
       filename: '[name].[contenthash].css'
     }),
     new HtmlWebpackPlugin({
-      filename: path.resolve(__dirname, '../dist/index.html'),
+      filename: path.resolve(__dirname, '../../../public/listo.html'),
       template: 'src/index.html',
       inject: true,
       minify: {

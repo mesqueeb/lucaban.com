@@ -2,7 +2,7 @@
 <div class="c-panel__navigation">
 	<a href="#"
 		:class="{'active':
-			!selection.filter.length
+			get['selection/noFiltersSelected']
 			&& selection.view == 'tree'
 			&& $route.path == '/'
 		}"
@@ -10,7 +10,7 @@
 	>{{ get.text.menu.all }}</a>
 	<a href="#"
 		:class="{'active':
-			selection.filter.includes('today')
+			get['selection/dueTodayFiltered']
 			&& $route.path == '/'
 		}"
 		@click="openMenu('Today', $event)"
@@ -81,7 +81,7 @@ export default {
 			}
 			if (menu == 'Today')
 			{
-				this.dispatch('filterItems', { keyword:'duedate', value:'today', event})
+				this.dispatch('filterItems', { keyword:'duedate', value:new Date(), event})
 			}
 			if (menu == 'Journal')
 			{

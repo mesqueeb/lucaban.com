@@ -6,7 +6,7 @@ var
   path = require('path'),
   fs = require('fs')
 
-  targetPath = '../dist';
+  targetPath = '../../../public';
 
 module.exports.postcss = [autoprefixer()]
 

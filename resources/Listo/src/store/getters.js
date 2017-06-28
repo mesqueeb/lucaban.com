@@ -1,10 +1,14 @@
+// we import all of `date`
+import { date } from 'quasar'
+// destructuring to keep only what is needed
+const { getDateDiff, formatDate } = date;
+
 // import { enhancedGetters } from 'vuex-strong-cache'
 import { Platform } from 'quasar'
 import {
 	Utilities,objectToArray,uniqBy,sortObjectArrayByProperty,sortObjectArrayByTwoProperties
 } from '../helpers/globalFunctions.js'
 import { sec_to_hourmin } from '../helpers/valueMorphers2.js'
-import * as moment from 'moment'
 
 export default {
 // ...enhancedGetters({
@@ -96,7 +100,7 @@ totalTimeDifferentFromParent: (state, getters) =>
 	return getters.totalPlannedSec(id) != getters.totalPlannedSec(item.parent_id);
 },
 oS: (state, getters) => {
-	return 'mac';
+	return Platform.is.platform;
 },
 hasTag: (state, getters) =>
 (id, tags) => {
@@ -398,7 +402,7 @@ hasParentDueToday: (state, getters) =>
 	if (!item.parent_id){ return false; }
 	let parent = state.nodes[item.parent_id];
 	if (!parent){ return false; }
-	let diff = moment(parent.due_date).diff(moment(), 'days');
+	let diff = getDateDiff(new Date(parent.due_date), new Date(), 'days');
 	if (diff <= 0)
 	{
 		return true;
@@ -411,10 +415,8 @@ isDueToday: (state, getters) =>
 	let item = state.nodes[id];
 	if (!item){ return false; }
 
-	let diff = moment(item.due_date).diff(moment(), 'days');
-	let calendarDateDiff = moment(item.due_date).date() == moment().date();
-
-	if (diff < 0 || (diff == 0 && calendarDateDiff)) { return true; }
+	let diff = getDateDiff(new Date(item.due_date), new Date(), 'days');
+	if (diff <= 0) { return true; }
 	return false;
 },
 isProject: (state, getters) =>
@@ -611,7 +613,7 @@ filteredItemsJournal: (state, getters) => {
 	let dates = {};
 	getters.filteredItemsFlat.forEach(function(item){
 		if (!item.done){ return; }
-		let dd = moment(item.done_date).format('YYYY-MM-DD');
+		let dd = formatDate(item.done_date, 'YYYY-MM-DD');
 		if (!dates[dd])
 		{
 			dates[dd] = [];
@@ -621,7 +623,7 @@ filteredItemsJournal: (state, getters) => {
 	let datesArray = [];
 	Object.keys(dates).forEach(function(dd){
 		let journalItem = {
-			'done_date':moment(dd).format('YYYY-MM-DD'),
+			'done_date':dd,
 			'children':sortObjectArrayByProperty(dates[dd], 'parents_bodies'),
 			'depth':0,
 			'journalDate':true,
@@ -648,15 +650,15 @@ filteredItemsFlat: (state, getters) => {
 // targetDone = ${targetDone}
 // targetToday = ${targetToday}
 // 			`);
-		if ( state.selection.filter.includes('today') )
+		if ( getters['selection/dueTodayFiltered'] )
 		{
 			targetToday = false;
-			let diff = moment(item.due_date).diff(moment( ), 'days');
+			let diff = getDateDiff(new Date(item.due_date), new Date(), 'days');
 			if ( diff <= 0 || getters.hasParentDueToday(item.id) )
 			{
 				targetToday = true;
 			}
-			let doneDateDiff = moment(item.done_date).diff(moment( ), 'days');
+			let doneDateDiff = getDateDiff(new Date(item.done_date), new Date(), 'days');
 			if (doneDateDiff <= 1) { targetToday = false; }
 		}
 		if (target && !targetHidden && targetDone && targetToday)
@@ -671,59 +673,73 @@ filteredItemsFlat: (state, getters) => {
 	return ar;
 },
 filteredItemsTree: (state, getters) => {
-	console.log(`update filteredItemsTree (nodes length: ${objectToArray(state.nodes).length})`);
-	//Go through ALL ITEMS and return those that have the tag AND no parent with the tag.
 	if (objectToArray(state.nodes).length == 1 && objectToArray(state.nodes)[0].id == state.root.id)
 	{
 		return objectToArray(state.nodes);
 	}
-	let children = objectToArray(state.nodes).filter(function(item){
-		let target;
-		let hasParentWithTag;
-		let targetToday;
-		let topLvlItem;
-		if (getters['selection/noFilterOrTag'])
-		{
-			topLvlItem = (item.depth == 1) ? true : false;
-			if (topLvlItem){ return true; } else { return false; }
-		}
 
-		if (state.selection.tags.length > 1)
-		{
-			hasParentWithTag = state.selection.tags.every(tag => getters.hasParentWithTag(item.id, tag));
-		} else {
-			hasParentWithTag = state.selection.tags.some(tag => getters.hasParentWithTag(item.id, tag));
-		}
-		target = state.selection.tags.every(tag => getters.hasTag(item.id, tag));
+	let children;
+	// There are no Filters or Tags selected
+	if (!getters['selection/noFilterOrTag'])
+	{
+		children = objectToArray(state.nodes).filter(function(item){
 
-		if ( !state.selection.filter.includes('today') && target && !hasParentWithTag )
-		{
-			return true;
-		}
-
-		if ( state.selection.filter.includes('today') )
-		{
-			let doneDateDiff = moment(item.done_date).diff(moment(), 'days');
-			if (item.done && doneDateDiff <= -1) { return false; }
-			let hasParentDueToday = getters.hasParentDueToday(item.id);
-			let isDue = getters.isDueToday(item.id);
-			if (!state.selection.tags.length && isDue)
+			// tag filter test
+			let passedTagFilter = true; let hasParentWithTag;
+			if (state.selection.tags.length)
 			{
-				return true;
+				let hasAllTags = state.selection.tags.every(tag => getters.hasTag(item.id, tag));
+				let hasHiddenTags = state.selection.hiddenTags.some(tag => getters.hasTag(item.id, tag));
+				hasParentWithTag = state.selection.tags.every(tag => getters.hasParentWithTag(item.id, tag));
+				// IF I ever make an 'OR' selector:
+				// hasParentWithTag = state.selection.tags.some(tag => getters.hasParentWithTag(item.id, tag));				
+				passedTagFilter = (hasAllTags && !hasParentWithTag && !hasHiddenTags) ? true : false;
 			}
-			else if ( 	state.selection.tags.length
-					&& 	target
-					&& 	(isDue || hasParentDueToday)
-					&& 	!(hasParentWithTag && hasParentDueToday) )
+
+			// due date filter test
+			let passedDueDateFilter = true; let hasParentDueToday;
+			if (getters['selection/dueTodayFiltered'])
 			{
-				return true;
+				let isDueToday = getters.isDueToday(item.id);
+				hasParentDueToday = getters.hasParentDueToday(item.id);
+				passedDueDateFilter = (isDueToday || hasParentDueToday) ? true : false;
 			}
-		}
-		return false;
-	});
+
+			// Filter out anything that's done yesterday
+			let passedDoneTest;
+			if (getters['selection/doneFiltered'])
+			{
+				passedDoneTest = (item.done) ? true : false ;
+			}
+			else
+			{
+				let doneDateDiff = getDateDiff(new Date(item.done_date), new Date(), 'days');
+				passedDoneTest = (!item.done || doneDateDiff <= -1) ? true : false;
+			}
+
+			// Filter out those who have AND parents with tags AND parents who are due
+			let passedBothTagAndDueOnParentTest = true;
+			if (state.selection.tags.length && getters['selection/dueTodayFiltered'])
+			{
+				passedBothTagAndDueOnParentTest = (passedDueDateFilter && passedTagFilter
+				&& !(hasParentWithTag && hasParentDueToday)) ? true : false;
+			}
+			
+			let passedHiddenItemsTest = state.selection.hiddenItemIds.every(id => id != item.id);
+
+			if (   passedTagFilter
+				&& passedDueDateFilter
+				&& passedDoneTest
+				&& passedBothTagAndDueOnParentTest
+				&& passedHiddenItemsTest )
+			{ return true; }
+			return false;
+		});
+	}
 	// Sort on root children_order when no filter:
 	if (getters['selection/noFilterOrTag'])
 	{
+		children = state.root.children;
 		let order = state.root.children_order;
 		if (order instanceof Array && order.length)
 		{
@@ -731,7 +747,8 @@ filteredItemsTree: (state, getters) => {
 			children = order.map(id => children.find(t => t.id === id));
 		}
 	}
-	if ( state.selection.filter.includes('today') )
+	// TODAY tab -> Sort children by done_date
+	if ( getters['selection/dueTodayFiltered'] )
 	{
 		children = sortObjectArrayByProperty(children,'done_date');
 	}
@@ -786,7 +803,7 @@ clipboardText: (state, getters) =>
 	let children;
 	let directChildren;
 	let spaceVariable = 0;
-	if (state.selection.filter.includes('today'))
+	if (getters['selection/dueTodayFiltered'])
 	{
 		// item = id;
 		// children = item.children;
@@ -857,7 +874,7 @@ journalDate: (state, getters) =>
 	{
 		return false;
 	}
-	return moment(item.done_date,'YYYYMMDD').format('YYYY/MM/DD');
+	return item.done_date;
 },
 hiddenItemIds: (state, getters) => {
 	// console.log('running hiddenItemIds');
@@ -865,45 +882,6 @@ hiddenItemIds: (state, getters) => {
 		let targetHidden = state.selection.hiddenTags.some(tag => getters.hasTag(item.id, tag));
 		if (targetHidden){ return true; }
 	}).map(item => item.id);
-},
-selectionFilter: (state, getters) => { // For list title
-	return state.selection.filter.map(function (val, i) {
-		if (state.selection.filter.length == i+1)
-		{
-			val = Utilities.tagSlugToName(val);
-		}
-		else
-		{
-			val = Utilities.tagSlugToName(val)+', ';
-		}
-		return val;
-	});
-},
-selectionTags: (state, getters) => { // For list title
-	return state.selection.tags.map(function (val, i) {
-		if (state.selection.tags.length == i+1)
-		{
-			val = Utilities.tagSlugToName(val);
-		}
-		else
-		{
-			val = Utilities.tagSlugToName(val)+', ';
-		}
-		return val;
-	});
-},
-selectionHiddenTags: (state, getters) => { // For list title
-	return state.selection.hiddenTags.map(function (val, i) {
-		if (state.selection.hiddenTags.length == i+1)
-		{
-			val = Utilities.tagSlugToName(val);
-		}
-		else
-		{
-			val = Utilities.tagSlugToName(val)+', ';
-		}
-		return val;
-	});
 },
 allTagsComputed: (state, getters) => {
 	var t0 = performance.now( );
