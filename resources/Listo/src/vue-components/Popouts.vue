@@ -166,7 +166,11 @@ Deleted
 </template>
 <script>
 // import PopoutConfirmation from './PopoutConfirmation.vue';
-import { sec_to_hhmmss, momentCalendar } from '../helpers/valueMorphers2.js'
+// we import all of `date`
+import { date } from 'quasar'
+// destructuring to keep only what is needed
+const { formatDate } = date;
+import { sec_to_hhmmss, customCalendar } from '../helpers/valueMorphers2.js'
 import autosize from 'autosize';
 import {stringToKeyboardKeys} from '../helpers/globalFunctions.js'
 
@@ -202,7 +206,7 @@ export default {
     methods: {
 		commit(action, payload){ this.$store.commit(action, payload); },
 		dispatch(action, payload){ this.$store.dispatch(action, payload); },
-    	sec_to_hhmmss, momentCalendar, stringToKeyboardKeys,
+    	sec_to_hhmmss, customCalendar, stringToKeyboardKeys,
     	countdownTimer(used_time, planned_time)
     	{
     		let secondsLeft = planned_time*60-used_time;
@@ -262,7 +266,7 @@ export default {
         	item = (item) ? item : (this.timer[0]) ? this.timer[0] : null ;
         	if(!item){ console.log('no timer item'); return; }
         	// console.log(item);
-        	console.log("timer started: "+moment().format('HH:mm:ss'));
+        	console.log("timer started: "+new Date().formatDate('HH:mm:ss'));
         	this.timerRunning = true;
 			let update = function(){
 				if(item.planned_time>0)
@@ -278,7 +282,7 @@ export default {
 		},
 		pauseTimer(item)
 		{
-        	console.log("timer paused: "+moment().format('HH:mm:ss'));
+        	console.log("timer paused: "+new Date().formatDate('HH:mm:ss'));
 			this.timerRunning = false;
 			if (!window.timers) { return; }
 			if (!window.timers[item.id]) { return; }
@@ -293,13 +297,13 @@ export default {
 		},
 		resetTimer(item)
 		{
-        	console.log("timer reset: "+moment().format('HH:mm:ss'));
+        	console.log("timer reset: "+new Date().formatDate('HH:mm:ss'));
 			item.used_time = 0;
 			this.dispatch('patch', {id:item.id, field:'used_time'});
 		},
 		closeTimer(item)
 		{
-        	console.log("timer closed: "+moment().format('HH:mm:ss'));
+        	console.log("timer closed: "+new Date().formatDate('HH:mm:ss'));
 			if (window.timers && window.timers[item.id])
 			{
 				clearInterval(window.timers[item.id]);

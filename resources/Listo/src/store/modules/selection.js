@@ -1,3 +1,4 @@
+import { differenceInCalendarDays } from 'date-fns/esm'
 // we import all of `date`
 import { date } from 'quasar'
 // destructuring to keep only what is needed
@@ -171,6 +172,98 @@ export default {
 				console.log(b);
 				return a + b;
 			}, 0);
+		},
+		testAgainstTagSelection: (state, getters, rootState, rootGetters) =>
+		(id, {flat = false} = { flat: false }) => {
+			let passedTest = true;
+			if (state.tags.length)
+			{
+				let hasAllTags = state.tags.every(tag => rootGetters.hasTag(id, tag));
+				let hasHiddenTags = state.hiddenTags.some(tag => rootGetters.hasTag(id, tag));
+				let hasParentWithTag = state.tags.every(tag => rootGetters.hasParentWithTag(id, tag));
+				// IF I ever make an 'OR' selector:
+				// hasParentWithTag = state.selection.tags.some(tag => getters.hasParentWithTag(item.id, tag));				
+				if (flat)
+				{
+					passedTest = (hasAllTags && !hasHiddenTags) ? true : false;
+				}
+				else
+				{
+					passedTest = (hasAllTags && !hasParentWithTag && !hasHiddenTags) ? true : false;
+				}
+			}
+			return passedTest;
+		},
+		testAgainstDueDateSelection: (state, getters, rootState, rootGetters) =>
+		(id, {flat = false} = { flat: false }) => {
+			let passedTest = true;
+			if (getters.dueTodayFiltered)
+			{
+				let isDueToday = rootGetters.isDueToday(id);
+				hasParentDueToday = rootGetters.hasParentDueToday(id);
+				if (flat)
+				{
+				passedTest = (isDueToday || hasParentDueToday) ? true : false;
+				}
+				else
+				{
+				passedTest = (isDueToday && !hasParentDueToday) ? true : false;
+				}
+			}
+			return passedTest;
+		},
+		testAgainstDoneSelection: (state, getters, rootState, rootGetters) =>
+		(id) => {
+			let passedTest = true;
+			let item = rootState.nodes[id];
+			if (!item){ return false; }
+			if (getters.doneFiltered)
+			{
+				passedTest = (item.done) ? true : false ;
+			}
+			else
+			{
+				let doneDateDiff = differenceInCalendarDays(new Date(item.done_date), new Date());
+				passedTest = (!item.done || doneDateDiff <= -1) ? true : false;
+			}
+			return passedTest;
+		},
+		testAgainstHiddenItems: (state, getters, rootState, rootGetters) =>
+		(id) => {
+			let passedTest = state.hiddenItems.every(i => i != id);
+			return passedTest;
+		},
+		testAgainstAllSelection: (state, getters, rootState, rootGetters) =>
+		(id, { flat = false } = { flat: false }) => {
+			let passedAllTests = true;
+			if (flat)
+			{
+				passedAllTests = ( getters.testAgainstTagSelection(id, {flat:true})
+								&& getters.testAgainstDueDateSelection(id, {flat:true})
+								&& getters.testAgainstDoneSelection(id)
+								&& getters.testAgainstHiddenItems(id) );
+			}
+			else
+			{
+				let passedTagTest = getters.testAgainstTagSelection(id);
+				let passedDoneTest = getters.testAgainstDoneSelection(id);
+				let passedHiddenItemsTest = getters.testAgainstHiddenItems(id);
+				if (state.selection.tags.length && getters.dueTodayFiltered)
+				{
+					passedAllTests = ( passedTagTest
+									&& getters.testAgainstDueDateSelection(id, {flat:true})
+									&& passedDoneTest
+									&& passedHiddenItemsTest );
+				}
+				else
+				{
+					passedAllTests = ( passedTagTest
+									&& getters.testAgainstDueDateSelection(id, {flat:false})
+									&& passedDoneTest
+									&& passedHiddenItemsTest );
+				}
+			}
+			return passedAllTests;
 		},
 	},
 }

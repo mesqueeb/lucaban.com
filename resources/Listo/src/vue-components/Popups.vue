@@ -13,7 +13,7 @@
             <div class="c-popup__title">{{ get.text.popups.completed }} {{ popup.item.body }} {{ get.text.popups.completedB }}
             <label class="done-after-done"
                 @keydown="keydownInPopup(popup, $event, 'flatPicker')"
-            >{{ momentCalendar(popup.item.done_date) }}
+            >{{ customCalendar(popup.item.done_date) }}
                 <input
                     v-flatpicky
                     :id="'done-date-edit-'+popup.item.id"
@@ -89,7 +89,7 @@
 </div>
 </template>
 <script>
-import { sec_to_hhmmss, momentCalendar } from '../helpers/valueMorphers2.js'
+import { sec_to_hhmmss, customCalendar } from '../helpers/valueMorphers2.js'
 import autosize from 'autosize';
 import flatPickConfig from '../config/flatPickrOptions.js';
 
@@ -103,7 +103,7 @@ export default {
         popups(){ return this.state.popups },
     },
     methods: {
-        sec_to_hhmmss, momentCalendar,
+        sec_to_hhmmss, customCalendar,
         commit(action, payload){ this.$store.commit(action, payload) },
         dispatch(action, payload){ this.$store.dispatch(action, payload) },
         addPopup(popup) { this.commit('addPopup',{popup}) },

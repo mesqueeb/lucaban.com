@@ -1,17 +1,8 @@
-import languageContents from '../store/lang.js';
+import { formatRelative } from 'date-fns/esm'
+
+import languageContents from '../store/lang.js'
 let text = (window.store) ? store.getters.text : languageContents.en;
 
-function MD(val) {
-  // model -> view
-  // formats the value when updating the input element.
-  	// return moment(val).format("M/D");
-  // // view -> model
-  // // formats the value when writing to the data.
-  // write: function(val, oldVal) {
-  //   var number = +val.replace(/[^\d.]/g, '')
-  //   return isNaN(number) ? 0 : parseFloat(number.toFixed(2))
-  // }
-}
 function min_to_hours(val)
 {
   	let nr = val/60;
@@ -104,39 +95,19 @@ function sec_to_hourmin(val)
 		return pad(minutes,text.global.min)
 	}
 }
-function momentRelative(val)
+function customCalendar(val)
 {
-  	return moment(val).fromNow();
-}
-function momentCalendar(val)
-{
-  	return moment(val).startOf('day').calendar(null, {
-	    sameDay: '[Today]',
-	    nextDay: '[Tomorrow]',
-	    nextWeek: 'dddd',
-	    lastDay: '[Yesterday]',
-	    lastWeek: '[Last] dddd',
-	    sameElse: 'YYYY/MM/DD'
-	});
-}
-function momentDate(val)
-{
-  	return moment(val).startOf('day').calendar(null, {
-	    sameDay: 'YYYY/MM/DD',
-	    nextDay: 'YYYY/MM/DD',
-	    nextWeek: 'YYYY/MM/DD',
-	    lastDay: 'YYYY/MM/DD',
-	    lastWeek: 'YYYY/MM/DD',
-	    sameElse: 'YYYY/MM/DD',
-	});
-}
+  	val = new Date(val);
+	let relativeTime = formatRelative(val, new Date(), {addSuffix: true});
+  	return relativeTime.substring(0, relativeTime.indexOf(' at'));
 
-function linkify(val)
-{
-  	let a = linkifyHtml(val, {
-		defaultProtocol: 'https'
-	});
-	return a;
 }
+// function linkify(val)
+// {
+//   	let a = linkifyHtml(val, {
+// 		defaultProtocol: 'https'
+// 	});
+// 	return a;
+// }
 
-export { MD, min_to_hours, countdown, sec_to_hhmmss, sec_to_hourminsec, hourmin, sec_to_hourmin, momentRelative, momentCalendar, momentDate, linkify }
+export { min_to_hours, countdown, sec_to_hhmmss, sec_to_hourminsec, hourmin, sec_to_hourmin, customCalendar }

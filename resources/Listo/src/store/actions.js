@@ -1,3 +1,4 @@
+import { format, formatRelative, differenceInCalendarDays, addDays } from 'date-fns/esm'
 import {
 	Utilities, hasClass, mobilecheck, isElementInViewport, objectToArray, uniqBy, uniq, arrayToString, sortObjectArrayByProperty, sortObjectArrayByTwoProperties, removeEmptyValuesFromArray
 } from '../helpers/globalFunctions.js';
@@ -363,7 +364,7 @@ prepareDonePatch ({state, commit, dispatch, getters},
 	{id} = {})
 {
 	let item = state.nodes[id];
-	let done_date = moment().format();
+	let done_date = format(new Date(), 'YYYY-MM-DD HH:mm:ss');
 	item.done_date = done_date;
 	dispatch('patchDone', {id} );
 	if (item.done)
@@ -488,11 +489,11 @@ flushDoneItems ({state, commit, dispatch, getters})
 setDueDate ({state, commit, dispatch, getters},
 	{id, duedate} = {})
 {
-	let dd = (duedate) ? duedate : moment().format();
-	let oriDueDate = state.nodes[id].due_date;
-	let diff = moment(oriDueDate).diff(dd, 'days');
+	let dd = (duedate) ? new Date(duedate) : new Date();
+	let oriDueDate = new Date(state.nodes[id].due_date);
+	let diff = differenceInCalendarDays(oriDueDate, dd);
 	if (diff == 0){ dd = '0000-00-00 00:00:00'; }
-	state.nodes[id].due_date = dd;
+	state.nodes[id].due_date = format(dd, 'YYYY-MM-DD hh:mm:ss');
 	if (diff == 0 && getters['selection/dueTodayFiltered'])
 	{
 		state.selection.selectedId = getters.nextItemId(id);
@@ -525,7 +526,7 @@ formatDone ({state, commit, dispatch, getters},
 	let doneItemsObject = doneArray.reduce((prev,item) => {
 		if (item.done)
 		{
-		  	let donePropName = moment(item.done_date).format('YYYY/MM/DD');
+		  	let donePropName = format(item.done_date, 'YYYY/MM/DD');
 		  	// if we don't have a slot for thiz date, make one
 		  	if (!prev.hasOwnProperty(donePropName))
 		  	{
@@ -703,14 +704,14 @@ addNew ({state, commit, dispatch, getters},
 	if (state.selection.view == "journal")
 	{
 		newItem.done = 1;
-		let doneDate = (!olderSibling || olderSibling.depth == 0) ? moment().format() : olderSibling.done_date;
+		let doneDate = (!olderSibling || olderSibling.depth == 0) ? format(new Date(), 'YYYY-MM-DD HH:mm:ss') : olderSibling.done_date;
 		newItem.done_date = doneDate;
 	}
 	if ( getters['selection/dueTodayFiltered']
 	   && getters.isTopLvlItemInFilteredRoot(olderSibling.id)
 	   && !state.addingNewAsChild )
 	{
-		newItem.due_date = moment().format();
+		newItem.due_date = format(new Date(), 'YYYY-MM-DD HH:mm:ss');
 		addTags = addTags.filter(function(val){
 			return val != 'Today';
 		});
@@ -724,72 +725,6 @@ addNew ({state, commit, dispatch, getters},
 	dispatch('addTempNewItem', { item:newItem, index, addNextItemAs, addTags });
 	dispatch('postNewItem', { newItem, index, addNextItemAs, addTags, duplication:null });
 },
-checkFilteredItemsTree ({state, commit, dispatch, getters})
-{
-	//Go through ALL ITEMS and return those that have the tag AND no parent with the tag.
-	objectToArray(state.nodes).forEach(function(item){
-		let target;
-		let targetHidden;
-		let hasParentWithTag;
-		let targetToday;
-		let topLvlItem;
-		if (getters.selection.nothingSelected)
-		{
-			topLvlItem = (item.depth == 1) ? true : false;
-			if (topLvlItem){ return true; }
-		} else {
-			target = state.selection.tags.every(tag => getters.hasTag(item.id, tag));
-			targetHidden = state.selection.hiddenTags.some(tag => getters.hasTag(item.id, tag));
-			hasParentWithTag = state.selection.tags.some(tag => getters.hasParentWithTag(item.id, tag));
-			targetToday = true;
-			if ( getters['selection/dueTodayFiltered'] )
-			{
-				targetToday = false;
-				let diff = moment(item.due_date).diff(moment(), 'days');
-				if (diff <= 0) { targetToday = true; }
-			}
-		}
-		if (target){
-			console.log(`target = [${item.body}]
-			hidden: ${targetHidden}
-			parentwithTag: ${hasParentWithTag}
-			targetToday: ${targetToday}`);
-		}
-		// if ( target && !targetHidden && !hasParentWithTag && targetToday )
-		// {
-		// 	return true;
-		// }
-	});
-},
-// resetDoneData()
-// {
-// 	let dd = objectToArray(state.nodes).filter(item => item.done);
-// 	dd = sortObjectArrayByTwoProperties(dd,'done_date','parents_bodies','desc','asc');
-// 	state.doneData = dd;
-// },
-// getItemWithVisibleChildren(id)
-// {
-// 	id = (id) ? id : state.selection.selectedId;
-// 	if (!id){ return; }
-// 	let item = state.nodes[id];
-// 	if (!item){ return; }
-// 	let visibleChildren = [];
-// 	item.children.forEach(function(child){
-// 		if (!state.hiddenItemIds.includes(child.id))
-// 		{
-// 			visibleChildren.push(getters.getItemWithVisibleChildren(child.id));
-// 		}
-// 	});
-// 	item.children = visibleChildren;
-// 	return item;
-// },
-// returnDoneChildrenAmount(item){
-// 	let x = item.children.reduce(function(prevChild, currChild) {
-// 		let y = (currChild.done) ? 1 : 0;
-// 		return prevChild + y;
-// 	}, 0);
-// 	return x;
-// },
 showChildren ({state, commit, dispatch, getters},
 	{id, action} = {})
 {
@@ -912,7 +847,7 @@ setTomorrow ({state, commit, dispatch, getters},
 {
 	id = (id) ? id : state.selection.selectedId;
 	if (!id){ return; }
-	let duedate = moment().add(1, 'days').format("YYYY-MM-DD HH:mm:ss");
+	let duedate = addDays(new Date(), 1).format("YYYY-MM-DD HH:mm:ss");
 	dispatch('setDueDate', {id, duedate});
 },
 showAddNewItem ({state, commit, dispatch, getters},

@@ -1,8 +1,4 @@
-// we import all of `date`
-import { date } from 'quasar'
-// destructuring to keep only what is needed
-const { getDateDiff, formatDate } = date;
-
+import { format, formatRelative, differenceInCalendarDays } from 'date-fns/esm'
 // import { enhancedGetters } from 'vuex-strong-cache'
 import { Platform } from 'quasar'
 import {
@@ -210,7 +206,7 @@ nextItemId: (state, getters) =>
 	if (item.show_children && item.children.length)
 	{
 		nextItemId = item.children_order[0];
-		if (getters.hiddenItemIds.includes(nextItemId))
+		if (!getters.filteredItemsFlat.includes(nextItemId))
 	 	{
 	 		nextItemId = getters.nextItemRecursion(nextItemId);
 	 	}
@@ -269,7 +265,7 @@ findDeepestVisibleChild: (state, getters) =>
 (id = state.selection.selectedId) => {
 	// console.log('running findDeepestVisibleChild');
 	let item = state.nodes[id];
-	let children = item.children.filter(child => !getters.hiddenItemIds.includes(child.id));
+	let children = item.children.filter(child => getters.filteredItemsFlat.includes(child.id));
 	if (!children.length) { return id; }
 	let deepestId = children[children.length-1].id;
 	return getters.findDeepestVisibleChild(deepestId);
@@ -336,7 +332,7 @@ prevItemId: (state, getters) =>
 			prevItemId = getters.getDeepestLastChildId(prevItemId);
 		}
 	}
- 	if (getters.hiddenItemIds.includes(prevItemId))
+ 	if (!getters.filteredItemsFlat.includes(prevItemId))
  	{
 	 	return getters.prevItemId(prevItemId);
  	} else {
@@ -372,7 +368,7 @@ nextItemRecursion: (state, getters) =>
 		return getters.nextItemRecursion(parent_id);
 	}
 	let nextItemId = state.nodes[parent_id].children_order[nextIndex];
-	if (getters.hiddenItemIds.includes(nextItemId))
+	if (!getters.filteredItemsFlat.includes(nextItemId))
 	{
 		return getters.nextItemRecursion(nextItemId);
 	}
@@ -402,7 +398,7 @@ hasParentDueToday: (state, getters) =>
 	if (!item.parent_id){ return false; }
 	let parent = state.nodes[item.parent_id];
 	if (!parent){ return false; }
-	let diff = getDateDiff(new Date(parent.due_date), new Date(), 'days');
+	let diff = differenceInCalendarDays(new Date(parent.due_date), new Date());
 	if (diff <= 0)
 	{
 		return true;
@@ -415,7 +411,7 @@ isDueToday: (state, getters) =>
 	let item = state.nodes[id];
 	if (!item){ return false; }
 
-	let diff = getDateDiff(new Date(item.due_date), new Date(), 'days');
+	let diff = differenceInCalendarDays(new Date(item.due_date), new Date());
 	if (diff <= 0) { return true; }
 	return false;
 },
@@ -590,11 +586,6 @@ noItems: (state, getters) => {
 	if (!getters.visibleDirectChildren(state.root.id).length){ 
 		return true;
 	}
-	if (getters.visibleDirectChildren(state.root.id).length == 1
-		&& getters.visibleDirectChildren(state.root.id)[0].id == state.root.id)
-	{
-		return true;
-	}
 	return false;
 },
 filteredItems: (state, getters) => {
@@ -613,7 +604,7 @@ filteredItemsJournal: (state, getters) => {
 	let dates = {};
 	getters.filteredItemsFlat.forEach(function(item){
 		if (!item.done){ return; }
-		let dd = formatDate(item.done_date, 'YYYY-MM-DD');
+		let dd = format(item.done_date, 'YYYY-MM-DD');
 		if (!dates[dd])
 		{
 			dates[dd] = [];
@@ -637,142 +628,82 @@ filteredItemsJournal: (state, getters) => {
 journalDates: (state, getters) => {
 	return Object.keys(getters.filteredItemsJournal);
 },
-filteredItemsFlat: (state, getters) => {
-	let ar = objectToArray(state.nodes).filter(function(item){
-		let target = state.selection.tags.every(tag => getters.hasTag(item.id, tag));
-		let targetHidden = state.selection.hiddenTags.some(tag => getters.hasTag(item.id, tag));
-		let targetDone = (state.selection.view == 'journal') ? item.done : true;
-		let targetToday = true;
-// 		console.log(`
-// ${item.body} =
-// target = ${target}
-// targetHidden = ${targetHidden}
-// targetDone = ${targetDone}
-// targetToday = ${targetToday}
-// 			`);
-		if ( getters['selection/dueTodayFiltered'] )
-		{
-			targetToday = false;
-			let diff = getDateDiff(new Date(item.due_date), new Date(), 'days');
-			if ( diff <= 0 || getters.hasParentDueToday(item.id) )
-			{
-				targetToday = true;
-			}
-			let doneDateDiff = getDateDiff(new Date(item.done_date), new Date(), 'days');
-			if (doneDateDiff <= 1) { targetToday = false; }
-		}
-		if (target && !targetHidden && targetDone && targetToday)
-		{
-			return true;
-		}
-	});
-	if (state.selection.view == 'journal')
-	{
-		ar = sortObjectArrayByTwoProperties(ar,'done_date','parents_bodies','desc','asc');
-	}
-	return ar;
-},
-filteredItemsTree: (state, getters) => {
-	if (objectToArray(state.nodes).length == 1 && objectToArray(state.nodes)[0].id == state.root.id)
-	{
-		return objectToArray(state.nodes);
-	}
-
-	let children;
-	// There are no Filters or Tags selected
-	if (!getters['selection/noFilterOrTag'])
-	{
-		children = objectToArray(state.nodes).filter(function(item){
-
-			// tag filter test
-			let passedTagFilter = true; let hasParentWithTag;
-			if (state.selection.tags.length)
-			{
-				let hasAllTags = state.selection.tags.every(tag => getters.hasTag(item.id, tag));
-				let hasHiddenTags = state.selection.hiddenTags.some(tag => getters.hasTag(item.id, tag));
-				hasParentWithTag = state.selection.tags.every(tag => getters.hasParentWithTag(item.id, tag));
-				// IF I ever make an 'OR' selector:
-				// hasParentWithTag = state.selection.tags.some(tag => getters.hasParentWithTag(item.id, tag));				
-				passedTagFilter = (hasAllTags && !hasParentWithTag && !hasHiddenTags) ? true : false;
-			}
-
-			// due date filter test
-			let passedDueDateFilter = true; let hasParentDueToday;
-			if (getters['selection/dueTodayFiltered'])
-			{
-				let isDueToday = getters.isDueToday(item.id);
-				hasParentDueToday = getters.hasParentDueToday(item.id);
-				passedDueDateFilter = (isDueToday || hasParentDueToday) ? true : false;
-			}
-
-			// Filter out anything that's done yesterday
-			let passedDoneTest;
-			if (getters['selection/doneFiltered'])
-			{
-				passedDoneTest = (item.done) ? true : false ;
-			}
-			else
-			{
-				let doneDateDiff = getDateDiff(new Date(item.done_date), new Date(), 'days');
-				passedDoneTest = (!item.done || doneDateDiff <= -1) ? true : false;
-			}
-
-			// Filter out those who have AND parents with tags AND parents who are due
-			let passedBothTagAndDueOnParentTest = true;
-			if (state.selection.tags.length && getters['selection/dueTodayFiltered'])
-			{
-				passedBothTagAndDueOnParentTest = (passedDueDateFilter && passedTagFilter
-				&& !(hasParentWithTag && hasParentDueToday)) ? true : false;
-			}
-			
-			let passedHiddenItemsTest = state.selection.hiddenItemIds.every(id => id != item.id);
-
-			if (   passedTagFilter
-				&& passedDueDateFilter
-				&& passedDoneTest
-				&& passedBothTagAndDueOnParentTest
-				&& passedHiddenItemsTest )
-			{ return true; }
-			return false;
-		});
-	}
-	// Sort on root children_order when no filter:
+filteredIdsFlat: (state, getters) => {
+	let ids = [];
+	console.log('running filteredIdsFlat');
 	if (getters['selection/noFilterOrTag'])
 	{
-		children = state.root.children;
+		ids = Object.keys(state.nodes).filter(id => id != state.root.id);
+	}
+	else
+	{
+		ids = Object.keys(state.nodes).filter(id => {
+			return getters['selection/testAgainstAllSelection'](id, { flat:true })
+		});
+	}
+	return ids;
+},
+filteredItemsFlat: (state, getters) => {
+	let children = getters.filteredIdsFlat
+					.map(id => state.nodes[id])
+					.filter(child => child !== undefined);
+	if (state.selection.view == 'journal')
+	{
+		children = sortObjectArrayByTwoProperties(children,'done_date','parents_bodies','desc','asc');
+	}
+	return children;
+},
+filteredIdsTree: (state, getters) => {
+	let ids = [];
+	if (getters['selection/noFilterOrTag'])
+	{
+		ids = state.root.children_order;
+	}
+	else
+	{
+		ids = Object.keys(state.nodes).filter(id => {
+			return getters['selection/testAgainstAllSelection'](id, { flat:false })
+		});
+	}
+	return ids;
+},
+filteredItemsTree: (state, getters) => {
+	let children = getters.filteredIdsTree
+					.map(id => state.nodes[id])
+					.filter(child => child !== undefined);
+	// Sort the children by children_order if there's no selected tag or filter
+	if (getters['selection/noFilterOrTag'])
+	{
 		let order = state.root.children_order;
-		if (order instanceof Array && order.length)
+		if (order.length)
 		{
-			// order = order.filter(id => getters.childrenOrder(state.root.id).includes(id));
-			children = order.map(id => children.find(t => t.id === id));
+			children = order.map(id => children.find(child => child.id === id));
 		}
 	}
-	// TODAY tab -> Sort children by done_date
+	// Sort children by done_date if dueDate is filtered
 	if ( getters['selection/dueTodayFiltered'] )
 	{
 		children = sortObjectArrayByProperty(children,'done_date');
 	}
-	children = children.filter(c => c !== undefined);
 	return children;
 },
 allVisibleChildItems: (state, getters) =>
 (id) => {
 	let children = getters.visibleDirectChildren(id);
-	// let flattenedTree = [];
 	let flattenedTree = getters.flattenTree(children);
-	let visibleChildren = flattenedTree.filter(child => !getters.hiddenItemIds.includes(child.id));
+	let visibleChildren = flattenedTree.filter(child => getters.filteredItemsFlat.includes(child.id));
 	return visibleChildren;
 },
 visibleDirectChildren: (state, getters) =>
 (id) => {
 	if (id == state.root.id)
 	{
-		return getters.filteredItems.filter(itm => itm.id != state.root.id);
+		return getters.filteredItems;
 	}
 	let item = state.nodes[id];
 	if (!item || !item.children.length){ return []; }
 
-	return item.children.filter(child => !getters.hiddenItemIds.includes(child.id));
+	return item.children.filter(child => getters.filteredItemsFlat.includes(child.id));
 },
 flattenTree: (state, getters) =>
 (array) => {
@@ -875,13 +806,6 @@ journalDate: (state, getters) =>
 		return false;
 	}
 	return item.done_date;
-},
-hiddenItemIds: (state, getters) => {
-	// console.log('running hiddenItemIds');
-	return objectToArray(state.nodes).filter(function(item){
-		let targetHidden = state.selection.hiddenTags.some(tag => getters.hasTag(item.id, tag));
-		if (targetHidden){ return true; }
-	}).map(item => item.id);
 },
 allTagsComputed: (state, getters) => {
 	var t0 = performance.now( );

@@ -10,7 +10,7 @@
 			&& item.id != state.editingDoneDateItem
 			&& state.selection.view != 'journal'"
 	>
-		{{ get.text.tags.done }} {{ momentCalendar(item.done_date) }}
+		{{ get.text.tags.done }} {{ customCalendar(item.done_date) }}
 		<input
 			v-flatpicky
 			:id="'done-date-edit-'+item.id"
@@ -42,14 +42,14 @@
 			&& item.id != state.editingItemTags"
 		class="o-pill--duedate"
 	>
-		{{ momentCalendar(item.due_date) }}
+		{{ customCalendar(item.due_date) }}
 	</span>
 	<span
 		v-if="item.dueDateParent && !item.done
 		 && item.id != state.editingItemTags"
 		class="o-pill--duedate-parent"
 	>
-		{{ momentCalendar(item.dueDateParent) }}
+		{{ customCalendar(item.dueDateParent) }}
 	</span>
 	<span
 		v-if="tagArray"
@@ -74,7 +74,7 @@
 </template>
 
 <script>
-import { momentCalendar, sec_to_hourminsec } from '../helpers/valueMorphers2.js';
+import { customCalendar, sec_to_hourminsec } from '../helpers/valueMorphers2.js';
 import { Utilities, uniq } from '../helpers/globalFunctions.js'
 
 export default {
@@ -116,7 +116,7 @@ export default {
 	},
 	methods:
 	{
-		momentCalendar, sec_to_hourminsec,
+		customCalendar, sec_to_hourminsec,
 		commit(action, payload){ this.$store.commit(action, payload) },
 		dispatch(action, payload){ this.$store.dispatch(action, payload) },
 		tab(index, e)

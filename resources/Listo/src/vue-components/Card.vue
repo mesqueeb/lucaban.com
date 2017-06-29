@@ -10,7 +10,7 @@
 <!-- item-card-wrapper -->
 <div 
 	class="d-flex flex-wrap"
-	v-if="!isHidden || listIsEmpty"
+	v-if="listIsEmpty"
 >
 
 	<div
@@ -18,8 +18,8 @@
 		v-if="journalDate && item.journalDate"
 	>
 		<!-- Codementor: Is this the correct way to format something like this? -->
-		<span>{{ momentCalendar(journalDate) }}</span>
-		<span class="c-section-head__subtitle" v-if="journalDate != momentCalendar(journalDate)">
+		<span>{{ customCalendar(journalDate) }}</span>
+		<span class="c-section-head__subtitle" v-if="journalDate != customCalendar(journalDate)">
 			{{ journalDate }}
 		</span>
 		<button
@@ -128,7 +128,8 @@
 </div>
 </template>
 <script>
-import { linkify, momentCalendar, sec_to_hourmin } from '../helpers/valueMorphers2.js';
+import { format } from 'date-fns/esm'
+import { customCalendar, sec_to_hourmin } from '../helpers/valueMorphers2.js';
 // import flatPickConfig from '../components/flatPickrOptions.js';
 import { uniq, Utilities } from '../helpers/globalFunctions.js';
 import Clipboard from 'clipboard';
@@ -197,11 +198,8 @@ export default {
 				let prevParentString = this.state.nodes[prevId].parents_bodies;
 
 				let prevDoneDate = this.state.nodes[prevId].done_date;
-				// console.log('moment dates');
-				// console.log(prevDoneDate);
-				// console.log(this.item.done_date);
-				prevDoneDate = moment(prevDoneDate).format('YYYY/MM/DD');
-				let thisDoneDate = moment(this.item.done_date).format('YYYY/MM/DD');
+				prevDoneDate = format(new Date(prevDoneDate), 'YYYY/MM/DD');
+				let thisDoneDate = format(new Date(this.item.done_date), 'YYYY/MM/DD');
 
 				if (
 					parentString
@@ -222,24 +220,18 @@ export default {
 			let index = this.get.childrenOrder(parentId).indexOf(this.item.id);
 			if (index == 0){ return this.state.root.id; }
 			let prevId = this.get.childrenOrder(parentId)[index-1];
-			if(prevId != this.get.prevItemId(this.item.id))
-			{
-				console.info(`getters.prevItemId(${this.item.id}) != visiblePrevItemId
-					visiblePrevItemId = ${prevId}
-					prevItemId = ${this.get.prevItemId(this.item.id)}
-					`);
-			}
+			// if(prevId != this.get.prevItemId(this.item.id))
+			// {
+			// 	console.info(`getters.prevItemId(${this.item.id}) != visiblePrevItemId
+			// 		visiblePrevItemId = ${prevId}
+			// 		prevItemId = ${this.get.prevItemId(this.item.id)}
+			// 		`);
+			// }
 			return prevId;
-		},
-		isHidden()
-		{ if (!this.item){ return true; }
-			// console.log('allVisibleChildItems');
-			return this.get.hiddenItemIds.includes(this.item.id)
 		},
 	},
 	methods: {
-		linkify,
-		momentCalendar,
+		customCalendar,
 		sec_to_hourmin,
 		commit(action, payload){ this.$store.commit(action, payload); },
 		dispatch(action, payload){ this.$store.dispatch(action, payload); },

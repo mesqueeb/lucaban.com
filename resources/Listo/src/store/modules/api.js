@@ -136,7 +136,7 @@ export default {
 				});
 				return;
 			}
-			duedate = moment(duedate).format();
+			duedate = new Date(duedate);
 			console.log('PatchDueDate: '+duedate);
 			axios.patch(apiBaseURL+'items/' + id, {'due_date':duedate})
 			.then(function(response){
@@ -151,7 +151,7 @@ export default {
 			let done_date;
 			let doneValue = rootState.nodes[id].done;
 			if (doneValue){
-				done_date = moment().format();
+				done_date = new Date();
 			} else {
 				done_date = '0000-00-00 00:00:00';
 			}

@@ -4,7 +4,7 @@
 // // 1. use next line to activate CUSTOM STYLE (./src/themes)
 // // require(`./themes/app.${__THEME}.styl`)
 // // 2. or, use next line to activate DEFAULT QUASAR STYLE
-require(`quasar/dist/quasar.${__THEME}.css`)
+require(`quasar/dist/quasar.${__THEME}.css`);
 // // ==============================
 
 // import Vue from 'vue'
@@ -31,47 +31,35 @@ require(`quasar/dist/quasar.${__THEME}.css`)
 //   })
 // })
 
-// we import all of `date`
-import { date } from 'quasar'
-// destructuring to keep only what is needed
-window.date = date;
-
-
-
-// MY ITEMS APP:
-
-// IMPORT Own jQuery replacement functions
-	import { hasClass, addClass, removeClass } from './helpers/globalFunctions.js';
+// IMPORT Own global class helper functions
+	import { hasClass, addClass, removeClass } from './helpers/globalFunctions.js'
 	// Make hasClass(el) available as el.hasClass();
 	window.Element.prototype.hasClass = function(config){ return hasClass(this,config) };
 	window.Element.prototype.addClass = function(config){ return addClass(this,config) };
 	window.Element.prototype.removeClass = function(config){ return removeClass(this,config) };
 
-// IMPORT linkify
-	import * as linkify from 'linkifyjs';
-	import linkifyHtml from 'linkifyjs/html';
-	import hashtag from 'linkifyjs/plugins/hashtag'; // optional
-	window.linkifyHtml = linkifyHtml;
-	window.hashtag = hashtag;
-	hashtag(linkify);
+// // IMPORT linkify
+// 	import * as linkify from 'linkifyjs'
+// 	import linkifyHtml from 'linkifyjs/html'
+// 	import hashtag from 'linkifyjs/plugins/hashtag' // optional
+// 	window.linkifyHtml = linkifyHtml;
+// 	window.hashtag = hashtag;
+// 	hashtag(linkify);
 
-
-// IMPORT Moment
-	import moment from 'moment';
-	window.moment = moment;
-
-	import axios from 'axios';
-	window.axios = axios;
-	// window.axios.defaults.headers.common = {
-	//     'X-Requested-With': 'XMLHttpRequest',
-	// 	'Authorization': "Bearer " + token ,
-	// };
 	
+// 0.
+import axios from 'axios'
+window.axios = axios;
+// window.axios.defaults.headers.common = {
+//     'X-Requested-With': 'XMLHttpRequest',
+// 	'Authorization': "Bearer " + token ,
+// };
+
 // 1.
-import Vue from 'vue';
-window.Vue = Vue;
+import Vue from 'vue'
+window.Vue = Vue
 Vue.config.productionTip = false
-// 2
+// 2.
 import Quasar, { QBtn, QIcon, QPopover, QModal, QSpinnerOval, QLayout, QFixedPosition } from 'quasar'
 import 'quasar-extras/material-icons'
 import 'quasar-extras/ionicons'
@@ -81,9 +69,9 @@ Vue.use(Quasar, {
   }
 })
 // 3.
-import Vuex from 'vuex';
+import Vuex from 'vuex'
 Vue.use(Vuex);
-import ListStore from './store/store.js';
+import ListStore from './store/store.js'
 window.store = new Vuex.Store(ListStore);
 // 4.
 import Vuelidate from 'vuelidate'
@@ -92,13 +80,13 @@ Vue.use(Vuelidate)
 import router from './router.js'
 window.router = router;
 // 6.
-import WindowKeyBindings from './config/WindowKeyBindings.js';
+import WindowKeyBindings from './config/WindowKeyBindings.js'
 new WindowKeyBindings();
 // 7.
-import ListDirectives from './config/Directives.js';
+import ListDirectives from './config/Directives.js'
 Vue.use(ListDirectives);
 // 8.
-import VueClipboard from 'vue-clipboard2';
+import VueClipboard from 'vue-clipboard2'
 Vue.use(VueClipboard);
 // GO.
 window.vm = new Vue({
