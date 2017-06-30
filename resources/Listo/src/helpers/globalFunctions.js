@@ -57,18 +57,18 @@ function removeEmptyValuesFromArray(array) {
 	return cleanArray;
 }
 
-function sortObjectArrayByProperty(array, propertyName, order) {
+function sortObjectArrayByProperty(array, propertyName, order = 'asc') {
 	return array.sort(function(a, b) {
 	    let textA = a[propertyName].toUpperCase();
 	    let textB = b[propertyName].toUpperCase();
-	    if (!order || order =='asc') {
+	    if (order =='asc') {
 		    return (textA < textB) ? -1 : (textA > textB) ? 1 : 0;
 	    } else if (order == 'desc') {
 		    return (textA > textB) ? -1 : (textA < textB) ? 1 : 0;
 	    }
 	}.bind(propertyName));
 }
-function sortObjectArrayByTwoProperties(array, prop1, prop2, order, order2) {
+function sortObjectArrayByTwoProperties(array, prop1, prop2, order = 'asc', order2 = 'asc') {
 	let props = {prop1, prop2};
 	return array.sort(function(a, b) {
 		prop1 = props['prop1'];
@@ -76,7 +76,7 @@ function sortObjectArrayByTwoProperties(array, prop1, prop2, order, order2) {
 	    let textA = a[prop1].toUpperCase();
 	    let textB = b[prop1].toUpperCase();
 
-	    if (!order || order =='asc') {
+	    if (order =='asc') {
 	    	if (textA < textB) { return -1; }
 	    	else if (textA > textB) { return 1; }
 	    	else
@@ -84,7 +84,7 @@ function sortObjectArrayByTwoProperties(array, prop1, prop2, order, order2) {
 				if (!a[prop2] || !b[prop2]) { return 0; }
 			    let text2A = a[prop2].toUpperCase();
 			    let text2B = b[prop2].toUpperCase();
-				if (!order2 || order2 == 'asc')
+				if (order2 == 'asc')
 				{
 					return (text2A > text2B) ? -1 : (text2A < text2B) ? 1 : 0;
 				} else if (order2 == 'desc') {
@@ -99,8 +99,8 @@ function sortObjectArrayByTwoProperties(array, prop1, prop2, order, order2) {
 				if (!a[prop2] || !b[prop2]) { return 0; }
 			    let text2A = a[prop2].toUpperCase();
 			    let text2B = b[prop2].toUpperCase();
-				console.log('text2A: '+text2A+' | text2B: '+text2B);
-				if (!order2 || order2 == 'asc')
+				// console.log('text2A: '+text2A+' | text2B: '+text2B);
+				if (order2 == 'asc')
 				{
 					return (text2A > text2B) ? -1 : (text2A < text2B) ? 1 : 0;
 				} else if (order2 == 'desc') {

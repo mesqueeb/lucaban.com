@@ -40,7 +40,6 @@
 			</div>
 			<div
 				class="o-popmenu__item"
-				v-if="get.mobile"
 				@click="dispatch('startEdit', {item}), $refs.popover.close()"
 			>
 				<div v-html="state.keybindings.edit.popmenu[l]"></div>
@@ -126,7 +125,7 @@ export default{
     justify-content: center;
 }
 .c-item-nav button{
-    margin: 0.1rem 0.3rem;
+    margin: 0 0.3rem;
     padding: 0.1rem 0.2rem;
 }
 .c-item-nav__icon{

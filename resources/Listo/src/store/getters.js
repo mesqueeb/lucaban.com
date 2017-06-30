@@ -14,7 +14,7 @@ export default {
 		if (!item){ return 0; }
 
 		let selfValue = (item.planned_time) ? parseFloat(item.planned_time) : 0;
-		let childrenArray = getters.getAllChildrenIds(id);
+		let childrenArray = getters.allVisibleChildIds(id);
 		if (!childrenArray || !childrenArray.length) { return selfValue; }
 		let x = childrenArray.reduce(function(prevVal, childId){
 			let child = state.nodes[childId];
@@ -33,7 +33,7 @@ export default {
 			childrenArray = item.children;
 		} else {
 			item = state.nodes[idOrItem];
-			childrenArray = getters.getAllChildrenIds(idOrItem);
+			childrenArray = getters.allVisibleChildIds(idOrItem);
 		}
 		if (!item){ return 0; }
 
@@ -116,18 +116,18 @@ hasParentWithTag: (state, getters) =>
 (id, tags) => {
 	if (!id){ return false; }
 	let item = state.nodes[id];
-	let parent_id = state.nodes[id].parent_id;
-	if (!parent_id){ return false; }
-	if (!state.nodes[parent_id]){
+	let parentId = state.nodes[id].parent_id;
+	if (!parentId){ return false; }
+	if (!state.nodes[parentId]){
 		// console.log('Parent of ('+id+')['+item.body+'] is non existant.');
 		return false;
 	}
-	let parentHasTag = getters.hasTag(parent_id, tags);
+	let parentHasTag = getters.hasTag(parentId, tags);
 	if (parentHasTag)
 	{
 		return true;
 	} else {
-		return getters.hasParentWithTag(parent_id, tags);
+		return getters.hasParentWithTag(parentId, tags);
 	}
 },
 parentIdWithTag: (state, getters) =>
@@ -135,23 +135,19 @@ parentIdWithTag: (state, getters) =>
 	// debugger;
 	let item = state.nodes[id];
 	console.log('id & body = '+item.id+" - "+item.body);
-	let parent_id = state.nodes[id].parent_id;
-	if (!parent_id){ return false; }
+	let parentId = state.nodes[id].parent_id;
+	if (!parentId){ return false; }
 	
-	let parentHasTag = getters.hasTag(parent_id, tags);
+	let parentHasTag = getters.hasTag(parentId, tags);
 	console.log('parentHasTag');
 	console.log(parentHasTag);
 	if (parentHasTag)
 	{
-		return parent_id;
+		return parentId;
 	} else {
-		return getters.parentIdWithTag(parent_id, tags);
+		return getters.parentIdWithTag(parentId, tags);
 	}
 },
-// returnTagsAsArray: (state, getters) =>
-// (id) => {
-// 	return state.nodes[id].tagged.map(obj => obj.tag_name);
-// },
 tagsArray: (state, getters) =>
 (id) => {
 	let item = state.nodes[id];
@@ -159,30 +155,35 @@ tagsArray: (state, getters) =>
 	return item.tagged.map(obj => obj.tag_name);
 },
 siblingIndex: (state, getters) =>
-(id) => {
+(id, {visibleChildrenOnly = false} = {visibleChildrenOnly: false}) => {
 	let item = state.nodes[id];
 	if (!item){ return false; }
-	let parent_id = item.parent_id;
-	if (!parent_id || !state.nodes[parent_id]){ return false; }
-	// console.log('sibind parent_id');
-	// console.log(parent_id);
-	// console.log(state.nodes[parent_id]);
-	let siblingsArray = state.nodes[parent_id].children_order;
+	let parentId = item.parent_id;
+	if (!parentId || !state.nodes[parentId]){ return false; }
+	let siblingsArray;
+	if (visibleChildrenOnly)
+	{
+		siblingsArray = getters.visibleDirectChildIds(parentId);
+	}
+	else
+	{
+		siblingsArray = state.nodes[parentId].children_order;
+	}
 	return siblingsArray.indexOf(id);
 },
 olderSiblingId: (state, getters) =>
 (id) => {
 	let item = state.nodes[id];
 	if (!item){ return; }
-	let parent_id = item.parent_id;
-	if (!parent_id){ return; }
-	let siblingsArray = state.nodes[parent_id].children_order;
+	let parentId = item.parent_id;
+	if (!parentId){ return; }
+	let siblingsArray = state.nodes[parentId].children_order;
 	if (siblingsArray.length <= 1 || getters.siblingIndex(id) == 0)
 	{
-		return parent_id;
+		return parentId;
 	}
 	let siblingIndex = siblingsArray.indexOf(id);
-	return state.nodes[parent_id].children_order[siblingIndex-1];
+	return state.nodes[parentId].children_order[siblingIndex-1];
 },
 nextItemId: (state, getters) =>
 (id, debug) => {
@@ -190,190 +191,154 @@ nextItemId: (state, getters) =>
 	if (!id){ return; }
 	let item = state.nodes[id];
 	if (!item){ return; }
-	let nextItemId;
-	// Select next item on top level.
-	if ( getters.isTopLvlItemInFilteredRoot(id) && !item.show_children
-	  || state.selection.view == 'journal' )
+
+	// Journal
+	if (state.selection.view == 'journal')
 	{
-		let ind = getters.childrenOrder(state.root.id).indexOf(id);
-		if (ind+1 == getters.childrenOrder(state.root.id).length)
+		let ind = getters.filteredIdsTree.indexOf(id);
+		if (ind+1 == getters.filteredIdsTree.length)
 		{
-			return getters.childrenOrder(state.root.id)[0];
+			return getters.filteredIdsTree[0];
 		}
-		return getters.childrenOrder(state.root.id)[ind+1];
+		return getters.filteredIdsTree[ind+1];
+	}
+	// Select next item on top level.
+	else if (getters.filteredIdsTree.includes(id)
+		&& (!getters.visibleDirectChildren(id).length
+			|| !item.show_children ))
+	{
+		let ind = getters.filteredIdsTree.indexOf(id);
+		if (ind+1 == getters.filteredIdsTree.length)
+		{
+			return getters.filteredIdsTree[0];
+		}
+		return getters.filteredIdsTree[ind+1];
 	}
 	// Select first child if any.
-	if (item.show_children && item.children.length)
+	else if ( getters.visibleDirectChildIds(id).length && item.show_children)
 	{
-		nextItemId = item.children_order[0];
-		if (!getters.filteredItemsFlat.includes(nextItemId))
-	 	{
-	 		nextItemId = getters.nextItemRecursion(nextItemId);
-	 	}
- 	} else {
-		nextItemId = getters.nextItemRecursion(id);
+		return getters.visibleDirectChildIds(id)[0];
  	}
- 	return nextItemId;
+	// All other cases
+ 	else
+ 	{
+		return getters.nextItemRecursion(id);
+ 	}
+},
+nextItemRecursion: (state, getters) =>
+(id) => {
+	if (!id){ return; }
+	if (getters.itIsADeepestChild(id))
+	{
+		let topLvlItemId = getters.topLvlParentOfDeepestChild(id);
+		let index = getters.filteredIdsTree.indexOf(topLvlItemId);
+		if (index+1 == getters.filteredIdsTree.length)
+		{ 
+			let firstItemId = getters.filteredIdsTree[0];
+			if (firstItemId == id) { return null; }
+			return firstItemId;
+		}
+		return getters.filteredIdsTree[index+1];
+	}
+	let index = getters.siblingIndex(id, {visibleChildrenOnly:true});
+	let parentId = state.nodes[id].parent_id;
+	let parentsChildren = getters.visibleDirectChildIds(parentId);
+	if (index+1 == parentsChildren.length)
+	{
+		if (parentId == state.root.id){ return; }
+		return getters.nextItemRecursion(parentId);
+	}
+	return parentsChildren[index+1];
 },
 nextSiblingOrParentsSiblingId: (state, getters) =>
 (id) => {
 	let item = state.nodes[id];
 	if (!item){ return; }
-	let parent_id = item.parent_id;
-	if (!parent_id){ return; }
-	let children_order = state.nodes[parent_id].children_order;
+	let parentId = item.parent_id;
+	if (!parentId){ return; }
+	let children_order = state.nodes[parentId].children_order;
 	let nextIndex = getters.siblingIndex(id)+1;
 	if (nextIndex == children_order.length)
 	{
-		return getters.nextSiblingOrParentsSiblingId(parent_id);
+		return getters.nextSiblingOrParentsSiblingId(parentId);
 	} else {
 		return children_order[nextIndex];
 	}
 },
-getLastChildId: (state, getters) =>
-(id) => {
-	let item = state.nodes[id];
-	let childrenCount = item.children.length;
-	if (childrenCount && item.show_children)
+findDeepestVisibleChild: (state, getters) =>
+(id = state.selection.selectedId) => {
+	let childrenIds = getters.visibleDirectChildIds(id);
+	if (!childrenIds.length)
 	{
-		let lastChild = item.children[childrenCount-1];
-		return lastChild.id;
+		return id;
 	}
-	return id;
+	let deepestId = childrenIds[childrenIds.length-1];
+	return getters.findDeepestVisibleChild(deepestId);
 },
-getDeepestLastChildId: (state, getters) =>
-(id) => {
-	// debugger;
-	let lastChildId = getters.getLastChildId(id);
-	let item = state.nodes[lastChildId];
-	if (item.children.length && item.show_children)
-	{
-		return getters.getDeepestLastChildId(lastChildId);
-	}
-	return lastChildId;
+filteredItemsTreeDeepestChildren: (state, getters) => {
+	return getters.filteredIdsTree.map(id => {
+		return {
+			'id':id,
+			'deepestChild':getters.findDeepestVisibleChild(id)
+		};
+	});
 },
 itIsADeepestChild: (state, getters) =>
 (id) => {
 	// console.log('running itIsADeepestChild');
 	if (!id){ console.log('you need an ID'); return; }
-	if (getters.childrensDeepestChildren(state.root.id).map(item => item.deepestChild).includes(id))
-	{
-		return true;
-	} return false;
+	return getters.filteredItemsTreeDeepestChildren.map(item => item.deepestChild).includes(id);
 },
-findDeepestVisibleChild: (state, getters) =>
-(id = state.selection.selectedId) => {
-	// console.log('running findDeepestVisibleChild');
-	let item = state.nodes[id];
-	if (!item){ return false; }
-	let children = item.children.filter(child => getters.filteredIdsFlat.includes(child.id));
-	if (!children.length) { return id; }
-	let deepestId = children[children.length-1].id;
-	return getters.findDeepestVisibleChild(deepestId);
+topLvlParentOfDeepestChild: (state, getters) =>
+(id) => {
+	return getters.filteredItemsTreeDeepestChildren.find(obj => (obj.deepestChild == id)).id;
 },
 isFirstItem: (state, getters) =>
 (id) => {
 	if (getters.noItems){ return false; }
 	return (getters.siblingIndex(id) == 0);
 },
-childrensDeepestChildren: (state, getters) =>
-(id = state.root.id) => {
-	return getters.visibleDirectChildren(id).map(function(item){
-		return {
-			'id':item.id,
-			'deepestChild':getters.findDeepestVisibleChild(item.id)
-		};
-	});
-},
-deepestChild: (state, getters) =>
-(id) => {
-	return getters.childrensDeepestChildren(state.root.id).find(obj => (obj.id == id)).deepestChild;
-},
-topLvlParentOfDeepestChild: (state, getters) =>
-(id) => {
-	return getters.childrensDeepestChildren(state.root.id).find(obj => (obj.deepestChild == id)).id;
-},
 prevItemId: (state, getters) =>
 (id, debug) => {
 	if (debug){ debugger; }
-	if (!id){ return false; }
-	let item = state.nodes[id];
-	if (item.depth == 0){ return false; }
-	let parent_id = item.parent_id;
+	if (!id || state.nodes[id].depth == 0){ return false; }
 	let prevItemId;
-	let index;
-	// Select next item on top level.
-	let childrenIds = getters.childrenOrder(state.root.id);
-	if (getters.isTopLvlItemInFilteredRoot(id) || state.selection.view == 'journal')
+	// Previous item in JOURNAL
+	if (state.selection.view == 'journal')
 	{
-		index = childrenIds.indexOf(id);
-		if (index == 0) {
-			if (state.selection.view == 'journal')
-			{
-				prevItemId = childrenIds[childrenIds.length-1];
-			} else {
-				prevItemId = getters.deepestChild(childrenIds[childrenIds.length-1]);
-			}
-		} else {
-			prevItemId = childrenIds[index-1];
-			if (state.selection.view != 'journal')
-			{
-				prevItemId = getters.deepestChild(prevItemId);
-			}
-		}
-	} else {
-		index = getters.siblingIndex(id);
-		if (childrenIds[0] == id)
+		let journalChildren = getters.filteredIdsTree;
+		let index = journalChildren.indexOf(id);
+		if (index == 0)
 		{
-			prevItemId = getters.deepestChild(childrenIds[childrenIds.length-1]);
-		} else if (index == 0) {
-			prevItemId = parent_id;
+			prevItemId = journalChildren[journalChildren.length-1];
+		}
+		else
+		{
+			prevItemId = journalChildren[index-1];
+		}
+	}
+	// Previous item on top level
+	else if (getters.filteredIdsTree.includes(id))
+	{
+		let topLvlIds = getters.filteredIdsTree;
+		let index = topLvlIds.indexOf(id);
+		if (index == 0) {
+			prevItemId = getters.findDeepestVisibleChild(topLvlIds[topLvlIds.length-1]);
 		} else {
-			prevItemId = state.nodes[parent_id].children_order[index-1];
-			prevItemId = getters.getDeepestLastChildId(prevItemId);
+			prevItemId = getters.findDeepestVisibleChild(topLvlIds[index-1]);
+		}
+	// All other cases
+	} else {
+		let item = state.nodes[id];
+		let index = getters.siblingIndex(id, {visibleChildrenOnly:true});
+		if (index == 0) {
+			prevItemId = item.parent_id;
+		} else {
+			let elderSiblingId = getters.visibleDirectChildIds(item.parent_id)[index-1];
+			prevItemId = getters.findDeepestVisibleChild(elderSiblingId);
 		}
 	}
- 	if (!getters.filteredItemsFlat.includes(prevItemId))
- 	{
-	 	return getters.prevItemId(prevItemId);
- 	} else {
-	 	return prevItemId;
- 	}
-},
-nextItemRecursion: (state, getters) =>
-(id) => {
-	// debugger;
-	let nextIndex = getters.siblingIndex(id)+1;
-	let item = state.nodes[id];
-	let parent_id = item.parent_id;
-	// let tagsSelected = state.selection.tags.length;
-
-	if (getters.itIsADeepestChild(id))
-	{
-		let topLvlItemId = getters.topLvlParentOfDeepestChild(id);
-		let topLvlChildrenIds = getters.childrenOrder(state.root.id);
-		let ind = topLvlChildrenIds.indexOf(topLvlItemId);
-		if (ind+1 == topLvlChildrenIds.length)
-		{ 
-			let firstItemId = topLvlChildrenIds[0];
-			if (firstItemId == id) { return null; }
-			return firstItemId;
-		}
-		return topLvlChildrenIds[ind+1];
-	}
-	let parentsChildrenOrder = state.nodes[parent_id].children_order;
-	let itemIsLastSibling = (nextIndex == parentsChildrenOrder.length);
-	if (itemIsLastSibling)
-	{
-		if (parent_id == state.root.id){ return; }
-		return getters.nextItemRecursion(parent_id);
-	}
-	let nextItemId = state.nodes[parent_id].children_order[nextIndex];
-	if (!getters.filteredItemsFlat.includes(nextItemId))
-	{
-		return getters.nextItemRecursion(nextItemId);
-	}
-	return nextItemId;
+ 	return prevItemId;
 },
 isTopLvlItemInFilteredRoot: (state, getters) =>
 (id) => {
@@ -443,23 +408,6 @@ allChildrenDone: (state, getters) =>
 		return true;
 	} else {
 		return false;
-	}
-},
-getAllChildrenIds: (state, getters) =>
-(id) => {
-	let allChildrenIds = [];
-	getters.getAllChildrenIdsRecursive(id, allChildrenIds);		
-	return allChildrenIds;
-},
-getAllChildrenIdsRecursive: (state, getters) =>
-(id, allChildrenIds) => {
-	let item = state.nodes[id];
-	if (!item || (!(Array.isArray(item.children) && item.children.length)))
-	{
-		return;
-	} else {
-		item.children_order.forEach(childId => { allChildrenIds.push(childId); });
-		item.children_order.forEach(childId => { return getters.getAllChildrenIdsRecursive(childId, allChildrenIds) });
 	}
 },
 calTotalPlannedTime: (state, getters) =>
@@ -592,7 +540,7 @@ filteredItems: (state, getters) => {
 filteredItemsJournal: (state, getters) => {
 	if (state.selection.view != 'journal'){ return []; }
 	let dates = {};
-	getters.filteredItemsFlat.forEach(function(item){
+	getters.filteredItemsTree.forEach(function(item){
 		if (!item.done){ return; }
 		let dd = format(item.done_date, 'YYYY-MM-DD');
 		if (!dates[dd])
@@ -619,6 +567,7 @@ journalDates: (state, getters) => {
 	return Object.keys(getters.filteredItemsJournal);
 },
 filteredIdsFlat: (state, getters) => {
+	if (state.loading){ return []; }
 	let ids = [];
 	console.log('running filteredIdsFlat');
 	let allNodes = Object.keys(state.nodes).map(k => (Number(k)) ? Number(k) : k);
@@ -645,6 +594,11 @@ filteredItemsFlat: (state, getters) => {
 	return children;
 },
 filteredIdsTree: (state, getters) => {
+	return getters.filteredItemsTree
+			.map(item => item.id);			
+},
+filteredItemsTree: (state, getters) => {
+	if (state.loading){ return []; }
 	let ids = [];
 	if (getters['selection/noFilterOrTag'])
 	{
@@ -656,25 +610,27 @@ filteredIdsTree: (state, getters) => {
 			return getters['selection/testAgainstAllSelection'](id, { flat:false })
 		});
 	}
-	return ids;
-},
-filteredItemsTree: (state, getters) => {
-	let children = getters.filteredIdsTree
-					.map(id => state.nodes[id])
-					.filter(child => child !== undefined);
+	console.log('ids');
+	console.log(ids);
+	let children = ids.map(id => state.nodes[id]);
+	// .filter(item => item !== undefined);
+	// SORTING !!
 	// Sort the children by children_order if there's no selected tag or filter
 	if (getters['selection/noFilterOrTag'])
 	{
-		let order = state.root.children_order;
-		if (order.length)
+		if (ids.length)
 		{
-			children = order.map(id => children.find(child => child.id === id));
+			children = ids.map(id => children.find(child => child.id === id));
 		}
 	}
 	// Sort children by done_date if dueDate is filtered
-	if ( getters['selection/dueTodayFiltered'] )
+	else if ( getters['selection/dueTodayFiltered'] )
 	{
-		children = sortObjectArrayByProperty(children,'done_date');
+		children = sortObjectArrayByTwoProperties(children, 'done_date', 'due_date', 'asc', 'desc');
+	}
+	else if ( state.selection.view == 'journal' )
+	{
+		children = sortObjectArrayByTwoProperties(children, 'done_date', 'parents_bodies', 'desc', 'asc');
 	}
 	return children;
 },
@@ -685,6 +641,10 @@ allVisibleChildItems: (state, getters) =>
 	let visibleChildren = flattenedTree.filter(child => getters.filteredIdsFlat.includes(child.id));
 	return visibleChildren;
 },
+allVisibleChildIds: (state, getters) =>
+(id) => {
+	return getters.allVisibleChildItems(id).map(c => c.id);
+},
 visibleDirectChildren: (state, getters) =>
 (id) => {
 	if (id == state.root.id)
@@ -692,9 +652,13 @@ visibleDirectChildren: (state, getters) =>
 		return getters.filteredItems;
 	}
 	let item = state.nodes[id];
-	if (!item || !item.children.length){ return []; }
+	if (!item || !item.children.length || !item.show_children){ return []; }
 
 	return item.children.filter(child => getters.filteredIdsFlat.includes(child.id));
+},
+visibleDirectChildIds: (state, getters) =>
+(id) => {
+	return getters.visibleDirectChildren(id).map(c => c.id);
 },
 flattenTree: (state, getters) =>
 (array) => {
@@ -708,15 +672,6 @@ flattenTree: (state, getters) =>
 		}
 	});
 	return flattenedTree;
-},
-childrenOrder: (state, getters) =>
-(id) => {
-	let children = getters.visibleDirectChildren(id);
-	if (state.selection.view == 'journal' && id == state.root.id)
-	{
-		children = children.reduce((a, c) => a.concat(c.children), []);
-	}
-	return children.map(child => child.id);
 },
 clipboardText: (state, getters) =>
 (id = state.selection.selectedId) => {
@@ -896,15 +851,10 @@ allTagsComputed_1b: (state, getters) => {
 	return allTagsArray;
 },
 itemAmount: (state, getters) => {
-	if (getters.noItems){ return 0; }
-	let items = (getters.filteredItemsFlat.length) ? getters.filteredItemsFlat : [] ;
-	return items.length-1;
+	return getters.filteredIdsFlat.length;
 },
 doneItemAmount: (state, getters) => {
-	if (getters.noItems){ return 0; }
-	let items = (getters.filteredItemsFlat.length) ? getters.filteredItemsFlat : [] ;
-	let doneChildren = items.filter(child => child.done).length;
-	return doneChildren;
+	return getters.filteredItemsFlat.filter(child => child.done).length;
 },
 lastItems: (state, getters) => {
 	if (getters.noItems ){ return []; }

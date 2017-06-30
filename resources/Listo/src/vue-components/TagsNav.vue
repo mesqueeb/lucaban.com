@@ -1,14 +1,15 @@
 <template>
 	<div class="c-navigation__tag-menu">
-		<a v-for="tag in get.allTagsComputed"
+		<a
+			v-for="tag in get.allTagsComputed"
 			href="#"
-			:class="{'active': selection.tags.includes(tag.slug)}"
+			:class="['c-tag-menu__tag', {'c-tag-menu--active': selection.tags.includes(tag.slug)}]"
 			:value="tag.slug"
-			@click="dispatch('filterItems', { keyword:'tag', value:tag.slug, event:$event })"
+			@click.prevent="dispatch('filterItems', { keyword:'tag', value:tag.slug, event:$event })"
 		>{{ tag.name }}</a>
 		<a v-for="tag in selection.hiddenTags"
-			class="filtered-out" href="#"
-			@click.prevent="dispatch('removeFilter', {tag})"
+			class="c-tag-menu--filtered-out" href="#"
+			@click.prevent="dispatch('removeHiddenTag', {tag})"
 		>{{ tagSlugToName(tag) }}</a>
 	</div>
 </template>
@@ -47,22 +48,29 @@ export default {
     flex-wrap: wrap;
     justify-content: flex-end;
     margin-bottom: 0.2em;
-    a{
-        transition: all 0.35s;
-        text-decoration: none;
-        color: #4d4d4d !important;
-        margin: 0em 0.2em;
-        padding: 0.3em;
-        &:hover{
-            color:$theme-color;
-        }
+	// keeping the 'a' here is important for css bugs
+	a{
+	    text-decoration: none;
+	    color: $text-gray;
+	    transition: all 0.35s;
+	    margin: 0em 0.2em;
+	    padding: 0.3em;
+	}
+}
+.c-tag-menu__tag{
+    &:hover{
+        color:$theme-color !important;
     }
-    .active{
-        color: $theme-color !important;
-    }
-    .filtered-out{
-        text-decoration: line-through;
-        color: $duedate-color;
+}
+.c-tag-menu--active{
+    color: $theme-color !important;
+}
+.c-tag-menu--filtered-out{
+    text-decoration: line-through !important;
+    color: $duedate-color !important;
+    &:hover{
+    	color: $text-gray !important;
+	    text-decoration: none !important;
     }
 }
 </style>

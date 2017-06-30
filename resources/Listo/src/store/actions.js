@@ -295,7 +295,7 @@ deleteItem ({state, commit, dispatch, getters},
 	// Delete all children as well!
 	if (Array.isArray(item.children) && item.children.length)
 	{
-		let allChildrenIds = getters.getAllChildrenIds(id);
+		let allChildrenIds = getters.allVisibleChildIds(id);
 		dispatch('deleteItemApi', { idOrArray:allChildrenIds });
 	}
 	// Delete items attached to previous parent
@@ -487,13 +487,14 @@ flushDoneItems ({state, commit, dispatch, getters})
 	});
 },
 setDueDate ({state, commit, dispatch, getters},
-	{id, duedate} = {})
+	{id, duedate} = {duedate:false})
 {
 	let dd = (duedate) ? new Date(duedate) : new Date();
 	let oriDueDate = new Date(state.nodes[id].due_date);
 	let diff = differenceInCalendarDays(oriDueDate, dd);
-	if (diff == 0){ dd = '0000-00-00 00:00:00'; }
-	state.nodes[id].due_date = format(dd, 'YYYY-MM-DD hh:mm:ss');
+	console.log(diff);
+	dd = (diff == 0) ? '0000-00-00 00:00:00' : format(dd, 'YYYY-MM-DD hh:mm:ss');
+	state.nodes[id].due_date = dd;
 	if (diff == 0 && getters['selection/dueTodayFiltered'])
 	{
 		state.selection.selectedId = getters.nextItemId(id);
@@ -592,6 +593,7 @@ doneEdit ({state, commit, dispatch, getters},
 {
 	console.log('Done edit!');
 	dispatch('blockBlur');
+	preventKeydownListener();
 	if (getters.mobile){ store.$refs['edit-item-modal-'+id].close(); }
 	let item = state.nodes[id];
 	commit('updateState',{ editingItem:null });
@@ -805,28 +807,27 @@ unindent ({state, commit, dispatch, getters},
 	dispatch('giveNewParent', { id, new_parent_id });
 },
 selectItem ({state, commit, dispatch, getters},
-	{id, direction} = {})
+	{id = state.selection.selectedId, direction} = {id:state.selection.selectedId})
 {
-	id = (id) ? id : state.selection.selectedId;
 	let nextSelectedId;
 	if (!direction)
 	{
 		nextSelectedId = id;
-	} else
-	if (direction == 'next')
+	}
+	else if (direction == 'next')
 	{
 		if (!id || id == state.root.id)
 		{
-			nextSelectedId = vm.$refs.root.childrenOrder[0];
+			nextSelectedId = getters.filteredIdsTree[0];
 		} else {
 			nextSelectedId = getters.nextItemId(id);
 		}
-	} else
-	if (direction == 'prev') {
+	}
+	else if (direction == 'prev') {
 		if (!id || id == state.root.id)
 		{
-			let l = vm.$refs.root.childrenOrder.length;
-			nextSelectedId = vm.$refs.root.childrenOrder[l-1];
+			let toplvlItems = getters.filteredIdsTree;
+			nextSelectedId = toplvlItems[toplvlItems.length-1];
 		} else {
 			nextSelectedId = getters.prevItemId(id);
 		}
@@ -839,7 +840,14 @@ setToday ({state, commit, dispatch, getters},
 {
 	id = (id) ? id : state.selection.selectedId;
 	if (!id){ return; }
-	if (getters.hasParentDueToday(id)){ console.log('parent is already due'); return; }
+	let item = state.nodes[id];
+	if (!item){ return; }
+	if (getters.hasParentDueToday(id)
+		&& item.due_date == '0000-00-00 00:00:00')
+	{
+		console.log('parent is already due');
+		return;
+	}
 	dispatch('setDueDate', {id});
 },
 setTomorrow ({state, commit, dispatch, getters},
@@ -1108,7 +1116,7 @@ filterItems ({state, commit, dispatch, getters},
 	}
 	dispatch('selection/addKeywords', { keyword, value, operator });
 },
-removeFilter ({state, commit, dispatch, getters},
+removeHiddenTag ({state, commit, dispatch, getters},
 	{tag} = {})
 {
 	state.selection.hiddenTags = state.selection.hiddenTags.filter(x => x !== tag);

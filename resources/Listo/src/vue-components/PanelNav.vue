@@ -85,7 +85,7 @@ export default {
 			}
 			if (menu == 'Journal')
 			{
-				this.dispatch('filterItems', { keyword:'journal', event})
+				this.dispatch('filterItems', { keyword:'journal', value:new Date(), event})
 			}
 
 		},

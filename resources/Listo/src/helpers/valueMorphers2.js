@@ -99,8 +99,11 @@ function customCalendar(val)
 {
   	val = new Date(val);
 	let relativeTime = formatRelative(val, new Date(), {addSuffix: true});
-  	return relativeTime.substring(0, relativeTime.indexOf(' at'));
-
+  	if (relativeTime.includes('at'))
+  	{
+		relativeTime = relativeTime.substring(0, relativeTime.indexOf(' at'));
+  	}
+  	return relativeTime;
 }
 // function linkify(val)
 // {

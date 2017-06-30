@@ -2,7 +2,7 @@
 <div
 	:class="{
 		'items-card': true,
-		'journal-wrapper': journalView
+		'journal-wrapper': state.selection.view == 'journal'
 	}"
 >
 <!-- day-card-wrapper -->
@@ -30,18 +30,9 @@
 			<span class="o-pill--used-time">{{ sec_to_hourmin(get.totalUsedSec(item)) }}</span>
 		</div>
 	</div>
-	<div
-		class="c-subsection-head"
-		v-if="journalParentString"
-		@click="selectItem"
-	>
-		<div class="c-subsection-head__text">
-			{{ journalParentString }}
-		</div>
-	</div>
 	<!-- _|CHILDREN -->
 	<div
-		class="l-journal-day-children"
+		class="c-journal-day-children"
 		v-if="item.children.length"
 		v-show="item.show_children"
 	>
@@ -51,7 +42,6 @@
 			v-for="childCard in item.children"
 			:item="childCard"
 			:key="childCard.id"
-			:parent-tags="[]"
 		></Card>
 	</div>
 	<!-- CHILDREN|_ -->
@@ -79,37 +69,6 @@ export default {
 		journalDate(){ return this.get.journalDate(this.item) },
 /* \ ============================================== / *\
 \* / ============================================== \ */
-		journalView()
-		{ if (!this.item){ return; }
-			if (this.state.selection.view == 'journal'){
-				return true;
-			} else { return false; }
-		},
-		journalParentString()
-		{ if (!this.item){ return; }
-			// console.log('run on '+this.item.id+' - '+this.item.body);
-			if (this.state.selection.view != 'journal'){ return false; }
-			if (this.journalView && !this.item.journalDate){
-				if (this.item.depth == 0){ return; }
-				let prevId = null;
-				let parentString = this.item.parents_bodies;
-				if (!this.state.nodes[prevId]){ return; }
-				let prevParentString = this.state.nodes[prevId].parents_bodies;
-
-				let prevDoneDate = this.state.nodes[prevId].done_date;
-				prevDoneDate = format(new Date(prevDoneDate), 'YYYY/MM/DD');
-				let thisDoneDate = format(new Date(this.item.done_date), 'YYYY/MM/DD');
-
-				if (
-					parentString
-					&& ( parentString != prevParentString
-						|| thisDoneDate != prevDoneDate ) )
-				{
-					return parentString;
-				}
-			}
-			return false;
-		},
 	},
 	methods: {
 		customCalendar,
@@ -122,17 +81,17 @@ export default {
 </script>
 <style lang="scss">
 @import '../css/_variables.scss';
-.l-journal-day-children{
+.c-journal-day-children{
     width: 100%;
     margin-left: 0;
+    border-bottom: 1px solid #ededed;
+    padding-bottom: 0.7rem;
 }
 .c-section-head{
-    border-top: 1px solid #ededed;
     color: #46c5b6;
     font-size: 1.2em;
     text-align: left;
-    padding: 0.5em 0;
-    margin-top: 0.7em;
+    margin-top: 1rem;
     display: flex;
     flex-wrap: wrap;
     width: 100%;
@@ -142,16 +101,6 @@ export default {
     color: #dadada;
     font-size: 0.8em;
     margin-left: 0.5em;
-}
-.c-subsection-head{
-    margin-bottom: 1px;
-}
-.c-subsection-head__text{
-    border: 1px solid;
-    display: initial;
-    padding: 0em 0.5em;
-    border-top: none;
-    border-left: none;
 }
 .c-journal-used-time{
     @include text-settings();

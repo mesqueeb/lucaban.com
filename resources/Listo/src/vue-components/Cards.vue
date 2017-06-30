@@ -23,14 +23,12 @@
 			v-for="childCard in get.filteredItemsTree"
 			:item="childCard"
 			:key="childCard.id"
-			:parent-tags="[]"
 		></Card>
 		<Journal-Day
 			v-if="state.selection.view == 'journal'"
 			v-for="childCard in get.filteredItemsJournal"
 			:item="childCard"
 			:key="childCard.id"
-			:parent-tags="[]"			
 		></Journal-Day>
 	</div>
 	<!-- CHILDREN|_ -->

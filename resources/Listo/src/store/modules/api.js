@@ -1,5 +1,5 @@
 import {
-	Utilities, hasClass, mobilecheck, isElementInViewport, objectToArray, uniqBy, uniq, arrayToString, sortObjectArrayByProperty, sortObjectArrayByTwoProperties, removeEmptyValuesFromArray
+	arrayToString, removeEmptyValuesFromArray
 } from '../../helpers/globalFunctions.js'
 import organizeData from '../fetchedDataOrganizer.js'
 import axios from 'axios'
@@ -59,7 +59,7 @@ export default {
 			commit('updateState', { orphans:userData.orphans });
 			commit('updateState', { root:userData.root });
 			commit('updateState', { nodes:userData.nodes });
-			// dispatch('sortAllChildren');
+			dispatch('sortAllChildren');
 		},
 		getUser ({dispatch, commit})
 		{
@@ -209,13 +209,12 @@ export default {
 				}
 				// clean up and add as nodes
 				data.forEach(item => {
-					item = getters.setDefaultItemValues(item)
-					if (!rootState.nodes[item.id]){ rootState.nodes[item.id] = item; }
-				});
-				// Codementor
+					dispatch('addAndCleanNodesRecursively', {item});
+				})
 				rootState.selection.view = null;
 				rootState.selection.view = 'journal';
 				rootState.loading = false;
+				// Codementor
 			});
 		},
 		postNewItem ({rootState, dispatch, getters},

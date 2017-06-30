@@ -266,7 +266,7 @@ export default {
         	item = (item) ? item : (this.timer[0]) ? this.timer[0] : null ;
         	if(!item){ console.log('no timer item'); return; }
         	// console.log(item);
-        	console.log("timer started: "+new Date().formatDate('HH:mm:ss'));
+        	console.log("timer started: "+formatDate(new Date(),'HH:mm:ss'));
         	this.timerRunning = true;
 			let update = function(){
 				if(item.planned_time>0)
@@ -282,7 +282,7 @@ export default {
 		},
 		pauseTimer(item)
 		{
-        	console.log("timer paused: "+new Date().formatDate('HH:mm:ss'));
+        	console.log("timer paused: "+formatDate(new Date(), 'HH:mm:ss'));
 			this.timerRunning = false;
 			if (!window.timers) { return; }
 			if (!window.timers[item.id]) { return; }
@@ -297,13 +297,13 @@ export default {
 		},
 		resetTimer(item)
 		{
-        	console.log("timer reset: "+new Date().formatDate('HH:mm:ss'));
+        	console.log("timer reset: "+formatDate(new Date(), 'HH:mm:ss'));
 			item.used_time = 0;
 			this.dispatch('patch', {id:item.id, field:'used_time'});
 		},
 		closeTimer(item)
 		{
-        	console.log("timer closed: "+new Date().formatDate('HH:mm:ss'));
+        	console.log("timer closed: "+formatDate(new Date(), 'HH:mm:ss'));
 			if (window.timers && window.timers[item.id])
 			{
 				clearInterval(window.timers[item.id]);

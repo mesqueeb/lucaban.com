@@ -1,8 +1,4 @@
 import { differenceInCalendarDays } from 'date-fns/esm'
-// we import all of `date`
-import { date } from 'quasar'
-// destructuring to keep only what is needed
-const { getDateDiff } = date;
 
 export default {
 	namespaced: true,
@@ -106,7 +102,8 @@ export default {
 				if (keyword == 'journal')
 				{
 					state.view = 'journal';
-				} else if (value) {
+					state.filter.doneDate.to = value;
+				} else {
 					state.view = 'tree';
 				}
 				if (keyword == 'duedate')
@@ -151,7 +148,7 @@ export default {
 				|| state.filter.doneDate.to != null;
 		},
 		dueTodayFiltered: (state) => {
-			return (getDateDiff(state.filter.dueDate.to, new Date(), 'days') == 0);
+			return (differenceInCalendarDays(state.filter.dueDate.to, new Date())== 0);
 		},
 		getHiddenItemsTotalUsedTime: (state, getters) => {
 			if(!state.hiddenItems.length){ return 0; }
@@ -200,7 +197,7 @@ export default {
 			if (getters.dueTodayFiltered)
 			{
 				let isDueToday = rootGetters.isDueToday(id);
-				hasParentDueToday = rootGetters.hasParentDueToday(id);
+				let hasParentDueToday = rootGetters.hasParentDueToday(id);
 				if (flat)
 				{
 				passedTest = (isDueToday || hasParentDueToday) ? true : false;

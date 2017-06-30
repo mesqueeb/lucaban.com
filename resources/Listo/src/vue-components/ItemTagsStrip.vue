@@ -91,7 +91,11 @@ export default {
 			{
 				return this.get.tagsArray(this.get['newItem/parent_id']);
 			} else {
-				return this.get.tagsArray(this.item.parent_id);
+				if (this.get.filteredIdsFlat.includes(this.item.parent_id))
+				{
+					return this.get.tagsArray(this.item.parent_id);
+				}
+				return [];
 			}
 		},
 		secLeft(){ return this.get.secLeft(this.item.id) },

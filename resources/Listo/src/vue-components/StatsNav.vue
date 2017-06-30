@@ -1,14 +1,27 @@
 <template>
 <div>
 	<div class="c-panel-title">
-		<!-- NEEDS TO BE ADDED BACK IN: c-panel__title- -scrolled-down -->
-		<div class="c-panel-title__top-row">
+		<div class="c-panel-title__tags">
 			<span v-if="get['selection/noFilterOrTag']">{{ text.menu.all }}</span>
 			<span v-if="get['selection/dueTodayFiltered']">{{ text.menu.today }}</span>
-			<span v-if="selection.tags.length" v-for="tag in selection.tags">{{ tag }}</span>
+			<span
+				class="c-panel-title__tag"
+				v-if="selection.tags.length"
+				v-for="(tag, index) in selection.tags"
+				@click="dispatch('filterItems', { keyword:'tag', value:tag, event:$event })"
+			>
+				{{ tagSlugToName(tag) }}<span v-if="index+1 != selection.tags.length" class="c-panel-title__selection-divider">, </span>
+			</span>
 		</div>
 		<div class="c-panel-title__hidden-tags">
-			<span v-if="selection.hiddenTags.length" v-for="hiddenTag in selection.hiddenTags">{{ hiddenTag }}</span>
+			<span
+				class="c-panel-title__hidden-tag"
+				v-if="selection.hiddenTags.length"
+				v-for="(hiddenTag, index) in selection.hiddenTags"
+				@click="dispatch('removeHiddenTag', { tag:hiddenTag })"
+			>
+				{{ tagSlugToName(hiddenTag) }}<span v-if="index+1 != selection.hiddenTags.length" class="c-panel-title__selection-divider">, </span>
+			</span>
 		</div>
 	</div>
 	<!-- PANEL__TITLE|_ -->
@@ -34,8 +47,9 @@
 				<div class="c-stats__done-children-amount">{{ get.doneItemAmount }}</div>
 			</div>
 		</div>
-		<div v-if="selection.view != 'journal' && this.get.filteredIdsFlat.length">
+		<div style="min-width:2rem">
 			<button
+				v-if="selection.view != 'journal' && this.get.filteredIdsFlat.length"
 				class="o-btn c-stats__copy-btn"
 				v-btn-effect
 				v-clipboard:copy="get.clipboardText(state.root.id)"
@@ -81,21 +95,24 @@ export default {
     font-size: 1.2em;
     padding: 6px 0 0;
 }
+.c-panel-title__tags{
+
+}
+.c-panel-title__tag{
+	cursor:pointer;
+}
+.c-panel-title__tag:hover{
+    color:$dark-gray;
+}
 .c-panel-title__hidden-tags{
+}
+.c-panel-title__hidden-tag{
     text-decoration: line-through;
+	cursor:pointer;
 }
-.c-panel-title--scrolled-down{
-    position: fixed;
-    top: 0;
-    left: 0;
-    background: rgba(255, 255, 255, 0.9);
-    width: 100vw;
-    align-content: inherit;
-    z-index: 4;
-}
-.c-panel-title__top-row{
-    display: flex;
-    justify-content: center;
+.c-panel-title__hidden-tag:hover{
+    text-decoration: none;
+    color:$dark-gray;
 }
 .c-panel__stats{
     display: flex;
@@ -130,10 +147,10 @@ export default {
 .c-stats__done-children-amount{
     background-color: $done-color;
 }
-.c-panel__stats--scrolled-down{
-    margin-top: 26px;
-}
 .c-stats__copy-btn{
 	padding-top: 0.18em;
+}
+.c-panel-title__selection-divider{
+	padding-right: 0.2em;
 }
 </style>

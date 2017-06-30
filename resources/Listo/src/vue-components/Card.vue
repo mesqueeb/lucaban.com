@@ -11,8 +11,17 @@
 <div 
 	class="d-flex flex-wrap"
 >
+	<div
+		class="c-subsection-head"
+		v-if="journalParentString && state.selection.view == 'journal'"
+		@click="selectItem"
+	>
+		<div class="c-subsection-head__text">
+			{{ journalParentString }}
+		</div>
+	</div>
 	<div 
-		v-if="item.depth != 0 && !(state.selection.view == 'journal' && journalDate)"
+		v-if="item.depth != 0"
 		v-show="item.id != state.editingItem || get.mobile"
 		:id="'item-body-'+item.id"
 		:class="{
@@ -20,6 +29,7 @@
 			'show_children': item.show_children,
 		}"
 	>
+
 		<!-- _|ITEM-TOGGLES -->
 		<Item-Toggles :item="item"></Item-Toggles>
 		<!-- ITEM-TOGGLES|_ -->
@@ -76,7 +86,6 @@
 			v-for="childCard in visibleDirectChildren"
 			:item="childCard"
 			:key="childCard.id"
-			:parent-tags="tagsArray"
 		></Card>
 	</div>
 	<!-- CHILDREN|_ -->
@@ -100,12 +109,6 @@ export default {
 		ItemNav, ItemToggles, ItemEditAddWrapper, ItemTagsStrip, ItemAddTag, JournalDay
 	},
 	data(){ return {} },
-	rendered()
-	{
-		console.log(this.item);
-	},
-	mounted()
-	{	},
 	computed: {
 		id(){ return this.item.id },
  /* \ ============================================== / *\
@@ -113,13 +116,8 @@ export default {
  \* / ============================================== \ */
 		get(){ return this.$store.getters },
 		state(){ return this.$store.state },
-		l(){ return this.get.language },
 		visibleDirectChildren(){ return this.get.visibleDirectChildren(this.id) },
-		childrenOrder(){ return this.get.childrenOrder(this.id) },
 		isProject(){ return this.get.isProject(this.id) },
-		journalDate(){ return this.get.journalDate(this.item) },
-		tagsArray(){ return this.get.tagsArray(this.id) },
-		parentTags(){ return this.get.tagsArray(this.item.parent_id) },
 /* \ ============================================== / *\
 \* / ============================================== \ */
 		listIsEmpty()
@@ -133,23 +131,31 @@ export default {
 			return ((this.state.addingNewUnder == this.item.id)
 				|| (this.listIsEmpty && !this.mobile && this.state.selection.view != 'journal'));
 		},
-		visiblePrevItemId()
+		journalParentString()
 		{
-			if (!this.item){ return; }
-			let parentId = this.item.parent_id;
-			if (!parentId || this.state.nodes[parentId]){ return; }
-			
-			let index = this.get.childrenOrder(parentId).indexOf(this.item.id);
-			if (index == 0){ return this.state.root.id; }
-			let prevId = this.get.childrenOrder(parentId)[index-1];
-			// if(prevId != this.get.prevItemId(this.item.id))
-			// {
-			// 	console.info(`getters.prevItemId(${this.item.id}) != visiblePrevItemId
-			// 		visiblePrevItemId = ${prevId}
-			// 		prevItemId = ${this.get.prevItemId(this.item.id)}
-			// 		`);
-			// }
-			return prevId;
+			return this.item.parents_bodies;
+			// console.log('run on '+this.item.id+' - '+this.item.body);
+			if (this.state.selection.view != 'journal'){ return false; }
+			if (this.journalView && !this.item.journalDate){
+				if (this.item.depth == 0){ return; }
+				let prevId = null;
+				let parentString = this.item.parents_bodies;
+				if (!this.state.nodes[prevId]){ return; }
+				let prevParentString = this.state.nodes[prevId].parents_bodies;
+
+				let prevDoneDate = this.state.nodes[prevId].done_date;
+				prevDoneDate = format(new Date(prevDoneDate), 'YYYY/MM/DD');
+				let thisDoneDate = format(new Date(this.item.done_date), 'YYYY/MM/DD');
+
+				if (
+					parentString
+					&& ( parentString != prevParentString
+						|| thisDoneDate != prevDoneDate ) )
+				{
+					return parentString;
+				}
+			}
+			return false;
 		},
 	},
 	methods: {
@@ -247,5 +253,14 @@ export default {
         padding: 2px 0 0 2em;
     }
 }
-
+.c-subsection-head{
+    margin-bottom: 1px;
+}
+.c-subsection-head__text{
+    border: 1px solid;
+    display: initial;
+    padding: 0em 0.5em;
+    border-top: none;
+    border-left: none;
+}
 </style>

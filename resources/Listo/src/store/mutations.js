@@ -64,7 +64,7 @@ resetNewItem(state)
 },
 addNode(state, { item })
 {
-	state.nodes[item.id] = item;
+	vm.$set(state.nodes,item.id,item);
 },
 addChild(state, { newParentId, index, item })
 {

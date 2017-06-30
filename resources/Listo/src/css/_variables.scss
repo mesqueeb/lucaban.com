@@ -11,9 +11,10 @@ $used-time-color: #5d67b3;
 $border-gray: #ededed;
 $light-gray: #e6e6e6;
 $gray: #d9d9d9;
-$dark-gray: #5a5a5a;
+$mid-gray: #ababab;
+$dark-gray: #696969;
+$text-gray: #4d4d4d;
 
-$mid-grey: #ababab;
 $sepia-background:#f5f2eb;
 $sepia-brown:#a59174;
 $sepia-grey:#c0b2b4;
@@ -31,7 +32,7 @@ $font-family-base:        $font-family-sans-serif !default;
 // Check Bootstrap/scss for this variable.
 @mixin text-settings() {
     font-family: $font-family-base;
-    color: #4d4d4d;
+    color: $text-gray;
     font-weight: 300;
     -webkit-font-smoothing: antialiased;
     -moz-font-smoothing: antialiased;

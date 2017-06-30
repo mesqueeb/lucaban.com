@@ -115,7 +115,7 @@ export default {
 				this.commit('updateState', {addingNewAsChild:true});
 				return;
 			}
-			let lastChildId = this.get.getLastChildId(this.state.addingNewUnder);
+			let lastChildId = this.get.findDeepestVisibleChild(this.state.addingNewUnder);
     		this.dispatch('showAddNewItem', { id:lastChildId });
 		},
 		newItemUnindent()
