@@ -4,51 +4,15 @@
 	:id="'card-'+item.id"
 	:class="{
 		'items-card': true,
-		'journal-wrapper': journalView
+		'journal-wrapper': state.selection.view == 'journal'
 	}"
 >
 <!-- item-card-wrapper -->
 <div 
 	class="d-flex flex-wrap"
-	v-if="listIsEmpty"
 >
-
-	<div
-		class="c-section-head"
-		v-if="journalDate && item.journalDate"
-	>
-		<!-- Codementor: Is this the correct way to format something like this? -->
-		<span>{{ customCalendar(journalDate) }}</span>
-		<span class="c-section-head__subtitle" v-if="journalDate != customCalendar(journalDate)">
-			{{ journalDate }}
-		</span>
-		<button
-			class="o-btn ml-auto"
-			v-btn-effect
-			v-clipboard:copy="get.clipboardTextJournal(item)"
-			v-clipboard:success="dispatch('clipboardSuccess')"
-			v-clipboard:error="dispatch('clipboardError')"
-			v-if="true"
-		>
-			{{ get.text.card.copy }}
-		</button>
-		<div class="w-100 d-flex" v-if="sec_to_hourmin(get.totalUsedSec(item))">
-			<span class="c-journal-used-time">{{ get.text.menu.usedTime }}: </span>
-			<span class="o-pill--used-time">{{ sec_to_hourmin(get.totalUsedSec(item)) }}</span>
-		</div>
-	</div>
-		<!-- v-if="journalView && item.depth != 0 && item.parents_bodies" -->
-	<div
-		class="c-subsection-head"
-		v-if="journalParentString"
-		@click="selectItem"
-	>
-		<div class="c-subsection-head__text">
-			{{ journalParentString }}
-		</div>
-	</div>
 	<div 
-		v-if="item.depth != 0 && !(journalView && journalDate)"
+		v-if="item.depth != 0 && !(state.selection.view == 'journal' && journalDate)"
 		v-show="item.id != state.editingItem || get.mobile"
 		:id="'item-body-'+item.id"
 		:class="{
@@ -77,7 +41,7 @@
 					}"
 			>
 				<div :class="{
-					'u-lightgray':item.temp,
+					'u-lightgray':(item.temp && get.loggedIn),
 					'c-body-text--done': item.done
 					}"
 				>{{ item.body }}</div>
@@ -108,15 +72,8 @@
 	>
 		<!-- :style="(state.addingNewAsFirstChild)?'order:3;':''" -->
 		<Card
-			v-if="!item.journalDate"
+			v-if="state.selection.view != 'journal'"
 			v-for="childCard in visibleDirectChildren"
-			:item="childCard"
-			:key="childCard.id"
-			:parent-tags="tagsArray"
-		></Card>
-		<Card
-			v-if="item.journalDate"
-			v-for="childCard in item.children"
 			:item="childCard"
 			:key="childCard.id"
 			:parent-tags="tagsArray"
@@ -128,31 +85,27 @@
 </div>
 </template>
 <script>
-import { format } from 'date-fns/esm'
-import { customCalendar, sec_to_hourmin } from '../helpers/valueMorphers2.js';
-// import flatPickConfig from '../components/flatPickrOptions.js';
-import { uniq, Utilities } from '../helpers/globalFunctions.js';
-import Clipboard from 'clipboard';
 import ItemNav from './ItemNav.vue';
 import ItemToggles from './ItemToggles.vue';
 import ItemEditAddWrapper from './ItemEditAddWrapper.vue';
-import ItemEditAddBox from './ItemEditAddBox.vue';
 import ItemAddTag from './ItemAddTag.vue';
 import ItemTagsStrip from './ItemTagsStrip.vue';
+import JournalDay from './JournalDay.vue';
 
 export default {
 	name: 'Card',
 	template:'#items-card-template',
 	props: ['item'],
 	components: {
-		ItemNav, ItemToggles, ItemEditAddWrapper, ItemEditAddBox, ItemTagsStrip, ItemAddTag
+		ItemNav, ItemToggles, ItemEditAddWrapper, ItemTagsStrip, ItemAddTag, JournalDay
 	},
 	data(){ return {} },
-	mounted()
+	rendered()
 	{
-		// this.convertbodyURLtoHTML();
-		if (this.listIsEmpty){ this.commit( 'updateState', { addingNewEmptyList:true }); }
+		console.log(this.item);
 	},
+	mounted()
+	{	},
 	computed: {
 		id(){ return this.item.id },
  /* \ ============================================== / *\
@@ -180,37 +133,6 @@ export default {
 			return ((this.state.addingNewUnder == this.item.id)
 				|| (this.listIsEmpty && !this.mobile && this.state.selection.view != 'journal'));
 		},
-		journalView()
-		{ if (!this.item){ return; }
-			if (this.state.selection.view == 'journal'){
-				return true;
-			} else { return false; }
-		},
-		journalParentString()
-		{ if (!this.item){ return; }
-			// console.log('run on '+this.item.id+' - '+this.item.body);
-			if (this.state.selection.view != 'journal'){ return false; }
-			if (this.journalView && !this.item.journalDate){
-				if (this.item.depth == 0){ return; }
-				let prevId = this.visiblePrevItemId;
-				let parentString = this.item.parents_bodies;
-				if (!this.state.nodes[prevId]){ return; }
-				let prevParentString = this.state.nodes[prevId].parents_bodies;
-
-				let prevDoneDate = this.state.nodes[prevId].done_date;
-				prevDoneDate = format(new Date(prevDoneDate), 'YYYY/MM/DD');
-				let thisDoneDate = format(new Date(this.item.done_date), 'YYYY/MM/DD');
-
-				if (
-					parentString
-					&& ( parentString != prevParentString
-						|| thisDoneDate != prevDoneDate ) )
-				{
-					return parentString;
-				}
-			}
-			return false;
-		},
 		visiblePrevItemId()
 		{
 			if (!this.item){ return; }
@@ -231,8 +153,6 @@ export default {
 		},
 	},
 	methods: {
-		customCalendar,
-		sec_to_hourmin,
 		commit(action, payload){ this.$store.commit(action, payload); },
 		dispatch(action, payload){ this.$store.dispatch(action, payload); },
 		
@@ -268,33 +188,6 @@ export default {
     display: flex;
     align-items: center;
 }
-.c-section-head{
-    border-top: 1px solid #ededed;
-    color: #46c5b6;
-    font-size: 1.2em;
-    text-align: left;
-    padding: 0.5em 0;
-    margin-top: 0.7em;
-    display: flex;
-    flex-wrap: wrap;
-    width: 100%;
-    align-items: baseline;
-}
-.c-section-head__subtitle{
-    color: #dadada;
-    font-size: 0.8em;
-    margin-left: 0.5em;
-}
-.c-subsection-head{
-    margin-bottom: 1px;
-}
-.c-subsection-head__text{
-    border: 1px solid;
-    display: initial;
-    padding: 0em 0.5em;
-    border-top: none;
-    border-left: none;
-}
 .c-body-div{
     border-bottom: thin solid $border-gray;
     width: 100%;
@@ -327,10 +220,6 @@ export default {
 	    text-decoration: line-through;
 	}
 }
-.c-journal-used-time{
-    @include text-settings();
-    margin-right: 0.3em;
-}
 .l-completion-notes{
     padding: 2px 0 0 2em;
     width: 100%;
@@ -340,10 +229,6 @@ export default {
     background: none !important;
 }
 .journal-wrapper {
-    >div>.l-children>div:first-child .c-section-head {
-        border-top: none;
-        margin-top: 0;
-    }
     .l-children {
         margin-left: 0;
     }

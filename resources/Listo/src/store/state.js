@@ -25,8 +25,15 @@ let initialItem = {
     parents_bodies: "",
     tagged: [],
 }
+let secondItem = JSON.parse(JSON.stringify(initialItem));
+secondItem.id = 'y';
+secondItem.depth = 1;
+secondItem.body = 'thhe test body';
+initialItem.children.push(secondItem);
+initialItem.children_order.push(secondItem.id);
 let nodes = {}
 nodes[initialItem.id] = initialItem;
+nodes[secondItem.id] = secondItem;
 
 export default {
     languageContents,

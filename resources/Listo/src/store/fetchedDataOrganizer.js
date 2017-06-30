@@ -2,6 +2,7 @@
 function setDefaultItemValues(item)
 {
 	// item.parent_id_backup = item.parent_id;
+	if (!item) { console.log('item undefffff');}
 	item.depth = Number(item.depth);
 	if(item.show_children == null){ item.show_children = 1 		 }
 	if(!item.children)	{ item.children = []					 }
@@ -29,9 +30,9 @@ function makeNode (item, returnedObject)
 	else { returnedObject.orphans.push(node); }
 	returnedObject.nodes[node.id] = node;
 }
-function initializeState (fetchedData)
+export default function organizeData (fetchedData)
 {
-	console.log(`initializeState() with fetchedData ↓`);
+	console.log(`organizeData() with fetchedData ↓`);
 	console.log(fetchedData);
 	if (!fetchedData){ return; }
 
@@ -44,4 +45,3 @@ function initializeState (fetchedData)
 
 	return returnedObject;
 }
-export { initializeState };

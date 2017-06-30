@@ -265,7 +265,8 @@ findDeepestVisibleChild: (state, getters) =>
 (id = state.selection.selectedId) => {
 	// console.log('running findDeepestVisibleChild');
 	let item = state.nodes[id];
-	let children = item.children.filter(child => getters.filteredItemsFlat.includes(child.id));
+	if (!item){ return false; }
+	let children = item.children.filter(child => getters.filteredIdsFlat.includes(child.id));
 	if (!children.length) { return id; }
 	let deepestId = children[children.length-1].id;
 	return getters.findDeepestVisibleChild(deepestId);
@@ -385,11 +386,8 @@ isTopLvlItemInFilteredRoot: (state, getters) =>
 	if (id == state.root.id)
 	{
 		return true;
-	} else if (getters.childrenOrder(state.root.id).includes(id)) {
-		return true;
-	} else {
-		return false;
 	}
+	return getters.filteredIdsTree.includes(id);
 },
 hasParentDueToday: (state, getters) =>
 (id) => {
@@ -589,15 +587,7 @@ noItems: (state, getters) => {
 	return false;
 },
 filteredItems: (state, getters) => {
-	// if (getters.noItems){ return []; }
-	if (state.selection.view == 'tree')
-	{
-		return getters.filteredItemsTree;
-	}
-	else if (state.selection.view == 'journal')
-	{
-		return getters.filteredItemsJournal;
-	}
+	return getters.filteredItemsTree;
 },
 filteredItemsJournal: (state, getters) => {
 	if (state.selection.view != 'journal'){ return []; }
@@ -631,13 +621,14 @@ journalDates: (state, getters) => {
 filteredIdsFlat: (state, getters) => {
 	let ids = [];
 	console.log('running filteredIdsFlat');
+	let allNodes = Object.keys(state.nodes).map(k => (Number(k)) ? Number(k) : k);
 	if (getters['selection/noFilterOrTag'])
 	{
-		ids = Object.keys(state.nodes).filter(id => id != state.root.id);
+		ids = allNodes.filter(id => id != state.root.id);
 	}
 	else
 	{
-		ids = Object.keys(state.nodes).filter(id => {
+		ids = allNodes.filter(id => {
 			return getters['selection/testAgainstAllSelection'](id, { flat:true })
 		});
 	}
@@ -661,7 +652,7 @@ filteredIdsTree: (state, getters) => {
 	}
 	else
 	{
-		ids = Object.keys(state.nodes).filter(id => {
+		ids = Object.keys(state.nodes).map(k => (Number(k)) ? Number(k) : k).filter(id => {
 			return getters['selection/testAgainstAllSelection'](id, { flat:false })
 		});
 	}
@@ -691,7 +682,7 @@ allVisibleChildItems: (state, getters) =>
 (id) => {
 	let children = getters.visibleDirectChildren(id);
 	let flattenedTree = getters.flattenTree(children);
-	let visibleChildren = flattenedTree.filter(child => getters.filteredItemsFlat.includes(child.id));
+	let visibleChildren = flattenedTree.filter(child => getters.filteredIdsFlat.includes(child.id));
 	return visibleChildren;
 },
 visibleDirectChildren: (state, getters) =>
@@ -703,7 +694,7 @@ visibleDirectChildren: (state, getters) =>
 	let item = state.nodes[id];
 	if (!item || !item.children.length){ return []; }
 
-	return item.children.filter(child => getters.filteredItemsFlat.includes(child.id));
+	return item.children.filter(child => getters.filteredIdsFlat.includes(child.id));
 },
 flattenTree: (state, getters) =>
 (array) => {
@@ -917,19 +908,12 @@ doneItemAmount: (state, getters) => {
 },
 lastItems: (state, getters) => {
 	if (getters.noItems ){ return []; }
-	let lastChild = getters.topLvlItems[getters.topLvlItems.length-1];
+	let lastChild = getters.filteredIdsTree[getters.filteredIdsTree.length-1];
 	let deepestChild = getters.findDeepestVisibleChild(lastChild);
 	return [lastChild, deepestChild];
 },
 firstItem: (state, getters) => {
 	if (getters.noItems){ return null; }
-	return getters.topLvlItems[0];
+	return getters.filteredIdsTree[0];
 },
-topLvlItems: (state, getters) => {
-	if (getters.noItems){ return []; }
-	console.log('getters.filteredItemsTree in toplvlitems');
-	console.log(getters.filteredItemsTree);
-	return getters.filteredItemsTree.map(i => i.id);
-},
-
 }

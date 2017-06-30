@@ -4,8 +4,8 @@
 		@click="dispatch('unindent')"
 		:class="{
 			'o-btn':true,
-			'u-disabled':(get.topLvlItems.includes(selection.selectedId))}"
-		:disabled="get.topLvlItems.includes(selection.selectedId)"
+			'u-disabled':(get.filteredIdsTree.includes(selection.selectedId))}"
+		:disabled="get.filteredIdsTree.includes(selection.selectedId)"
 	>
 		<q-icon name="ion-android-arrow-dropleft-circle" />
 	</button>

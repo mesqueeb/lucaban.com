@@ -48,19 +48,12 @@ export default {
 	{
 		get(){ return this.$store.getters },
 		state(){ return this.$store.state },
-		visibleDirectChildren(){ return this.get.visibleDirectChildren(this.item.id) },
-		listIsEmpty()
-		{
-			if (!this.item || !this.state.root){ return false; }
-			if (this.item.id != this.state.root.id){ return false; }
-			if (!this.visibleDirectChildren.length){ return true; }
-		},
 		showAddNewBox()
 		{
 			return (
 				(this.state.addingNewUnder
 					&& this.state.addingNewUnder == this.item.id)
-				|| (this.listIsEmpty && !this.mobile && this.state.selection.view != 'journal'));
+				|| (!this.get.filteredIdsFlat.length && !this.mobile && this.state.selection.view != 'journal'));
 		},
 		showEditBox()
 		{

@@ -9,9 +9,9 @@
 	<div class="u-line"></div>	
 	<Stats-Nav></Stats-Nav>
 	<div class="layout-view c-content-wrapper">
-		<Card :item="state.root"
+		<Cards :item="state.root"
 			ref="root"
-		></Card>
+		></Cards>
  	</div>
 	
 	<div class="c-bottom-hint"
@@ -24,7 +24,7 @@
 
 <script>
 // components:
-import Card from '../vue-components/Card.vue'
+import Cards from '../vue-components/Cards.vue'
 import TagsNav from '../vue-components/TagsNav.vue'
 import StatsNav from '../vue-components/StatsNav.vue'
 import ItemEditAddBox from '../vue-components/ItemEditAddBox.vue'
@@ -34,7 +34,7 @@ export default {
 		TagsNav,
 		StatsNav,
 		ItemEditAddBox,
-		Card,
+		Cards,
 	},
 	mounted() {
 		if (!store.$refs) { store.$refs = {} }

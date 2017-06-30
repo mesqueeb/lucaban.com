@@ -182,7 +182,7 @@ export default {
 				let hasHiddenTags = state.hiddenTags.some(tag => rootGetters.hasTag(id, tag));
 				let hasParentWithTag = state.tags.every(tag => rootGetters.hasParentWithTag(id, tag));
 				// IF I ever make an 'OR' selector:
-				// hasParentWithTag = state.selection.tags.some(tag => getters.hasParentWithTag(item.id, tag));				
+				// hasParentWithTag = state.tags.some(tag => getters.hasParentWithTag(item.id, tag));				
 				if (flat)
 				{
 					passedTest = (hasAllTags && !hasHiddenTags) ? true : false;
@@ -248,7 +248,7 @@ export default {
 				let passedTagTest = getters.testAgainstTagSelection(id);
 				let passedDoneTest = getters.testAgainstDoneSelection(id);
 				let passedHiddenItemsTest = getters.testAgainstHiddenItems(id);
-				if (state.selection.tags.length && getters.dueTodayFiltered)
+				if (state.tags.length && getters.dueTodayFiltered)
 				{
 					passedAllTests = ( passedTagTest
 									&& getters.testAgainstDueDateSelection(id, {flat:true})

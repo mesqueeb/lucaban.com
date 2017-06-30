@@ -5,10 +5,10 @@
 		<div class="c-panel-title__top-row">
 			<span v-if="get['selection/noFilterOrTag']">{{ text.menu.all }}</span>
 			<span v-if="get['selection/dueTodayFiltered']">{{ text.menu.today }}</span>
-			<span v-if="selection.tags.length" v-for="sel in get.selectionTags">{{ sel }}</span>
+			<span v-if="selection.tags.length" v-for="tag in selection.tags">{{ tag }}</span>
 		</div>
 		<div class="c-panel-title__hidden-tags">
-			<span v-if="selection.hiddenTags.length" v-for="hidden in get.selectionHiddenTags">{{ get.hidden }}</span>
+			<span v-if="selection.hiddenTags.length" v-for="hiddenTag in selection.hiddenTags">{{ hiddenTag }}</span>
 		</div>
 	</div>
 	<!-- PANEL__TITLE|_ -->
@@ -34,7 +34,7 @@
 				<div class="c-stats__done-children-amount">{{ get.doneItemAmount }}</div>
 			</div>
 		</div>
-		<div v-if="selection.view != 'journal'">
+		<div v-if="selection.view != 'journal' && this.get.filteredIdsFlat.length">
 			<button
 				class="o-btn c-stats__copy-btn"
 				v-btn-effect
@@ -50,6 +50,7 @@
 </template>
 
 <script>
+import { Utilities } from '../helpers/globalFunctions.js'
 export default {
 	data () {
 		return {}
@@ -60,41 +61,15 @@ export default {
 		state(){ return this.$store.state },
 		selection(){ return this.state.selection },
 		text(){ return this.get.text },
-		selectionTags()
-		{ // For list title
-			return this.state.selection.tags.map(function (val, i) {
-				if (this.state.selection.tags.length == i+1)
-				{
-					val = Utilities.tagSlugToName(val);
-				}
-				else
-				{
-					val = Utilities.tagSlugToName(val)+', ';
-				}
-				return val;
-			});
-		},
-		selectionHiddenTags()
-		{ // For list title
-			return this.state.selection.hiddenTags.map(function (val, i) {
-				if (this.state.selection.hiddenTags.length == i+1)
-				{
-					val = Utilities.tagSlugToName(val);
-				}
-				else
-				{
-					val = Utilities.tagSlugToName(val)+', ';
-				}
-				return val;
-			});
-		},
-
 	},
 	methods:
 	{
 		commit(action, payload){ this.$store.commit(action, payload) },
 		dispatch(action, payload){ this.$store.dispatch(action, payload) },
-
+		tagSlugToName(tag)
+		{
+			return Utilities.tagSlugToName(tag);
+		},
 	},
 }
 </script>

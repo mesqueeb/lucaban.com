@@ -1,8 +1,8 @@
 import {
 	Utilities, hasClass, mobilecheck, isElementInViewport, objectToArray, uniqBy, uniq, arrayToString, sortObjectArrayByProperty, sortObjectArrayByTwoProperties, removeEmptyValuesFromArray
-} from '../../helpers/globalFunctions.js';
-import { initializeState } from '../stateInitializer.js';
-import axios from 'axios';
+} from '../../helpers/globalFunctions.js'
+import organizeData from '../fetchedDataOrganizer.js'
+import axios from 'axios'
 
 export default {
 	state:
@@ -39,17 +39,27 @@ export default {
 			axios.get(apiBaseURL+'items').then(({data}) => { 			/*
 			\*\ ～～～～～～～～～～～～～～～～～～～～～～～　/*/
 				console.log('fetched all items');
-				let userData = initializeState(data);
-				commit('updateState', { source:userData.source });
-				commit('updateState', { orphans:userData.orphans });
-				commit('updateState', { nodes:userData.nodes });
-				commit('updateState', { root:userData.root });
-				dispatch('sortAllChildren');
-				commit('updateState', { loading:false } );
-				dispatch('getUser');
+				dispatch('initializeState', {data})
+				.then(() => {
+					commit('updateState', { loading:false } );
+					dispatch('getUser');
+				}).catch((error) => {
+					console.log(`ERROR: ${error}`);
+				});
 			}).catch((error) => {
 				console.log(`ERROR: ${error}`);
 			});
+		},
+		initializeState ({dispatch, commit},
+			{data})
+		{
+			let userData = organizeData(data);
+			window.userData = userData;
+			commit('updateState', { source:userData.source });
+			commit('updateState', { orphans:userData.orphans });
+			commit('updateState', { root:userData.root });
+			commit('updateState', { nodes:userData.nodes });
+			// dispatch('sortAllChildren');
 		},
 		getUser ({dispatch, commit})
 		{
@@ -57,6 +67,8 @@ export default {
 				console.log(data);
 				commit('updateUser', {user:data.user});
 				dispatch('sendFlash',{msg:`Hello ${data.user.name}!`})
+			}).catch((error) => {
+				console.log(`ERROR: ${error}`);
 			});
 		},
 		patch ({commit, dispatch, getters, rootState},
