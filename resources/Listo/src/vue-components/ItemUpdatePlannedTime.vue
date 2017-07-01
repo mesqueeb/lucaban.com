@@ -13,8 +13,8 @@
 		@blur="dispatch('blurOnEditOrAdd')"
 		@keydown.esc="dispatch('cancelEditOrAdd')"
 		@keydown.enter="setPlannedTime(item, $event, dur)"
-		@keydown.up="dispatch('focusElement',{ el:'.js-edit-body' })"
-		@keydown.down="dispatch('focusElement',{ el:'.js-add-tag' })"
+		@keydown.up="dispatch('focusElement',{ el:`#card-${get.editingOrAddingId} .js-edit-body` })"
+		@keydown.down="dispatch('focusElement',{ el:`#card-${get.editingOrAddingId} .js-add-tag` })"
 	>{{ dur }} {{ (mobileSmall) ? text.global.m : text.global.min }}</button>
 	<div>
 		<input
@@ -24,8 +24,8 @@
 			@blur="dispatch('blurOnEditOrAdd')"
 			@keydown.esc="dispatch('cancelEditOrAdd')"
 			@keydown.enter="setPlannedTime(item, $event)"
-			@keydown.up="dispatch('focusElement',{ el:'.js-edit-body' })"
-			@keydown.down="dispatch('focusElement',{ el:'.js-add-tag' })"
+			@keydown.up.prevent="dispatch('focusElement',{ el:`#card-${get.editingOrAddingId} .js-edit-body` })"
+			@keydown.down.prevent="dispatch('focusElement',{ el:`#card-${get.editingOrAddingId} .js-add-tag` })"
 			type="number"
 		/>{{ text.global.min }}
 	</div>

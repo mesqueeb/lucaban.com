@@ -195,8 +195,8 @@ export default {
 			'ja':'アイテムを複製',
 		},
 		'popmenu':{
-			'en':'',
-			'ja':'',
+			'en':'Duplicate item',
+			'ja':'アイテムを複製',
 		},
 	},
 }

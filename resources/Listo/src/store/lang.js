@@ -62,6 +62,7 @@ export default {
 		'popups'://
 		{
 			'journalNotes':'Journal notes',
+			'journalNotesPopover':'Edit journal notes',
 			'completed':'Completed',
 			'completedB':'',
 			'usedTime':'Used time',
@@ -157,6 +158,7 @@ export default {
 		'popups'://
 		{
 			'journalNotes':'日報メモ',
+			'journalNotesPopover':'日報メモを編集',
 			'completed':'',
 			'completedB':'を完了致しました',
 			'usedTime':'使用時間',

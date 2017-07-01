@@ -11,25 +11,14 @@
 <div 
 	class="d-flex flex-wrap"
 >
-	<div
-		class="c-subsection-head"
-		v-if="journalParentString && state.selection.view == 'journal'"
-		@click="selectItem"
-	>
-		<div class="c-subsection-head__text">
-			{{ journalParentString }}
-		</div>
-	</div>
 	<div 
-		v-if="item.depth != 0"
-		v-show="item.id != state.editingItem || get.mobile"
+		v-if="(item.id != state.editingItem && item.id != state.editingItemTags) || get.mobile"
 		:id="'item-body-'+item.id"
 		:class="{
 			'c-item-card': true,
 			'show_children': item.show_children,
 		}"
 	>
-
 		<!-- _|ITEM-TOGGLES -->
 		<Item-Toggles :item="item"></Item-Toggles>
 		<!-- ITEM-TOGGLES|_ -->
@@ -38,16 +27,13 @@
 				'c-body-div':true,
 				'textarea-wrap':true,
 				'u-selected': item.id == state.selection.selectedId,
-				'c-body-div--updating-tags': item.id == state.editingItemTags
 				}"
 			@dblclick="dblclick($event)"
 			@click="selectItem"
 		>
 			<div
 				:class="{ 'c-body-text': true,
-					'js-body-text': true,
 					'c-body-text--project':isProject,
-					'c-body-text--updating-tags': item.id == state.editingItemTags
 					}"
 			>
 				<div :class="{
@@ -67,8 +53,6 @@
 				<span v-if="item.children_order.length">[{{item.children_order}}]</span>
 			</span>
 			<!-- // For debugging: -->
-			
-			<Item-Add-Tag v-if="item.id == state.editingItemTags" :item="item"></Item-Add-Tag>
 			<Item-Tags-Strip v-if="item.id != state.editingItem" :item="item" style="padding:0.2em"></Item-Tags-Strip>
 			<Item-Nav :item="item"></Item-Nav>
 		</div>
@@ -131,32 +115,6 @@ export default {
 			return ((this.state.addingNewUnder == this.item.id)
 				|| (this.listIsEmpty && !this.mobile && this.state.selection.view != 'journal'));
 		},
-		journalParentString()
-		{
-			return this.item.parents_bodies;
-			// console.log('run on '+this.item.id+' - '+this.item.body);
-			if (this.state.selection.view != 'journal'){ return false; }
-			if (this.journalView && !this.item.journalDate){
-				if (this.item.depth == 0){ return; }
-				let prevId = null;
-				let parentString = this.item.parents_bodies;
-				if (!this.state.nodes[prevId]){ return; }
-				let prevParentString = this.state.nodes[prevId].parents_bodies;
-
-				let prevDoneDate = this.state.nodes[prevId].done_date;
-				prevDoneDate = format(new Date(prevDoneDate), 'YYYY/MM/DD');
-				let thisDoneDate = format(new Date(this.item.done_date), 'YYYY/MM/DD');
-
-				if (
-					parentString
-					&& ( parentString != prevParentString
-						|| thisDoneDate != prevDoneDate ) )
-				{
-					return parentString;
-				}
-			}
-			return false;
-		},
 	},
 	methods: {
 		commit(action, payload){ this.$store.commit(action, payload); },
@@ -168,15 +126,6 @@ export default {
 			if (e.target.nodeName == 'I' || e.target.nodeName == 'BUTTON'){ return; }
 			this.dispatch('startEdit', {item:this.item});
 		},
-		// convertbodyURLtoHTML()
-		// {
-		// 	// console.log('converting');
-		// 	if (!this.item || this.item.depth == 0){ return; }
-		// 	let bodyboxQS = '#'+this.$el.id+' .js-body-text';
-		// 	let a = document.querySelector(bodyboxQS);
-		// 	if (!a || !a.innerHTML.includes('a href')){ return; }
-		// 	a.innerHTML = a.innerHTML.replace("&lt;a href=", "<a href=").replace('target="_blank"&gt;','target="_blank">').replace("&lt;/a&gt;","</a>");
-		// },
 	},
 }
 </script>
@@ -252,15 +201,5 @@ export default {
         color: #a2999a;
         padding: 2px 0 0 2em;
     }
-}
-.c-subsection-head{
-    margin-bottom: 1px;
-}
-.c-subsection-head__text{
-    border: 1px solid;
-    display: initial;
-    padding: 0em 0.5em;
-    border-top: none;
-    border-left: none;
 }
 </style>

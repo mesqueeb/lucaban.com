@@ -43,14 +43,18 @@
 				@click="dispatch('startEdit', {item}), $refs.popover.close()"
 			>
 				<div v-html="state.keybindings.edit.popmenu[l]"></div>
-				<div v-if="!get.mobile" v-html="stringToKeyboardKeys(state.keybindings.edit[oS])"></div>
+				<div
+					class="o-popmenu__hotkey"
+					v-if="!get.mobile"
+					v-html="stringToKeyboardKeys(state.keybindings.edit[oS])"
+				></div>
 			</div>
 			<div
 				class="o-popmenu__item"
 				v-if="item.done"
 				@click="dispatch('popup', { id:item.id, type:'afterDone' }), $refs.popover.close()"
 			>
-				<div>{{ get.text.popups.journalNotes }}</div>
+				<div>{{ get.text.popups.journalNotesPopover }}</div>
 				<div v-if="!get.mobile"></div>
 			</div>
 			<div
@@ -59,14 +63,34 @@
 				@click="dispatch('setToday', {id:item.id}), $refs.popover.close()"
 			>
 				<div v-html="state.keybindings.setToday.popmenu[l]"></div>
-				<div v-if="!get.mobile" v-html="stringToKeyboardKeys(state.keybindings.setToday[oS])"></div>
+				<div
+					class="o-popmenu__hotkey"
+					v-if="!get.mobile"
+					v-html="stringToKeyboardKeys(state.keybindings.setToday[oS])"
+				></div>
+			</div>
+			<div
+				class="o-popmenu__item"
+				v-if="get.loggedIn && state.selection.view != 'journal'"
+				@click="dispatch('duplicate', {id:item.id}), $refs.popover.close()"
+			>
+				<div v-html="state.keybindings.duplicate.popmenu[l]"></div>
+				<div
+					class="o-popmenu__hotkey"
+					v-if="!get.mobile"
+					v-html="stringToKeyboardKeys(state.keybindings.duplicate[oS])"
+				></div>
 			</div>
 			<div
 				class="o-popmenu__item"
 				@click="dispatch('deleteItemDialogue', { id:item.id }), $refs.popover.close()"
 			>
 				<div><q-icon name="ion-trash-a" /> {{ state.keybindings.delete.popmenu[l] }}</div>
-				<div v-if="!get.mobile" v-html="stringToKeyboardKeys(state.keybindings.delete[oS])"></div>
+				<div
+					class="o-popmenu__hotkey"
+					v-if="!get.mobile"
+					v-html="stringToKeyboardKeys(state.keybindings.delete[oS])"
+				></div>
 			</div>
 		</div>
 		</q-popover>
@@ -133,5 +157,11 @@ export default{
 }
 .c-item-nav__delete{
     color: rgba(231, 76, 60, 0.3);
+}
+.o-popmenu__item{
+	white-space: nowrap;
+}
+.o-popmenu__hotkey{
+	font-size: 0.8em;
 }
 </style>

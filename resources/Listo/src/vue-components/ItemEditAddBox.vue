@@ -5,9 +5,11 @@
 			'c-editaddbox--mobile':(mobile)}]"
 	@submit.prevent
 >
-	<div :class="[
-		'c-editaddbox__body',
-		{'c-editaddbox__body--mobile':(mobile)}]"
+	<div
+		v-if="!state.editingItemTags"
+		:class="[
+			'c-editaddbox__body',
+			{'c-editaddbox__body--mobile':(mobile)}]"
 	>
 		<div class="c-language-picker w-100" v-if="listIsEmpty && mobile">
 			<a href="#"
@@ -36,6 +38,20 @@
 			autocomplete="off"
 		></textarea>
 	</div>
+	<div
+		v-else
+		:class="['c-editaddbox__body', 'c-editaddbox__body--editing-tags',
+			{'c-body-text--project':get.isProject(item.id)}]"
+	>
+		<div :class="{
+			'u-lightgray':(item.temp && get.loggedIn),
+			'c-body-text--done': item.done
+			}"
+		>{{ item.body }}</div>
+		<div class="l-completion-notes c-completion-notes bodybox"
+			v-if="item.completion_memo"
+		>{{ item.completion_memo }}</div>
+	</div>
 	<div :class="{
 		'c-editaddbox__lower-body':true,
 		'c-editaddbox__lower-body--mobile':(mobile),
@@ -43,7 +59,7 @@
 	>
 		<Item-Update-Planned-Time
 			:item="item"
-			v-if="state.selection.view != 'journal'"
+			v-if="state.selection.view != 'journal' && !state.editingItemTags"
 		></Item-Update-Planned-Time>
 
 		<div :class="{ 'c-item-tags':true,
@@ -163,7 +179,7 @@ export default {
 			e.preventDefault();
 			preventKeydownListener();
 			if (direction == 'up'){ this.dispatch('cancelEditOrAdd') }
-			if (direction == 'down'){ this.dispatch('focusElement',{ el:'.js-update-planned-time__button' }) }
+			if (direction == 'down'){ this.dispatch('focusElement',{ el:`#card-${this.get.editingOrAddingId} .js-update-planned-time__button` }) }
 			if (direction == 'right'){ this.newItemIndent() }
 			if (direction == 'left'){ this.newItemUnindent() }
 		},
@@ -196,6 +212,11 @@ export default {
     outline: 0px !important;
     padding: 0.5em;
     resize: none;
+}
+.c-editaddbox__body--editing-tags{
+	background-color: white;
+	font-size: 14px;
+	padding: 0.5em;
 }
 .c-editaddbox__lower-body{
     display: flex;

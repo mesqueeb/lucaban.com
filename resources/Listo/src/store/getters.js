@@ -534,6 +534,21 @@ noItems: (state, getters) => {
 	}
 	return false;
 },
+editingOrAddingId(state, getters)
+{
+	if (state.editingItemTags)
+	{
+		return state.editingItemTags;
+	}
+	else if (state.editingItem)
+	{
+		return state.editingItem;
+	}
+	else if (state.addingNewUnder)
+	{
+		return state.addingNewUnder;
+	}
+},
 filteredItems: (state, getters) => {
 	return getters.filteredItemsTree;
 },
@@ -545,23 +560,25 @@ filteredItemsJournal: (state, getters) => {
 		let dd = format(item.done_date, 'YYYY-MM-DD');
 		if (!dates[dd])
 		{
-			dates[dd] = [];
+			dates[dd] = {date:dd, items:[]};
 		}
-		dates[dd].push(item);
+		if (!state.userSettings.journalShowParentBodies)
+		{
+			dates[dd].items.push(item);
+			return;
+		}
+		let parentBody = (!item.parents_bodies) ? 'null_no_parent_body' : item.parents_bodies;
+		let entry = dates[dd].items.find(entry => entry.parentBody == parentBody)
+		if (!entry)
+		{
+			dates[dd].items.push({parentBody, items:[item]});
+		}
+		else
+		{
+			entry.items.push(item);
+		}
 	});
-	let datesArray = [];
-	Object.keys(dates).forEach(function(dd){
-		let journalItem = {
-			'done_date':dd,
-			'children':sortObjectArrayByProperty(dates[dd], 'parents_bodies'),
-			'depth':0,
-			'journalDate':true,
-		};
-		journalItem = getters.setDefaultItemValues(journalItem);
-		datesArray.push(journalItem);
-	});
-	datesArray = sortObjectArrayByProperty(datesArray, 'done_date', 'desc');
-	return datesArray;
+	return Object.keys(dates).map(dd => dates[dd]);
 },
 journalDates: (state, getters) => {
 	return Object.keys(getters.filteredItemsJournal);

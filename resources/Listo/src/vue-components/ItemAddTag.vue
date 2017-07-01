@@ -6,7 +6,7 @@
 			v-model="state.newTag" placeholder="..."
 			@blur="dispatch('blurOnEditOrAdd', { field:'add-tag' })"
 			@keydown.esc="dispatch('cancelEditOrAdd')"
-			@keydown.enter.prevent="addTag"
+			@keydown.enter.prevent="enter"
 			@keydown.up="arrow('up',$event)"
 			@keydown.down="arrow('down',$event)"
 			@keydown.tab="tab($event)"
@@ -32,11 +32,15 @@ export default {
 	{
 		commit(action, payload){ this.$store.commit(action, payload) },
 		dispatch(action, payload){ this.$store.dispatch(action, payload) },
-		addTag()
+		enter()
 		{
 			preventKeydownListener();
+			if (!this.state.newTag)
+			{
+				this.dispatch('doneEditOrAddNew');
+				return;
+			}
 			if (this.state.newTag){ this.state.newTag = this.state.newTag.trim() }
-			if (!this.state.newTag){ this.commit('updateState', { editingItemTags:null }); return; }
 			if (this.item.newItem)
 			{
 				this.dispatch('prepareTag');
@@ -64,18 +68,18 @@ export default {
 		},
 		up(e)
 		{
-			if(this.store.editingItemTags){ return; }
-			this.dispatch('focusElement',{ el:'.js-update-planned-time__button' })
+			if(this.state.editingItemTags){ return; }
+			this.dispatch('focusElement',{ el:`#card-${this.get.editingOrAddingId} .js-update-planned-time__button` })
 		},
 		down(e)
 		{
-			if(this.store.editingItemTags){ return; }
+			if(this.state.editingItemTags){ return; }
 			if (this.item.newItem && !this.state.newTag)
 			{
 	        	this.dispatch('cancelEditOrAdd');
 	        	return;
 			}
-			this.dispatch('focusElement',{ el:'.js-edit-body' })
+			this.dispatch('focusElement',{ el:`#card-${this.get.editingOrAddingId} .js-edit-body` })
 		},
 	},
 }

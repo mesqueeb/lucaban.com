@@ -1,21 +1,13 @@
 <template>
-<div
-	:class="{
-		'items-card': true,
-		'journal-wrapper': state.selection.view == 'journal'
-	}"
->
+<div class="c-journal-day">
 <!-- day-card-wrapper -->
-<div 
-	class="d-flex flex-wrap"
->
-	<div class="c-section-head">
+	<div class="c-journal-date">
 		<!-- Codementor: Is this the correct way to format something like this? -->
-		<span>{{ customCalendar(journalDate) }}</span>
-		<span class="c-section-head__subtitle" v-if="journalDate != customCalendar(journalDate)">
-			{{ journalDate }}
+		<span>{{ customCalendar(day.date) }}</span>
+		<span class="c-journal-date__subtitle" v-if="day.date != customCalendar(day.date)">
+			{{ day.date }}
 		</span>
-		<button
+		<!-- <button
 			class="o-btn ml-auto"
 			v-btn-effect
 			v-clipboard:copy="get.clipboardTextJournal(item)"
@@ -24,38 +16,53 @@
 			v-if="true"
 		>
 			{{ get.text.card.copy }}
-		</button>
-		<div class="w-100 d-flex" v-if="sec_to_hourmin(get.totalUsedSec(item))">
+		</button> -->
+		<!-- <div class="w-100 d-flex" v-if="sec_to_hourmin(get.totalUsedSec(day))">
 			<span class="c-journal-used-time">{{ get.text.menu.usedTime }}: </span>
-			<span class="o-pill--used-time">{{ sec_to_hourmin(get.totalUsedSec(item)) }}</span>
-		</div>
+			<span class="o-pill--used-time">{{ sec_to_hourmin(get.totalUsedSec(day)) }}</span>
+		</div> -->
 	</div>
 	<!-- _|CHILDREN -->
 	<div
-		class="c-journal-day-children"
-		v-if="item.children.length"
-		v-show="item.show_children"
+		class="c-journal-day__entries"
+		v-if="day.items.length && day.items[0].parentBody"
 	>
 		<!-- :style="(state.addingNewAsFirstChild)?'order:3;':''" -->
+		<div
+			class="c-journal-entry"
+			v-for="parentBodyEntry in sortedParentBodyEntries"
+		>
+			<div class="c-journal-entry__parent-body" v-if="parentBodyEntry.parentBody != 'null_no_parent_body'">
+				{{ parentBodyEntry.parentBody }}
+			</div>
+			<Card
+				class="c-journal-entry__item"
+				v-for="item in parentBodyEntry.items"
+				:item="item"
+				:key="item.id"
+			></Card>
+		</div>
+	</div>
+	<div v-else class="c-journal-day__entries">
 		<Card
-			v-if="item.journalDate"
-			v-for="childCard in item.children"
-			:item="childCard"
-			:key="childCard.id"
+			class="c-journal-entry__item"
+			v-for="item in day.items"
+			:item="item"
+			:key="item.id"
 		></Card>
+		
 	</div>
 	<!-- CHILDREN|_ -->
-
-</div>
 </div>
 </template>
 <script>
 import { format } from 'date-fns/esm'
-import { customCalendar, sec_to_hourmin } from '../helpers/valueMorphers2.js';
-import Card from './Card.vue';
+import { customCalendar, sec_to_hourmin } from '../helpers/valueMorphers2.js'
+import { sortObjectArrayByProperty } from '../helpers/globalFunctions.js'
+import Card from './Card.vue'
 
 export default {
-	props: ['item'],
+	props: ['day'],
 	components: {
 		Card
 	},
@@ -66,29 +73,31 @@ export default {
  \* / ============================================== \ */
 		get(){ return this.$store.getters },
 		state(){ return this.$store.state },
-		journalDate(){ return this.get.journalDate(this.item) },
 /* \ ============================================== / *\
 \* / ============================================== \ */
+		sortedParentBodyEntries()
+		{
+			return sortObjectArrayByProperty(this.day.items, 'parents_bodies', 'desc');
+		},
 	},
 	methods: {
 		customCalendar,
 		sec_to_hourmin,
 		commit(action, payload){ this.$store.commit(action, payload); },
 		dispatch(action, payload){ this.$store.dispatch(action, payload); },
-		selectItem(){ this.dispatch('selectItem', {id:this.item.id}) },
 	},
 }
 </script>
 <style lang="scss">
 @import '../css/_variables.scss';
-.c-journal-day-children{
-    width: 100%;
-    margin-left: 0;
+.c-journal-day{
+	display: flex;
+	flex-wrap: wrap;
     border-bottom: 1px solid #ededed;
     padding-bottom: 0.7rem;
 }
-.c-section-head{
-    color: #46c5b6;
+.c-journal-date{
+    color: $theme-color;
     font-size: 1.2em;
     text-align: left;
     margin-top: 1rem;
@@ -97,10 +106,26 @@ export default {
     width: 100%;
     align-items: baseline;
 }
-.c-section-head__subtitle{
-    color: #dadada;
+.c-journal-date__subtitle{
+    color: $light-gray;
     font-size: 0.8em;
     margin-left: 0.5em;
+}
+.c-journal-entry{
+    width: 100%;
+}
+.c-journal-day__entries{
+    width: 100%;
+}
+.c-journal-entry__parent-body{
+    display: initial;
+    padding: 0em 0.5em;
+    border-top: none;
+    border-left: none;
+    color: $mid-gray;
+}
+.c-journal-entry__item{
+	margin-left: 1em;
 }
 .c-journal-used-time{
     @include text-settings();

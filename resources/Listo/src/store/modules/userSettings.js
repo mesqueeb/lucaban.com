@@ -3,6 +3,7 @@ export default {
 	{
 		plannedDurations: [10, 15, 25, 50],
 		language: 'en',
+		journalShowParentBodies: true,
 	},
 	mutations:
 	{

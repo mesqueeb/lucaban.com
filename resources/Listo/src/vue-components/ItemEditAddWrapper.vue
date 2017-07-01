@@ -8,8 +8,8 @@
 			'c-editadd-wrapper--child':state.addingNewAsChild,
 			}]"
 	>
-		<Item-Toggles v-if="item.id == state.editingItem" :item="item"></Item-Toggles>
-		<Item-Edit-Add-Box v-if="item.id == state.editingItem" :item="item"></Item-Edit-Add-Box>
+		<Item-Toggles v-if="showEditBox" :item="item"></Item-Toggles>
+		<Item-Edit-Add-Box v-if="showEditBox" :item="item"></Item-Edit-Add-Box>
 
 		<Item-Toggles v-if="showAddNewBox" :item="state.newItem"></Item-Toggles>
 		<Item-Edit-Add-Box v-if="showAddNewBox" :item="state.newItem"></Item-Edit-Add-Box>
@@ -17,7 +17,7 @@
 
 	<q-modal :ref="'edit-item-modal-'+item.id" position="top" @close="dispatch('doneEditOrCancelNew')">
 		<div v-if="get.mobile">
-			<Item-Edit-Add-Box v-if="item.id == state.editingItem" :item="item"></Item-Edit-Add-Box>
+			<Item-Edit-Add-Box v-if="showEditBox" :item="item"></Item-Edit-Add-Box>
 		</div>
 	</q-modal>
 </div>
@@ -58,7 +58,9 @@ export default {
 		showEditBox()
 		{
 			return (this.state.editingItem
-				&& this.item.id == this.state.editingItem)
+					&& this.item.id == this.state.editingItem)
+				|| (this.state.editingItemTags
+					&& this.item.id == this.state.editingItemTags);
 		},
 
 	},

@@ -32,7 +32,7 @@
 		<div
 			class=""
 			v-if="state.selection.view == 'journal'"
-		>・</div>
+		></div>
 	</div>
 </template>
 <script>

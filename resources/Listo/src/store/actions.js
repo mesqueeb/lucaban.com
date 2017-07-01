@@ -1090,9 +1090,25 @@ doneEditOrCancelNew({state, dispatch}) // this is to use with modals
 	// 	commit('updateState', { editingItemTags:null });
 	// }
 },
+doneEditOrAddNew({state, dispatch})
+{
+	if (state.editingItemTags)
+	{
+		commit('updateState', { editingItemTags:null });
+	}
+	else if (state.editingItem)
+	{
+		dispatch('doneEdit');
+	}
+	else if (state.addingNewUnder)
+	{
+		dispatch('addNew');
+	}
+},
 focusElement({state},
 	{el})
 {
+	console.log('trying to focus: '+el);
 	document.querySelector(el).focus();
 },
 filterItems ({state, commit, dispatch, getters},

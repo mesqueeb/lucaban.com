@@ -27,8 +27,7 @@
 		<Journal-Day
 			v-if="state.selection.view == 'journal'"
 			v-for="childCard in get.filteredItemsJournal"
-			:item="childCard"
-			:key="childCard.id"
+			:day="childCard"
 		></Journal-Day>
 	</div>
 	<!-- CHILDREN|_ -->
