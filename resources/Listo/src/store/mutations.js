@@ -79,6 +79,19 @@ addChild(state, { newParentId, index, item })
 	state.nodes[newParentId].children.splice(index,0,item);
 	state.nodes[newParentId].children_order.splice(index,0,item.id);
 },
+addTempTag (state, {id, tagObject, requestType} = {})
+{
+	if (requestType == 'tag' || !requestType)
+	{
+		console.log(state.nodes[id].tagged);
+		state.nodes[id].tagged.push(tagObject);
+		console.log(state.nodes[id].tagged);
+	}
+	if (requestType == 'untag')
+	{
+		state.nodes[id].tagged = state.nodes[id].tagged.filter(t => t.tag_slug != tagObject.tag_slug);
+	}
+},
 deleteTempItem(state, { item })
 {
 	let parent = state.nodes[item.parent_id];

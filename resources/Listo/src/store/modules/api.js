@@ -103,24 +103,17 @@ export default {
 		patchTag ({rootState, dispatch},
 			{id, tags, requestType} = {})
 		{
-			if (!rootState.user.user) { console.log('not Logged in'); return; }
 			/* requestType can be:
 				'tag': tag item  (default if null)
 				'untag': untag item with certain tag
 				'retag': delete all tags and retag new ones
 			*/
-			if (!tags){ return; }
-			dispatch('updateItemTagsDom', { id, tags, requestType });
-			if (Array.isArray(tags)){
-				tags = removeEmptyValuesFromArray(tags);
-				if (!tags.length){ return; }
-			} else {
-				if (!tags.replace(/\s/g, "").length){ return; }
-			}
+			if (!rootState.user.user) { console.log('not Logged in'); return; }
 			dispatch('startPatching');
 			let patchObj = {};
 			patchObj['tags'] = tags;
 			patchObj['type'] = requestType;
+			// AXIOS REQUEST
 			axios.patch(apiBaseURL+'itemtags/' + id, patchObj, { method: 'PATCH'})
 			.then(function(tagResponse){
 				let syncedTags = tagResponse.data.tags;
@@ -226,29 +219,12 @@ export default {
 			if (newItem.children_order){
 				newItem.children_order = arrayToString(newItem.children_order);
 			}
-			// let data = {
-			// 	newItemArray: [newItem, newItem]
-			// }
 			let data = newItem;
-			// newItem.id = 99999999;
-			// index = 0;
-			// allItems.addItem(newItem, index);
-			// return;
 
-			// let data = newItem;
-			// data = JSON.stringify(data);
 			axios.post(apiBaseURL+'items',data) //SEND
 			// axios.post(apiBaseURL+'items',newItem) //SEND
 			.then(function(response){ //response
 				let storedItem = response.data;
-				// Revert old item's children_order back to string.
-				// storedItem.children_order = (!newItem.children_order) ? [] : newItem.children_order.split(',').map(Number);
-				// if (storedItem.constructor === Array){
-				// 	console.log(storedItem);
-				// 	console.log('storedItem ARRAY');
-				// 	storedItem.forEach(item => allItems.addItem(item));
-				// 	return;
-				// }
 				console.log('starting dom update...');
 				console.log('Index: ');
 				console.log(index);

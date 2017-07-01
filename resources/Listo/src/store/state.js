@@ -1,30 +1,9 @@
 import languageContents from './lang.js'
 import keybindings from './keybindings.js'
-window.apiBaseURL = 'http://api.lucaban.dev/';
+import setDefaultItemValues from './setDefaultItemValues.js'
 
-let initialItem = {
-    id: "z",
-    created_by: null,
-    parent_id: null,
-    depth: 0,
-    children: [],
-    children_order: [],
-    body: "ALL",
-    memo: "",
-    planned_time: 0,
-    used_time: 0,
-    completion_rate: "0.0000",
-    due_date: "0000-00-00 00:00:00",
-    done_date: "0000-00-00 00:00:00",
-    done: 0,
-    completion_memo: "",
-    show_children: 1,
-    deleted_at: null,
-    created_at: "0000-00-00 00:00:00",
-    updated_at: "0000-00-00 00:00:00",
-    parents_bodies: "",
-    tagged: [],
-}
+window.apiBaseURL = 'http://api.lucaban.dev/';
+let initialItem = setDefaultItemValues({id: 'z', depth: 0, temp: true});
 let secondItem = JSON.parse(JSON.stringify(initialItem));
 secondItem.id = 'y';
 secondItem.depth = 1;

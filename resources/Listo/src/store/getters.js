@@ -5,6 +5,7 @@ import {
 	Utilities,objectToArray,uniqBy,sortObjectArrayByProperty,sortObjectArrayByTwoProperties
 } from '../helpers/globalFunctions.js'
 import { sec_to_hourmin } from '../helpers/valueMorphers2.js'
+import setDefaultItemValues from './setDefaultItemValues.js'
 
 export default {
 // ...enhancedGetters({
@@ -153,6 +154,19 @@ tagsArray: (state, getters) =>
 	let item = state.nodes[id];
 	if (!item){ return []; }
 	return item.tagged.map(obj => obj.tag_name);
+},
+makeTagObject: (state, getters) =>
+(tagAsString) => {
+	return {
+		temp: true,
+		tag_name: tagAsString,
+		tag_slug: Utilities.tagNameToSlug(tagAsString),
+		tag: {
+			temp: true,
+			name: tagAsString,
+			slug: Utilities.tagNameToSlug(tagAsString),
+		},
+	};
 },
 siblingIndex: (state, getters) =>
 (id, {visibleChildrenOnly = false} = {visibleChildrenOnly: false}) => {
@@ -475,21 +489,7 @@ getParentsRecursive: (state, getters) =>
 },
 setDefaultItemValues: (state, getters) =>
 (item) => {
-	// item.parent_id_backup = item.parent_id;
-	item.depth = Number(item.depth);
-	if (item.show_children == null){ item.show_children = 1 		 }
-	if (!item.children)	{ item.children = []					 }
-	if (!item.due_date)	{ item.due_date = "0000-00-00 00:00:00"	 }
-	if (!item.done_date)	{ item.done_date = "0000-00-00 00:00:00" }
-	if (!item.done)		{ item.done = false 					 }
-	if (!item.used_time)	{ item.used_time = 0 					 }
-	if (!item.tagged)	{ item.tagged = []	 					 }
-	if (!item.children_order){ item.children_order = [];			 }
-	else if (typeof item.children_order === 'string')
-	{
-		item.children_order = item.children_order.split(',').map(Number);
-	}
-	return item;
+	return setDefaultItemValues(item);
 },
 // Original VM
 countChildren: (state, getters) =>

@@ -191,7 +191,10 @@ addTempNewItem ({state, commit, dispatch, getters},
 	console.log('temp item:');
 	console.log(item);
 	// Add item as node.
-	dispatch('addAndCleanNodesRecursively', {item} );
+	dispatch('addAndCleanNodesRecursively', {item} ).then(()=>{
+		console.log('added temp item, now tagging it.');
+		if (addTags){ dispatch('tagItem', { id:item.id, tags:addTags }); }
+	});
 	// Add item to parent.
 	commit('addChild',{ newParentId:item.parent_id, index, item });
 	// addingNewUnder:
@@ -332,8 +335,13 @@ deleteItem ({state, commit, dispatch, getters},
 	delete state.nodes[id];
 },
 tagItem ({state, commit, dispatch, getters},
-	{id, tags = state.newTag} = {id:state.selection.selectedId, tags:state.newTag})
+	{id, tags = state.newTag, requestType} = {id:state.selection.selectedId, tags:state.newTag})
 {
+	/* requestType can be:
+		'tag': tag item  (default if null)
+		'untag': untag item with certain tag
+		'retag': delete all tags and retag new ones
+	*/
 	if (!tags){ return; }
 	tags = JSON.parse(JSON.stringify(tags));
 	state.newTag = null;
@@ -345,7 +353,9 @@ tagItem ({state, commit, dispatch, getters},
 	tags = tags.filter(t => !getters.hasTag(id,t));
 	if (!tags.length){ return; }
 
-	dispatch('patchTag', { id,tags });
+	dispatch('addTempTag', { id, tags, requestType });
+	dispatch('patchTag', { id, tags });
+
 	let item = state.nodes[id];
 	if (item.children.length)
 	{
@@ -354,11 +364,16 @@ tagItem ({state, commit, dispatch, getters},
 		});
 	}
 },
-prepareTag ({state, commit, dispatch, getters},
-	{id, tags} = {})
+addTempTag ({state, commit, dispatch, getters},
+	{id, tags, requestType} = {})
 {
-	let item = state.nodes[id];
-
+	if (!tags){ return; }
+	if (Array.isArray(tags)){
+		tags.forEach(t => dispatch('addTempTag', { id, tags:t, requestType } ));
+		return;
+	}
+	let tagObject = getters.makeTagObject(tags);
+	commit('addTempTag', {id, tagObject, requestType});
 },
 prepareDonePatch ({state, commit, dispatch, getters},
 	{id} = {})
@@ -387,39 +402,6 @@ autoCalculateDoneState ({state, commit, dispatch, getters},
 		dispatch('markDone', {id, markAs:'done' });
 	} else {
 		dispatch('markDone', {id, markAs:'notDone' });
-	}
-},
-updateItemTagsDom ({state, commit, dispatch, getters},
-	{id, tags, requestType} = {})
-{
-	/* requestType can be:
-		'tag': tag item  (default if null)
-		'untag': untag item with certain tag
-		'retag': delete all tags and retag new ones
-	*/
-	if (!tags){ return; }
-	if (Array.isArray(tags)){
-		tags.forEach(t => dispatch('updateItemTagsDom', { id, tags:t, requestType } ));
-		return;
-	}
-	let tagName = tags.trim();
-	let tagSlug = Utilities.tagNameToSlug(tagName);
-	let tempTag = { 'temp':'temp',
-		'tag_name':tagName,
-		'tag_slug':tagSlug,
-		'tag':{
-			'name':tagName,
-			'slug':tagSlug
-		}};
-	if (requestType == 'tag' || !requestType)
-	{
-		console.log(state.nodes[id].tagged);
-		state.nodes[id].tagged.push(tempTag);
-		console.log(state.nodes[id].tagged);
-	}
-	if (requestType == 'untag')
-	{
-		state.nodes[id].tagged = state.nodes[id].tagged.filter(t => t.tag_slug != tagSlug);
 	}
 },
 moveItem ({state, commit, dispatch, getters},
@@ -676,6 +658,7 @@ addNew ({state, commit, dispatch, getters},
 	if (getters.mobile && addNextItemAs == 'stop'){ store.$refs['add-item-modal'].close() };
 	console.log('addingNew');
 	let newItem = JSON.parse(JSON.stringify(state.newItem));
+	newItem.newItem = null; // important to prevent bugs with temp items
 	let olderSiblingId = state.addingNewUnder;
 	let addTags = getters['newItem/preparedPlusComputedTags'];
 	if (!newItem.body){ return; }
@@ -1017,7 +1000,7 @@ copyProgrammatic ({dispatch, state, getters},
 },
 prepareTag ({state})
 {
-	if (!state.newTag){ return; }
+	if (!state.newTag || !state.newTag.trim()){ return; }
 	state.newItem.preparedTags.push(state.newTag);
 	state.newTag = null;
 },
@@ -1090,7 +1073,7 @@ doneEditOrCancelNew({state, dispatch}) // this is to use with modals
 	// 	commit('updateState', { editingItemTags:null });
 	// }
 },
-doneEditOrAddNew({state, dispatch})
+doneEditOrAddNew({state, dispatch, commit})
 {
 	if (state.editingItemTags)
 	{
