@@ -21,6 +21,8 @@ export default {
 			'register':'Register',
 			'email':'Email Address',
 			'password':'Password',
+			'passwordConfirm':'Please type password again',
+			'showpassword':'Show password',
 			'name':'Name',
 		},
 		'menu'://
@@ -117,6 +119,8 @@ export default {
 			'register':'登録',
 			'email':'メールアドレス',
 			'password':'パスワード',
+			'passwordConfirm':'パスワードを再度入力',
+			'showpassword':'パスワードを表示',
 			'name':'名前',
 		},
 		'menu'://

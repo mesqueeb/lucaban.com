@@ -35,6 +35,7 @@
 				v-clipboard:success="clipboardSuccess"
 				v-clipboard:error="clipboardError"
 			>
+				<q-icon v-if="copySuccess" name="ion-ios-checkmark-empty" />
 				<div :class="{ 'u-color-success':copySuccess }" v-html="state.keybindings.copyClipboard.popmenu[l]"></div>
 				<div v-if="!get.mobile"></div>
 			</div>
@@ -71,7 +72,7 @@
 			</div>
 			<div
 				class="o-popmenu__item"
-				v-if="get.loggedIn && state.selection.view != 'journal'"
+				v-if="get['user/loggedIn'] && state.selection.view != 'journal'"
 				@click="dispatch('duplicate', {id:item.id}), $refs.popover.close()"
 			>
 				<div v-html="state.keybindings.duplicate.popmenu[l]"></div>
@@ -130,7 +131,7 @@ export default{
 		},
 		clipboardSuccess()
 		{
-			this.dispatch('sendFlash', { type:'success', msg:this.state.keybindings.copyClipboard.success[this.l] });
+			this.dispatch('sendFlash', { type:'success', msg:this.state.keybindings.copyClipboard.success[this.l]+"<br><br>"+this.get.clipboardText(this.item.id) });
 			this.copySuccess = true;
 		},
 		clipboardError()

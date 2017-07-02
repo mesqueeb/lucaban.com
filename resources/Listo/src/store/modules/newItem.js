@@ -1,8 +1,6 @@
 import { Utilities, uniq } from '../../helpers/globalFunctions.js'
-export default {
-	namespaced: true,
-	state:
-	{
+function initialState() {
+	return {
 		body: '',
         due_date: '0000-00-00 00:00:00',
         done_date: '0000-00-00 00:00:00',
@@ -12,9 +10,18 @@ export default {
         children: [],
         children_order: [],
         newItem: true,
-	},
+	}
+}
+export default {
+	namespaced: true,
+	state: initialState(),
 	mutations:
 	{
+		resetStateData(state)
+		{
+			let newState = initialState();
+			state = Object.assign(state, newState);
+		},
 		updateState(state, payload) // { id, field, value } or other
 		{
 			let key = payload.field;

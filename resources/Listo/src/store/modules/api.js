@@ -7,28 +7,84 @@ import axios from 'axios'
 export default {
 	state:
 	{
-		// user: null,
+		token: null,
 	},
-	actions:
+	mutations:
 	{
-		login ({commit, dispatch, getters, rootState},
-			credentials)
+		destroyToken(state)
 		{
-			commit('updateState',{loading:true});
-			// let self = this;
-			axios.post(apiBaseURL+'auth', credentials).then(({data}) => {
-				dispatch('setToken', {token:data.token});
-				dispatch('fetchListo');
-				router.push('/');
-			});
+			window.axios.defaults.headers.common = {
+			    'X-Requested-With': 'XMLHttpRequest',
+				'Authorization': "Bearer " + '' ,
+			};
+			state.token = null;
 		},
-		setToken({state}, {token})
+		setToken(state, {token})
 		{
 			window.axios.defaults.headers.common = {
 			    'X-Requested-With': 'XMLHttpRequest',
 				'Authorization': "Bearer " + token ,
 			};
-			console.log('token set!');
+			state.token = token;
+		},
+	},
+	actions:
+	{
+		logout ({commit, dispatch, getters, rootState, state})
+		{
+			commit('updateState',{loading:true});
+			if (state.token)
+			{
+				let token = JSON.parse(JSON.stringify(state.token));
+				axios.post(apiBaseURL+'logout', {token})
+				.then(({data}) => {
+					console.log(data);
+				});
+				commit('destroyToken');
+			}
+			dispatch('resetStore').then(()=>{
+				commit('updateState',{loading:false});
+			});
+		},
+		login ({commit, dispatch, getters, rootState},
+			credentials)
+		{
+			commit('updateState',{loading:true});
+			// let self = this;
+			axios.post(apiBaseURL+'auth', credentials)
+			.then(({data}) => {
+				commit('setToken', {token:data.token});
+				dispatch('fetchListo');
+				router.push('/');
+			}).catch(({response})=>{
+				let serverError = response.data;
+				commit('updateState',{loading:false});
+				console.log(serverError);
+				let errors = Object.keys(serverError).map((k)=>{
+					return serverError[k];
+				}).map((e, i) => e[i]).join('<br>');
+				dispatch('sendFlash',{msg:errors});
+			});
+		},
+		register ({commit, dispatch, getters, rootState},
+			credentials)
+		{
+			commit('updateState',{loading:true});
+			// let self = this;
+			axios.post(apiBaseURL+'register', credentials)
+			.then(({data}) => {
+				commit('setToken', {token:data.token});
+				dispatch('fetchListo');
+				router.push('/');
+			}).catch(({response})=>{
+				let serverError = response.data;
+				commit('updateState',{loading:false});
+				console.log(serverError);
+				let errors = Object.keys(serverError).map((k)=>{
+					return serverError[k];
+				}).map((e, i) => e[i]).join('<br>');
+				dispatch('sendFlash',{msg:errors});
+			});
 		},
 		fetchListo ({commit, dispatch})
 		{
@@ -65,10 +121,10 @@ export default {
 		{
 			axios.get(apiBaseURL+'user').then(({data}) => {
 				console.log(data);
-				commit('updateUser', {user:data.user});
+				commit('user/updateState', {user:data.user});
 				dispatch('sendFlash',{msg:`Hello ${data.user.name}!`})
 			}).catch((error) => {
-				console.log(`ERROR: ${error}`);
+				console.log(`ERROR: ${error.response}`);
 			});
 		},
 		patch ({commit, dispatch, getters, rootState},

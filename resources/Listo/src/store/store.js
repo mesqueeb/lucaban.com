@@ -8,16 +8,18 @@ import api from './modules/api.js'
 import selection from './modules/selection.js'
 import newItem from './modules/newItem.js'
 
-export default {
-	state,
-	getters,
-    mutations,
-    actions,
-    modules: {
-	    user,
-	    userSettings,
-	    api,
-	    selection,
-	    newItem,
-	},
+export default function() {
+	return {
+		state: state(),
+		getters,
+	    mutations,
+	    actions,
+	    modules: {
+		    user,
+		    userSettings,
+		    api,
+		    selection,
+		    newItem,
+		},
+	}
 }

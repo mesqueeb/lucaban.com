@@ -5,6 +5,14 @@ import {
 // import { sec_to_hourmin } from '../../components/valueMorphers2.js';
 
 export default {
+resetStore({commit})
+{
+	commit('newItem/resetStateData');
+	commit('selection/resetStateData');
+	commit('userSettings/resetStateData');
+	commit('user/resetStateData');
+	commit('resetStateData');
+},
 flattenTree ({state, commit, dispatch, getters},
 	{array})
 {
@@ -296,9 +304,10 @@ deleteItem ({state, commit, dispatch, getters},
 	let item = state.nodes[id];
 	let previousItemId = (getters.prevItemId(id)) ? getters.prevItemId(id) : null;
 	// Delete all children as well!
+	let allChildrenIds;
 	if (Array.isArray(item.children) && item.children.length)
 	{
-		let allChildrenIds = getters.allVisibleChildIds(id);
+		allChildrenIds = getters.allVisibleChildIds(id);
 		dispatch('deleteItemApi', { idOrArray:allChildrenIds });
 	}
 	// Delete items attached to previous parent
@@ -332,7 +341,10 @@ deleteItem ({state, commit, dispatch, getters},
 	let newSelectedId = (getters.nextItemId(previousItemId)) ? getters.nextItemId(previousItemId) : null;
 	console.log(`new selected ID is: ${newSelectedId}`);
     state.selection.selectedId = newSelectedId;
-	delete state.nodes[id];
+	vm.$delete(state.nodes, id);
+	allChildrenIds.forEach((id)=>{
+		vm.$delete(state.nodes, id);
+	});
 },
 tagItem ({state, commit, dispatch, getters},
 	{id, tags = state.newTag, requestType} = {id:state.selection.selectedId, tags:state.newTag})
@@ -388,7 +400,7 @@ prepareDonePatch ({state, commit, dispatch, getters},
 	}
 	// dispatch('autoCalculateDoneState', { id:item.parent_id });
 	if (item.done)
-	{ // IF DONE:
+	{
 		//Add parent's body
 		dispatch('attachParentBody',{ id: id });
 	}
@@ -399,7 +411,7 @@ autoCalculateDoneState ({state, commit, dispatch, getters},
 	if (state.nodes[id].depth == 0){ return; }
 	if (getters.allChildrenDone(id) == true && !getters.isProject(id))
 	{
-		dispatch('markDone', {id, markAs:'done' });
+		// dispatch('markDone', {id, markAs:'done' });
 	} else {
 		dispatch('markDone', {id, markAs:'notDone' });
 	}
@@ -902,9 +914,9 @@ popup ({state, commit, dispatch, getters},
 //         }
 },
 sendFlash ({state, commit, dispatch, getters},
-	{type, msg} = {})
+	payload = {})
 {
-	commit('pushFlash', {type,msg});
+	commit('pushFlash', payload);
 },
 popout ({state, commit, dispatch, getters},
 	{id, type} = {})
@@ -937,7 +949,7 @@ addTimer ({state, commit, dispatch, getters},
 	dispatch('popout', { id, type:'timer' });
 	return;
 },
-clipboardSuccess ({dispatch, state, getters})
+clipboardSuccess ({dispatch, state, getters}, )
 {
 	// dispatch('sendFlash', { type:'success', msg:state.keybindings.copyClipboard.success[getters.language] });
 },

@@ -37,10 +37,15 @@
 			<div class="c-popout__bodybox">
 				<table class="c-guide__table">
 					<tr>
-						<th>{{ get.text.guide.action }}</th><th>{{ get.text.guide.key }}</th>
+						<th>{{ get.text.guide.action }}</th>
+						<th>{{ get.text.guide.key }}</th>
 					</tr>
 					<tr v-for="k in guide">
-						<td v-html="state.keybindings[k].guide[get.language]"></td><td v-html="stringToKeyboardKeys(state.keybindings[k][get.oS])"></td>
+						<td v-html="state.keybindings[k].guide[get.language]"></td>
+						<td v-if="state.keybindings[k][get.oS].includes('click')">
+							<span v-html="stringToKeyboardKeys(state.keybindings[k][get.oS])"></span><q-icon name='mouse' />
+						</td>
+						<td v-else v-html="stringToKeyboardKeys(state.keybindings[k][get.oS])"></td>
 					</tr>
 				</table>
 			</div>
@@ -357,6 +362,8 @@ export default {
     font-size: 1.1em;
     padding: 1em;
     width: 100%;
+    display: flex;
+    word-break: break-word;
 }
 .c-popout__nav {
     padding: 0.6em 1em;

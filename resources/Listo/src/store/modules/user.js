@@ -1,11 +1,19 @@
-export default {
-	state:
-	{
+function initialState() {
+	return {
 		user: null,
-	},
+	}
+}
+export default {
+	namespaced: true,
+	state:initialState(),
 	mutations:
 	{
-		updateUser(state, payload) // { id, field, value } or other
+		resetStateData(state)
+		{
+			let newState = initialState();
+			state = Object.assign(state, newState);
+		},
+		updateState(state, payload) // { id, field, value } or other
 		{
 			let key = payload.field;
 			let val = payload.value;

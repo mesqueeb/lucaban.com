@@ -60,19 +60,19 @@ import Vue from 'vue'
 window.Vue = Vue
 Vue.config.productionTip = false
 // 2.
-import Quasar, { QBtn, QIcon, QPopover, QModal, QSpinnerOval, QLayout, QFixedPosition } from 'quasar'
+import Quasar, { QBtn, QIcon, QPopover, QModal, QSpinnerOval, QLayout, QFixedPosition, QProgress } from 'quasar'
 import 'quasar-extras/material-icons'
 import 'quasar-extras/ionicons'
 Vue.use(Quasar, {
   components: {
-	QBtn, QIcon, QPopover, QModal, QSpinnerOval, QLayout, QFixedPosition
+	QBtn, QIcon, QPopover, QModal, QSpinnerOval, QLayout, QFixedPosition, QProgress
   }
 })
 // 3.
 import Vuex from 'vuex'
 Vue.use(Vuex);
 import ListStore from './store/store.js'
-window.store = new Vuex.Store(ListStore);
+window.store = new Vuex.Store(ListStore());
 // 4.
 import Vuelidate from 'vuelidate'
 Vue.use(Vuelidate)

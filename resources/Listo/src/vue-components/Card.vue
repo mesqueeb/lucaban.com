@@ -37,7 +37,7 @@
 					}"
 			>
 				<div :class="{
-					'u-lightgray':(item.temp && get.loggedIn),
+					'u-lightgray':(item.temp && get['user/loggedIn']),
 					'c-body-text--done': item.done
 					}"
 				>{{ item.body }}</div>

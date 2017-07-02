@@ -11,8 +11,8 @@
 			class="o-btn ml-auto"
 			v-btn-effect
 			v-clipboard:copy="get.clipboardTextJournal(item)"
-			v-clipboard:success="dispatch('clipboardSuccess')"
-			v-clipboard:error="dispatch('clipboardError')"
+			v-clipboard:success="clipboardSuccess"
+			v-clipboard:error="clipboardError"
 			v-if="true"
 		>
 			{{ get.text.card.copy }}
@@ -85,6 +85,14 @@ export default {
 		sec_to_hourmin,
 		commit(action, payload){ this.$store.commit(action, payload); },
 		dispatch(action, payload){ this.$store.dispatch(action, payload); },
+		clipboardSuccess()
+		{
+			this.dispatch('sendFlash', { type:'success', msg:this.state.keybindings.copyClipboard.success[this.l]+"<br><br>"+this.get.clipboardText(this.item.id) });
+		},
+		clipboardError()
+		{
+			this.dispatch('sendFlash', { type:'error', msg:this.state.keybindings.copyClipboard.error[this.l] });
+		},
 	},
 }
 </script>

@@ -53,8 +53,8 @@
 				class="o-btn c-stats__copy-btn"
 				v-btn-effect
 				v-clipboard:copy="get.clipboardText(state.root.id)"
-				v-clipboard:success="dispatch('clipboardSuccess')"
-				v-clipboard:error="dispatch('clipboardError')"
+				v-clipboard:success="clipboardSuccess"
+				v-clipboard:error="clipboardError"
 			>
 				{{ text.card.copy }}
 			</button>
@@ -83,6 +83,14 @@ export default {
 		tagSlugToName(tag)
 		{
 			return Utilities.tagSlugToName(tag);
+		},
+		clipboardSuccess()
+		{
+			this.dispatch('sendFlash', { type:'success', msg:this.state.keybindings.copyClipboard.success[this.get.language]+"<br><br>"+this.get.clipboardText(this.state.root.id) });
+		},
+		clipboardError()
+		{
+			this.dispatch('sendFlash', { type:'error', msg:this.state.keybindings.copyClipboard.error[this.get.language] });
 		},
 	},
 }

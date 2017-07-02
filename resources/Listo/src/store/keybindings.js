@@ -152,8 +152,8 @@ export default {
 		},
 	},
 	'hideTag':{
-		'mac':'alt click',
-		'win':'alt click',
+		'mac':"alt click",
+		'win':"alt click",
 		'name':{
 			'en':'',
 			'ja':'',

@@ -1,4 +1,11 @@
+import initialState from './state.js'
+
 export default {
+resetStateData(state)
+{
+	let newState = initialState();
+	state = Object.assign(state, newState);
+},
 updateState(state, payload) // { id, field, value } or other
 {
 	let key = payload.field;

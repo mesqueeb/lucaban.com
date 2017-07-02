@@ -26,20 +26,30 @@
 		@click="commit('updatePopouts', { guide:true })"
 		v-if="!get.mobile"
 	>?</a>
-	<a href="#"
+	<button
 		@click="commit('updateState', { setLanguage:'ja' })"
 		v-if="get.language != 'ja'"
-	>日本語</a>
-	<a href="#"
+	>日本語</button>
+	<button
 		@click="commit('updateState', { setLanguage:'en' })"
 		v-if="get.language != 'en'"
-	>English</a>
+	>English</button>
 	<router-link :to="'login'"
 		:class="{'active':
 			$route.path.includes('login')
 		}"
-		v-if="!state.user.user"
+		v-if="!get['user/loggedIn']"
 	>{{ get.text.user.login }}</router-link>
+	<router-link :to="'register'"
+		:class="{'active':
+			$route.path.includes('register')
+		}"
+		v-if="!get['user/loggedIn']"
+	>{{ get.text.user.register }}</router-link>
+	<a href="#"
+		@click="dispatch('logout')"
+		v-if="get['user/loggedIn']"
+	>{{ get.text.user.logout }}</a>
 	<a href="#"
 		id="js-copy__1068"
 		@click="test"
@@ -71,7 +81,7 @@ export default {
 		dispatch(action, payload){ this.$store.dispatch(action, payload) },
 		openMenu(menu, event)
 		{
-			if (router.currentRoute.path.includes('login'))
+			if (this.$route.path != '/')
 			{
 				router.push('/');
 			}
@@ -79,11 +89,11 @@ export default {
 			{
 				this.dispatch('filterItems', { keyword:'all', event})
 			}
-			if (menu == 'Today')
+			else if (menu == 'Today')
 			{
 				this.dispatch('filterItems', { keyword:'duedate', value:new Date(), event})
 			}
-			if (menu == 'Journal')
+			else if (menu == 'Journal')
 			{
 				this.dispatch('filterItems', { keyword:'journal', value:new Date(), event})
 			}
@@ -102,15 +112,21 @@ export default {
     background-color: rgba(255, 255, 255, 0.95);
 }
 .c-panel__navigation{
-    a{
+    a, button{
         transition: all 0.35s;
         text-decoration: none;
         color: #4d4d4d !important;
         margin: 0em 0.2em;
         padding: 0.3em;
-        &:hover{
-            color:$theme-color;
-        }
+        background: none;
+        border: none;
+    	color:$text-gray;
+    }
+    a:hover, button:hover{
+        color:$theme-color !important;
+    }
+    a:focus, button:focus{
+    	outline: none;
     }
     .active, .router-link-active{
         color: $theme-color !important;

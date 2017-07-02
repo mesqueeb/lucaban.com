@@ -25,6 +25,7 @@ export default new VueRouter({
       children: [
         { path: '', component: load('Listo') },
         { path: 'login', component: load('Login') },
+        { path: 'register', component: load('Register') },
       ]
     }, // Default
     { path: '*', component: load('Error404') }, // Not found

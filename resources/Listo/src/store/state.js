@@ -2,19 +2,18 @@ import languageContents from './lang.js'
 import keybindings from './keybindings.js'
 import setDefaultItemValues from './setDefaultItemValues.js'
 
-window.apiBaseURL = 'http://api.lucaban.dev/';
+if (DEV) {
+    window.apiBaseURL = 'http://api.lucaban.dev/';
+}
+if (PROD) {
+    window.apiBaseURL = 'http://api.lucaban.com/';
+}
 let initialItem = setDefaultItemValues({id: 'z', depth: 0, temp: true});
-let secondItem = JSON.parse(JSON.stringify(initialItem));
-secondItem.id = 'y';
-secondItem.depth = 1;
-secondItem.body = 'thhe test body';
-initialItem.children.push(secondItem);
-initialItem.children_order.push(secondItem.id);
 let nodes = {}
 nodes[initialItem.id] = initialItem;
-nodes[secondItem.id] = secondItem;
 
-export default {
+export default function(){
+  return {
     languageContents,
     keybindings,
     nodes,
@@ -43,4 +42,5 @@ export default {
     manualMobile: false,
     newTag: null,
     setLanguage: null,
-};
+  }
+}

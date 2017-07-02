@@ -1,9 +1,6 @@
 import { differenceInCalendarDays } from 'date-fns/esm'
-
-export default {
-	namespaced: true,
-	state:
-	{
+function initialState() {
+	return {
 		selectedId: null,
 		lastSelectedId: null,
 		filter: {
@@ -15,9 +12,18 @@ export default {
 		hiddenItems: [],
 		hiddenBookmarks: [],
 		view: 'tree',
-	},
+	}
+}
+export default {
+	namespaced: true,
+	state: initialState(),
 	mutations:
 	{
+		resetStateData(state)
+		{
+			let newState = initialState();
+			state = Object.assign(state, newState);
+		},
 		clear (state)
 		{
 			state.filter = {

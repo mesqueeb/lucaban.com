@@ -2,12 +2,19 @@
 
 Route::domain('api'.env('SESSION_DOMAIN'))
 	->middleware(['cors','api'])
-	->post('auth','AuthenticateController@authenticate');
+	->group(function () {
+		Route::post('auth','AuthenticateController@login');
+		Route::post('register','AuthenticateController@register');
+		Route::post('logout','AuthenticateController@logout');
+});
 // Cors patches
 Route::domain('api'.env('SESSION_DOMAIN'))
-	->options('auth','CORSHelperController@handleCORS');
-Route::domain('api'.env('SESSION_DOMAIN'))
-	->options('items','CORSHelperController@handleCORS');
+	->group(function () {
+		Route::options('auth','CORSHelperController@handleCORS');
+		Route::options('register','CORSHelperController@handleCORS');
+		Route::options('logout','CORSHelperController@handleCORS');
+		Route::options('items','CORSHelperController@handleCORS');
+});
 
 Route::domain('listo'.env('SESSION_DOMAIN'))
 	->get('/', 'ViewController@listo')
