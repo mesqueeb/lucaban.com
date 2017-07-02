@@ -179,6 +179,10 @@ return [
         Conner\Tagging\Providers\TaggingServiceProvider::class,
         GeneaLabs\LaravelCaffeine\Providers\LaravelCaffeineService::class,
         Mcamara\LaravelLocalization\LaravelLocalizationServiceProvider::class,
+        // Laravel\Passport\PassportServiceProvider::class,
+        // →　Tried passport but then replaced with JWT
+        Tymon\JWTAuth\Providers\JWTAuthServiceProvider::class,
+        Barryvdh\Cors\ServiceProvider::class,
     ],
 
     /*
@@ -228,6 +232,7 @@ return [
         'Validator' => Illuminate\Support\Facades\Validator::class,
         'View' => Illuminate\Support\Facades\View::class,
         'LaravelLocalization' => Mcamara\LaravelLocalization\Facades\LaravelLocalization::class,
+        'JWTAuth' => Tymon\JWTAuth\Facades\JWTAuth::class,
     ],
 
 ];

@@ -1,7 +1,6 @@
 <?php
 
 use Illuminate\Http\Request;
-
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -13,25 +12,8 @@ use Illuminate\Http\Request;
 |
 */
 
-Route::middleware('auth:api')->get('/user', function (Request $request) {
-    return $request->user();
-});
-
-Route::get('/items/fetchdone','CardController@getDone');
-Route::post('/itemtags/fetchTagged','ItemTagController@fetchTagged');
-Route::resource('/items','CardController');
-Route::resource('/itemtags','ItemTagController');
-
-// http://api.example.com/listo/tasks
-// http://listo.example.com/
-
-// Route::group([
-// 	'middleware' => 'auth:api',
-// 	'domain' => 'api'.env('SESSION_DOMAIN'),
-// ], function(){
-// 	Route::group([
-// 		'prefix' => 'listo',
-// 	], function(){
-		
-// 	});
-// });
+Route::get('items/fetchdone','CardController@getDone');
+Route::post('itemtags/fetchTagged','ItemTagController@fetchTagged');
+Route::resource('items','CardController');
+Route::resource('itemtags','ItemTagController');
+Route::get('user','AuthenticateController@getAuthenticatedUser');

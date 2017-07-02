@@ -18,6 +18,11 @@
 @include('components.menu')
 <div class="line"></div>
 @include('lp.contents')
+{{-- 
+@if (Auth::id() == 1)
+    @include('components.oauth')
+@endif
+--}}
 @include('components.footer')
 
 </div>{{-- /.lp-wrapper  --}}

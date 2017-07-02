@@ -11,18 +11,24 @@ const { mix } = require('laravel-mix');
  */
 
 mix
-   .js('resources/assets/js/items.js', 'public/js')
+   .copyDirectory('resources/Listo/dist/js', 'public/js')
+   .copyDirectory('resources/Listo/dist/img', 'public/img')
+   .copyDirectory('resources/Listo/dist/fonts', 'public/fonts')
+   .copyDirectory('resources/Listo/dist/statics', 'public/statics')
+   .copyDirectory('resources/Listo/dist/', 'public/Listo')
+
+   // Copy MATERIAL FONT
+   // .copy('node_modules/material-design-iconic-font/dist/fonts', 'public/css/fonts')
+
    .js('resources/assets/js/lp.js', 'public/js')
    .js('resources/assets/js/_boilerplate_app.js', 'public/js')
 
-   .sass('resources/assets/sass/items.scss', 'public/css')
    .sass('resources/assets/sass/lp.scss', 'public/css')
    .sass('resources/assets/sass/_boilerplate_app.scss', 'public/css')
 
    .copy('resources/assets/svg', 'public/css/svg')
    .copy('resources/assets/img', 'public/img')
-   // Copy MATERIAL FONT
-   .copy('node_modules/material-design-iconic-font/dist/fonts', 'public/css/fonts')
+
    .browserSync({
       browser: "google chrome",
       proxy: "lucaban.dev",

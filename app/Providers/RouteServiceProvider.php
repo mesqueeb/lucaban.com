@@ -35,10 +35,11 @@ class RouteServiceProvider extends ServiceProvider
      */
     public function map()
     {
-        $this->mapListoRoutes();
-        $this->mapApiRoutes();
-        $this->mapWebRoutes();
         $this->mapWWWRoutes();
+        $this->mapWebRoutes();
+        $this->mapApiRoutesJWTAuth();
+        $this->mapApiRoutesAuth();
+        $this->mapCustomRoutes();
     }
 
     /**
@@ -50,27 +51,22 @@ class RouteServiceProvider extends ServiceProvider
      */
     protected function mapWebRoutes()
     {
-        Route::middleware('web')
-            ->domain(substr(env('SESSION_DOMAIN'),1))
+        Route::domain(substr(env('SESSION_DOMAIN'),1))
+            ->middleware('web')
             ->namespace($this->namespace)
             ->group(base_path('routes/web.php'));
     }
     protected function mapWWWRoutes()
     {
-        Route::middleware('web')
-            ->domain('www'.env('SESSION_DOMAIN'))
+        Route::domain('www'.env('SESSION_DOMAIN'))
+            ->middleware('web')
             ->namespace($this->namespace)
             ->group(base_path('routes/web.php'));
     }
-    protected function mapListoRoutes()
-    {   
-        Route::group([
-            'namespace' => $this->namespace,
-            'domain' => 'listo'.env('SESSION_DOMAIN'),
-            'middleware' => ['web','auth'],
-        ], function(){
-            require base_path('routes/listo.php');
-        });
+    protected function mapCustomRoutes()
+    {
+            Route::namespace($this->namespace)
+            ->group(base_path('routes/customroutes.php'));
     }
     /**
      * Define the "api" routes for the application.
@@ -79,11 +75,18 @@ class RouteServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    protected function mapApiRoutes()
+    protected function mapApiRoutesJWTAuth()
     {
-        Route::prefix('api')
-             ->middleware(['api','auth'])
-             ->namespace($this->namespace)
-             ->group(base_path('routes/api.php'));
+            Route::domain('api'.env('SESSION_DOMAIN'))
+            ->namespace($this->namespace)
+            ->middleware(['api', 'jwt.auth', 'cors'])
+            ->group(base_path('routes/api.php'));
+    }
+    protected function mapApiRoutesAuth()
+    {
+            Route::prefix('api')
+            ->namespace($this->namespace)
+            ->middleware(['web', 'auth'])
+            ->group(base_path('routes/api.php'));
     }
 }

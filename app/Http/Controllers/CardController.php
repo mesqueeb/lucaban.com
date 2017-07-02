@@ -18,9 +18,10 @@ class CardController extends Controller
      *
      * @return void
      */
-    public function __construct()
+    public function __construct(Request $request)
     {
-        $this->middleware('auth');
+        // return auth()->user();
+        // dd(auth()->user());
     }
 
     /**
@@ -28,15 +29,17 @@ class CardController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        $userId = auth()->id();
+        // dd(auth()->user());
+        $userId = (!$request->id) ? auth()->id() : $request->id ;
         $god = User::find($userId)->items()
             ->where('parent_id',NULL)
             ->where('created_by',$userId)
             ->where('depth',0)
             ->first();
-        if(!$god){
+        if (!$god)
+        {
             $firstItem = Item::create(
                 ['body' => 'ALL',
                 'created_by' => $userId,
