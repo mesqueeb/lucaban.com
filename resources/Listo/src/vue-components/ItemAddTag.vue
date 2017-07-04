@@ -53,6 +53,10 @@ export default {
 			if (this.state.editingItemTags && e.shiftKey){
 				e.preventDefault();
 			}
+			if (!document.querySelectorAll(`#card-${this.get.editingOrAddingId} .js-item-tags i`).length)
+			{
+				e.preventDefault();
+			}
 		},
 		arrow(direction, e)
 		{

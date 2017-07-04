@@ -97,7 +97,7 @@ function sec_to_hourmin(val)
 }
 function customCalendar(val)
 {
-  	val = new Date(val);
+  	val = new Date(val.replace(/-/g, "/"));
 	let relativeTime = formatRelative(val, new Date(), {addSuffix: true});
   	if (relativeTime.includes('at'))
   	{

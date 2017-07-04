@@ -1,6 +1,6 @@
 <template>
 <div :class="
-	['c-item-tags',
+	['c-item-tags', 'js-item-tags',
 	{ 'c-item-tags--updating-tags': item.id == state.editingItemTags,
 	'c-item-tags--mobile-editing': mobileEditing }]"
 >
@@ -135,11 +135,13 @@ export default {
 		},
 		deleteTag(id, tag, event)
 		{
+			this.dispatch('blockBlur');
 			let plsFocus = '.js-add-tag';
 			document.querySelector(plsFocus).focus();	
 			if (this.state.editingItemTags || this.state.editingItem)
 			{
-				let plsHide = this.getSrcButton(event.srcElement);
+				let plsHide = this.getTagPillElement(event.srcElement);
+				console.log(plsHide);
 				plsHide.hidden = true;
 				this.dispatch('patchTag',{id, tags:tag, requestType:'untag'});
 			}
@@ -161,13 +163,13 @@ export default {
 			}
 			return false;
 		},
-		getSrcButton(element)
+		getTagPillElement(element)
 		{
 			if (element.nodeName == 'BUTTON')
 			{
-				return element;
+				return element.parentNode;
 			} else {
-				return this.getSrcButton(element.parentNode);
+				return this.getTagPillElement(element.parentNode);
 			}
 		},
 	},

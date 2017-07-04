@@ -226,7 +226,7 @@ export default {
 			}
 			else
 			{
-				let doneDateDiff = differenceInCalendarDays(new Date(item.done_date), new Date());
+				let doneDateDiff = differenceInCalendarDays(new Date(item.done_date.replace(/-/g, "/")), new Date());
 				passedTest = (!item.done || doneDateDiff <= -1) ? true : false;
 			}
 			return passedTest;

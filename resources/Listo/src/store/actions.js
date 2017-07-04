@@ -2,6 +2,11 @@ import { format, formatRelative, differenceInCalendarDays, addDays } from 'date-
 import {
 	Utilities, hasClass, mobilecheck, isElementInViewport, objectToArray, uniqBy, uniq, arrayToString, sortObjectArrayByProperty, sortObjectArrayByTwoProperties, removeEmptyValuesFromArray
 } from '../helpers/globalFunctions.js';
+
+// we import all of `date`
+import { date } from 'quasar'
+// destructuring to keep only what is needed
+const { addToDate } = date
 // import { sec_to_hourmin } from '../../components/valueMorphers2.js';
 
 export default {
@@ -139,48 +144,67 @@ addAndCleanNodesRecursively ({state, commit, dispatch, getters},
 addItem ({state, commit, dispatch, getters},
 	{item, index, addNextItemAs, addTags, duplication} = {})
 {
+	console.log(`addItem ({state, commit, dispatch, getters},
+	{item, index, addNextItemAs, addTags, duplication} = {})
+`);
+	console.log(item);
 	// Add item to nodes.
 	dispatch('addAndCleanNodesRecursively', {item} );
-	// Remove the Temp item
-	commit('deleteTempItem', {item});
-	// Add item to parent:
-	commit('addChild',{ newParentId:item.parent_id, index, item });
+	// Remove the Temp item.
+	if (getters['user/loggedIn'])
+	{
+		commit('deleteTempItem', {item});
+	}
 
-	// Patches etc.
-    state.selection.selectedId = item.id;
+	// Add item to parent node:
+	commit('addChild',{ newParentId:item.parent_id, index, item });
+	// Add tags
+    if (addTags){ dispatch('tagItem', { id:item.id, tags:addTags }); }
+	// calculate done state of parent. (if it was done, make undone because a new item is added)
+	dispatch('autoCalculateDoneState', { id:item.parent_id });
+	
+	// this is done at "SHOW ADD NEW ITEM"
+	// =========================
+	// // Patches etc.
+	// state.selection.selectedId = item.id;
+	// // addingNewUnder:
+	// commit('updateState',{ addingNewUnder:item.id });
+	// =========================
+
 	// if ( getters.isTopLvlItemInFilteredRoot(item.id)
 	// 	&& item.parent_id == state.root.id )
 	// {
 	// 	getters.backups.rootChildren.push(item);
 	// 	vm.patchRootChildrenOrderWithFilter(item.id);
 	// } else {
+		console.log('patching parent order: '+item.parent_id);
 	    dispatch('patch', { id:item.parent_id, field:'children_order' });
 	    // console.log('this is when we patch the parents children_order');
 	    // console.log('parent node:');
 	    // console.log(state.nodes[item.parent_id]);
 	// }
-    if (addTags){ dispatch('tagItem', { id:item.id, tags:addTags }); }
-	dispatch('attachParentBody',{ id: item.id });
-	dispatch('autoCalculateDoneState', { id:item.parent_id });
-	
-	if (state.selection.view == 'journal')
-	{
-		state.selection.view = null;
-		state.selection.view = 'journal';
-	}
-	if (getters['selection/dueTodayFiltered'])
-	{
-		state.selection.filter.dueDate.to = null;
-		state.selection.filter.dueDate.to = new Date();
-	}
-	if (state.selection.tags.length)
-	{
-		let tags = state.selection.tags;
-		state.selection.tags = [];
-		state.selection.tags = tags;
-	}
-	
-    
+
+	// Refresh the filter to update for new item.
+	// MAYBE NOT NEEDED ANYMORE
+	// =========================
+	// if (state.selection.view == 'journal')
+	// {
+	// 	state.selection.view = null;
+	// 	state.selection.view = 'journal';
+	// }
+	// if (getters['selection/dueTodayFiltered'])
+	// {
+	// 	state.selection.filter.dueDate.to = null;
+	// 	state.selection.filter.dueDate.to = new Date();
+	// }
+	// if (state.selection.tags.length)
+	// {
+	// 	let tags = state.selection.tags;
+	// 	state.selection.tags = [];
+	// 	state.selection.tags = tags;
+	// }
+	// ========================
+
     if (duplication || addNextItemAs == 'stop')
     {
     	state.addingNewUnder = null;
@@ -193,24 +217,9 @@ addTempNewItem ({state, commit, dispatch, getters},
 	{item, index, addNextItemAs, addTags} = {})
 {
 	console.info('adding Temp item');
-	item = JSON.parse(JSON.stringify(item));
 	item.id = 'tempItem_' + Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
 	item.temp = true;
-	console.log('temp item:');
-	console.log(item);
-	// Add item as node.
-	dispatch('addAndCleanNodesRecursively', {item} ).then(()=>{
-		console.log('added temp item, now tagging it.');
-		if (addTags){ dispatch('tagItem', { id:item.id, tags:addTags }); }
-	});
-	// Add item to parent.
-	commit('addChild',{ newParentId:item.parent_id, index, item });
-	// addingNewUnder:
-	commit('updateState',{ addingNewUnder:item.id });
-    if (addNextItemAs == 'stop')
-    {
-    	Vue.nextTick(()=> dispatch('scrollToItemIfNeeded', { id: item.id }));
-	}
+	dispatch('addItem', {item, index, addNextItemAs, addTags});
 },
 hideTaggedNodes ({state, commit, dispatch, getters},
 	{tag} = {})
@@ -304,11 +313,13 @@ deleteItem ({state, commit, dispatch, getters},
 	let item = state.nodes[id];
 	let previousItemId = (getters.prevItemId(id)) ? getters.prevItemId(id) : null;
 	// Delete all children as well!
-	let allChildrenIds;
 	if (Array.isArray(item.children) && item.children.length)
 	{
-		allChildrenIds = getters.allVisibleChildIds(id);
+		let allChildrenIds = getters.allVisibleChildIds(id);
 		dispatch('deleteItemApi', { idOrArray:allChildrenIds });
+		allChildrenIds.forEach((id)=>{
+			vm.$delete(state.nodes, id);
+		});
 	}
 	// Delete items attached to previous parent
 	let parent_id = item.parent_id;
@@ -342,9 +353,6 @@ deleteItem ({state, commit, dispatch, getters},
 	console.log(`new selected ID is: ${newSelectedId}`);
     state.selection.selectedId = newSelectedId;
 	vm.$delete(state.nodes, id);
-	allChildrenIds.forEach((id)=>{
-		vm.$delete(state.nodes, id);
-	});
 },
 tagItem ({state, commit, dispatch, getters},
 	{id, tags = state.newTag, requestType} = {id:state.selection.selectedId, tags:state.newTag})
@@ -479,22 +487,6 @@ flushDoneItems ({state, commit, dispatch, getters})
 			dispatch('deleteItem', {id} );
 		}
 	});
-},
-setDueDate ({state, commit, dispatch, getters},
-	{id, duedate} = {duedate:false})
-{
-	let dd = (duedate) ? new Date(duedate) : new Date();
-	let oriDueDate = new Date(state.nodes[id].due_date);
-	let diff = differenceInCalendarDays(oriDueDate, dd);
-	console.log(diff);
-	dd = (diff == 0) ? '0000-00-00 00:00:00' : format(dd, 'YYYY-MM-DD hh:mm:ss');
-	state.nodes[id].due_date = dd;
-	if (diff == 0 && getters['selection/dueTodayFiltered'])
-	{
-		state.selection.selectedId = getters.nextItemId(id);
-	}
-	dispatch('patchDueDate', {id, duedate:dd });
-	dispatch('updateChildrenDueDate', { id:id });
 },
 updateChildrenDueDate ({state, commit, dispatch, getters},
 	{id} = {})
@@ -639,7 +631,8 @@ cancelEdit ({state, commit, dispatch, getters})
 },
 cancelEditOrAdd ({state, commit, dispatch, getters})
 {
-	preventKeydownListener(); // see window object. initialized at ListAppKeyBindings.js
+	// why do i need this?
+	// preventKeydownListener(); // see window object. initialized at ListAppKeyBindings.js
 	dispatch('blockBlur');
 	if (state.addingNewUnder)
 	{
@@ -850,8 +843,25 @@ setTomorrow ({state, commit, dispatch, getters},
 {
 	id = (id) ? id : state.selection.selectedId;
 	if (!id){ return; }
-	let duedate = addDays(new Date(), 1).format("YYYY-MM-DD HH:mm:ss");
+	// let duedate = addDays(new Date(), 1).format("YYYY-MM-DD HH:mm:ss");
+	let duedate = addToDate(new Date(), { days: 1 });
+	duedate = format(duedate, "YYYY-MM-DD HH:mm:ss");
 	dispatch('setDueDate', {id, duedate});
+},
+setDueDate ({state, commit, dispatch, getters},
+	{id, duedate} = {duedate:false})
+{
+	let dd = (duedate) ? new Date(duedate) : new Date();
+	let oriDueDate = new Date(state.nodes[id].due_date.replace(/-/g, "/"));
+	let diff = differenceInCalendarDays(oriDueDate, dd);
+	dd = (diff == 0) ? '0000-00-00 00:00:00' : format(dd, 'YYYY-MM-DD hh:mm:ss');
+	state.nodes[id].due_date = dd;
+	if (diff == 0 && getters['selection/dueTodayFiltered'])
+	{
+		state.selection.selectedId = getters.nextItemId(id);
+	}
+	dispatch('patchDueDate', {id, duedate:dd });
+	dispatch('updateChildrenDueDate', { id:id });
 },
 showAddNewItem ({state, commit, dispatch, getters},
 	{id, addAs} = {})

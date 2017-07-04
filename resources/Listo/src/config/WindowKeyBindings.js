@@ -61,7 +61,7 @@ iniKeydownListenerPause()
 	window.preventKeydownListener = function(){
 		console.log('preventing keydown listener');
 		window.keydownListenerPaused = true;
-		setTimeout(function(){ window.keydownListenerPaused = false; }.bind(this), 500);
+		setTimeout(function(){ window.keydownListenerPaused = false; }.bind(this), 100);
 	};
 }
 iniKeyBindingListener()

@@ -197,7 +197,7 @@ export default {
 				});
 				return;
 			}
-			duedate = new Date(duedate);
+			duedate = new Date(duedate.replace(/-/g, "/"));
 			console.log('PatchDueDate: '+duedate);
 			axios.patch(apiBaseURL+'items/' + id, {'due_date':duedate})
 			.then(function(response){
@@ -269,7 +269,10 @@ export default {
 		postNewItem ({rootState, dispatch, getters},
 			{newItem, index, addNextItemAs, addTags, duplication} = {})
 		{
-			if (!rootState.user.user) { console.log('not Logged in'); return; }
+			if (!rootState.user.user) {
+				console.log('not Logged in');
+				return;
+			}
 			dispatch('startPatching');
 			// Prepare children_order for sending to DB.
 			if (newItem.children_order){

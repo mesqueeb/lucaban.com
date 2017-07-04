@@ -3,7 +3,7 @@
 import Vue from 'vue';
 window.Vue = Vue;
 // import lang from './lang/lp.js'
-import { isElementInViewport, addClass, removeClass } from './components/globalFunctions.js';
+import { isElementInViewport, addClass, removeClass } from './helpers/globalFunctions.js';
     window.Element.prototype.addClass = function(config){ return addClass(this,config) };
     window.Element.prototype.removeClass = function(config){ return removeClass(this,config) };
 

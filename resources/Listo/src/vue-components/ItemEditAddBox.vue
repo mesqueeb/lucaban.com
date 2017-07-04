@@ -34,6 +34,7 @@
 			@keydown.down="arrow('down',$event)"
 			@keydown.right="arrow('right',$event)"
 			@keydown.left="arrow('left',$event)"
+			@keydown.shift.tab.prevent
 			placeholder="...　　" rows="1"
 			autocomplete="off"
 		></textarea>
@@ -177,8 +178,10 @@ export default {
 		{
 			if (this.item.body){ return; }
 			e.preventDefault();
-			preventKeydownListener();
-			if (direction == 'up'){ this.dispatch('cancelEditOrAdd') }
+			if (direction == 'up'){
+				preventKeydownListener();
+				this.dispatch('cancelEditOrAdd')
+			}
 			if (direction == 'down'){ this.dispatch('focusElement',{ el:`#card-${this.get.editingOrAddingId} .js-update-planned-time__button` }) }
 			if (direction == 'right'){ this.newItemIndent() }
 			if (direction == 'left'){ this.newItemUnindent() }

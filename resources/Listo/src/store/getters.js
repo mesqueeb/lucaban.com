@@ -375,7 +375,7 @@ hasParentDueToday: (state, getters) =>
 	if (!item.parent_id){ return false; }
 	let parent = state.nodes[item.parent_id];
 	if (!parent){ return false; }
-	let diff = differenceInCalendarDays(new Date(parent.due_date), new Date());
+	let diff = differenceInCalendarDays(new Date(parent.due_date.replace(/-/g, "/")), new Date());
 	if (diff <= 0)
 	{
 		return true;
@@ -388,7 +388,7 @@ isDueToday: (state, getters) =>
 	let item = state.nodes[id];
 	if (!item){ return false; }
 
-	let diff = differenceInCalendarDays(new Date(item.due_date), new Date());
+	let diff = differenceInCalendarDays(new Date(item.due_date.replace(/-/g, "/")), new Date());
 	if (diff <= 0) { return true; }
 	return false;
 },
@@ -633,15 +633,15 @@ filteredItemsTree: (state, getters) => {
 	// .filter(item => item !== undefined);
 	// SORTING !!
 	// Sort the children by children_order if there's no selected tag or filter
-	if (getters['selection/noFilterOrTag'])
-	{
-		if (ids.length)
-		{
-			children = ids.map(id => children.find(child => child.id === id));
-		}
-	}
+	// if (getters['selection/noFilterOrTag'])
+	// {
+	// 	if (ids.length)
+	// 	{
+	// 		children = ids.map(id => children.find(child => child.id === id));
+	// 	}
+	// }
 	// Sort children by done_date if dueDate is filtered
-	else if ( getters['selection/dueTodayFiltered'] )
+	if ( getters['selection/dueTodayFiltered'] )
 	{
 		children = sortObjectArrayByTwoProperties(children, 'done_date', 'due_date', 'asc', 'desc');
 	}

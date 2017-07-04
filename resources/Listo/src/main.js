@@ -46,7 +46,6 @@ require(`quasar/dist/quasar.${__THEME}.css`);
 // 	window.hashtag = hashtag;
 // 	hashtag(linkify);
 
-	
 // 0.
 import axios from 'axios'
 window.axios = axios;
