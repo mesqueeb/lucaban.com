@@ -157,6 +157,10 @@ tagsArray: (state, getters) =>
 },
 makeTagObject: (state, getters) =>
 (tagAsString) => {
+	if (Array.isArray(tagAsString))
+	{
+		return tagAsString.map(tag => getters.makeTagObject(tag));
+	}
 	return {
 		temp: true,
 		tag_name: tagAsString,
@@ -395,6 +399,11 @@ isDueToday: (state, getters) =>
 isProject: (state, getters) =>
 (id) => {
 	if (!id){ return false; }
+	let item = state.nodes[id];
+	if (!item){ return false; }
+	console.log(`
+[${id}] ${item.body} isProject?
+		`);
 	if (state.nodes[id].body.slice(-1) == ':')
 	{
 		return true;
@@ -587,7 +596,8 @@ filteredIdsFlat: (state, getters) => {
 	if (state.loading){ return []; }
 	let ids = [];
 	console.log('running filteredIdsFlat');
-	let allNodes = Object.keys(state.nodes).map(k => (Number(k)) ? Number(k) : k);
+	let allNodes = Object.keys(state.nodes)
+						 .map(k => (Number(k)) ? Number(k) : k);
 	if (getters['selection/noFilterOrTag'])
 	{
 		ids = allNodes.filter(id => id != state.root.id);
@@ -595,6 +605,7 @@ filteredIdsFlat: (state, getters) => {
 	else
 	{
 		ids = allNodes.filter(id => {
+			if (id == state.root.id){ return false }
 			return getters['selection/testAgainstAllSelection'](id, { flat:true })
 		});
 	}
@@ -602,8 +613,8 @@ filteredIdsFlat: (state, getters) => {
 },
 filteredItemsFlat: (state, getters) => {
 	let children = getters.filteredIdsFlat
-					.map(id => state.nodes[id])
-					.filter(child => child !== undefined);
+						  .map(id => state.nodes[id])
+						  .filter(child => child !== undefined);
 	if (state.selection.view == 'journal')
 	{
 		children = sortObjectArrayByTwoProperties(children,'done_date','parents_bodies','desc','asc');
@@ -623,11 +634,14 @@ filteredItemsTree: (state, getters) => {
 	}
 	else
 	{
-		ids = Object.keys(state.nodes).map(k => (Number(k)) ? Number(k) : k).filter(id => {
-			return getters['selection/testAgainstAllSelection'](id, { flat:false })
-		});
+		ids = Object.keys(state.nodes)
+					.map(k => (Number(k)) ? Number(k) : k)
+					.filter(id => {
+						if (id == state.root.id){ return false }
+						return getters['selection/testAgainstAllSelection'](id, { flat:false })
+					});
 	}
-	console.log('ids');
+	console.log('Filtered Items Tree, IDs:');
 	console.log(ids);
 	let children = ids.map(id => state.nodes[id]);
 	// .filter(item => item !== undefined);

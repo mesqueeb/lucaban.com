@@ -86,9 +86,10 @@ addChild(state, { newParentId, index, item })
 	state.nodes[newParentId].children.splice(index,0,item);
 	state.nodes[newParentId].children_order.splice(index,0,item.id);
 },
-addTempTag (state, {id, tagObject, requestType} = {})
+addOrDeleteTempTag (state, {id, tagObject, requestType = 'tag'} = {})
 {
-	if (requestType == 'tag' || !requestType)
+	console.log(`${requestType}ging items tempor ${id} with "${tagObject.tag_name}"`);
+	if (requestType == 'tag')
 	{
 		console.log(state.nodes[id].tagged);
 		state.nodes[id].tagged.push(tagObject);
@@ -107,7 +108,7 @@ deleteTempItem(state, { item })
 	Object.keys(state.nodes).forEach(k => {
 		if (k.toString().includes('tempItem'))
 		{
-			delete state.nodes[k];
+			vm.$delete(state.nodes,k);
 		}
 	});
 },

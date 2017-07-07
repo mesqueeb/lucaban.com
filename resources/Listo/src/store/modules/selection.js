@@ -162,7 +162,7 @@ export default {
 				let item = state.nodes[id];
 				if (!item){ return a; }
 				let b = item.used_time;
-				console.log(b);
+				// console.log(b);
 				return a + b;
 			}, 0);
 		},
@@ -172,30 +172,46 @@ export default {
 				let item = state.nodes[id];
 				if (!item){ return a; }
 				let b = item.planned_time;
-				console.log(b);
+				// console.log(b);
 				return a + b;
 			}, 0);
 		},
 		testAgainstTagSelection: (state, getters, rootState, rootGetters) =>
 		(id, {flat = false} = { flat: false }) => {
-			let passedTest = true;
+			if (!state.tags.length && !state.hiddenTags.length)
+			{
+				return true;
+			}
+			let hasHiddenTags = false;
+			if (state.hiddenTags.length)
+			{
+				hasHiddenTags = state.hiddenTags.some(tag => rootGetters.hasTag(id, tag));
+			}
+			if (state.hiddenTags.length && state.tags.length)
+			{
+				return (!hasHiddenTags && state.root.children_order.includes(id));
+			}
+			let hasAllTags = true;
+			let hasParentWithTag = false;
 			if (state.tags.length)
 			{
-				let hasAllTags = state.tags.every(tag => rootGetters.hasTag(id, tag));
-				let hasHiddenTags = state.hiddenTags.some(tag => rootGetters.hasTag(id, tag));
-				let hasParentWithTag = state.tags.every(tag => rootGetters.hasParentWithTag(id, tag));
+				hasAllTags = state.tags.every(tag => rootGetters.hasTag(id, tag));
+				hasParentWithTag = state.tags.every(tag => rootGetters.hasParentWithTag(id, tag));
 				// IF I ever make an 'OR' selector:
 				// hasParentWithTag = state.tags.some(tag => getters.hasParentWithTag(item.id, tag));				
-				if (flat)
-				{
-					passedTest = (hasAllTags && !hasHiddenTags) ? true : false;
-				}
-				else
-				{
-					passedTest = (hasAllTags && !hasParentWithTag && !hasHiddenTags) ? true : false;
-				}
 			}
-			return passedTest;
+			// console.log(`id = ${id}
+			// 	hasAllTags = ${hasAllTags}
+			// 	hasParentWithTag = ${hasParentWithTag}
+			// 	hasHiddenTags = ${hasHiddenTags}`);
+			if (flat)
+			{
+				return (hasAllTags && !hasHiddenTags);
+			}
+			else
+			{
+				return (hasAllTags && !hasHiddenTags && !hasParentWithTag);
+			}
 		},
 		testAgainstDueDateSelection: (state, getters, rootState, rootGetters) =>
 		(id, {flat = false} = { flat: false }) => {
@@ -226,8 +242,14 @@ export default {
 			}
 			else
 			{
-				let doneDateDiff = differenceInCalendarDays(new Date(item.done_date.replace(/-/g, "/")), new Date());
-				passedTest = (!item.done || doneDateDiff <= -1) ? true : false;
+				// console.log(`-------------- doneTest ${id} --------------`);
+				let doneDate = (item.done_date) ? item.done_date.replace(/-/g, "/") : "0000-00-00 00:00:00";
+				// console.log(doneDate);
+				let doneDateDiff = differenceInCalendarDays(new Date(doneDate), new Date());
+				// console.log(doneDateDiff);
+				passedTest = (!item.done || doneDateDiff >= 0) ? true : false;
+				// console.log(passedTest);
+				// console.log(`-------------- -------------- --------------`);
 			}
 			return passedTest;
 		},
@@ -241,16 +263,27 @@ export default {
 			let passedAllTests = true;
 			if (flat)
 			{
+				// console.log(`=================== testing ${id} flat! ===================`);
 				passedAllTests = ( getters.testAgainstTagSelection(id, {flat:true})
 								&& getters.testAgainstDueDateSelection(id, {flat:true})
 								&& getters.testAgainstDoneSelection(id)
 								&& getters.testAgainstHiddenItems(id) );
+				// console.log(`testAgainstTagSelection = ${getters.testAgainstTagSelection(id, {flat:true})}`);
+				// console.log(`testAgainstDueDateSelection = ${getters.testAgainstDueDateSelection(id, {flat:true})}`);
+				// console.log(`testAgainstDoneSelection = ${getters.testAgainstDoneSelection(id)}`);
+				// console.log(`testAgainstHiddenItems = ${getters.testAgainstHiddenItems(id)}`);
+				// console.log(`=================== =================== ===================`);
 			}
 			else
 			{
+				// console.log(`=================== testing ${id} tree structure! ===================`);
 				let passedTagTest = getters.testAgainstTagSelection(id);
 				let passedDoneTest = getters.testAgainstDoneSelection(id);
 				let passedHiddenItemsTest = getters.testAgainstHiddenItems(id);
+				// console.log(`passedTagTest (${id}) = ${passedTagTest}`);
+				// console.log(`passedDoneTest (${id}) = ${passedDoneTest}`);
+				// console.log(`passedHiddenItemsTest (${id}) = ${passedHiddenItemsTest}`);
+				// console.log(`=================== =================== ===================`);
 				if (state.tags.length && getters.dueTodayFiltered)
 				{
 					passedAllTests = ( passedTagTest

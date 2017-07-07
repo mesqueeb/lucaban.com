@@ -26,8 +26,9 @@
 				v-if="item.children_order.length==0
 					|| item.done == true || get.allChildrenDone(item.id)"
 				v-model="item.done"
-				@change="dispatch('prepareDonePatch',{ id:item.id })"
+				@click="dispatch('prepareDonePatch',{ id:item.id })"
 			>
+				<!-- @change="test('change')" -->
 		</div>
 		<div
 			class=""
@@ -48,6 +49,12 @@ export default {
 	{
 		// commit(action, payload){ this.$store.commit(action, payload); },
 		dispatch(action, payload){ this.$store.dispatch(action, payload); },
+		test(val){ 
+			Vue.nextTick(function ()
+			{
+				console.log('it works!');
+			});
+		},
 	},
 }
 </script>

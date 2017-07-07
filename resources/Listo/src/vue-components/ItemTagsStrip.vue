@@ -63,8 +63,9 @@
 			v-if="deletableTag(tag)"
 			@blur="dispatch('blurOnEditOrAdd', { id:item.id })"
 			@click.prevent="deleteTag(item.id, tag, $event)"
-			@keydown.delete="deleteTag(item.id, tag, $event)"
-			@keydown.enter="deleteTag(item.id, tag, $event)"
+			@keydown.delete.prevent="deleteTag(item.id, tag, $event)"
+			@keydown.enter.prevent="deleteTag(item.id, tag, $event)"
+			@keydown.space.prevent="deleteTag(item.id, tag, $event)"
 			@keydown.tab="tab(index, $event)"
 		>
 			<q-icon name="ion-close-circled" />
@@ -136,14 +137,14 @@ export default {
 		deleteTag(id, tag, event)
 		{
 			this.dispatch('blockBlur');
-			let plsFocus = '.js-add-tag';
+			let plsFocus = `#card-${this.get.editingOrAddingId} .js-add-tag`;
 			document.querySelector(plsFocus).focus();	
 			if (this.state.editingItemTags || this.state.editingItem)
 			{
 				let plsHide = this.getTagPillElement(event.srcElement);
 				console.log(plsHide);
 				plsHide.hidden = true;
-				this.dispatch('patchTag',{id, tags:tag, requestType:'untag'});
+				this.dispatch('tagItem',{id, tags:tag, requestType:'untag'});
 			}
 			else if (this.item.newItem)
 			{

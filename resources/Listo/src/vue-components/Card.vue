@@ -33,9 +33,9 @@
 		>
 			<div
 				:class="{ 'c-body-text': true,
-					'c-body-text--project':isProject,
 					}"
 			>
+					<!-- 'c-body-text--project': get.isProject(item.id), -->
 				<div :class="{
 					'u-lightgray':(item.temp && get['user/loggedIn']),
 					'c-body-text--done': item.done

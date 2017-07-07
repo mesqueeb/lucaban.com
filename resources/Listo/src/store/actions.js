@@ -303,7 +303,7 @@ attachParentBody ({state, commit, dispatch, getters},
 	if (!item.parent_id){ return; }
 	let parent = state.nodes[item.parent_id];
 	if (!parent){ return; }
-	item.parents_bodies = parent.body;
+	commit('updateState', {id, parents_bodies:parent.body});
 	dispatch('patch', { id:id, field:'parents_bodies' });
 },
 deleteItem ({state, commit, dispatch, getters},
@@ -355,8 +355,10 @@ deleteItem ({state, commit, dispatch, getters},
 	vm.$delete(state.nodes, id);
 },
 tagItem ({state, commit, dispatch, getters},
-	{id, tags = state.newTag, requestType} = {id:state.selection.selectedId, tags:state.newTag})
+	{id = state.selection.selectedId, tags = state.newTag, requestType = 'tag'} =
+	{id:state.selection.selectedId, tags:state.newTag, requestType:'tag'})
 {
+	// console.log(`tagItem`);
 	/* requestType can be:
 		'tag': tag item  (default if null)
 		'untag': untag item with certain tag
@@ -370,10 +372,12 @@ tagItem ({state, commit, dispatch, getters},
 		tags = [tags];
 	}
 	tags = removeEmptyValuesFromArray(tags);
-	tags = tags.filter(t => !getters.hasTag(id,t));
+	if (requestType == 'tag')
+	{
+		tags = tags.filter(t => !getters.hasTag(id,t));
+	}
 	if (!tags.length){ return; }
-
-	dispatch('addTempTag', { id, tags, requestType });
+	dispatch('tagItemTemporarely', { id, tags, requestType });
 	dispatch('patchTag', { id, tags });
 
 	let item = state.nodes[id];
@@ -384,39 +388,48 @@ tagItem ({state, commit, dispatch, getters},
 		});
 	}
 },
-addTempTag ({state, commit, dispatch, getters},
+tagItemTemporarely ({state, commit, dispatch, getters},
 	{id, tags, requestType} = {})
 {
 	if (!tags){ return; }
 	if (Array.isArray(tags)){
-		tags.forEach(t => dispatch('addTempTag', { id, tags:t, requestType } ));
+		tags.forEach(t => dispatch('tagItemTemporarely', { id, tags:t, requestType } ));
 		return;
 	}
+	// console.log(`tagItemTemp`);
 	let tagObject = getters.makeTagObject(tags);
-	commit('addTempTag', {id, tagObject, requestType});
+	commit('addOrDeleteTempTag', {id, tagObject, requestType});
 },
 prepareDonePatch ({state, commit, dispatch, getters},
 	{id} = {})
 {
+	console.log(`preparingDonePatch for ${id}`);
 	let item = state.nodes[id];
-	let done_date = format(new Date(), 'YYYY-MM-DD HH:mm:ss');
-	item.done_date = done_date;
+	if (!item){ return; }
+	console.log(`item.done = ${item.done}`);
+	if (item.done)
+	{
+		let done_date = format(new Date(), 'YYYY-MM-DD HH:mm:ss');
+		console.log(done_date);
+		commit('updateState', {id, done_date});
+	}
+	else
+	{
+		commit('updateState', {id, done_date: '0000-00-00 00:00:00'});
+	}
 	dispatch('patchDone', {id} );
 	if (item.done)
 	{
 		dispatch('popup', { id:id, type:'afterDone' });
-	}
-	// dispatch('autoCalculateDoneState', { id:item.parent_id });
-	if (item.done)
-	{
-		//Add parent's body
 		dispatch('attachParentBody',{ id: id });
 	}
+	// dispatch('autoCalculateDoneState', { id:item.parent_id });
 },
 autoCalculateDoneState ({state, commit, dispatch, getters},
 	{id} = {})
 {
 	if (state.nodes[id].depth == 0){ return; }
+	console.log('auto calculating done state');
 	if (getters.allChildrenDone(id) == true && !getters.isProject(id))
 	{
 		// dispatch('markDone', {id, markAs:'done' });
@@ -723,12 +736,12 @@ showChildren ({state, commit, dispatch, getters},
 	if (!item.children || !item.children.length){ return; }
 	if (action == 'show'){
 		if (item.show_children) { return; }
-		item.show_children = true;
+		commit('updateState', {id, show_children:true});
 	} else if (action == 'hide') {
 		if (!item.show_children) { return; }
-		item.show_children = false;
+		commit('updateState', {id, show_children:false});
 	} else {
-		item.show_children = !item.show_children;
+		commit('updateState', {id, show_children:!item.show_children});
 	}
 	dispatch('patch', { id:id, field:'show_children' });
 },
@@ -739,8 +752,9 @@ markDone ({state, commit, dispatch, getters},
 	if (!id){ return; }
 	let item = state.nodes[id];
 	if (!item){ return; }
+	console.log(`marking (${id}) ${item.body} as... ${markAs}`);
 	if (markAs == 'notDone'){
-		item.done = false;
+		commit('updateState', {id, done:false});
 		dispatch('prepareDonePatch', {id} );
 		return;
 	}
@@ -748,9 +762,9 @@ markDone ({state, commit, dispatch, getters},
 		return;
 	}
 	if (markAs == 'done') {
-		item.done = true;
+		commit('updateState', {id, done:true});
 	} else {
-		item.done = !item.done;
+		commit('updateState', {id, done:!item.done});
 	}
 	dispatch('prepareDonePatch', {id} );
 },

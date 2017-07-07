@@ -9837,7 +9837,6 @@ module.exports = Vue$3;
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-throw new Error("Cannot find module \"date-fns/format\"");
 /* unused harmony export stringToKeyboardKeys */
 /* unused harmony export mobilecheck */
 /* unused harmony export objectToArray */
@@ -9923,64 +9922,6 @@ function sortObjectArrayByProperty(array, propertyName, order = 'asc') {
 			return textA > textB ? -1 : textA < textB ? 1 : 0;
 		}
 	}.bind(propertyName));
-}
-
-function sortObjectArrayByTwoProperties(array, prop1, prop2, order = 'asc', order2 = 'asc') {
-	let props = { prop1, prop2 };
-	return array.sort(function (a, b) {
-		prop1 = props['prop1'];
-		prop2 = props['prop2'];
-
-		let textA;
-		let textB;
-		if (a[prop1]) {
-			textA = prop1.includes('date_forgetabboutit') ? new Date(__WEBPACK_IMPORTED_MODULE_0_date_fns_format___default()(new Date(a[prop1]), 'YYYY/MM/DD')) : a[prop1].toUpperCase();
-		} else {
-			textA = ' ';
-		}
-		if (b[prop1]) {
-			textB = prop1.includes('date_forgetabboutit') ? new Date(__WEBPACK_IMPORTED_MODULE_0_date_fns_format___default()(new Date(b[prop1]), 'YYYY/MM/DD')) : b[prop1].toUpperCase();
-		} else {
-			textB = ' ';
-		}
-
-		if (order == 'asc') {
-			if (textA < textB) {
-				return -1;
-			} else if (textA > textB) {
-				return 1;
-			} else {
-				if (!a[prop2] || !b[prop2]) {
-					return 0;
-				}
-				let text2A = a[prop2] ? a[prop2].toUpperCase() : ' ';
-				let text2B = b[prop2] ? b[prop2].toUpperCase() : ' ';
-				if (order2 == 'asc') {
-					return text2A > text2B ? -1 : text2A < text2B ? 1 : 0;
-				} else if (order2 == 'desc') {
-					return text2A < text2B ? -1 : text2A > text2B ? 1 : 0;
-				}
-			}
-		} else if (order == 'desc') {
-			if (textA > textB) {
-				return -1;
-			} else if (textA < textB) {
-				return 1;
-			} else {
-				if (!a[prop2] || !b[prop2]) {
-					return 0;
-				}
-				let text2A = a[prop2] ? a[prop2].toUpperCase() : ' ';
-				let text2B = b[prop2] ? b[prop2].toUpperCase() : ' ';
-				// console.log('text2A: '+text2A+' | text2B: '+text2B);
-				if (order2 == 'asc') {
-					return text2A > text2B ? -1 : text2A < text2B ? 1 : 0;
-				} else if (order2 == 'desc') {
-					return text2A < text2B ? -1 : text2A > text2B ? 1 : 0;
-				}
-			}
-		}
-	}.bind(props));
 }
 function uniqBy(a, key) {
 	key = key ? key : JSON.stringify;
