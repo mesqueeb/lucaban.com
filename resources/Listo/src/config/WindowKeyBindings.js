@@ -142,7 +142,7 @@ iniKeyBindingListener()
         	return;
 		}
 		else
-		{ 
+		{
 			// console.log('keydown event: NO inputs or buttons are focussed!');
 		  // INPUT AREAS NOT IN FOCUS
           switch(e.keyCode)
@@ -257,7 +257,8 @@ iniKeyBindingListener()
 					self.keystroke('meta_c');
 		  			break;
 		  		}
-	  		case 189: // key c
+		  		break;
+	  		case 189: // key -
 				e.preventDefault();
 				self.keystroke('-');
 	  			break;

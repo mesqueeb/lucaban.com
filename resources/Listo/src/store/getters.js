@@ -213,12 +213,12 @@ nextItemId: (state, getters) =>
 	// Journal
 	if (state.selection.view == 'journal')
 	{
-		let ind = getters.filteredIdsTree.indexOf(id);
-		if (ind+1 == getters.filteredIdsTree.length)
+		let ind = getters.filteredIdsFlat.indexOf(id);
+		if (ind+1 == getters.filteredIdsFlat.length)
 		{
-			return getters.filteredIdsTree[0];
+			return getters.filteredIdsFlat[0];
 		}
-		return getters.filteredIdsTree[ind+1];
+		return getters.filteredIdsFlat[ind+1];
 	}
 	// Select next item on top level.
 	else if (getters.filteredIdsTree.includes(id)
@@ -324,7 +324,7 @@ prevItemId: (state, getters) =>
 	// Previous item in JOURNAL
 	if (state.selection.view == 'journal')
 	{
-		let journalChildren = getters.filteredIdsTree;
+		let journalChildren = getters.filteredIdsFlat;
 		let index = journalChildren.indexOf(id);
 		if (index == 0)
 		{
@@ -564,7 +564,7 @@ filteredItems: (state, getters) => {
 filteredItemsJournal: (state, getters) => {
 	if (state.selection.view != 'journal'){ return []; }
 	let dates = {};
-	getters.filteredItemsTree.forEach(function(item){
+	getters.filteredItemsFlat.forEach(function(item){
 		if (!item.done){ return; }
 		let dd = format(item.done_date, 'YYYY-MM-DD');
 		if (!dates[dd])

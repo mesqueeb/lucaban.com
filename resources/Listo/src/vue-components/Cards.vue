@@ -11,7 +11,6 @@
 <div 
 	class="d-flex flex-wrap"
 >
-	<Item-Edit-Add-Wrapper :item="item"></Item-Edit-Add-Wrapper>
 	<!-- _|CHILDREN -->
 	<div
 		class="l-children"
@@ -31,19 +30,24 @@
 		></Journal-Day>
 	</div>
 	<!-- CHILDREN|_ -->
+	<Add-Item-Tease
+		v-if="state.addingNewUnder != state.root.id && !listIsEmpty || (listIsEmpty && get.mobile)"
+	></Add-Item-Tease>
+	<Item-Edit-Add-Wrapper :item="item"></Item-Edit-Add-Wrapper>
 
 </div>
 </div>
 </template>
 <script>
 import ItemEditAddWrapper from './ItemEditAddWrapper.vue';
+import AddItemTease from './AddItemTease.vue';
 import JournalDay from './JournalDay.vue';
 import Card from './Card.vue';
 
 export default {
 	props: ['item'],
 	components: {
-		ItemEditAddWrapper, JournalDay, Card
+		ItemEditAddWrapper, JournalDay, Card, AddItemTease
 	},
 	data(){ return {} },
 	mounted()
@@ -61,7 +65,7 @@ export default {
 		{
 			if (!this.get.filteredItemsTree.length){ return true; }
 		},
-		showAddNewBox()
+		showingEditAddBox()
 		{
 			return ((this.state.addingNewUnder == this.item.id)
 				|| (this.listIsEmpty && !this.mobile && this.state.selection.view != 'journal'));

@@ -86,7 +86,7 @@ addChild(state, { newParentId, index, item })
 	state.nodes[newParentId].children.splice(index,0,item);
 	state.nodes[newParentId].children_order.splice(index,0,item.id);
 },
-addOrDeleteTempTag (state, {id, tagObject, requestType = 'tag'} = {})
+addOrDeleteTempTag(state, {id, tagObject, requestType = 'tag'} = {})
 {
 	console.log(`${requestType}ging items tempor ${id} with "${tagObject.tag_name}"`);
 	if (requestType == 'tag')
@@ -99,6 +99,28 @@ addOrDeleteTempTag (state, {id, tagObject, requestType = 'tag'} = {})
 	{
 		state.nodes[id].tagged = state.nodes[id].tagged.filter(t => t.tag_slug != tagObject.tag_slug);
 	}
+},
+deleteTag(state, {id, tags})
+{
+	if (!state.nodes[id]){
+		console.log(`trying to tag an unexisting item`);
+		return;
+	}
+	tags.forEach(tag => state.nodes[id].tagged = state.nodes[id].tagged.filter(t => t.tag_slug != tag.tag_slug));
+},
+addTagTemporarely(state, {id, tags})
+{
+	if (!Array.isArray(tags)){
+		tags = [tags];
+	}
+	if (!state.nodes[id]){
+		console.log(`trying to tag an unexisting item`);
+		return;
+	}
+	console.log(`tagging items tempor ${id} with... "${tags.map(t => t.tag_name)}"`);
+	// this isn't reactive
+	// state.nodes[id].tagged = Object.assign(state.nodes[id].tagged, tags);
+	tags.forEach(tag => state.nodes[id].tagged.push(tag));
 },
 deleteTempItem(state, { item })
 {

@@ -25,8 +25,8 @@
 </template>
 
 <script>
-import ItemToggles from './ItemToggles.vue';
-import ItemEditAddBox from './ItemEditAddBox.vue';
+import ItemToggles from './ItemToggles.vue'
+import ItemEditAddBox from './ItemEditAddBox.vue'
 export default {
 	props: ['item'],
 	components: {

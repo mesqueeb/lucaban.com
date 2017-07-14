@@ -75,6 +75,7 @@ export default {
 				return rootState.addingNewUnder;
 				
 			}
+			if (!rootState.nodes[rootState.addingNewUnder]){ return null; }
 			return rootState.nodes[rootState.addingNewUnder].parent_id;
 		},
 		preparedPlusComputedTags: (state, getters, rootState, rootGetters) => {

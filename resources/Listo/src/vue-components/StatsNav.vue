@@ -86,11 +86,13 @@ export default {
 		},
 		clipboardSuccess()
 		{
-			this.dispatch('sendFlash', { type:'success', msg:this.state.keybindings.copyClipboard.success[this.get.language]+"<br><br>"+this.get.clipboardText(this.state.root.id) });
+			this.dispatch('sendFlash', { type:'success', msg:`${this.state.keybindings.copyClipboard.success[this.get.language]}
+
+${this.get.clipboardText(this.state.root.id)}` });
 		},
 		clipboardError()
 		{
-			this.dispatch('sendFlash', { type:'error', msg:this.state.keybindings.copyClipboard.error[this.get.language] });
+			this.dispatch('sendFlash', { type:'error', msg:`${this.state.keybindings.copyClipboard.error[this.get.language]}` });
 		},
 	},
 }

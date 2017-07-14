@@ -112,7 +112,11 @@ export default {
 			{
 				return this.get['newItem/preparedPlusComputedTags'];
 			}
-			return this.item.tagged.map(t => t.tag_name).filter(t => !this.parentTags.includes(t));
+			return this.item.tagged
+					.map(t => t.tag_name)
+					.filter(t => {
+						return (this.get.isTopLvlItemInFilteredRoot(this.item.id) || !this.parentTags.includes(t))
+					});
 		},
 		mobileEditing(){
 			if (!this.get.mobile) { return false; }

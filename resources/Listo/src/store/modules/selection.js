@@ -189,7 +189,7 @@ export default {
 			}
 			if (state.hiddenTags.length && state.tags.length)
 			{
-				return (!hasHiddenTags && state.root.children_order.includes(id));
+				return (!hasHiddenTags && rootState.root.children_order.includes(id));
 			}
 			let hasAllTags = true;
 			let hasParentWithTag = false;
@@ -222,11 +222,11 @@ export default {
 				let hasParentDueToday = rootGetters.hasParentDueToday(id);
 				if (flat)
 				{
-				passedTest = (isDueToday || hasParentDueToday) ? true : false;
+					passedTest = (isDueToday || hasParentDueToday) ? true : false;
 				}
 				else
 				{
-				passedTest = (isDueToday && !hasParentDueToday) ? true : false;
+					passedTest = (isDueToday && !hasParentDueToday) ? true : false;
 				}
 			}
 			return passedTest;
@@ -263,40 +263,67 @@ export default {
 			let passedAllTests = true;
 			if (flat)
 			{
-				// console.log(`=================== testing ${id} flat! ===================`);
 				passedAllTests = ( getters.testAgainstTagSelection(id, {flat:true})
 								&& getters.testAgainstDueDateSelection(id, {flat:true})
 								&& getters.testAgainstDoneSelection(id)
 								&& getters.testAgainstHiddenItems(id) );
-				// console.log(`testAgainstTagSelection = ${getters.testAgainstTagSelection(id, {flat:true})}`);
-				// console.log(`testAgainstDueDateSelection = ${getters.testAgainstDueDateSelection(id, {flat:true})}`);
-				// console.log(`testAgainstDoneSelection = ${getters.testAgainstDoneSelection(id)}`);
-				// console.log(`testAgainstHiddenItems = ${getters.testAgainstHiddenItems(id)}`);
-				// console.log(`=================== =================== ===================`);
+				console.log(`
+				⎡⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺ testing ${id} flat! ⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎤
+				⎜　testAgainstTagSelection = ${getters.testAgainstTagSelection(id, {flat:true})}
+				⎜　testAgainstDueDateSelection = ${getters.testAgainstDueDateSelection(id, {flat:true})}
+				⎜　testAgainstDoneSelection = ${getters.testAgainstDoneSelection(id)}
+				⎜　testAgainstHiddenItems = ${getters.testAgainstHiddenItems(id)}
+				⎣______________________________________________________⎦
+				`);
 			}
 			else
 			{
-				// console.log(`=================== testing ${id} tree structure! ===================`);
-				let passedTagTest = getters.testAgainstTagSelection(id);
 				let passedDoneTest = getters.testAgainstDoneSelection(id);
 				let passedHiddenItemsTest = getters.testAgainstHiddenItems(id);
-				// console.log(`passedTagTest (${id}) = ${passedTagTest}`);
-				// console.log(`passedDoneTest (${id}) = ${passedDoneTest}`);
-				// console.log(`passedHiddenItemsTest (${id}) = ${passedHiddenItemsTest}`);
-				// console.log(`=================== =================== ===================`);
+				// In the case of a tag filter AND due date filter
 				if (state.tags.length && getters.dueTodayFiltered)
 				{
-					passedAllTests = ( passedTagTest
+					// This is to ensure that children of items who are due + have the selected tag
+					//       are not added twice, once as children and once as top lvl filered item
+					let hasParentDueToday = rootGetters.hasParentDueToday(id);
+					let hasParentWithTag;
+					if (state.tags.length)
+					{
+						hasParentWithTag = state.tags.every(tag => rootGetters.hasParentWithTag(id, tag));
+					}
+					if (hasParentDueToday && hasParentWithTag)
+					{
+						return false;
+					}
+					// Continue with the regular tests
+					passedAllTests = ( getters.testAgainstTagSelection(id, {flat:true})
 									&& getters.testAgainstDueDateSelection(id, {flat:true})
 									&& passedDoneTest
 									&& passedHiddenItemsTest );
+					console.log(`
+					⎡⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺ testing (${id}) tree structure! ⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎤
+					⎜　passedTagTest = ${getters.testAgainstTagSelection(id, {flat:true})}
+					⎜　passedDueDateTest = ${getters.testAgainstDueDateSelection(id, {flat:true})}
+					⎜　passedDoneTest = ${passedDoneTest}
+					⎜　passedHiddenItemsTest = ${passedHiddenItemsTest}
+					⎣___________________________________________________________________⎦
+					`);
 				}
+				// in the case of either a tag filter OR a due date filter
 				else
 				{
-					passedAllTests = ( passedTagTest
-									&& getters.testAgainstDueDateSelection(id, {flat:false})
+					passedAllTests = ( getters.testAgainstTagSelection(id)
+									&& getters.testAgainstDueDateSelection(id)
 									&& passedDoneTest
 									&& passedHiddenItemsTest );
+					console.log(`
+					⎡⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺ testing (${id}) tree structure! ⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎤
+					⎜　passedTagTest = ${getters.testAgainstTagSelection(id)}
+					⎜　passedDueDateTest = ${getters.testAgainstDueDateSelection(id)}
+					⎜　passedDoneTest = ${passedDoneTest}
+					⎜　passedHiddenItemsTest = ${passedHiddenItemsTest}
+					⎣___________________________________________________________________⎦
+					`);
 				}
 			}
 			return passedAllTests;

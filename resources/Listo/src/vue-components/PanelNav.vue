@@ -53,8 +53,15 @@
 	<a href="#"
 		id="js-copy__1068"
 		@click="test"
-		v-if="state.debug"
+		v-if="state.debug && DEV"
 	>TEST</a>
+	<a href="#"
+		id="js-copy__1063"
+		:style="(state.debug) ? 'color:red !important; border: thin solid; padding: 0 0.2em; margin: auto;' : ''"
+		@click="state.debug = !state.debug"
+		v-if="DEV"
+	>Debug</a>
+	
 </div>
 </template>
 
@@ -71,6 +78,7 @@ export default {
 		state(){ return this.$store.state },
 		selection(){ return this.state.selection },
 		router(){ return router },
+		DEV(){ return DEV },
 	},
 	methods:
 	{

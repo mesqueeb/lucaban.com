@@ -28,7 +28,15 @@
 				v-model="item.done"
 				@click="dispatch('prepareDonePatch',{ id:item.id })"
 			>
-				<!-- @change="test('change')" -->
+				<!-- 
+				@change="test('change')"
+				TODO (codementor)
+				@change doesn't get run when having this:
+				ITEM (tag: 'a')
+					ITEM
+					⤷　click on this item's togglebox to mark done.
+						In the case that the list is filtered on tag 'a', the item disappears before the @change is applied...
+				-->
 		</div>
 		<div
 			class=""

@@ -144,74 +144,78 @@ addAndCleanNodesRecursively ({state, commit, dispatch, getters},
 addItem ({state, commit, dispatch, getters},
 	{item, index, addNextItemAs, addTags, duplication} = {})
 {
-	console.log(`addItem ({state, commit, dispatch, getters},
-	{item, index, addNextItemAs, addTags, duplication} = {})
-`);
+	console.log(`addItem to DOM`);
 	console.log(item);
-	// Add item to nodes.
-	dispatch('addAndCleanNodesRecursively', {item} );
 	// Remove the Temp item.
-	if (getters['user/loggedIn'])
+	if (getters['user/loggedIn'] && !item.id.toString().includes('tempItem'))
 	{
+		console.log('deleting temp item');
 		commit('deleteTempItem', {item});
 	}
-
-	// Add item to parent node:
-	commit('addChild',{ newParentId:item.parent_id, index, item });
-	// Add tags
-    if (addTags){ dispatch('tagItem', { id:item.id, tags:addTags }); }
-	// calculate done state of parent. (if it was done, make undone because a new item is added)
-	dispatch('autoCalculateDoneState', { id:item.parent_id });
+	// Add item to nodes.
+	dispatch('addAndCleanNodesRecursively', {item} )
+	.then(()=>{
+		// Add item to parent node:
+		commit('addChild',{ newParentId:item.parent_id, index, item })
+		// Add tags
+	    if (addTags){ dispatch('tagItem', { id:item.id, tags:addTags }); }
+		// calculate done state of parent. (if it was done, make undone because a new item is added)
+		dispatch('autoCalculateDoneState', { id:item.parent_id });
+		
 	
-	// this is done at "SHOW ADD NEW ITEM"
-	// =========================
-	// // Patches etc.
-	// state.selection.selectedId = item.id;
-	// // addingNewUnder:
-	// commit('updateState',{ addingNewUnder:item.id });
-	// =========================
+		// this is done at "SHOW ADD NEW ITEM"
+		// =========================
+		// // Patches etc.
+		// state.selection.selectedId = item.id;
+		// // addingNewUnder:
+		// commit('updateState',{ addingNewUnder:item.id });
+		// =========================
 
-	// if ( getters.isTopLvlItemInFilteredRoot(item.id)
-	// 	&& item.parent_id == state.root.id )
-	// {
-	// 	getters.backups.rootChildren.push(item);
-	// 	vm.patchRootChildrenOrderWithFilter(item.id);
-	// } else {
-		console.log('patching parent order: '+item.parent_id);
-	    dispatch('patch', { id:item.parent_id, field:'children_order' });
-	    // console.log('this is when we patch the parents children_order');
-	    // console.log('parent node:');
-	    // console.log(state.nodes[item.parent_id]);
-	// }
+		// if ( getters.isTopLvlItemInFilteredRoot(item.id)
+		// 	&& item.parent_id == state.root.id )
+		// {
+		// 	getters.backups.rootChildren.push(item);
+		// 	vm.patchRootChildrenOrderWithFilter(item.id);
+		// } else {
+			if (!item.id.toString().includes('tempItem'))
+			{
+				console.log('patching parent order: '+item.parent_id);
+			    dispatch('patch', { id:item.parent_id, field:'children_order' });
+			}
+		    // console.log('this is when we patch the parents children_order');
+		    // console.log('parent node:');
+		    // console.log(state.nodes[item.parent_id]);
+		// }
 
-	// Refresh the filter to update for new item.
-	// MAYBE NOT NEEDED ANYMORE
-	// =========================
-	// if (state.selection.view == 'journal')
-	// {
-	// 	state.selection.view = null;
-	// 	state.selection.view = 'journal';
-	// }
-	// if (getters['selection/dueTodayFiltered'])
-	// {
-	// 	state.selection.filter.dueDate.to = null;
-	// 	state.selection.filter.dueDate.to = new Date();
-	// }
-	// if (state.selection.tags.length)
-	// {
-	// 	let tags = state.selection.tags;
-	// 	state.selection.tags = [];
-	// 	state.selection.tags = tags;
-	// }
-	// ========================
+		// Refresh the filter to update for new item.
+		// MAYBE NOT NEEDED ANYMORE
+		// =========================
+		// if (state.selection.view == 'journal')
+		// {
+		// 	state.selection.view = null;
+		// 	state.selection.view = 'journal';
+		// }
+		// if (getters['selection/dueTodayFiltered'])
+		// {
+		// 	state.selection.filter.dueDate.to = null;
+		// 	state.selection.filter.dueDate.to = new Date();
+		// }
+		// if (state.selection.tags.length)
+		// {
+		// 	let tags = state.selection.tags;
+		// 	state.selection.tags = [];
+		// 	state.selection.tags = tags;
+		// }
+		// ========================
 
-    if (duplication || addNextItemAs == 'stop')
-    {
-    	state.addingNewUnder = null;
-    } else {
-	    dispatch('showAddNewItem', { id:item.id, addAs:addNextItemAs });
-    }
-	Vue.nextTick(()=> dispatch('scrollToItemIfNeeded', { id:item.id }));
+	    if (duplication || addNextItemAs == 'stop')
+	    {
+	    	state.addingNewUnder = null;
+	    } else {
+		    dispatch('showAddNewItem', { id:item.id, addAs:addNextItemAs });
+	    }
+		Vue.nextTick(()=> dispatch('scrollToItemIfNeeded', { id:item.id }));
+	});
 },
 addTempNewItem ({state, commit, dispatch, getters},
 	{item, index, addNextItemAs, addTags} = {})
@@ -381,6 +385,7 @@ tagItem ({state, commit, dispatch, getters},
 	dispatch('patchTag', { id, tags });
 
 	let item = state.nodes[id];
+	if (!item){ return; }
 	if (item.children.length)
 	{
 		item.children_order.forEach(function(childId){
@@ -389,16 +394,19 @@ tagItem ({state, commit, dispatch, getters},
 	}
 },
 tagItemTemporarely ({state, commit, dispatch, getters},
-	{id, tags, requestType} = {})
+	{id, tags, requestType = 'tag'} = {id:null, tags:null, requestType:'tag'})
 {
 	if (!tags){ return; }
-	if (Array.isArray(tags)){
-		tags.forEach(t => dispatch('tagItemTemporarely', { id, tags:t, requestType } ));
-		return;
+	if (!Array.isArray(tags)){
+		tags = [tags];
 	}
-	// console.log(`tagItemTemp`);
-	let tagObject = getters.makeTagObject(tags);
-	commit('addOrDeleteTempTag', {id, tagObject, requestType});
+	tags = tags.map(tag => getters.makeTagObject(tag));
+	if (requestType == 'untag')
+	{
+		commit('deleteTag', {id, tags});
+	} else {
+		commit('addTagTemporarely', {id, tags});
+	}
 },
 prepareDonePatch ({state, commit, dispatch, getters},
 	{id} = {})
@@ -585,6 +593,7 @@ scrollToItemIfNeeded ({state, commit, dispatch, getters},
 	if (!isElementInViewport(el))
 	{
 		el.scrollIntoView();
+		// window.scrollBy(0, -100);
 	}
 },
 doneEdit ({state, commit, dispatch, getters},
@@ -725,8 +734,8 @@ addNew ({state, commit, dispatch, getters},
 	console.log(addTags);
 	// Send to Root for Ajax call.
 	store.commit('resetNewItem');
-	dispatch('addTempNewItem', { item:newItem, index, addNextItemAs, addTags });
-	dispatch('postNewItem', { newItem, index, addNextItemAs, addTags, duplication:null });
+	dispatch('addTempNewItem', { item:newItem, index, addNextItemAs, addTags })
+	.then(()=> dispatch('postNewItem', { newItem, index, addNextItemAs, addTags, duplication:null }));
 },
 showChildren ({state, commit, dispatch, getters},
 	{id, action} = {})
@@ -878,17 +887,22 @@ setDueDate ({state, commit, dispatch, getters},
 	dispatch('updateChildrenDueDate', { id:id });
 },
 showAddNewItem ({state, commit, dispatch, getters},
-	{id, addAs} = {})
+	{id = state.selection.selectedId, addAs} = {id: state.selection.selectedId})
 {
 	if (getters.mobile){ store.$refs['add-item-modal'].open() };
-	id = (id) ? id : (state.selection.selectedId) ? state.selection.selectedId : state.root.id ;
+	id = (id) ? id : state.root.id ;
+	console.log(`showing add new item for id: ${id}`);
 	if (!id){ return; }
-	console.log('showAddNewItem for ['+state.nodes[id].body+']');
 	state.addingNewUnder = id;
 	state.selection.lastSelectedId = id;
 	state.selection.selectedId = null;
 	// state.addingNewAsFirstChild = (addAs == 'child') ? true : false;
 	state.addingNewAsChild = (addAs == 'child') ? true : false;
+	if (getters.mobile){ 
+		Vue.nextTick(()=>{
+			document.querySelector('.js-edit-body').focus();
+		});
+	};
 },
 startEditTags ({state, commit, dispatch, getters},
 	{id} = {})
@@ -1026,11 +1040,15 @@ copyProgrammatic ({dispatch, state, getters},
 	try {
 	    let successful = document.execCommand('copy');
 	    let msg = successful ? 'successful' : 'unsuccessful';
-	    dispatch('clipboardSuccess');
-	    console.log('Copying text command was ' + msg);
+	    // dispatch('clipboardSuccess');
+	    // console.log('Copying text command was ' + msg);
+	    dispatch('sendFlash', { type:'success', msg:`${state.keybindings.copyClipboard.success[getters.language]}
+
+${getters.clipboardText(id)}` });
 	} catch (err) {
-	    dispatch('clipboardError');
-	    console.log('Oops, unable to copy');
+	    // dispatch('clipboardError');
+	    // console.log('Oops, unable to copy');
+	    dispatch('sendFlash', { type:'error', msg:`${state.keybindings.copyClipboard.error[getters.language]}` });
 	}
 	document.body.removeChild(textArea);
 },

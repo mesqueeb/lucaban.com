@@ -46,6 +46,7 @@ export default {
 			'setToday':'Do today',
 			'addAndContinue':'Add and continue',
 			'addAndClose':'Add and close',
+			'addNew': 'Add new...',
 		},
 		'tags':
 		{
@@ -144,6 +145,7 @@ export default {
 			'setToday':'今日やる',
 			'addAndContinue':'複数追加',
 			'addAndClose':'追加して閉じる',
+			'addNew': '追加...',
 		},
 		'tags':
 		{

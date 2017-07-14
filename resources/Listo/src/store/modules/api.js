@@ -49,6 +49,7 @@ export default {
 		login ({commit, dispatch, getters, rootState},
 			credentials)
 		{
+			dispatch('resetStore');
 			commit('updateState',{loading:true});
 			// let self = this;
 			axios.post(apiBaseURL+'auth', credentials)
@@ -131,6 +132,7 @@ export default {
 			{id, field, value} = {})
 		{
 			if (!rootState.user.user) { console.log('not Logged in'); return; }
+			if (id.toString().includes('tempItem')) { return; console.log('not patching temp items...'); }
 			// if (getters.isTopLvlItemInFilteredRoot(id)){ 
 			// 	if (field == 'children_order' || field == 'parent_id'){
 			// 		console.log("you can't sync a toplvlItem when filtering");
@@ -165,6 +167,7 @@ export default {
 				'retag': delete all tags and retag new ones
 			*/
 			if (!rootState.user.user) { console.log('not Logged in'); return; }
+			if (id.toString().includes('tempItem')) { return; console.log('not patching temp items...'); }
 			dispatch('startPatching');
 			let patchObj = {};
 			patchObj['tags'] = tags;
@@ -189,6 +192,7 @@ export default {
 			{id, duedate} = {})
 		{
 			if (!rootState.user.user) { console.log('not Logged in'); return; }
+			if (id.toString().includes('tempItem')) { return; console.log('not patching temp items...'); }
 			dispatch('startPatching');
 			if (duedate == '0000-00-00 00:00:00'){
 				axios.patch(apiBaseURL+'items/' + id, {'due_date':duedate})
@@ -208,6 +212,7 @@ export default {
 			{id} = {})
 		{
 			if (!rootState.user.user) { console.log('not Logged in'); return; }
+			if (id.toString().includes('tempItem')) { return; console.log('not patching temp items...'); }
 			dispatch('startPatching');
 			let done_date;
 			let doneValue = rootState.nodes[id].done;
@@ -231,6 +236,7 @@ export default {
 				array.forEach(id => { dispatch('deleteItemApi', { idOrArray:id }); });
 			} else {
 				let id = idOrArray; // It's an ID!
+				if (id.toString().includes('tempItem')) { return; console.log('not patching temp items...'); }
 				if (!id){ return; }
 				let item = rootState.nodes[id];
 				axios.delete(apiBaseURL+'items/' + id)
@@ -269,6 +275,8 @@ export default {
 		postNewItem ({rootState, dispatch, getters},
 			{newItem, index, addNextItemAs, addTags, duplication} = {})
 		{
+			console.log(`posting newItem...`);
+			console.log(newItem);
 			if (!rootState.user.user) {
 				console.log('not Logged in');
 				return;
@@ -300,6 +308,7 @@ export default {
 			{id} = {})
 		{
 			if (!rootState.user.user) { console.log('not Logged in'); return; }
+			if (id.toString().includes('tempItem')) { return; console.log('not patching temp items...'); }
 			axios.get(apiBaseURL+'items/'+rootState.root.id).then(function(response){
 				let rootChildrenOrder = response.data.children_order;
 				rootChildrenOrder = rootChildrenOrder+','+id;
