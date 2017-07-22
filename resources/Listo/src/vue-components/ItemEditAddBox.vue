@@ -25,7 +25,7 @@
 		</div>
 		<textarea
 			class="js-edit-body c-editaddbox__textarea"
-			v-focus v-autoheight
+			v-focus.noMobile v-autoheight
 			v-model="item.body"
 			@blur="dispatch('blurOnEditOrAdd')"
 			@keydown.esc="dispatch('cancelEditOrAdd')"
@@ -42,7 +42,7 @@
 	<div
 		v-else
 		:class="['c-editaddbox__body', 'c-editaddbox__body--editing-tags',
-			{'c-body-text--project':get.isProject(item.id)}]"
+			{'c-body-text--project':isProject}]"
 	>
 		<div :class="{
 			'u-lightgray':(item.temp && get['user/loggedIn']),
@@ -112,6 +112,10 @@ export default {
 		mobile(){ return this.get.mobile },
 		listIsEmpty(){ return this.$parent.listIsEmpty },
 		itemAddingUnder(){ return this.state.nodes[this.state.addingNewUnder] },
+		isProject(){
+			if (this.item.newItem){ return false }
+			return itemGetters[this.item.id].isProject;
+		},
 	},
 	methods:
 	{
@@ -132,7 +136,9 @@ export default {
 				this.commit('updateState', {addingNewAsChild:true});
 				return;
 			}
-			let lastChildId = this.get.findDeepestVisibleChild(this.state.addingNewUnder);
+			let previousItemGetters = itemGetters[this.state.addingNewUnder];
+			if (!previousItemGetters){ return }
+			let lastChildId = previousItemGetters.findDeepestVisibleChild;
     		this.dispatch('showAddNewItem', { id:lastChildId });
 		},
 		newItemUnindent()

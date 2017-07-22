@@ -1,12 +1,11 @@
 import { format, formatRelative, differenceInCalendarDays, addDays } from 'date-fns/esm'
-import {
-	Utilities, hasClass, mobilecheck, isElementInViewport, objectToArray, uniqBy, uniq, arrayToString, sortObjectArrayByProperty, sortObjectArrayByTwoProperties, removeEmptyValuesFromArray
-} from '../helpers/globalFunctions.js';
+import { hasClass, isElementInViewport, removeEmptyValuesFromArray } from '../helpers/globalFunctions.js'
+import setDefaultItemValues from './setDefaultItemValues.js'
 
 // we import all of `date`
 import { date } from 'quasar'
 // destructuring to keep only what is needed
-const { addToDate } = date
+const { addToDate } = date;
 // import { sec_to_hourmin } from '../../components/valueMorphers2.js';
 
 export default {
@@ -18,24 +17,10 @@ resetStore({commit})
 	commit('user/resetStateData');
 	commit('resetStateData');
 },
-flattenTree ({state, commit, dispatch, getters},
-	{array})
-{
-	console.log('flattening tree...');
-	let flattenedTree = [];
-	array.forEach(function(item){
-		flattenedTree.push(item);
-		if (item.children.length)
-		{
-			Array.prototype.push.apply(flattenedTree, getters.flattenTree(item.children));
-		}
-	});
-	return flattenedTree;
-},
 giveNewParent ({state, commit, dispatch, getters},
 	{ id, new_parent_id, specificNewIndex } = {})
 {
-	if (getters.isTopLvlItemInFilteredRoot(id))
+	if (itemGetters[id].isTopLvlItemInFilteredRoot)
 	{ 
 		let errMsg = getters.text.flashes.moveTopLvlItem;
 		console.log(errMsg);
@@ -51,7 +36,7 @@ giveNewParent ({state, commit, dispatch, getters},
 	let prevParent = state.nodes[parent_id];
 		console.log('prevParent ↓ ');
 		console.log(prevParent);
-	let siblingIndex = getters.siblingIndex(id);
+	let siblingIndex = itemGetters[id].siblingIndex;
 	// targetItem.parent_id = new_parent_id;
 	commit('updateState', { id: id, field: 'parent_id', value: new_parent_id });
 	// targetItem.depth = newParent.depth+1;
@@ -73,7 +58,7 @@ giveNewParent ({state, commit, dispatch, getters},
 	else if (prevParent.depth-1 == newParent.depth && new_parent_id == prevParent.parent_id)
 	{
 		// when unindenting
-		let newIndex = getters.siblingIndex(prevParent.id)+1;
+		let newIndex = itemGetters[prevParent.id].siblingIndex+1;
 		// newParent.children.splice(newIndex,0,targetItem);
 		// newParent.children_order.splice(newIndex,0,id);
 		commit('addChild',{'index':newIndex,'item':targetItem,'newParentId':new_parent_id });		
@@ -100,7 +85,7 @@ giveNewParent ({state, commit, dispatch, getters},
 
 	// Patches etc.
 	dispatch('attachParentBody',{ id: id });
-	let tags = getters.itemTagArray(new_parent_id);
+	let tags = itemGetters[new_parent_id].itemTagArray;
 	dispatch('tagItem', { id:id, tags:tags });
 	dispatch('patch', { id:id, field:'depth' });
 	dispatch('patch', { id:id, field:'parent_id' });
@@ -113,12 +98,12 @@ giveNewParent ({state, commit, dispatch, getters},
 	dispatch('autoCalculateDoneState', { id:new_parent_id });
 	dispatch('autoCalculateDoneState', { id:parent_id });
 },
-duplicate ({state, commit, dispatch, getters},
+duplicate ({state, dispatch},
 	{id} = {})
 {
 	id = (!id) ? state.selection.selectedId : id ;
 	let item = state.nodes[id];
-	let index = getters.siblingIndex(id)+1;
+	let index = itemGetters[id].siblingIndex+1;
 	let dupe = JSON.parse(JSON.stringify(item));
 	// state.nodes[item.parent_id].children.splice(index, 0, dupe);
 
@@ -127,23 +112,37 @@ duplicate ({state, commit, dispatch, getters},
 	let duplication = true;
 	dispatch('postNewItem', { newItem:dupe, index, addNextItemAs, addTags, duplication });
 },
-addAndCleanNodesRecursively ({state, commit, dispatch, getters},
+addAndCleanNodesRecursively ({commit, dispatch, getters},
 	{item} = {})
 {
+		let t0 = performance.now( );
 	// console.info('adding this item as node ↓');
 	// console.log(item);
-	item = getters.setDefaultItemValues(item);
+	item = setDefaultItemValues(item);
+		let t0__a = performance.now( );
 	commit('addNode',{item});
-	if (item.children)
+		let t1__a = performance.now( );
+	console.log("			call to addAndCleanNodesRecursively part A took " + (t1__a - t0__a) + " milliseconds.")
+	if (item.children.length)
 	{
 		item.children.forEach(function(child) {
 			return dispatch('addAndCleanNodesRecursively', { item:child });
 		});
 	}
+		let t1 = performance.now( );
+	console.log("			call to addAndCleanNodesRecursively took " + (t1 - t0) + " milliseconds.")
+},
+addFetchedNodes ({commit},
+	{nodes})
+{
+	Object.keys(nodes).forEach(id => {
+		commit('addNode', {item: nodes[id]});
+	});
 },
 addItem ({state, commit, dispatch, getters},
 	{item, index, addNextItemAs, addTags, duplication} = {})
 {
+	let t0 = performance.now( );
 	console.log(`addItem to DOM`);
 	console.log(item);
 	// Remove the Temp item.
@@ -171,7 +170,7 @@ addItem ({state, commit, dispatch, getters},
 		// commit('updateState',{ addingNewUnder:item.id });
 		// =========================
 
-		// if ( getters.isTopLvlItemInFilteredRoot(item.id)
+		// if ( itemGetters[item.id].isTopLvlItemInFilteredRoot
 		// 	&& item.parent_id == state.root.id )
 		// {
 		// 	getters.backups.rootChildren.push(item);
@@ -215,17 +214,19 @@ addItem ({state, commit, dispatch, getters},
 		    dispatch('showAddNewItem', { id:item.id, addAs:addNextItemAs });
 	    }
 		Vue.nextTick(()=> dispatch('scrollToItemIfNeeded', { id:item.id }));
+		let t1 = performance.now( );
+		console.log("			call to addItem took " + (t1 - t0) + " milliseconds.")
 	});
 },
-addTempNewItem ({state, commit, dispatch, getters},
+addTempNewItem ({dispatch},
 	{item, index, addNextItemAs, addTags} = {})
 {
 	console.info('adding Temp item');
-	item.id = 'tempItem_' + Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
-	item.temp = true;
+	// item.id = 'tempItem_' + Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+	// item.temp = true;
 	dispatch('addItem', {item, index, addNextItemAs, addTags});
 },
-hideTaggedNodes ({state, commit, dispatch, getters},
+hideTaggedNodes ({state, getters},
 	{tag} = {})
 {
 	Object.keys(state.nodes).forEach(function(id) {
@@ -239,7 +240,7 @@ hideTaggedNodes ({state, commit, dispatch, getters},
 		}
 	});
 },
-hideDoneNodes ({state, commit, dispatch, getters})
+hideDoneNodes ({state})
 {
 	Object.keys(state.nodes).forEach(id => {
 		id = parseFloat(id);
@@ -250,7 +251,7 @@ hideDoneNodes ({state, commit, dispatch, getters})
 		}
 	});
 },
-sortAllChildren ({state, commit, dispatch, getters})
+sortAllChildren ({state, dispatch})
 {
 	if(!state.root.children || !state.root.children.length){ return; }
 	console.log('sorting all items');
@@ -259,7 +260,7 @@ sortAllChildren ({state, commit, dispatch, getters})
 	    dispatch('updateChildrenDueDate', {id});
 	});
 },
-sortChildren ({state, commit, dispatch, getters},
+sortChildren ({state, commit, dispatch},
 	{id} = {})
 {
 	let item = state.nodes[id];
@@ -272,7 +273,7 @@ sortChildren ({state, commit, dispatch, getters},
 		item.children = order.map(id => items.find(t => t.id === id));
 	}
 },
-updateChildrenDepth ({state, commit, dispatch, getters},
+updateChildrenDepth ({state, commit, dispatch},
 	{id} = {})
 {
 	let targetChildren = state.nodes[id].children;
@@ -285,7 +286,7 @@ updateChildrenDepth ({state, commit, dispatch, getters},
 		return true;
 	})
 },
-copyParentBodyToAllChildren ({state, commit, dispatch, getters},
+copyParentBodyToAllChildren ({state, commit, dispatch},
 	{parent_id} = {})
 {
 	if (!parent_id){ return; }
@@ -299,7 +300,7 @@ copyParentBodyToAllChildren ({state, commit, dispatch, getters},
 		dispatch('patch', { id:child.id, field:'parents_bodies' });
 	});
 },
-attachParentBody ({state, commit, dispatch, getters},
+attachParentBody ({state, commit, dispatch},
 	{id} = {})
 {
 	if (!id){ return; }
@@ -315,11 +316,11 @@ deleteItem ({state, commit, dispatch, getters},
 {
 	if (!id){ console.log('item id not specified at deleteItem'); }
 	let item = state.nodes[id];
-	let previousItemId = (getters.prevItemId(id)) ? getters.prevItemId(id) : null;
+	let previousItemId = (itemGetters[id].prevItemId) ? itemGetters[id].prevItemId : null;
 	// Delete all children as well!
 	if (Array.isArray(item.children) && item.children.length)
 	{
-		let allChildrenIds = getters.allVisibleChildIds(id);
+		let allChildrenIds = itemGetters[id].allVisibleChildIds;
 		dispatch('deleteItemApi', { idOrArray:allChildrenIds });
 		allChildrenIds.forEach((id)=>{
 			vm.$delete(state.nodes, id);
@@ -330,7 +331,7 @@ deleteItem ({state, commit, dispatch, getters},
 	let prevParent = state.nodes[parent_id];
 	if (prevParent)
 	{
-		let siblingIndex = getters.siblingIndex(id);
+		let siblingIndex = itemGetters[id].siblingIndex;
 		prevParent.children.splice(siblingIndex,1);
 		prevParent.children_order.splice(siblingIndex,1);
 		// Patch and recalculate
@@ -353,7 +354,7 @@ deleteItem ({state, commit, dispatch, getters},
 		state.selection.filter.dueDate.to = null;
 		state.selection.filter.dueDate.to = new Date();
 	}
-	let newSelectedId = (getters.nextItemId(previousItemId)) ? getters.nextItemId(previousItemId) : null;
+	let newSelectedId = (itemGetters[previousItemId].nextItemId) ? itemGetters[previousItemId].nextItemId : null;
 	console.log(`new selected ID is: ${newSelectedId}`);
     state.selection.selectedId = newSelectedId;
 	vm.$delete(state.nodes, id);
@@ -362,6 +363,7 @@ tagItem ({state, commit, dispatch, getters},
 	{id = state.selection.selectedId, tags = state.newTag, requestType = 'tag'} =
 	{id:state.selection.selectedId, tags:state.newTag, requestType:'tag'})
 {
+	let t0 = performance.now( );
 	// console.log(`tagItem`);
 	/* requestType can be:
 		'tag': tag item  (default if null)
@@ -381,8 +383,14 @@ tagItem ({state, commit, dispatch, getters},
 		tags = tags.filter(t => !getters.hasTag(id,t));
 	}
 	if (!tags.length){ return; }
+		let t0__a = performance.now( );
 	dispatch('tagItemTemporarely', { id, tags, requestType });
+		let t1__a = performance.now( );
+		console.log("			A point in tagItem call took " + (t1__a - t0__a) + " milliseconds.")
+		let t0__b = performance.now( );
 	dispatch('patchTag', { id, tags });
+		let t1__b = performance.now( );
+		console.log("			B point in tagItem call took " + (t1__b - t0__b) + " milliseconds.")
 
 	let item = state.nodes[id];
 	if (!item){ return; }
@@ -392,10 +400,13 @@ tagItem ({state, commit, dispatch, getters},
 			dispatch('tagItem', { id:childId, tags:tags });
 		});
 	}
+	let t1 = performance.now( );
+	console.log("			Call to tagItem took " + (t1 - t0) + " milliseconds.")
 },
 tagItemTemporarely ({state, commit, dispatch, getters},
 	{id, tags, requestType = 'tag'} = {id:null, tags:null, requestType:'tag'})
 {
+	let t0a = performance.now( );
 	if (!tags){ return; }
 	if (!Array.isArray(tags)){
 		tags = [tags];
@@ -407,14 +418,16 @@ tagItemTemporarely ({state, commit, dispatch, getters},
 	} else {
 		commit('addTagTemporarely', {id, tags});
 	}
+	let t1a = performance.now( );
+	console.log("			Call to dispatch tagItemTemporarely took " + (t1a - t0a) + " milliseconds.")
 },
-prepareDonePatch ({state, commit, dispatch, getters},
+prepareDonePatch ({state, commit, dispatch},
 	{id} = {})
 {
-	console.log(`preparingDonePatch for ${id}`);
+	// console.log(`preparingDonePatch for ${id}`);
 	let item = state.nodes[id];
 	if (!item){ return; }
-	console.log(`item.done = ${item.done}`);
+	// console.log(`item.done = ${item.done}`);
 	if (item.done)
 	{
 		let done_date = format(new Date(), 'YYYY-MM-DD HH:mm:ss');
@@ -433,12 +446,12 @@ prepareDonePatch ({state, commit, dispatch, getters},
 	}
 	// dispatch('autoCalculateDoneState', { id:item.parent_id });
 },
-autoCalculateDoneState ({state, commit, dispatch, getters},
+autoCalculateDoneState ({state, commit, dispatch},
 	{id} = {})
 {
 	if (state.nodes[id].depth == 0){ return; }
-	console.log('auto calculating done state');
-	if (getters.allChildrenDone(id) == true && !getters.isProject(id))
+	// console.log('auto calculating done state');
+	if (itemGetters[id].allChildrenAreDone == true && !itemGetters[id].isProject)
 	{
 		// dispatch('markDone', {id, markAs:'done' });
 	} else {
@@ -449,7 +462,7 @@ moveItem ({state, commit, dispatch, getters},
 	{id, direction} = {})
 {
 	id = (!id) ? state.selection.selectedId : id ;
-	if (getters.isTopLvlItemInFilteredRoot(id))
+	if (itemGetters[id].isTopLvlItemInFilteredRoot)
 	{ 
 		let errMsg = getters.text.flashes.moveTopLvlItem;
 		console.log(errMsg);
@@ -459,14 +472,14 @@ moveItem ({state, commit, dispatch, getters},
 	clearTimeout(window.patchDelay);
 	let pId = state.nodes[id].parent_id;
 	let parent = state.nodes[pId];
-	let index = getters.siblingIndex(id);
+	let index = itemGetters[id].siblingIndex;
 	if (direction == 'up')
 	{
 		if (index == 0)
 		{
 			if (parent.depth == 0){ console.log('ceiling!'); return; }
 			// Jump to last child of previous Sibling
-			let parentOlderSiblingId = getters.olderSiblingId(pId);
+			let parentOlderSiblingId = itemGetters[pId].olderSiblingId;
 			let newInd = (parentOlderSiblingId == parent.parent_id) ? 0 : null;
 			dispatch('giveNewParent', { id, new_parent_id:parentOlderSiblingId, specificNewIndex:newInd } );
 		} else { // When moving through siblings
@@ -484,7 +497,7 @@ moveItem ({state, commit, dispatch, getters},
 		{
 			if (parent.depth == 0){ console.log('floor!'); return; }
 			// Jump to First child of next Sibling
-			let new_parent_id = getters.nextSiblingOrParentsSiblingId(id);
+			let new_parent_id = itemGetters[id].nextSiblingOrParentsSiblingId;
 			console.log('new_parent_id: '+new_parent_id);
 			dispatch('giveNewParent', { id, new_parent_id:new_parent_id, specificNewIndex:0 } );
 		} else { // When moving through siblings
@@ -498,7 +511,7 @@ moveItem ({state, commit, dispatch, getters},
 	}
 	Vue.nextTick(()=> dispatch('scrollToItemIfNeeded', { id:id }));
 },
-flushDoneItems ({state, commit, dispatch, getters})
+flushDoneItems ({state, commit, dispatch})
 { // Do not use yet. Not sure how to best implement the below...
 	let nodes = state.nodes;
 	let keys = Object.keys(nodes);
@@ -509,7 +522,7 @@ flushDoneItems ({state, commit, dispatch, getters})
 		}
 	});
 },
-updateChildrenDueDate ({state, commit, dispatch, getters},
+updateChildrenDueDate ({state, commit, dispatch},
 	{id} = {})
 {
 	let item = state.nodes[id];
@@ -528,7 +541,7 @@ updateChildrenDueDate ({state, commit, dispatch, getters},
 		}
 	})
 },
-formatDone ({state, commit, dispatch, getters},
+formatDone ({state, commit, dispatch},
 	{doneArray} = {})
 {
 	let doneItemsObject = doneArray.reduce((prev,item) => {
@@ -555,7 +568,7 @@ formatDone ({state, commit, dispatch, getters},
 	});
 },
 // Original VM
-blockBlur ({state, commit, dispatch, getters})
+blockBlur ({state, commit, dispatch})
 {
 	state.blockBlur = true;
 	setTimeout(function()
@@ -585,7 +598,7 @@ startEdit ({state, commit, dispatch, getters},
 	commit('updateState',{ editingItem:item.id });
 	if (getters.mobile) { store.$refs['edit-item-modal-'+item.id].open() }
 },
-scrollToItemIfNeeded ({state, commit, dispatch, getters},
+scrollToItemIfNeeded ({state, commit, dispatch},
 	{id} = {})
 {
 	if (!id){ return };
@@ -651,7 +664,7 @@ cancelEdit ({state, commit, dispatch, getters})
 	commit('updateState',{ editingItemTags:null });
 	commit('updatePopouts',{ edit:[] });
 },
-cancelEditOrAdd ({state, commit, dispatch, getters})
+cancelEditOrAdd ({state, commit, dispatch})
 {
 	// why do i need this?
 	// preventKeydownListener(); // see window object. initialized at ListAppKeyBindings.js
@@ -685,6 +698,7 @@ addNew ({state, commit, dispatch, getters},
 	if (getters.mobile && addNextItemAs == 'stop'){ store.$refs['add-item-modal'].close() };
 	console.log('addingNew');
 	let newItem = JSON.parse(JSON.stringify(state.newItem));
+	commit('newItem/resetStateData');
 	newItem.newItem = null; // important to prevent bugs with temp items
 	let olderSiblingId = state.addingNewUnder;
 	let addTags = getters['newItem/preparedPlusComputedTags'];
@@ -700,7 +714,7 @@ addNew ({state, commit, dispatch, getters},
 	newItem.parent_id = (olderSibling.parent_id) ? olderSibling.parent_id : state.root.id;
 	newItem.depth = (!olderSibling.depth) ? 1 : olderSibling.depth;
 
-	let OlderSiblingIndex = getters.siblingIndex(olderSibling.id);
+	let OlderSiblingIndex = itemGetters[olderSibling.id].siblingIndex;
 	let index = (isNaN(OlderSiblingIndex)) ? 0 : OlderSiblingIndex+1;
 	console.log(`
 		adding new item[${newItem.body}]
@@ -720,7 +734,7 @@ addNew ({state, commit, dispatch, getters},
 		newItem.done_date = doneDate;
 	}
 	if ( getters['selection/dueTodayFiltered']
-	   && getters.isTopLvlItemInFilteredRoot(olderSibling.id)
+	   && itemGetters[olderSibling.id].isTopLvlItemInFilteredRoot
 	   && !state.addingNewAsChild )
 	{
 		newItem.due_date = format(new Date(), 'YYYY-MM-DD HH:mm:ss');
@@ -733,11 +747,11 @@ addNew ({state, commit, dispatch, getters},
 	console.log('sending tags:');
 	console.log(addTags);
 	// Send to Root for Ajax call.
-	store.commit('resetNewItem');
+	commit('resetNewItem');
 	dispatch('addTempNewItem', { item:newItem, index, addNextItemAs, addTags })
 	.then(()=> dispatch('postNewItem', { newItem, index, addNextItemAs, addTags, duplication:null }));
 },
-showChildren ({state, commit, dispatch, getters},
+showChildren ({state, commit, dispatch},
 	{id, action} = {})
 {
 	id = (id) ? id : state.selection.selectedId;
@@ -754,56 +768,57 @@ showChildren ({state, commit, dispatch, getters},
 	}
 	dispatch('patch', { id:id, field:'show_children' });
 },
-markDone ({state, commit, dispatch, getters},
+markDone ({state, commit, dispatch},
 	{id, markAs} = {})
 {
 	id = (id) ? id : state.selection.selectedId;
 	if (!id){ return; }
 	let item = state.nodes[id];
 	if (!item){ return; }
-	console.log(`marking (${id}) ${item.body} as... ${markAs}`);
 	if (markAs == 'notDone'){
+		if (!item.done){ return; }
 		commit('updateState', {id, done:false});
 		dispatch('prepareDonePatch', {id} );
 		return;
 	}
-	if (item.children.length && !getters.allChildrenDone(id)){
+	if (item.children.length && !itemGetters[id].allChildrenAreDone){
 		return;
 	}
 	if (markAs == 'done') {
+		if (item.done){ return; }
 		commit('updateState', {id, done:true});
 	} else {
 		commit('updateState', {id, done:!item.done});
 	}
 	dispatch('prepareDonePatch', {id} );
 },
-indent ({state, commit, dispatch, getters},
+indent ({state, commit, dispatch},
 	{id} = {})
 {
 	id = (id) ? id : state.selection.selectedId;
-	// if (!getters.isTopLvlItemInFilteredRoot(id)){ 
+	// if (!itemGetters[id].isTopLvlItemInFilteredRoot){ 
 	// 	console.log("can't indent a topLvlItem in filtered list");
 	// 	return;
 	// }
-	let new_parent_id = getters.olderSiblingId(id);
+	let new_parent_id = itemGetters[id].olderSiblingId;
 	if (new_parent_id == state.nodes[id].parent_id){ console.log('bump! ceiling!'); return; }
 	console.log('new_parent_id / olderSiblingId: '+new_parent_id);
 	dispatch('giveNewParent', { id,new_parent_id });
 },
-unindent ({state, commit, dispatch, getters},
+unindent ({state, commit, dispatch},
 	{id} = {})
 {
 	id = (id) ? id : state.selection.selectedId;
-	// if (!getters.isTopLvlItemInFilteredRoot(id)){ 
+	// if (!itemGetters[id].isTopLvlItemInFilteredRoot){ 
 	// 	console.log("can't unindent a topLvlItem in filtered list");
 	// 	return;
 	// }
 	let depth = state.nodes[id].depth;
-	let olderSiblingId = getters.olderSiblingId(id);
+	let olderSiblingId = itemGetters[id].olderSiblingId;
 	let olderSiblingDepth = state.nodes[olderSiblingId].depth;
 
 	while(olderSiblingDepth != depth-1){
-		olderSiblingId = getters.olderSiblingId(olderSiblingId);
+		olderSiblingId = itemGetters[olderSiblingId].olderSiblingId;
 		olderSiblingDepth = state.nodes[olderSiblingId].depth;
 	}
 	let new_parent_id = olderSiblingId;
@@ -831,7 +846,7 @@ selectItem ({state, commit, dispatch, getters},
 		{
 			nextSelectedId = getters.filteredIdsTree[0];
 		} else {
-			nextSelectedId = getters.nextItemId(id);
+			nextSelectedId = itemGetters[id].nextItemId;
 		}
 	}
 	else if (direction == 'prev') {
@@ -840,20 +855,20 @@ selectItem ({state, commit, dispatch, getters},
 			let toplvlItems = getters.filteredIdsTree;
 			nextSelectedId = toplvlItems[toplvlItems.length-1];
 		} else {
-			nextSelectedId = getters.prevItemId(id);
+			nextSelectedId = itemGetters[id].prevItemId;
 		}
 	}
 	state.selection.selectedId = nextSelectedId;
 	dispatch('scrollToItemIfNeeded', { id:nextSelectedId });
 },
-setToday ({state, commit, dispatch, getters},
+setToday ({state, commit, dispatch},
 	{id} = {})
 {
 	id = (id) ? id : state.selection.selectedId;
 	if (!id){ return; }
 	let item = state.nodes[id];
 	if (!item){ return; }
-	if (getters.hasParentDueToday(id)
+	if (itemGetters[id].hasParentDueToday
 		&& item.due_date == '0000-00-00 00:00:00')
 	{
 		console.log('parent is already due');
@@ -861,7 +876,7 @@ setToday ({state, commit, dispatch, getters},
 	}
 	dispatch('setDueDate', {id});
 },
-setTomorrow ({state, commit, dispatch, getters},
+setTomorrow ({state, commit, dispatch},
 	{id} = {})
 {
 	id = (id) ? id : state.selection.selectedId;
@@ -881,7 +896,7 @@ setDueDate ({state, commit, dispatch, getters},
 	state.nodes[id].due_date = dd;
 	if (diff == 0 && getters['selection/dueTodayFiltered'])
 	{
-		state.selection.selectedId = getters.nextItemId(id);
+		state.selection.selectedId = itemGetters[id].nextItemId;
 	}
 	dispatch('patchDueDate', {id, duedate:dd });
 	dispatch('updateChildrenDueDate', { id:id });
@@ -904,30 +919,30 @@ showAddNewItem ({state, commit, dispatch, getters},
 		});
 	};
 },
-startEditTags ({state, commit, dispatch, getters},
+startEditTags ({state, commit, dispatch},
 	{id} = {})
 {
 	id = (id) ? id : state.selection.selectedId;
 	if (!id){ return; }
 	state.editingItemTags = id;
 },
-stopPatching ({state, commit, dispatch, getters})
+stopPatching ({state, commit, dispatch})
 {
 	if (window.stopPatchingIcon){ clearTimeout(window.stopPatchingIcon); }
     window.stopPatchingIcon = setTimeout(function(){ state.patching = false; }.bind(state), 300);
 },
-startPatching ({state, commit, dispatch, getters})
+startPatching ({state, commit, dispatch})
 {
     if (window.stopPatchingIcon){ clearTimeout(window.stopPatchingIcon); }
 	state.patching = true;
 },
-deleteItemDialogue ({state, commit, dispatch, getters},
+deleteItemDialogue ({state, commit, dispatch},
 	{id} = {})
 {
 	id = (!id) ? state.selection.selectedId : id ;
 	dispatch('popout', { id:id, type:'confirm-delete' });
 },
-popup ({state, commit, dispatch, getters},
+popup ({state, commit, dispatch},
 	{id, type} = {})
 {
 	id = (!id) ? state.selection.selectedId : id ;
@@ -951,12 +966,12 @@ popup ({state, commit, dispatch, getters},
 		// });
 //         }
 },
-sendFlash ({state, commit, dispatch, getters},
+sendFlash ({state, commit, dispatch},
 	payload = {})
 {
 	commit('pushFlash', payload);
 },
-popout ({state, commit, dispatch, getters},
+popout ({state, commit, dispatch},
 	{id, type} = {})
 {
 	id = (!id) ? state.selection.selectedId : id ;
@@ -981,24 +996,16 @@ popout ({state, commit, dispatch, getters},
 		}
 	// }
 },
-addTimer ({state, commit, dispatch, getters},
+addTimer ({state, commit, dispatch},
 	{id = state.selection.selectedId} = {id: state.selection.selectedId})
 {
 	dispatch('popout', { id, type:'timer' });
 	return;
 },
-clipboardSuccess ({dispatch, state, getters}, )
-{
-	// dispatch('sendFlash', { type:'success', msg:state.keybindings.copyClipboard.success[getters.language] });
-},
-clipboardError ({dispatch, state, getters})
-{
-	// dispatch('sendFlash', { type:'error', msg:state.keybindings.copyClipboard.error[getters.language] });
-},
 copyProgrammatic ({dispatch, state, getters},
 	{id = state.selection.selectedId} = {id: state.selection.selectedId})
 {
-	let text = getters.clipboardText(id);
+	let text = itemGetters[id].clipboardText;
 	let textArea = document.createElement("textarea");
 	// *** This styling is an extra step which is likely not required. ***
 	//
@@ -1044,7 +1051,7 @@ copyProgrammatic ({dispatch, state, getters},
 	    // console.log('Copying text command was ' + msg);
 	    dispatch('sendFlash', { type:'success', msg:`${state.keybindings.copyClipboard.success[getters.language]}
 
-${getters.clipboardText(id)}` });
+${itemGetters[id].clipboardText}` });
 	} catch (err) {
 	    // dispatch('clipboardError');
 	    // console.log('Oops, unable to copy');
@@ -1148,7 +1155,7 @@ focusElement({state},
 	console.log('trying to focus: '+el);
 	document.querySelector(el).focus();
 },
-filterItems ({state, commit, dispatch, getters},
+filterItems ({state, commit, dispatch},
 	{keyword, value, event} = {})
 {
 	if (state.editingItem){ return; }
@@ -1169,12 +1176,12 @@ filterItems ({state, commit, dispatch, getters},
 	}
 	dispatch('selection/addKeywords', { keyword, value, operator });
 },
-removeHiddenTag ({state, commit, dispatch, getters},
+removeHiddenTag ({state, commit, dispatch},
 	{tag} = {})
 {
 	state.selection.hiddenTags = state.selection.hiddenTags.filter(x => x !== tag);
 },
-test ({state, commit, dispatch, getters},
+test ({state, commit, dispatch},
 	{id} = {})
 {
 	document.querySelectorAll(".tag-menu a").forEach(el => alert(JSON.stringify(el.style.color)));
@@ -1184,7 +1191,7 @@ test ({state, commit, dispatch, getters},
 	// this.patchTag(id, 'bloem', 'tag');
 
 },
-alert ({state, commit, dispatch, getters},
+alert ({state, commit, dispatch},
 	{value} = {})
 {
 	alert(value);

@@ -2,6 +2,7 @@
 <div
 	:class="['full-width',{'order-last':(showAddNewBox && !state.addingNewAsChild)}]"
 >
+		<!-- v-if="(showEditBox || showAddNewBox)" -->
 	<div
 		v-if="(showEditBox || showAddNewBox) && !get.mobile"
 		:class="['c-editadd-wrapper', {

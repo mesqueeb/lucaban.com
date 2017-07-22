@@ -34,8 +34,8 @@ export default {
 		flashes(){ return this.state.flashes },
 	},
     methods: {
-		commit(action, payload){ this.$store.commit(action, payload); },
-		dispatch(action, payload){ this.$store.dispatch(action, payload); },
+		commit(action, payload){ this.$store.commit(action, payload) },
+		dispatch(action, payload){ this.$store.dispatch(action, payload) },
         maskClick(event)
         {
         	if(event.target.id == 'c-flashes-mask')

@@ -5,7 +5,7 @@
 			:class="{'o-toggle-div':true,
 				'l-toggle-div':true,
 				'o-toggle-div--both':item.children_order.length>0
-					&&(item.done == true || get.allChildrenDone(item.id) )
+					&&(item.done == true || allChildrenAreDone )
 			}"
 		>
 			<input
@@ -24,7 +24,7 @@
 				class="o-toggle__check"
 				type="checkbox"
 				v-if="item.children_order.length==0
-					|| item.done == true || get.allChildrenDone(item.id)"
+					|| item.done == true || allChildrenAreDone"
 				v-model="item.done"
 				@click="dispatch('prepareDonePatch',{ id:item.id })"
 			>
@@ -50,13 +50,14 @@ export default {
 	props: ['item'],
 	computed:
 	{
-		state(){ return this.$store.state; },
-		get(){ return this.$store.getters; },
+		state(){ return this.$store.state },
+		get(){ return this.$store.getters },
+		allChildrenAreDone(){ return itemGetters[this.item.id].allChildrenAreDone },
 	},
 	methods:
 	{
-		// commit(action, payload){ this.$store.commit(action, payload); },
-		dispatch(action, payload){ this.$store.dispatch(action, payload); },
+		// commit(action, payload){ this.$store.commit(action, payload) },
+		dispatch(action, payload){ this.$store.dispatch(action, payload) },
 		test(val){ 
 			Vue.nextTick(function ()
 			{

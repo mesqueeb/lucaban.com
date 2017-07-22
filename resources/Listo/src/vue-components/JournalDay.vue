@@ -18,6 +18,7 @@
 			{{ get.text.card.copy }}
 		</button> -->
 		<!-- <div class="w-100 d-flex" v-if="sec_to_hourmin(get.totalUsedSec(day))">
+		RETHINK totalUsedSec(day)
 			<span class="c-journal-used-time">{{ get.text.menu.usedTime }}: </span>
 			<span class="o-pill--used-time">{{ sec_to_hourmin(get.totalUsedSec(day)) }}</span>
 		</div> -->
@@ -83,11 +84,11 @@ export default {
 	methods: {
 		customCalendar,
 		sec_to_hourmin,
-		commit(action, payload){ this.$store.commit(action, payload); },
-		dispatch(action, payload){ this.$store.dispatch(action, payload); },
+		commit(action, payload){ this.$store.commit(action, payload) },
+		dispatch(action, payload){ this.$store.dispatch(action, payload) },
 		clipboardSuccess()
 		{
-			this.dispatch('sendFlash', { type:'success', msg:this.state.keybindings.copyClipboard.success[this.l]+"<br><br>"+this.get.clipboardText(this.item.id) });
+			this.dispatch('sendFlash', { type:'success', msg:this.state.keybindings.copyClipboard.success[this.l]+"<br><br>"+itemGetters[this.item.id].clipboardText });
 		},
 		clipboardError()
 		{

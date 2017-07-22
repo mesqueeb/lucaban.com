@@ -218,8 +218,8 @@ export default {
 			let passedTest = true;
 			if (getters.dueTodayFiltered)
 			{
-				let isDueToday = rootGetters.isDueToday(id);
-				let hasParentDueToday = rootGetters.hasParentDueToday(id);
+				let isDueToday = itemGetters[id].isDueToday;
+				let hasParentDueToday = itemGetters[id].hasParentDueToday;
 				if (flat)
 				{
 					passedTest = (isDueToday || hasParentDueToday) ? true : false;
@@ -267,14 +267,14 @@ export default {
 								&& getters.testAgainstDueDateSelection(id, {flat:true})
 								&& getters.testAgainstDoneSelection(id)
 								&& getters.testAgainstHiddenItems(id) );
-				console.log(`
-				⎡⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺ testing ${id} flat! ⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎤
-				⎜　testAgainstTagSelection = ${getters.testAgainstTagSelection(id, {flat:true})}
-				⎜　testAgainstDueDateSelection = ${getters.testAgainstDueDateSelection(id, {flat:true})}
-				⎜　testAgainstDoneSelection = ${getters.testAgainstDoneSelection(id)}
-				⎜　testAgainstHiddenItems = ${getters.testAgainstHiddenItems(id)}
-				⎣______________________________________________________⎦
-				`);
+				// console.log(`
+				// ⎡⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺ testing ${id} flat! ⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎤
+				// ⎜　testAgainstTagSelection = ${getters.testAgainstTagSelection(id, {flat:true})}
+				// ⎜　testAgainstDueDateSelection = ${getters.testAgainstDueDateSelection(id, {flat:true})}
+				// ⎜　testAgainstDoneSelection = ${getters.testAgainstDoneSelection(id)}
+				// ⎜　testAgainstHiddenItems = ${getters.testAgainstHiddenItems(id)}
+				// ⎣______________________________________________________⎦
+				// `);
 			}
 			else
 			{
@@ -285,7 +285,7 @@ export default {
 				{
 					// This is to ensure that children of items who are due + have the selected tag
 					//       are not added twice, once as children and once as top lvl filered item
-					let hasParentDueToday = rootGetters.hasParentDueToday(id);
+					let hasParentDueToday = itemGetters[id].hasParentDueToday;
 					let hasParentWithTag;
 					if (state.tags.length)
 					{
@@ -300,14 +300,14 @@ export default {
 									&& getters.testAgainstDueDateSelection(id, {flat:true})
 									&& passedDoneTest
 									&& passedHiddenItemsTest );
-					console.log(`
-					⎡⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺ testing (${id}) tree structure! ⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎤
-					⎜　passedTagTest = ${getters.testAgainstTagSelection(id, {flat:true})}
-					⎜　passedDueDateTest = ${getters.testAgainstDueDateSelection(id, {flat:true})}
-					⎜　passedDoneTest = ${passedDoneTest}
-					⎜　passedHiddenItemsTest = ${passedHiddenItemsTest}
-					⎣___________________________________________________________________⎦
-					`);
+					// console.log(`
+					// ⎡⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺ testing (${id}) tree structure! ⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎤
+					// ⎜　passedTagTest = ${getters.testAgainstTagSelection(id, {flat:true})}
+					// ⎜　passedDueDateTest = ${getters.testAgainstDueDateSelection(id, {flat:true})}
+					// ⎜　passedDoneTest = ${passedDoneTest}
+					// ⎜　passedHiddenItemsTest = ${passedHiddenItemsTest}
+					// ⎣___________________________________________________________________⎦
+					// `);
 				}
 				// in the case of either a tag filter OR a due date filter
 				else
@@ -316,14 +316,14 @@ export default {
 									&& getters.testAgainstDueDateSelection(id)
 									&& passedDoneTest
 									&& passedHiddenItemsTest );
-					console.log(`
-					⎡⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺ testing (${id}) tree structure! ⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎤
-					⎜　passedTagTest = ${getters.testAgainstTagSelection(id)}
-					⎜　passedDueDateTest = ${getters.testAgainstDueDateSelection(id)}
-					⎜　passedDoneTest = ${passedDoneTest}
-					⎜　passedHiddenItemsTest = ${passedHiddenItemsTest}
-					⎣___________________________________________________________________⎦
-					`);
+					// console.log(`
+					// ⎡⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺ testing (${id}) tree structure! ⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎤
+					// ⎜　passedTagTest = ${getters.testAgainstTagSelection(id)}
+					// ⎜　passedDueDateTest = ${getters.testAgainstDueDateSelection(id)}
+					// ⎜　passedDoneTest = ${passedDoneTest}
+					// ⎜　passedHiddenItemsTest = ${passedHiddenItemsTest}
+					// ⎣___________________________________________________________________⎦
+					// `);
 				}
 			}
 			return passedAllTests;

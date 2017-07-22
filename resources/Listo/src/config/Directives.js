@@ -1,4 +1,3 @@
-import { mobilecheck } from '../helpers/globalFunctions.js';
 import Flatpickr from 'flatpickr';
 import flatPickConfig from '../config/flatPickrOptions.js';
 import autosize from 'autosize';
@@ -18,7 +17,7 @@ install(Vue){
 	Vue.directive('focus', {
 		inserted(el, binding)
 		{
-			if (binding.modifiers.noMobile && mobilecheck()){ return; }
+			if (binding.modifiers.noMobile && store.getters.mobile){ return; }
 			if (binding.value || binding.value === undefined)
 			{
 				el.focus()

@@ -30,13 +30,13 @@
 	<div class="c-panel__stats">
 		<div style="width:2rem"></div>
 		<div class="c-stats">
-			<div v-show="get.totalUsedHourMin(state.root.id) && selection.view != 'journal'">
+			<div v-show="totalUsedTime && selection.view != 'journal'">
 				{{ text.menu.usedTime }}
-				<div class="c-stats__used-time">{{ get.totalUsedHourMin(state.root.id) }}</div>
+				<div class="c-stats__used-time">{{ totalUsedTime }}</div>
 			</div>
-			<div v-show="get.totalHourMinLeft(state.root.id) && selection.view != 'journal'">
+			<div v-show="totalTimeLeft && selection.view != 'journal'">
 				{{ text.menu.timeLeft }}
-				<div class="c-stats__time-left">{{ get.totalHourMinLeft(state.root.id) }}</div>
+				<div class="c-stats__time-left">{{ totalTimeLeft }}</div>
 			</div>
 			<div v-show="selection.view != 'journal'">
 				{{ text.menu.items }}
@@ -52,7 +52,7 @@
 				v-if="selection.view != 'journal' && this.get.filteredIdsFlat.length"
 				class="o-btn c-stats__copy-btn"
 				v-btn-effect
-				v-clipboard:copy="get.clipboardText(state.root.id)"
+				v-clipboard:copy="clipboardText"
 				v-clipboard:success="clipboardSuccess"
 				v-clipboard:error="clipboardError"
 			>
@@ -65,16 +65,29 @@
 
 <script>
 import { Utilities } from '../helpers/globalFunctions.js'
+import { sec_to_hourmin } from '../helpers/valueMorphers2.js'
+
 export default {
-	data () {
-		return {}
-	},
+	data(){ return {} },
 	computed:
 	{
 		get(){ return this.$store.getters },
 		state(){ return this.$store.state },
 		selection(){ return this.state.selection },
 		text(){ return this.get.text },
+		totalUsedTime()
+		{
+			return sec_to_hourmin(this.get.filteredItemsUsedSec)
+		},
+		totalTimeLeft()
+		{
+			return sec_to_hourmin(this.get.filteredItemsSecLeft)
+		},
+		clipboardText()
+		{
+			if (!itemGetters[this.state.root.id]){ return '' }
+			return itemGetters[this.state.root.id].clipboardText
+		},
 	},
 	methods:
 	{
@@ -88,7 +101,7 @@ export default {
 		{
 			this.dispatch('sendFlash', { type:'success', msg:`${this.state.keybindings.copyClipboard.success[this.get.language]}
 
-${this.get.clipboardText(this.state.root.id)}` });
+${itemGetters[this.state.root.id].clipboardText}` });
 		},
 		clipboardError()
 		{

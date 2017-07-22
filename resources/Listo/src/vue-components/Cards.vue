@@ -39,10 +39,10 @@
 </div>
 </template>
 <script>
-import ItemEditAddWrapper from './ItemEditAddWrapper.vue';
-import AddItemTease from './AddItemTease.vue';
-import JournalDay from './JournalDay.vue';
-import Card from './Card.vue';
+import ItemEditAddWrapper from './ItemEditAddWrapper.vue'
+import AddItemTease from './AddItemTease.vue'
+import JournalDay from './JournalDay.vue'
+import Card from './Card.vue'
 
 export default {
 	props: ['item'],
@@ -50,8 +50,6 @@ export default {
 		ItemEditAddWrapper, JournalDay, Card, AddItemTease
 	},
 	data(){ return {} },
-	mounted()
-	{	},
 	computed: {
 		id(){ return this.item.id },
  /* \ ============================================== / *\
@@ -72,8 +70,8 @@ export default {
 		},
 	},
 	methods: {
-		commit(action, payload){ this.$store.commit(action, payload); },
-		dispatch(action, payload){ this.$store.dispatch(action, payload); },
+		commit(action, payload){ this.$store.commit(action, payload) },
+		dispatch(action, payload){ this.$store.dispatch(action, payload) },
 	},
 }
 </script>

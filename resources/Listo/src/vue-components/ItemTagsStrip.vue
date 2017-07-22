@@ -90,18 +90,31 @@ export default {
 		parentTags(){
 			if (this.item.newItem)
 			{
-				return this.get.tagsArray(this.get['newItem/parent_id']);
+				return itemGetters[this.get['newItem/parent_id']].tagsArray;
 			} else {
 				if (this.get.filteredIdsFlat.includes(this.item.parent_id))
 				{
-					return this.get.tagsArray(this.item.parent_id);
+					if (!itemGetters[this.item.parent_id]){ return [] }
+					return itemGetters[this.item.parent_id].tagsArray;
 				}
 				return [];
 			}
 		},
-		secLeft(){ return this.get.secLeft(this.item.id) },
-		totalSecLeft(){ return this.get.totalSecLeft(this.item.id) },
-		totalTimeDifferentFromParent(){ return this.get.totalTimeDifferentFromParent(this.item.id) },
+		secLeft()
+		{
+			if (this.item.newItem){ return 0 }
+			return itemGetters[this.item.id].secLeft
+		},
+		totalTimeDifferentFromParent()
+		{
+			if (this.item.newItem){ return 0 }
+			return itemGetters[this.item.id].totalTimeDifferentFromParent
+		},
+		totalSecLeft()
+		{
+			if (this.item.newItem){ return 0 }
+			return itemGetters[this.item.id].totalSecLeft
+		},
 		hasDueDate()
 		{
 		    return (this.item.due_date && this.item.due_date != '0000-00-00 00:00:00');
@@ -115,7 +128,7 @@ export default {
 			return this.item.tagged
 					.map(t => t.tag_name)
 					.filter(t => {
-						return (this.get.isTopLvlItemInFilteredRoot(this.item.id) || !this.parentTags.includes(t))
+						return (itemGetters[this.item.id].isTopLvlItemInFilteredRoot || !this.parentTags.includes(t))
 					});
 		},
 		mobileEditing(){

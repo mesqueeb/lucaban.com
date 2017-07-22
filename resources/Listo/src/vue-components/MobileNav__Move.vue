@@ -33,8 +33,8 @@
 		@click="dispatch('indent')"
 		:class="{
 			'o-btn':true,
-			'u-disabled':(get.isFirstItem(selection.selectedId))}"
-		:disabled="get.isFirstItem(selection.selectedId)"
+			'u-disabled':(isFirstItem)}"
+		:disabled="isFirstItem"
 	>
 		<q-icon name="ion-android-arrow-dropright-circle" />
 	</button>
@@ -51,6 +51,7 @@ export default {
 		get(){ return this.$store.getters },
 		state(){ return this.$store.state },
 		selection(){ return this.state.selection },
+		isFirstItem(){ return itemGetters[selection.selectedId].isFirstItem },
 	},
 	methods:
 	{

@@ -2,6 +2,7 @@
 <div
 	v-if="item || listIsEmpty"
 	:id="'card-'+item.id"
+	:refs="item.id"
 	:class="{
 		'items-card': true,
 		'journal-wrapper': state.selection.view == 'journal'
@@ -33,9 +34,9 @@
 		>
 			<div
 				:class="{ 'c-body-text': true,
+						'c-body-text--project': isProject,
 					}"
 			>
-					<!-- 'c-body-text--project': get.isProject(item.id), -->
 				<div :class="{
 					'u-lightgray':(item.temp && get['user/loggedIn']),
 					'c-body-text--done': item.done
@@ -78,12 +79,12 @@
 </div>
 </template>
 <script>
-import ItemNav from './ItemNav.vue';
-import ItemToggles from './ItemToggles.vue';
-import ItemEditAddWrapper from './ItemEditAddWrapper.vue';
-import ItemAddTag from './ItemAddTag.vue';
-import ItemTagsStrip from './ItemTagsStrip.vue';
-import JournalDay from './JournalDay.vue';
+import ItemNav from './ItemNav.vue'
+import ItemToggles from './ItemToggles.vue'
+import ItemEditAddWrapper from './ItemEditAddWrapper.vue'
+import ItemAddTag from './ItemAddTag.vue'
+import ItemTagsStrip from './ItemTagsStrip.vue'
+import JournalDay from './JournalDay.vue'
 
 export default {
 	name: 'Card',
@@ -100,8 +101,6 @@ export default {
  \* / ============================================== \ */
 		get(){ return this.$store.getters },
 		state(){ return this.$store.state },
-		visibleDirectChildren(){ return this.get.visibleDirectChildren(this.id) },
-		isProject(){ return this.get.isProject(this.id) },
 /* \ ============================================== / *\
 \* / ============================================== \ */
 		listIsEmpty()
@@ -115,10 +114,18 @@ export default {
 			return ((this.state.addingNewUnder == this.item.id)
 				|| (this.listIsEmpty && !this.mobile && this.state.selection.view != 'journal'));
 		},
+		isProject()
+		{
+			return itemGetters[this.item.id].isProject;
+		},
+		visibleDirectChildren()
+		{
+			return itemGetters[this.item.id].visibleDirectChildren;
+		},
 	},
 	methods: {
-		commit(action, payload){ this.$store.commit(action, payload); },
-		dispatch(action, payload){ this.$store.dispatch(action, payload); },
+		commit(action, payload){ this.$store.commit(action, payload) },
+		dispatch(action, payload){ this.$store.dispatch(action, payload) },
 		
 		selectItem(){ this.dispatch('selectItem', {id:this.item.id}) },
 		dblclick(e)

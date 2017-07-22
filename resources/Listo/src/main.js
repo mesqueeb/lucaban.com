@@ -72,6 +72,21 @@ import Vuex from 'vuex'
 Vue.use(Vuex);
 import ListStore from './store/store.js'
 window.store = new Vuex.Store(ListStore());
+
+import itemComputedProperties from './store/itemComputedProperties.js'
+
+window.itemGetters = {};
+Object.keys(store.state.nodes).forEach(id => {
+    itemGetters[id] = new Vue({
+        store,
+        data: {
+            item: store.state.nodes[id],
+        },
+        computed: itemComputedProperties,
+    });
+});
+// console.log(itemGetters);
+
 // 4.
 import Vuelidate from 'vuelidate'
 Vue.use(Vuelidate)

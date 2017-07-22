@@ -1,16 +1,17 @@
 import { Utilities, uniq } from '../../helpers/globalFunctions.js'
-function initialState() {
-	return {
+import setDefaultItemValues from '../setDefaultItemValues.js'
+
+let tempId = function(){
+	return 'tempItem_' + Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+}
+let initialState = function(){
+	return setDefaultItemValues({
 		body: '',
-        due_date: '0000-00-00 00:00:00',
-        done_date: '0000-00-00 00:00:00',
-        done: false,
-        planned_time: '',
-        preparedTags: [],
-        children: [],
-        children_order: [],
+		preparedTags: [],
         newItem: true,
-	}
+        temp: true,
+        id: tempId()
+	});
 }
 export default {
 	namespaced: true,
@@ -80,7 +81,11 @@ export default {
 		},
 		preparedPlusComputedTags: (state, getters, rootState, rootGetters) => {
 			let alltags = state.preparedTags;
-			let parentTags = rootGetters.tagsArray(getters.parent_id);
+			let parentTags = [];
+			if (itemGetters[getters.parent_id])
+			{
+				parentTags = itemGetters[getters.parent_id].tagsArray;
+			}
 			alltags = alltags.concat(parentTags);
 			alltags = alltags.concat(rootState.selection.tags.map(tag => Utilities.tagSlugToName(tag)));
 			// if (this.get.isTopLvlItemInFilteredRoot(this.state.addingNewUnder))

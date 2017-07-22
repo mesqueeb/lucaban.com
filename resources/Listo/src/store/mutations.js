@@ -1,4 +1,5 @@
 import initialState from './state.js'
+import itemComputedProperties from './itemComputedProperties.js'
 
 export default {
 resetStateData(state)
@@ -71,7 +72,17 @@ resetNewItem(state)
 },
 addNode(state, { item })
 {
+	let t0 = performance.now( );
 	vm.$set(state.nodes,item.id,item);
+	itemGetters[item.id] = new Vue({
+	    store,
+	    data: {
+	        item: store.state.nodes[item.id],
+	    },
+	    computed: itemComputedProperties,
+	});
+	let t1 = performance.now( );
+	console.log("			Call to addNode took " + (t1 - t0) + " milliseconds.")
 },
 addChild(state, { newParentId, index, item })
 {
@@ -110,6 +121,7 @@ deleteTag(state, {id, tags})
 },
 addTagTemporarely(state, {id, tags})
 {
+	let t0 = performance.now( );
 	if (!Array.isArray(tags)){
 		tags = [tags];
 	}
@@ -121,6 +133,8 @@ addTagTemporarely(state, {id, tags})
 	// this isn't reactive
 	// state.nodes[id].tagged = Object.assign(state.nodes[id].tagged, tags);
 	tags.forEach(tag => state.nodes[id].tagged.push(tag));
+	let t1 = performance.now( );
+	console.log("			Call to commit addTagTemporarely took " + (t1 - t0) + " milliseconds.")
 },
 deleteTempItem(state, { item })
 {

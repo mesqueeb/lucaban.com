@@ -1,7 +1,7 @@
 <template>
 <div
 	class="c-item-nav"
-	v-if="
+	v-show="
 		state.editingItem != item.id
 		&& state.editingItemTags != item.id
 		&& state.selection.selectedId == item.id"
@@ -31,9 +31,7 @@
 		<div class="o-popmenu__body">
 			<div
 				class="o-popmenu__item"
-				v-clipboard:copy="get.clipboardText(item.id)"
-				v-clipboard:success="clipboardSuccess"
-				v-clipboard:error="clipboardError"
+				@click="dispatch('copyProgrammatic',{id:item.id})"
 			>
 				<q-icon v-if="copySuccess" name="ion-ios-checkmark-empty" />
 				<div :class="{ 'u-color-success':copySuccess }" v-html="state.keybindings.copyClipboard.popmenu[l]"></div>
@@ -108,6 +106,8 @@
 <script>
 import Clipboard from 'clipboard';
 import {stringToKeyboardKeys} from '../helpers/globalFunctions.js'
+import all from '../store/ItemComputedProperties.js'
+
 export default{
 	name: 'itemNav',
 	props: ['item','clipboardTextJournal'],
@@ -123,21 +123,9 @@ export default{
 	},
 	methods:
 	{
-		commit(action, payload){ this.$store.commit(action, payload); },
-		dispatch(action, payload){ this.$store.dispatch(action, payload); },
+		commit(action, payload){ this.$store.commit(action, payload) },
+		dispatch(action, payload){ this.$store.dispatch(action, payload) },
 		stringToKeyboardKeys,
-		hello(){
-			console.log('hello');
-		},
-		clipboardSuccess()
-		{
-			this.dispatch('sendFlash', { type:'success', msg:this.state.keybindings.copyClipboard.success[this.l]+"<br><br>"+this.get.clipboardText(this.item.id) });
-			this.copySuccess = true;
-		},
-		clipboardError()
-		{
-			this.dispatch('sendFlash', { type:'error', msg:this.state.keybindings.copyClipboard.error[this.l] });
-		},
 	},
 }
 </script>

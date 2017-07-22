@@ -209,8 +209,8 @@ export default {
 		},
 	},
     methods: {
-		commit(action, payload){ this.$store.commit(action, payload); },
-		dispatch(action, payload){ this.$store.dispatch(action, payload); },
+		commit(action, payload){ this.$store.commit(action, payload) },
+		dispatch(action, payload){ this.$store.dispatch(action, payload) },
     	sec_to_hhmmss, customCalendar, stringToKeyboardKeys,
     	countdownTimer(used_time, planned_time)
     	{

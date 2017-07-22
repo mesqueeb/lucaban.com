@@ -3,6 +3,8 @@ import {
 } from '../../helpers/globalFunctions.js'
 import organizeData from '../fetchedDataOrganizer.js'
 import axios from 'axios'
+import itemComputedProperties from '../itemComputedProperties.js'
+import Vue from 'vue'
 
 export default {
 	state:
@@ -111,11 +113,21 @@ export default {
 			{data})
 		{
 			let userData = organizeData(data);
-			window.userData = userData;
+			// window.userData = userData;
+			Object.keys(userData.nodes).forEach(id => {
+			    itemGetters[id] = new Vue({
+			        store,
+			        data: {
+			            item: userData.nodes[id],
+			        },
+			        computed: itemComputedProperties,
+			    });
+			});
 			commit('updateState', { source:userData.source });
 			commit('updateState', { orphans:userData.orphans });
 			commit('updateState', { root:userData.root });
 			commit('updateState', { nodes:userData.nodes });
+			// dispatch('addFetchedNodes', { nodes: userData.nodes });
 			dispatch('sortAllChildren');
 		},
 		getUser ({dispatch, commit})
@@ -251,27 +263,38 @@ export default {
 		{
 			if (!rootState.user.user) { console.log('not Logged in'); return; }
 			rootState.loading = true;
-			axios.get(apiBaseURL+'items/fetchdone').then(function(response){
-				// debugger;
+			axios.get(apiBaseURL+'items/fetchdone').then(({data}) => {
 				rootState.fetchedDone = true;
 				console.log('fetched Done');
-				let data = response.data;
-				console.log(data);
 				if (!data.length){ 
 					console.log('no done items...');
 					rootState.loading = false;
 					return;
 				}
+				
+				let doneData = organizeData(data);
+				// window.doneData = doneData;
+				Object.keys(doneData.nodes).forEach(id => {
+				    itemGetters[id] = new Vue({
+				        store,
+				        data: {
+				            item: doneData.nodes[id],
+				        },
+				        computed: itemComputedProperties,
+				    });
+				});
+				Object.assign(rootState.nodes, doneData.nodes);
 				// clean up and add as nodes
-				data.forEach(item => {
-					dispatch('addAndCleanNodesRecursively', {item});
-				})
-				rootState.selection.view = null;
-				rootState.selection.view = 'journal';
+				// data.forEach(item => {
+				// 	dispatch('addAndCleanNodesRecursively', {item});
+				// })
+				// rootState.selection.view = null;
+				// rootState.selection.view = 'journal';
 				rootState.loading = false;
 				// Codementor
 			});
 		},
+
 		postNewItem ({rootState, dispatch, getters},
 			{newItem, index, addNextItemAs, addTags, duplication} = {})
 		{
