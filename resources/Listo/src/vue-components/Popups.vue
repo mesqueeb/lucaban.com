@@ -20,59 +20,60 @@
                     class="flatpickr"
                     :name="popup.item.id"
                     v-model="popup.item.done_date"
-                >
+                />
             </label></div>
         </div>
         
         <div class="c-popup__body">
             <div class="c-popup__completion-memo">
-              <label>{{ get.text.popups.journalNotes }}</label>
-              <textarea name="c-popup__completion_memo__txtarea"
-                v-model="popup.item.completion_memo"
-                @keydown="keydownInCompletionMemo(popup, $event)"
-                v-focus.noMobile
-                v-autoheight
-              ></textarea>
+                <label>{{ get.text.popups.journalNotes }}</label>
+                <textarea name="c-popup__completion_memo__txtarea"
+                    class="js-popup__completion_memo__txtarea"
+                    v-model="popup.item.completion_memo"
+                    @keydown="keydownInCompletionMemo(popup, $event)"
+                    v-focus.noMobile
+                    v-autoheight
+                ></textarea>
             </div>
             <div class="c-popup__used-time">
-              <div>
-                <label class="">{{ get.text.popups.usedTime }}</label>
-                <!-- <input v-model="popup.item.used_time" type="number"/> -->
-                <span class="">{{ sec_to_hhmmss(popup.item.used_time) }}</span>
-              </div>
-              <div class="buttons">
                 <div>
-                  <button class="o-btn forward"
-                    @click="incrementUsedTime(popup.item, 60)"
-                    @keydown="keydownInPopup(popup, $event, 'forward')"
-                  >+1 {{ get.text.global.min }}</button>
-                  <button class="o-btn forward"
-                    @click="incrementUsedTime(popup.item, 300)"
-                    @keydown="keydownInPopup(popup, $event, 'forward')"
-                  >+5 {{ get.text.global.min }}</button>
-                  <button class="o-btn forward"
-                    @click="incrementUsedTime(popup.item, 600)"
-                    @keydown="keydownInPopup(popup, $event, 'forward')"
-                  >+10 {{ get.text.global.min }}</button>
-                </div><div>
-                  <button class="o-btn forward"
-                    @click="incrementUsedTime(popup.item, 1800)"
-                    @keydown="keydownInPopup(popup, $event, 'forward')"
-                  >+30 {{ get.text.global.min }}</button>
-                  <!-- <button class="o-btn forward"
-                    @click="incrementUsedTime(popup.item, 3600)"
-                    @keydown="keydownInPopup(popup, $event, 'forward')"
-                  >+1 hour</button> -->
-                  <button class="o-btn reset"
-                    @click="resetUsedTime(popup.item)"
-                    @keydown="keydownInPopup(popup, $event, 'reset')"
-                  >{{ get.text.popups.reset }}</button>
-                  <button class="o-btn undo-completion"
-                    @click="setNotDone(popup)"
-                    @keydown="keydownInPopup(popup, $event, 'setNotDone')"
-                  >{{ get.text.popups.setNotDone }}</button>
+                    <label class="">{{ get.text.popups.usedTime }}</label>
+                    <!-- <input v-model="popup.item.used_time" type="number"/> -->
+                    <span class="">{{ sec_to_hhmmss(popup.item.used_time) }}</span>
                 </div>
-              </div>
+                <div class="buttons">
+                    <div>
+                        <button class="o-btn forward"
+                            @click="incrementUsedTime(popup.item, 60)"
+                            @keydown="keydownInPopup(popup, $event, 'forward')"
+                        >+1 {{ get.text.global.min }}</button>
+                        <button class="o-btn forward"
+                            @click="incrementUsedTime(popup.item, 300)"
+                            @keydown="keydownInPopup(popup, $event, 'forward')"
+                        >+5 {{ get.text.global.min }}</button>
+                        <button class="o-btn forward"
+                            @click="incrementUsedTime(popup.item, 600)"
+                            @keydown="keydownInPopup(popup, $event, 'forward')"
+                        >+10 {{ get.text.global.min }}</button>
+                    </div><div>
+                        <button class="o-btn forward"
+                            @click="incrementUsedTime(popup.item, 1800)"
+                            @keydown="keydownInPopup(popup, $event, 'forward')"
+                        >+30 {{ get.text.global.min }}</button>
+                        <!-- <button class="o-btn forward"
+                            @click="incrementUsedTime(popup.item, 3600)"
+                            @keydown="keydownInPopup(popup, $event, 'forward')"
+                        >+1 hour</button> -->
+                        <button class="o-btn reset"
+                            @click="resetUsedTime(popup.item)"
+                            @keydown="keydownInPopup(popup, $event, 'reset')"
+                        >{{ get.text.popups.reset }}</button>
+                        <button class="o-btn undo-completion"
+                            @click="setNotDone(popup)"
+                            @keydown="keydownInPopup(popup, $event, 'setNotDone')"
+                        >{{ get.text.popups.setNotDone }}</button>
+                    </div>
+                </div>
             </div>
         </div>
         <button

@@ -1,5 +1,5 @@
 import { format, formatRelative, differenceInCalendarDays, addDays } from 'date-fns/esm'
-import { hasClass, isElementInViewport, removeEmptyValuesFromArray } from '../helpers/globalFunctions.js'
+import { hasClass, isElementInViewport, removeEmptyValuesFromArray, makeTagObject } from '../helpers/globalFunctions.js'
 import setDefaultItemValues from './setDefaultItemValues.js'
 
 // we import all of `date`
@@ -194,7 +194,7 @@ addItem ({state, commit, dispatch, getters},
 		// 	state.selection.view = null;
 		// 	state.selection.view = 'journal';
 		// }
-		// if (getters['selection/dueTodayFiltered'])
+		// if (getters['selection/dueItemsFiltered'])
 		// {
 		// 	state.selection.filter.dueDate.to = null;
 		// 	state.selection.filter.dueDate.to = new Date();
@@ -349,7 +349,7 @@ deleteItem ({state, commit, dispatch, getters},
 		state.selection.view = 'journal';
 		state.selection.view = 'tree';
 	}
-	if (getters['selection/dueTodayFiltered'])
+	if (getters['selection/dueItemsFiltered'])
 	{
 		state.selection.filter.dueDate.to = null;
 		state.selection.filter.dueDate.to = new Date();
@@ -411,7 +411,7 @@ tagItemTemporarely ({state, commit, dispatch, getters},
 	if (!Array.isArray(tags)){
 		tags = [tags];
 	}
-	tags = tags.map(tag => getters.makeTagObject(tag));
+	tags = tags.map(tag => makeTagObject(tag));
 	if (requestType == 'untag')
 	{
 		commit('deleteTag', {id, tags});
@@ -733,7 +733,7 @@ addNew ({state, commit, dispatch, getters},
 		let doneDate = (!olderSibling || olderSibling.depth == 0) ? format(new Date(), 'YYYY-MM-DD HH:mm:ss') : olderSibling.done_date;
 		newItem.done_date = doneDate;
 	}
-	if ( getters['selection/dueTodayFiltered']
+	if ( getters['selection/dueItemsFiltered']
 	   && itemGetters[olderSibling.id].isTopLvlItemInFilteredRoot
 	   && !state.addingNewAsChild )
 	{
@@ -894,7 +894,7 @@ setDueDate ({state, commit, dispatch, getters},
 	let diff = differenceInCalendarDays(oriDueDate, dd);
 	dd = (diff == 0) ? '0000-00-00 00:00:00' : format(dd, 'YYYY-MM-DD hh:mm:ss');
 	state.nodes[id].due_date = dd;
-	if (diff == 0 && getters['selection/dueTodayFiltered'])
+	if (diff == 0 && getters['selection/dueItemsFiltered'])
 	{
 		state.selection.selectedId = itemGetters[id].nextItemId;
 	}
@@ -1090,10 +1090,13 @@ blurOnEditOrAdd ({dispatch, commit, state, getters},
 	if (getters.mobile){ return; }
 	setTimeout(function()
 	{
-    	if ( document.activeElement.nodeName == 'INPUT'
+    	if ( (  document.activeElement.nodeName == 'INPUT'
     		||  document.activeElement.nodeName == 'TEXTAREA'
     		||  document.activeElement.nodeName == 'A'
     		||  document.activeElement.nodeName == 'BUTTON' )
+    		&& !document.activeElement.className.includes('js-popup__completion_memo__txtarea')
+    		&& !document.activeElement.className.includes('js-toggle')
+    	   )
     	{
     		return;
 		} else {
@@ -1158,6 +1161,7 @@ focusElement({state},
 filterItems ({state, commit, dispatch},
 	{keyword, value, event} = {})
 {
+	commit('updateState', {computing:true});
 	if (state.editingItem){ return; }
 	// debugger;
 	let operator = null;
@@ -1174,7 +1178,8 @@ filterItems ({state, commit, dispatch},
 	{
 		dispatch('fetchDone', { tags:null, operator:operator });
 	}
-	dispatch('selection/addKeywords', { keyword, value, operator });
+	dispatch('selection/addKeywords', { keyword, value, operator })
+	.then(()=> commit('updateState', {computing:false}) );
 },
 removeHiddenTag ({state, commit, dispatch},
 	{tag} = {})

@@ -1,7 +1,7 @@
 import languageContents from './lang.js'
 import keybindings from './keybindings.js'
 import setDefaultItemValues from './setDefaultItemValues.js'
-import itemComputedProperties from './itemComputedProperties.js'
+import ItemComputedProperties from './ItemComputedProperties.js'
 
 if (DEV) {
     window.apiBaseURL = 'http://api.lucaban.dev/';
@@ -40,19 +40,6 @@ if (DEV) {
     nodes[initialItem.id].children_order = [aa.id,bb.id,cc.id];
 }
 
-// import Vue from 'vue'
-// window.itemGetters = {};
-// Object.keys(nodes).forEach(id => {
-//     itemGetters[id] = new Vue({
-//         // store,
-//         data: {
-//             item: nodes[id],
-//         },
-//         computed: itemComputedProperties,
-//     });
-// });
-
-
 export default function(){
   return {
     languageContents,
@@ -72,6 +59,8 @@ export default function(){
     editingDoneDateItem: null,
     loading: false,
     patching: false,
+    computing: false,
+    allTags: [],
     popups: [],
     popouts: {'delete':[], 'timer':[], 'edit':[], 'guide':false },
     flashes: [], // e.g. {type:'', msg:''}

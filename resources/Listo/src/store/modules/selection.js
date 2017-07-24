@@ -12,6 +12,7 @@ function initialState() {
 		hiddenItems: [],
 		hiddenBookmarks: [],
 		view: 'tree',
+		filters: [],
 	}
 }
 export default {
@@ -153,7 +154,7 @@ export default {
 			return state.filter.doneDate.from != null
 				|| state.filter.doneDate.to != null;
 		},
-		dueTodayFiltered: (state) => {
+		dueItemsFiltered: (state) => {
 			return (differenceInCalendarDays(state.filter.dueDate.to, new Date())== 0);
 		},
 		getHiddenItemsTotalUsedTime: (state, getters) => {
@@ -178,6 +179,7 @@ export default {
 		},
 		testAgainstTagSelection: (state, getters, rootState, rootGetters) =>
 		(id, {flat = false} = { flat: false }) => {
+			console.log('running testAgainstTagSelection');
 			if (!state.tags.length && !state.hiddenTags.length)
 			{
 				return true;
@@ -216,18 +218,9 @@ export default {
 		testAgainstDueDateSelection: (state, getters, rootState, rootGetters) =>
 		(id, {flat = false} = { flat: false }) => {
 			let passedTest = true;
-			if (getters.dueTodayFiltered)
+			if (getters.dueItemsFiltered)
 			{
-				let isDueToday = itemGetters[id].isDueToday;
-				let hasParentDueToday = itemGetters[id].hasParentDueToday;
-				if (flat)
-				{
-					passedTest = (isDueToday || hasParentDueToday) ? true : false;
-				}
-				else
-				{
-					passedTest = (isDueToday && !hasParentDueToday) ? true : false;
-				}
+				passedTest = (flat) ? itemGetters[id].isDueFlat : itemGetters[id].isDueToday;
 			}
 			return passedTest;
 		},
@@ -260,6 +253,7 @@ export default {
 		},
 		testAgainstAllSelection: (state, getters, rootState, rootGetters) =>
 		(id, { flat = false } = { flat: false }) => {
+			console.log('running testAgainstAllSelection');
 			let passedAllTests = true;
 			if (flat)
 			{
@@ -281,16 +275,12 @@ export default {
 				let passedDoneTest = getters.testAgainstDoneSelection(id);
 				let passedHiddenItemsTest = getters.testAgainstHiddenItems(id);
 				// In the case of a tag filter AND due date filter
-				if (state.tags.length && getters.dueTodayFiltered)
+				if (state.tags.length && getters.dueItemsFiltered)
 				{
 					// This is to ensure that children of items who are due + have the selected tag
 					//       are not added twice, once as children and once as top lvl filered item
 					let hasParentDueToday = itemGetters[id].hasParentDueToday;
-					let hasParentWithTag;
-					if (state.tags.length)
-					{
-						hasParentWithTag = state.tags.every(tag => rootGetters.hasParentWithTag(id, tag));
-					}
+					let hasParentWithTag = state.tags.every(tag => rootGetters.hasParentWithTag(id, tag));
 					if (hasParentDueToday && hasParentWithTag)
 					{
 						return false;

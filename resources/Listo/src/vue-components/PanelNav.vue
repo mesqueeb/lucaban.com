@@ -10,7 +10,7 @@
 	>{{ get.text.menu.all }}</a>
 	<a href="#"
 		:class="{'active':
-			get['selection/dueTodayFiltered']
+			get['selection/dueItemsFiltered']
 			&& $route.path == '/'
 		}"
 		@click="openMenu('Today', $event)"
@@ -61,6 +61,10 @@
 		@click="state.debug = !state.debug"
 		v-if="DEV"
 	>Debug</a>
+	<q-spinner-oval
+		v-if="state.computing"
+		class="c-panel-navigation__spinner" size="1.5em"
+	/>
 	
 </div>
 </template>
@@ -116,6 +120,7 @@ export default {
 .c-panel__navigation{
     display: flex;
     flex-wrap: wrap;
+    align-items: center;
     padding: 0.1em 0.3em;
     background-color: rgba(255, 255, 255, 0.95);
 }
@@ -143,5 +148,10 @@ export default {
         text-decoration: line-through;
         color: $duedate-color;
     }
+}
+.c-panel-navigation__spinner{
+	color: $theme-color;
+	margin-left: auto;
+	margin-right: 0.1em;
 }
 </style>

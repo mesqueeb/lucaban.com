@@ -1,5 +1,5 @@
 import initialState from './state.js'
-import itemComputedProperties from './itemComputedProperties.js'
+import ItemComputedProperties from './ItemComputedProperties.js'
 
 export default {
 resetStateData(state)
@@ -79,7 +79,7 @@ addNode(state, { item })
 	    data: {
 	        item: store.state.nodes[item.id],
 	    },
-	    computed: itemComputedProperties,
+	    computed: ItemComputedProperties,
 	});
 	let t1 = performance.now( );
 	console.log("			Call to addNode took " + (t1 - t0) + " milliseconds.")

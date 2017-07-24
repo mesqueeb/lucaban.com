@@ -22,10 +22,7 @@ totalPlannedMin()
 {
 	let t0__a = performance.now( );
 	console.log('running totalPlannedMin...');
-	let item = store.state.nodes[this.item.id];
-	// if (store.state.debug){  debugger }
-	if (!item){ return 0; }
-
+	let item = this.item;
 	let selfValue = (item.planned_time) ? parseFloat(item.planned_time) : 0;
 	let childrenArray = this.allChildItems;
 	if (!childrenArray || !childrenArray.length) { return selfValue; }
@@ -41,10 +38,8 @@ totalUsedSec()
 {
 	let t0__a = performance.now( );
 	console.log('running totalUsedSec...');
-	let item = store.state.nodes[this.item.id];
+	let item = this.item;
 	let childrenArray = this.allChildItems;
-	if (!item){ return 0; }
-
 	let selfValue = (item.used_time) ? parseFloat(item.used_time) : 0;
 	if (!childrenArray || !childrenArray.length) { return selfValue; }
 	
@@ -70,10 +65,7 @@ totalVisiblePlannedMin()
 {
 	let t0__a = performance.now( );
 	console.log('running totalVisiblePlannedMin...');
-	let item = store.state.nodes[this.item.id];
-	// if (store.state.debug){  debugger }
-	if (!item){ return 0; }
-
+	let item = this.item;
 	let selfValue = (item.planned_time) ? parseFloat(item.planned_time) : 0;
 	let childrenArray = this.allVisibleChildIds;
 	if (!childrenArray || !childrenArray.length) { return selfValue; }
@@ -90,10 +82,8 @@ totalVisibleUsedSec()
 {
 	let t0__a = performance.now( );
 	console.log('running totalVisibleUsedSec...');
-	let item = store.state.nodes[this.item.id];
+	let item = this.item;
 	let childrenArray = this.allVisibleChildIds;
-	if (!item){ return 0; }
-
 	let selfValue = (item.used_time) ? parseFloat(item.used_time) : 0;
 	if (!childrenArray || !childrenArray.length) { return selfValue; }
 	
@@ -119,18 +109,15 @@ totalVisibleSecLeft()
 secLeft()
 {
 	console.log('running secLeft...');
-	let item = store.state.nodes[this.item.id];
-	if (!item){ return 0; }
-	return item.planned_time*60-item.used_time;
+	if (!this.item){ return 0; }
+	return this.item.planned_time*60-this.item.used_time;
 },
 totalTimeDifferentFromParent()
 {
 	console.log('running totalTimeDifferentFromParent...');
-	let item = store.state.nodes[this.item.id];
-	if (!item){ return 0; }
-	if (!item.parent_id){ return true; }
+	if (!this.item.parent_id){ return true; }
 
-	return this.totalPlannedSec != itemGetters[item.parent_id].totalPlannedSec;
+	return this.totalPlannedSec != itemGetters[this.item.parent_id].totalPlannedSec;
 },
 // totalPlannedHour()
 // {
@@ -150,17 +137,13 @@ totalTimeDifferentFromParent()
 tagsArray()
 {
 	console.log('running tagsArray...');
-	let item = store.state.nodes[this.item.id];
-	if (!item){ return []; }
-	return item.tagged.map(obj => obj.tag_name);
+	return this.item.tagged.map(obj => obj.tag_name);
 },
 siblingIndex()
 {
 	console.log('running siblingIndex...');
 	let id = this.item.id;
-	let item = store.state.nodes[id];
-	if (!item){ return false; }
-	let parentId = item.parent_id;
+	let parentId = this.item.parent_id;
 	if (!parentId || !store.state.nodes[parentId]){ return false; }
 	let siblingsArray = store.state.nodes[parentId].children_order;
 	return siblingsArray.indexOf(id);
@@ -169,9 +152,7 @@ visibleSiblingIndex()
 {
 	console.log('running siblingIndex...');
 	let id = this.item.id;
-	let item = store.state.nodes[id];
-	if (!item){ return false; }
-	let parentId = item.parent_id;
+	let parentId = this.item.parent_id;
 	if (!parentId || !store.state.nodes[parentId]){ return false; }
 	let siblingsArray = itemGetters[parentId].visibleDirectChildIds;
 	return siblingsArray.indexOf(id);
@@ -180,9 +161,7 @@ olderSiblingId()
 {
 	console.log('running olderSiblingId...');
 	let id = this.item.id;
-	let item = store.state.nodes[id];
-	if (!item){ return; }
-	let parentId = item.parent_id;
+	let parentId = this.item.parent_id;
 	if (!parentId){ return; }
 	let siblingsArray = store.state.nodes[parentId].children_order;
 	if (siblingsArray.length <= 1 || this.siblingIndex == 0)
@@ -196,10 +175,8 @@ nextItemId()
 {
 	console.log('running nextItemId...');
 	let id = this.item.id;
+	let item = this.item;
 	if (!id){ return; }
-	let item = store.state.nodes[id];
-	if (!item){ return; }
-
 	// Journal
 	if (store.state.selection.view == 'journal')
 	{
@@ -252,7 +229,7 @@ nextItemRecursion()
 		return store.getters.filteredIdsTree[index+1];
 	}
 	let index = this.visibleSiblingIndex;
-	let parentId = store.state.nodes[id].parent_id;
+	let parentId = this.item.parent_id;
 	if (!parentId){ return }
 	let parentsChildren = itemGetters[parentId].visibleDirectChildIds;
 	if (index+1 == parentsChildren.length)
@@ -265,9 +242,7 @@ nextItemRecursion()
 nextSiblingOrParentsSiblingId()
 {
 	console.log('running nextSiblingOrParentsSiblingId...');
-	let item = store.state.nodes[this.item.id];
-	if (!item){ return; }
-	let parentId = item.parent_id;
+	let parentId = this.item.parent_id;
 	if (!parentId){ return; }
 	let children_order = store.state.nodes[parentId].children_order;
 	let nextIndex = this.siblingIndex+1;
@@ -314,7 +289,7 @@ prevItemId()
 {
 	console.log('running prevItemId...');
 	let id = this.item.id;
-	if (!id || store.state.nodes[id].depth == 0){ return false; }
+	if (!id || this.item.depth == 0){ return false; }
 	let prevItemId;
 	// Previous item in JOURNAL
 	if (store.state.selection.view == 'journal')
@@ -342,7 +317,7 @@ prevItemId()
 		}
 	// All other cases
 	} else {
-		let item = store.state.nodes[this.item.id];
+		let item = this.item;
 		let index = this.visibleSiblingIndex;
 		if (index == 0) {
 			prevItemId = item.parent_id;
@@ -373,7 +348,7 @@ hasParentDueToday()
 {
 	console.log('running hasParentDueToday...');
 	let id = this.item.id;
-	let item = store.state.nodes[id];
+	let item = this.item;
 	if (!item.parent_id){ return false; }
 	let parent = store.state.nodes[item.parent_id];
 	if (!parent){ return false; }
@@ -388,19 +363,18 @@ hasParentDueToday()
 isDueToday()
 {
 	console.log('running isDueToday...');
-	let item = store.state.nodes[this.item.id];
-	if (!item){ return false; }
-
-	let diff = differenceInCalendarDays(new Date(item.due_date.replace(/-/g, "/")), new Date());
+	let diff = differenceInCalendarDays(new Date(this.item.due_date.replace(/-/g, "/")), new Date());
 	if (diff <= 0) { return true; }
 	return false;
+},
+isDueFlat()
+{
+	return (this.isDueToday || this.hasParentDueToday)
 },
 isProject()
 {
 	console.log('running isProject...');
-	let item = store.state.nodes[this.item.id];
-	if (!item){ return false; }
-	if (item.body.slice(-1) == ':')
+	if (this.item.body.slice(-1) == ':')
 	{
 		return true;
 	} else {
@@ -410,8 +384,7 @@ isProject()
 itemTagArray()
 {
 	console.log('running itemTagArray...');
-	let item = store.state.nodes[this.item.id];
-	return item.tagged.map(function(tagObj){
+	return this.item.tagged.map(function(tagObj){
 		return tagObj.tag_name;
 	});
 },
@@ -419,7 +392,7 @@ allChildrenAreDone()
 {
 	console.log('running allChildrenAreDone...');
 	let id = this.item.id;
-	let children = store.state.nodes[id].children;
+	let children = this.item.children;
 	if (!children.length){ return false; }
 	let doneAmount = children.reduce(function (prev, child){
 		let a = (child.done) ? 1 : 0 ;
@@ -435,7 +408,7 @@ allChildrenAreDone()
 calTotalPlannedTime()
 {
 	console.log('running calTotalPlannedTime...');
-	let item = store.state.nodes[this.item.id];
+	let item = this.item;
 	let totalPlannedTime;
     if (!(Array.isArray(item.children) && item.children.length))
     {
@@ -453,8 +426,7 @@ calTotalPlannedTime()
 calTotalUsedTime()
 {
 	console.log('running calTotalUsedTime...');
-	let item = store.state.nodes[this.item.id];
-	if (!item){ return 0; }
+	let item = this.item;
 	let totalUsedTime;
     if (!(Array.isArray(item.children) && item.children.length))
     {
@@ -491,9 +463,8 @@ allVisibleChildIds()
 },
 visibleDirectChildren()
 {
-	let item = store.state.nodes[this.item.id];
-	if (!item || !item.children.length || !item.show_children){ return []; }
-
+	let item = this.item;
+	if (!item.children.length || !item.show_children){ return []; }
 	return item.children.filter(child => store.getters.filteredIdsFlat.includes(child.id));
 },
 visibleDirectChildIds()
@@ -505,17 +476,17 @@ clipboardText()
 {
 	console.log('running clipboardText...');
 	let id = this.item.id;
-	let item = store.state.nodes[id];
+	let item = this.item;
 	let children;
 	let directChildren;
 	let spaceVariable = 0;
-	if (this.$store.getters['selection/dueTodayFiltered'])
+	if (this.$store.getters['selection/dueItemsFiltered'])
 	{
 		// item = id;
 		// children = item.children;
 		directChildren = true;
 	} else {
-		// item = store.state.nodes[id];
+		// item = this.item;
 		// children = this.allVisibleChildItems;
 		spaceVariable = parseFloat(item.depth);
 	}

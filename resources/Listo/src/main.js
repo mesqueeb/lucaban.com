@@ -73,7 +73,7 @@ Vue.use(Vuex);
 import ListStore from './store/store.js'
 window.store = new Vuex.Store(ListStore());
 
-import itemComputedProperties from './store/itemComputedProperties.js'
+import ItemComputedProperties from './store/ItemComputedProperties.js'
 
 window.itemGetters = {};
 Object.keys(store.state.nodes).forEach(id => {
@@ -82,7 +82,8 @@ Object.keys(store.state.nodes).forEach(id => {
         data: {
             item: store.state.nodes[id],
         },
-        computed: itemComputedProperties,
+        computed: ItemComputedProperties,
+        // hasParentWithTag: {},
     });
 });
 // console.log(itemGetters);

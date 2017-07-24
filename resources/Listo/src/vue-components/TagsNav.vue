@@ -5,7 +5,7 @@
 			href="#"
 			:class="['c-tag-menu__tag', {'c-tag-menu--active': selection.tags.includes(tag.slug)}]"
 			:value="tag.slug"
-			@click.prevent="dispatch('filterItems', { keyword:'tag', value:tag.slug, event:$event })"
+			@click.prevent="state.computing = true; dispatch('filterItems', { keyword:'tag', value:tag.slug, event:$event })"
 		>{{ tag.name }}</a>
 		<a v-for="tag in selection.hiddenTags"
 			class="c-tag-menu--filtered-out" href="#"
@@ -64,6 +64,9 @@ export default {
 }
 .c-tag-menu--active{
     color: $theme-color !important;
+    &:hover{
+        color:$text-gray !important;
+    }
 }
 .c-tag-menu--filtered-out{
     text-decoration: line-through !important;

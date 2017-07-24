@@ -24,7 +24,7 @@
 	<Mobile-Nav-Add></Mobile-Nav-Add>
 </q-fixed-position>
 <q-fixed-position corner="bottom-left" :offset="[18, 15]"
-	v-if="$route.path == '/' && get.mobile && state.selection.view != 'journal' && get.itemAmount && state.selection.selectedId"
+	v-if="$route.path == '/' && get.mobile && state.selection.view != 'journal' && get.itemCount && state.selection.selectedId"
 >
 	<Mobile-Nav-Move></Mobile-Nav-Move>
 </q-fixed-position>

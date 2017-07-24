@@ -10,10 +10,11 @@
 		>
 			<input
 				type="checkbox"
-				class="o-toggle__arrow-helper"
+				class="o-toggle__arrow-helper js-toggle"
 				:id="'show_children_'+item.id"
 				v-model="item.show_children"
 				@change="dispatch('patch',{ id:item.id, field:'show_children' })"
+				@focus="toggleFocus"
 			>
 			<label
 				class="o-toggle__arrow"
@@ -21,12 +22,13 @@
 				v-if="item.children_order.length>0"
 			></label>
 			<input
-				class="o-toggle__check"
+				class="o-toggle__check js-toggle"
 				type="checkbox"
 				v-if="item.children_order.length==0
 					|| item.done == true || allChildrenAreDone"
 				v-model="item.done"
 				@click="dispatch('prepareDonePatch',{ id:item.id })"
+				@focus="toggleFocus"
 			>
 				<!-- 
 				@change="test('change')"
@@ -63,6 +65,15 @@ export default {
 			{
 				console.log('it works!');
 			});
+		},
+		toggleFocus()
+		{
+			setTimeout(() => {
+				if (document.activeElement.className.includes('js-toggle'))
+				{
+					document.activeElement.blur()
+				}
+			}, 50);
 		},
 	},
 }

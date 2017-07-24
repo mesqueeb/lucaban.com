@@ -17,3 +17,4 @@ Route::post('itemtags/fetchTagged','ItemTagController@fetchTagged');
 Route::resource('items','CardController');
 Route::resource('itemtags','ItemTagController');
 Route::get('user','AuthenticateController@getAuthenticatedUser');
+Route::get('allTags','ItemTagController@index');

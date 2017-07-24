@@ -3,7 +3,7 @@ import {
 } from '../../helpers/globalFunctions.js'
 import organizeData from '../fetchedDataOrganizer.js'
 import axios from 'axios'
-import itemComputedProperties from '../itemComputedProperties.js'
+import ItemComputedProperties from '../ItemComputedProperties.js'
 import Vue from 'vue'
 
 export default {
@@ -92,6 +92,8 @@ export default {
 		fetchListo ({commit, dispatch})
 		{
 			commit('updateState', { loading:true } );
+			dispatch('getUser');
+			dispatch('fetchAllTags');
 			console.log('start fetching all items');
 			console.log(axios.defaults.headers.common);
 			/*/ ～～～～～～～～～～～～～～～～～～～～～～～　\*\		*/
@@ -101,7 +103,6 @@ export default {
 				dispatch('initializeState', {data})
 				.then(() => {
 					commit('updateState', { loading:false } );
-					dispatch('getUser');
 				}).catch((error) => {
 					console.log(`ERROR: ${error}`);
 				});
@@ -120,7 +121,8 @@ export default {
 			        data: {
 			            item: userData.nodes[id],
 			        },
-			        computed: itemComputedProperties,
+			        computed: ItemComputedProperties,
+			        // hasParentWithTag: {},
 			    });
 			});
 			commit('updateState', { source:userData.source });
@@ -258,6 +260,16 @@ export default {
 				});
 			}
 		},
+		fetchAllTags ({rootState, dispatch, getters, commit})
+		{
+			// if (!rootState.user.user) { console.log('not Logged in'); return; }
+			rootState.patching = true;
+			axios.get(apiBaseURL+'allTags')
+			.then(({data}) => {
+				commit('updateState', { allTags:data });
+				rootState.patching = false;
+			});
+		},
 		fetchDone ({rootState, dispatch, getters},
 			{tags, operator} = {})
 		{
@@ -280,18 +292,12 @@ export default {
 				        data: {
 				            item: doneData.nodes[id],
 				        },
-				        computed: itemComputedProperties,
+				        computed: ItemComputedProperties,
+				        // hasParentWithTag: {},
 				    });
 				});
 				Object.assign(rootState.nodes, doneData.nodes);
-				// clean up and add as nodes
-				// data.forEach(item => {
-				// 	dispatch('addAndCleanNodesRecursively', {item});
-				// })
-				// rootState.selection.view = null;
-				// rootState.selection.view = 'journal';
 				rootState.loading = false;
-				// Codementor
 			});
 		},
 

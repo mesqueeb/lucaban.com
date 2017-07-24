@@ -1,6 +1,5 @@
 <template id="items-card-template">
 <div
-	v-if="item || listIsEmpty"
 	:id="'card-'+item.id"
 	:refs="item.id"
 	:class="{
@@ -74,7 +73,6 @@
 		></Card>
 	</div>
 	<!-- CHILDREN|_ -->
-
 </div>
 </div>
 </template>
@@ -91,7 +89,7 @@ export default {
 	template:'#items-card-template',
 	props: ['item'],
 	components: {
-		ItemNav, ItemToggles, ItemEditAddWrapper, ItemTagsStrip, ItemAddTag, JournalDay
+		ItemNav, ItemToggles, ItemEditAddWrapper, ItemTagsStrip, ItemAddTag, JournalDay, 
 	},
 	data(){ return {} },
 	computed: {
@@ -103,17 +101,6 @@ export default {
 		state(){ return this.$store.state },
 /* \ ============================================== / *\
 \* / ============================================== \ */
-		listIsEmpty()
-		{
-			if (!this.item || !this.state.root){ return false; }
-			if (this.item.id != this.state.root.id){ return false; }
-			if (!this.visibleDirectChildren.length){ return true; }
-		},
-		showAddNewBox()
-		{
-			return ((this.state.addingNewUnder == this.item.id)
-				|| (this.listIsEmpty && !this.mobile && this.state.selection.view != 'journal'));
-		},
 		isProject()
 		{
 			return itemGetters[this.item.id].isProject;

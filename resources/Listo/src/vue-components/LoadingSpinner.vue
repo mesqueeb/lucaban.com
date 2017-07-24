@@ -3,7 +3,7 @@
 	<div class="c-spinner__svg-wrapper" title="loading" alt="Loading"
 		v-show="state.patching || state.loading"
 	>
-		<q-spinner-oval class="c-spinner" />
+		<q-spinner-oval class="c-spinner" size="2.5rem" />
 	</div>
 	<div class="c-spinner__patching-error" v-show="state.patching == 'error'" v-cloak>Error!</div>
 </div>
@@ -38,8 +38,6 @@ export default {
     top: 1em;
 }
 .c-spinner{
-	width:40px;
-	height:40px;
 	color: $theme-color;
 }
 .c-spinner__patching-error{

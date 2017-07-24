@@ -3,7 +3,7 @@
 	<div class="c-panel-title">
 		<div class="c-panel-title__tags">
 			<span v-if="get['selection/noFilterOrTag']">{{ text.menu.all }}</span>
-			<span v-if="get['selection/dueTodayFiltered']">{{ text.menu.today }}</span>
+			<span v-if="get['selection/dueItemsFiltered']">{{ text.menu.today }}</span>
 			<span
 				class="c-panel-title__tag"
 				v-if="selection.tags.length"
@@ -40,11 +40,11 @@
 			</div>
 			<div v-show="selection.view != 'journal'">
 				{{ text.menu.items }}
-				<div class="c-stats__children-amount">{{ get.itemAmount }}</div>
+				<div class="c-stats__children-amount">{{ get.itemCount }}</div>
 			</div>
-			<div v-if="get.doneItemAmount">
+			<div v-if="get.doneItemsCount">
 				{{ (selection.view != 'journal') ? text.menu.done : text.menu.total }}
-				<div class="c-stats__done-children-amount">{{ get.doneItemAmount }}</div>
+				<div class="c-stats__done-children-amount">{{ get.doneItemsCount }}</div>
 			</div>
 		</div>
 		<div style="min-width:2rem">
@@ -125,7 +125,7 @@ ${itemGetters[this.state.root.id].clipboardText}` });
 	cursor:pointer;
 }
 .c-panel-title__tag:hover{
-    color:$dark-gray;
+    color:$mid-gray;
 }
 .c-panel-title__hidden-tags{
 }
