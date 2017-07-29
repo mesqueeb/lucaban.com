@@ -3,6 +3,7 @@
 	<div class="c-panel-title">
 		<div class="c-panel-title__tags">
 			<span v-if="get['selection/noFilterOrTag']">{{ text.menu.all }}</span>
+			<span v-if="state.selection.view == 'journal'">{{ text.menu.journal }}</span>
 			<span v-if="get['selection/dueItemsFiltered']">{{ text.menu.today }}</span>
 			<span
 				class="c-panel-title__tag"

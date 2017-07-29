@@ -17,11 +17,11 @@
 		>
 			{{ get.text.card.copy }}
 		</button> -->
-		<!-- <div class="w-100 d-flex" v-if="sec_to_hourmin(get.totalUsedSec(day))">
-		RETHINK totalUsedSec(day)
+		<div class="w-100 d-flex" v-if="usedTime">
+		<!-- RETHINK totalUsedSec(day) -->
 			<span class="c-journal-used-time">{{ get.text.menu.usedTime }}: </span>
-			<span class="o-pill--used-time">{{ sec_to_hourmin(get.totalUsedSec(day)) }}</span>
-		</div> -->
+			<span class="o-pill--used-time">{{ sec_to_hourmin(usedTime) }}</span>
+		</div>
 	</div>
 	<!-- _|CHILDREN -->
 	<div
@@ -79,6 +79,15 @@ export default {
 		sortedParentBodyEntries()
 		{
 			return sortObjectArrayByProperty(this.day.items, 'parents_bodies', 'desc');
+		},
+		usedTime()
+		{
+			return this.day.items.reduce((result, pbodyItem) => {
+				let totalUsedTimeParentBodyItem = pbodyItem.items.reduce((result, item) => {
+					return result + (item.used_time) ? parseFloat(item.used_time) : 0
+				}, 0);
+				return result + (totalUsedTimeParentBodyItem) ? parseFloat(totalUsedTimeParentBodyItem) : 0
+			}, 0);
 		},
 	},
 	methods: {

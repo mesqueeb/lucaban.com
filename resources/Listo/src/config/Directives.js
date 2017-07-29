@@ -75,5 +75,16 @@ install(Vue){
 			// }
 		}
 	});
-}
-}
+	Vue.directive('noClickFocus', {
+		bind(el, binding)
+		{
+			el.addEventListener('click', 
+				function(event){
+					setTimeout(function(){
+						document.activeElement.blur()
+					}, 10);
+				}
+			);
+		}
+	});
+}}

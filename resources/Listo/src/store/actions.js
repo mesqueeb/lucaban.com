@@ -418,26 +418,32 @@ tagItemTemporarely ({state, commit, dispatch, getters},
 	} else {
 		commit('addTagTemporarely', {id, tags});
 	}
+	tags.forEach((tag) => {
+		if (!state.allTags.find(t => t.tag == tag.tag_slug))
+		{
+			state.allTags.push(tag.tag)
+		}
+	});
 	let t1a = performance.now( );
 	console.log("			Call to dispatch tagItemTemporarely took " + (t1a - t0a) + " milliseconds.")
 },
 prepareDonePatch ({state, commit, dispatch},
 	{id} = {})
 {
-	// console.log(`preparingDonePatch for ${id}`);
+	console.log(`preparingDonePatch for ${id}`);
 	let item = state.nodes[id];
 	if (!item){ return; }
 	// console.log(`item.done = ${item.done}`);
-	if (item.done)
-	{
+	// if (item.done)
+	// {
 		let done_date = format(new Date(), 'YYYY-MM-DD HH:mm:ss');
 		console.log(done_date);
 		commit('updateState', {id, done_date});
-	}
-	else
-	{
-		commit('updateState', {id, done_date: '0000-00-00 00:00:00'});
-	}
+	// }
+	// else
+	// {
+	// 	commit('updateState', {id, done_date: '0000-00-00 00:00:00'});
+	// }
 	dispatch('patchDone', {id} );
 	if (item.done)
 	{
@@ -596,7 +602,7 @@ startEdit ({state, commit, dispatch, getters},
 	// 	return;
 	// }
 	commit('updateState',{ editingItem:item.id });
-	if (getters.mobile) { store.$refs['edit-item-modal-'+item.id].open() }
+	// if (getters.mobile) { store.$refs['edit-item-modal-'+item.id].open() }
 },
 scrollToItemIfNeeded ({state, commit, dispatch},
 	{id} = {})
@@ -615,7 +621,7 @@ doneEdit ({state, commit, dispatch, getters},
 	console.log('Done edit!');
 	dispatch('blockBlur');
 	preventKeydownListener();
-	if (getters.mobile){ store.$refs['edit-item-modal-'+id].close(); }
+	// if (getters.mobile){ store.$refs['edit-item-modal-'+id].close(); }
 	let item = state.nodes[id];
 	commit('updateState',{ editingItem:null });
 	commit('updatePopouts',{ edit:[] });
@@ -651,7 +657,7 @@ cancelEdit ({state, commit, dispatch, getters})
 {
 	let id = (state.editingItem) ? state.editingItem : state.editingItemTags;
 	if (!id) { return; }
-	if (getters.mobile){ store.$refs['edit-item-modal-'+id].close() };
+	// if (getters.mobile){ store.$refs['edit-item-modal-'+id].close() };
 	if (state.editingItem)
 	{
 		Vue.nextTick(() => {
@@ -680,7 +686,7 @@ cancelEditOrAdd ({state, commit, dispatch})
 },
 cancelAddNew ({state, commit, dispatch, getters})
 {
-	if (getters.mobile){ store.$refs['add-item-modal'].close() };
+	// if (getters.mobile){ store.$refs['add-item-modal'].close() };
 	console.log('cancelAddNew');
 	if (state.selection.selectedId == state.addingNewUnder || state.selection.selectedId == null)
 	{ // to prevent item being reselected when cancelAddNew through blur because of clicking on another item.
@@ -695,7 +701,7 @@ addNew ({state, commit, dispatch, getters},
 	{addNextItemAs} = {addNextItemAs:null})
 {
 	dispatch('blockBlur');
-	if (getters.mobile && addNextItemAs == 'stop'){ store.$refs['add-item-modal'].close() };
+	// if (getters.mobile && addNextItemAs == 'stop'){ store.$refs['add-item-modal'].close() };
 	console.log('addingNew');
 	let newItem = JSON.parse(JSON.stringify(state.newItem));
 	commit('newItem/resetStateData');
@@ -835,6 +841,7 @@ unindent ({state, commit, dispatch},
 selectItem ({state, commit, dispatch, getters},
 	{id = state.selection.selectedId, direction} = {id:state.selection.selectedId})
 {
+	if (getters.mobile){ state.editingItem = state.addingNewUnder = null }
 	let nextSelectedId;
 	if (!direction)
 	{
@@ -904,7 +911,7 @@ setDueDate ({state, commit, dispatch, getters},
 showAddNewItem ({state, commit, dispatch, getters},
 	{id = state.selection.selectedId, addAs} = {id: state.selection.selectedId})
 {
-	if (getters.mobile){ store.$refs['add-item-modal'].open() };
+	// if (getters.mobile){ store.$refs['add-item-modal'].open() };
 	id = (id) ? id : state.root.id ;
 	console.log(`showing add new item for id: ${id}`);
 	if (!id){ return; }

@@ -1,36 +1,33 @@
 <template>
-<!-- root node required -->
-<div>
-	<div class="layout-padding">
-		<form action="" @submit.prevent="login">
-			<div class="field">
-				<label class="label">{{ get.text.user.email }}</label>
-				<p class="control">
-					<input required
-						class="full-width input"
-						type="email"
-						v-model.trim="email"
-					>
-						<!-- @input="$v.name.$touch()" -->
-				</p>
-			</div>
-			<div class="floating-label field">
-				<label class="label">{{ get.text.user.password }}</label>
-				<p class="control">
-					<input required
-						class="full-width input"
-						type="password"
-						v-model.trim="password"
-					>
-						<!-- @input="$v.name.$touch()" -->
-				</p>
-			</div>
-			<q-btn loader class="button is-primary" type="submit">
-				{{ get.text.user.login }}
-				<q-spinner-oval slot="loading" size="20px" />
-			</q-btn>
-		</form>
-	</div>
+<div class="layout-padding">
+	<form action="" @submit.prevent="login">
+		<div class="field">
+			<label class="label">{{ get.text.user.email }}</label>
+			<p class="control">
+				<input required
+					class="full-width input"
+					type="email"
+					v-model.trim="email"
+				>
+					<!-- @input="$v.name.$touch()" -->
+			</p>
+		</div>
+		<div class="floating-label field">
+			<label class="label">{{ get.text.user.password }}</label>
+			<p class="control">
+				<input required
+					class="full-width input"
+					type="password"
+					v-model.trim="password"
+				>
+					<!-- @input="$v.name.$touch()" -->
+			</p>
+		</div>
+		<q-btn loader class="button is-primary" type="submit">
+			{{ get.text.user.login }}
+			<q-spinner-oval slot="loading" size="20px" />
+		</q-btn>
+	</form>
 </div>
 </template>
 

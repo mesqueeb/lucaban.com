@@ -7,6 +7,7 @@
 			&& $route.path == '/'
 		}"
 		@click="openMenu('All', $event)"
+		v-noClickFocus
 	>{{ get.text.menu.all }}</a>
 	<a href="#"
 		:class="{'active':
@@ -14,6 +15,7 @@
 			&& $route.path == '/'
 		}"
 		@click="openMenu('Today', $event)"
+		v-noClickFocus
 	>{{ get.text.menu.today }}</a>
 	<a href="#"
 		:class="{'active':
@@ -21,6 +23,7 @@
 				&& $route.path == '/',
 			'filtered-out': selection.hiddenBookmarks.includes('journal')}"
 		@click="openMenu('Journal', $event)"
+		v-noClickFocus
 	>{{ get.text.menu.journal }}</a>
 	<a href="#"
 		@click="commit('updatePopouts', { guide:true })"
@@ -29,40 +32,48 @@
 	<button
 		@click="commit('updateState', { setLanguage:'ja' })"
 		v-if="get.language != 'ja'"
+		v-noClickFocus
 	>日本語</button>
 	<button
 		@click="commit('updateState', { setLanguage:'en' })"
 		v-if="get.language != 'en'"
+		v-noClickFocus
 	>English</button>
 	<router-link :to="'login'"
 		:class="{'active':
 			$route.path.includes('login')
 		}"
 		v-if="!get['user/loggedIn']"
+		v-noClickFocus
 	>{{ get.text.user.login }}</router-link>
 	<router-link :to="'register'"
 		:class="{'active':
 			$route.path.includes('register')
 		}"
 		v-if="!get['user/loggedIn']"
+		v-noClickFocus
 	>{{ get.text.user.register }}</router-link>
 	<a href="#"
 		@click="dispatch('logout')"
 		v-if="get['user/loggedIn']"
+		v-noClickFocus
 	>{{ get.text.user.logout }}</a>
 	<a href="#"
 		id="js-copy__1068"
 		@click="test"
 		v-if="state.debug && DEV"
+		v-noClickFocus
 	>TEST</a>
 	<a href="#"
 		id="js-copy__1063"
 		:style="(state.debug) ? 'color:red !important; border: thin solid; padding: 0 0.2em; margin: auto;' : ''"
 		@click="state.debug = !state.debug"
 		v-if="DEV"
+		v-noClickFocus
 	>Debug</a>
 	<q-spinner-oval
 		v-if="state.computing"
+		v-noClickFocus
 		class="c-panel-navigation__spinner" size="1.5em"
 	/>
 	

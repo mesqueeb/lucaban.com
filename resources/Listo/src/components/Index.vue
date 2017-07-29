@@ -1,5 +1,5 @@
 <template>
-<q-layout ref="layout" view="HHH LpR FFF" v-cloak>
+<q-layout ref="layout" view="HHH LpR FFF" v-cloak class="gradient1">
 
 <!-- HEADER -->
 <div slot="header" :class="{'mobile':get.mobile}">
@@ -24,7 +24,8 @@
 	<Mobile-Nav-Add></Mobile-Nav-Add>
 </q-fixed-position>
 <q-fixed-position corner="bottom-left" :offset="[18, 15]"
-	v-if="$route.path == '/' && get.mobile && state.selection.view != 'journal' && get.itemCount && state.selection.selectedId"
+	v-if="$route.path == '/' && get.mobile && state.selection.view != 'journal'
+			&& get.itemCount && state.selection.selectedId"
 >
 	<Mobile-Nav-Move></Mobile-Nav-Move>
 </q-fixed-position>
@@ -81,10 +82,17 @@ export default {
 </script>
 
 <style lang="scss">
+.gradient1{
+	// background: linear-gradient(45deg,#FFE9D0,#FD7153);
+}
 .layout-header {
-    box-shadow: 0 2px 4px -1px rgba(0,0,0,0.2), 0 4px 5px rgba(0,0,0,0.04), 0 1px 10px rgba(0,0,0,0.02) !important;
+    box-shadow: 0 2px 4px -1px rgba(0,0,0,0.2),
+    			0 4px 5px rgba(0,0,0,0.04),
+    			0 1px 10px rgba(0,0,0,0.02) !important;
 }
 .layout-footer {
-    box-shadow: 0 -2px 4px -1px rgba(0,0,0,0.2), 0 -4px 5px rgba(0,0,0,0.04), 0 -1px 10px rgba(0,0,0,0.02) !important;
+    box-shadow: 0 -2px 4px -1px rgba(0,0,0,0.2),
+    			0 -4px 5px rgba(0,0,0,0.04),
+    			0 -1px 10px rgba(0,0,0,0.02) !important;
 }
 </style>

@@ -51,7 +51,7 @@ export default {
 		get(){ return this.$store.getters },
 		state(){ return this.$store.state },
 		selection(){ return this.state.selection },
-		isFirstItem(){ return itemGetters[selection.selectedId].isFirstItem },
+		isFirstItem(){ return itemGetters[this.selection.selectedId].isFirstItem },
 	},
 	methods:
 	{

@@ -1,12 +1,12 @@
 <template>
 <div class="c-panel">
 	<!-- Add Item Modal -->
-	<q-modal ref="add-item-modal" position="top" @close="dispatch('doneEditOrCancelNew')">
+<!-- 	<q-modal ref="add-item-modal" class="absolute-full" position="top" @close="dispatch('doneEditOrCancelNew')">
 		<Item-Edit-Add-Box :item="state.newItem"></Item-Edit-Add-Box>
-	</q-modal>
+	</q-modal> -->
 	<!-- /Add Item Modal -->
 	<Tags-Nav></Tags-Nav>
-	<div class="u-line"></div>	
+	<div class="u-line"></div>
 	<Stats-Nav></Stats-Nav>
 	<div class="layout-view c-content-wrapper">
 		<Cards :item="state.root"
@@ -61,7 +61,7 @@ export default {
 .c-panel{
     background: white;
     padding: 1rem;
-    margin-bottom: 6.5rem;
+    margin-bottom: 4.5rem;
 }
 .c-content-wrapper{
     max-width: 50rem;

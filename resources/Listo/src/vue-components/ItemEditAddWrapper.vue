@@ -2,25 +2,43 @@
 <div
 	:class="['full-width',{'order-last':(showAddNewBox && !state.addingNewAsChild)}]"
 >
-		<!-- v-if="(showEditBox || showAddNewBox)" -->
+		<!-- v-if="(showEditBox || showAddNewBox) && !get.mobile" -->
 	<div
-		v-if="(showEditBox || showAddNewBox) && !get.mobile"
+		v-if="(showEditBox || showAddNewBox) && get.mobile"
+		:class="['c-item-card', 
+				{ 'c-editadd-wrapper--child':state.addingNewAsChild }]"
+	>
+<!-- 
+		<Item-Toggles v-if="showEditBox" :item="item"></Item-Toggles>
+		<span 		  v-if="showEditBox" class="c-mobile-toggle-preview__body">Editing item...</span>
+ -->
+		<Item-Toggles v-if="showAddNewBox" :item="state.newItem"></Item-Toggles>
+		<div class="c-body-div textarea-wrap u-selected" v-if="showAddNewBox">
+			<div class="c-body-text">{{ get.text.card.addingNewItem }}</div>
+		</div>
+		<!-- <span 		   class="c-mobile-toggle-preview__body">Adding new item...</span> -->
+	</div>
+	<div
+		v-if="(showEditBox || showAddNewBox)"
+		:style="style"
 		:class="['c-editadd-wrapper', {
-			'c-editadd-wrapper--child':state.addingNewAsChild,
+			'c-editadd-wrapper--child':state.addingNewAsChild && !get.mobile,
+			'c-editadd-wrapper--mobile':get.mobile,
+			'shadow-5':get.mobile,
 			}]"
 	>
-		<Item-Toggles v-if="showEditBox" :item="item"></Item-Toggles>
+		<Item-Toggles v-if="showEditBox && !get.mobile" :item="item"></Item-Toggles>
 		<Item-Edit-Add-Box v-if="showEditBox" :item="item"></Item-Edit-Add-Box>
 
-		<Item-Toggles v-if="showAddNewBox" :item="state.newItem"></Item-Toggles>
+		<Item-Toggles v-if="showAddNewBox && !get.mobile" :item="state.newItem"></Item-Toggles>
 		<Item-Edit-Add-Box v-if="showAddNewBox" :item="state.newItem"></Item-Edit-Add-Box>
 	</div>
 
-	<q-modal :ref="'edit-item-modal-'+item.id" position="top" @close="dispatch('doneEditOrCancelNew')">
+<!-- 	<q-modal :ref="'edit-item-modal-'+item.id" class="absolute-full" position="top" @close="dispatch('doneEditOrCancelNew')">
 		<div v-if="get.mobile">
 			<Item-Edit-Add-Box v-if="showEditBox" :item="item"></Item-Edit-Add-Box>
 		</div>
-	</q-modal>
+	</q-modal> -->
 </div>
 
 </template>
@@ -51,10 +69,8 @@ export default {
 		state(){ return this.$store.state },
 		showAddNewBox()
 		{
-			return (
-				(this.state.addingNewUnder
-					&& this.state.addingNewUnder == this.item.id)
-				|| (!this.get.filteredIdsFlat.length && !this.mobile && this.state.selection.view != 'journal'));
+			return   ( this.state.addingNewUnder
+					&& this.state.addingNewUnder == this.item.id);
 		},
 		showEditBox()
 		{
@@ -63,7 +79,19 @@ export default {
 				|| (this.state.editingItemTags
 					&& this.item.id == this.state.editingItemTags);
 		},
-
+		style()
+		{
+			let d = this.item.depth;
+			let x = 1;
+				x = (d > 1) ? 1.50 * d : x;
+				x = (d > 3) ? 1.60 * d : x;
+				x = (d > 5) ? 1.64 * d : x;
+				x = (d > 6) ? 1.68 * d : x;
+				x = (this.state.selection.view == 'journal') ? 1.9 : x;
+			let s = `width: 100vw !important;
+					 margin-left: -${x}rem !important;`
+			return (this.get.mobile) ? s : '';
+		},
 	},
 	methods:
 	{
@@ -83,5 +111,18 @@ export default {
 	&--child{
 	    margin-left: 1.8em;
 	}
+	&--mobile{
+		border-top: thin solid $light-gray;
+		margin-bottom: 0.5em;		
+	}
+}
+.c-mobile-toggle-preview{
+	// padding-top: 0.3em;
+	// padding-bottom: 0.3em;
+	// display: flex;
+	// align-items: center;
+}
+.c-mobile-toggle-preview__body{
+	// padding:0.3em;
 }
 </style>

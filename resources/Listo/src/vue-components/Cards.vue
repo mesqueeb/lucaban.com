@@ -31,7 +31,7 @@
 	</div>
 	<!-- CHILDREN|_ -->
 	<Add-Item-Tease
-		v-if="state.addingNewUnder != state.root.id && !listIsEmpty || (listIsEmpty && get.mobile)"
+		v-if="state.addingNewUnder != state.root.id"
 	></Add-Item-Tease>
 	<Item-Edit-Add-Wrapper :item="item"></Item-Edit-Add-Wrapper>
 

@@ -25,7 +25,7 @@
 		</div>
 		<textarea
 			class="js-edit-body c-editaddbox__textarea"
-			v-focus.noMobile v-autoheight
+			v-focus v-autoheight
 			v-model="item.body"
 			@blur="dispatch('blurOnEditOrAdd')"
 			@keydown.esc="dispatch('cancelEditOrAdd')"
@@ -248,9 +248,12 @@ export default {
     justify-content: space-between;
     width: 100%;
     margin-top: 0.3em;
-    padding-bottom: 0 !important;
+    padding: 0 !important;
     button{
+        padding: 0.3em;
+        padding-bottom: 0;
         font-size:1.2em;
+
     }
 }
 </style>
