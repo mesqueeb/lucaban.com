@@ -66,12 +66,18 @@ export default {
 			let plsFocus = '.js-add-tag';
 			Vue.nextTick(function ()
 			{
-				if (this.get.mobile)
-				{
-					document.querySelector(plsFocus).focus();
-				} else {
-					document.querySelectorAll(plsFocus)[1].focus();
-				}
+				console.log('plsFocus');
+				console.log(plsFocus);
+				console.log(document.querySelector(plsFocus));
+				console.log(document.querySelector('.js-add-tag'));
+				document.querySelector(plsFocus).focus();
+				// DEPRECIATED because I deleted the modal:
+				// if (this.get.mobile)
+				// {
+				// 	document.querySelector(plsFocus).focus();
+				// } else {
+				// 	document.querySelectorAll(plsFocus)[1].focus();
+				// }
 				console.log('returning to editting: '+plsFocus);
 			}.bind(this));
 		},
