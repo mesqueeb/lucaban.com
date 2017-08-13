@@ -8,7 +8,7 @@
 		}"
 		@click="openMenu('All', $event)"
 		v-noClickFocus
-	>{{ get.text.menu.all }} CAORHERCAOHERAOEH</a>
+	>{{ get.text.menu.all }}</a>
 	<a href="#"
 		:class="{'active':
 			get['selection/dueItemsFiltered']

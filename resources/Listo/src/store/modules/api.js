@@ -6,32 +6,51 @@ import axios from 'axios'
 import ItemComputedProperties from '../ItemComputedProperties.js'
 import Vue from 'vue'
 
+import { date } from 'quasar'
+const { getDateDiff } = date;
+
 export default {
 	state:
 	{
 		token: null,
+		tokenTimeStamp: null,
 	},
 	mutations:
 	{
 		destroyToken(state)
 		{
+			localStorage.removeItem('token');
+			localStorage.removeItem('tokenTimeStamp');
 			window.axios.defaults.headers.common = {
 			    'X-Requested-With': 'XMLHttpRequest',
 				'Authorization': "Bearer " + '' ,
 			};
 			state.token = null;
+			state.tokenTimeStamp = null;
 		},
 		setToken(state, {token})
 		{
+			// console.log(localStorage);
+			localStorage.setItem('token', token);
+			localStorage.setItem('tokenTimeStamp', new Date());
 			window.axios.defaults.headers.common = {
 			    'X-Requested-With': 'XMLHttpRequest',
 				'Authorization': "Bearer " + token ,
 			};
 			state.token = token;
+			state.tokenTimeStamp = new Date();
 		},
 	},
 	actions:
 	{
+		refreshToken({commit, state})
+		{
+			let token = JSON.parse(JSON.stringify(state.token));
+			axios.post(apiBaseURL+'refreshToken', {token})
+			.then(({data}) => {
+				commit('setToken', {token:data});
+			});
+		},
 		logout ({commit, dispatch, getters, rootState, state})
 		{
 			commit('updateState',{loading:true});
@@ -142,7 +161,7 @@ export default {
 				console.log(`ERROR: ${error.response}`);
 			});
 		},
-		patch ({commit, dispatch, getters, rootState},
+		patch ({commit, dispatch, getters, rootState, state},
 			{id, field, value} = {})
 		{
 			if (!rootState.user.user) { console.log('not Logged in'); return; }
@@ -154,6 +173,41 @@ export default {
 			// 	}
 			// }
 			dispatch('startPatching');
+			// Refresh the token if nessesary;
+			let diff = getDateDiff(new Date(), state.tokenTimeStamp, 'minutes');
+			console.log(`diff = ${diff}`);
+			let tokenLifeSpan = 4300; // Three days - 20 min
+			if (diff > tokenLifeSpan)
+			{
+				if (window.refreshingToken)
+				{ 
+					console.log('refreshingToken...');
+					return;
+				}
+				window.refreshingToken = true;
+				console.log(`old Token: ${state.token}`);
+				console.log(`old Token Date: ${state.tokenTimeStamp}`);
+				axios.post(apiBaseURL+'refreshToken', {token:state.token})
+				.then(({data}) => {
+					window.axios.defaults.headers.common = {
+					    'X-Requested-With': 'XMLHttpRequest',
+						'Authorization': "Bearer " + data ,
+					};
+					state.token = data;
+					state.tokenTimeStamp = new Date();
+					localStorage.setItem('token', data);
+					localStorage.setItem('tokenTimeStamp', new Date());
+					
+					console.log(`new Token: ${state.token}`);
+					console.log(`new Token Date: ${state.tokenTimeStamp}`);
+					window.refreshingToken = false;
+					dispatch('patch', {id, field, value});
+				});
+				console.log('stop here');
+				return;
+				console.log('THIS SHOULD NOT SHOW');
+			}
+			// End refresh token
 			let patchObj = {};
 			let patchVal = (value) ? value : rootState.nodes[id][field];
 			if (field == 'children_order'){

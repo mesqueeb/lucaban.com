@@ -6,6 +6,7 @@ Route::domain('api'.env('SESSION_DOMAIN'))
 		Route::post('auth','AuthenticateController@login');
 		Route::post('register','AuthenticateController@register');
 		Route::post('logout','AuthenticateController@logout');
+		Route::post('refreshToken','AuthenticateController@refreshToken');
 });
 // Cors patches
 Route::domain('api'.env('SESSION_DOMAIN'))
@@ -14,6 +15,7 @@ Route::domain('api'.env('SESSION_DOMAIN'))
 		Route::options('register','CORSHelperController@handleCORS');
 		Route::options('logout','CORSHelperController@handleCORS');
 		Route::options('items','CORSHelperController@handleCORS');
+		Route::options('refreshToken','CORSHelperController@handleCORS');
 });
 
 Route::domain('listo'.env('SESSION_DOMAIN'))

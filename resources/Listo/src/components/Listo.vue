@@ -43,6 +43,7 @@ export default {
 		if (!store.$refs) { store.$refs = {} }
 		Object.assign(store.$refs, this.$refs);
 		console.log(`Mounted 'add-item-modal'`);
+		
 	},
 	computed:
 	{

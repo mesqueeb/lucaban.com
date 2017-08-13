@@ -43,9 +43,9 @@
 				{{ text.menu.items }}
 				<div class="c-stats__children-amount">{{ get.itemCount }}</div>
 			</div>
-			<div v-if="get.doneItemsCount">
+			<div v-if="get.doneItemsCountFlat">
 				{{ (selection.view != 'journal') ? text.menu.done : text.menu.total }}
-				<div class="c-stats__done-children-amount">{{ get.doneItemsCount }}</div>
+				<div class="c-stats__done-children-amount">{{ get.doneItemsCountFlat }}</div>
 			</div>
 		</div>
 		<div style="min-width:2rem">

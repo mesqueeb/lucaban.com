@@ -67,6 +67,28 @@ export default {
             console.log(`computer says "no"... {$id}`); return;
         });
         this.$store.dispatch('sortAllChildren');
+
+		let localToken = localStorage.getItem('token');
+		if (localToken)
+		{
+			console.log(`old Token: ${localToken}`);
+			console.log(`old Token Date: ${localStorage.getItem('tokenTimeStamp')}`);
+			axios.post(apiBaseURL+'refreshToken', {token:localToken})
+			.then(({data}) => {
+				window.axios.defaults.headers.common = {
+				    'X-Requested-With': 'XMLHttpRequest',
+					'Authorization': "Bearer " + data ,
+				};
+				store.state.token = data;
+				store.state.tokenTimeStamp = new Date();
+				localStorage.setItem('token', data);
+				localStorage.setItem('tokenTimeStamp', new Date());
+				console.log(`new Token: ${store.state.token}`);
+				console.log(`new Token Date: ${store.state.tokenTimeStamp}`);
+				store.dispatch('fetchListo');
+			});
+		}
+
 	},
 	computed:
 	{

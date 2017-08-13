@@ -211,10 +211,6 @@ journalDates: (state, getters) => {
 	console.log('running journalDates...');
 	return Object.keys(getters.filteredItemsJournal);
 },
-doneItemsCount: (state, getters) => {
-	console.log('running doneItemsCount...');
-	return 
-},
 nodesArray: (state) => {
 	return Object.keys(state.nodes).filter(id => id != state.root.id).map(id => state.nodes[id])
 },
@@ -228,10 +224,10 @@ doneItemsFlat: (state, getters) => {
 	return result;
 },
 doneIdsFlat: (state, getters) => {
-	return getters.dueItemsFlat.map(item => item.id)
+	return getters.doneItemsFlat.map(item => item.id)
 },
 doneItemsCountFlat: (state, getters) => {
-	return getters.dueItemsFlat.length
+	return getters.doneItemsFlat.length
 },
 // ==================
 // DUE ITEMS

@@ -206,8 +206,7 @@ addItem ({state, commit, dispatch, getters},
 		// 	state.selection.tags = tags;
 		// }
 		// ========================
-
-	    if (duplication || addNextItemAs == 'stop')
+	    if (duplication || addNextItemAs == 'stop' || state.selection.selectedId != null)
 	    {
 	    	state.addingNewUnder = null;
 	    } else {

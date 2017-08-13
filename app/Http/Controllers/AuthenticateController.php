@@ -80,6 +80,17 @@ class AuthenticateController extends Controller
     {
         JWTAuth::invalidate($request->only('token')['token']);
     }
+    public function refreshToken(Request $request)
+    {
+        $newToken = JWTAuth::refresh($request->only('token')['token']);
+        $minutes = $path = $domain = null;
+        $domain = 'http://localhost:8080';
+        $secure = $httpOnly = true;
+        // return $newToken;
+        return response($newToken)
+		        // ->cookie('token', $newToken, $minutes, $path, $domain, $secure, $httpOnly)
+		        ->header('Set-Cookie', 'token='.$newToken.'; Secure; HttpOnly;');
+    }
     public function getAuthenticatedUser(Request $request)
 	{
 	    try
