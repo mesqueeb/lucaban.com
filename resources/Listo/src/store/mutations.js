@@ -88,7 +88,7 @@ addChild(state, { newParentId, index, item })
 {
 	if (!state.nodes[newParentId].children){ state.nodes[newParentId].children = []; }
 	if (!state.nodes[newParentId].children_order){ state.nodes[newParentId].children_order = []; }
-	if (!index)
+	if (!index && index != 0)
 	{
  		state.nodes[newParentId].children.push(item);
 		state.nodes[newParentId].children_order.push(item.id)

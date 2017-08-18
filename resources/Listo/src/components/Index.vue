@@ -75,12 +75,14 @@ export default {
 			console.log(`old Token Date: ${localStorage.getItem('tokenTimeStamp')}`);
 			axios.post(apiBaseURL+'refreshToken', {token:localToken})
 			.then(({data}) => {
+				console.log('refreshed token:');
+				console.log(data);
 				window.axios.defaults.headers.common = {
 				    'X-Requested-With': 'XMLHttpRequest',
 					'Authorization': "Bearer " + data ,
 				};
-				store.state.token = data;
-				store.state.tokenTimeStamp = new Date();
+				store.state.api.token = data;
+				store.state.api.tokenTimeStamp = new Date();
 				localStorage.setItem('token', data);
 				localStorage.setItem('tokenTimeStamp', new Date());
 				console.log(`new Token: ${store.state.token}`);

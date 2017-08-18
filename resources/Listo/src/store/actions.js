@@ -387,7 +387,7 @@ tagItem ({state, commit, dispatch, getters},
 		let t1__a = performance.now( );
 		console.log("			A point in tagItem call took " + (t1__a - t0__a) + " milliseconds.")
 		let t0__b = performance.now( );
-	dispatch('patchTag', { id, tags });
+	dispatch('patchTag', { id, tags, requestType });
 		let t1__b = performance.now( );
 		console.log("			B point in tagItem call took " + (t1__b - t0__b) + " milliseconds.")
 
