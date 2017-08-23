@@ -400,8 +400,12 @@ filteredItemsTree: (state, getters) => {
 	{
 		items = getters.dueItemsFlat;
 		items = items.filter(item => getters.hasAllTags(item.id, tagFilters)
-									&& !getters.hasAllTags(item.parent_id, tagFilters));
-		items = uniq(items);
+									&& !(
+										getters.hasAllTags(item.parent_id, tagFilters)
+										&& itemGetters[item.id].hasParentDueToday
+									)
+							);
+		// items = uniq(items);
 	}
 	let t1 = performance.now();
 	console.log("			call to filteredItemsTree 2 took " + (t1 - t0) + " milliseconds.");

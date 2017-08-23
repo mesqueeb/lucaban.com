@@ -1,5 +1,5 @@
 import { format, formatRelative, differenceInCalendarDays, addDays } from 'date-fns/esm'
-import { hasClass, isElementInViewport, removeEmptyValuesFromArray, makeTagObject } from '../helpers/globalFunctions.js'
+import { hasClass, scrollToElementIfNeeded, removeEmptyValuesFromArray, makeTagObject } from '../helpers/globalFunctions.js'
 import setDefaultItemValues from './setDefaultItemValues.js'
 
 // we import all of `date`
@@ -206,24 +206,22 @@ addItem ({state, commit, dispatch, getters},
 		// 	state.selection.tags = tags;
 		// }
 		// ========================
-	    if (duplication || addNextItemAs == 'stop' || state.selection.selectedId != null)
+		console.log('showing state.selection.selectedId');
+		console.log(state.selection.selectedId);
+		if (duplication || addNextItemAs == 'stop' || state.selection.selectedId != null)
 	    {
 	    	state.addingNewUnder = null;
 	    } else {
 		    dispatch('showAddNewItem', { id:item.id, addAs:addNextItemAs });
 	    }
+	    if (state.selection.selectedId && state.selection.selectedId.includes('tempItem'))
+	    {
+	    	state.selection.selectedId = item.id;
+	    }
 		Vue.nextTick(()=> dispatch('scrollToItemIfNeeded', { id:item.id }));
 		let t1 = performance.now( );
 		console.log("			call to addItem took " + (t1 - t0) + " milliseconds.")
 	});
-},
-addTempNewItem ({dispatch},
-	{item, index, addNextItemAs, addTags} = {})
-{
-	console.info('adding Temp item');
-	// item.id = 'tempItem_' + Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
-	// item.temp = true;
-	dispatch('addItem', {item, index, addNextItemAs, addTags});
 },
 hideTaggedNodes ({state, getters},
 	{tag} = {})
@@ -608,11 +606,7 @@ scrollToItemIfNeeded ({state, commit, dispatch},
 {
 	if (!id){ return };
 	let el = document.getElementById('item-body-'+id);
-	if (!isElementInViewport(el))
-	{
-		el.scrollIntoView();
-		// window.scrollBy(0, -100);
-	}
+	scrollToElementIfNeeded(el);
 },
 doneEdit ({state, commit, dispatch, getters},
 	{id = state.editingItem} = { id: state.editingItem })
@@ -690,6 +684,7 @@ cancelAddNew ({state, commit, dispatch, getters})
 	if (state.selection.selectedId == state.addingNewUnder || state.selection.selectedId == null)
 	{ // to prevent item being reselected when cancelAddNew through blur because of clicking on another item.
 		state.selection.selectedId = state.selection.lastSelectedId;
+		dispatch('scrollToItemIfNeeded', {id:state.selection.lastSelectedId});
 	}
 	// Reset newItem to sibling stance.
 	state.addingNewUnder = null;
@@ -703,10 +698,10 @@ addNew ({state, commit, dispatch, getters},
 	// if (getters.mobile && addNextItemAs == 'stop'){ store.$refs['add-item-modal'].close() };
 	console.log('addingNew');
 	let newItem = JSON.parse(JSON.stringify(state.newItem));
-	commit('newItem/resetStateData');
-	newItem.newItem = null; // important to prevent bugs with temp items
 	let olderSiblingId = state.addingNewUnder;
 	let addTags = getters['newItem/preparedPlusComputedTags'];
+	commit('newItem/resetStateData');
+	newItem.newItem = null; // important to prevent bugs with temp items
 	if (!newItem.body){ return; }
 	if (!olderSiblingId && state.selection.selectedId)
 	{
@@ -753,7 +748,7 @@ addNew ({state, commit, dispatch, getters},
 	console.log(addTags);
 	// Send to Root for Ajax call.
 	commit('resetNewItem');
-	dispatch('addTempNewItem', { item:newItem, index, addNextItemAs, addTags })
+	dispatch('addItem', {item:newItem, index, addNextItemAs, addTags}) // this is the temporary item
 	.then(()=> dispatch('postNewItem', { newItem, index, addNextItemAs, addTags, duplication:null }));
 },
 showChildren ({state, commit, dispatch},
@@ -919,11 +914,16 @@ showAddNewItem ({state, commit, dispatch, getters},
 	state.selection.selectedId = null;
 	// state.addingNewAsFirstChild = (addAs == 'child') ? true : false;
 	state.addingNewAsChild = (addAs == 'child') ? true : false;
-	if (getters.mobile){ 
-		Vue.nextTick(()=>{
-			document.querySelector('.js-edit-body').focus();
-		});
-	};
+	Vue.nextTick(()=>{
+		let el = document.querySelector('.js-editaddbox');
+		console.log(el);
+		scrollToElementIfNeeded(el);
+	});
+	// if (getters.mobile){ 
+		// Vue.nextTick(()=>{
+		// 	document.querySelector('.js-edit-body').focus();
+		// });
+	// };
 },
 startEditTags ({state, commit, dispatch},
 	{id} = {})

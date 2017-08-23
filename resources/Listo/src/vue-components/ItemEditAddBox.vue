@@ -1,8 +1,8 @@
 <template>
 <form 
 	:class="[
-		'c-editaddbox', {
-			'c-editaddbox--mobile':(mobile)}]"
+		'c-editaddbox', 'js-editaddbox', {
+		'c-editaddbox--mobile':(mobile)}]"
 	@submit.prevent
 >
 	<div

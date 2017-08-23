@@ -12,11 +12,11 @@
 	>
 		{{ get.text.tags.done }} {{ customCalendar(item.done_date) }}
 		<input
-			v-flatpicky
+			v-model="item.done_date"
 			:id="'done-date-edit-'+item.id"
 			class="flatpickr"
 			:name="item.id"
-			v-model="item.done_date"
+			v-flatpicky
 		>
 	</label>
  	<span

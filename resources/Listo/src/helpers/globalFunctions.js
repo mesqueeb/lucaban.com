@@ -163,16 +163,26 @@ function uniq(a) {
     // })
     return Array.from(new Set(a));
 }
-
 function isElementInViewport(el)
 {
     let rect = el.getBoundingClientRect();
+    let panelNavHeight = 40;
+    let topVar = (store.getters.mobile) ? 0 : panelNavHeight;
+    let bottomVar = (window.innerHeight || document.documentElement.clientHeight);
+    bottomVar = (!store.getters.mobile) ? bottomVar : bottomVar-panelNavHeight;
     return (
-        rect.top >= 0 &&
+        rect.top >= topVar &&
         rect.left >= 0 &&
-        rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) && /*or $(window).height() */
+        rect.bottom <= bottomVar && /*or $(window).height() */
         rect.right <= (window.innerWidth || document.documentElement.clientWidth) /*or $(window).width() */
     );
+}
+function scrollToElementIfNeeded(el){
+	if (!isElementInViewport(el))
+	{
+		el.scrollIntoView();
+		window.scrollBy(0, -40);
+	}
 }
 const Utilities = {
 	tagNameToSlug(tag)
@@ -192,4 +202,4 @@ const Utilities = {
 	},
 };
 
-export { stringToKeyboardKeys, mobilecheck, objectToArray, uniqBy, uniq, arrayToString, sec_to_hourmin, addClass, removeClass, hasClass, isElementInViewport, sortObjectArrayByProperty, sortObjectArrayByTwoProperties, removeEmptyValuesFromArray, Utilities, makeTagObject }
+export { stringToKeyboardKeys, mobilecheck, objectToArray, uniqBy, uniq, arrayToString, sec_to_hourmin, addClass, removeClass, hasClass, scrollToElementIfNeeded, sortObjectArrayByProperty, sortObjectArrayByTwoProperties, removeEmptyValuesFromArray, Utilities, makeTagObject }

@@ -38,10 +38,11 @@ class Item extends Model
 	}
 	public function scopeUserItems($query)
     {
+    	$query->where('created_by', '=', auth()->id());
         // Retrieve all posts with at least one comment containing words like foo%
-        $query->whereHas('users', function ($query) {
-        	$query->where('id', '=', auth()->id());
-        });
+        // $query->whereHas('users', function ($query) {
+        // 	$query->where('id', '=', auth()->id());
+        // });
     }
 	// Class - Instruction Manual/Description of an Object
 	// Instance - Actual thing, based on a class

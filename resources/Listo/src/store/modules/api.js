@@ -328,7 +328,7 @@ export default {
 				rootState.patching = false;
 			});
 		},
-		fetchDone ({rootState, dispatch, getters},
+		fetchDone ({rootState, dispatch, getters, rootGetters},
 			{tags, operator} = {})
 		{
 			if (!rootState.user.user) { console.log('not Logged in'); return; }
@@ -343,7 +343,6 @@ export default {
 				}
 				
 				let doneData = organizeData(data);
-				// window.doneData = doneData;
 				Object.keys(doneData.nodes).forEach(id => {
 				    itemGetters[id] = new Vue({
 				        store,
@@ -354,7 +353,30 @@ export default {
 				        // hasParentWithTag: {},
 				    });
 				});
-				Object.assign(rootState.nodes, doneData.nodes);
+
+				// Todo, leave your knowledge somewhere on Stack Overflow:
+				
+				// Doesn't work:
+				// 1. Directly assigning the new object inside the old:
+				// rootState.nodes = Object.assign(rootState.nodes, doneData.nodes);
+				// or just:
+				// Object.assign(rootState.nodes, doneData.nodes);
+				// 2. Assigning the new object directly:
+				// let newItems = Object.assign(rootState.nodes, doneData.nodes);
+				// rootState.nodes = newItems;
+
+				// The answer:
+				// let allItems = Object.assign(rootState.nodes, doneData.nodes);
+				// rootState.nodes = Object.assign({}, allItems);
+				// If this is the answer, I'm not sure why option 2 won't work...
+
+				
+				// console.log(Object.keys(rootState.nodes).length);
+				// console.log(Object.keys(rootGetters.nodesArray).length);
+				let allItems = Object.assign(rootState.nodes, doneData.nodes);
+				rootState.nodes = Object.assign({}, allItems);
+				// console.log(Object.keys(rootState.nodes).length);
+				// console.log(Object.keys(rootGetters.nodesArray).length);
 				rootState.loading = false;
 			});
 		},

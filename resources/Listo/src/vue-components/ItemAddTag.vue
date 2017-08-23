@@ -37,6 +37,10 @@ export default {
 			preventKeydownListener();
 			if (!this.state.newTag)
 			{
+				if (this.item.newItem && !this.item.body)
+				{
+					return;
+				}
 				this.dispatch('doneEditOrAddNew');
 				return;
 			}

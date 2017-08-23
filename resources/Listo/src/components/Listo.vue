@@ -41,7 +41,7 @@ export default {
 	},
 	mounted() {
 		if (!store.$refs) { store.$refs = {} }
-		Object.assign(store.$refs, this.$refs);
+		store.$refs = Object.assign(store.$refs, this.$refs);
 		console.log(`Mounted 'add-item-modal'`);
 		
 	},

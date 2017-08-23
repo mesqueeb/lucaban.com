@@ -61,7 +61,7 @@ export default {
 		{
 			store.$refs = {};
 		}
-		Object.assign(store.$refs, this.$refs);
+		store.$refs = Object.assign(store.$refs, this.$refs);
 	},
 	computed:
 	{
