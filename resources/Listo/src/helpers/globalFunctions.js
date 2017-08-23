@@ -184,6 +184,10 @@ function scrollToElementIfNeeded(el){
 		window.scrollBy(0, -40);
 	}
 }
+function scrollToElement(el){
+	el.scrollIntoView();
+	window.scrollBy(0, -40);
+}
 const Utilities = {
 	tagNameToSlug(tag)
 	{
@@ -202,4 +206,4 @@ const Utilities = {
 	},
 };
 
-export { stringToKeyboardKeys, mobilecheck, objectToArray, uniqBy, uniq, arrayToString, sec_to_hourmin, addClass, removeClass, hasClass, scrollToElementIfNeeded, sortObjectArrayByProperty, sortObjectArrayByTwoProperties, removeEmptyValuesFromArray, Utilities, makeTagObject }
+export { stringToKeyboardKeys, mobilecheck, objectToArray, uniqBy, uniq, arrayToString, sec_to_hourmin, addClass, removeClass, hasClass, scrollToElementIfNeeded, scrollToElement, sortObjectArrayByProperty, sortObjectArrayByTwoProperties, removeEmptyValuesFromArray, Utilities, makeTagObject }

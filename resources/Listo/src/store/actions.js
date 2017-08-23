@@ -1,5 +1,5 @@
 import { format, formatRelative, differenceInCalendarDays, addDays } from 'date-fns/esm'
-import { hasClass, scrollToElementIfNeeded, removeEmptyValuesFromArray, makeTagObject } from '../helpers/globalFunctions.js'
+import { hasClass, scrollToElementIfNeeded, scrollToElement, removeEmptyValuesFromArray, makeTagObject } from '../helpers/globalFunctions.js'
 import setDefaultItemValues from './setDefaultItemValues.js'
 
 // we import all of `date`
@@ -600,6 +600,13 @@ startEdit ({state, commit, dispatch, getters},
 	// }
 	commit('updateState',{ editingItem:item.id });
 	// if (getters.mobile) { store.$refs['edit-item-modal-'+item.id].open() }
+	if (getters.mobile)
+	{ 
+		Vue.nextTick(() => {
+			let el = document.querySelector('.js-editaddbox');
+			scrollToElement(el);
+		});
+	}
 },
 scrollToItemIfNeeded ({state, commit, dispatch},
 	{id} = {})
@@ -917,6 +924,11 @@ showAddNewItem ({state, commit, dispatch, getters},
 	Vue.nextTick(()=>{
 		let el = document.querySelector('.js-editaddbox');
 		console.log(el);
+		if (getters.mobile)
+		{
+			scrollToElement(el);
+			return;
+		}
 		scrollToElementIfNeeded(el);
 	});
 	// if (getters.mobile){ 

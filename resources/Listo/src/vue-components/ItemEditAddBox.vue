@@ -125,8 +125,7 @@ export default {
 		{
 			if (!this.get.mobile){ return; }
 			if (event && event.srcElement.nodeName != 'FORM'){ return; }
-			if (!this.item.newItem){ this.dispatch('doneEdit'); }
-			this.dispatch('cancelAddNew');
+			this.dispatch('doneEditOrCancelNew');
 		},
 		newItemIndent()
 		{

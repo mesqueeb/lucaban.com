@@ -2,6 +2,10 @@
 <div
 	:class="['full-width',{'order-last':(showAddNewBox && !state.addingNewAsChild)}]"
 >
+	<div class="c-popouts-mask js-popouts-mask"
+		v-if="get.mobile && (showEditBox || showAddNewBox)"
+		@click="clickOnEditOrAddCurtain($event)"
+	></div>
 		<!-- v-if="(showEditBox || showAddNewBox) && !get.mobile" -->
 	<div
 		v-if="(showEditBox || showAddNewBox) && get.mobile"
@@ -97,7 +101,12 @@ export default {
 	{
 		commit(action, payload){ this.$store.commit(action, payload) },
 		dispatch(action, payload){ this.$store.dispatch(action, payload) },
-
+		clickOnEditOrAddCurtain(event)
+		{
+			if (!this.get.mobile){ return; }
+			if (event && !event.srcElement.className.includes('js-popouts-mask')){ return; }
+			this.dispatch('doneEditOrCancelNew');
+		},
 	},
 }
 </script>
@@ -108,6 +117,9 @@ export default {
 	margin-top: 0.3em;
     display: flex;
     align-items: baseline;
+    z-index: 100;
+    position: relative;
+    background-color: white;
 	&--child{
 	    margin-left: 1.8em;
 	}
