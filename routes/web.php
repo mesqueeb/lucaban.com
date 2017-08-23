@@ -27,7 +27,8 @@ function()
 
     Route::get('/', ['uses' => 'ViewController@index'])->name('home');
     Route::get('home', ['uses' => 'ViewController@index']);
-    Route::get('controlpanel', ['uses' => 'ViewController@controlPanel', 'as' => 'userarea.controlpanel']);
+    // old passport route:
+    // Route::get('controlpanel', ['uses' => 'ViewController@controlPanel', 'as' => 'userarea.controlpanel']);
 });
 
 // AUTH API

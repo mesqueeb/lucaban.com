@@ -10,7 +10,7 @@
     <p>
         <a class="btn btn-lg btn-outline"
             role="button"
-            href="{{ url('/register') }}"
+            href="http://listo.lucaban.com"
         >
             @lang("Try it out")
         </a>
@@ -42,7 +42,7 @@
             <p>
                 <a class="btn btn-lg btn-success"
                     role="button"
-                    href="{{ url('/register') }}"
+                    href="http://listo.lucaban.com"
                 >
                     @lang("Try it out now")
                 </a>

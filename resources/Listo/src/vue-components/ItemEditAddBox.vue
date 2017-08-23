@@ -248,6 +248,7 @@ export default {
     justify-content: space-between;
     width: 100%;
     margin-top: 0.3em;
+    margin-bottom: -0.5em;
     padding: 0 !important;
     button{
         padding: 0.3em;

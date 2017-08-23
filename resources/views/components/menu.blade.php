@@ -1,8 +1,15 @@
 <nav class="fixed-top">
     <ul class="nav justify-content-end">
-        <li class="nav-item">
+{{--         <li class="nav-item">
             <a class="nav-link active" href="#page-top">{{ config('app.name', 'Laravel') }}</a>
         </li>
+ --}}
+        <li class="nav-item">
+            <a class="nav-link" href="http://listo.lucaban.com">
+                @lang("My :app", ['app' => config('app.name')])
+            </a>
+        </li>
+
         @if (App::getLocale() != 'ja')
             <li class="nav-item">
                 <a class="nav-link" href="{{ url('/ja') }}"
@@ -21,7 +28,8 @@
         <li class="nav-item" v-if="false">
             <a class="nav-link" href="#author">@lang("Author")</a>
         </li>
-        @if (Route::has('login'))
+
+{{--         @if (Route::has('login'))
             @if (Auth::check())
                 <li class="nav-item">
                     <a class="nav-link" href="{{ route('listo.index') }}">
@@ -47,5 +55,5 @@
                 </li>
             @endif
         @endif
-    </ul>
+ --}}    </ul>
 </nav>

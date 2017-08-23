@@ -1,6 +1,6 @@
 section.jumbotron {
     padding-top: 6rem;
-	background: url("img/lp-jumbo-bg.jpg"), $black;
+	background: url("../img/lp-jumbo-bg.jpg"), $black;
     background-size: cover;
     background-position: top;
     background-repeat: no-repeat;
@@ -19,7 +19,7 @@ a {
 }
 nav {
 	li:first-child {
-		margin-right: auto;
+		// margin-right: auto;
 	}
 	a {
 		color: white;
