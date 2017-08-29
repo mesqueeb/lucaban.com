@@ -4,6 +4,7 @@ import {
 	Utilities,objectToArray,uniq,uniqBy,sortObjectArrayByProperty,sortObjectArrayByTwoProperties
 } from '../helpers/globalFunctions.js'
 import { sec_to_hourmin } from '../helpers/valueMorphers2.js'
+import clipboardFormat from '../helpers/clipboardFormat.js'
 
 export default {
 filteredItemsUsedSec: (state, getters) => {
@@ -505,4 +506,13 @@ firstItem: (state, getters) => {
 	if (getters.noItems){ return null; }
 	return getters.filteredIdsTree[0];
 },
+clipboardTextDue: (state, getters) => {
+	console.log('running clipboardTextDue...');
+	return `◆ Today
+`+clipboardFormat(getters.filteredItemsTree, {first:true});
+},
+
+
+
+
 }

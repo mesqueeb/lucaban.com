@@ -52,10 +52,8 @@
 			<button
 				v-if="selection.view != 'journal' && this.get.filteredIdsFlat.length"
 				class="o-btn c-stats__copy-btn"
+				@click="copyAll"
 				v-btn-effect
-				v-clipboard:copy="clipboardText"
-				v-clipboard:success="clipboardSuccess"
-				v-clipboard:error="clipboardError"
 			>
 				{{ text.card.copy }}
 			</button>
@@ -84,29 +82,19 @@ export default {
 		{
 			return sec_to_hourmin(this.get.filteredItemsSecLeft)
 		},
-		clipboardText()
-		{
-			if (!itemGetters[this.state.root.id]){ return '' }
-			return itemGetters[this.state.root.id].clipboardText
-		},
 	},
 	methods:
 	{
 		commit(action, payload){ this.$store.commit(action, payload) },
 		dispatch(action, payload){ this.$store.dispatch(action, payload) },
+		copyAll()
+		{
+			let text = (this.get['selection/dueDateFiltered']) ? this.get.clipboardTextDue : itemGetters[this.state.root.id].clipboardText;
+			this.dispatch('copyProgrammatic',{text});
+		},
 		tagSlugToName(tag)
 		{
 			return Utilities.tagSlugToName(tag);
-		},
-		clipboardSuccess()
-		{
-			this.dispatch('sendFlash', { type:'success', msg:`${this.state.keybindings.copyClipboard.success[this.get.language]}
-
-${itemGetters[this.state.root.id].clipboardText}` });
-		},
-		clipboardError()
-		{
-			this.dispatch('sendFlash', { type:'error', msg:`${this.state.keybindings.copyClipboard.error[this.get.language]}` });
 		},
 	},
 }

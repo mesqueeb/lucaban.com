@@ -3,6 +3,7 @@ import {
 	Utilities
 	// ,objectToArray,uniqBy,sortObjectArrayByProperty,sortObjectArrayByTwoProperties
 } from '../helpers/globalFunctions.js'
+import clipboardFormat from '../helpers/clipboardFormat.js'
 
 function flattenTree(array){
 	// console.log('running flattenTree...');
@@ -116,7 +117,7 @@ totalTimeDifferentFromParent()
 {
 	console.log('running totalTimeDifferentFromParent...');
 	if (!this.item.parent_id){ return true; }
-
+	if (!itemGetters[this.item.parent_id]){ return true; }
 	return this.totalPlannedSec != itemGetters[this.item.parent_id].totalPlannedSec;
 },
 // totalPlannedHour()
@@ -443,7 +444,7 @@ calTotalUsedTime()
 },
 allChildItems()
 {
-	console.log('running allVisibleChildItems...');
+	console.log('running allChildItems...');
 	let flattenedTree = flattenTree(this.item.children);
 	// let flattenedTree = flattenedTree.map(child => child.id);
 	return flattenedTree;
@@ -475,30 +476,6 @@ visibleDirectChildIds()
 clipboardText()
 {
 	console.log('running clipboardText...');
-	let id = this.item.id;
-	let item = this.item;
-	let children;
-	let directChildren;
-	let spaceVariable = 0;
-	if (this.$store.getters['selection/dueItemsFiltered'])
-	{
-		// item = id;
-		// children = item.children;
-		directChildren = true;
-	} else {
-		// item = this.item;
-		// children = this.allVisibleChildItems;
-		spaceVariable = parseFloat(item.depth);
-	}
-	children = this.allVisibleChildItems;
-
-	if (!item){ return ''; }
-    let allChildren = children.reduce(function(all, val){
-		let spacesVal = (directChildren) ? 0 : parseFloat(val.depth)-spaceVariable;
-		let spaces = '　　'.repeat(spacesVal);
-		return `${all}
-${spaces}・${val.body}`;
-	}, `${item.body}`);
-    return allChildren;
+	return clipboardFormat([this.item], {first:true});
 },
 }

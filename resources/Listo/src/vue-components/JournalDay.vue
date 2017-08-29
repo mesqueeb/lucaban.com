@@ -7,16 +7,13 @@
 		<span class="c-journal-date__subtitle" v-if="day.date != customCalendar(day.date)">
 			{{ day.date }}
 		</span>
-		<!-- <button
+		<button
 			class="o-btn ml-auto"
 			v-btn-effect
-			v-clipboard:copy="get.clipboardTextJournal(item)"
-			v-clipboard:success="clipboardSuccess"
-			v-clipboard:error="clipboardError"
-			v-if="true"
+			@click="dispatch('copyProgrammatic',{text:clipboardTextJournalDay})"
 		>
 			{{ get.text.card.copy }}
-		</button> -->
+		</button>
 		<div class="w-100 d-flex" v-if="usedTime">
 		<!-- RETHINK totalUsedSec(day) -->
 			<span class="c-journal-used-time">{{ get.text.menu.usedTime }}: </span>
@@ -61,6 +58,7 @@ import { format } from 'date-fns/esm'
 import { customCalendar, sec_to_hourmin } from '../helpers/valueMorphers2.js'
 import { sortObjectArrayByProperty } from '../helpers/globalFunctions.js'
 import Card from './Card.vue'
+import clipboardFormat from '../helpers/clipboardFormat.js'
 
 export default {
 	props: ['day'],
@@ -89,6 +87,19 @@ export default {
 				return result + (totalUsedTimeParentBodyItem) ? parseFloat(totalUsedTimeParentBodyItem) : 0
 			}, 0);
 		},
+		clipboardTextJournalDay(){
+			let text = `◆ ${this.day.date}
+${this.get.text.menu.usedTime}: ${this.sec_to_hourmin(this.usedTime)}
+`;
+			this.day.items.forEach(section => {
+				if (section.parentBody && section.parentBody != 'null_no_parent_body')
+				{
+					text += `
+${section.parentBody}:`+clipboardFormat(section.items);
+				}
+			});
+			return text;
+		}
 	},
 	methods: {
 		customCalendar,
@@ -103,6 +114,7 @@ export default {
 		{
 			this.dispatch('sendFlash', { type:'error', msg:this.state.keybindings.copyClipboard.error[this.l] });
 		},
+
 	},
 }
 </script>

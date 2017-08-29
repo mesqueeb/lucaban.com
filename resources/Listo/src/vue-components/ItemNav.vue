@@ -31,7 +31,7 @@
 		<div class="o-popmenu__body">
 			<div
 				class="o-popmenu__item"
-				@click="dispatch('copyProgrammatic',{id:item.id})"
+				@click="dispatch('copyProgrammatic'), copySuccess = true"
 			>
 				<q-icon v-if="copySuccess" name="ion-ios-checkmark-empty" />
 				<div :class="{ 'u-color-success':copySuccess }" v-html="state.keybindings.copyClipboard.popmenu[l]"></div>

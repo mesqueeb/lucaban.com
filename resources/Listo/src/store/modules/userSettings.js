@@ -3,6 +3,10 @@ function initialState() {
 		plannedDurations: [10, 15, 25, 50],
 		language: 'en',
 		journalShowParentBodies: true,
+		clipboardSettings: {
+			bulletin: '・',
+			depthSpace: '　',
+		},
 	}
 }
 export default {

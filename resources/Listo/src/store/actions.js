@@ -1021,9 +1021,8 @@ addTimer ({state, commit, dispatch},
 	return;
 },
 copyProgrammatic ({dispatch, state, getters},
-	{id = state.selection.selectedId} = {id: state.selection.selectedId})
+	{text = itemGetters[state.selection.selectedId].clipboardText} = {text: itemGetters[state.selection.selectedId].clipboardText})
 {
-	let text = itemGetters[id].clipboardText;
 	let textArea = document.createElement("textarea");
 	// *** This styling is an extra step which is likely not required. ***
 	//
@@ -1069,10 +1068,11 @@ copyProgrammatic ({dispatch, state, getters},
 	    // console.log('Copying text command was ' + msg);
 	    dispatch('sendFlash', { type:'success', msg:`${state.keybindings.copyClipboard.success[getters.language]}
 
-${itemGetters[id].clipboardText}` });
+${text}` });
 	} catch (err) {
 	    // dispatch('clipboardError');
 	    // console.log('Oops, unable to copy');
+	    console.log(err);
 	    dispatch('sendFlash', { type:'error', msg:`${state.keybindings.copyClipboard.error[getters.language]}` });
 	}
 	document.body.removeChild(textArea);
