@@ -1,15 +1,16 @@
 {
-    "name": "helloworld",
-    "displayName": "HelloCordova",
+    "name": "Listo",
+    "displayName": "Listo",
     "version": "1.0.0",
-    "description": "A sample Apache Cordova application that responds to the deviceready event.",
+    "description": "Your favourite list'o!",
     "main": "index.js",
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1"
     },
-    "author": "Apache Cordova Team",
+    "author": "Luca Ban",
     "license": "Apache-2.0",
     "dependencies": {
+        "cordova": "^7.0.1",
         "cordova-ios": "^4.4.0",
         "cordova-plugin-whitelist": "^1.3.2"
     },

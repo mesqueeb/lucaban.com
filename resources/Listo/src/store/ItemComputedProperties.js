@@ -333,10 +333,8 @@ isTopLvlItemInFilteredRoot()
 {
 	console.log('running isTopLvlItemInFilteredRoot...');
 	let id = this.item.id;
-	// console.log('running isTopLvlItemInFilteredRoot');
 	if (store.getters['selection/nothingSelected'] && store.state.selection.view == 'tree')
 	{
-		// console.log('the root is not filtered');
 		return false;
 	}
 	if (id == store.state.root.id)
@@ -345,28 +343,37 @@ isTopLvlItemInFilteredRoot()
 	}
 	return store.getters.filteredIdsTree.includes(id);
 },
+relativeDepth()
+{
+	if (this.item.isTopLvlItemInFilteredRoot){ return 0 }
+	let item = this.item;
+	if (!item.parent_id){ return 0 }
+	let parent = store.state.nodes[item.parent_id];
+	if (!parent){ return 0 }
+	return itemGetters[item.parent_id].relativeDepth + 1;
+},
 hasParentDueToday()
 {
-	console.log('running hasParentDueToday...');
-	let id = this.item.id;
+	// console.log('running hasParentDueToday...');
 	let item = this.item;
-	if (!item.parent_id){ return false; }
+	if (!item.parent_id){ return false }
 	let parent = store.state.nodes[item.parent_id];
-	if (!parent){ return false; }
-	let diff = differenceInCalendarDays(new Date(parent.due_date.replace(/-/g, "/")), new Date());
-	if (diff <= 0)
+	if (!parent){ return false }
+	let parentIsDueToday = itemGetters[item.parent_id].isDueToday;
+	if (parentIsDueToday)
 	{
-		return true;
+		return true
 	} else {
 		return itemGetters[item.parent_id].hasParentDueToday;
 	}
 },
 isDueToday()
 {
-	console.log('running isDueToday...');
+	if (this.item.done){ return false }
+	// console.log('running isDueToday...');
 	let diff = differenceInCalendarDays(new Date(this.item.due_date.replace(/-/g, "/")), new Date());
-	if (diff <= 0) { return true; }
-	return false;
+	if (diff <= 0) { return true }
+	return false
 },
 isDueFlat()
 {

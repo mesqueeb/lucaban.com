@@ -85,6 +85,7 @@ export default {
 		},
 		style()
 		{
+			if (!this.get['selection/noFilterOrTag']){ return '' }
 			let d = this.item.depth;
 			let x = 1;
 				x = (d > 1) ? 1.50 * d : x;

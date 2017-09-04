@@ -14,18 +14,20 @@
 <router-view></router-view>
 
 <!-- FOOTER -->
-<div slot="footer" v-if="get.mobile">
+<div slot="footer" v-if="get.mobile" v-show="!get.editingOrAddingId">
 	<Panel-Nav></Panel-Nav>
 </div>
 
 <q-fixed-position corner="bottom-right" :offset="[18, 18]"
 	v-if="$route.path == '/' && get.mobile"
+	v-show="!get.editingOrAddingId"
 >
 	<Mobile-Nav-Add></Mobile-Nav-Add>
 </q-fixed-position>
 <q-fixed-position corner="bottom-left" :offset="[18, 15]"
 	v-if="$route.path == '/' && get.mobile && state.selection.view != 'journal'
 			&& get.itemCount && state.selection.selectedId"
+	v-show="!get.editingOrAddingId"
 >
 	<Mobile-Nav-Move></Mobile-Nav-Move>
 </q-fixed-position>
