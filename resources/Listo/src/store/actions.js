@@ -3,7 +3,7 @@ import { hasClass, scrollToElementIfNeeded, scrollToElement, removeEmptyValuesFr
 import setDefaultItemValues from './setDefaultItemValues.js'
 
 // we import all of `date`
-import { date } from 'quasar'
+import { Toast, date } from 'quasar'
 // destructuring to keep only what is needed
 const { addToDate } = date;
 // import { sec_to_hourmin } from '../../components/valueMorphers2.js';
@@ -23,8 +23,7 @@ giveNewParent ({state, commit, dispatch, getters},
 	if (itemGetters[id].isTopLvlItemInFilteredRoot)
 	{ 
 		let errMsg = getters.text.flashes.moveTopLvlItem;
-		console.log(errMsg);
-		dispatch('sendFlash', { type:'warning', msg:errMsg });
+		Toast.create(errMsg);
 		return;
 	}
 	console.log('giving new parent');
@@ -468,8 +467,7 @@ moveItem ({state, commit, dispatch, getters},
 	if (itemGetters[id].isTopLvlItemInFilteredRoot)
 	{ 
 		let errMsg = getters.text.flashes.moveTopLvlItem;
-		console.log(errMsg);
-		dispatch('sendFlash', { type:'warning', msg:errMsg });
+		Toast.create(errMsg)
 		return; 
 	}
 	clearTimeout(window.patchDelay);
@@ -984,11 +982,6 @@ popup ({state, commit, dispatch},
 		// });
 //         }
 },
-sendFlash ({state, commit, dispatch},
-	payload = {})
-{
-	commit('pushFlash', payload);
-},
 popout ({state, commit, dispatch},
 	{id, type} = {})
 {
@@ -1066,14 +1059,14 @@ copyProgrammatic ({dispatch, state, getters},
 	    let msg = successful ? 'successful' : 'unsuccessful';
 	    // dispatch('clipboardSuccess');
 	    // console.log('Copying text command was ' + msg);
-	    dispatch('sendFlash', { type:'success', msg:`${state.keybindings.copyClipboard.success[getters.language]}
+		Toast.create({html:`${state.keybindings.copyClipboard.success[getters.language]}
 
-${text}` });
+${text}`});
 	} catch (err) {
-	    // dispatch('clipboardError');
-	    // console.log('Oops, unable to copy');
 	    console.log(err);
-	    dispatch('sendFlash', { type:'error', msg:`${state.keybindings.copyClipboard.error[getters.language]}` });
+	    Toast.create(`${state.keybindings.copyClipboard.error[getters.language]}
+
+${err}`);
 	}
 	document.body.removeChild(textArea);
 },

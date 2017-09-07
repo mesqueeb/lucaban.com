@@ -21,13 +21,13 @@ export default new VueRouter({
    */
 
   routes: [
-    { path: '/', component: load('Index'),
+    { path: '/', name: 'index', component: load('Index'),
       children: [
-        { path: '', component: load('Listo') },
-        { path: 'login', component: load('Login') },
-        { path: 'register', component: load('Register') },
+        { path: '', name: 'listo', component: load('Listo') },
+        { path: 'login', name: 'login', component: load('Login') },
+        { path: 'register', name: 'register', component: load('Register') },
       ]
     }, // Default
-    { path: '*', component: load('Error404') }, // Not found
+    { path: '*', name: 'error404', component: load('Error404') }, // Not found
   ]
 })

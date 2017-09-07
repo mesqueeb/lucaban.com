@@ -59,13 +59,16 @@ import Vue from 'vue'
 window.Vue = Vue
 Vue.config.productionTip = false
 // 2.
-import Quasar, { QBtn, QIcon, QPopover, QModal, QSpinnerOval, QLayout, QFixedPosition, QProgress } from 'quasar'
+import Quasar, { QBtn, QIcon, QPopover, QModal, QSpinnerOval, QLayout, QFixedPosition, QProgress, Toast } from 'quasar'
 import 'quasar-extras/material-icons'
 import 'quasar-extras/ionicons'
 Vue.use(Quasar, {
   components: {
-	QBtn, QIcon, QPopover, QModal, QSpinnerOval, QLayout, QFixedPosition, QProgress
+	QBtn, QIcon, QPopover, QModal, QSpinnerOval, QLayout, QFixedPosition, QProgress, Toast
   }
+})
+Toast.setDefaults({
+  timeout: 3000,
 })
 // 3.
 import Vuex from 'vuex'
@@ -106,11 +109,15 @@ Vue.use(VueClipboard);
 // GO.
 window.vm = new Vue({
     el: '#q-app',
-	router,
-	store,
+  router,
+  store,
     render: h => h(require('./App.vue'))
 });
 
+// G.A. Google Analytics
+router.afterEach((to, from) => {
+    ga.logPage(to.path, to.name, sessionId)
+})
 // CSS
 // import * from './css/index.scss'
 // require('./index.scss');

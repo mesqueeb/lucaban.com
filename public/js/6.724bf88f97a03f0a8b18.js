@@ -58,7 +58,7 @@ exports.push([module.i, ".error-page .error-code{height:50vh;width:100%;padding-
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_quasar__ = __webpack_require__(31);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_quasar__ = __webpack_require__(20);
 
 
 

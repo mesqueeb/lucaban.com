@@ -48,6 +48,8 @@ export default {
 			'addAndClose':'Add and close',
 			'addNew':'Add new...',
 			'addingNewItem':'Adding new item...',
+			'showMore': 'show more',
+			'showLess': 'show less',
 		},
 		'tags':
 		{
@@ -148,6 +150,8 @@ export default {
 			'addAndClose':'追加して閉じる',
 			'addNew':'追加...',
 			'addingNewItem':'新しいアイテムを追加...',
+			'showMore': '表示',
+			'showLess': '非表示',
 		},
 		'tags':
 		{

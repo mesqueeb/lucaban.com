@@ -6,7 +6,7 @@ import axios from 'axios'
 import ItemComputedProperties from '../ItemComputedProperties.js'
 import Vue from 'vue'
 
-import { date } from 'quasar'
+import { date, Toast } from 'quasar'
 const { getDateDiff } = date;
 
 export default {
@@ -87,7 +87,7 @@ export default {
 				let errors = Object.keys(serverError).map((k)=>{
 					return serverError[k];
 				}).map((e, i) => e[i]).join('<br>');
-				dispatch('sendFlash',{msg:errors});
+				Toast.create(errors);
 			});
 		},
 		register ({commit, dispatch, getters, rootState},
@@ -107,7 +107,7 @@ export default {
 				let errors = Object.keys(serverError).map((k)=>{
 					return serverError[k];
 				}).map((e, i) => e[i]).join('<br>');
-				dispatch('sendFlash',{msg:errors});
+				Toast.create(errors);
 			});
 		},
 		fetchListo ({commit, dispatch})
@@ -158,7 +158,10 @@ export default {
 			axios.get(apiBaseURL+'user').then(({data}) => {
 				console.log(data);
 				commit('user/updateState', {user:data.user});
-				dispatch('sendFlash',{msg:`Hello ${data.user.name}!`})
+				Toast.create({
+					html: `Hello ${data.user.name}!`,
+					timeout: 5000
+				})
 			}).catch((error) => {
 				console.log(`ERROR: ${error.response}`);
 			});
@@ -225,8 +228,7 @@ export default {
 			}, (response) => {
 				commit('updateState', {patching:'error'});
 				let errMsg = getters.text.flashes.ajaxError;
-				console.log(errMsg);
-				dispatch('sendFlash', { type:'ajaxError', msg:errMsg });
+				Toast.create(errMsg);
 				return;
 			});
 		},
@@ -409,8 +411,7 @@ export default {
 			}, (response) => {
 				rootState.patching = 'error';
 				let errMsg = getters.text.flashes.ajaxError;
-				console.log(errMsg);
-				dispatch('sendFlash', { type:'ajaxError', msg:errMsg });
+				Toast.create(errMsg);
 			});
 		},
 		patchRootChildrenOrderWithFilter ({rootState, dispatch},

@@ -4,6 +4,13 @@
 [v-cloak] {
     display: none;
 }
+.q-toast-message {
+    white-space: pre-line;
+}
+.q-toast-message--fullscreen {
+    overflow: scroll;
+    height: 100vh;
+}
 body {
     @include text-settings();
     font-size: 14px;

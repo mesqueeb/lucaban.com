@@ -58,7 +58,7 @@ exports.push([module.i, ".logo-container{width:192px;height:268px;-webkit-perspe
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_quasar__ = __webpack_require__(31);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_quasar__ = __webpack_require__(20);
 
 
 var moveForce = 30;

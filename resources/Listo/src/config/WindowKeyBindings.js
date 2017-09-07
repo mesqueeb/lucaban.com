@@ -1,3 +1,5 @@
+import { Toast } from 'quasar'
+
 export default class
 {
 constructor()
@@ -22,10 +24,10 @@ keystroke(k)
 		|| k == '-'
 		|| k == 's' ))
 	{
-		console.log('cannot use '+k+' in journal mode');
+		// console.log('cannot use '+k+' in journal mode');
 		let errMsg = store.getters.text.flashes.cannotDoThisInJournal;
-		console.log(errMsg);
-		store.dispatch('sendFlash', { type:'warning', msg:errMsg });
+		// console.log(errMsg);
+		Toast.create(errMsg)
 		return;
 	}
 	console.log(k);

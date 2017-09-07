@@ -59,6 +59,7 @@ import { customCalendar, sec_to_hourmin } from '../helpers/valueMorphers2.js'
 import { sortObjectArrayByProperty } from '../helpers/globalFunctions.js'
 import Card from './Card.vue'
 import clipboardFormat from '../helpers/clipboardFormat.js'
+import { Toast } from 'quasar'
 
 export default {
 	props: ['day'],
@@ -108,11 +109,13 @@ ${section.parentBody}:`+clipboardFormat(section.items);
 		dispatch(action, payload){ this.$store.dispatch(action, payload) },
 		clipboardSuccess()
 		{
-			this.dispatch('sendFlash', { type:'success', msg:this.state.keybindings.copyClipboard.success[this.l]+"<br><br>"+itemGetters[this.item.id].clipboardText });
+			Toast.create(`${this.state.keybindings.copyClipboard.success[this.l]}
+
+${itemGetters[this.item.id].clipboardText}`);
 		},
 		clipboardError()
 		{
-			this.dispatch('sendFlash', { type:'error', msg:this.state.keybindings.copyClipboard.error[this.l] });
+			Toast.create(`${this.state.keybindings.copyClipboard.error[this.l]}`);
 		},
 
 	},

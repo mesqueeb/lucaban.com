@@ -58,13 +58,13 @@ exports.push([module.i, ".logo-container{width:255px;height:242px;-webkit-perspe
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_quasar__ = __webpack_require__(31);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_quasar__ = __webpack_require__(20);
 
 
 
 
-var viewport = __WEBPACK_IMPORTED_MODULE_0_quasar__["t" /* dom */].viewport,
-    position = __WEBPACK_IMPORTED_MODULE_0_quasar__["u" /* event */].position,
+var viewport = __WEBPACK_IMPORTED_MODULE_0_quasar__["u" /* dom */].viewport,
+    position = __WEBPACK_IMPORTED_MODULE_0_quasar__["v" /* event */].position,
     moveForce = 30,
     rotateForce = 40,
     RAD_TO_DEG = 180 / Math.PI;
@@ -119,7 +119,7 @@ function getRotationFromAccel(accelX, accelY, accelZ) {
   },
   methods: {
     launch: function launch(url) {
-      Object(__WEBPACK_IMPORTED_MODULE_0_quasar__["v" /* openURL */])(url);
+      Object(__WEBPACK_IMPORTED_MODULE_0_quasar__["w" /* openURL */])(url);
     },
     move: function move(evt) {
       var _viewport = viewport(),

@@ -2,10 +2,9 @@
 <div
 	:id="'card-'+item.id"
 	:refs="item.id"
-	:class="{
-		'items-card': true,
-		'journal-wrapper': state.selection.view == 'journal'
-	}"
+	:class="['items-card',{
+			 'journal-wrapper': state.selection.view == 'journal'
+	}]"
 >
 <!-- item-card-wrapper -->
 <div 
@@ -42,9 +41,13 @@
 					}"
 				>{{ item.body }}</div>
 				<div class="l-completion-notes c-completion-notes bodybox"
+					:style="(showCompletionNotes) ? '' : 'height:3.4em;'"
 					v-if="item.completion_memo"
 					@click="selectItem"
 				>{{ item.completion_memo }}</div>
+				<div class="c-completion-notes c-completion-notes__showHide"
+					v-if="item.completion_memo && item.completion_memo.length > 80"
+					@click="showCompletionNotes = !showCompletionNotes">{{ (showCompletionNotes) ? get.text.card.showLess : get.text.card.showMore }}</div>
 			</div>
 
 			<!-- For debugging: -->
@@ -91,7 +94,7 @@ export default {
 	components: {
 		ItemNav, ItemToggles, ItemEditAddWrapper, ItemTagsStrip, ItemAddTag, JournalDay, 
 	},
-	data(){ return {} },
+	data(){ return { showCompletionNotes: false } },
 	computed: {
 		id(){ return this.item.id },
  /* \ ============================================== / *\
@@ -176,6 +179,11 @@ export default {
 .c-completion-notes{
     color: #a2999a;
     background: none !important;
+    overflow: hidden;
+}
+.c-completion-notes__showHide{
+	text-align: right;
+	cursor: pointer;
 }
 .journal-wrapper {
     .l-children {
