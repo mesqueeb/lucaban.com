@@ -1,16 +1,16 @@
 webpackJsonp([4],{
 
-/***/ 378:
+/***/ 380:
 /***/ (function(module, exports, __webpack_require__) {
 
 function injectStyle (ssrContext) {
-  __webpack_require__(533)
+  __webpack_require__(530)
 }
 var Component = __webpack_require__(118)(
   /* script */
-  __webpack_require__(535),
+  __webpack_require__(532),
   /* template */
-  __webpack_require__(536),
+  __webpack_require__(533),
   /* styles */
   injectStyle,
   /* scopeId */
@@ -24,24 +24,24 @@ module.exports = Component.exports
 
 /***/ }),
 
-/***/ 533:
+/***/ 530:
 /***/ (function(module, exports, __webpack_require__) {
 
 // style-loader: Adds some css to the DOM by adding a <style> tag
 
 // load the styles
-var content = __webpack_require__(534);
+var content = __webpack_require__(531);
 if(typeof content === 'string') content = [[module.i, content, '']];
 if(content.locals) module.exports = content.locals;
 // add the styles to the DOM
-var update = __webpack_require__(372)("11ebb5f1", content, true);
+var update = __webpack_require__(374)("11ebb5f1", content, true);
 
 /***/ }),
 
-/***/ 534:
+/***/ 531:
 /***/ (function(module, exports, __webpack_require__) {
 
-exports = module.exports = __webpack_require__(371)(undefined);
+exports = module.exports = __webpack_require__(373)(undefined);
 // imports
 
 
@@ -53,7 +53,7 @@ exports.push([module.i, ".logo-container{width:192px;height:268px;-webkit-perspe
 
 /***/ }),
 
-/***/ 535:
+/***/ 532:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -171,7 +171,7 @@ function getRotationFromAccel(accelX, accelY, accelZ) {
 
 /***/ }),
 
-/***/ 536:
+/***/ 533:
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
@@ -191,7 +191,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     style: (_vm.position)
   }, [_c('img', {
     attrs: {
-      "src": __webpack_require__(537)
+      "src": __webpack_require__(534)
     }
   }), _vm._v(" "), _c('p', {
     staticClass: "caption text-center"
@@ -204,7 +204,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
 
 /***/ }),
 
-/***/ 537:
+/***/ 534:
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = __webpack_require__.p + "img/listo-logo-s.69eff1c.png";

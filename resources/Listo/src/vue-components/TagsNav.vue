@@ -5,7 +5,7 @@
 			href="#"
 			:class="['c-tag-menu__tag', {'c-tag-menu--active': selection.tags.includes(tag.slug)}]"
 			:value="tag.slug"
-			@click.prevent="state.computing = true; dispatch('filterItems', { keyword:'tag', value:tag.slug, event:$event })"
+			@click.prevent="dispatch('doneEditOrCancelNew'); state.computing = true; dispatch('filterItems', { keyword:'tag', value:tag.slug, event:$event }); doc.activeElement.blur()"
 		>{{ tag.name }}</a>
 		<a v-for="tag in selection.hiddenTags"
 			class="c-tag-menu--filtered-out" href="#"
@@ -27,7 +27,7 @@ export default {
 		get(){ return this.$store.getters },
 		state(){ return this.$store.state },
 		selection(){ return this.state.selection },
-
+		doc(){ return document },
 	},
 	methods:
 	{

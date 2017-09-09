@@ -111,28 +111,28 @@ addOrDeleteTempTag(state, {id, tagObject, requestType = 'tag'} = {})
 		state.nodes[id].tagged = state.nodes[id].tagged.filter(t => t.tag_slug != tagObject.tag_slug);
 	}
 },
-deleteTag(state, {id, tags})
+deleteTag(state, {id, tagObjs})
 {
 	if (!state.nodes[id]){
 		console.log(`trying to tag an unexisting item`);
 		return;
 	}
-	tags.forEach(tag => state.nodes[id].tagged = state.nodes[id].tagged.filter(t => t.tag_slug != tag.tag_slug));
+	tagObjs.forEach(tagObj => state.nodes[id].tagged = state.nodes[id].tagged.filter(t => t.tag_slug != tagObj.tag_slug));
 },
-addTagTemporarely(state, {id, tags})
+addTagTemporarely(state, {id, tagObjs})
 {
 	let t0 = performance.now( );
-	if (!Array.isArray(tags)){
-		tags = [tags];
+	if (!Array.isArray(tagObjs)){
+		tagObjs = [tagObjs];
 	}
 	if (!state.nodes[id]){
 		console.log(`trying to tag an unexisting item`);
 		return;
 	}
-	console.log(`tagging items tempor ${id} with... "${tags.map(t => t.tag_name)}"`);
+	console.log(`tagging items tempor ${id} with... "${tagObjs.map(t => t.tag_name)}"`);
 	// this isn't reactive
-	// state.nodes[id].tagged = Object.assign(state.nodes[id].tagged, tags);
-	tags.forEach(tag => state.nodes[id].tagged.push(tag));
+	// state.nodes[id].tagged = Object.assign(state.nodes[id].tagged, tagObjs);
+	tagObjs.forEach(tag => state.nodes[id].tagged.push(tag));
 	let t1 = performance.now( );
 	console.log("			Call to commit addTagTemporarely took " + (t1 - t0) + " milliseconds.")
 },

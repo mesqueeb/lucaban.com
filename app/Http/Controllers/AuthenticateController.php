@@ -74,7 +74,7 @@ class AuthenticateController extends Controller
         { // something went wrong whilst attempting to encode the token
             return response()->json(['error' => 'could_not_create_token'], 500);
         } // all good so return the token
-        return response()->json();
+        return $token;
     }
     public function logout(Request $request)
     {

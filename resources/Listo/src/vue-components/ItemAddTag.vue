@@ -54,10 +54,12 @@ export default {
 		},
 		tab(e)
 		{
-			if (this.state.editingItemTags && e.shiftKey){
+			if (this.state.editingItemTags && e.shiftKey)
+			{
 				e.preventDefault();
 			}
-			if (!document.querySelectorAll(`#card-${this.get.editingOrAddingId} .js-item-tags i`).length)
+			if (!document.querySelectorAll(`#card-${this.get.editingOrAddingId} .js-item-tags i`).length
+				&& !this.state.editingItemTags && !e.shiftKey)
 			{
 				e.preventDefault();
 			}

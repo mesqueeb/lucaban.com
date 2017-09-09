@@ -35,5 +35,8 @@ export default {
 		loggedIn: (state) => {
 			return (state.user) ? true : false;
 		},
+		id: (state) => {
+			return (state.user) ? state.user.id : 0;
+		},
 	},
 }

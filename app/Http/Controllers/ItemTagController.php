@@ -114,6 +114,23 @@ class ItemTagController extends Controller
         }
         return response()->json($request->all());
     }
+    public function bulk_tag(Request $request)
+    {
+        $payload = $request->all();
+        foreach ($payload as $tagRequest)
+        {
+            if ($tagRequest['type'] == 'tag' || !$tagRequest['type']){
+                Item::findOrFail($tagRequest['id'])->tag($tagRequest['tags']); // attach the tag
+            }
+            if ($tagRequest['type'] == 'untag'){
+                Item::findOrFail($tagRequest['id'])->untag($tagRequest['tags']); // untag tag
+            }
+            if ($tagRequest['type'] == 'retag'){
+                Item::findOrFail($tagRequest['id'])->retag($tagRequest['tags']); // Remove all tags and retag with request
+            }
+        }
+        return response()->json($payload);
+    }
 
 
     /**

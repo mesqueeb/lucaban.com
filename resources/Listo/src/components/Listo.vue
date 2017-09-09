@@ -19,7 +19,7 @@
 		v-if="get.mobile"
 	>{{ get.text.guide.hints.addItemHint }}<br>➘</div>
 
-	<all-tags v-for="tag in state.allTags" :tag="tag" :key="tag"></all-tags>
+	<!-- <all-tags v-for="tag in state.allTags" :tag="tag" :key="tag.slug"></all-tags> -->
 </div>
 </template>
 
@@ -29,7 +29,7 @@ import Cards from '../vue-components/Cards.vue'
 import TagsNav from '../vue-components/TagsNav.vue'
 import StatsNav from '../vue-components/StatsNav.vue'
 import ItemEditAddBox from '../vue-components/ItemEditAddBox.vue'
-import AllTags from '../vue-components/AllTags.vue'
+// import AllTags from '../vue-components/AllTags.vue'
 
 export default {
 	components: {
@@ -37,7 +37,7 @@ export default {
 		StatsNav,
 		ItemEditAddBox,
 		Cards,
-		AllTags,
+		// AllTags,
 	},
 	mounted() {
 		if (!store.$refs) { store.$refs = {} }

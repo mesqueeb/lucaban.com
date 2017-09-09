@@ -333,7 +333,7 @@ isTopLvlItemInFilteredRoot()
 {
 	console.log('running isTopLvlItemInFilteredRoot...');
 	let id = this.item.id;
-	if (store.getters['selection/nothingSelected'] && store.state.selection.view == 'tree')
+	if (store.getters['selection/noFilterOrTag'] && store.state.selection.view == 'tree')
 	{
 		return false;
 	}
@@ -345,7 +345,7 @@ isTopLvlItemInFilteredRoot()
 },
 relativeDepth()
 {
-	if (this.item.isTopLvlItemInFilteredRoot){ return 0 }
+	if (this.isTopLvlItemInFilteredRoot){ return 0 }
 	let item = this.item;
 	if (!item.parent_id){ return 0 }
 	let parent = store.state.nodes[item.parent_id];

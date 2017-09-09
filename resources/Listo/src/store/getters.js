@@ -262,7 +262,7 @@ itemsWithSelectedTagsTree: (state, getters) => {
 	let tagFilters = state.selection.tags;
 	if (!tagFilters.length){ return [] }
 
-	let items = tagFilters.map(tagSlug => itemsByTag[tagSlug].tree);
+	let items = tagFilters.map(tagSlug => itemsByTag(tagSlug).tree);
 	items = items.reduce((items, array) => {
 		return items.concat(array)
 	}, []);
@@ -277,15 +277,15 @@ itemsWithSelectedTagsFlat: (state, getters) => {
 	let items;
 	if (tagFilters.length == 1)
 	{
-		items = itemsByTag[tagFilters[0]].flat;
+		items = itemsByTag(tagFilters[0]).flat;
 	}
 	else if (tagFilters.length > 1)
 	{
-		let tagFiltersCounts = tagFilters.map(tagSlug => itemsByTag[tagSlug].countFlat);
+		let tagFiltersCounts = tagFilters.map(tagSlug => itemsByTag(tagSlug).countFlat);
 		let smallestResult = Math.min(...tagFiltersCounts);
-		let startTag = tagFilters.find(tagSlug => itemsByTag[tagSlug].countFlat == smallestResult);
+		let startTag = tagFilters.find(tagSlug => itemsByTag(tagSlug).countFlat == smallestResult);
 		let remainingTags = tagFilters.filter(tagSlug => tagSlug != startTag);
-		items = itemsByTag[startTag].flat;
+		items = itemsByTag(startTag).flat;
 		items = items.filter(item => getters.hasAllTags(item.id, remainingTags));
 	}
 	return items;

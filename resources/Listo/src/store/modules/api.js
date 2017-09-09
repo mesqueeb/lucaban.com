@@ -14,6 +14,11 @@ export default {
 	{
 		token: null,
 		tokenTimeStamp: null,
+		syncStack: {
+			items:[],
+			deleteItems:[],
+			tags:[],
+		},
 	},
 	mutations:
 	{
@@ -97,7 +102,8 @@ export default {
 			// let self = this;
 			axios.post(apiBaseURL+'register', credentials)
 			.then(({data}) => {
-				commit('setToken', {token:data.token});
+				console.log(data);
+				commit('setToken', {token:data});
 				dispatch('fetchListo');
 				router.push('/');
 			}).catch(({response})=>{
@@ -114,7 +120,7 @@ export default {
 		{
 			commit('updateState', { loading:true } );
 			dispatch('getUser');
-			dispatch('fetchAllTags');
+			// dispatch('fetchAllTags');
 			console.log('start fetching all items');
 			console.log(axios.defaults.headers.common);
 			/*/ ～～～～～～～～～～～～～～～～～～～～～～～　\*\		*/
@@ -166,17 +172,22 @@ export default {
 				console.log(`ERROR: ${error.response}`);
 			});
 		},
-		patch ({commit, dispatch, getters, rootState, state},
-			{id, field, value} = {})
+		queueItemPatch ({state, dispatch}, payload = [])
 		{
-			if (!rootState.user.user) { console.log('not Logged in'); return; }
-			if (id.toString().includes('tempItem')) { return; console.log('not patching temp items...'); }
-			// if (getters.isTopLvlItemInFilteredRoot(id)){ 
-			// 	if (field == 'children_order' || field == 'parent_id'){
-			// 		console.log("you can't sync a toplvlItem when filtering");
-			// 		return;
-			// 	}
-			// }
+			payload = (Array.isArray(payload)) ? payload : [payload];
+			if (!payload.length){ return }
+			payload.forEach(patchRequest => state.syncStack.items.push(patchRequest));
+			console.log(`pushed to syncStack! ${state.syncStack.items.length}`);
+			if (window.bulkPatchQueue){ clearTimeout(window.bulkPatchQueue) }
+		    window.bulkPatchQueue = setTimeout(function(){
+		    	console.log('dispatching bulkSendPatches');
+		    	dispatch('bulkSendPatches', state.syncStack.items);
+		    	state.syncStack.items = [];
+		    }.bind(dispatch), 750);
+		},
+		bulkSendPatches ({state, dispatch, commit}, payload = [])
+		{
+			console.log('starting bulkSendPatches');
 			dispatch('startPatching');
 			// Refresh the token if nessesary;
 			let diff = getDateDiff(new Date(), state.tokenTimeStamp, 'minutes');
@@ -212,18 +223,12 @@ export default {
 				});
 				console.log('stop here');
 				return;
-				console.log('THIS SHOULD NOT SHOW');
 			}
 			// End refresh token
-			let patchObj = {};
-			let patchVal = (value) ? value : rootState.nodes[id][field];
-			if (field == 'children_order'){
-				patchVal = arrayToString(patchVal);
-			}
-			patchObj[field] = patchVal;
-			axios.patch(apiBaseURL+'items/' + id, patchObj, { method: 'PATCH'})
+			console.log('patching the syncStack:');
+			console.log(state.syncStack.items);
+			axios.patch(apiBaseURL+'items/bulkPatch', payload, { method: 'PATCH'})
 			.then(function(response){
-				console.log(`patched ${id}[${rootState.nodes[id].body}].${field} = ${patchObj[field]}`);
 				dispatch('stopPatching');
 			}, (response) => {
 				commit('updateState', {patching:'error'});
@@ -231,6 +236,26 @@ export default {
 				Toast.create(errMsg);
 				return;
 			});
+		},
+		patch ({dispatch, getters, rootState},
+			{id, field, value} = {})
+		{
+			if (!rootState.user.user) { console.log('not Logged in'); return; }
+			if (id.toString().includes('tempItem')) { return; console.log('not patching temp items...'); }
+			// if (getters.isTopLvlItemInFilteredRoot(id)){ 
+			// 	if (field == 'children_order' || field == 'parent_id'){
+			// 		console.log("you can't sync a toplvlItem when filtering");
+			// 		return;
+			// 	}
+			// }
+			let patchObj = {};
+			let patchVal = (value) ? value : rootState.nodes[id][field];
+			if (field == 'children_order'){
+				patchVal = arrayToString(patchVal);
+			}
+			patchObj[field] = patchVal;
+			patchObj['id'] = id;
+			dispatch('queueItemPatch', patchObj);
 		},
 		patchTag ({rootState, dispatch},
 			{id, tags, requestType} = {})
@@ -246,79 +271,68 @@ export default {
 			let patchObj = {};
 			patchObj['tags'] = tags;
 			patchObj['type'] = requestType;
-			// AXIOS REQUEST
-			axios.patch(apiBaseURL+'itemtags/' + id, patchObj, { method: 'PATCH'})
-			.then(function(tagResponse){
-				let syncedTags = tagResponse.data.tags;
-				console.log('tagged ['+rootState.nodes[id].body+'] with: '+tagResponse.data.tags+';');
-				console.log(tagResponse);
-				// Re-Add tags of item
-				axios.get(apiBaseURL+'itemtags/' + id, { type: 'tags'})
-				// Codementor: Request type doesn't work......
-				.then(function(updatedTagList){
-					rootState.nodes[id].tagged = updatedTagList.data;
-					console.log('updatedTagList of ['+rootState.nodes[id].body+'] with: '+updatedTagList.data.map(t => t.tag_name)+';');
+			patchObj['id'] = id;
+			dispatch('queueTagPatch', patchObj);
+		},
+		queueTagPatch ({state, dispatch}, payload = [])
+		{
+			payload = (Array.isArray(payload)) ? payload : [payload];
+			if (!payload.length){ return }
+			payload.forEach(patchRequest => state.syncStack.tags.push(patchRequest));
+			if (window.bulkTagPatchQueue){ clearTimeout(window.bulkTagPatchQueue) }
+		    window.bulkTagPatchQueue = setTimeout(function(){
+				axios.patch(apiBaseURL+'itemtags/bulkTag', state.syncStack.tags)
+				.then(function(tagResponse){
+					console.log(tagResponse);
+					dispatch('stopPatching');
 				});
-				dispatch('stopPatching');
-			});
+		    	state.syncStack.tags = [];
+		    }.bind(dispatch), 750);
 		},
 		patchDueDate ({dispatch, rootState},
 			{id, duedate} = {})
 		{
 			if (!rootState.user.user) { console.log('not Logged in'); return; }
 			if (id.toString().includes('tempItem')) { return; console.log('not patching temp items...'); }
-			dispatch('startPatching');
-			if (duedate == '0000-00-00 00:00:00'){
-				axios.patch(apiBaseURL+'items/' + id, {'due_date':duedate})
-				.then(function(response){
-					dispatch('stopPatching');
-				});
-				return;
-			}
-			duedate = new Date(duedate.replace(/-/g, "/"));
-			console.log('PatchDueDate: '+duedate);
-			axios.patch(apiBaseURL+'items/' + id, {'due_date':duedate})
-			.then(function(response){
-				dispatch('stopPatching');
-			});
+			duedate = (duedate == '0000-00-00 00:00:00') ? '0000-00-00 00:00:00' : new Date(duedate.replace(/-/g, "/"));
+			dispatch('queueItemPatch', {id, due_date:duedate});
 		},
 		patchDone ({rootState, dispatch},
 			{id} = {})
 		{
 			if (!rootState.user.user) { console.log('not Logged in'); return; }
 			if (id.toString().includes('tempItem')) { return; console.log('not patching temp items...'); }
-			dispatch('startPatching');
 			let done_date;
-			let doneValue = rootState.nodes[id].done;
-			if (doneValue){
+			let done = rootState.nodes[id].done;
+			if (done){
 				done_date = new Date();
 			} else {
 				done_date = '0000-00-00 00:00:00';
 			}
-			axios.patch(apiBaseURL+'items/' + id, {'done':doneValue, 'done_date':done_date})
-			.then(function(response){
-				dispatch('stopPatching');
-			});
+			dispatch('queueItemPatch', {id, done, done_date});
 		},
-		deleteItemApi ({rootState, dispatch},
+		deleteItemApi ({rootState, dispatch, state},
 			{idOrArray} = {})
 		{
 			if (!rootState.user.user) { console.log('not Logged in'); return; }
 			dispatch('startPatching');
-			if (Array.isArray(idOrArray) && idOrArray.length) {
-				let array = idOrArray; // It's an array!
-				array.forEach(id => { dispatch('deleteItemApi', { idOrArray:id }); });
-			} else {
-				let id = idOrArray; // It's an ID!
-				if (id.toString().includes('tempItem')) { return; console.log('not patching temp items...'); }
-				if (!id){ return; }
-				let item = rootState.nodes[id];
-				axios.delete(apiBaseURL+'items/' + id)
+			if (!Array.isArray(idOrArray)) {
+				idOrArray = [idOrArray];
+			}
+			let array = idOrArray.filter(id => !id.toString().includes('tempItem'));
+			if (!array.length){ return }
+			
+			array.forEach(id => state.syncStack.deleteItems.push(id));
+			if (window.bulkDeleteQueue){ clearTimeout(window.bulkDeleteQueue) }
+		    window.bulkDeleteQueue = setTimeout(function(){
+		    	console.log('dispatching bulkSendPatches');
+				axios.patch(apiBaseURL+'items/bulkDestroy', state.syncStack.deleteItems)
 				.then(function(response){
-					console.log(`deleted: ${id}[${item.body}]`);
+					console.log(`deleted: ${array.toString()}`);
 					dispatch('stopPatching');
 				});
-			}
+		    	state.syncStack.deleteItems = [];
+		    }.bind(dispatch), 750);
 		},
 		fetchAllTags ({rootState, dispatch, getters, commit})
 		{
@@ -414,6 +428,7 @@ export default {
 				Toast.create(errMsg);
 			});
 		},
+		// UNUSED:
 		patchRootChildrenOrderWithFilter ({rootState, dispatch},
 			{id} = {})
 		{

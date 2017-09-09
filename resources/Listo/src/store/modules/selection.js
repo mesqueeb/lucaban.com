@@ -128,12 +128,12 @@ export default {
 	},
 	getters:
 	{
-		nothingSelected: (state, getters) => {
-			return getters.noTagsSelected
-				&& getters.noFiltersSelected
-				&& !(state.hiddenItems.length)
-				&& !(state.hiddenBookmarks.length);
-		},
+		// nothingSelected: (state, getters) => {
+		// 	return getters.noTagsSelected
+		// 		&& getters.noFiltersSelected
+		// 		&& !(state.hiddenItems.length)
+		// 		&& !(state.hiddenBookmarks.length);
+		// },
 		noFilterOrTag: (state, getters) => {
 			return getters.noTagsSelected
 				&& getters.noFiltersSelected;

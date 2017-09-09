@@ -16,7 +16,7 @@
 		@keydown.up="dispatch('focusElement',{ el:`#card-${get.editingOrAddingId} .js-edit-body` })"
 		@keydown.down="dispatch('focusElement',{ el:`#card-${get.editingOrAddingId} .js-add-tag` })"
 	>{{ dur }} {{ (mobileSmall) ? text.global.m : text.global.min }}</button>
-	<div>
+	<div class="c-update-planned-time__inputClear">
 		<input
 			class="c-update-planned-time__input" 
 			v-show="true"
@@ -28,6 +28,20 @@
 			@keydown.down.prevent="dispatch('focusElement',{ el:`#card-${get.editingOrAddingId} .js-add-tag` })"
 			type="number"
 		/>{{ text.global.min }}
+		<button
+			class="o-btn c-update-planned-time__clear"
+			v-if="item.planned_time && item.planned_time != '0'"
+			@blur="dispatch('blurOnEditOrAdd')"
+			@click.prevent="setPlannedTime(item, $event, 0)"
+			@keydown.esc="dispatch('cancelEditOrAdd')"
+			@keydown.delete.prevent="setPlannedTime(item, $event, 0)"
+			@keydown.enter.prevent="setPlannedTime(item, $event, 0)"
+			@keydown.space.prevent="setPlannedTime(item, $event, 0)"
+			@keydown.up.prevent="dispatch('focusElement',{ el:`#card-${get.editingOrAddingId} .js-edit-body` })"
+			@keydown.down.prevent="dispatch('focusElement',{ el:`#card-${get.editingOrAddingId} .js-add-tag` })"
+		>
+			<q-icon name="ion-close-circled" />
+		</button>
 	</div>
 </div>
 </template>
@@ -56,7 +70,7 @@ export default {
 			event.preventDefault();
 			console.log(`launching setPlannedTime with ${newTime}`);
 
-			if (newTime)
+			if (newTime || newTime == 0)
 			{
 				this.item.planned_time = newTime;
 			}
@@ -101,6 +115,14 @@ export default {
     width: 2em;
     text-align: center;
     padding: 0;
+}
+.c-update-planned-time__clear{
+	color: $dark-gray;
+	padding: 0.4em;
+}
+.c-update-planned-time__inputClear{
+	display: flex;
+	align-items: center;
 }
 .c-update-planned-time__label:after {
     content: 'min';

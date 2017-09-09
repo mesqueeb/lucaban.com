@@ -12,6 +12,7 @@
 		@keydown.delete.prevent="deleteTag(item.id, tag, $event)"
 		@keydown.enter.prevent="deleteTag(item.id, tag, $event)"
 		@keydown.space.prevent="deleteTag(item.id, tag, $event)"
+		@keydown.esc.prevent="dispatch('cancelEditOrAdd')"
 		@keydown.tab="tab(index, $event)"
 	>
 		<q-icon name="ion-close-circled" />

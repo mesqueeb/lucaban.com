@@ -1,16 +1,16 @@
 webpackJsonp([5],{
 
-/***/ 374:
+/***/ 376:
 /***/ (function(module, exports, __webpack_require__) {
 
 function injectStyle (ssrContext) {
-  __webpack_require__(408)
+  __webpack_require__(410)
 }
 var Component = __webpack_require__(118)(
   /* script */
-  __webpack_require__(410),
+  __webpack_require__(412),
   /* template */
-  __webpack_require__(411),
+  __webpack_require__(413),
   /* styles */
   injectStyle,
   /* scopeId */
@@ -24,24 +24,24 @@ module.exports = Component.exports
 
 /***/ }),
 
-/***/ 408:
+/***/ 410:
 /***/ (function(module, exports, __webpack_require__) {
 
 // style-loader: Adds some css to the DOM by adding a <style> tag
 
 // load the styles
-var content = __webpack_require__(409);
+var content = __webpack_require__(411);
 if(typeof content === 'string') content = [[module.i, content, '']];
 if(content.locals) module.exports = content.locals;
 // add the styles to the DOM
-var update = __webpack_require__(372)("0edaaa1e", content, true);
+var update = __webpack_require__(374)("0edaaa1e", content, true);
 
 /***/ }),
 
-/***/ 409:
+/***/ 411:
 /***/ (function(module, exports, __webpack_require__) {
 
-exports = module.exports = __webpack_require__(371)(undefined);
+exports = module.exports = __webpack_require__(373)(undefined);
 // imports
 
 
@@ -53,7 +53,7 @@ exports.push([module.i, ".logo-container{width:255px;height:242px;-webkit-perspe
 
 /***/ }),
 
-/***/ 410:
+/***/ 412:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -188,7 +188,7 @@ function getRotationFromAccel(accelX, accelY, accelZ) {
 
 /***/ }),
 
-/***/ 411:
+/***/ 413:
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
@@ -293,14 +293,14 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     style: (_vm.position)
   }, [_c('img', {
     attrs: {
-      "src": __webpack_require__(412)
+      "src": __webpack_require__(414)
     }
   })])])], 1)
 },staticRenderFns: []}
 
 /***/ }),
 
-/***/ 412:
+/***/ 414:
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = __webpack_require__.p + "img/quasar-logo-full.c3e8865.svg";

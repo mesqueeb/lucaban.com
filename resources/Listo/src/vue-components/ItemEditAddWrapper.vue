@@ -85,15 +85,9 @@ export default {
 		},
 		style()
 		{
-			if (!this.get['selection/noFilterOrTag']){ return '' }
-			let d = this.item.depth;
-			let x = 1;
-				x = (d > 1) ? 1.50 * d : x;
-				x = (d > 3) ? 1.60 * d : x;
-				x = (d > 5) ? 1.64 * d : x;
-				x = (d > 6) ? 1.68 * d : x;
-				x = (this.state.selection.view == 'journal') ? 1.9 : x;
-			let s = `width: 100vw !important;
+			let d = itemGetters[this.item.id].relativeDepth;
+			let x = (d) ? d*1.8 : 0;
+			let s = `width: calc(100vw - 2rem) !important;
 					 margin-left: -${x}rem !important;`
 			return (this.get.mobile) ? s : '';
 		},

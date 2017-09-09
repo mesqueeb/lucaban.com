@@ -213,7 +213,7 @@ addItem ({state, commit, dispatch, getters},
 	    } else {
 		    dispatch('showAddNewItem', { id:item.id, addAs:addNextItemAs });
 	    }
-	    if (state.selection.selectedId && state.selection.selectedId.includes('tempItem'))
+	    if (state.selection.selectedId && typeof state.selection.selectedId == 'string' && state.selection.selectedId.includes('tempItem'))
 	    {
 	    	state.selection.selectedId = item.id;
 	    }
@@ -393,7 +393,7 @@ tagItem ({state, commit, dispatch, getters},
 	if (item.children.length)
 	{
 		item.children_order.forEach(function(childId){
-			dispatch('tagItem', { id:childId, tags:tags });
+			dispatch('tagItem', { id:childId, tags, requestType });
 		});
 	}
 	let t1 = performance.now( );
@@ -407,19 +407,23 @@ tagItemTemporarely ({state, commit, dispatch, getters},
 	if (!Array.isArray(tags)){
 		tags = [tags];
 	}
-	tags = tags.map(tag => makeTagObject(tag));
+	let tagObjs = tags.map(tag => makeTagObject(tag));
 	if (requestType == 'untag')
 	{
-		commit('deleteTag', {id, tags});
-	} else {
-		commit('addTagTemporarely', {id, tags});
-	}
-	tags.forEach((tag) => {
-		if (!state.allTags.find(t => t.tag == tag.tag_slug))
+		commit('deleteTag', {id, tagObjs});
+		if (state.selection.tags.some(tSlug => tagObjs.filter(tObj => tObj.tag_slug == tSlug).length))
 		{
-			state.allTags.push(tag.tag)
+			dispatch('doneEdit');
 		}
-	});
+	} else {
+		commit('addTagTemporarely', {id, tagObjs});
+	}
+	// tags.forEach((tag) => {
+	// 	if (!state.allTags.find(t => t.slug == tag.tag_slug))
+	// 	{
+	// 		state.allTags.push(tag.tag)
+	// 	}
+	// });
 	let t1a = performance.now( );
 	console.log("			Call to dispatch tagItemTemporarely took " + (t1a - t0a) + " milliseconds.")
 },

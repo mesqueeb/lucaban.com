@@ -1,5 +1,5 @@
 export default {
-    logEvent(category, action, label, sessionId = null) {
+    logEvent(category, action, label, sessionId = 0) {
         dataLayer.push({
             'appEventCategory': category,
             'appEventAction': action,
@@ -8,7 +8,7 @@ export default {
         });
         dataLayer.push({ 'event': 'appEvent' });
     },
-    logPage(path, name, userId = null) {
+    logPage(path, name, sessionId = 0) {
         dataLayer.push({
             'screenPath': path,
             'screenName': name,

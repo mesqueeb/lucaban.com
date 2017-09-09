@@ -12,9 +12,14 @@ use Illuminate\Http\Request;
 |
 */
 
-Route::get('items/fetchdone','CardController@getDone');
-Route::post('itemtags/fetchTagged','ItemTagController@fetchTagged');
-Route::resource('items','CardController');
-Route::resource('itemtags','ItemTagController');
 Route::get('user','AuthenticateController@getAuthenticatedUser');
+
+Route::patch('items/bulkPatch','CardController@bulk_patch_items');
+Route::patch('items/bulkDestroy','CardController@bulk_destroy');
+Route::get('items/fetchdone','CardController@getDone');
+Route::resource('items','CardController');
+
+Route::post('itemtags/fetchTagged','ItemTagController@fetchTagged');
+Route::patch('itemtags/bulkTag','ItemTagController@bulk_tag');
 Route::get('allTags','ItemTagController@index');
+Route::resource('itemtags','ItemTagController');

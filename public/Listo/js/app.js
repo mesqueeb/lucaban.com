@@ -1,270 +1,6 @@
 webpackJsonp([8],{
 
-/***/ 119:
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* unused harmony export min_to_hours */
-/* unused harmony export countdown */
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return sec_to_hhmmss; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "d", function() { return sec_to_hourminsec; });
-/* unused harmony export hourmin */
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "c", function() { return sec_to_hourmin; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return customCalendar; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_date_fns_esm__ = __webpack_require__(21);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__store_lang_js__ = __webpack_require__(86);
-
-
-
-var text = window.store ? store.getters.text : __WEBPACK_IMPORTED_MODULE_1__store_lang_js__["a" /* default */].en;
-
-function min_to_hours(val) {
-	var nr = val / 60;
-	if (val == 10) {
-		nr = nr.toFixed(2);
-	}
-	return nr;
-}
-function countdown(val) {
-	var item = allItems.nodes[val];
-	var p = item.planned_time;
-	var u = item.used_time;
-	var time = parseFloat(p) * 60 - parseFloat(u);
-	return calc_hhmmss(time);
-}
-function sec_to_hhmmss(val) {
-	return calc_hhmmss(val);
-}
-function calc_hhmmss(val) {
-	function pad(num) {
-		return ("0" + num).slice(-2);
-	}
-	var secs = void 0;
-	var minutes = Math.floor(val / 60);
-	secs = val % 60;
-	var hours = Math.floor(minutes / 60);
-	minutes = minutes % 60;
-	if (hours > 0) {
-		return pad(hours) + ":" + pad(minutes) + ":" + pad(secs);
-	} else {
-		return pad(minutes) + ":" + pad(secs);
-	}
-}
-function sec_to_hourminsec(val) {
-	function pad(num, unit) {
-		if (num > 0) {
-			return num + " " + unit;
-		}return '';
-	}
-	var secs = void 0;
-	var minutes = Math.floor(val / 60);
-	secs = val % 60;
-	var hours = Math.floor(minutes / 60);
-	minutes = minutes % 60;
-	if (hours > 0) {
-		return pad(hours, text.global.hour + ' ') + pad(minutes, text.global.min);
-	} else if (minutes > 0) {
-		return pad(minutes, text.global.min + ' ') + pad(secs, text.global.sec);
-	} else {
-		return pad(secs, text.global.sec);
-	}
-}
-function hourmin(val) {
-	function pad(num, unit) {
-		if (num > 0) {
-			return num + " " + unit;
-		}return '';
-	}
-	var minutes = val % 60;
-	var hours = Math.floor(val / 60);
-	if (hours > 0) {
-		return pad(hours, text.global.hour + ' ') + pad(minutes, text.global.min);
-	} else {
-		return pad(minutes, text.global.min);
-	}
-}
-function sec_to_hourmin(val) {
-	function pad(num, unit) {
-		if (num > 0) {
-			return num + " " + unit;
-		}return '';
-	}
-	var secs = void 0;
-	var minutes = Math.floor(val / 60);
-	secs = val % 60;
-	var hours = Math.floor(minutes / 60);
-	minutes = minutes % 60;
-	if (hours > 0) {
-		return pad(hours, text.global.hour + ' ') + pad(minutes, text.global.min);
-	} else {
-		return pad(minutes, text.global.min);
-	}
-}
-function customCalendar(val) {
-	val = new Date(val.replace(/-/g, "/"));
-	var relativeTime = Object(__WEBPACK_IMPORTED_MODULE_0_date_fns_esm__["c" /* formatRelative */])(val, new Date(), { addSuffix: true });
-	if (relativeTime.includes('at')) {
-		relativeTime = relativeTime.substring(0, relativeTime.indexOf(' at'));
-	}
-	return relativeTime;
-}
-
-
-
-
-/***/ }),
-
-/***/ 122:
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-
-/* harmony default export */ __webpack_exports__["a"] = ({
-	dateFormat: 'Y-m-d H:i:S',
-	maxDate: 'today',
-
-	time_24hr: true,
-	onOpen: function onOpen(dateObj, dateStr, instance) {
-		var id = instance.element.name;
-		if (!store.state.beforeEditCache_doneDate) {
-			store.state.beforeEditCache_doneDate = {};
-		}
-		console.log('flatPickr[onOpen] id: ' + id + '.    dateStr: ' + dateStr);
-		store.state.beforeEditCache_doneDate[id] = dateStr;
-	},
-	onClose: function onClose(dateObj, dateStr, instance) {
-		var id = instance.element.name;
-		console.log('flatPickr[onClose] id: ' + id + '.    dateStr: ' + dateStr);
-		console.log('store.state.beforeEditCache_doneDate[id] = ' + store.state.beforeEditCache_doneDate[id]);
-		if (store.state.beforeEditCache_doneDate[id] == dateStr) {
-			return;
-		}
-		store.dispatch('patch', { id: id, field: 'done_date', value: dateStr });
-		delete store.state.beforeEditCache_doneDate[id];
-	}
-});
-
-/***/ }),
-
-/***/ 124:
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_babel_runtime_core_js_object_keys__ = __webpack_require__(3);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_babel_runtime_core_js_object_keys___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_babel_runtime_core_js_object_keys__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__helpers_globalFunctions_js__ = __webpack_require__(15);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_axios__ = __webpack_require__(79);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_axios___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_axios__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_vue__ = __webpack_require__(54);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_quasar__ = __webpack_require__(20);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5_quasar_extras_material_icons__ = __webpack_require__(210);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5_quasar_extras_material_icons___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_5_quasar_extras_material_icons__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6_quasar_extras_ionicons__ = __webpack_require__(212);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6_quasar_extras_ionicons___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_6_quasar_extras_ionicons__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7_vuex__ = __webpack_require__(214);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__store_store_js__ = __webpack_require__(215);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__store_ItemComputedProperties_js__ = __webpack_require__(32);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10_vuelidate__ = __webpack_require__(344);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10_vuelidate___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_10_vuelidate__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_11__router_js__ = __webpack_require__(346);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_12__config_WindowKeyBindings_js__ = __webpack_require__(356);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_13__config_Directives_js__ = __webpack_require__(362);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_14_vue_clipboard2__ = __webpack_require__(365);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_14_vue_clipboard2___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_14_vue_clipboard2__);
-
-
-__webpack_require__(133);
-
-
-
-window.Element.prototype.hasClass = function (config) {
-    return Object(__WEBPACK_IMPORTED_MODULE_1__helpers_globalFunctions_js__["d" /* hasClass */])(this, config);
-};
-window.Element.prototype.addClass = function (config) {
-    return Object(__WEBPACK_IMPORTED_MODULE_1__helpers_globalFunctions_js__["b" /* addClass */])(this, config);
-};
-window.Element.prototype.removeClass = function (config) {
-    return Object(__WEBPACK_IMPORTED_MODULE_1__helpers_globalFunctions_js__["f" /* removeClass */])(this, config);
-};
-
-
-window.axios = __WEBPACK_IMPORTED_MODULE_2_axios___default.a;
-
-
-window.Vue = __WEBPACK_IMPORTED_MODULE_3_vue__["a" /* default */];
-__WEBPACK_IMPORTED_MODULE_3_vue__["a" /* default */].config.productionTip = false;
-
-
-
-
-__WEBPACK_IMPORTED_MODULE_3_vue__["a" /* default */].use(__WEBPACK_IMPORTED_MODULE_4_quasar__["t" /* default */], {
-    components: {
-        QBtn: __WEBPACK_IMPORTED_MODULE_4_quasar__["b" /* QBtn */], QIcon: __WEBPACK_IMPORTED_MODULE_4_quasar__["d" /* QIcon */], QPopover: __WEBPACK_IMPORTED_MODULE_4_quasar__["l" /* QPopover */], QModal: __WEBPACK_IMPORTED_MODULE_4_quasar__["k" /* QModal */], QSpinnerOval: __WEBPACK_IMPORTED_MODULE_4_quasar__["n" /* QSpinnerOval */], QLayout: __WEBPACK_IMPORTED_MODULE_4_quasar__["h" /* QLayout */], QFixedPosition: __WEBPACK_IMPORTED_MODULE_4_quasar__["c" /* QFixedPosition */], QProgress: __WEBPACK_IMPORTED_MODULE_4_quasar__["m" /* QProgress */], Toast: __WEBPACK_IMPORTED_MODULE_4_quasar__["q" /* Toast */]
-    }
-});
-__WEBPACK_IMPORTED_MODULE_4_quasar__["q" /* Toast */].setDefaults({
-    timeout: 3000
-});
-
-
-__WEBPACK_IMPORTED_MODULE_3_vue__["a" /* default */].use(__WEBPACK_IMPORTED_MODULE_7_vuex__["a" /* default */]);
-
-window.store = new __WEBPACK_IMPORTED_MODULE_7_vuex__["a" /* default */].Store(Object(__WEBPACK_IMPORTED_MODULE_8__store_store_js__["a" /* default */])());
-
-
-
-window.itemGetters = {};
-__WEBPACK_IMPORTED_MODULE_0_babel_runtime_core_js_object_keys___default()(store.state.nodes).forEach(function (id) {
-    itemGetters[id] = new __WEBPACK_IMPORTED_MODULE_3_vue__["a" /* default */]({
-        store: store,
-        data: {
-            item: store.state.nodes[id]
-        },
-        computed: __WEBPACK_IMPORTED_MODULE_9__store_ItemComputedProperties_js__["a" /* default */]
-    });
-});
-
-
-__WEBPACK_IMPORTED_MODULE_3_vue__["a" /* default */].use(__WEBPACK_IMPORTED_MODULE_10_vuelidate___default.a);
-
-
-window.router = __WEBPACK_IMPORTED_MODULE_11__router_js__["a" /* default */];
-
-
-new __WEBPACK_IMPORTED_MODULE_12__config_WindowKeyBindings_js__["a" /* default */]();
-
-
-__WEBPACK_IMPORTED_MODULE_3_vue__["a" /* default */].use(__WEBPACK_IMPORTED_MODULE_13__config_Directives_js__["a" /* default */]);
-
-
-__WEBPACK_IMPORTED_MODULE_3_vue__["a" /* default */].use(__WEBPACK_IMPORTED_MODULE_14_vue_clipboard2___default.a);
-
-window.vm = new __WEBPACK_IMPORTED_MODULE_3_vue__["a" /* default */]({
-    el: '#q-app',
-    router: __WEBPACK_IMPORTED_MODULE_11__router_js__["a" /* default */],
-    store: store,
-    render: function render(h) {
-        return h(__webpack_require__(366));
-    }
-});
-
-__WEBPACK_IMPORTED_MODULE_11__router_js__["a" /* default */].afterEach(function (to, from) {
-    ga.logPage(to.path, to.name, sessionId);
-});
-
-__webpack_require__(370);
-
-/***/ }),
-
-/***/ 133:
-/***/ (function(module, exports) {
-
-// removed by extract-text-webpack-plugin
-
-/***/ }),
-
-/***/ 15:
+/***/ 10:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -293,7 +29,7 @@ __webpack_require__(370);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_babel_runtime_core_js_array_from___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_babel_runtime_core_js_array_from__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_babel_runtime_core_js_json_stringify__ = __webpack_require__(26);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_babel_runtime_core_js_json_stringify___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_3_babel_runtime_core_js_json_stringify__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_babel_runtime_core_js_object_keys__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_babel_runtime_core_js_object_keys__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_babel_runtime_core_js_object_keys___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_4_babel_runtime_core_js_object_keys__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_5_date_fns_format__ = __webpack_require__(169);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_5_date_fns_format___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_5_date_fns_format__);
@@ -513,6 +249,275 @@ var Utilities = {
 };
 
 
+
+/***/ }),
+
+/***/ 119:
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* unused harmony export min_to_hours */
+/* unused harmony export countdown */
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return sec_to_hhmmss; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "d", function() { return sec_to_hourminsec; });
+/* unused harmony export hourmin */
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "c", function() { return sec_to_hourmin; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return customCalendar; });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_date_fns_esm__ = __webpack_require__(21);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__store_lang_js__ = __webpack_require__(86);
+
+
+
+var text = window.store ? store.getters.text : __WEBPACK_IMPORTED_MODULE_1__store_lang_js__["a" /* default */].en;
+
+function min_to_hours(val) {
+	var nr = val / 60;
+	if (val == 10) {
+		nr = nr.toFixed(2);
+	}
+	return nr;
+}
+function countdown(val) {
+	var item = allItems.nodes[val];
+	var p = item.planned_time;
+	var u = item.used_time;
+	var time = parseFloat(p) * 60 - parseFloat(u);
+	return calc_hhmmss(time);
+}
+function sec_to_hhmmss(val) {
+	return calc_hhmmss(val);
+}
+function calc_hhmmss(val) {
+	function pad(num) {
+		return ("0" + num).slice(-2);
+	}
+	var secs = void 0;
+	var minutes = Math.floor(val / 60);
+	secs = val % 60;
+	var hours = Math.floor(minutes / 60);
+	minutes = minutes % 60;
+	if (hours > 0) {
+		return pad(hours) + ":" + pad(minutes) + ":" + pad(secs);
+	} else {
+		return pad(minutes) + ":" + pad(secs);
+	}
+}
+function sec_to_hourminsec(val) {
+	function pad(num, unit) {
+		if (num > 0) {
+			return num + " " + unit;
+		}return '';
+	}
+	var secs = void 0;
+	var minutes = Math.floor(val / 60);
+	secs = val % 60;
+	var hours = Math.floor(minutes / 60);
+	minutes = minutes % 60;
+	if (hours > 0) {
+		return pad(hours, text.global.hour + ' ') + pad(minutes, text.global.min);
+	} else if (minutes > 0) {
+		return pad(minutes, text.global.min + ' ') + pad(secs, text.global.sec);
+	} else {
+		return pad(secs, text.global.sec);
+	}
+}
+function hourmin(val) {
+	function pad(num, unit) {
+		if (num > 0) {
+			return num + " " + unit;
+		}return '';
+	}
+	var minutes = val % 60;
+	var hours = Math.floor(val / 60);
+	if (hours > 0) {
+		return pad(hours, text.global.hour + ' ') + pad(minutes, text.global.min);
+	} else {
+		return pad(minutes, text.global.min);
+	}
+}
+function sec_to_hourmin(val) {
+	function pad(num, unit) {
+		if (num > 0) {
+			return num + " " + unit;
+		}return '';
+	}
+	var secs = void 0;
+	var minutes = Math.floor(val / 60);
+	secs = val % 60;
+	var hours = Math.floor(minutes / 60);
+	minutes = minutes % 60;
+	if (hours > 0) {
+		return pad(hours, text.global.hour + ' ') + pad(minutes, text.global.min);
+	} else {
+		return pad(minutes, text.global.min);
+	}
+}
+function customCalendar(val) {
+	val = new Date(val.replace(/-/g, "/"));
+	var relativeTime = Object(__WEBPACK_IMPORTED_MODULE_0_date_fns_esm__["c" /* formatRelative */])(val, new Date(), { addSuffix: true });
+	if (relativeTime.includes('at')) {
+		relativeTime = relativeTime.substring(0, relativeTime.indexOf(' at'));
+	}
+	return relativeTime;
+}
+
+
+
+
+/***/ }),
+
+/***/ 122:
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+
+/* harmony default export */ __webpack_exports__["a"] = ({
+	dateFormat: 'Y-m-d H:i:S',
+	maxDate: 'today',
+
+	time_24hr: true,
+	onOpen: function onOpen(dateObj, dateStr, instance) {
+		var id = instance.element.name;
+		if (!store.state.beforeEditCache_doneDate) {
+			store.state.beforeEditCache_doneDate = {};
+		}
+		console.log('flatPickr[onOpen] id: ' + id + '.    dateStr: ' + dateStr);
+		store.state.beforeEditCache_doneDate[id] = dateStr;
+	},
+	onClose: function onClose(dateObj, dateStr, instance) {
+		var id = instance.element.name;
+		console.log('flatPickr[onClose] id: ' + id + '.    dateStr: ' + dateStr);
+		console.log('store.state.beforeEditCache_doneDate[id] = ' + store.state.beforeEditCache_doneDate[id]);
+		if (store.state.beforeEditCache_doneDate[id] == dateStr) {
+			return;
+		}
+		store.dispatch('patch', { id: id, field: 'done_date', value: dateStr });
+		delete store.state.beforeEditCache_doneDate[id];
+	}
+});
+
+/***/ }),
+
+/***/ 124:
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_babel_runtime_core_js_object_keys__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_babel_runtime_core_js_object_keys___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_babel_runtime_core_js_object_keys__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__helpers_globalFunctions_js__ = __webpack_require__(10);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_axios__ = __webpack_require__(79);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_axios___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_axios__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_vue__ = __webpack_require__(54);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_quasar__ = __webpack_require__(20);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5_quasar_extras_material_icons__ = __webpack_require__(210);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5_quasar_extras_material_icons___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_5_quasar_extras_material_icons__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6_quasar_extras_ionicons__ = __webpack_require__(212);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6_quasar_extras_ionicons___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_6_quasar_extras_ionicons__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7_vuex__ = __webpack_require__(214);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__store_store_js__ = __webpack_require__(215);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__store_ItemComputedProperties_js__ = __webpack_require__(32);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__store_itemsByTag_js__ = __webpack_require__(344);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_11_vuelidate__ = __webpack_require__(345);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_11_vuelidate___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_11_vuelidate__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_12__router_js__ = __webpack_require__(347);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_13__config_WindowKeyBindings_js__ = __webpack_require__(357);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_14__config_Directives_js__ = __webpack_require__(363);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_15_vue_clipboard2__ = __webpack_require__(366);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_15_vue_clipboard2___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_15_vue_clipboard2__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_16__config_analytics_js__ = __webpack_require__(371);
+
+
+__webpack_require__(133);
+
+
+
+window.Element.prototype.hasClass = function (config) {
+    return Object(__WEBPACK_IMPORTED_MODULE_1__helpers_globalFunctions_js__["d" /* hasClass */])(this, config);
+};
+window.Element.prototype.addClass = function (config) {
+    return Object(__WEBPACK_IMPORTED_MODULE_1__helpers_globalFunctions_js__["b" /* addClass */])(this, config);
+};
+window.Element.prototype.removeClass = function (config) {
+    return Object(__WEBPACK_IMPORTED_MODULE_1__helpers_globalFunctions_js__["f" /* removeClass */])(this, config);
+};
+
+
+window.axios = __WEBPACK_IMPORTED_MODULE_2_axios___default.a;
+
+
+window.Vue = __WEBPACK_IMPORTED_MODULE_3_vue__["a" /* default */];
+__WEBPACK_IMPORTED_MODULE_3_vue__["a" /* default */].config.productionTip = false;
+
+
+
+
+__WEBPACK_IMPORTED_MODULE_3_vue__["a" /* default */].use(__WEBPACK_IMPORTED_MODULE_4_quasar__["t" /* default */], {
+    components: {
+        QBtn: __WEBPACK_IMPORTED_MODULE_4_quasar__["b" /* QBtn */], QIcon: __WEBPACK_IMPORTED_MODULE_4_quasar__["d" /* QIcon */], QPopover: __WEBPACK_IMPORTED_MODULE_4_quasar__["l" /* QPopover */], QModal: __WEBPACK_IMPORTED_MODULE_4_quasar__["k" /* QModal */], QSpinnerOval: __WEBPACK_IMPORTED_MODULE_4_quasar__["n" /* QSpinnerOval */], QLayout: __WEBPACK_IMPORTED_MODULE_4_quasar__["h" /* QLayout */], QFixedPosition: __WEBPACK_IMPORTED_MODULE_4_quasar__["c" /* QFixedPosition */], QProgress: __WEBPACK_IMPORTED_MODULE_4_quasar__["m" /* QProgress */], Toast: __WEBPACK_IMPORTED_MODULE_4_quasar__["q" /* Toast */]
+    }
+});
+__WEBPACK_IMPORTED_MODULE_4_quasar__["q" /* Toast */].setDefaults({
+    timeout: 3000
+});
+
+
+__WEBPACK_IMPORTED_MODULE_3_vue__["a" /* default */].use(__WEBPACK_IMPORTED_MODULE_7_vuex__["a" /* default */]);
+
+window.store = new __WEBPACK_IMPORTED_MODULE_7_vuex__["a" /* default */].Store(Object(__WEBPACK_IMPORTED_MODULE_8__store_store_js__["a" /* default */])());
+
+
+window.itemGetters = {};
+__WEBPACK_IMPORTED_MODULE_0_babel_runtime_core_js_object_keys___default()(store.state.nodes).forEach(function (id) {
+    itemGetters[id] = new __WEBPACK_IMPORTED_MODULE_3_vue__["a" /* default */]({
+        store: store,
+        data: {
+            item: store.state.nodes[id]
+        },
+        computed: __WEBPACK_IMPORTED_MODULE_9__store_ItemComputedProperties_js__["a" /* default */]
+    });
+});
+
+
+window.itemsByTag = __WEBPACK_IMPORTED_MODULE_10__store_itemsByTag_js__["a" /* default */];
+
+
+__WEBPACK_IMPORTED_MODULE_3_vue__["a" /* default */].use(__WEBPACK_IMPORTED_MODULE_11_vuelidate___default.a);
+
+
+window.router = __WEBPACK_IMPORTED_MODULE_12__router_js__["a" /* default */];
+
+
+new __WEBPACK_IMPORTED_MODULE_13__config_WindowKeyBindings_js__["a" /* default */]();
+
+
+__WEBPACK_IMPORTED_MODULE_3_vue__["a" /* default */].use(__WEBPACK_IMPORTED_MODULE_14__config_Directives_js__["a" /* default */]);
+
+
+__WEBPACK_IMPORTED_MODULE_3_vue__["a" /* default */].use(__WEBPACK_IMPORTED_MODULE_15_vue_clipboard2___default.a);
+
+window.vm = new __WEBPACK_IMPORTED_MODULE_3_vue__["a" /* default */]({
+    el: '#q-app',
+    router: __WEBPACK_IMPORTED_MODULE_12__router_js__["a" /* default */],
+    store: store,
+    render: function render(h) {
+        return h(__webpack_require__(367));
+    }
+});
+
+
+__WEBPACK_IMPORTED_MODULE_12__router_js__["a" /* default */].afterEach(function (to, from) {
+    __WEBPACK_IMPORTED_MODULE_16__config_analytics_js__["a" /* default */].logPage(to.path, to.name, store.getters['user/id']);
+});
+
+__webpack_require__(372);
+
+/***/ }),
+
+/***/ 133:
+/***/ (function(module, exports) {
+
+// removed by extract-text-webpack-plugin
 
 /***/ }),
 
@@ -785,7 +790,7 @@ var Utilities = {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_date_fns_esm__ = __webpack_require__(21);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__helpers_globalFunctions_js__ = __webpack_require__(15);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__helpers_globalFunctions_js__ = __webpack_require__(10);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__helpers_clipboardFormat_js__ = __webpack_require__(62);
 
 
@@ -1103,7 +1108,7 @@ function flattenTree(array) {
 	isTopLvlItemInFilteredRoot: function isTopLvlItemInFilteredRoot() {
 		console.log('running isTopLvlItemInFilteredRoot...');
 		var id = this.item.id;
-		if (store.getters['selection/nothingSelected'] && store.state.selection.view == 'tree') {
+		if (store.getters['selection/noFilterOrTag'] && store.state.selection.view == 'tree') {
 			return false;
 		}
 		if (id == store.state.root.id) {
@@ -1112,7 +1117,7 @@ function flattenTree(array) {
 		return store.getters.filteredIdsTree.includes(id);
 	},
 	relativeDepth: function relativeDepth() {
-		if (this.item.isTopLvlItemInFilteredRoot) {
+		if (this.isTopLvlItemInFilteredRoot) {
 			return 0;
 		}
 		var item = this.item;
@@ -1264,11 +1269,11 @@ function flattenTree(array) {
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_babel_runtime_helpers_toConsumableArray__ = __webpack_require__(327);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_babel_runtime_helpers_toConsumableArray___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_babel_runtime_helpers_toConsumableArray__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_babel_runtime_core_js_object_keys__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_babel_runtime_core_js_object_keys__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_babel_runtime_core_js_object_keys___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_babel_runtime_core_js_object_keys__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_date_fns_esm__ = __webpack_require__(21);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_quasar__ = __webpack_require__(20);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__helpers_globalFunctions_js__ = __webpack_require__(15);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__helpers_globalFunctions_js__ = __webpack_require__(10);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__helpers_valueMorphers2_js__ = __webpack_require__(119);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__helpers_clipboardFormat_js__ = __webpack_require__(62);
 
@@ -1580,7 +1585,7 @@ function flattenTree(array) {
 		}
 
 		var items = tagFilters.map(function (tagSlug) {
-			return itemsByTag[tagSlug].tree;
+			return itemsByTag(tagSlug).tree;
 		});
 		items = items.reduce(function (items, array) {
 			return items.concat(array);
@@ -1599,19 +1604,19 @@ function flattenTree(array) {
 
 		var items = void 0;
 		if (tagFilters.length == 1) {
-			items = itemsByTag[tagFilters[0]].flat;
+			items = itemsByTag(tagFilters[0]).flat;
 		} else if (tagFilters.length > 1) {
 			var tagFiltersCounts = tagFilters.map(function (tagSlug) {
-				return itemsByTag[tagSlug].countFlat;
+				return itemsByTag(tagSlug).countFlat;
 			});
 			var smallestResult = Math.min.apply(Math, __WEBPACK_IMPORTED_MODULE_0_babel_runtime_helpers_toConsumableArray___default()(tagFiltersCounts));
 			var startTag = tagFilters.find(function (tagSlug) {
-				return itemsByTag[tagSlug].countFlat == smallestResult;
+				return itemsByTag(tagSlug).countFlat == smallestResult;
 			});
 			var remainingTags = tagFilters.filter(function (tagSlug) {
 				return tagSlug != startTag;
 			});
-			items = itemsByTag[startTag].flat;
+			items = itemsByTag(startTag).flat;
 			items = items.filter(function (item) {
 				return getters.hasAllTags(item.id, remainingTags);
 			});
@@ -1766,7 +1771,7 @@ function flattenTree(array) {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_babel_runtime_core_js_object_keys__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_babel_runtime_core_js_object_keys__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_babel_runtime_core_js_object_keys___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_babel_runtime_core_js_object_keys__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_babel_runtime_core_js_object_assign__ = __webpack_require__(16);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_babel_runtime_core_js_object_assign___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_babel_runtime_core_js_object_assign__);
@@ -1897,35 +1902,35 @@ function flattenTree(array) {
 	},
 	deleteTag: function deleteTag(state, _ref7) {
 		var id = _ref7.id,
-		    tags = _ref7.tags;
+		    tagObjs = _ref7.tagObjs;
 
 		if (!state.nodes[id]) {
 			console.log('trying to tag an unexisting item');
 			return;
 		}
-		tags.forEach(function (tag) {
+		tagObjs.forEach(function (tagObj) {
 			return state.nodes[id].tagged = state.nodes[id].tagged.filter(function (t) {
-				return t.tag_slug != tag.tag_slug;
+				return t.tag_slug != tagObj.tag_slug;
 			});
 		});
 	},
 	addTagTemporarely: function addTagTemporarely(state, _ref8) {
 		var id = _ref8.id,
-		    tags = _ref8.tags;
+		    tagObjs = _ref8.tagObjs;
 
 		var t0 = performance.now();
-		if (!Array.isArray(tags)) {
-			tags = [tags];
+		if (!Array.isArray(tagObjs)) {
+			tagObjs = [tagObjs];
 		}
 		if (!state.nodes[id]) {
 			console.log('trying to tag an unexisting item');
 			return;
 		}
-		console.log('tagging items tempor ' + id + ' with... "' + tags.map(function (t) {
+		console.log('tagging items tempor ' + id + ' with... "' + tagObjs.map(function (t) {
 			return t.tag_name;
 		}) + '"');
 
-		tags.forEach(function (tag) {
+		tagObjs.forEach(function (tag) {
 			return state.nodes[id].tagged.push(tag);
 		});
 		var t1 = performance.now();
@@ -1971,12 +1976,12 @@ function flattenTree(array) {
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_babel_runtime_core_js_number_is_nan__ = __webpack_require__(335);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_babel_runtime_core_js_number_is_nan___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_babel_runtime_core_js_number_is_nan__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_babel_runtime_core_js_object_keys__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_babel_runtime_core_js_object_keys__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_babel_runtime_core_js_object_keys___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_babel_runtime_core_js_object_keys__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_babel_runtime_core_js_json_stringify__ = __webpack_require__(26);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_babel_runtime_core_js_json_stringify___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_babel_runtime_core_js_json_stringify__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_date_fns_esm__ = __webpack_require__(21);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__helpers_globalFunctions_js__ = __webpack_require__(15);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__helpers_globalFunctions_js__ = __webpack_require__(10);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__setDefaultItemValues_js__ = __webpack_require__(35);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_6_quasar__ = __webpack_require__(20);
 
@@ -2161,7 +2166,7 @@ var addToDate = __WEBPACK_IMPORTED_MODULE_6_quasar__["s" /* date */].addToDate;
 			} else {
 				dispatch('showAddNewItem', { id: item.id, addAs: addNextItemAs });
 			}
-			if (state.selection.selectedId && state.selection.selectedId.includes('tempItem')) {
+			if (state.selection.selectedId && typeof state.selection.selectedId == 'string' && state.selection.selectedId.includes('tempItem')) {
 				state.selection.selectedId = item.id;
 			}
 			Vue.nextTick(function () {
@@ -2401,7 +2406,7 @@ var addToDate = __WEBPACK_IMPORTED_MODULE_6_quasar__["s" /* date */].addToDate;
 		}
 		if (item.children.length) {
 			item.children_order.forEach(function (childId) {
-				dispatch('tagItem', { id: childId, tags: tags });
+				dispatch('tagItem', { id: childId, tags: tags, requestType: requestType });
 			});
 		}
 		var t1 = performance.now();
@@ -2426,21 +2431,22 @@ var addToDate = __WEBPACK_IMPORTED_MODULE_6_quasar__["s" /* date */].addToDate;
 		if (!Array.isArray(tags)) {
 			tags = [tags];
 		}
-		tags = tags.map(function (tag) {
+		var tagObjs = tags.map(function (tag) {
 			return Object(__WEBPACK_IMPORTED_MODULE_4__helpers_globalFunctions_js__["e" /* makeTagObject */])(tag);
 		});
 		if (requestType == 'untag') {
-			commit('deleteTag', { id: id, tags: tags });
-		} else {
-			commit('addTagTemporarely', { id: id, tags: tags });
-		}
-		tags.forEach(function (tag) {
-			if (!state.allTags.find(function (t) {
-				return t.tag == tag.tag_slug;
+			commit('deleteTag', { id: id, tagObjs: tagObjs });
+			if (state.selection.tags.some(function (tSlug) {
+				return tagObjs.filter(function (tObj) {
+					return tObj.tag_slug == tSlug;
+				}).length;
 			})) {
-				state.allTags.push(tag.tag);
+				dispatch('doneEdit');
 			}
-		});
+		} else {
+			commit('addTagTemporarely', { id: id, tagObjs: tagObjs });
+		}
+
 		var t1a = performance.now();
 		console.log("			Call to dispatch tagItemTemporarely took " + (t1a - t0a) + " milliseconds.");
 	},
@@ -3369,7 +3375,7 @@ var addToDate = __WEBPACK_IMPORTED_MODULE_6_quasar__["s" /* date */].addToDate;
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_babel_runtime_core_js_object_keys__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_babel_runtime_core_js_object_keys__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_babel_runtime_core_js_object_keys___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_babel_runtime_core_js_object_keys__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_babel_runtime_core_js_object_assign__ = __webpack_require__(16);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_babel_runtime_core_js_object_assign___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_babel_runtime_core_js_object_assign__);
@@ -3402,6 +3408,9 @@ function initialState() {
 	getters: {
 		loggedIn: function loggedIn(state) {
 			return state.user ? true : false;
+		},
+		id: function id(state) {
+			return state.user ? state.user.id : 0;
 		}
 	}
 });
@@ -3412,7 +3421,7 @@ function initialState() {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_babel_runtime_core_js_object_keys__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_babel_runtime_core_js_object_keys__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_babel_runtime_core_js_object_keys___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_babel_runtime_core_js_object_keys__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_babel_runtime_core_js_object_assign__ = __webpack_require__(16);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_babel_runtime_core_js_object_assign___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_babel_runtime_core_js_object_assign__);
@@ -3459,11 +3468,11 @@ function initialState() {
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_babel_runtime_core_js_object_assign__ = __webpack_require__(16);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_babel_runtime_core_js_object_assign___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_babel_runtime_core_js_object_assign__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_babel_runtime_core_js_object_keys__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_babel_runtime_core_js_object_keys__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_babel_runtime_core_js_object_keys___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_babel_runtime_core_js_object_keys__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_babel_runtime_core_js_json_stringify__ = __webpack_require__(26);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_babel_runtime_core_js_json_stringify___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_babel_runtime_core_js_json_stringify__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__helpers_globalFunctions_js__ = __webpack_require__(15);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__helpers_globalFunctions_js__ = __webpack_require__(10);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__fetchedDataOrganizer_js__ = __webpack_require__(341);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_5_axios__ = __webpack_require__(79);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_5_axios___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_5_axios__);
@@ -3486,7 +3495,12 @@ var getDateDiff = __WEBPACK_IMPORTED_MODULE_8_quasar__["s" /* date */].getDateDi
 /* harmony default export */ __webpack_exports__["a"] = ({
 	state: {
 		token: null,
-		tokenTimeStamp: null
+		tokenTimeStamp: null,
+		syncStack: {
+			items: [],
+			deleteItems: [],
+			tags: []
+		}
 	},
 	mutations: {
 		destroyToken: function destroyToken(state) {
@@ -3587,7 +3601,8 @@ var getDateDiff = __WEBPACK_IMPORTED_MODULE_8_quasar__["s" /* date */].getDateDi
 			__WEBPACK_IMPORTED_MODULE_5_axios___default.a.post(apiBaseURL + 'register', credentials).then(function (_ref10) {
 				var data = _ref10.data;
 
-				commit('setToken', { token: data.token });
+				console.log(data);
+				commit('setToken', { token: data });
 				dispatch('fetchListo');
 				router.push('/');
 			}).catch(function (_ref11) {
@@ -3610,7 +3625,7 @@ var getDateDiff = __WEBPACK_IMPORTED_MODULE_8_quasar__["s" /* date */].getDateDi
 
 			commit('updateState', { loading: true });
 			dispatch('getUser');
-			dispatch('fetchAllTags');
+
 			console.log('start fetching all items');
 			console.log(__WEBPACK_IMPORTED_MODULE_5_axios___default.a.defaults.headers.common);
 
@@ -3667,25 +3682,35 @@ var getDateDiff = __WEBPACK_IMPORTED_MODULE_8_quasar__["s" /* date */].getDateDi
 				console.log('ERROR: ' + error.response);
 			});
 		},
-		patch: function patch(_ref18) {
-			var commit = _ref18.commit,
-			    dispatch = _ref18.dispatch,
-			    getters = _ref18.getters,
-			    rootState = _ref18.rootState,
-			    state = _ref18.state;
+		queueItemPatch: function queueItemPatch(_ref18) {
+			var state = _ref18.state,
+			    dispatch = _ref18.dispatch;
+			var payload = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
 
-			var _ref19 = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {},
-			    id = _ref19.id,
-			    field = _ref19.field,
-			    value = _ref19.value;
-
-			if (!rootState.user.user) {
-				console.log('not Logged in');return;
+			payload = Array.isArray(payload) ? payload : [payload];
+			if (!payload.length) {
+				return;
 			}
-			if (id.toString().includes('tempItem')) {
-				return;console.log('not patching temp items...');
+			payload.forEach(function (patchRequest) {
+				return state.syncStack.items.push(patchRequest);
+			});
+			console.log('pushed to syncStack! ' + state.syncStack.items.length);
+			if (window.bulkPatchQueue) {
+				clearTimeout(window.bulkPatchQueue);
 			}
+			window.bulkPatchQueue = setTimeout(function () {
+				console.log('dispatching bulkSendPatches');
+				dispatch('bulkSendPatches', state.syncStack.items);
+				state.syncStack.items = [];
+			}.bind(dispatch), 750);
+		},
+		bulkSendPatches: function bulkSendPatches(_ref19) {
+			var state = _ref19.state,
+			    dispatch = _ref19.dispatch,
+			    commit = _ref19.commit;
+			var payload = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
 
+			console.log('starting bulkSendPatches');
 			dispatch('startPatching');
 
 			var diff = getDateDiff(new Date(), state.tokenTimeStamp, 'minutes');
@@ -3720,17 +3745,11 @@ var getDateDiff = __WEBPACK_IMPORTED_MODULE_8_quasar__["s" /* date */].getDateDi
 				});
 				console.log('stop here');
 				return;
-				console.log('THIS SHOULD NOT SHOW');
 			}
 
-			var patchObj = {};
-			var patchVal = value ? value : rootState.nodes[id][field];
-			if (field == 'children_order') {
-				patchVal = Object(__WEBPACK_IMPORTED_MODULE_3__helpers_globalFunctions_js__["c" /* arrayToString */])(patchVal);
-			}
-			patchObj[field] = patchVal;
-			__WEBPACK_IMPORTED_MODULE_5_axios___default.a.patch(apiBaseURL + 'items/' + id, patchObj, { method: 'PATCH' }).then(function (response) {
-				console.log('patched ' + id + '[' + rootState.nodes[id].body + '].' + field + ' = ' + patchObj[field]);
+			console.log('patching the syncStack:');
+			console.log(state.syncStack.items);
+			__WEBPACK_IMPORTED_MODULE_5_axios___default.a.patch(apiBaseURL + 'items/bulkPatch', payload, { method: 'PATCH' }).then(function (response) {
 				dispatch('stopPatching');
 			}, function (response) {
 				commit('updateState', { patching: 'error' });
@@ -3739,14 +3758,40 @@ var getDateDiff = __WEBPACK_IMPORTED_MODULE_8_quasar__["s" /* date */].getDateDi
 				return;
 			});
 		},
-		patchTag: function patchTag(_ref21) {
-			var rootState = _ref21.rootState,
-			    dispatch = _ref21.dispatch;
+		patch: function patch(_ref21) {
+			var dispatch = _ref21.dispatch,
+			    getters = _ref21.getters,
+			    rootState = _ref21.rootState;
 
 			var _ref22 = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {},
 			    id = _ref22.id,
-			    tags = _ref22.tags,
-			    requestType = _ref22.requestType;
+			    field = _ref22.field,
+			    value = _ref22.value;
+
+			if (!rootState.user.user) {
+				console.log('not Logged in');return;
+			}
+			if (id.toString().includes('tempItem')) {
+				return;console.log('not patching temp items...');
+			}
+
+			var patchObj = {};
+			var patchVal = value ? value : rootState.nodes[id][field];
+			if (field == 'children_order') {
+				patchVal = Object(__WEBPACK_IMPORTED_MODULE_3__helpers_globalFunctions_js__["c" /* arrayToString */])(patchVal);
+			}
+			patchObj[field] = patchVal;
+			patchObj['id'] = id;
+			dispatch('queueItemPatch', patchObj);
+		},
+		patchTag: function patchTag(_ref23) {
+			var rootState = _ref23.rootState,
+			    dispatch = _ref23.dispatch;
+
+			var _ref24 = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {},
+			    id = _ref24.id,
+			    tags = _ref24.tags,
+			    requestType = _ref24.requestType;
 
 			if (!rootState.user.user) {
 				console.log('not Logged in');return;
@@ -3758,54 +3803,39 @@ var getDateDiff = __WEBPACK_IMPORTED_MODULE_8_quasar__["s" /* date */].getDateDi
 			var patchObj = {};
 			patchObj['tags'] = tags;
 			patchObj['type'] = requestType;
-
-			__WEBPACK_IMPORTED_MODULE_5_axios___default.a.patch(apiBaseURL + 'itemtags/' + id, patchObj, { method: 'PATCH' }).then(function (tagResponse) {
-				var syncedTags = tagResponse.data.tags;
-				console.log('tagged [' + rootState.nodes[id].body + '] with: ' + tagResponse.data.tags + ';');
-				console.log(tagResponse);
-
-				__WEBPACK_IMPORTED_MODULE_5_axios___default.a.get(apiBaseURL + 'itemtags/' + id, { type: 'tags' }).then(function (updatedTagList) {
-					rootState.nodes[id].tagged = updatedTagList.data;
-					console.log('updatedTagList of [' + rootState.nodes[id].body + '] with: ' + updatedTagList.data.map(function (t) {
-						return t.tag_name;
-					}) + ';');
-				});
-				dispatch('stopPatching');
-			});
+			patchObj['id'] = id;
+			dispatch('queueTagPatch', patchObj);
 		},
-		patchDueDate: function patchDueDate(_ref23) {
-			var dispatch = _ref23.dispatch,
-			    rootState = _ref23.rootState;
+		queueTagPatch: function queueTagPatch(_ref25) {
+			var state = _ref25.state,
+			    dispatch = _ref25.dispatch;
+			var payload = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
 
-			var _ref24 = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {},
-			    id = _ref24.id,
-			    duedate = _ref24.duedate;
-
-			if (!rootState.user.user) {
-				console.log('not Logged in');return;
-			}
-			if (id.toString().includes('tempItem')) {
-				return;console.log('not patching temp items...');
-			}
-			dispatch('startPatching');
-			if (duedate == '0000-00-00 00:00:00') {
-				__WEBPACK_IMPORTED_MODULE_5_axios___default.a.patch(apiBaseURL + 'items/' + id, { 'due_date': duedate }).then(function (response) {
-					dispatch('stopPatching');
-				});
+			payload = Array.isArray(payload) ? payload : [payload];
+			if (!payload.length) {
 				return;
 			}
-			duedate = new Date(duedate.replace(/-/g, "/"));
-			console.log('PatchDueDate: ' + duedate);
-			__WEBPACK_IMPORTED_MODULE_5_axios___default.a.patch(apiBaseURL + 'items/' + id, { 'due_date': duedate }).then(function (response) {
-				dispatch('stopPatching');
+			payload.forEach(function (patchRequest) {
+				return state.syncStack.tags.push(patchRequest);
 			});
+			if (window.bulkTagPatchQueue) {
+				clearTimeout(window.bulkTagPatchQueue);
+			}
+			window.bulkTagPatchQueue = setTimeout(function () {
+				__WEBPACK_IMPORTED_MODULE_5_axios___default.a.patch(apiBaseURL + 'itemtags/bulkTag', state.syncStack.tags).then(function (tagResponse) {
+					console.log(tagResponse);
+					dispatch('stopPatching');
+				});
+				state.syncStack.tags = [];
+			}.bind(dispatch), 750);
 		},
-		patchDone: function patchDone(_ref25) {
-			var rootState = _ref25.rootState,
-			    dispatch = _ref25.dispatch;
+		patchDueDate: function patchDueDate(_ref26) {
+			var dispatch = _ref26.dispatch,
+			    rootState = _ref26.rootState;
 
-			var _ref26 = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {},
-			    id = _ref26.id;
+			var _ref27 = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {},
+			    id = _ref27.id,
+			    duedate = _ref27.duedate;
 
 			if (!rootState.user.user) {
 				console.log('not Logged in');return;
@@ -3813,79 +3843,98 @@ var getDateDiff = __WEBPACK_IMPORTED_MODULE_8_quasar__["s" /* date */].getDateDi
 			if (id.toString().includes('tempItem')) {
 				return;console.log('not patching temp items...');
 			}
-			dispatch('startPatching');
+			duedate = duedate == '0000-00-00 00:00:00' ? '0000-00-00 00:00:00' : new Date(duedate.replace(/-/g, "/"));
+			dispatch('queueItemPatch', { id: id, due_date: duedate });
+		},
+		patchDone: function patchDone(_ref28) {
+			var rootState = _ref28.rootState,
+			    dispatch = _ref28.dispatch;
+
+			var _ref29 = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {},
+			    id = _ref29.id;
+
+			if (!rootState.user.user) {
+				console.log('not Logged in');return;
+			}
+			if (id.toString().includes('tempItem')) {
+				return;console.log('not patching temp items...');
+			}
 			var done_date = void 0;
-			var doneValue = rootState.nodes[id].done;
-			if (doneValue) {
+			var done = rootState.nodes[id].done;
+			if (done) {
 				done_date = new Date();
 			} else {
 				done_date = '0000-00-00 00:00:00';
 			}
-			__WEBPACK_IMPORTED_MODULE_5_axios___default.a.patch(apiBaseURL + 'items/' + id, { 'done': doneValue, 'done_date': done_date }).then(function (response) {
-				dispatch('stopPatching');
-			});
+			dispatch('queueItemPatch', { id: id, done: done, done_date: done_date });
 		},
-		deleteItemApi: function deleteItemApi(_ref27) {
-			var rootState = _ref27.rootState,
-			    dispatch = _ref27.dispatch;
+		deleteItemApi: function deleteItemApi(_ref30) {
+			var rootState = _ref30.rootState,
+			    dispatch = _ref30.dispatch,
+			    state = _ref30.state;
 
-			var _ref28 = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {},
-			    idOrArray = _ref28.idOrArray;
+			var _ref31 = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {},
+			    idOrArray = _ref31.idOrArray;
 
 			if (!rootState.user.user) {
 				console.log('not Logged in');return;
 			}
 			dispatch('startPatching');
-			if (Array.isArray(idOrArray) && idOrArray.length) {
-				var array = idOrArray;
-				array.forEach(function (id) {
-					dispatch('deleteItemApi', { idOrArray: id });
-				});
-			} else {
-				var id = idOrArray;
-				if (id.toString().includes('tempItem')) {
-					return;console.log('not patching temp items...');
-				}
-				if (!id) {
-					return;
-				}
-				var item = rootState.nodes[id];
-				__WEBPACK_IMPORTED_MODULE_5_axios___default.a.delete(apiBaseURL + 'items/' + id).then(function (response) {
-					console.log('deleted: ' + id + '[' + item.body + ']');
+			if (!Array.isArray(idOrArray)) {
+				idOrArray = [idOrArray];
+			}
+			var array = idOrArray.filter(function (id) {
+				return !id.toString().includes('tempItem');
+			});
+			if (!array.length) {
+				return;
+			}
+
+			array.forEach(function (id) {
+				return state.syncStack.deleteItems.push(id);
+			});
+			if (window.bulkDeleteQueue) {
+				clearTimeout(window.bulkDeleteQueue);
+			}
+			window.bulkDeleteQueue = setTimeout(function () {
+				console.log('dispatching bulkSendPatches');
+				__WEBPACK_IMPORTED_MODULE_5_axios___default.a.patch(apiBaseURL + 'items/bulkDestroy', state.syncStack.deleteItems).then(function (response) {
+					console.log('deleted: ' + array.toString());
 					dispatch('stopPatching');
 				});
-			}
+				state.syncStack.deleteItems = [];
+			}.bind(dispatch), 750);
 		},
-		fetchAllTags: function fetchAllTags(_ref29) {
-			var rootState = _ref29.rootState,
-			    dispatch = _ref29.dispatch,
-			    getters = _ref29.getters,
-			    commit = _ref29.commit;
+		fetchAllTags: function fetchAllTags(_ref32) {
+			var rootState = _ref32.rootState,
+			    dispatch = _ref32.dispatch,
+			    getters = _ref32.getters,
+			    commit = _ref32.commit;
 
 			rootState.patching = true;
-			__WEBPACK_IMPORTED_MODULE_5_axios___default.a.get(apiBaseURL + 'allTags').then(function (_ref30) {
-				var data = _ref30.data;
+			__WEBPACK_IMPORTED_MODULE_5_axios___default.a.get(apiBaseURL + 'allTags').then(function (_ref33) {
+				var data = _ref33.data;
 
 				commit('updateState', { allTags: data });
 				rootState.patching = false;
 			});
 		},
-		fetchDone: function fetchDone(_ref31) {
-			var rootState = _ref31.rootState,
-			    dispatch = _ref31.dispatch,
-			    getters = _ref31.getters,
-			    rootGetters = _ref31.rootGetters;
+		fetchDone: function fetchDone(_ref34) {
+			var rootState = _ref34.rootState,
+			    dispatch = _ref34.dispatch,
+			    getters = _ref34.getters,
+			    rootGetters = _ref34.rootGetters;
 
-			var _ref32 = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {},
-			    tags = _ref32.tags,
-			    operator = _ref32.operator;
+			var _ref35 = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {},
+			    tags = _ref35.tags,
+			    operator = _ref35.operator;
 
 			if (!rootState.user.user) {
 				console.log('not Logged in');return;
 			}
 			rootState.loading = true;
-			__WEBPACK_IMPORTED_MODULE_5_axios___default.a.get(apiBaseURL + 'items/fetchdone').then(function (_ref33) {
-				var data = _ref33.data;
+			__WEBPACK_IMPORTED_MODULE_5_axios___default.a.get(apiBaseURL + 'items/fetchdone').then(function (_ref36) {
+				var data = _ref36.data;
 
 				rootState.fetchedDone = true;
 				console.log('fetched Done');
@@ -3912,17 +3961,17 @@ var getDateDiff = __WEBPACK_IMPORTED_MODULE_8_quasar__["s" /* date */].getDateDi
 				rootState.loading = false;
 			});
 		},
-		postNewItem: function postNewItem(_ref34) {
-			var rootState = _ref34.rootState,
-			    dispatch = _ref34.dispatch,
-			    getters = _ref34.getters;
+		postNewItem: function postNewItem(_ref37) {
+			var rootState = _ref37.rootState,
+			    dispatch = _ref37.dispatch,
+			    getters = _ref37.getters;
 
-			var _ref35 = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {},
-			    newItem = _ref35.newItem,
-			    index = _ref35.index,
-			    addNextItemAs = _ref35.addNextItemAs,
-			    addTags = _ref35.addTags,
-			    duplication = _ref35.duplication;
+			var _ref38 = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {},
+			    newItem = _ref38.newItem,
+			    index = _ref38.index,
+			    addNextItemAs = _ref38.addNextItemAs,
+			    addTags = _ref38.addTags,
+			    duplication = _ref38.duplication;
 
 			console.log('posting newItem...');
 			console.log(newItem);
@@ -3950,12 +3999,12 @@ var getDateDiff = __WEBPACK_IMPORTED_MODULE_8_quasar__["s" /* date */].getDateDi
 				__WEBPACK_IMPORTED_MODULE_8_quasar__["q" /* Toast */].create(errMsg);
 			});
 		},
-		patchRootChildrenOrderWithFilter: function patchRootChildrenOrderWithFilter(_ref36) {
-			var rootState = _ref36.rootState,
-			    dispatch = _ref36.dispatch;
+		patchRootChildrenOrderWithFilter: function patchRootChildrenOrderWithFilter(_ref39) {
+			var rootState = _ref39.rootState,
+			    dispatch = _ref39.dispatch;
 
-			var _ref37 = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {},
-			    id = _ref37.id;
+			var _ref40 = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {},
+			    id = _ref40.id;
 
 			if (!rootState.user.user) {
 				console.log('not Logged in');return;
@@ -4036,7 +4085,7 @@ function organizeData(fetchedData) {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_babel_runtime_core_js_object_keys__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_babel_runtime_core_js_object_keys__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_babel_runtime_core_js_object_keys___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_babel_runtime_core_js_object_keys__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_babel_runtime_core_js_object_assign__ = __webpack_require__(16);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_babel_runtime_core_js_object_assign___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_babel_runtime_core_js_object_assign__);
@@ -4169,9 +4218,6 @@ function initialState() {
 		}
 	},
 	getters: {
-		nothingSelected: function nothingSelected(state, getters) {
-			return getters.noTagsSelected && getters.noFiltersSelected && !state.hiddenItems.length && !state.hiddenBookmarks.length;
-		},
 		noFilterOrTag: function noFilterOrTag(state, getters) {
 			return getters.noTagsSelected && getters.noFiltersSelected;
 		},
@@ -4335,11 +4381,11 @@ function initialState() {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_babel_runtime_core_js_object_keys__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_babel_runtime_core_js_object_keys__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_babel_runtime_core_js_object_keys___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_babel_runtime_core_js_object_keys__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_babel_runtime_core_js_object_assign__ = __webpack_require__(16);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_babel_runtime_core_js_object_assign___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_babel_runtime_core_js_object_assign__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__helpers_globalFunctions_js__ = __webpack_require__(15);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__helpers_globalFunctions_js__ = __webpack_require__(10);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__setDefaultItemValues_js__ = __webpack_require__(35);
 
 
@@ -4449,12 +4495,109 @@ var initialState = function initialState() {
 
 /***/ }),
 
-/***/ 346:
+/***/ 344:
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_babel_runtime_core_js_object_keys__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_babel_runtime_core_js_object_keys___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_babel_runtime_core_js_object_keys__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__helpers_globalFunctions_js__ = __webpack_require__(10);
+
+
+
+var tagSlugToName = __WEBPACK_IMPORTED_MODULE_1__helpers_globalFunctions_js__["a" /* Utilities */].tagSlugToName;
+
+
+var cachedItemsByTag = {};
+/* harmony default export */ __webpack_exports__["a"] = (function (tagSlug) {
+	if (cachedItemsByTag[tagSlug]) {
+		return cachedItemsByTag[tagSlug];
+	}
+	console.log('creating new Vue for itemsByTag ' + tagSlug + '!');
+	return cachedItemsByTag[tagSlug] = new Vue({
+		props: ['tag'],
+		data: function data() {
+			return {};
+		},
+
+		computed: {
+			get: function get() {
+				return store.getters;
+			},
+			state: function state() {
+				return store.state;
+			},
+			selection: function selection() {
+				return this.state.selection;
+			},
+			idsFlat: function idsFlat() {
+				var _this = this;
+
+				console.log('running itemsByTag(' + tagSlug + ').idsFlat');
+				return __WEBPACK_IMPORTED_MODULE_0_babel_runtime_core_js_object_keys___default()(this.state.nodes).map(function (k) {
+					return Number(k) ? Number(k) : k;
+				}).filter(function (id) {
+					return _this.state.nodes[id].tagged.filter(function (tagObject) {
+						return tagObject.tag_slug == tagSlug;
+					}).length;
+				});
+			},
+			countFlat: function countFlat() {
+				return this.idsFlat.length;
+			},
+			flat: function flat() {
+				var _this2 = this;
+
+				return this.idsFlat.map(function (id) {
+					return _this2.state.nodes[id];
+				});
+			},
+			idsTree: function idsTree() {
+				var _this3 = this;
+
+				console.log('running itemsByTag(' + tagSlug + ').idsTree');
+				return __WEBPACK_IMPORTED_MODULE_0_babel_runtime_core_js_object_keys___default()(this.state.nodes).map(function (k) {
+					return Number(k) ? Number(k) : k;
+				}).filter(function (id) {
+					return _this3.state.nodes[id].tagged.filter(function (tagObject) {
+						if (tagObject.tag_slug == tagSlug) {
+							return !_this3.get.hasParentWithTag(id, tagSlug);
+						}
+					}).length;
+				});
+			},
+			countTree: function countTree() {
+				return this.idsTree.length;
+			},
+			tree: function tree() {
+				var _this4 = this;
+
+				return this.idsTree.map(function (id) {
+					return _this4.state.nodes[id];
+				});
+			}
+		},
+		methods: {
+			commit: function commit(action, payload) {
+				store.commit(action, payload);
+			},
+			dispatch: function dispatch(action, payload) {
+				store.dispatch(action, payload);
+			},
+
+			tagSlugToName: tagSlugToName
+		}
+	});
+});
+
+/***/ }),
+
+/***/ 347:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_vue__ = __webpack_require__(54);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_vue_router__ = __webpack_require__(347);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_vue_router__ = __webpack_require__(348);
 
 
 
@@ -4462,7 +4605,7 @@ __WEBPACK_IMPORTED_MODULE_0_vue__["a" /* default */].use(__WEBPACK_IMPORTED_MODU
 
 function load(component) {
   return function () {
-    return __webpack_require__(348)("./" + component + '.vue');
+    return __webpack_require__(349)("./" + component + '.vue');
   };
 }
 
@@ -4475,36 +4618,36 @@ function load(component) {
 
 /***/ }),
 
-/***/ 348:
+/***/ 349:
 /***/ (function(module, exports, __webpack_require__) {
 
 var map = {
 	"./Error404.vue": [
-		373,
+		375,
 		6
 	],
 	"./Hello.vue": [
-		374,
+		376,
 		5
 	],
 	"./Index.vue": [
-		375,
+		377,
 		1
 	],
 	"./Listo.vue": [
-		376,
+		378,
 		0
 	],
 	"./Login.vue": [
-		377,
+		379,
 		3
 	],
 	"./QuasarSplash.vue": [
-		378,
+		380,
 		4
 	],
 	"./Register.vue": [
-		379,
+		381,
 		2
 	]
 };
@@ -4519,7 +4662,7 @@ function webpackAsyncContext(req) {
 webpackAsyncContext.keys = function webpackAsyncContextKeys() {
 	return Object.keys(map);
 };
-webpackAsyncContext.id = 348;
+webpackAsyncContext.id = 349;
 module.exports = webpackAsyncContext;
 
 /***/ }),
@@ -4572,13 +4715,13 @@ function setDefaultItemValues(item) {
 
 /***/ }),
 
-/***/ 356:
+/***/ 357:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_babel_runtime_helpers_classCallCheck__ = __webpack_require__(357);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_babel_runtime_helpers_classCallCheck__ = __webpack_require__(358);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_babel_runtime_helpers_classCallCheck___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_babel_runtime_helpers_classCallCheck__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_babel_runtime_helpers_createClass__ = __webpack_require__(358);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_babel_runtime_helpers_createClass__ = __webpack_require__(359);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_babel_runtime_helpers_createClass___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_babel_runtime_helpers_createClass__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_quasar__ = __webpack_require__(20);
 
@@ -4836,16 +4979,16 @@ var _class = function () {
 
 /***/ }),
 
-/***/ 362:
+/***/ 363:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_flatpickr__ = __webpack_require__(363);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_flatpickr__ = __webpack_require__(364);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_flatpickr___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_flatpickr__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__config_flatPickrOptions_js__ = __webpack_require__(122);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_autosize__ = __webpack_require__(121);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_autosize___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_autosize__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_autosize_input__ = __webpack_require__(364);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_autosize_input__ = __webpack_require__(365);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_autosize_input___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_3_autosize_input__);
 
 
@@ -4914,17 +5057,17 @@ var _class = function () {
 
 /***/ }),
 
-/***/ 366:
+/***/ 367:
 /***/ (function(module, exports, __webpack_require__) {
 
 function injectStyle (ssrContext) {
-  __webpack_require__(367)
+  __webpack_require__(368)
 }
 var Component = __webpack_require__(118)(
   /* script */
-  __webpack_require__(368),
-  /* template */
   __webpack_require__(369),
+  /* template */
+  __webpack_require__(370),
   /* styles */
   injectStyle,
   /* scopeId */
@@ -4938,14 +5081,14 @@ module.exports = Component.exports
 
 /***/ }),
 
-/***/ 367:
+/***/ 368:
 /***/ (function(module, exports) {
 
 // removed by extract-text-webpack-plugin
 
 /***/ }),
 
-/***/ 368:
+/***/ 369:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -4955,7 +5098,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
 /***/ }),
 
-/***/ 369:
+/***/ 370:
 /***/ (function(module, exports) {
 
 module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
@@ -4968,7 +5111,37 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
 
 /***/ }),
 
-/***/ 370:
+/***/ 371:
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony default export */ __webpack_exports__["a"] = ({
+    logEvent: function logEvent(category, action, label) {
+        var sessionId = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 0;
+
+        dataLayer.push({
+            'appEventCategory': category,
+            'appEventAction': action,
+            'appEventLabel': label,
+            'sessionId': sessionId
+        });
+        dataLayer.push({ 'event': 'appEvent' });
+    },
+    logPage: function logPage(path, name) {
+        var sessionId = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0;
+
+        dataLayer.push({
+            'screenPath': path,
+            'screenName': name,
+            'sessionId': sessionId
+        });
+        dataLayer.push({ 'event': 'appScreenView' });
+    }
+});
+
+/***/ }),
+
+/***/ 372:
 /***/ (function(module, exports) {
 
 // removed by extract-text-webpack-plugin

@@ -134,8 +134,17 @@ class CardController extends Controller
      */
     public function update(Request $request, $id)
     {
-        Item::findOrFail($id)->update(request()->all());
-        return response()->json($request->all());
+        $payload = request()->all();
+        Item::findOrFail($id)->update($payload);
+        return response()->json($payload);
+    }
+    public function bulk_patch_items(Request $request) // needs to be an array
+    {
+        $payload = request()->all();
+        foreach ($payload as $item) {
+            Item::findOrFail($item['id'])->update($item);
+        }
+        return response()->json($payload);
     }
 
     /**
@@ -149,5 +158,15 @@ class CardController extends Controller
         $item = Item::findOrFail($id);
         $item->users()->detach(auth()->id());
         $item->delete();
+    }
+    public function bulk_destroy(Request $request)
+    {
+        $payload = request()->all();
+        foreach ($payload as $id)
+        {
+            $item = Item::findOrFail($id);
+            $item->users()->detach(auth()->id());
+            $item->delete();
+        }
     }
 }

@@ -132,7 +132,7 @@ export default {
     width: 100%;
 }
 .l-children .l-children{
-    margin-left: 2em;
+    margin-left: 1.8rem;
 }
 .c-item-card{
     width: 100%;

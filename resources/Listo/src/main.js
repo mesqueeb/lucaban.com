@@ -77,7 +77,6 @@ import ListStore from './store/store.js'
 window.store = new Vuex.Store(ListStore());
 
 import ItemComputedProperties from './store/ItemComputedProperties.js'
-
 window.itemGetters = {};
 Object.keys(store.state.nodes).forEach(id => {
     itemGetters[id] = new Vue({
@@ -90,6 +89,8 @@ Object.keys(store.state.nodes).forEach(id => {
     });
 });
 // console.log(itemGetters);
+import itemsByTag from './store/itemsByTag.js'
+window.itemsByTag = itemsByTag;
 
 // 4.
 import Vuelidate from 'vuelidate'
@@ -115,8 +116,9 @@ window.vm = new Vue({
 });
 
 // G.A. Google Analytics
+import ga from './config/analytics.js'
 router.afterEach((to, from) => {
-    ga.logPage(to.path, to.name, sessionId)
+    ga.logPage(to.path, to.name, store.getters['user/id'])
 })
 // CSS
 // import * from './css/index.scss'
