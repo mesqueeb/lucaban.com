@@ -1121,11 +1121,7 @@ function flattenTree(array) {
 			return 0;
 		}
 		var item = this.item;
-		if (!item.parent_id) {
-			return 0;
-		}
-		var parent = store.state.nodes[item.parent_id];
-		if (!parent) {
+		if (!item.parent_id || item.parent_id == store.state.root.id || !store.state.nodes[item.parent_id] || !itemGetters[item.parent_id]) {
 			return 0;
 		}
 		return itemGetters[item.parent_id].relativeDepth + 1;

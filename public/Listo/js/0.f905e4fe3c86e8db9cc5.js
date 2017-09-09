@@ -467,8 +467,9 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 		},
 		style: function style() {
 			var d = itemGetters[this.item.id].relativeDepth;
-			var x = d ? d * 1.8 : 0;
-			var s = 'width: calc(100vw - 2rem) !important;\n\t\t\t\t\t margin-left: -' + x + 'rem !important;';
+			var x = d && d > 0 ? d * 1.8 : 0;
+			x = x + 1;
+			var s = 'width: 100vw !important;\n\t\t\t\t\t margin-left: -' + x + 'rem !important;';
 			return this.get.mobile ? s : '';
 		}
 	},

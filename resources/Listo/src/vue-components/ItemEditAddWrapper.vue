@@ -86,8 +86,9 @@ export default {
 		style()
 		{
 			let d = itemGetters[this.item.id].relativeDepth;
-			let x = (d) ? d*1.8 : 0;
-			let s = `width: calc(100vw - 2rem) !important;
+			let x = (d && d>0) ? d*1.8 : 0;
+				x = x+1;
+			let s = `width: 100vw !important;
 					 margin-left: -${x}rem !important;`
 			return (this.get.mobile) ? s : '';
 		},

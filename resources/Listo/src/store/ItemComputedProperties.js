@@ -347,9 +347,10 @@ relativeDepth()
 {
 	if (this.isTopLvlItemInFilteredRoot){ return 0 }
 	let item = this.item;
-	if (!item.parent_id){ return 0 }
-	let parent = store.state.nodes[item.parent_id];
-	if (!parent){ return 0 }
+	if (!item.parent_id
+		|| item.parent_id == store.state.root.id
+		|| !store.state.nodes[item.parent_id]
+		|| !itemGetters[item.parent_id]){ return 0 }
 	return itemGetters[item.parent_id].relativeDepth + 1;
 },
 hasParentDueToday()
