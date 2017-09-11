@@ -11,11 +11,11 @@ const { mix } = require('laravel-mix');
  */
 
 mix
-   .copyDirectory('resources/Listo/dist/js', 'public/js')
-   .copyDirectory('resources/Listo/dist/img', 'public/img')
-   .copyDirectory('resources/Listo/dist/fonts', 'public/fonts')
-   .copyDirectory('resources/Listo/dist/statics', 'public/statics')
-   .copyDirectory('resources/Listo/dist/', 'public/Listo')
+   // .copyDirectory('resources/Listo/dist/js', 'public/js')
+   // .copyDirectory('resources/Listo/dist/img', 'public/img')
+   // .copyDirectory('resources/Listo/dist/fonts', 'public/fonts')
+   // .copyDirectory('resources/Listo/dist/statics', 'public/statics')
+   // .copyDirectory('resources/Listo/dist/', 'public/Listo')
 
    // Copy MATERIAL FONT
    // .copy('node_modules/material-design-iconic-font/dist/fonts', 'public/css/fonts')

@@ -24,3 +24,11 @@ resources/assets/js/.DS_Store
 /resources/Listo/ngrok
 
 resources/Listo/node_modules/.bin/jsesc
+
+/pwas/Listo/.DS_Store
+/pwas/Listo/.thumbs.db
+/pwas/Listo/node_modules/
+/pwas/Listo/dist/
+/pwas/Listo/npm-debug.log*
+/pwas/Listo/cordova/platforms
+/pwas/Listo/cordova/plugins
