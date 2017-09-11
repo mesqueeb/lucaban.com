@@ -177,7 +177,6 @@ return [
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
         Conner\Tagging\Providers\TaggingServiceProvider::class,
-        GeneaLabs\LaravelCaffeine\Providers\LaravelCaffeineService::class,
         Mcamara\LaravelLocalization\LaravelLocalizationServiceProvider::class,
         // Laravel\Passport\PassportServiceProvider::class,
         // →　Tried passport but then replaced with JWT
