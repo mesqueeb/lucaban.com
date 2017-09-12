@@ -17,6 +17,16 @@ Route::domain('api'.env('SESSION_DOMAIN'))
 		Route::options('items','CORSHelperController@handleCORS');
 		Route::options('refreshToken','CORSHelperController@handleCORS');
 });
+// Cors patches
+// Route::domain(substr(env('SESSION_DOMAIN'), 1))
+Route::prefix('api')
+	->group(function () {
+		Route::options('auth','CORSHelperController@handleCORS');
+		Route::options('register','CORSHelperController@handleCORS');
+		Route::options('logout','CORSHelperController@handleCORS');
+		Route::options('items','CORSHelperController@handleCORS');
+		Route::options('refreshToken','CORSHelperController@handleCORS');
+});
 
 Route::domain('listo'.env('SESSION_DOMAIN'))
 	->get('/', 'ViewController@listo')
