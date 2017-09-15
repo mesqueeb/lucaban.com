@@ -25,7 +25,11 @@ class ResetPasswordController extends Controller
      *
      * @var string
      */
-    protected $redirectTo = '/';
+    protected function redirectTo()
+    {
+        // dd(config('APP_ENV'));
+        return redirect(env('APP_SCHEME').'listo.'.env('APP_URLBASE'));
+    }
 
     /**
      * Create a new controller instance.

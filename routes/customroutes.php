@@ -1,6 +1,5 @@
 <?php
-
-Route::domain('api'.env('SESSION_DOMAIN'))
+Route::domain('api.'.env('APP_URLBASE'))
 	->middleware(['cors','api'])
 	->group(function () {
 		Route::post('auth','AuthenticateController@login');
@@ -9,7 +8,7 @@ Route::domain('api'.env('SESSION_DOMAIN'))
 		Route::post('refreshToken','AuthenticateController@refreshToken');
 });
 // Cors patches
-Route::domain('api'.env('SESSION_DOMAIN'))
+Route::domain('api.'.env('APP_URLBASE'))
 	->group(function () {
 		Route::options('auth','CORSHelperController@handleCORS');
 		Route::options('register','CORSHelperController@handleCORS');
@@ -18,7 +17,6 @@ Route::domain('api'.env('SESSION_DOMAIN'))
 		Route::options('refreshToken','CORSHelperController@handleCORS');
 });
 // Cors patches
-// Route::domain(substr(env('SESSION_DOMAIN'), 1))
 Route::prefix('api')
 	->group(function () {
 		Route::options('auth','CORSHelperController@handleCORS');
@@ -28,7 +26,12 @@ Route::prefix('api')
 		Route::options('refreshToken','CORSHelperController@handleCORS');
 });
 
-Route::domain('listo'.env('SESSION_DOMAIN'))
-	->get('/', 'ViewController@listo')
-	->name('listo.index');
+// Route::get('listo', function () {
+//     return redirect('');
+// });
+Route::domain('listo.'.env('APP_URLBASE'))
+->get('/', function () {
+	return redirect(env('APP_SCHEME').'listo.'.env('APP_URLBASE'));
+})->name('listo');
+	// ->get('/', 'ViewController@listo')
 	// ->middleware(['web'])

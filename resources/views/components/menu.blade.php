@@ -32,7 +32,7 @@
 {{--         @if (Route::has('login'))
             @if (Auth::check())
                 <li class="nav-item">
-                    <a class="nav-link" href="{{ route('listo.index') }}">
+                    <a class="nav-link" href="{{ route('listo') }}">
                         @lang("My :app", ['app' => config('app.name')])
                     </a>
                 </li>

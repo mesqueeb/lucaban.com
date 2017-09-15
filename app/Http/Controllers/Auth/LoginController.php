@@ -34,7 +34,7 @@ class LoginController extends Controller
      */
     public function __construct()
     {
-        $this->redirectTo = route('listo.index');
+        $this->redirectTo = route('listo');
         $this->middleware('guest', ['except' => 'logout']);
     }
 }

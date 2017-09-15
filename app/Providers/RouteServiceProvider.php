@@ -51,14 +51,14 @@ class RouteServiceProvider extends ServiceProvider
      */
     protected function mapWebRoutes()
     {
-        Route::domain(substr(env('SESSION_DOMAIN'),1))
+        Route::domain(env('APP_URLBASE'))
             ->middleware('web')
             ->namespace($this->namespace)
             ->group(base_path('routes/web.php'));
     }
     protected function mapWWWRoutes()
     {
-        Route::domain('www'.env('SESSION_DOMAIN'))
+        Route::domain('www.'.env('APP_URLBASE'))
             ->middleware('web')
             ->namespace($this->namespace)
             ->group(base_path('routes/web.php'));
@@ -77,7 +77,7 @@ class RouteServiceProvider extends ServiceProvider
      */
     protected function mapApiRoutesJWTAuth()
     {
-            Route::domain('api'.env('SESSION_DOMAIN'))
+            Route::domain('api.'.env('APP_URLBASE'))
             ->namespace($this->namespace)
             ->middleware(['api', 'jwt.auth', 'cors'])
             ->group(base_path('routes/api.php'));
