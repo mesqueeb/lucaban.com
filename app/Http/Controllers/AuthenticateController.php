@@ -10,7 +10,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Support\Facades\Validator;
 use App\User;
-
+use App;
+use Lang;
 
 class AuthenticateController extends Controller
 {
@@ -20,15 +21,15 @@ class AuthenticateController extends Controller
 	}
     public function login(Request $request)
     {
-		// return 'ha';
-		// dd('ha');
+        App::setLocale($request->locale);
         // grab credentials from the request
         $credentials = $request->only('email', 'password');
         try
         { // attempt to verify the credentials and create a token for the user
             if (! $token = JWTAuth::attempt($credentials))
             {
-                return response()->json(['error' => 'invalid_credentials'], 401);
+                $err = Lang::get('auth.failed');
+                return response()->json(['error' => $err], 401);
             }
         }
         catch (JWTException $e)
@@ -60,6 +61,7 @@ class AuthenticateController extends Controller
      */
     public function register(Request $request)
     {
+        App::setLocale($request->locale);
         // grab credentials from the request
         $credentials = $request->only('email', 'password', 'password_confirmation', 'name');
         $this->validator($credentials)->validate();
