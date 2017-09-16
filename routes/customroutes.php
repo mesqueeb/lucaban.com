@@ -26,12 +26,7 @@ Route::prefix('api')
 		Route::options('refreshToken','CORSHelperController@handleCORS');
 });
 
-// Route::get('listo', function () {
-//     return redirect('');
-// });
 Route::domain('listo.'.env('APP_URLBASE'))
 ->get('/', function () {
 	return redirect(env('APP_SCHEME').'listo.'.env('APP_URLBASE'));
 })->name('listo');
-	// ->get('/', 'ViewController@listo')
-	// ->middleware(['web'])

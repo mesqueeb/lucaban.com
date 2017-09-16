@@ -3,7 +3,11 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
+use JWTAuth;
+use App\User;
+
 
 class LoginController extends Controller
 {
@@ -25,7 +29,18 @@ class LoginController extends Controller
      *
      * @var string
      */
-    protected $redirectTo = '/';
+    protected function authenticated(Request $request, User $user){
+        $token = JWTAuth::fromUser($user);
+        $domain = env('APP_SCHEME').'listo.'.env('APP_URLBASE');
+        return redirect($domain.'?token='.$token)
+            // Cookie not recognized on the subdomain...
+            ->cookie(
+                'access_token', $token, 100, null, $domain, true, true
+            );
+    }
+    // protected function redirectTo()
+    // {
+    // }
 
     /**
      * Create a new controller instance.
@@ -34,7 +49,7 @@ class LoginController extends Controller
      */
     public function __construct()
     {
-        $this->redirectTo = route('listo');
+        // $this->redirectTo = route('listo');
         $this->middleware('guest', ['except' => 'logout']);
     }
 }

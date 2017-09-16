@@ -10,7 +10,7 @@
     <p>
         <a class="btn btn-lg btn-outline"
             role="button"
-            href="http://listo.lucaban.com"
+            href="{{ env('APP_SCHEME').'listo.'.env('APP_URLBASE') }}"
         >
             @lang("Try it out")
         </a>
@@ -42,7 +42,7 @@
             <p>
                 <a class="btn btn-lg btn-success"
                     role="button"
-                    href="http://listo.lucaban.com"
+                    href="{{ env('APP_SCHEME').'listo.'.env('APP_URLBASE') }}"
                 >
                     @lang("Try it out now")
                 </a>

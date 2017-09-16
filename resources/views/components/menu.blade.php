@@ -5,7 +5,7 @@
         </li>
  --}}
         <li class="nav-item">
-            <a class="nav-link" href="http://listo.lucaban.com">
+            <a class="nav-link" href="{{ env('APP_SCHEME').'listo.'.env('APP_URLBASE') }}">
                 @lang("My :app", ['app' => config('app.name')])
             </a>
         </li>

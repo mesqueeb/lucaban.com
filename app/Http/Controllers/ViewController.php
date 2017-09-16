@@ -20,12 +20,6 @@ class viewController extends Controller
 
         return view('items.index');
     }
-    public function listo()
-    {
-        // return view('listo');
-        // return \View::make('listo');
-        return \File::get(public_path() . '/listo.html');
-    }
     public function controlPanel()
     {
     	return view('userarea.controlpanel');
