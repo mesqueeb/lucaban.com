@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\ResetsPasswords;
 use App\User;
+use Auth;
 use JWTAuth;
 
 class ResetPasswordController extends Controller
@@ -28,24 +29,25 @@ class ResetPasswordController extends Controller
      *
      * @var string
      */
-    protected function authenticated(Request $request, User $user){
-        $token = JWTAuth::fromUser($user);
-        $domain = env('APP_SCHEME').'listo.'.env('APP_URLBASE');
-        return redirect($domain.'?token='.$token)
-            // Cookie not recognized on the subdomain...
-            ->cookie(
-                'access_token', $token, 100, null, $domain, true, true
-            );
-    }
-    // protected function redirectTo()
-    // {
-    //     $user = User::where('email',request()->input('email'))->first();
+    // protected function authenticated(Request $request, User $user){
+    //     dd($user->email);
     //     $token = JWTAuth::fromUser($user);
-    //     return redirect(env('APP_SCHEME').'listo.'.env('APP_URLBASE'))
+    //     $domain = env('APP_SCHEME').'listo.'.env('APP_URLBASE');
+    //     return redirect($domain.'?token='.$token)
+    //         // Cookie not recognized on the subdomain...
     //         ->cookie(
-    //             'access_token', $token, 100, null, null, true, true
+    //             'access_token', $token, 100, null, $domain, true, true
     //         );
     // }
+    protected function redirectTo()
+    {
+        $user = Auth::user();
+        $token = JWTAuth::fromUser($user);
+        $domain = env('APP_SCHEME').'listo.'.env('APP_URLBASE');
+        $redirectUrl = $domain.'?token='.$token;
+        // return redirect($redirectUrl);
+        return $redirectUrl;
+    }
 
     /**
      * Create a new controller instance.
