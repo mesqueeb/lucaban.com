@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Support\Facades\Validator;
 use App\User;
+use App\UserSettings;
 use App;
 use Lang;
 
@@ -114,6 +115,7 @@ class AuthenticateController extends Controller
 	    {
 	        return response()->json(['token_absent'], $e->getStatusCode());
 	    } // the token is valid and we have found the user via the sub claim
-	    return response()->json(compact('user'));
+        $userSettings = UserSettings::where('user_id', $user->id)->first();
+	    return response()->json(compact(['user', 'userSettings']));
 	}
 }

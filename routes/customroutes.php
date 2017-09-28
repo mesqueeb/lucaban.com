@@ -14,15 +14,7 @@ Route::domain('api.'.env('APP_URLBASE'))
 		Route::options('register','CORSHelperController@handleCORS');
 		Route::options('logout','CORSHelperController@handleCORS');
 		Route::options('items','CORSHelperController@handleCORS');
-		Route::options('refreshToken','CORSHelperController@handleCORS');
-});
-// Cors patches
-Route::prefix('api')
-	->group(function () {
-		Route::options('auth','CORSHelperController@handleCORS');
-		Route::options('register','CORSHelperController@handleCORS');
-		Route::options('logout','CORSHelperController@handleCORS');
-		Route::options('items','CORSHelperController@handleCORS');
+		Route::options('userSettings','CORSHelperController@handleCORS');
 		Route::options('refreshToken','CORSHelperController@handleCORS');
 });
 

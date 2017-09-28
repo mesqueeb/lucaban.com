@@ -14,6 +14,8 @@ use Illuminate\Http\Request;
 
 Route::get('user','AuthenticateController@getAuthenticatedUser');
 
+Route::resource('userSettings','UserSettingsController');
+
 Route::patch('items/bulkPatch','CardController@bulk_patch_items');
 Route::patch('items/bulkDestroy','CardController@bulk_destroy');
 Route::get('items/fetchdone','CardController@getDone');
