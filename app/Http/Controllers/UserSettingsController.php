@@ -63,7 +63,7 @@ class UserSettingsController extends Controller
         if (!$userSettings)
         {
             $userSettings = new UserSettings;
-            $userSettings->user_id = $request->user_id;
+            $userSettings->user_id = $user->user_id;
         }
         foreach ($request->all() as $key => $value)
         {
