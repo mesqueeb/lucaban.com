@@ -58,12 +58,11 @@ class UserSettingsController extends Controller
         {
             return response()->json(['token_absent'], $e->getStatusCode());
         } // the token is valid and we have found the user via the sub claim
-
         $userSettings = UserSettings::where('user_id', $user->id)->first();
         if (!$userSettings)
         {
             $userSettings = new UserSettings;
-            $userSettings->user_id = $user->user_id;
+            $userSettings->user_id = $user->id;
         }
         foreach ($request->all() as $key => $value)
         {
