@@ -4,6 +4,9 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\UserSettings;
+use JWTAuth;
+// use Tymon\JWTAuth\Exceptions\JWTException;
+
 
 class UserSettingsController extends Controller
 {
@@ -35,19 +38,36 @@ class UserSettingsController extends Controller
      */
     public function store(Request $request)
     {
-        $userSettings = UserSettings::where('user_id', $request->user_id)->first();
+        // Get authenticated user:
+        try
+        {
+            if (! $user = JWTAuth::parseToken()->authenticate())
+            {
+                return response()->json(['user_not_found'], 404);
+            }
+        }
+        catch (Tymon\JWTAuth\Exceptions\TokenExpiredException $e)
+        {
+            return response()->json(['token_expired'], $e->getStatusCode());
+        }
+        catch (Tymon\JWTAuth\Exceptions\TokenInvalidException $e)
+        {
+            return response()->json(['token_invalid'], $e->getStatusCode());
+        }
+        catch (Tymon\JWTAuth\Exceptions\JWTException $e)
+        {
+            return response()->json(['token_absent'], $e->getStatusCode());
+        } // the token is valid and we have found the user via the sub claim
+
+        $userSettings = UserSettings::where('user_id', $user->id)->first();
         if (!$userSettings)
         {
             $userSettings = new UserSettings;
             $userSettings->user_id = $request->user_id;
         }
-        if ($request->planned_time != null)
+        foreach ($request->all() as $key => $value)
         {
-            $userSettings->planned_time = $request->planned_time;
-        }
-        if ($request->lang != null)
-        {
-            $userSettings->lang = $request->lang;
+            $userSettings->$key = $value;
         }
         $userSettings->save();
         return $userSettings;
