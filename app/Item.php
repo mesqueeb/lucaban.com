@@ -60,7 +60,12 @@ class Item extends Model
 	    unset($item['children']);
 	    unset($item['children_order']);
 	   	$item->save();
-
+	   	// Tag the item
+        foreach ($itemData['tagged'] as $tagObj)
+        {
+            $item->tag($tagObj['tag_name']);
+        }
+        // attach the children
 	    $children = [];
 	    if(!empty($itemData['children'])){
 		    foreach($itemData['children'] as $child){
@@ -72,6 +77,8 @@ class Item extends Model
 	   	$item->save();
 	   	$item->users()->attach($userid);
 	   	$item['children'] = $children;
+	   	$item['tempId'] = $itemData['id'];
+	   	$item['tagged'] = $itemData['tagged'];
 	    return $item;
 	}
 

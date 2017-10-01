@@ -20,8 +20,6 @@ class CardController extends Controller
      */
     public function __construct(Request $request)
     {
-        // return auth()->user();
-        // dd(auth()->user());
     }
 
     /**
@@ -31,17 +29,7 @@ class CardController extends Controller
      */
     public function index(Request $request)
     {
-        // dd(auth()->user());
-        // dd([
-            // auth()->id(),
-            // $request->id,
-            // Item::UserItems()->get()->count(),
-            // User::UserItems()->get()->count(),
-            // User::find(auth()->id())->items()->count()
-            // Item::UserItems()->where('created_by','!=',1)->get()->count(),
-            // User::find(auth()->id())->items()->where('created_by','!=',1)->get()->count(),
-        // ]);
-        $userId = (!$request->id) ? auth()->id() : $request->id ;
+        $userId = auth()->id();
         $god = User::find($userId)->items()
             ->where('parent_id',NULL)
             ->where('created_by',$userId)
